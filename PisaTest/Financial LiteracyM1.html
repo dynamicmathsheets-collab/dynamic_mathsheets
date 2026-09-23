@@ -1,0 +1,1351 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>แบบจำลองการสอบตามแนว Pisa สำหรับนักเรียน ชั้นมัธยมปีที่ 1</title>
+    <!-- โมเดล AI ตรวจจับบุคคล -->
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@3.21.0/dist/tf.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/coco-ssd@2.2.2/dist/coco-ssd.min.js"></script>
+    <style>
+        :root {
+            --pisa-navy: #0f172a;
+            --pisa-blue: #1d4ed8;
+            --pisa-cyan: #38bdf8;
+            --pisa-bg: #f8fafc;
+            --pisa-card: #ffffff;
+            --pisa-border: #e2e8f0;
+            --pisa-text: #1e293b;
+            --pisa-muted: #64748b;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --success: #10b981;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Sarabun', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            -webkit-user-select: none;
+            user-select: none;
+        }
+
+        input {
+            -webkit-user-select: auto;
+            user-select: auto;
+        }
+
+        body {
+            background-color: var(--pisa-bg);
+            color: var(--pisa-text);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        header.pisa-topbar {
+            background-color: var(--pisa-navy);
+            color: #ffffff;
+            padding: 12px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.15);
+        }
+
+        .pisa-brand-text {
+            font-size: 15px;
+            font-weight: 700;
+            letter-spacing: 0.3px;
+            color: #ffffff;
+        }
+
+        .pisa-cluster-badge {
+            background: rgba(56, 189, 248, 0.2);
+            border: 1px solid #38bdf8;
+            color: #38bdf8;
+            font-size: 11px;
+            font-weight: 700;
+            padding: 2px 8px;
+            border-radius: 9999px;
+            margin-left: 8px;
+        }
+
+        .pisa-timer-badge {
+            background: rgba(15, 23, 42, 0.8);
+            border: 1px solid rgba(255,255,255,0.2);
+            color: #ffffff;
+            padding: 4px 12px;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .pisa-timer-time {
+            font-size: 15px;
+            font-weight: 800;
+            color: #38bdf8;
+            font-family: monospace;
+        }
+
+        .anticheat-bar {
+            background: #fef2f2;
+            border-bottom: 1px solid #fecaca;
+            color: #991b1b;
+            padding: 8px 24px;
+            display: none;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .warning-chips {
+            display: flex;
+            gap: 6px;
+        }
+
+        .strike-pill {
+            padding: 2px 8px;
+            border-radius: 4px;
+            background: #fee2e2;
+            border: 1px solid #ef4444;
+            color: #b91c1c;
+            font-size: 11px;
+        }
+
+        .strike-pill.active {
+            background: #ef4444;
+            color: white;
+            font-weight: bold;
+        }
+
+        main.pisa-workspace {
+            flex: 1;
+            max-width: 1400px;
+            width: 100%;
+            margin: 16px auto;
+            padding: 0 20px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .page-view {
+            display: none;
+            width: 100%;
+        }
+
+        .page-view.active {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .center-card-wrap {
+            max-width: 600px;
+            margin: 30px auto;
+            background: #ffffff;
+            border: 1px solid var(--pisa-border);
+            border-radius: 14px;
+            padding: 32px;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.05);
+            width: 100%;
+        }
+
+        .form-group {
+            margin-bottom: 18px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .form-group label {
+            font-size: 14px;
+            font-weight: 600;
+            color: #334155;
+        }
+
+        .form-group input {
+            padding: 12px 14px;
+            border-radius: 8px;
+            border: 1.5px solid #cbd5e1;
+            font-size: 15px;
+            outline: none;
+        }
+
+        .form-group input:focus {
+            border-color: var(--pisa-blue);
+        }
+
+        .btn-primary {
+            background: var(--pisa-blue);
+            color: #ffffff;
+            border: none;
+            border-radius: 8px;
+            padding: 14px 20px;
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+            width: 100%;
+            transition: background 0.2s;
+        }
+
+        .btn-primary:hover {
+            background: #1e40af;
+        }
+
+        .btn-primary:disabled {
+            background: #94a3b8;
+            cursor: not-allowed;
+        }
+
+        .camera-container {
+            position: relative;
+            width: 100%;
+            max-width: 480px;
+            height: 320px;
+            margin: 0 auto 16px;
+            background: #000;
+            border-radius: 12px;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #cameraFeed {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .scan-overlay-guide {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            right: 10px;
+            background: rgba(0,0,0,0.7);
+            color: white;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            text-align: center;
+            transition: background-color 0.2s;
+        }
+
+        .angle-progress-bar {
+            height: 10px;
+            background: #e2e8f0;
+            border-radius: 999px;
+            overflow: hidden;
+            margin: 10px 0;
+        }
+
+        .angle-progress-fill {
+            height: 100%;
+            width: 0%;
+            background: var(--success);
+            transition: width 0.2s;
+        }
+
+        .pisa-split-card {
+            display: grid;
+            grid-template-columns: 1.15fr 0.85fr;
+            gap: 20px;
+        }
+
+        @media (max-width: 960px) {
+            .pisa-split-card {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .pisa-pane {
+            background: #ffffff;
+            border: 1px solid var(--pisa-border);
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+
+        .scenario-tag {
+            display: inline-flex;
+            background: #eff6ff;
+            color: #1d4ed8;
+            border: 1px solid #bfdbfe;
+            padding: 3px 10px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 700;
+            width: fit-content;
+        }
+
+        .scenario-title {
+            font-size: 17px;
+            font-weight: 800;
+            color: #0f172a;
+        }
+
+        .scenario-text {
+            font-size: 14px;
+            line-height: 1.6;
+            color: #334155;
+        }
+
+        .svg-container {
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 10px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .note-callout {
+            background: #f8fafc;
+            border-left: 4px solid var(--pisa-blue);
+            padding: 10px 12px;
+            font-size: 12px;
+            color: #475569;
+            margin-top: auto;
+        }
+
+        .option-box {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: #ffffff;
+            border: 1.5px solid #cbd5e1;
+            border-radius: 8px;
+            padding: 12px 16px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+
+        .option-box:hover {
+            background: #f8fafc;
+        }
+
+        .option-box.selected {
+            border-color: var(--pisa-blue);
+            background-color: #eff6ff;
+            font-weight: 600;
+        }
+
+        .custom-radio {
+            width: 18px;
+            height: 18px;
+            border: 2px solid #94a3b8;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .option-box.selected .custom-radio {
+            border-color: var(--pisa-blue);
+            background-color: var(--pisa-blue);
+        }
+
+        .option-box.selected .custom-radio::after {
+            content: "";
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: #ffffff;
+        }
+
+        footer.pisa-bottombar {
+            background: #ffffff;
+            border-top: 1px solid #e2e8f0;
+            padding: 10px 24px;
+            position: sticky;
+            bottom: 0;
+            z-index: 100;
+        }
+
+        .pisa-bottom-inner {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .pisa-palette {
+            display: flex;
+            gap: 5px;
+            flex-wrap: wrap;
+        }
+
+        .p-btn {
+            width: 32px;
+            height: 32px;
+            border: 1px solid #cbd5e1;
+            background: #ffffff;
+            font-size: 12px;
+            font-weight: 700;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        .p-btn.active {
+            background: var(--pisa-blue);
+            color: white;
+            border-color: var(--pisa-blue);
+        }
+
+        .p-btn.answered {
+            background: #eff6ff;
+            border-color: #93c5fd;
+            color: #1e40af;
+        }
+
+        .btn-nav {
+            padding: 8px 18px;
+            font-size: 14px;
+            font-weight: 700;
+            border-radius: 6px;
+            cursor: pointer;
+            border: none;
+        }
+
+        .btn-back { background: #f1f5f9; color: #475569; }
+        .btn-forward { background: #2563eb; color: white; }
+        .btn-submit-exam { background: #16a34a; color: white; display: none; }
+
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(15, 23, 42, 0.85);
+            z-index: 999;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .modal-alert-card {
+            background: white;
+            border-radius: 12px;
+            padding: 28px;
+            max-width: 460px;
+            width: 100%;
+            text-align: center;
+            box-shadow: 0 20px 25px rgba(0,0,0,0.3);
+        }
+
+        .review-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+            margin-top: 14px;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            border: 1px solid #e2e8f0;
+        }
+
+        .review-table th, .review-table td {
+            padding: 10px 12px;
+            border: 1px solid #e2e8f0;
+            text-align: left;
+        }
+
+        .review-table th {
+            background: #f8fafc;
+            color: #334155;
+        }
+    </style>
+</head>
+<body>
+
+    <header class="pisa-topbar">
+        <div style="display: flex; align-items: center;">
+            <span class="pisa-brand-text">แบบจำลองการสอบตามแนว Pisa สำหรับนักเรียน ชั้นมัธยมปีที่ 1</span>
+            <span class="pisa-cluster-badge">ม.1 FINANCIAL LITERACY</span>
+        </div>
+        <div class="pisa-timer-badge" id="timerContainer" style="visibility: hidden;">
+            เวลาที่เหลือ: <span class="pisa-timer-time" id="timerClock">30:00</span>
+        </div>
+    </header>
+
+    <div class="anticheat-bar" id="antiCheatBar">
+        <span>🛡️ ระบบป้องกันการทุจริตเปิดทำงาน: ห้ามสลับแท็บ / ห้ามย่อจอ / ห้ามใช้คีย์ลัด / ห้ามแคปหน้าจอ</span>
+        <div style="display: flex; align-items: center; gap: 8px;">
+            <span>โควตาทำผิดกฎ:</span>
+            <div class="warning-chips">
+                <span class="strike-pill" id="strike-1">ครั้งที่ 1</span>
+                <span class="strike-pill" id="strike-2">ครั้งที่ 2</span>
+                <span class="strike-pill" id="strike-3">ครั้งที่ 3</span>
+            </div>
+        </div>
+    </div>
+
+    <main class="pisa-workspace">
+
+        <!-- PAGE 1: ข้อมูลผู้เข้าสอบ -->
+        <div class="page-view active" id="page-1">
+            <div class="center-card-wrap">
+                <h2 style="font-size: 18px; margin-bottom: 8px; color: #0f172a;">กรอกข้อมูลประจำตัวผู้เข้าสอบ</h2>
+                <p style="font-size: 13px; color: #64748b; margin-bottom: 20px;">กรุณากรอกข้อมูลจริงให้ครบถ้วนก่อนเข้าสู่ขั้นตอนตรวจสอบสภาพแวดล้อมห้องสอบ</p>
+                
+                <div class="form-group">
+                    <label>ชื่อ - สกุล *</label>
+                    <input type="text" id="inputName" placeholder="เช่น เด็กชายรักเรียน เพียรศึกษา" required>
+                </div>
+                <div class="form-group">
+                    <label>โรงเรียน *</label>
+                    <input type="text" id="inputSchool" placeholder="เช่น โรงเรียนสาธิตศึกษา" required>
+                </div>
+                <div class="form-group">
+                    <label>อีเมล (E-mail) *</label>
+                    <input type="email" id="inputEmail" placeholder="student@school.ac.th" required>
+                </div>
+
+                <button class="btn-primary" onclick="proceedToPage2()">ถัดไป: ตรวจสอบสภาพแวดล้อมห้องสอบ →</button>
+            </div>
+        </div>
+
+        <!-- PAGE 2: ตรวจสอบสภาพแวดล้อม 360 องศา -->
+        <div class="page-view" id="page-2">
+            <div class="center-card-wrap" style="text-align: center;">
+                <h2 style="font-size: 18px; margin-bottom: 6px;">ตรวจสอบสภาพแวดล้อมห้องสอบ (360° Scan)</h2>
+                <p style="font-size: 13px; color: #64748b; margin-bottom: 14px;">
+                    1. ส่องหน้าตัวเอง $\rightarrow$ 2. กดเริ่มและหมุนเครื่องกวาดรอบห้อง (ต้องไม่มีคนอื่น) $\rightarrow$ 3. หมุนกลับมาที่ตัวเอง
+                </p>
+
+                <div class="camera-container">
+                    <video id="cameraFeed" autoplay playsinline muted></video>
+                    <div class="scan-overlay-guide" id="scanGuideText">กำลังเชื่อมต่อกล้องและเปิดโมเดล AI...</div>
+                </div>
+
+                <div style="text-align: left; font-size: 12px; color: #475569;">ความคืบหน้าการหมุนรอบห้อง: <span id="angleText">0°</span> / 360°</div>
+                <div class="angle-progress-bar">
+                    <div class="angle-progress-fill" id="angleProgress"></div>
+                </div>
+
+                <div id="aiStatusText" style="font-size: 13px; color: #0284c7; margin-bottom: 14px; font-weight: bold;">
+                    ⏳ กำลังตรวจจับใบหน้าผู้เข้าสอบ...
+                </div>
+
+                <button class="btn-primary" id="btnStartScan" onclick="startScanningProcess()" disabled>เริ่มหมุนกล้องตรวจสอบ</button>
+            </div>
+        </div>
+
+        <!-- PAGES 3 - 17: ข้อสอบ 1 - 15 -->
+        <div id="examPagesContainer"></div>
+
+        <!-- PAGE 18: สรุปผลคะแนน -->
+        <div class="page-view" id="page-18">
+            <div class="center-card-wrap" style="max-width: 850px;">
+                <div style="text-align: center; margin-bottom: 20px;">
+                    <h2 style="font-size: 22px; color: #0f172a;">สรุปผลการทดสอบสมรรถนะ PISA</h2>
+                    <p style="font-size: 14px; color: #64748b;">คลัสเตอร์: Financial Literacy (มัธยมศึกษาปีที่ 1)</p>
+                </div>
+
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px; background: #f8fafc; padding: 14px; border-radius: 8px; font-size: 13px; margin-bottom: 18px; border: 1px solid #e2e8f0;">
+                    <div><strong>ผู้เข้าสอบ:</strong> <span id="resName">-</span></div>
+                    <div><strong>โรงเรียน:</strong> <span id="resSchool">-</span></div>
+                    <div><strong>อีเมล:</strong> <span id="resEmail">-</span></div>
+                    <div><strong>เวลาส่งคำตอบ:</strong> <span id="resTime">-</span></div>
+                </div>
+
+                <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; text-align: center; margin-bottom: 20px;">
+                    <div style="background: #ecfdf5; border: 1px solid #a7f3d0; padding: 16px; border-radius: 8px;">
+                        <div style="font-size: 12px; color: #065f46; font-weight: bold;">ตอบถูก</div>
+                        <div style="font-size: 28px; font-weight: 800; color: #059669;" id="resCorrect">0</div>
+                        <div style="font-size: 11px; color: #047857;">ข้อ</div>
+                    </div>
+                    <div style="background: #fef2f2; border: 1px solid #fecaca; padding: 16px; border-radius: 8px;">
+                        <div style="font-size: 12px; color: #991b1b; font-weight: bold;">ตอบผิด</div>
+                        <div style="font-size: 28px; font-weight: 800; color: #dc2626;" id="resWrong">0</div>
+                        <div style="font-size: 11px; color: #b91c1c;">ข้อ</div>
+                    </div>
+                    <div style="background: #eff6ff; border: 1px solid #bfdbfe; padding: 16px; border-radius: 8px;">
+                        <div style="font-size: 12px; color: #1e40af; font-weight: bold;">ร้อยละที่ได้</div>
+                        <div style="font-size: 28px; font-weight: 800; color: #2563eb;" id="resPercent">0.00%</div>
+                        <div style="font-size: 11px; color: #1d4ed8;">คะแนนสัมพัทธ์</div>
+                    </div>
+                </div>
+
+                <h3 style="font-size: 15px; margin-bottom: 8px;">ตารางแสดงข้อผิดพลาดและผลการวิเคราะห์รายข้อ</h3>
+                <div style="overflow-x: auto;">
+                    <table class="review-table">
+                        <thead>
+                            <tr>
+                                <th style="width: 60px;">ข้อที่</th>
+                                <th style="width: 120px;">คำตอบของคุณ (SC)</th>
+                                <th style="width: 120px;">เฉลยที่ถูกต้อง (TC)</th>
+                                <th>ผลการประเมินและคำอธิบาย</th>
+                            </tr>
+                        </thead>
+                        <tbody id="reviewTableBody"></tbody>
+                    </table>
+                </div>
+
+                <div style="margin-top: 20px; text-align: center;">
+                    <div id="saveStatus" style="font-size: 13px; color: #059669; margin-bottom: 8px; font-weight: bold;">
+                        ✓ บันทึกข้อมูลและประมวลผลคำตอบเข้าสู่ระบบเรียบร้อยแล้ว
+                    </div>
+                    <button class="btn-primary" style="max-width: 250px;" onclick="window.print()">พิมพ์ / บันทึกผลสอบ PDF</button>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <footer class="pisa-bottombar" id="examFooter" style="display: none;">
+        <div class="pisa-bottom-inner">
+            <button class="btn-nav btn-back" id="btnBack" onclick="navigateQuestion(-1)">← ข้อก่อนหน้า</button>
+            <div class="pisa-palette" id="paletteContainer"></div>
+            <button class="btn-nav btn-forward" id="btnForward" onclick="navigateQuestion(1)">ข้อถัดไป →</button>
+            <button class="btn-nav btn-submit-exam" id="btnSubmitExam" onclick="confirmSubmitExam()">ส่งข้อสอบ</button>
+        </div>
+    </footer>
+
+    <!-- Center Alert Modal -->
+    <div class="modal-overlay" id="centerAlertModal">
+        <div class="modal-alert-card">
+            <div style="font-size: 40px; margin-bottom: 10px;" id="modalAlertIcon">⚠️</div>
+            <h3 style="font-size: 18px; color: #b91c1c; margin-bottom: 10px;" id="modalAlertTitle">แจ้งเตือน</h3>
+            <p style="font-size: 14px; color: #475569; line-height: 1.6; margin-bottom: 20px;" id="modalAlertBody"></p>
+            <button class="btn-primary" id="modalAlertBtn" onclick="closeCenterModal()">ตกลง</button>
+        </div>
+    </div>
+
+    <script>
+        // ================= Global Data & State =================
+        let studentData = { name: "", school: "", email: "", startTime: null, endTime: null };
+        let activePageIndex = 1;
+        let stream = null;
+        let aiModel = null;
+        let totalStrikes = 0;
+        const MAX_STRIKES = 3;
+        let isAntiCheatActive = false;
+
+        const totalQuestions = 15;
+        let userChoices = new Array(totalQuestions).fill(null);
+
+        // ตัวเลือกสุ่มสลับตำแหน่ง (Randomized Options & Keys)
+        const answerKey = [2, 0, 3, 1, 0, 3, 1, 2, 0, 3, 1, 0, 2, 3, 1];
+
+        const questionsList = [
+            {
+                scenarioNum: 1,
+                title: "สถานการณ์ที่ 1: การวางแผนงบประมาณรายรับ-รายจ่ายส่วนบุคคล",
+                text: "กานดาได้รับเงินค่าขนมสัปดาห์ละ 500 บาท เธอได้ทำตารางบันทึกรายรับ-รายจ่ายตลอดสัปดาห์ดังภาพ หากกานดาต้องการเก็บเงินซื้อหนังสือเตรียมสอบราคา 180 บาท กานดาจะต้องใช้เวลาออมเงินกี่สัปดาห์จึงจะซื้อหนังสือเล่มนี้ได้?",
+                svg: `<svg viewBox="0 0 500 160" width="100%" height="160" xmlns="http://www.w3.org/2000/svg"><rect width="500" height="160" fill="#fffbeb" rx="8" stroke="#fde68a"/><rect x="30" y="15" width="440" height="28" fill="#f59e0b" rx="4"/><text x="50" y="34" font-size="12" font-weight="bold" fill="white">รายการรายรับ-รายจ่ายประจำสัปดาห์ของกานดา</text><text x="50" y="65" font-size="11" fill="#78350f">• รายรับ: เงินค่าขนมประจำสัปดาห์</text><text x="380" y="65" font-size="11" font-weight="bold" fill="#047857">+500 บาท</text><text x="50" y="90" font-size="11" fill="#78350f">• รายจ่ายจำเป็น (ค่าอาหารและเดินทาง 5 วัน):</text><text x="380" y="90" font-size="11" font-weight="bold" fill="#b91c1c">-325 บาท</text><text x="50" y="115" font-size="11" fill="#78350f">• รายจ่ายผันแปร (ขนมและของว่าง):</text><text x="380" y="115" font-size="11" font-weight="bold" fill="#b91c1c">-115 บาท</text><line x1="30" y1="128" x2="470" y2="128" stroke="#d97706"/><text x="50" y="146" font-size="12" font-weight="bold" fill="#b45309">เงินออมคงเหลือสุทธิ:</text><text x="380" y="146" font-size="13" font-weight="bold" fill="#15803d">60 บาท / สัปดาห์</text></svg>`,
+                options: ["2 สัปดาห์", "4 สัปดาห์", "3 สัปดาห์", "5 สัปดาห์"],
+                exp: "เงินคงเหลือสัปดาห์ละ 60 บาท หนังสือราคา 180 บาท ต้องใช้เวลา = 180 / 60 = 3 สัปดาห์ (ตรงกับข้อ C)"
+            },
+            {
+                scenarioNum: 2,
+                title: "สถานการณ์ที่ 2: ความคุ้มค่าของโปรโมชันร้านสะดวกซื้อ",
+                text: "ร้านค้าสองร้านจำหน่ายนมกล่องยี่ห้อเดียวกัน ขนาด 250 มล. เหมือนกัน ดังนี้: ร้าน A ขายแพ็ก 4 กล่อง ราคา 48 บาท ส่วนร้าน B มีโปรโมชัน ซื้อกล่องเดี่ยวราคา 13 บาท ซื้อ 2 กล่องแถม 1 กล่อง หากต้องการซื้อนม 6 กล่อง ซื้อจากร้านใดประหยัดกว่า และประหยัดกว่ากี่บาท?",
+                svg: `<svg viewBox="0 0 500 150" width="100%" height="150" xmlns="http://www.w3.org/2000/svg"><rect width="500" height="150" fill="#f8fafc" rx="8" stroke="#cbd5e1"/><rect x="30" y="20" width="200" height="110" rx="6" fill="#ecfeff" stroke="#06b6d4"/><text x="130" y="45" font-size="12" font-weight="bold" fill="#0e7490" text-anchor="middle">ร้าน A (ขายแพ็ก)</text><text x="130" y="75" font-size="11" fill="#155e75" text-anchor="middle">แพ็ก 4 กล่อง 48 บาท (กล่องละ 12 บ.)</text><text x="130" y="105" font-size="11" font-weight="bold" fill="#0f172a" text-anchor="middle">ซื้อ 6 กล่อง = 72 บาท</text><rect x="270" y="20" width="200" height="110" rx="6" fill="#fef3c7" stroke="#f59e0b"/><text x="370" y="45" font-size="12" font-weight="bold" fill="#b45309" text-anchor="middle">ร้าน B (ซื้อ 2 แถม 1)</text><text x="370" y="75" font-size="11" fill="#92400e" text-anchor="middle">กล่องละ 13 บาท ซื้อ 2 แถม 1</text><text x="370" y="105" font-size="11" font-weight="bold" fill="#0f172a" text-anchor="middle">ซื้อ 4 จ่าย 4 (ได้ 6 กล่อง) = 52 บ.</text></svg>`,
+                options: ["ร้าน B ประหยัดกว่า 20 บาท", "ร้าน A ประหยัดกว่า 4 บาท", "ร้าน B ประหยัดกว่า 14 บาท", "ทั้งสองร้านราคาเท่ากัน"],
+                exp: "ร้าน A ซื้อ 6 กล่อง = 72 บาท ร้าน B จ่ายเงิน 4 กล่องได้ 6 กล่อง = 52 บาท ร้าน B จึงประหยัดกว่า 20 บาท (ตรงกับข้อ A)"
+            },
+            {
+                scenarioNum: 3,
+                title: "สถานการณ์ที่ 3: ดอกเบี้ยเงินฝากธนาคารและความเสี่ยง",
+                text: "เด็กชายต้นกล้านำเงินเก็บ 10,000 บาทไปฝากธนาคารพาณิชย์เป็นบัญชีเงินฝากประจำ 1 ปี โดยได้รับอัตราดอกเบี้ย 1.8% ต่อปี เมื่อครบกำหนด 1 ปี ต้นกล้าจะได้รับเงินรวม (เงินต้น + ดอกเบี้ย) ทั้งหมดกี่บาท (ยังไม่หักภาษี)?",
+                svg: "",
+                options: ["10,018 บาท", "11,800 บาท", "10,090 บาท", "10,180 บาท"],
+                exp: "ดอกเบี้ย = 10,000 × (1.8 / 100) = 180 บาท เงินรวมทั้งสิ้น = 10,000 + 180 = 10,180 บาท (ตรงกับข้อ D)"
+            },
+            {
+                scenarioNum: 4,
+                title: "สถานการณ์ที่ 4: การคำนวณภาษีมูลค่าเพิ่ม (VAT) ในใบเสร็จ",
+                text: "ใบเสร็จรับเงินจากร้านค้าแห่งหนึ่งระบุราคาสินค้าก่อนคิดภาษีมูลค่าเพิ่มคือ 300 บาท หากประเทศไทยใช้อัตราภาษีมูลค่าเพิ่ม (VAT) 7% ยอดเงินสุทธิรวมภาษีที่ผู้ซื้อต้องจ่ายจริงคือเท่าใด?",
+                svg: "",
+                options: ["307.00 บาท", "321.00 บาท", "327.00 บาท", "370.00 บาท"],
+                exp: "VAT 7% = 300 × 0.07 = 21 บาท ยอดชำระสุทธิ = 300 + 21 = 321.00 บาท (ตรงกับข้อ B)"
+            },
+            {
+                scenarioNum: 5,
+                title: "สถานการณ์ที่ 5: ความต้องการ (Wants) และความจำเป็น (Needs)",
+                text: "หลักการทางการเงินแยกแยะระหว่าง 'สิ่งจำเป็น (Needs)' กับ 'สิ่งที่ต้องการ (Wants)' เพื่อให้สามารถจัดลำดับความสำคัญของรายจ่าย ข้อใดต่อไปนี้จัดเป็น 'สิ่งที่ต้องการ (Wants)' ทั้งหมด?",
+                svg: "",
+                options: ["เติมเงินซื้อสกินเกมออนไลน์, เคสโทรศัพท์ลายการ์ตูนรุ่นใหม่", "ยารักษาโรค, เสื้อผ้านักเรียน", "ค่าอาหารกลางวัน, ค่าอุปกรณ์การเรียนประจำวิชา", "ค่าเดินทางรถโดยสารประจำทางไปโรงเรียน, น้ำดื่มสะอาด"],
+                exp: "สกินเกมและเคสแฟชั่นเป็นความพึงพอใจส่วนตัว จัดเป็นสิ่งที่ต้องการ (Wants) ที่สามารถชะลอการซื้อได้ (ตรงกับข้อ A)"
+            },
+            {
+                scenarioNum: 6,
+                title: "สถานการณ์ที่ 6: ภัยทางการเงินและการหลอกลวงออนไลน์ (Scam)",
+                text: "มีข้อความ SMS ส่งมาในโทรศัพท์มือถือของนักเรียน: 'ยินดีด้วย! คุณได้รับรางวัลเงินสด 50,000 บาท กรุณากดลิงก์นี้และโอนเงินค่าธรรมเนียม 500 บาท เพื่อยืนยันบัญชีทันที' การปฏิบัติตามข้อใดปลอดภัยและถูกต้องที่สุด?",
+                svg: "",
+                options: ["รีบโอนเงิน 500 บาททันทีเพื่อไม่ให้เสียสิทธิ์เงินรางวัล", "กดคลิกลิงก์เข้าไปกรอกเลขบัญชีธนาคารและรหัสผ่านเพื่อตรวจสอบ", "ส่งต่อข้อความให้เพื่อนทุกคนเพื่อช่วยกันตรวจสอบ", "เพิกเฉย ไม่กดลิงก์ ไม่โอนเงินใดๆ และบล็อกเบอร์หรือลบข้อความทิ้งทันทีเพราะเป็นกลโกงมิจฉาชีพ"],
+                exp: "ข้อความ Phishing SMS หลอกให้โอนค่าธรรมเนียม ไม่ควรกดลิงก์หรือโอนเงินเด็ดขาด (ตรงกับข้อ D)"
+            },
+            {
+                scenarioNum: 7,
+                title: "สถานการณ์ที่ 7: ต้นทุนค่าเสียโอกาส (Opportunity Cost)",
+                text: "วินัยมีเงินเก็บ 300 บาท เขาสามารถเลือกได้ว่าจะนำไปซื้อหนังสือการ์ตูนความรู้ หรือนำไปซื้อตั๋วภาพยนตร์กับกลุ่มเพื่อน หากวินัยตัดสินใจเลือกซื้อตั๋วภาพยนตร์ 'ต้นทุนค่าเสียโอกาส' ของวินัยคืออะไร?",
+                svg: "",
+                options: ["ราคาตั๋วภาพยนตร์ 300 บาท", "ความรู้และความเพลิดเพลินที่น่าจะได้รับจากการอ่านหนังสือการ์ตูนความรู้", "เวลาที่ใช้ในการนั่งชมภาพยนตร์", "เงินค่าป๊อปคอร์นและเครื่องดื่มหน้าโรงหนัง"],
+                exp: "ต้นทุนค่าเสียโอกาสคือมูลค่าของทางเลือกที่ดีที่สุดที่ต้องสละไป คือความรู้และความเพลิดเพลินจากหนังสือการ์ตูน (ตรงกับข้อ B)"
+            },
+            {
+                scenarioNum: 8,
+                title: "สถานการณ์ที่ 8: เงินเฟ้อกับอำนาจซื้อ (Inflation and Purchasing Power)",
+                text: "ปีที่แล้ว บะหมี่กึ่งสำเร็จรูปราคาซองละ 6 บาท ปีนี้ราคาปรับขึ้นเป็น 7 บาท ถ้าเด็กหญิงแป้งมีเงิน 42 บาทเท่าเดิม อำนาจซื้อของแป้งจะเปลี่ยนแปลงไปอย่างไร?",
+                svg: "",
+                options: ["อำนาจซื้อเพิ่มขึ้น ซื้อบะหมี่ได้มากกว่าเดิม 1 ซอง", "อำนาจซื้อเท่าเดิมเพราะมีเงิน 42 บาทเท่าเดิม", "อำนาจซื้อลดลง ซื้อบะหมี่ได้น้อยลง 1 ซอง", "อำนาจซื้อลดลง ซื้อบะหมี่ได้น้อยลง 2 ซอง"],
+                exp: "เดิมซื้อได้ 42/6 = 7 ซอง ปัจจุบันซื้อได้ 42/7 = 6 ซอง อำนาจซื้อจึงลดลง ซื้อได้น้อยลง 1 ซอง (ตรงกับข้อ C)"
+            },
+            {
+                scenarioNum: 9,
+                title: "สถานการณ์ที่ 9: อัตราแลกเปลี่ยนเงินตราต่างประเทศ",
+                text: "นักเรียนวางแผนจะเดินทางไปทัศนศึกษาต่างประเทศ ร้านแลกเงินกำหนดอัตราแลกเปลี่ยน 1 ดอลลาร์สหรัฐ (USD) = 35.50 บาทไทย (THB) ถ้านักเรียนต้องการแลกเงิน 80 ดอลลาร์สหรัฐ จะต้องเตรียมเงินบาทไทยกี่บาท?",
+                svg: "",
+                options: ["2,840 บาท", "2,640 บาท", "2,920 บาท", "3,150 บาท"],
+                exp: "จำนวนเงินบาทที่ต้องใช้ = 80 × 35.50 = 2,840 บาท (ตรงกับข้อ A)"
+            },
+            {
+                scenarioNum: 10,
+                title: "สถานการณ์ที่ 10: การเปรียบเทียบการชำระเงินสดกับการผ่อนชำระ",
+                text: "แท็บเล็ตเพื่อการศึกษามีราคาเงินสด 6,000 บาท หากเลือกซื้อแบบผ่อนชำระ ต้องวางเงินดาวน์ 1,000 บาท และผ่อนชำระเดือนละ 550 บาท เป็นเวลา 10 เดือน การซื้อแบบผ่อนชำระต้องจ่ายเงินแพงกว่าราคาเงินสดกี่บาท?",
+                svg: "",
+                options: ["400 บาท", "550 บาท", "650 บาท", "500 บาท"],
+                exp: "ยอดผ่อนรวม = 1,000 + (550 × 10) = 6,500 บาท แพงกว่าเงินสด = 6,500 - 6,000 = 500 บาท (ตรงกับข้อ D)"
+            },
+            {
+                scenarioNum: 11,
+                title: "สถานการณ์ที่ 11: กองทุนฉุกเฉินและการบริหารความเสี่ยง",
+                text: "หลักการสร้างภูมิคุ้มกันที่ดีตามหลักปรัชญาเศรษฐกิจพอเพียงในการบริหารเงิน ข้อใดคือเป้าหมายสำคัญที่สุดของการสำรอง 'เงินออมเผื่อฉุกเฉิน'?",
+                svg: "",
+                options: ["เพื่อนำไปเก็งกำไรในตลาดหุ้นหรือสินทรัพย์เสี่ยงสูง", "เพื่อใช้จ่ายสำหรับกรณีเหตุการณ์ไม่คาดฝัน เช่น เจ็บป่วยกะทันหัน หรืออุบัติเหตุ", "เพื่อนำไปซื้อของแบรนด์เนมทันทีที่มีการลดราคา", "เพื่อให้ได้สิทธิพิเศษในการกู้เงินก้อนใหญ่ขึ้น"],
+                exp: "เงินสำรองฉุกเฉินมีไว้เพื่อรองรับวิกฤตหรือเหตุการณ์ไม่คาดฝันโดยไม่ต้องกู้หนี้ยืมสิน (ตรงกับข้อ B)"
+            },
+            {
+                scenarioNum: 12,
+                title: "สถานการณ์ที่ 12: การอ่านฉลากเปรียบเทียบราคาต่อหน่วย (Unit Price)",
+                text: "ผงซักฟอกยี่ห้อหนึ่ง บรรจุภัณฑ์ขนาด 500 กรัม ราคา 45 บาท กับขนาด 1,200 กรัม ราคา 96 บาท ขนาดใดมีราคาต่อ 100 กรัมถูกกว่า และถูกกว่ากี่บาท?",
+                svg: "",
+                options: ["ขนาด 1,200 กรัม ถูกกว่า 1 บาทต่อ 100 กรัม", "ขนาด 500 กรัม ถูกกว่า 1 บาทต่อ 100 กรัม", "ขนาด 1,200 กรัม ถูกกว่า 2 บาทต่อ 100 กรัม", "ทั้งสองขนาดราคาต่อหน่วยเท่ากัน"],
+                exp: "ขนาด 500g = 9 บาท/100g, ขนาด 1,200g = 8 บาท/100g ดังนั้นขนาด 1,200 กรัม ถูกกว่า 1 บาทต่อ 100 กรัม (ตรงกับข้อ A)"
+            },
+            {
+                scenarioNum: 13,
+                title: "สถานการณ์ที่ 13: ค่าธรรมเนียมและการทำธุรกรรมไร้เงินสด",
+                text: "ระบบพร้อมเพย์ (PromptPay) ที่ผูกบัญชีด้วยเลขประจำตัวประชาชนหรือเบอร์โทรศัพท์ มีประโยชน์หลักประการใดต่อประชาชนทั่วไปในการทำธุรกรรมโอนเงินย่อย?",
+                svg: "",
+                options: ["ได้รับดอกเบี้ยเงินฝากเพิ่มขึ้นเป็นสองเท่าโดยอัตโนมัติ", "ไม่ต้องใช้อินเทอร์เน็ตหรือสมาร์ตโฟนในการทำรายการ", "โอนเงินข้ามธนาคารได้สะดวกรวดเร็วโดยไม่มีค่าธรรมเนียมสำหรับยอดเงินไม่เกินที่กำหนด", "สามารถยกเลิกการโอนเงินคืนได้ทุกเมื่อตามใจชอบ"],
+                exp: "พร้อมเพย์ช่วยให้โอนเงินข้ามธนาคารได้อย่างรวดเร็วโดยไม่มีค่าธรรมเนียมสำหรับยอดเงินไม่เกินที่กำหนด (ตรงกับข้อ C)"
+            },
+            {
+                scenarioNum: 14,
+                title: "สถานการณ์ที่ 14: บทบาทและสิทธิของผู้บริโภคในการคุ้มครองตนเอง",
+                text: "หากผู้บริโภคซื้อนมกล่องแล้วพบว่าบูดเน่าก่อนวันหมดอายุที่ระบุบนกล่อง สิทธิของผู้บริโภคข้อใดที่รองรับการเรียกร้องค่าชดเชยหรือเปลี่ยนสินค้าใหม่?",
+                svg: "",
+                options: ["สิทธิที่จะได้รับความปลอดภัยจากการใช้สินค้าและบริการ", "สิทธิที่จะได้รับความเป็นธรรมในการทำสัญญาและการชดเชยความเสียหาย", "สิทธิในการเลือกซื้อสินค้าในราคาทุนเท่านั้น", "ทั้งสิทธิที่จะได้รับความปลอดภัยและสิทธิได้รับการพิจารณาชดเชยความเสียหาย"],
+                exp: "ผู้บริโภคมีสิทธิทั้งด้านความปลอดภัยและสิทธิได้รับการชดเชยความเสียหายเมื่อสินค้าชำรุด (ตรงกับข้อ D)"
+            },
+            {
+                scenarioNum: 15,
+                title: "สถานการณ์ที่ 15: ผลตอบแทนจากการลงทุนและความสัมพันธ์กับความเสี่ยง",
+                text: "หลักการพื้นฐานทางการเงิน 'High Risk, High Return' มีความหมายตรงกับข้อใดมากที่สุด?",
+                svg: "",
+                options: ["การลงทุนที่มีความเสี่ยงต่ำ มักจะมีโอกาสได้กำไรสูงมากเสมอ", "การลงทุนที่มีโอกาสได้รับผลตอบแทนสูง มักมาพร้อมกับความเสี่ยงหรือโอกาสสูญเสียเงินที่สูงขึ้นด้วย", "ยิ่งลงทุนเป็นเวลานาน ความเสี่ยงจะกลายเป็นศูนย์", "ทุกการลงทุนการันตีผลตอบแทนเท่ากันเสมอขึ้นอยู่กับโชคชะตา"],
+                exp: "High Risk High Return หมายถึงโอกาสที่จะได้ผลตอบแทนสูงมักมาพร้อมความเสี่ยงต่อการสูญเสียเงินที่สูงขึ้น (ตรงกับข้อ B)"
+            }
+        ];
+
+        function renderExamPages() {
+            const container = document.getElementById('examPagesContainer');
+            container.innerHTML = "";
+
+            questionsList.forEach((q, idx) => {
+                const pageNum = idx + 3;
+                const html = `
+                <div class="page-view" id="page-${pageNum}">
+                    <div class="pisa-split-card">
+                        <div class="pisa-pane">
+                            <div class="scenario-tag">ข้อที่ ${idx + 1} จาก 15 (หน้า ${pageNum})</div>
+                            <div class="scenario-title">${q.title}</div>
+                            <div class="scenario-text">${q.text}</div>
+                            ${q.svg ? `<div class="svg-container">${q.svg}</div>` : ''}
+                            <div class="note-callout">
+                                📌 <strong>คำแนะนำ:</strong> อ่านสถานการณ์และคำถามอย่างถี่ถ้วนก่อนตัดสินใจเลือกคำตอบ
+                            </div>
+                        </div>
+                        <div class="pisa-pane">
+                            <div style="font-size: 15px; font-weight: 700; color: #0f172a; margin-bottom: 6px;">จงเลือกคำตอบที่ถูกต้องที่สุด:</div>
+                            <div style="display: flex; flex-direction: column; gap: 10px;">
+                                ${q.options.map((opt, oIdx) => `
+                                    <div class="option-box" id="opt-${idx}-${oIdx}" onclick="selectAnswer(${idx},${oIdx})">
+                                        <div class="custom-radio"></div>
+                                        <div>${String.fromCharCode(65 + oIdx)}.${opt}</div>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                    </div>
+                </div>`;
+                container.insertAdjacentHTML('beforeend', html);
+            });
+
+            const pal = document.getElementById('paletteContainer');
+            pal.innerHTML = "";
+            for (let i = 1; i <= 15; i++) {
+                const btn = document.createElement('button');
+                btn.className = 'p-btn' + (i === 1 ? ' active' : '');
+                btn.id = `palette-btn-${i}`;
+                btn.innerText = i;
+                btn.onclick = () => goToExamQuestion(i);
+                pal.appendChild(btn);
+            }
+        }
+
+        // ================= PAGE 1 -> PAGE 2 =================
+        function proceedToPage2() {
+            const name = document.getElementById('inputName').value.trim();
+            const school = document.getElementById('inputSchool').value.trim();
+            const email = document.getElementById('inputEmail').value.trim();
+
+            if (!name || !school || !email) {
+                showCenterModal("ข้อมูลไม่ครบถ้วน", "กรุณากรอกชื่อ-สกุล, โรงเรียน และอีเมล ให้ครบถ้วนก่อนดำเนินการต่อ", () => closeCenterModal());
+                return;
+            }
+
+            studentData.name = name;
+            studentData.school = school;
+            studentData.email = email;
+
+            switchPage(2);
+            initCameraAndAI();
+        }
+
+        // ================= PAGE 2: Room Scan Logic แบบใหม่ =================
+        let isScanning = false;
+        let cumulativeAngle = 0;
+        let lastAlpha = null;
+        let animFrameId = null;
+        let isDetecting = false;
+        let ceilingTiltCounter = 0;
+        let hasLockedUser = false; // ตัวแปรบอกว่าล็อกตัวผู้สอบเริ่มต้นเรียบร้อยหรือยัง
+
+        async function initCameraAndAI() {
+            try {
+                // เปิดกล้องหน้าปกติเพื่อให้ผู้สอบส่องตัวเองก่อน
+                stream = await navigator.mediaDevices.getUserMedia({
+                    video: { width: { ideal: 640 }, height: { ideal: 480 }, facingMode: "user" },
+                    audio: false
+                });
+                const videoEl = document.getElementById('cameraFeed');
+                videoEl.srcObject = stream;
+
+                document.getElementById('scanGuideText').innerText = "กล้องพร้อมใช้งาน กำลังตรวจจับใบหน้าผู้สอบ...";
+                
+                aiModel = await cocoSsd.load();
+                
+                // ตรวจหาตัวผู้สอบในเฟรมแรก
+                detectInitialUser();
+
+            } catch (err) {
+                showCenterModal("ไม่สามารถเปิดกล้องได้", "กรุณาอนุญาตการเข้าถึงกล้องและใช้งานผ่าน HTTPS: " + err.message, () => {
+                    closeCenterModal();
+                    switchPage(1);
+                });
+            }
+        }
+
+        // เช็กตัวผู้สอบก่อนเริ่มหมุน
+        async function detectInitialUser() {
+            const videoEl = document.getElementById('cameraFeed');
+            if (videoEl.readyState >= 2 && aiModel) {
+                const predictions = await aiModel.detect(videoEl);
+                const persons = predictions.filter(p => p.class === 'person' && p.score > 0.35);
+
+                if (persons.length === 1) {
+                    hasLockedUser = true;
+                    document.getElementById('aiStatusText').innerText = "✓ ยืนยันตัวตนผู้สอบสำเร็จ กดปุ่มด้านล่างเพื่อเริ่มหมุนกล้อง";
+                    document.getElementById('aiStatusText').style.color = "#16a34a";
+                    document.getElementById('btnStartScan').disabled = false;
+                    document.getElementById('scanGuideText').innerText = "พบผู้เข้าสอบ 1 คน พร้อมเริ่มหมุนสแกนสภาพแวดล้อม";
+                    return;
+                } else if (persons.length > 1) {
+                    triggerRoomViolation("มีบุคคลอื่นนั่งอยู่ด้วยตั้งแต่ก่อนเริ่มสแกน");
+                    return;
+                }
+            }
+            // วนตรวจหาตัวผู้สอบจนกว่าจะเจอหน้าตรงชัดเจน
+            if (!hasLockedUser) {
+                setTimeout(detectInitialUser, 600);
+            }
+        }
+
+        function startScanningProcess() {
+            document.getElementById('btnStartScan').disabled = true;
+            document.getElementById('scanGuideText').innerText = "กำลังสแกน... ค่อยๆ ถือเครื่องหมุนกวาดรอบห้อง (ห้ามมีคนอื่นติดเข้ามา)";
+            isScanning = true;
+            cumulativeAngle = 0;
+            ceilingTiltCounter = 0;
+            lastAlpha = null;
+
+            if (window.DeviceOrientationEvent) {
+                if (typeof DeviceOrientationEvent.requestPermission === 'function') {
+                    DeviceOrientationEvent.requestPermission()
+                        .then(response => {
+                            if (response === 'granted') {
+                                window.addEventListener('deviceorientation', handleOrientation);
+                            }
+                        })
+                        .catch(console.error);
+                } else {
+                    window.addEventListener('deviceorientation', handleOrientation);
+                }
+            }
+
+            runRealtimeDetection();
+        }
+
+        async function runRealtimeDetection() {
+            if (!isScanning) return;
+
+            const videoEl = document.getElementById('cameraFeed');
+
+            if (videoEl.readyState >= 2 && aiModel && !isDetecting) {
+                isDetecting = true;
+                try {
+                    const predictions = await aiModel.detect(videoEl);
+                    const persons = predictions.filter(p => p.class === 'person' && p.score > 0.28);
+
+                    document.getElementById('aiStatusText').innerText = `👁️ สถานะ: หมุนไปแล้ว ${Math.round(cumulativeAngle)}° (พบบุคคล: ${persons.length} คน)`;
+
+                    // ช่วงที่กล้องหมุนไปส่องรอบห้อง (35° - 325°) ต้องเป็นผนัง/ห้องว่าง ห้ามมีคนเลย!
+                    if (cumulativeAngle > 35 && cumulativeAngle < 325) {
+                        if (persons.length > 0) {
+                            // เจอคนนั่งหรือยืนอยู่ตามมุมห้อง = ผิดกฎทันที
+                            triggerRoomViolation(`ตรวจพบบุคคลอื่นในบริเวณห้องขณะหมุน (${persons.length} คน)`);
+                            return;
+                        }
+                    }
+
+                    // ช่วงเริ่มต้น (0° - 35°) หรือ หมุนกลับมาครบรอบ (325° - 360°) ต้องมีแค่ตัวผู้สอบคนเดียวเท่านั้น
+                    if (persons.length > 1) {
+                        triggerRoomViolation(`ตรวจพบบุคคลมากกว่า 1 คน (${persons.length} คน)`);
+                        return;
+                    }
+
+                } catch (e) {
+                    console.error(e);
+                } finally {
+                    isDetecting = false;
+                }
+            }
+
+            if (isScanning) {
+                animFrameId = requestAnimationFrame(runRealtimeDetection);
+            }
+        }
+
+        function handleOrientation(event) {
+            if (!isScanning) return;
+
+            const alpha = event.alpha;
+            const beta = event.beta;
+
+            // บล็อกการแหงนส่องเพดาน
+            if (beta !== null) {
+                const isLevel = (beta >= 55 && beta <= 115);
+                if (!isLevel) {
+                    ceilingTiltCounter++;
+                    document.getElementById('scanGuideText').innerText = "⚠️ ห้ามแหงนกล้องขึ้นเพดาน! กรุณาถือเครื่องตั้งตรงระดับสายตา";
+                    document.getElementById('scanGuideText').style.backgroundColor = "rgba(220, 38, 38, 0.9)";
+                    
+                    if (ceilingTiltCounter > 30) {
+                        stopScanProcess();
+                        shutDownCamera();
+                        showCenterModal(
+                            "ไม่อนุญาตให้เข้าสอบ!",
+                            "ท่านแหงนกล้องขึ้นเพดานเพื่อหลีกเลี่ยงการตรวจสอบสภาพแวดล้อม กรุณากลับไปเริ่มใหม่และถืออุปกรณ์ในระดับสายตา",
+                            () => {
+                                closeCenterModal();
+                                resetToPage1();
+                            }
+                        );
+                    }
+                    return;
+                } else {
+                    ceilingTiltCounter = 0;
+                    document.getElementById('scanGuideText').style.backgroundColor = "rgba(0, 0, 0, 0.7)";
+                }
+            }
+
+            if (alpha !== null && lastAlpha !== null) {
+                let diff = Math.abs(alpha - lastAlpha);
+                if (diff > 180) diff = 360 - diff;
+                if (diff > 1 && diff < 90) {
+                    updateAngleProgress(cumulativeAngle + diff);
+                }
+            }
+            lastAlpha = alpha;
+        }
+
+        function updateAngleProgress(angle) {
+            cumulativeAngle = angle;
+            const capped = Math.min(360, Math.round(cumulativeAngle));
+            document.getElementById('angleText').innerText = `${capped}°`;
+            const pct = (capped / 360) * 100;
+            document.getElementById('angleProgress').style.width = `${pct}%`;
+
+            if (capped >= 360) {
+                passRoomScan();
+            }
+        }
+
+        function triggerRoomViolation(detail = "") {
+            stopScanProcess();
+            shutDownCamera();
+            showCenterModal(
+                "ตรวจพบบุคคลอื่นในห้องสอบ!",
+                `ไม่อนุญาตให้เข้าสอบ! (${detail}) มีบุคคลอื่นอยู่ในห้องสอบ ขอให้ท่านไปอยู่ในห้องที่มีท่านเพียงคนเดียว`,
+                () => {
+                    closeCenterModal();
+                    resetToPage1();
+                }
+            );
+        }
+
+        function passRoomScan() {
+            stopScanProcess();
+            shutDownCamera(); // ปิดกล้อง 100% เครื่องไม่ร้อน
+
+            showCenterModal(
+                "ตรวจสอบสภาพแวดล้อมสำเร็จ",
+                "✓ สภาพแวดล้อมถูกต้อง ท่านอยู่ในห้องคนเดียว ระบบปิดกล้องเรียบร้อยเพื่อประหยัดพลังงาน กำลังนำเข้าสู่ข้อสอบ",
+                () => {
+                    closeCenterModal();
+                    startExamMode();
+                }
+            );
+        }
+
+        function stopScanProcess() {
+            isScanning = false;
+            if (animFrameId) cancelAnimationFrame(animFrameId);
+            window.removeEventListener('deviceorientation', handleOrientation);
+        }
+
+        function shutDownCamera() {
+            if (stream) {
+                stream.getTracks().forEach(track => track.stop());
+                stream = null;
+            }
+            const videoEl = document.getElementById('cameraFeed');
+            if (videoEl) videoEl.srcObject = null;
+        }
+
+        // รีเซ็ตค่ากลับไปหน้าแรก (Page 1) ทันที
+        function resetToPage1() {
+            stopScanProcess();
+            shutDownCamera();
+            hasLockedUser = false;
+            cumulativeAngle = 0;
+            ceilingTiltCounter = 0;
+            document.getElementById('angleText').innerText = "0°";
+            document.getElementById('angleProgress').style.width = "0%";
+            document.getElementById('btnStartScan').disabled = true;
+            document.getElementById('aiStatusText').innerText = "⏳ กำลังตรวจจับใบหน้าผู้เข้าสอบ...";
+            document.getElementById('aiStatusText').style.color = "#0284c7";
+            
+            switchPage(1);
+        }
+
+        // ================= Anti-Cheat Guard =================
+        let examTimer = null;
+        let secondsLeft = 30 * 60;
+
+        function startExamMode() {
+            studentData.startTime = new Date().toLocaleString('th-TH');
+            document.getElementById('timerContainer').style.visibility = 'visible';
+            document.getElementById('antiCheatBar').style.display = 'flex';
+            document.getElementById('examFooter').style.display = 'block';
+
+            start30MinTimer();
+
+            setTimeout(() => {
+                isAntiCheatActive = true;
+                initAntiCheatGuards();
+            }, 3000);
+
+            switchPage(3);
+            updateNavState();
+        }
+
+        function start30MinTimer() {
+            const clockEl = document.getElementById('timerClock');
+            examTimer = setInterval(() => {
+                secondsLeft--;
+                const m = Math.floor(secondsLeft / 60);
+                const s = secondsLeft % 60;
+                clockEl.innerText = `${m < 10 ? '0' : ''}${m}:${s < 10 ? '0' : ''}${s}`;
+
+                if (secondsLeft <= 0) {
+                    clearInterval(examTimer);
+                    showCenterModal("หมดเวลาการทำแบบทดสอบ", "ระบบจะทำการส่งข้อสอบและประมวลผลคะแนนอัตโนมัติ", () => {
+                        closeCenterModal();
+                        finishExam();
+                    });
+                }
+            }, 1000);
+        }
+
+        function registerCheatingStrike(reason) {
+            if (!isAntiCheatActive || activePageIndex < 3 || activePageIndex > 17) return;
+
+            totalStrikes++;
+            const pill = document.getElementById(`strike-${totalStrikes}`);
+            if (pill) pill.classList.add('active');
+
+            if (totalStrikes >= MAX_STRIKES) {
+                removeAntiCheatGuards();
+                showCenterModal(
+                    "ละเมิดกฎการสอบครบ 3 ครั้ง",
+                    `ระบบตรวจพบการทำผิดระเบียบครบ 3 ครั้ง (${reason}) ระบบได้ยุติการสอบทันทีและนำส่งคะแนนเท่าที่ทำได้`,
+                    () => {
+                        closeCenterModal();
+                        finishExam();
+                    }
+                );
+            } else {
+                showCenterModal(
+                    `เตือนการทำผิดกฎ (ครั้งที่ ${totalStrikes}/${MAX_STRIKES})`,
+                    `ตรวจพบ: ${reason}\nคำเตือน: หากครบ 3 ครั้งระบบจะส่งข้อสอบและยุติการสอบทันที`,
+                    () => closeCenterModal()
+                );
+            }
+        }
+
+        function initAntiCheatGuards() {
+            document.addEventListener("visibilitychange", onVisibilityChange);
+            window.addEventListener("keydown", onKeyDownGuard);
+            document.addEventListener("contextmenu", onContextMenuGuard);
+        }
+
+        function removeAntiCheatGuards() {
+            isAntiCheatActive = false;
+            document.removeEventListener("visibilitychange", onVisibilityChange);
+            window.removeEventListener("keydown", onKeyDownGuard);
+            document.removeEventListener("contextmenu", onContextMenuGuard);
+            document.getElementById('antiCheatBar').style.display = 'none';
+        }
+
+        function onVisibilityChange() {
+            if (document.hidden) {
+                registerCheatingStrike("การสลับหน้าจอ / สลับแท็บเบราว์เซอร์");
+            }
+        }
+
+        function onKeyDownGuard(e) {
+            const forbiddenKeys = ['c', 'v', 'a', 's', 'p', 'x', 'u'];
+            if ((e.ctrlKey || e.metaKey) && forbiddenKeys.includes(e.key.toLowerCase())) {
+                e.preventDefault();
+                registerCheatingStrike(`การใช้คีย์ลัด [Ctrl+${e.key.toUpperCase()}]`);
+                return false;
+            }
+            if (e.key === "PrintScreen" || e.keyCode === 44) {
+                e.preventDefault();
+                if (navigator.clipboard) navigator.clipboard.writeText("");
+                registerCheatingStrike("การกดบันทึกภาพหน้าจอ (PrintScreen)");
+                return false;
+            }
+            if (e.key === "F12") {
+                e.preventDefault();
+                registerCheatingStrike("การเปิดแถบ Developer Console [F12]");
+                return false;
+            }
+        }
+
+        function onContextMenuGuard(e) {
+            e.preventDefault();
+        }
+
+        // ================= Navigation & Finish =================
+        function selectAnswer(qIdx, optIdx) {
+            userChoices[qIdx] = optIdx;
+            for (let i = 0; i < 4; i++) {
+                const el = document.getElementById(`opt-${qIdx}-${i}`);
+                if (el) el.classList.toggle('selected', i === optIdx);
+            }
+            const palBtn = document.getElementById(`palette-btn-${qIdx + 1}`);
+            if (palBtn) palBtn.classList.add('answered');
+        }
+
+        function navigateQuestion(delta) {
+            const targetPage = activePageIndex + delta;
+            if (targetPage >= 3 && targetPage <= 17) {
+                switchPage(targetPage);
+                updateNavState();
+            }
+        }
+
+        function goToExamQuestion(qNum) {
+            switchPage(qNum + 2);
+            updateNavState();
+        }
+
+        function updateNavState() {
+            const currentQ = activePageIndex - 2;
+            document.getElementById('btnBack').disabled = (activePageIndex === 3);
+
+            for (let i = 1; i <= 15; i++) {
+                const btn = document.getElementById(`palette-btn-${i}`);
+                if (btn) btn.classList.toggle('active', i === currentQ);
+            }
+
+            if (activePageIndex === 17) {
+                document.getElementById('btnForward').style.display = 'none';
+                document.getElementById('btnSubmitExam').style.display = 'inline-block';
+            } else {
+                document.getElementById('btnForward').style.display = 'inline-block';
+                document.getElementById('btnSubmitExam').style.display = 'none';
+            }
+        }
+
+        function confirmSubmitExam() {
+            const answeredCount = userChoices.filter(x => x !== null).length;
+            showCenterModal(
+                "ยืนยันการส่งกระดาษคำตอบ",
+                `คุณทำข้อสอบไปแล้ว ${answeredCount} จากทั้งหมด 15 ข้อ ต้องการส่งข้อสอบและสิ้นสุดการประเมินหรือไม่?`,
+                () => {
+                    closeCenterModal();
+                    finishExam();
+                }
+            );
+        }
+
+        function finishExam() {
+            clearInterval(examTimer);
+            removeAntiCheatGuards();
+            document.getElementById('examFooter').style.display = 'none';
+            document.getElementById('timerContainer').style.visibility = 'hidden';
+
+            studentData.endTime = new Date().toLocaleString('th-TH');
+
+            let correctCount = 0;
+            let wrongCount = 0;
+            const reviewTbody = document.getElementById('reviewTableBody');
+            reviewTbody.innerHTML = "";
+
+            for (let i = 0; i < totalQuestions; i++) {
+                const studentAnswer = userChoices[i];
+                const correctAnswer = answerKey[i];
+                const isCorrect = (studentAnswer === correctAnswer);
+
+                if (isCorrect) correctCount++;
+                else wrongCount++;
+
+                const scLabel = (studentAnswer !== null) ? String.fromCharCode(65 + studentAnswer) : "ไม่ตอบ";
+                const tcLabel = String.fromCharCode(65 + correctAnswer);
+
+                const row = `
+                <tr>
+                    <td style="font-weight: bold; text-align: center;">${i + 1}</td>
+                    <td style="color: ${isCorrect ? '#16a34a' : '#dc2626'}; font-weight: bold;">${scLabel}</td>
+                    <td style="color: #15803d; font-weight: bold;">${tcLabel}</td>
+                    <td>
+                        <span style="font-weight: bold; color: ${isCorrect ? '#16a34a' : '#dc2626'};">
+                            ${isCorrect ? '✓ ถูกต้อง' : '✗ ตอบผิด'}
+                        </span>
+                        <div style="font-size: 11px; color: #64748b; margin-top: 2px;">${questionsList[i].exp}</div>
+                    </td>
+                </tr>`;
+                reviewTbody.insertAdjacentHTML('beforeend', row);
+            }
+
+            const percentage = ((correctCount / totalQuestions) * 100).toFixed(2);
+
+            document.getElementById('resName').innerText = studentData.name;
+            document.getElementById('resSchool').innerText = studentData.school;
+            document.getElementById('resEmail').innerText = studentData.email;
+            document.getElementById('resTime').innerText = studentData.endTime;
+
+            document.getElementById('resCorrect').innerText = correctCount;
+            document.getElementById('resWrong').innerText = wrongCount;
+            document.getElementById('resPercent').innerText = `${percentage}%`;
+
+            const examRecord = {
+                timestamp: new Date().toISOString(),
+                fullname: studentData.name,
+                school: studentData.school,
+                email: studentData.email,
+                ...userChoices.reduce((acc, choice, idx) => {
+                    acc[`SC${idx + 1}`] = (choice !== null) ? String.fromCharCode(65 + choice) : "";
+                    acc[`TC${idx + 1}`] = String.fromCharCode(65 + answerKey[idx]);
+                    return acc;
+                }, {}),
+                correct_count: correctCount,
+                wrong_count: wrongCount,
+                percentage: percentage
+            };
+
+            console.log("Exam Payload ready:", examRecord);
+            sendToGoogleSheet(examRecord);
+            switchPage(18);
+        }
+
+        function sendToGoogleSheet(data) {
+            const WEB_APP_URL = ""; 
+            if (WEB_APP_URL) {
+                fetch(WEB_APP_URL, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                }).then(() => {
+                    const statusEl = document.getElementById('saveStatus');
+                    if (statusEl) {
+                        statusEl.innerText = "✓ บันทึกข้อมูลและคะแนนลง Google Sheets เรียบร้อยแล้ว";
+                    }
+                }).catch(err => console.error("Save Error:", err));
+            }
+        }
+
+        // ================= Helpers =================
+        function switchPage(pageIdx) {
+            activePageIndex = pageIdx;
+            document.querySelectorAll('.page-view').forEach(el => el.classList.remove('active'));
+            const target = document.getElementById(`page-${pageIdx}`);
+            if (target) target.classList.add('active');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        let modalActionCallback = null;
+        function showCenterModal(title, body, callback) {
+            document.getElementById('modalAlertTitle').innerText = title;
+            document.getElementById('modalAlertBody').innerText = body;
+            document.getElementById('centerAlertModal').style.display = 'flex';
+            modalActionCallback = callback;
+        }
+
+        function closeCenterModal() {
+            document.getElementById('centerAlertModal').style.display = 'none';
+            if (modalActionCallback) {
+                const cb = modalActionCallback;
+                modalActionCallback = null;
+                cb();
+            }
+        }
+
+        window.onload = () => {
+            renderExamPages();
+        };
+    </script>
+</body>
+</html>
