@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>แบบจำลองเสมือน: การตอบสนองและฮอร์โมนพืช (Plant Tropism Simulation)</title>
+  <style>
+    :root {
+      --bg-color: #0f172a;
+      --card-bg: #1e293b;
+      --accent: #10b981;
+      --accent-hover: #059669;
+      --text-light: #f8fafc;
+      --text-muted: #94a3b8;
+      --border-color: #334155;
+    }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    body {
+      background-color: var(--bg-color);
+      color: var(--text-light);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 20px;
+      min-height: 100vh;
+    }
+    header {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    header h1 {
+      font-size: 1.6rem;
+      color: #34d399;
+      margin-bottom: 6px;
+    }
+    header p {
+      font-size: 0.95rem;
+      color: var(--text-muted);
+    }
+    .main-container {
+      display: flex;
+      flex-direction: row;
+      gap: 20px;
+      width: 100%;
+      max-width: 1080px;
+      background: var(--card-bg);
+      border-radius: 12px;
+      padding: 20px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+      border: 1px solid var(--border-color);
+    }
+    .canvas-section {
+      flex: 1.4;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    canvas {
+      background: #020617;
+      border-radius: 8px;
+      border: 1px solid var(--border-color);
+      width: 100%;
+      max-width: 540px;
+      height: 480px;
+      cursor: crosshair;
+    }
+    .control-section {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+    .control-group {
+      background: #0b1329;
+      padding: 14px;
+      border-radius: 8px;
+      border: 1px solid var(--border-color);
+    }
+    .control-group h3 {
+      font-size: 1rem;
+      color: #38bdf8;
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    label {
+      display: block;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      margin-bottom: 6px;
+    }
+    .radio-group, .select-group {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 10px;
+      flex-wrap: wrap;
+    }
+    .radio-btn {
+      flex: 1;
+      text-align: center;
+      padding: 8px 6px;
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.82rem;
+      transition: all 0.2s;
+    }
+    .radio-btn.active {
+      background: var(--accent);
+      color: #fff;
+      border-color: var(--accent);
+      font-weight: bold;
+    }
+    .checkbox-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.88rem;
+      cursor: pointer;
+      margin-top: 6px;
+    }
+    .btn-row {
+      display: flex;
+      gap: 10px;
+    }
+    button.action-btn {
+      flex: 1;
+      padding: 10px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: bold;
+      font-size: 0.9rem;
+      transition: background 0.2s;
+    }
+    .btn-reset {
+      background: #475569;
+      color: #fff;
+    }
+    .btn-reset:hover {
+      background: #64748b;
+    }
+    .info-card {
+      background: #1e1b4b;
+      border-left: 4px solid #818cf8;
+      padding: 12px;
+      border-radius: 4px;
+      font-size: 0.85rem;
+      line-height: 1.45;
+      color: #e0e7ff;
+    }
+    .legend {
+      display: flex;
+      gap: 15px;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      margin-top: 8px;
+    }
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+    .dot-auxin {
+      width: 8px;
+      height: 8px;
+      background: #fbbf24;
+      border-radius: 50%;
+      display: inline-block;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>ชีววิทยา ม.4: การตอบสนองของพืชต่อสิ่งเร้าและฮอร์โมนออกซิน</h1>
+    <p>แบบจำลองกลไก Phototropism & Gravitropism เชิงสรีรวิทยา</p>
+  </header>
+
+  <div class="main-container">
+    <!-- Simulation Canvas -->
+    <div class="canvas-section">
+      <canvas id="simCanvas" width="540" height="480"></canvas>
+      <div class="legend">
+        <div class="legend-item"><span class="dot-auxin"></span> จุดสีเหลือง = โมเลกุลออกซิน (Auxin)</div>
+        <div class="legend-item"><span style="color:#4ade80;">■</span> ยอดพืช (Shoot)</div>
+        <div class="legend-item"><span style="color:#d97706;">■</span> รากพืช (Root)</div>
+      </div>
+    </div>
+
+    <!-- Controls -->
+    <div class="control-section">
+      <!-- ทิศทางแสง -->
+      <div class="control-group">
+        <h3>1. ปัจจัยภายนอก (สิ่งเร้า)</h3>
+        <label>แหล่งกำเนิดแสง (Phototropism):</label>
+        <div class="radio-group" id="lightControls">
+          <div class="radio-btn" onclick="setLight('left')">ซ้าย</div>
+          <div class="radio-btn active" onclick="setLight('top')">ด้านบน (สมดุล)</div>
+          <div class="radio-btn" onclick="setLight('right')">ขวา</div>
+          <div class="radio-btn" onclick="setLight('dark')">ที่มืดสนิท</div>
+        </div>
+
+        <label>ทิศทางลำต้นเทียบแรงโน้มถ่วง (Gravitropism):</label>
+        <div class="radio-group" id="orientControls">
+          <div class="radio-btn active" onclick="setOrientation('vertical')">ตั้งตรงปกติ</div>
+          <div class="radio-btn" onclick="setOrientation('horizontal')">วางกระถางแนวนอน</div>
+        </div>
+      </div>
+
+      <!-- การทดลองตัด/คลุมยอด -->
+      <div class="control-group">
+        <h3>2. การทดลองของนักวิทยาศาสตร์ (ยอดปลายปลอก)</h3>
+        <div class="radio-group" id="treatmentControls">
+          <div class="radio-btn active" onclick="setTipTreatment('intact')">ยอดปกติ (Intact)</div>
+          <div class="radio-btn" onclick="setTipTreatment('cut')">ตัดปลายยอดทิ้ง (Decapitated)</div>
+          <div class="radio-btn" onclick="setTipTreatment('opaque')">คลุมปลอกทึบแสง (Opaque Cap)</div>
+        </div>
+        <label class="checkbox-item">
+          <input type="checkbox" id="showAuxinDots" checked onchange="toggleAuxinDots(this.checked)">
+          แสดงอนุภาคออกซิน (Auxin Distribution)
+        </label>
+      </div>
+
+      <!-- สรุปองค์ความรู้ -->
+      <div class="info-card" id="explanationText">
+        <strong>คำอธิบายกลไก:</strong> แสงจากด้านบนสม่ำเสมอ ออกซินแพร่ลงมาอย่างสมดุล เซลล์ทั้งสองฝั่งยืดตัวเท่ากัน ลำต้นจึงเจริญตั้งตรงขึ้นด้านบน
+      </div>
+
+      <div class="btn-row">
+        <button class="action-btn btn-reset" onclick="resetSim()">รีเซ็ตการทดลอง</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const canvas = document.getElementById('simCanvas');
+    const ctx = canvas.getContext('2d');
+
+    // สถานะแบบจำลอง
+    let state = {
+      light: 'top',             // 'left', 'top', 'right', 'dark'
+      orientation: 'vertical',  // 'vertical', 'horizontal'
+      treatment: 'intact',      // 'intact', 'cut', 'opaque'
+      showAuxin: true,
+      shootAngle: 0,            // องศาการเบนของลำต้น
+      rootAngle: 0,             // องศาการเบนของราก
+      auxinParticles: [],
+      potAngle: 0               // มุมการวางกระถาง
+    };
+
+    // กำหนดค่าจุดศูนย์กลางเมล็ด/กระถาง
+    const origin = { x: 270, y: 240 };
+
+    // สร้างอนุภาคออกซิน
+    function createAuxinParticles() {
+      state.auxinParticles = [];
+      for (let i = 0; i < 90; i++) {
+        state.auxinParticles.push({
+          region: i < 50 ? 'shoot' : 'root',
+          relX: (Math.random() - 0.5) * 16,
+          relY: Math.random(),
+          speed: 0.005 + Math.random() * 0.008
+        });
+      }
+    }
+
+    // อัปเดตคำอธิบายตามหลักชีววิทยา ม.4
+    function updateExplanation() {
+      const exp = document.getElementById('explanationText');
+      if (state.treatment === 'cut') {
+        exp.innerHTML = `<strong>ผลการทดลอง:</strong> ปลายยอดถูกตัดออก ไม่มีแหล่งผลิตออกซิน และไม่มีตัวรับรู้แสง พืชจึงหยุดยืดตัวและไม่โค้งงอเข้าหาแสง`;
+        return;
+      }
+      if (state.treatment === 'opaque') {
+        exp.innerHTML = `<strong>ผลการทดลอง (แบบ Darwin):</strong> ปลายยอดถูกคลุมด้วยปลอกทึบแสง แม้จะมีแสงส่องทางด้านข้าง แต่ส่วนรับแสง (Photoreceptor) ที่ยอดไม่ได้รับแสง ออกซินจึงแพร่ลงมาเท่าๆ กันทุกทิศทาง ทำให้ยอดเจริญตรง ไม่โค้งหาแสง`;
+        return;
+      }
+
+      if (state.orientation === 'horizontal') {
+        exp.innerHTML = `<strong>กลไก Gravitropism:</strong> เมื่อวางนอน แรงโน้มถ่วงดึงดูดเม็ดแป้ง Statolith ทำให้<strong>ออกซินสะสมด้านล่าง</strong> ทั้งในยอดและราก<br>
+        • <em>ยอด:</em> ออกซินเข้มข้นสูง<strong>กระตุ้น</strong>การยืดตัว เซลล์ด้านล่างยืดเร็วกว่า → ยอดโค้งขึ้นหนีแรงโน้มถ่วง (Negative gravitropism)<br>
+        • <em>ราก:</em> รากไวต่อออกซิน ออกซินสะสมด้านล่าง<strong>ยับยั้ง</strong>การยืดตัว เซลล์ด้านบนยืดตัวดีกว่า → รากโค้งลงตามแรงโน้มถ่วง (Positive gravitropism)`;
+        return;
+      }
+
+      if (state.light === 'left') {
+        exp.innerHTML = `<strong>กลไก Phototropism:</strong> แสงส่องจากทางซ้าย แสงสีน้ำเงินกระตุ้น Phototropin ส่งผลให้ออกซินลำเลียงหนีแสงไปสะสมทาง<strong>ฝั่งขวา (ฝั่งมืด)</strong> เซลล์ฝั่งขวาจึงขยายขนาดยาวกว่าฝั่งซ้าย ทำให้ลำต้นโค้งเข้าหาแสง`;
+      } else if (state.light === 'right') {
+        exp.innerHTML = `<strong>กลไก Phototropism:</strong> แสงส่องทางขวา ออกซินหนีแสงไปสะสมที่<strong>ฝั่งซ้าย (ฝั่งมืด)</strong> เซลล์ฝั่งซ้ายยืดตัวยาวกว่า ลำต้นจึงโค้งเข้าหาแสงทางขวา`;
+      } else {
+        exp.innerHTML = `<strong>สภาวะสมดุล:</strong> ได้รับแสงสม่ำเสมอ ออกซินลำเลียงแบบ Polar Transport กระจายตัวสม่ำเสมอ ลำต้นเจริญตั้งตรง`;
+      }
+    }
+
+    // วาดฉาก
+    function draw() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      // วาดแสง
+      drawLightSource();
+
+      // วาดดิน / พื้นหลัง
+      ctx.save();
+      ctx.fillStyle = '#1e293b';
+      ctx.fillRect(origin.x - 45, origin.y - 10, 90, 20);
+      ctx.restore();
+
+      // คำนวณมุมเป้าหมาย (Physics/Biology Interpolation)
+      let targetShoot = 0;
+      let targetRoot = 0;
+
+      if (state.treatment === 'intact') {
+        if (state.orientation === 'horizontal') {
+          targetShoot = -70; // โค้งขึ้น
+          targetRoot = 65;   // โค้งลง
+        } else {
+          if (state.light === 'left') targetShoot = -38;
+          else if (state.light === 'right') targetShoot = 38;
+          else targetShoot = 0;
+          targetRoot = 0;
+        }
+      } else if (state.treatment === 'cut' || state.treatment === 'opaque') {
+        targetShoot = 0;
+        targetRoot = 0;
+      }
+
+      // ปรับมุมแบบ Smooth Transition
+      state.shootAngle += (targetShoot - state.shootAngle) * 0.04;
+      state.rootAngle += (targetRoot - state.rootAngle) * 0.04;
+
+      // คำนวณมุมเอียงกระถาง
+      const targetPotAngle = state.orientation === 'horizontal' ? 90 : 0;
+      state.potAngle += (targetPotAngle - state.potAngle) * 0.05;
+
+      // วาดต้นพืช
+      ctx.save();
+      ctx.translate(origin.x, origin.y);
+      ctx.rotate((state.potAngle * Math.PI) / 180);
+
+      // 1. วาดราก (Root)
+      drawRoot();
+
+      // 2. วาดลำต้นและยอด (Shoot)
+      drawShoot();
+
+      // 3. วาดกระถาง
+      drawPot();
+
+      ctx.restore();
+
+      requestAnimationFrame(draw);
+    }
+
+    function drawLightSource() {
+      if (state.light === 'dark') return;
+      ctx.save();
+      let lx = 0, ly = 0;
+      if (state.light === 'left') { lx = 50; ly = 100; }
+      else if (state.light === 'right') { lx = 490; ly = 100; }
+      else if (state.light === 'top') { lx = 270; ly = 40; }
+
+      // ลำแสง
+      let grad = ctx.createRadialGradient(lx, ly, 10, lx, ly, 140);
+      grad.addColorStop(0, 'rgba(251, 191, 36, 0.7)');
+      grad.addColorStop(1, 'rgba(251, 191, 36, 0)');
+      ctx.fillStyle = grad;
+      ctx.beginPath();
+      ctx.arc(lx, ly, 140, 0, Math.PI * 2);
+      ctx.fill();
+
+      // หลอดไฟ / ดวงอาทิตย์
+      ctx.fillStyle = '#fef08a';
+      ctx.beginPath();
+      ctx.arc(lx, ly, 14, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.restore();
+    }
+
+    function drawShoot() {
+      ctx.save();
+      const rad = (state.shootAngle * Math.PI) / 180;
+      const length = 110;
+
+      ctx.beginPath();
+      ctx.moveTo(0, 0);
+      // โค้งงอตามมุม
+      const cpX = Math.sin(rad) * (length * 0.6);
+      const cpY = -Math.cos(rad) * (length * 0.6);
+      const endX = Math.sin(rad) * length;
+      const endY = -Math.cos(rad) * length;
+
+      ctx.quadraticCurveTo(cpX, cpY, endX, endY);
+      ctx.lineWidth = 14;
+      ctx.strokeStyle = '#22c55e';
+      ctx.lineCap = 'round';
+      ctx.stroke();
+
+      // ปลายยอด / ปลอกคลุม
+      if (state.treatment === 'cut') {
+        ctx.fillStyle = '#ef4444';
+        ctx.beginPath();
+        ctx.arc(endX, endY, 6, 0, Math.PI * 2);
+        ctx.fill();
+      } else if (state.treatment === 'opaque') {
+        ctx.fillStyle = '#0f172a';
+        ctx.beginPath();
+        ctx.arc(endX, endY, 10, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.strokeStyle = '#64748b';
+        ctx.lineWidth = 2;
+        ctx.stroke();
+      } else {
+        // ใบเลี้ยง / ปลายยอดอ่อนปกติ
+        ctx.fillStyle = '#86efac';
+        ctx.beginPath();
+        ctx.arc(endX, endY, 7, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      // วาดออกซินในลำต้น
+      if (state.showAuxin && state.treatment !== 'cut') {
+        drawAuxinShoot(endX, endY, cpX, cpY);
+      }
+      ctx.restore();
+    }
+
+    function drawRoot() {
+      ctx.save();
+      const rad = (state.rootAngle * Math.PI) / 180;
+      const length = 90;
+
+      ctx.beginPath();
+      ctx.moveTo(0, 0);
+      const cpX = Math.sin(rad) * (length * 0.6);
+      const cpY = Math.cos(rad) * (length * 0.6);
+      const endX = Math.sin(rad) * length;
+      const endY = Math.cos(rad) * length;
+
+      ctx.quadraticCurveTo(cpX, cpY, endX, endY);
+      ctx.lineWidth = 8;
+      ctx.strokeStyle = '#b45309';
+      ctx.lineCap = 'round';
+      ctx.stroke();
+
+      // หมวกราก (Root Cap)
+      ctx.fillStyle = '#78350f';
+      ctx.beginPath();
+      ctx.arc(endX, endY, 5, 0, Math.PI * 2);
+      ctx.fill();
+
+      // วาดออกซินในราก
+      if (state.showAuxin) {
+        drawAuxinRoot(endX, endY, cpX, cpY);
+      }
+      ctx.restore();
+    }
+
+    function drawAuxinShoot(endX, endY, cpX, cpY) {
+      ctx.fillStyle = '#fbbf24';
+      state.auxinParticles.forEach(p => {
+        if (p.region !== 'shoot') return;
+        p.relY = (p.relY + p.speed) % 1;
+
+        // คำนวณเบี่ยงเบนออกซินตามแสง/แรงโน้มถ่วง
+        let lateralBias = 0;
+        if (state.orientation === 'horizontal') {
+          lateralBias = 4.5; // สะสมด้านล่าง
+        } else if (state.light === 'left') {
+          lateralBias = 4.5; // หนีแสงไปขวา
+        } else if (state.light === 'right') {
+          lateralBias = -4.5; // หนีแสงไปซ้าย
+        }
+
+        const t = 1 - p.relY; // จากยอดลงโคน
+        const x = (1 - t) * (1 - t) * 0 + 2 * (1 - t) * t * cpX + t * t * endX + (p.relX + lateralBias);
+        const y = (1 - t) * (1 - t) * 0 + 2 * (1 - t) * t * cpY + t * t * endY;
+
+        ctx.beginPath();
+        ctx.arc(x, y, 2, 0, Math.PI * 2);
+        ctx.fill();
+      });
+    }
+
+    function drawAuxinRoot(endX, endY, cpX, cpY) {
+      ctx.fillStyle = '#fbbf24';
+      state.auxinParticles.forEach(p => {
+        if (p.region !== 'root') return;
+        p.relY = (p.relY + p.speed) % 1;
+
+        let lateralBias = 0;
+        if (state.orientation === 'horizontal') {
+          lateralBias = 3.5; // สะสมฝั่งล่างของรากเช่นกัน
+        }
+
+        const t = p.relY;
+        const x = (1 - t) * (1 - t) * 0 + 2 * (1 - t) * t * cpX + t * t * endX + (p.relX + lateralBias);
+        const y = (1 - t) * (1 - t) * 0 + 2 * (1 - t) * t * cpY + t * t * endY;
+
+        ctx.beginPath();
+        ctx.arc(x, y, 1.8, 0, Math.PI * 2);
+        ctx.fill();
+      });
+    }
+
+    function drawPot() {
+      ctx.fillStyle = '#64748b';
+      ctx.beginPath();
+      ctx.moveTo(-25, -5);
+      ctx.lineTo(25, -5);
+      ctx.lineTo(20, 20);
+      ctx.lineTo(-20, 20);
+      ctx.closePath();
+      ctx.fill();
+      ctx.strokeStyle = '#475569';
+      ctx.lineWidth = 2;
+      ctx.stroke();
+    }
+
+    // Functions ควบคุมปุ่ม
+    function setLight(type) {
+      state.light = type;
+      updateBtnActive('lightControls', type, {
+        'left': 0, 'top': 1, 'right': 2, 'dark': 3
+      });
+      updateExplanation();
+    }
+
+    function setOrientation(type) {
+      state.orientation = type;
+      updateBtnActive('orientControls', type, {
+        'vertical': 0, 'horizontal': 1
+      });
+      updateExplanation();
+    }
+
+    function setTipTreatment(type) {
+      state.treatment = type;
+      updateBtnActive('treatmentControls', type, {
+        'intact': 0, 'cut': 1, 'opaque': 2
+      });
+      updateExplanation();
+    }
+
+    function toggleAuxinDots(val) {
+      state.showAuxin = val;
+    }
+
+    function updateBtnActive(groupId, val, mapping) {
+      const btns = document.querySelectorAll(`#${groupId} .radio-btn`);
+      btns.forEach(b => b.classList.remove('active'));
+      const idx = mapping[val];
+      if (idx !== undefined && btns[idx]) {
+        btns[idx].classList.add('active');
+      }
+    }
+
+    function resetSim() {
+      setLight('top');
+      setOrientation('vertical');
+      setTipTreatment('intact');
+      state.shootAngle = 0;
+      state.rootAngle = 0;
+      state.potAngle = 0;
+      createAuxinParticles();
+    }
+
+    // เริ่มต้นระบบ
+    createAuxinParticles();
+    updateExplanation();
+    draw();
+  </script>
+</body>
+</html>

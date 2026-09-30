@@ -1,0 +1,1183 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ห้องปฏิบัติการสืบเสาะโครงสร้างโลก (Earth's Interior Lab)</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Google Fonts: Prompt & Space Grotesk -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <!-- Chart.js for Seismic Profile Visualization -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <style>
+    body {
+      font-family: 'Prompt', sans-serif;
+    }
+    .font-mono-num {
+      font-family: 'Space Grotesk', monospace;
+    }
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #0f172a;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #334155;
+      border-radius: 9999px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #475569;
+    }
+    /* Wave propagation pulse effect */
+    @keyframes waveP {
+      0% { transform: scaleX(0.96); opacity: 0.6; }
+      50% { transform: scaleX(1.02); opacity: 1; }
+      100% { transform: scaleX(0.96); opacity: 0.6; }
+    }
+    @keyframes waveS {
+      0% { transform: translateY(-3px); }
+      50% { transform: translateY(3px); }
+      100% { transform: translateY(-3px); }
+    }
+    .animate-wave-p {
+      animation: waveP 1.2s infinite ease-in-out;
+    }
+    .animate-wave-s {
+      animation: waveS 1.6s infinite ease-in-out;
+    }
+    .layer-card-transition {
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+  </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col selection:bg-cyan-500 selection:text-black">
+
+  <header class="bg-slate-900/90 backdrop-blur border-b border-slate-800 sticky top-0 z-40">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 py-3 flex flex-wrap items-center justify-between gap-3">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-cyan-600 via-indigo-600 to-amber-500 flex items-center justify-center text-white shadow-lg shadow-cyan-950/50">
+          <i data-lucide="layers" class="w-5 h-5"></i>
+        </div>
+        <div>
+          <div class="flex items-center gap-2">
+            <h1 class="text-base sm:text-lg font-bold text-white tracking-wide">ห้องปฏิบัติการสืบเสาะโครงสร้างโลก</h1>
+            <span class="text-[10px] px-2 py-0.5 rounded-full bg-cyan-950 border border-cyan-500/40 text-cyan-300 font-medium">Nature of Science</span>
+          </div>
+          <p class="text-xs text-slate-400">เรารู้โครงสร้างโลกได้อย่างไร โดยไม่เคยขุดไปถึงแก่นโลก?</p>
+        </div>
+      </div>
+
+      <!-- Mode Switcher Tabs -->
+      <nav class="flex items-center bg-slate-950 p-1 rounded-xl border border-slate-800 text-xs sm:text-sm font-medium">
+        <button id="tab-btn-1" onclick="switchMode(1)" class="tab-btn flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-cyan-400 bg-slate-800 shadow transition-all">
+          <i data-lucide="activity" class="w-4 h-4"></i>
+          <span>1. คลื่นไหวสะเทือน</span>
+        </button>
+        <button id="tab-btn-2" onclick="switchMode(2)" class="tab-btn flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-slate-400 hover:text-slate-200 transition-all">
+          <i data-lucide="split" class="w-4 h-4"></i>
+          <span>2. โมเดลถอด–เลื่อน</span>
+        </button>
+        <button id="tab-btn-3" onclick="switchMode(3)" class="tab-btn flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-slate-400 hover:text-slate-200 transition-all">
+          <i data-lucide="award" class="w-4 h-4"></i>
+          <span>3. ท้าทายความคิด</span>
+        </button>
+      </nav>
+    </div>
+  </header>
+
+  <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 py-5 flex flex-col gap-5">
+    
+    <!-- Scientific Inquiry Concept Banner -->
+    <div class="bg-gradient-to-r from-slate-900 via-indigo-950/40 to-slate-900 border border-slate-800/80 rounded-2xl p-4 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 shadow-xl">
+      <div class="flex items-start gap-3">
+        <div class="p-2.5 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-400 shrink-0 mt-0.5">
+          <i data-lucide="sparkles" class="w-5 h-5"></i>
+        </div>
+        <div>
+          <h2 class="text-sm font-semibold text-slate-200 flex items-center gap-2">
+            หลักการทางวิทยาศาสตร์: มนุษย์เจาะลึกได้เพียง ~12.2 กิโลเมตร (Kola Superdeep Borehole)
+          </h2>
+          <p class="text-xs text-slate-400 mt-0.5 leading-relaxed">
+            แต่รัศมีโลกยาวถึง 6,370 กม.! นักวิทยาศาสตร์จึงใช้ "คลื่นไหวสะเทือน (Seismic Waves)" เสมือนเครื่องอัลตราซาวด์สแกนพฤติกรรมความเร็วและเขตเงาคลื่น เพื่ออนุมานสถานะ ความหนาแน่น และความดันภายในโลก
+          </p>
+        </div>
+      </div>
+      <div class="flex items-center gap-2 text-xs shrink-0 bg-slate-900/80 border border-slate-800 px-3 py-2 rounded-xl">
+        <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
+        <span class="text-slate-300">ความลึกสำรวจสูงสุด: <b class="text-emerald-400 font-mono-num">6,370 km</b></span>
+      </div>
+    </div>
+
+    <!-- ========================================================================= -->
+    <!-- MODE 1: SEISMIC WAVE PROBE & VELOCITY GRAPH -->
+    <!-- ========================================================================= -->
+    <section id="mode-1-container" class="space-y-5">
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-5">
+        
+        <!-- Left: Interactive Depth Probe & Wave Simulation (5 Cols) -->
+        <div class="lg:col-span-5 bg-slate-900/80 border border-slate-800 rounded-2xl p-4 sm:p-5 flex flex-col justify-between shadow-xl">
+          <div>
+            <div class="flex items-center justify-between border-b border-slate-800 pb-3 mb-4">
+              <h3 class="font-semibold text-sm sm:text-base text-cyan-300 flex items-center gap-2">
+                <i data-lucide="radar" class="w-4 h-4"></i> หัววัดจำลองคลื่นที่ความลึก (Depth Probe)
+              </h3>
+              <span id="probeDepthBadge" class="text-xs px-2.5 py-1 rounded-full font-mono-num bg-cyan-950 border border-cyan-500/30 text-cyan-300 font-semibold">
+                ความลึก: 0 กม.
+              </span>
+            </div>
+
+            <!-- Depth Slider Controller -->
+            <div class="space-y-2 mb-5">
+              <div class="flex justify-between text-xs text-slate-400">
+                <span>ผิวโลก (0 km)</span>
+                <span>รอยต่อ Moho (35 km)</span>
+                <span>แก่นนอก (2,900 km)</span>
+                <span>จุดศูนย์กลาง (6,370 km)</span>
+              </div>
+              <input id="depthSlider" type="range" min="0" max="6370" value="700" step="10" 
+                class="w-full h-2 bg-slate-950 rounded-lg appearance-none cursor-pointer accent-cyan-400 border border-slate-700">
+              
+              <!-- Quick Jump Buttons to Critical Discontinuities -->
+              <div class="flex flex-wrap gap-1.5 pt-1">
+                <button onclick="setDepth(30)" class="text-[11px] px-2 py-1 rounded bg-slate-800 hover:bg-slate-700 text-slate-300 transition">เปลือกโลก (30 km)</button>
+                <button onclick="setDepth(200)" class="text-[11px] px-2 py-1 rounded bg-slate-800 hover:bg-slate-700 text-slate-300 transition">ฐานธรณีภาค (200 km)</button>
+                <button onclick="setDepth(2890)" class="text-[11px] px-2 py-1 rounded bg-amber-950/60 border border-amber-600/40 hover:bg-amber-900/60 text-amber-300 transition">รอยต่อกูเทนเบิร์ก (~2,900 km)</button>
+                <button onclick="setDepth(3500)" class="text-[11px] px-2 py-1 rounded bg-slate-800 hover:bg-slate-700 text-slate-300 transition">แก่นโลกชั้นนอก (3,500 km)</button>
+                <button onclick="setDepth(5150)" class="text-[11px] px-2 py-1 rounded bg-indigo-950/60 border border-indigo-600/40 hover:bg-indigo-900/60 text-indigo-300 transition">รอยต่อเลห์มันน์ (~5,150 km)</button>
+                <button onclick="setDepth(6000)" class="text-[11px] px-2 py-1 rounded bg-slate-800 hover:bg-slate-700 text-slate-300 transition">แก่นโลกชั้นใน (6,000 km)</button>
+              </div>
+            </div>
+
+            <!-- Wave Behavior Dynamic Cards -->
+            <div class="grid grid-cols-2 gap-3 mb-4">
+              <!-- P-Wave Status Card -->
+              <div class="bg-slate-950/80 border border-emerald-500/30 rounded-xl p-3 flex flex-col justify-between">
+                <div>
+                  <div class="flex items-center justify-between mb-1">
+                    <span class="text-xs font-bold text-emerald-400 flex items-center gap-1">
+                      <span class="w-2 h-2 rounded-full bg-emerald-400"></span> คลื่น P (ปฐมภูมิ)
+                    </span>
+                    <span id="pWaveStatusTag" class="text-[10px] px-1.5 py-0.5 rounded bg-emerald-950 text-emerald-300 font-semibold">ผ่านได้</span>
+                  </div>
+                  <p class="text-[11px] text-slate-400 leading-tight">คลื่นตามยาว เคลื่อนที่ผ่านได้ทั้ง <b>ของแข็ง ของเหลว แก๊ส</b></p>
+                </div>
+                <div class="mt-2 pt-2 border-t border-slate-800/80 flex items-baseline justify-between font-mono-num">
+                  <span class="text-xs text-slate-400">ความเร็ว:</span>
+                  <span id="pSpeedVal" class="text-base font-bold text-emerald-300">8.0 km/s</span>
+                </div>
+              </div>
+
+              <!-- S-Wave Status Card -->
+              <div class="bg-slate-950/80 border border-amber-500/30 rounded-xl p-3 flex flex-col justify-between">
+                <div>
+                  <div class="flex items-center justify-between mb-1">
+                    <span class="text-xs font-bold text-amber-400 flex items-center gap-1">
+                      <span class="w-2 h-2 rounded-full bg-amber-400"></span> คลื่น S (ทุติยภูมิ)
+                    </span>
+                    <span id="sWaveStatusTag" class="text-[10px] px-1.5 py-0.5 rounded bg-amber-950 text-amber-300 font-semibold">ผ่านได้</span>
+                  </div>
+                  <p class="text-[11px] text-slate-400 leading-tight">คลื่นตามขวาง เคลื่อนที่ผ่านได้เฉพาะ <b>ของแข็งเท่านั้น!</b></p>
+                </div>
+                <div class="mt-2 pt-2 border-t border-slate-800/80 flex items-baseline justify-between font-mono-num">
+                  <span class="text-xs text-slate-400">ความเร็ว:</span>
+                  <span id="sSpeedVal" class="text-base font-bold text-amber-300">4.5 km/s</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Real-time Physical Inference Box -->
+            <div id="inferenceBox" class="bg-slate-950/90 border border-cyan-500/30 rounded-xl p-3.5 space-y-1.5">
+              <div class="flex items-center gap-2 text-xs font-bold text-cyan-300">
+                <i data-lucide="microscope" class="w-4 h-4"></i>
+                <span id="inferLayerName">ชั้นเนื้อโลกตอนบน (Upper Mantle)</span>
+              </div>
+              <p id="inferExplanation" class="text-xs text-slate-300 leading-relaxed">
+                คลื่น P และ S เดินทางด้วยความเร็วเพิ่มขึ้นต่อเนื่องตามความหนาแน่นและความดัน แสดงว่าสสารอยู่ในสถานะ "ของแข็ง"
+              </p>
+              <div class="pt-2 flex flex-wrap gap-2 text-[11px]">
+                <span class="px-2 py-0.5 rounded bg-slate-800 text-slate-300">สถานะ: <b id="inferState" class="text-white">ของแข็ง</b></span>
+                <span class="px-2 py-0.5 rounded bg-slate-800 text-slate-300">ความหนาแน่น: <b id="inferDensity" class="text-white font-mono-num">3.4 g/cm³</b></span>
+                <span class="px-2 py-0.5 rounded bg-slate-800 text-slate-300">ความดัน: <b id="inferPressure" class="text-white font-mono-num">~25 GPa</b></span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Bottom: Seismic Wave Shadow Zone Principle Trigger -->
+          <div class="mt-4 pt-3 border-t border-slate-800 flex items-center justify-between text-xs text-slate-400">
+            <span class="flex items-center gap-1.5">
+              <i data-lucide="info" class="w-4 h-4 text-cyan-400"></i>
+              <span>สังเกตการหายไปของคลื่น S ที่ 2,900 กม.</span>
+            </span>
+            <button onclick="openShadowZoneModal()" class="text-cyan-400 hover:text-cyan-300 underline font-medium">ดูเขตเงาคลื่น (Shadow Zone)</button>
+          </div>
+        </div>
+
+        <!-- Right: Seismic Wave Velocity Profile Chart (7 Cols) -->
+        <div class="lg:col-span-7 bg-slate-900/80 border border-slate-800 rounded-2xl p-4 sm:p-5 flex flex-col justify-between shadow-xl">
+          <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
+            <div>
+              <h3 class="font-semibold text-sm sm:text-base text-slate-100 flex items-center gap-2">
+                <i data-lucide="line-chart" class="w-4 h-4 text-cyan-400"></i> กราฟความเร็วคลื่น P และ S ตามความลึก (PREM Model)
+              </h3>
+              <p class="text-xs text-slate-400">เส้นประแนวตั้งสีฟ้าคือตำแหน่งหัววัดปัจจุบันของคุณ</p>
+            </div>
+            <div class="flex items-center gap-3 text-xs">
+              <span class="flex items-center gap-1.5 text-emerald-400 font-semibold">
+                <span class="w-3 h-0.5 bg-emerald-400 rounded-full inline-block"></span> P-Wave
+              </span>
+              <span class="flex items-center gap-1.5 text-amber-400 font-semibold">
+                <span class="w-3 h-0.5 bg-amber-400 rounded-full inline-block"></span> S-Wave
+              </span>
+            </div>
+          </div>
+
+          <!-- Chart Canvas Container -->
+          <div class="relative w-full h-[320px] sm:h-[350px] bg-slate-950 rounded-xl p-2 border border-slate-800">
+            <canvas id="seismicChart"></canvas>
+          </div>
+
+          <!-- Key Scientific Deduction Milestones -->
+          <div class="mt-3 grid grid-cols-1 sm:grid-cols-3 gap-2 text-[11px]">
+            <div class="bg-slate-950/60 p-2 rounded-lg border border-slate-800">
+              <b class="text-cyan-400 block mb-0.5">1. Moho (~35 km)</b>
+              <span class="text-slate-400">ความเร็วคลื่นกระโดดขึ้นทันที เกิดจากการเปลี่ยนจากเปลือกโลกสู่เนื้อโลกที่มีความหนาแน่นสูงกว่า</span>
+            </div>
+            <div class="bg-slate-950/60 p-2 rounded-lg border border-amber-900/40">
+              <b class="text-amber-400 block mb-0.5">2. Gutenberg (~2,900 km)</b>
+              <span class="text-slate-400">S-wave ดิ่งเป็น 0 และ P-wave หักเหชะลอฮวบ บ่งชี้ว่าแก่นโลกชั้นนอกมีสภาพเป็น <b>"ของเหลว"</b></span>
+            </div>
+            <div class="bg-slate-950/60 p-2 rounded-lg border border-indigo-900/40">
+              <b class="text-indigo-400 block mb-0.5">3. Lehmann (~5,150 km)</b>
+              <span class="text-slate-400">P-wave เร่งความเร็วขึ้นอีกครั้ง พิสูจน์ว่าใจกลางโลกเป็น <b>"ของแข็งที่มีความหนาแน่นสูงยิ่งยวด"</b></span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ========================================================================= -->
+    <!-- MODE 2: MODULAR LAYER RECONSTRUCTION & SLIDE-COMPARE -->
+    <!-- ========================================================================= -->
+    <section id="mode-2-container" class="hidden space-y-5">
+      <div class="flex flex-wrap items-center justify-between gap-3 bg-slate-900/90 border border-slate-800 p-4 rounded-2xl">
+        <div class="flex items-center gap-2">
+          <i data-lucide="layers" class="w-5 h-5 text-indigo-400"></i>
+          <div>
+            <h3 class="text-sm sm:text-base font-bold text-white">โมเดลถอด–เลื่อน–เปรียบเทียบ (Modular Layer Explorer)</h3>
+            <p class="text-xs text-slate-400">คลิกดึงชิ้นส่วนแต่ละชั้นเพื่อศึกษาสมบัติเชิงลึก หรือสลับเกณฑ์การแบ่งชั้นโลก</p>
+          </div>
+        </div>
+
+        <!-- Criteria Switcher: Chemical Composition vs Physical/Mechanical Properties -->
+        <div class="flex items-center bg-slate-950 p-1 rounded-xl border border-slate-800 text-xs">
+          <button id="crit-chem-btn" onclick="switchCriteria('chemical')" class="px-3 py-1.5 rounded-lg bg-indigo-600 text-white font-medium shadow transition">
+            เกณฑ์องค์ประกอบเคมี (3-4 ชั้น)
+          </button>
+          <button id="crit-phys-btn" onclick="switchCriteria('physical')" class="px-3 py-1.5 rounded-lg text-slate-400 hover:text-slate-200 transition">
+            เกณฑ์สมบัติเชิงกล (5 ชั้น)
+          </button>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-5">
+        
+        <!-- Left: Vertical Stack of Earth Layer Blocks (5 Cols) -->
+        <div class="lg:col-span-5 bg-slate-900/80 border border-slate-800 rounded-2xl p-4 sm:p-5 flex flex-col justify-between shadow-xl">
+          <div class="flex items-center justify-between mb-3 text-xs text-slate-400">
+            <span>ผิวโลก (0 km)</span>
+            <span class="flex items-center gap-1"><i data-lucide="move-vertical" class="w-3.5 h-3.5"></i> เลือกชั้นเพื่อ "ดึงชิ้นส่วนออก"</span>
+            <span>จุดศูนย์กลาง (6,370 km)</span>
+          </div>
+
+          <!-- Dynamic Layer Stack Container -->
+          <div id="layerStackList" class="flex flex-col gap-2.5">
+            <!-- Injected by JavaScript based on active criteria -->
+          </div>
+
+          <div class="mt-4 p-3 rounded-xl bg-slate-950/70 border border-slate-800/80 text-[11px] text-slate-400 flex items-center justify-between">
+            <span>💡 สีของชั้นจำลองตามอุณหภูมิและความดันสัมพัทธ์</span>
+            <button onclick="resetExtractedLayer()" class="text-cyan-400 hover:text-cyan-300 font-medium">เก็บชิ้นส่วนทั้งหมดเข้าที่</button>
+          </div>
+        </div>
+
+        <!-- Right: Detailed Layer Inspector & Comparative Gauge (7 Cols) -->
+        <div class="lg:col-span-7 bg-slate-900/80 border border-slate-800 rounded-2xl p-4 sm:p-5 flex flex-col justify-between shadow-xl">
+          <div>
+            <!-- Active Layer Header -->
+            <div class="flex flex-wrap items-center justify-between gap-3 border-b border-slate-800 pb-3 mb-4">
+              <div class="flex items-center gap-3">
+                <div id="inspectorLayerBadgeColor" class="w-5 h-12 rounded-lg bg-amber-500 shadow-md"></div>
+                <div>
+                  <h4 id="inspectorLayerTitle" class="text-base sm:text-lg font-bold text-white">เปลือกโลก (Crust)</h4>
+                  <p id="inspectorLayerSub" class="text-xs text-slate-400">ความลึก: 0 - 70 กิโลเมตร | สัดส่วนมวล: ~1% ของโลก</p>
+                </div>
+              </div>
+              <div class="text-right">
+                <span id="inspectorStateTag" class="text-xs px-3 py-1 rounded-full font-semibold bg-emerald-950 border border-emerald-500/40 text-emerald-300">
+                  สถานะ: ของแข็ง (Solid)
+                </span>
+              </div>
+            </div>
+
+            <!-- Gauges Grid -->
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-5">
+              <!-- Gauge 1: Density -->
+              <div class="bg-slate-950 p-3 rounded-xl border border-slate-800 flex flex-col justify-between">
+                <span class="text-[11px] text-slate-400 flex items-center gap-1">
+                  <i data-lucide="weight" class="w-3.5 h-3.5 text-cyan-400"></i> ความหนาแน่น
+                </span>
+                <div class="mt-2">
+                  <span id="gaugeDensityVal" class="text-lg font-bold font-mono-num text-cyan-300">2.7 - 3.0</span>
+                  <span class="text-[10px] text-slate-500 block">g/cm³</span>
+                </div>
+                <!-- Mini Progress Bar -->
+                <div class="w-full bg-slate-800 h-1.5 rounded-full overflow-hidden mt-2">
+                  <div id="gaugeDensityBar" class="bg-cyan-400 h-full rounded-full" style="width: 22%"></div>
+                </div>
+              </div>
+
+              <!-- Gauge 2: Temperature -->
+              <div class="bg-slate-950 p-3 rounded-xl border border-slate-800 flex flex-col justify-between">
+                <span class="text-[11px] text-slate-400 flex items-center gap-1">
+                  <i data-lucide="thermometer" class="w-3.5 h-3.5 text-rose-400"></i> อุณหภูมิ
+                </span>
+                <div class="mt-2">
+                  <span id="gaugeTempVal" class="text-lg font-bold font-mono-num text-rose-300">20 - 800</span>
+                  <span class="text-[10px] text-slate-500 block">°C</span>
+                </div>
+                <div class="w-full bg-slate-800 h-1.5 rounded-full overflow-hidden mt-2">
+                  <div id="gaugeTempBar" class="bg-rose-500 h-full rounded-full" style="width: 14%"></div>
+                </div>
+              </div>
+
+              <!-- Gauge 3: Pressure -->
+              <div class="bg-slate-950 p-3 rounded-xl border border-slate-800 flex flex-col justify-between">
+                <span class="text-[11px] text-slate-400 flex items-center gap-1">
+                  <i data-lucide="gauge" class="w-3.5 h-3.5 text-amber-400"></i> ความดัน
+                </span>
+                <div class="mt-2">
+                  <span id="gaugePressVal" class="text-lg font-bold font-mono-num text-amber-300">&lt; 1</span>
+                  <span class="text-[10px] text-slate-500 block">GPa</span>
+                </div>
+                <div class="w-full bg-slate-800 h-1.5 rounded-full overflow-hidden mt-2">
+                  <div id="gaugePressBar" class="bg-amber-400 h-full rounded-full" style="width: 5%"></div>
+                </div>
+              </div>
+
+              <!-- Gauge 4: P/S Velocity Average -->
+              <div class="bg-slate-950 p-3 rounded-xl border border-slate-800 flex flex-col justify-between">
+                <span class="text-[11px] text-slate-400 flex items-center gap-1">
+                  <i data-lucide="activity" class="w-3.5 h-3.5 text-indigo-400"></i> คลื่นที่ผ่านได้
+                </span>
+                <div class="mt-2">
+                  <span id="gaugeWaveVal" class="text-base font-bold text-indigo-300">P และ S</span>
+                  <span id="gaugeWaveNote" class="text-[10px] text-slate-500 block">ผ่านได้ทั้งสองคลื่น</span>
+                </div>
+                <div class="flex gap-1 mt-2">
+                  <span id="dotWaveP" class="w-2 h-2 rounded-full bg-emerald-400"></span>
+                  <span id="dotWaveS" class="w-2 h-2 rounded-full bg-amber-400"></span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Deep Scientific Analysis & Chemical Composition -->
+            <div class="space-y-3">
+              <div class="bg-slate-950 p-3.5 rounded-xl border border-slate-800">
+                <h5 class="text-xs font-semibold text-slate-300 flex items-center gap-1.5 mb-1">
+                  <i data-lucide="atom" class="w-4 h-4 text-cyan-400"></i> องค์ประกอบทางเคมีและแร่ธาตุเด่น
+                </h5>
+                <p id="inspectorChemical" class="text-xs text-slate-400 leading-relaxed">
+                  สารประกอบซิลิกาและอะลูมินา (Si, Al, O) สำหรับเปลือกโลกทวีป (หินแกรนิต) และซิลิกา-แมกนีเซียม (Si, Mg) สำหรับเปลือกโลกมหาสมุทร (หินบะซอลต์)
+                </p>
+              </div>
+
+              <div class="bg-slate-950 p-3.5 rounded-xl border border-slate-800">
+                <h5 class="text-xs font-semibold text-slate-300 flex items-center gap-1.5 mb-1">
+                  <i data-lucide="brain-circuit" class="w-4 h-4 text-amber-400"></i> ข้อสรุปเชิงหลักฐานทางวิทยาศาสตร์
+                </h5>
+                <p id="inspectorEvidence" class="text-xs text-slate-400 leading-relaxed">
+                  คลื่นไหวสะเทือนเดินทางผ่านชั้นนี้ด้วยความเร็วต่ำสุดเมื่อเทียบกับชั้นอื่นๆ ภายใต้โลก และที่รอยต่อฐานเปลือกโลก ความเร็วจะพุ่งขึ้นทันทีจากการเปลี่ยนชนิดของหิน
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Bottom: Comparison Prompt -->
+          <div class="mt-4 pt-3 border-t border-slate-800 flex items-center justify-between text-xs text-slate-400">
+            <span>ทำไมแก่นโลกชั้นในร้อนถึง 5,500°C แต่ยังคงเป็น "ของแข็ง"?</span>
+            <span class="text-amber-400 font-medium">แรงดันกดทับมหาศาล (~360 GPa) เอาชนะจุดหลอมเหลว</span>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ========================================================================= -->
+    <!-- MODE 3: NATURE OF SCIENCE CHALLENGE (SCIENTIFIC INQUIRY QUIZ) -->
+    <!-- ========================================================================= -->
+    <section id="mode-3-container" class="hidden space-y-5">
+      <div class="max-w-3xl mx-auto bg-slate-900/90 border border-slate-800 rounded-2xl p-5 sm:p-6 shadow-2xl">
+        
+        <!-- Quiz Progress Bar & Header -->
+        <div class="flex items-center justify-between border-b border-slate-800 pb-4 mb-5">
+          <div class="flex items-center gap-2.5">
+            <div class="w-8 h-8 rounded-lg bg-indigo-500/20 text-indigo-400 flex items-center justify-center font-bold">
+              <i data-lucide="clipboard-check" class="w-4 h-4"></i>
+            </div>
+            <div>
+              <h3 class="text-base font-bold text-white">ห้องทดลองท้าทายความคิด: สืบจากหลักฐาน</h3>
+              <p class="text-xs text-slate-400">ทดสอบความเข้าใจว่านักวิทยาศาสตร์อนุมานโครงสร้างโลกอย่างไร</p>
+            </div>
+          </div>
+          <div class="text-right">
+            <span class="text-xs text-slate-400">คะแนนสะสม:</span>
+            <div id="quizScoreText" class="text-lg font-bold font-mono-num text-cyan-400">0 / 5</div>
+          </div>
+        </div>
+
+        <!-- Quiz Question Card Container -->
+        <div id="quizCard" class="space-y-4">
+          <div class="flex items-center justify-between text-xs text-slate-400">
+            <span id="quizQuestionNumberBadge" class="bg-indigo-950 border border-indigo-500/30 text-indigo-300 px-2 py-0.5 rounded font-mono-num">ข้อที่ 1 / 5</span>
+            <span id="quizCategoryBadge" class="text-slate-400">ประเด็น: พฤติกรรมคลื่นทุติยภูมิ</span>
+          </div>
+
+          <h4 id="quizQuestionText" class="text-sm sm:text-base font-medium text-slate-100 leading-relaxed">
+            เมื่อเกิดแผ่นดินไหว เครื่องวัดคลื่นไหวสะเทือนที่ตั้งอยู่ฝั่งตรงข้ามจุดเกิดเหตุ (มุมเกิน 105° จากจุดกำเนิด) จะไม่สามารถตรวจจับคลื่น S (S-wave) ได้เลย ปรากฏการณ์นี้เป็นหลักฐานสนับสนุนข้อสรุปใดอย่างหนักแน่นที่สุด?
+          </h4>
+
+          <!-- Option Buttons -->
+          <div id="quizOptionsContainer" class="space-y-2.5 pt-2">
+            <!-- Generated dynamically by JS -->
+          </div>
+
+          <!-- Feedback Box -->
+          <div id="quizFeedbackBox" class="hidden p-4 rounded-xl border text-xs leading-relaxed">
+            <!-- Dynamic feedback message and explanation -->
+          </div>
+
+          <!-- Next Button -->
+          <div class="pt-3 flex justify-end">
+            <button id="btnQuizNext" onclick="nextQuestion()" class="hidden bg-cyan-600 hover:bg-cyan-500 text-white text-xs font-semibold px-5 py-2.5 rounded-xl shadow-lg transition">
+              ไปยังข้อถัดไป ➔
+            </button>
+            <button id="btnQuizRestart" onclick="restartQuiz()" class="hidden bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold px-5 py-2.5 rounded-xl transition">
+              🔄 เริ่มทำแบบทดสอบใหม่
+            </button>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+  </main>
+
+  <div id="shadowZoneModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm hidden items-center justify-center p-4 z-50">
+    <div class="bg-slate-900 border border-slate-700 max-w-2xl w-full rounded-2xl p-5 sm:p-6 shadow-2xl space-y-4">
+      <div class="flex justify-between items-center border-b border-slate-800 pb-3">
+        <h4 class="text-base font-bold text-amber-400 flex items-center gap-2">
+          <i data-lucide="radio" class="w-5 h-5"></i> ทำความเข้าใจ: เขตเงาคลื่น (Seismic Shadow Zones)
+        </h4>
+        <button onclick="closeShadowZoneModal()" class="text-slate-400 hover:text-white text-lg">✕</button>
+      </div>
+
+      <!-- Shadow Zone Schematic SVG -->
+      <div class="bg-slate-950 rounded-xl p-3 border border-slate-800 flex justify-center">
+        <svg viewBox="0 0 400 300" class="w-full max-w-md h-auto select-none">
+          <!-- Outer Crust/Mantle -->
+          <circle cx="200" cy="150" r="130" fill="#334155" stroke="#64748b" stroke-width="2"/>
+          <!-- Outer Core (Liquid) -->
+          <circle cx="200" cy="150" r="70" fill="#ea580c" opacity="0.85"/>
+          <!-- Inner Core (Solid) -->
+          <circle cx="200" cy="150" r="26" fill="#facc15"/>
+          
+          <!-- Earthquake Focus on Top -->
+          <circle cx="200" cy="20" r="6" fill="#ef4444" stroke="#ffffff" stroke-width="2"/>
+          <text x="200" y="14" fill="#ef4444" font-size="10" font-weight="bold" text-anchor="middle">จุดศูนย์เกิดแผ่นดินไหว</text>
+
+          <!-- Wave Rays P & S (Mantle only paths) -->
+          <path d="M200,20 Q120,80 85,110" fill="none" stroke="#10b981" stroke-width="2"/>
+          <path d="M200,20 Q280,80 315,110" fill="none" stroke="#10b981" stroke-width="2"/>
+          <!-- P waves refracting into Outer Core -->
+          <path d="M200,20 Q180,90 190,170 Q195,230 200,280" fill="none" stroke="#10b981" stroke-width="1.5" stroke-dasharray="3,3"/>
+
+          <!-- S-wave Shadow Zones Labels -->
+          <path d="M200,150 L75,200 A130,130 0 0,0 325,200 Z" fill="#dc2626" opacity="0.25"/>
+          
+          <!-- Angle Markers -->
+          <text x="75" y="105" fill="#f59e0b" font-size="10" font-weight="bold">103°</text>
+          <text x="325" y="105" fill="#f59e0b" font-size="10" font-weight="bold">103°</text>
+          <text x="200" y="240" fill="#f87171" font-size="11" font-weight="bold" text-anchor="middle">S-Wave Shadow Zone (103° - 180°)</text>
+          <text x="200" y="255" fill="#cbd5e1" font-size="9" text-anchor="middle">ตรวจไม่พบคลื่น S เลยแม้แต่น้อย (เพราะแก่นโลกชั้นนอกเป็นของเหลว)</text>
+        </svg>
+      </div>
+
+      <div class="text-xs text-slate-300 space-y-2 leading-relaxed">
+        <p>
+          <b>เขตเงาคลื่น S (103° ถึง 180°):</b> เนื่องจากคลื่น S เดินทางผ่านของเหลวไม่ได้ เมื่อคลื่นเดินทางไปชนแก่นโลกชั้นนอก จึงถูกขวางกั้นอย่างสมบูรณ์ ทำให้เครื่องตรวจวัดบนโลกในมุมตั้งแต่ 103° ขึ้นไปจากจุดเกิดเหตุ ไม่พบคลื่น S เลย
+        </p>
+        <p>
+          <b>เขตเงาคลื่น P (103° ถึง 142°):</b> คลื่น P ผ่านของเหลวได้ แต่เกิด <em>การหักเหความเร็วอย่างรุนแรง (Refraction)</em> จนเบนทิศทาง ทำให้เกิดแถบวงแหวนว่างเปล่าที่คลื่น P ส่องไปไม่ถึง
+        </p>
+      </div>
+
+      <div class="pt-2 text-right">
+        <button onclick="closeShadowZoneModal()" class="bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs px-4 py-2 rounded-xl transition font-medium">เข้าใจแล้ว ปิดหน้าต่าง</button>
+      </div>
+    </div>
+  </div>
+
+  <footer class="bg-slate-900 border-t border-slate-800 py-3 text-center text-xs text-slate-500">
+    แบบจำลองวิทยาศาสตร์เชิงโต้ตอบ • อิงตามแบบจำลองความเร็วคลื่นไหวสะเทือนมาตรฐาน Preliminary Reference Earth Model (PREM)
+  </footer>
+
+  <!-- ========================================================================= -->
+  <!-- JAVASCRIPT SIMULATION LOGIC -->
+  <!-- ========================================================================= -->
+  <script>
+    let currentMode = 1;
+    let currentCriteria = 'chemical'; // 'chemical' or 'physical'
+    let currentSelectedLayerId = 'crust';
+
+    // PREM (Preliminary Reference Earth Model) approximated wave velocity & depth profiles
+    const depthDataPoints = [
+      { depth: 0, p: 5.8, s: 3.2, name: 'เปลือกโลก (Crust)', state: 'ของแข็ง (หิน)', density: '2.7 - 2.9 g/cm³', pressure: '0 GPa', desc: 'เปลือกโลกประกอบด้วยหินแกรนิตและบะซอลต์ มีความเร็วคลื่นค่อนข้างต่ำ' },
+      { depth: 35, p: 8.0, s: 4.4, name: 'รอยต่อโมโฮโรวิซิก (Moho Discontinuity)', state: 'ของแข็ง', density: '3.3 g/cm³', pressure: '1 GPa', desc: 'รอยต่อฐานเปลือกโลก ความเร็วคลื่นเพิ่มฉับพลันเนื่องจากเปลี่ยนเป็นหินเพริโดไทต์' },
+      { depth: 200, p: 8.1, s: 4.4, name: 'ฐานธรณีภาค (Asthenosphere)', state: 'ของแข็งที่มีสภาพพลาสติก (หินหนืดอ่อนนุ่ม)', density: '3.4 g/cm³', pressure: '7 GPa', desc: 'โซนความเร็วต่ำ (Low Velocity Zone) บางส่วนเกิดการหลอมละลายบางส่วน ทำให้แผ่นเปลือกโลกเลื่อนตัวได้' },
+      { depth: 670, p: 10.2, s: 5.5, name: 'เนื้อโลกตอนล่าง (Lower Mantle / Mesosphere)', state: 'ของแข็งที่มีความหนาแน่นสูง', density: '4.4 g/cm³', pressure: '24 GPa', desc: 'แร่ธาตุอัดตัวแน่นขึ้นเป็นโครงสร้างแบบบริดจ์มาไนต์ (Bridgmanite) ทำให้คลื่นเดินทางเร็วขึ้นต่อเนื่อง' },
+      { depth: 2890, p: 13.7, s: 7.2, name: 'ฐานเนื้อโลก (D-Double Prime Layer)', state: 'ของแข็งขอบรอยต่อ', density: '5.6 g/cm³', pressure: '135 GPa', desc: 'จุดสิ้นสุดของชั้นเนื้อโลก คลื่น P และ S มีความเร็วสูงสุดในชั้นหิน' },
+      { depth: 2900, p: 8.1, s: 0.0, name: 'แก่นโลกชั้นนอก (Outer Core - ขอบบน)', state: 'ของเหลว (Liquid Iron-Nickel)', density: '9.9 g/cm³', pressure: '136 GPa', desc: '★ จุดเปลี่ยนสำคัญ! S-wave ดิ่งเหลือ 0 ทันที และ P-wave ความเร็วลดลงฮวบ บ่งบอกว่าเป็นของเหลวหลอมเหลว' },
+      { depth: 4000, p: 9.5, s: 0.0, name: 'แก่นโลกชั้นนอก (Outer Core - ตอนกลาง)', state: 'ของเหลวพาความร้อน', density: '11.2 g/cm³', pressure: '240 GPa', desc: 'การไหลหมุนวนของเหล็กเหลวหลอมเหลวในชั้นนี้ ก่อให้เกิดสนามแม่เหล็กโลก (Geodynamo)' },
+      { depth: 5150, p: 10.3, s: 0.0, name: 'รอยต่อเลห์มันน์ (Lehmann Discontinuity)', state: 'รอยต่อเปลี่ยนสถานะ ของเหลว ➔ ของแข็ง', density: '12.2 g/cm³', pressure: '329 GPa', desc: 'แรงดันมหาศาลเริ่มบังคับให้อะตอมเหล็กเรียงตัวเป็นของแข็งอีกครั้ง' },
+      { depth: 5160, p: 11.0, s: 3.5, name: 'แก่นโลกชั้นใน (Inner Core - ขอบบน)', state: 'ของแข็งหนาแน่นยิ่งยวด', density: '12.8 g/cm³', pressure: '330 GPa', desc: 'คลื่น P ดีดตัวเร็วขึ้นทันที และเกิดคลื่น S รูปแบบเฉพาะในของแข็ง' },
+      { depth: 6370, p: 11.3, s: 3.7, name: 'ใจกลางโลก (Earth Center)', state: 'ของแข็งผลึกเหล็ก-นิกเกิล', density: '13.1 g/cm³', pressure: '364 GPa', desc: 'อุณหภูมิราว 5,500 - 6,000°C พอๆ กับผิวของดวงอาทิตย์ แต่เป็นของแข็งเพราะแรงกดทับสุดขั้ว' }
+    ];
+
+    // Layers defined by Chemical Composition
+    const chemicalLayers = [
+      {
+        id: 'crust',
+        name: 'เปลือกโลก (Crust)',
+        depth: '0 - 70 km',
+        sub: 'ความหนา ~1% ของรัศมีโลก',
+        state: 'ของแข็ง (Solid)',
+        density: '2.7 - 3.0',
+        densityPercent: 22,
+        temp: '20 - 800',
+        tempPercent: 14,
+        press: '< 1',
+        pressPercent: 4,
+        waves: 'P และ S',
+        waveNote: 'เดินทางผ่านได้ ความเร็วต่ำสุด',
+        color: 'from-amber-600 to-amber-700',
+        accentBg: 'bg-amber-600',
+        chem: 'สารประกอบซิลิกาและอะลูมินา (Si, Al - หินแกรนิต) และซิลิกา-แมกนีเซียม (Si, Mg - หินบะซอลต์)',
+        evidence: 'ขุดเจาะได้จริงบางส่วน ร่วมกับการวัดความเร็วคลื่น P และ S ที่สะท้อนจากแนวรอยต่อโมโฮ'
+      },
+      {
+        id: 'mantle',
+        name: 'เนื้อโลก (Mantle)',
+        depth: '70 - 2,900 km',
+        sub: 'กินปริมาตรมากที่สุด ~84% ของโลก',
+        state: 'ของแข็ง (Solid Silicate Rock)',
+        density: '3.3 - 5.7',
+        densityPercent: 43,
+        temp: '800 - 3,000',
+        tempPercent: 45,
+        press: '1 - 136',
+        pressPercent: 37,
+        waves: 'P และ S',
+        waveNote: 'ความเร็วเพิ่มขึ้นตามความลึก',
+        color: 'from-orange-600 to-red-700',
+        accentBg: 'bg-orange-600',
+        chem: 'หินอัลตรามาฟิก (เพริโดไทต์) อุดมด้วยธาตุ ซิลิคอน, ออกซิเจน, เหล็ก, แมกนีเซียม (Fe-Mg Silicates)',
+        evidence: 'พบเศษหินเนื้อโลก (Xenoliths) ปะปนมากับลาวาภูเขาไฟ และคลื่นไหวสะเทือนเดินทางผ่านได้ทั้งสองชนิด'
+      },
+      {
+        id: 'outer_core',
+        name: 'แก่นโลกชั้นนอก (Outer Core)',
+        depth: '2,900 - 5,150 km',
+        sub: 'แหล่งกำเนิดสนามแม่เหล็กโลก',
+        state: 'ของเหลว (Molten Liquid)',
+        density: '9.9 - 12.2',
+        densityPercent: 80,
+        temp: '3,000 - 4,800',
+        tempPercent: 75,
+        press: '136 - 329',
+        pressPercent: 85,
+        waves: 'P เท่านั้น (S หายไป)',
+        waveNote: 'S-wave = 0 ไม่สามารถผ่านได้',
+        color: 'from-red-600 to-rose-800',
+        accentBg: 'bg-rose-600',
+        chem: 'โลหะผสมเหล็กและนิกเกิลหลอมเหลว (Fe 85%, Ni 5%) ปนธาตุเบาอย่างกำมะถันและออกซิเจน',
+        evidence: 'คลื่น S หายไปอย่างสิ้นเชิงกลายเป็นเขตเงาคลื่น (Shadow Zone) ทั่วโลก และเป็นตัวสร้างสนามแม่เหล็กโลก'
+      },
+      {
+        id: 'inner_core',
+        name: 'แก่นโลกชั้นใน (Inner Core)',
+        depth: '5,150 - 6,370 km',
+        sub: 'ใจกลางโลก ความดันสูงสุดขีด',
+        state: 'ของแข็งหนาแน่นยิ่งยวด (Dense Solid)',
+        density: '12.8 - 13.1',
+        densityPercent: 100,
+        temp: '5,000 - 5,500',
+        tempPercent: 95,
+        press: '330 - 364',
+        pressPercent: 100,
+        waves: 'P (เร่งขึ้น) และ S แปลงรูป',
+        waveNote: 'P-wave กระโดดขึ้นชัดเจน',
+        color: 'from-amber-400 to-yellow-500',
+        accentBg: 'bg-yellow-400',
+        chem: 'เหล็กและนิกเกิลบริสุทธิ์เกือบ 100% ในรูปผลึกผลึกแข็งความหนาแน่นสูงมาก',
+        evidence: 'ความเร็วคลื่น P สะท้อนและหักเหเพิ่มขึ้นฉับพลันที่รอยต่อ 5,150 กม. พิสูจน์โดย Inge Lehmann ในปี 1936'
+      }
+    ];
+
+    // Layers defined by Mechanical/Physical Properties
+    const physicalLayers = [
+      {
+        id: 'lithosphere',
+        name: 'ธรณีภาค (Lithosphere)',
+        depth: '0 - 100 km',
+        sub: 'แผ่นเปลือกโลกที่แตกเป็นแผ่นๆ',
+        state: 'ของแข็งแข็งเกร็ง (Brittle Solid)',
+        density: '2.7 - 3.1',
+        densityPercent: 23,
+        temp: '20 - 1,000',
+        tempPercent: 16,
+        press: '< 3',
+        pressPercent: 5,
+        waves: 'P และ S',
+        waveNote: 'ผ่านได้ตามปกติ',
+        color: 'from-emerald-700 to-teal-800',
+        accentBg: 'bg-emerald-600',
+        chem: 'รวมเปลือกโลกและเนื้อโลกตอนบนสุดเข้าด้วยกัน เป็นแผ่นธรณี (Tectonic Plates) ที่ลอยตัวอยู่',
+        evidence: 'เป็นบริเวณที่เกิดแผ่นดินไหวหลักเกือบทั้งหมดของโลก'
+      },
+      {
+        id: 'asthenosphere',
+        name: 'ฐานธรณีภาค (Asthenosphere)',
+        depth: '100 - 410 km',
+        sub: 'ชั้นที่มีการหลอมละลายบางส่วน',
+        state: 'ของแข็งพลาสติก ยืดหยุ่นอ่อนตัว (Plastic Solid)',
+        density: '3.3 - 3.5',
+        densityPercent: 27,
+        temp: '1,000 - 1,400',
+        tempPercent: 25,
+        press: '3 - 14',
+        pressPercent: 10,
+        waves: 'P และ S (ความเร็วตกชั่วคราว)',
+        waveNote: 'Low Velocity Zone (LVZ)',
+        color: 'from-amber-700 to-orange-800',
+        accentBg: 'bg-amber-600',
+        chem: 'หินเพริโดไทต์ที่มีอุณหภูมิใกล้เคียงจุดหลอมเหลว มีลักษณะคล้ายดินน้ำมันหรือยางมะตอยร้อน',
+        evidence: 'ความเร็วคลื่นไหวสะเทือนลดลงเล็กน้อยในโซนนี้ และเป็นตัวรองรับการเคลื่อนที่ของทวีป'
+      },
+      {
+        id: 'mesosphere',
+        name: 'มัชฌิมภาค (Mesosphere)',
+        depth: '410 - 2,900 km',
+        sub: 'เนื้อโลกตอนล่างที่แน่นแข็ง',
+        state: 'ของแข็งแข็งแรง (Rigid Solid)',
+        density: '3.9 - 5.7',
+        densityPercent: 44,
+        temp: '1,400 - 3,000',
+        tempPercent: 50,
+        press: '14 - 136',
+        pressPercent: 37,
+        waves: 'P และ S',
+        waveNote: 'ความเร็วพุ่งสูงขึ้นอย่างต่อเนื่อง',
+        color: 'from-orange-800 to-rose-900',
+        accentBg: 'bg-orange-700',
+        chem: 'โครงสร้างผลึกแร่ธาตุอัดแน่นยิ่งยวดภายใต้แรงดันสูง',
+        evidence: 'คลื่น P และ S มีความเร็วพุ่งสูงต่อเนื่องจนแตะ ~13.7 km/s ที่ฐานล่างสุด'
+      },
+      {
+        id: 'outer_core_phys',
+        name: 'แก่นโลกชั้นนอก (Outer Core)',
+        depth: '2,900 - 5,150 km',
+        sub: 'ชั้นของเหลวหมุนวน',
+        state: 'ของเหลวไหลเวียน (Liquid Dynamo)',
+        density: '9.9 - 12.2',
+        densityPercent: 80,
+        temp: '3,000 - 4,800',
+        tempPercent: 75,
+        press: '136 - 329',
+        pressPercent: 85,
+        waves: 'P เท่านั้น (S หายไป)',
+        waveNote: 'S-wave = 0 ไม่สามารถผ่านได้',
+        color: 'from-red-600 to-rose-800',
+        accentBg: 'bg-rose-600',
+        chem: 'เหล็กหลอมเหลวที่หมุนวนด้วยการพาความร้อน ก่อให้เกิดสนามแม่เหล็กโลก',
+        evidence: 'การหายไปของคลื่น S ที่ 2,900 กม. ทั่วโลก'
+      },
+      {
+        id: 'inner_core_phys',
+        name: 'แก่นโลกชั้นใน (Inner Core)',
+        depth: '5,150 - 6,370 km',
+        sub: 'ของแข็งแก่นในสุด',
+        state: 'ของแข็งภายใต้ความดันวิกฤต',
+        density: '12.8 - 13.1',
+        densityPercent: 100,
+        temp: '5,000 - 5,500',
+        tempPercent: 95,
+        press: '330 - 364',
+        pressPercent: 100,
+        waves: 'P และ S แปลงรูป',
+        waveNote: 'P-wave พุ่งขึ้นฉับพลัน',
+        color: 'from-amber-400 to-yellow-500',
+        accentBg: 'bg-yellow-400',
+        chem: 'ผลึกของแข็งเหล็ก-นิกเกิล',
+        evidence: 'ความเร็วคลื่น P พุ่งขึ้นฉับพลันที่รอยต่อเลห์มันน์'
+      }
+    ];
+
+    // Quiz Questions Data for Mode 3
+    const quizQuestions = [
+      {
+        q: "เมื่อเกิดแผ่นดินไหว เครื่องวัดคลื่นที่ตั้งอยู่ฝั่งตรงข้ามจุดเกิดเหตุ (มุมเกิน 105°) ตรวจไม่พบคลื่น S (S-wave) เลย ปรากฏการณ์นี้เป็นหลักฐานสนับสนุนข้อสรุปใด?",
+        category: "พฤติกรรมคลื่นทุติยภูมิ (S-wave)",
+        options: [
+          { text: "แก่นโลกชั้นนอกมีสภาพเป็นของเหลว เพราะคลื่น S เคลื่อนที่ผ่านของเหลวไม่ได้", correct: true },
+          { text: "แก่นโลกชั้นนอกมีความหนาแน่นต่ำมากจนคลื่นสลายไป", correct: false },
+          { text: "คลื่น S ทั้งหมดเคลื่อนที่เร็วเกินไปจนเครื่องวัดตรวจไม่ทัน", correct: false },
+          { text: "โลกกลวงตรงกลาง ทำให้คลื่นสะท้อนกลับหมด", correct: false }
+        ],
+        explanation: "ถูกต้องอย่างยอดเยี่ยม! คลื่น S เป็นคลื่นเฉือนตามขวาง (Shear Wave) ซึ่งโมเลกุลของเหลวไม่มีแรงต้านทานการเปลี่ยนรูปเฉือน จึงไม่สามารถส่งผ่านคลื่น S ได้เลย"
+      },
+      {
+        q: "ถ้ามนุษย์เราไม่เคยขุดเจาะทะลุผ่านเปลือกโลกไปถึงแก่นโลกเลย เรารู้ได้อย่างไรว่าใจกลางโลกประกอบด้วย 'เหล็กและนิกเกิล' เป็นหลัก?",
+        category: "หลักฐานทางอ้อม (Indirect Evidence)",
+        options: [
+          { text: "คำนวณจากความหนาแน่นเฉลี่ยของโลก (~5.5 g/cm³) เทียบกับหินเปลือกโลก (~2.7 g/cm³) ร่วมกับการวิเคราะห์อุกกาบาตเหล็กโบราณ", correct: true },
+          { text: "ส่งดาวเทียมปล่อยแสงเอกซเรย์ทะลวงผ่านเปลือกโลกจนถึงแก่นกลาง", correct: false },
+          { text: "ตักตัวอย่างหินหลอมเหลวที่ปะทุขึ้นมาจากปล่องภูเขาไฟลึก", correct: false },
+          { text: "ใช้คลื่นเสียงสะท้อนกลับมาเป็นคลื่นวิทยุ", correct: false }
+        ],
+        explanation: "ยอดเยี่ยมมาก! หินบนผิวโลกเบามาก (~2.7 g/cm³) แต่ค่าเฉลี่ยทั้งโลกคือ 5.5 g/cm³ แสดงว่าส่วนในต้องมีธาตุที่หนักมาก เช่น เหล็ก-นิกเกิล ซึ่งตรงกับส่วนประกอบของอุกกาบาตเหล็กที่ตกมาจากยุคกำเนิดระบบสุริยะ"
+      },
+      {
+        q: "ที่ระดับความลึกประมาณ 35 กิโลเมตรใต้ทวีป ความเร็วคลื่น P พุ่งกระโดดจาก ~6 km/s เป็น ~8 km/s ในทันที ปรากฏการณ์นี้เรียกว่าอะไร?",
+        category: "รอยต่อความไม่ต่อเนื่อง",
+        options: [
+          { text: "แนวรอยต่อโมโฮโรวิซิก (Moho Discontinuity) ที่กั้นระหว่างเปลือกโลกกับเนื้อโลก", correct: true },
+          { text: "แนวรอยต่อกูเทนเบิร์กที่กั้นแก่นโลก", correct: false },
+          { text: "เขตเงาคลื่นไหวสะเทือน", correct: false },
+          { text: "ชั้นเปลือกโลกใต้มหาสมุทร", correct: false }
+        ],
+        explanation: "ถูกต้อง! Andrija Mohorovičić สังเกตพบในปี 1909 ว่าคลื่นเดินทางเร็วขึ้นอย่างฉับพลัน เกิดจากการเปลี่ยนชนิดหินจากหินแกรนิต/บะซอลต์ เป็นหินเพริโดไทต์ในชั้นเนื้อโลก"
+      },
+      {
+        q: "แก่นโลกชั้นในมีอุณหภูมิสูงถึง 5,500°C (ร้อนพอๆ กับผิวของดวงอาทิตย์) แต่ทำไมนักวิทยาศาสตร์จึงสรุปว่ามีสถานะเป็น 'ของแข็ง' ไม่ใช่ของเหลว?",
+        category: "ความดันยิ่งยวดและสถานะสสาร",
+        options: [
+          { text: "ความดันมหาศาล (~360 GPa) จากน้ำหนักของโลกทั้งใบกดทับจนจุดหลอมเหลวเพิ่มสูงขึ้นกว่าอุณหภูมิ", correct: true },
+          { text: "เพราะแก่นโลกชั้นในไม่มีธาตุกัมมันตรังสีให้ความร้อนแล้ว", correct: false },
+          { text: "เพราะน้ำใต้บาดาลรั่วซึมลงไปหล่อเย็นจนแข็งตัว", correct: false },
+          { text: "เพราะสนามแม่เหล็กโลกบีบให้อนุภาคหยุดนิ่ง", correct: false }
+        ],
+        explanation: "ถูกต้องที่สุด! จุดหลอมเหลวของสสารจะสูงขึ้นเมื่ออยู่ภายใต้ความดันสูง ที่ใจกลางโลกมีแรงดันมากกว่าผิวโลก 3.6 ล้านเท่า อะตอมจึงถูกบีบให้เรียงตัวเป็นของแข็งแม้จะร้อนจัดก็ตาม"
+      },
+      {
+        q: "ทำไมแบบจำลองโครงสร้างโลกจึงแบ่งได้ทั้ง 'แบบ 3 ชั้น (เคมี)' และ 'แบบ 5 ชั้น (สมบัติเชิงกล)' การมีสองเกณฑ์นี้สะท้อนธรรมชาติของวิทยาศาสตร์อย่างไร?",
+        category: "ธรรมชาติของวิทยาศาสตร์ (Nature of Science)",
+        options: [
+          { text: "แบบจำลองถูกสร้างขึ้นตามคำถามและหลักฐานที่ใช้ศึกษา ทั้งสองแบบจำลองเสริมพลังความเข้าใจซึ่งกันและกัน", correct: true },
+          { text: "แบบจำลองหนึ่งถูกต้อง ส่วนอีกแบบจำลองหนึ่งล้าสมัยและผิด", correct: false },
+          { text: "เพราะนักธรณีวิทยาทะเลาะกันและไม่ยอมตกลงข้อสรุป", correct: false },
+          { text: "เพราะโลกเปลี่ยนโครงสร้างสลับไปมาทุกๆ หนึ่งล้านปี", correct: false }
+        ],
+        explanation: "ลึกซึ้งมาก! วิทยาศาสตร์สร้าง 'แบบจำลอง (Models)' ขึ้นเพื่ออธิบายปรากฏการณ์ หากสนใจชนิดแร่ธาตุจะใช้เกณฑ์เคมี หากสนใจการเคลื่อนที่ของแผ่นธรณีและแผ่นดินไหวจะใช้เกณฑ์เชิงกล"
+      }
+    ];
+
+    let currentQuizIndex = 0;
+    let quizScore = 0;
+    let quizAnswered = false;
+
+    let seismicChartInstance = null;
+
+    function initChart() {
+      const ctx = document.getElementById('seismicChart').getContext('2d');
+      
+      const labels = depthDataPoints.map(d => d.depth);
+      const pData = depthDataPoints.map(d => d.p);
+      const sData = depthDataPoints.map(d => d.s);
+
+      seismicChartInstance = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: labels,
+          datasets: [
+            {
+              label: 'P-Wave Velocity (km/s)',
+              data: pData,
+              borderColor: '#34d399',
+              backgroundColor: 'rgba(52, 211, 153, 0.1)',
+              borderWidth: 3,
+              tension: 0.15,
+              pointRadius: 3,
+              pointHoverRadius: 6
+            },
+            {
+              label: 'S-Wave Velocity (km/s)',
+              data: sData,
+              borderColor: '#fbbf24',
+              backgroundColor: 'rgba(251, 191, 36, 0.1)',
+              borderWidth: 3,
+              tension: 0.15,
+              pointRadius: 3,
+              pointHoverRadius: 6
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          interaction: {
+            mode: 'index',
+            intersect: false
+          },
+          scales: {
+            x: {
+              title: {
+                display: true,
+                text: 'ระดับความลึก (Depth in km)',
+                color: '#94a3b8',
+                font: { family: 'Prompt', size: 11 }
+              },
+              ticks: { color: '#64748b', font: { family: 'Space Grotesk' } },
+              grid: { color: 'rgba(51, 65, 85, 0.4)' }
+            },
+            y: {
+              title: {
+                display: true,
+                text: 'ความเร็วคลื่น (Velocity km/s)',
+                color: '#94a3b8',
+                font: { family: 'Prompt', size: 11 }
+              },
+              min: 0,
+              max: 15,
+              ticks: { color: '#64748b', font: { family: 'Space Grotesk' } },
+              grid: { color: 'rgba(51, 65, 85, 0.4)' }
+            }
+          },
+          plugins: {
+            legend: { display: false },
+            tooltip: {
+              backgroundColor: '#090d16',
+              borderColor: '#334155',
+              borderWidth: 1,
+              titleFont: { family: 'Prompt' },
+              bodyFont: { family: 'Prompt' }
+            }
+          }
+        }
+      });
+    }
+
+    const depthSlider = document.getElementById('depthSlider');
+    const probeDepthBadge = document.getElementById('probeDepthBadge');
+    const pSpeedVal = document.getElementById('pSpeedVal');
+    const sSpeedVal = document.getElementById('sSpeedVal');
+    const pWaveStatusTag = document.getElementById('pWaveStatusTag');
+    const sWaveStatusTag = document.getElementById('sWaveStatusTag');
+    const inferLayerName = document.getElementById('inferLayerName');
+    const inferExplanation = document.getElementById('inferExplanation');
+    const inferState = document.getElementById('inferState');
+    const inferDensity = document.getElementById('inferDensity');
+    const inferPressure = document.getElementById('inferPressure');
+
+    function updateProbe(depth) {
+      probeDepthBadge.textContent = `ความลึก: ${depth.toLocaleString()} กม.`;
+      
+      // Find closest depth milestone or interpolate
+      let matched = depthDataPoints[0];
+      for (let i = 0; i < depthDataPoints.length; i++) {
+        if (depth >= depthDataPoints[i].depth) {
+          matched = depthDataPoints[i];
+        }
+      }
+
+      // Special transitions
+      let pSpeed = matched.p;
+      let sSpeed = matched.s;
+
+      if (depth >= 2900 && depth < 5150) {
+        sSpeed = 0.0;
+      }
+
+      pSpeedVal.textContent = `${pSpeed.toFixed(1)} km/s`;
+      sSpeedVal.textContent = sSpeed === 0 ? `0.0 km/s (หยุดชะงัก)` : `${sSpeed.toFixed(1)} km/s`;
+
+      if (sSpeed === 0) {
+        sWaveStatusTag.textContent = 'ไม่ผ่าน (0 km/s)';
+        sWaveStatusTag.className = 'text-[10px] px-1.5 py-0.5 rounded bg-rose-950 border border-rose-500/40 text-rose-300 font-semibold';
+      } else {
+        sWaveStatusTag.textContent = 'ผ่านได้';
+        sWaveStatusTag.className = 'text-[10px] px-1.5 py-0.5 rounded bg-amber-950 text-amber-300 font-semibold';
+      }
+
+      inferLayerName.textContent = matched.name;
+      inferExplanation.textContent = matched.desc;
+      inferState.textContent = matched.state;
+      inferDensity.textContent = matched.density;
+      inferPressure.textContent = matched.pressure;
+    }
+
+    depthSlider.addEventListener('input', (e) => {
+      updateProbe(Number(e.target.value));
+    });
+
+    function setDepth(val) {
+      depthSlider.value = val;
+      updateProbe(val);
+    }
+
+    function getActiveDataset() {
+      return currentCriteria === 'chemical' ? chemicalLayers : physicalLayers;
+    }
+
+    function renderLayerStack() {
+      const container = document.getElementById('layerStackList');
+      container.innerHTML = '';
+      const list = getActiveDataset();
+
+      list.forEach((layer) => {
+        const isSelected = layer.id === currentSelectedLayerId;
+        const card = document.createElement('div');
+        card.className = `layer-card-transition p-3.5 rounded-xl border cursor-pointer select-none flex items-center justify-between shadow-sm ${
+          isSelected 
+            ? 'bg-slate-800 border-cyan-400 translate-x-2 ring-1 ring-cyan-400/50' 
+            : 'bg-slate-950/80 border-slate-800 hover:border-slate-700 hover:bg-slate-900'
+        }`;
+        card.onclick = () => selectLayer(layer.id);
+
+        card.innerHTML = `
+          <div class="flex items-center gap-3">
+            <div class="w-3.5 h-10 rounded-md bg-gradient-to-b ${layer.color} shadow-sm shrink-0"></div>
+            <div>
+              <div class="flex items-center gap-2">
+                <span class="text-sm font-semibold text-white">${layer.name}</span>
+                ${isSelected ? '<span class="text-[10px] bg-cyan-950 border border-cyan-500/40 text-cyan-300 px-1.5 py-0.2 rounded">ถอดชิ้นส่วนอยู่</span>' : ''}
+              </div>
+              <span class="text-xs text-slate-400 font-mono-num">${layer.depth}</span>
+            </div>
+          </div>
+          <div class="text-right">
+            <span class="text-[11px] text-slate-400 block">${layer.state.split(' ')[0]}</span>
+            <span class="text-[10px] text-cyan-400 font-medium">ดูข้อมูล ➔</span>
+          </div>
+        `;
+        container.appendChild(card);
+      });
+
+      updateInspector();
+    }
+
+    function selectLayer(id) {
+      currentSelectedLayerId = id;
+      renderLayerStack();
+    }
+
+    function resetExtractedLayer() {
+      const list = getActiveDataset();
+      currentSelectedLayerId = list[0].id;
+      renderLayerStack();
+    }
+
+    function updateInspector() {
+      const list = getActiveDataset();
+      const current = list.find(l => l.id === currentSelectedLayerId) || list[0];
+
+      document.getElementById('inspectorLayerTitle').textContent = current.name;
+      document.getElementById('inspectorLayerSub').textContent = `ความลึก: ${current.depth} | ${current.sub}`;
+      document.getElementById('inspectorStateTag').textContent = `สถานะ: ${current.state}`;
+      
+      const badgeColor = document.getElementById('inspectorLayerBadgeColor');
+      badgeColor.className = `w-5 h-12 rounded-lg bg-gradient-to-b ${current.color} shadow-md`;
+
+      // Gauges values
+      document.getElementById('gaugeDensityVal').textContent = current.density;
+      document.getElementById('gaugeDensityBar').style.width = `${current.densityPercent}%`;
+
+      document.getElementById('gaugeTempVal').textContent = current.temp;
+      document.getElementById('gaugeTempBar').style.width = `${current.tempPercent}%`;
+
+      document.getElementById('gaugePressVal').textContent = current.press;
+      document.getElementById('gaugePressBar').style.width = `${current.pressPercent}%`;
+
+      document.getElementById('gaugeWaveVal').textContent = current.waves;
+      document.getElementById('gaugeWaveNote').textContent = current.waveNote;
+
+      const dotS = document.getElementById('dotWaveS');
+      if (current.waves.includes('หายไป') || current.waves.includes('เท่านั้น')) {
+        dotS.className = 'w-2 h-2 rounded-full bg-slate-600 opacity-40';
+      } else {
+        dotS.className = 'w-2 h-2 rounded-full bg-amber-400';
+      }
+
+      document.getElementById('inspectorChemical').textContent = current.chem;
+      document.getElementById('inspectorEvidence').textContent = current.evidence;
+    }
+
+    function switchCriteria(crit) {
+      currentCriteria = crit;
+      const btnChem = document.getElementById('crit-chem-btn');
+      const btnPhys = document.getElementById('crit-phys-btn');
+
+      if (crit === 'chemical') {
+        btnChem.className = 'px-3 py-1.5 rounded-lg bg-indigo-600 text-white font-medium shadow transition';
+        btnPhys.className = 'px-3 py-1.5 rounded-lg text-slate-400 hover:text-slate-200 transition';
+        currentSelectedLayerId = 'crust';
+      } else {
+        btnPhys.className = 'px-3 py-1.5 rounded-lg bg-indigo-600 text-white font-medium shadow transition';
+        btnChem.className = 'px-3 py-1.5 rounded-lg text-slate-400 hover:text-slate-200 transition';
+        currentSelectedLayerId = 'lithosphere';
+      }
+
+      renderLayerStack();
+    }
+
+    function renderQuiz() {
+      const q = quizQuestions[currentQuizIndex];
+      quizAnswered = false;
+
+      document.getElementById('quizQuestionNumberBadge').textContent = `ข้อที่ ${currentQuizIndex + 1} / ${quizQuestions.length}`;
+      document.getElementById('quizCategoryBadge').textContent = `ประเด็น: ${q.category}`;
+      document.getElementById('quizQuestionText').textContent = q.q;
+
+      const optionsBox = document.getElementById('quizOptionsContainer');
+      optionsBox.innerHTML = '';
+
+      q.options.forEach((opt, idx) => {
+        const btn = document.createElement('button');
+        btn.className = 'w-full text-left p-3.5 rounded-xl border border-slate-800 bg-slate-950/70 hover:bg-slate-800 hover:border-slate-700 text-xs sm:text-sm text-slate-200 transition flex items-start gap-3';
+        btn.onclick = () => selectQuizAnswer(idx, btn);
+
+        btn.innerHTML = `
+          <span class="w-5 h-5 rounded-full bg-slate-800 border border-slate-700 text-[11px] font-mono-num font-bold flex items-center justify-center shrink-0 mt-0.5">
+            ${String.fromCharCode(65 + idx)}
+          </span>
+          <span class="flex-1 leading-relaxed">${opt.text}</span>
+        `;
+        optionsBox.appendChild(btn);
+      });
+
+      const feedback = document.getElementById('quizFeedbackBox');
+      feedback.className = 'hidden p-4 rounded-xl border text-xs leading-relaxed';
+      feedback.innerHTML = '';
+
+      document.getElementById('btnQuizNext').classList.add('hidden');
+      document.getElementById('btnQuizRestart').classList.add('hidden');
+    }
+
+    function selectQuizAnswer(chosenIndex, selectedBtn) {
+      if (quizAnswered) return;
+      quizAnswered = true;
+
+      const q = quizQuestions[currentQuizIndex];
+      const isCorrect = q.options[chosenIndex].correct;
+      const feedback = document.getElementById('quizFeedbackBox');
+
+      // Disable all options and highlight correct/wrong
+      const allButtons = document.querySelectorAll('#quizOptionsContainer button');
+      allButtons.forEach((btn, idx) => {
+        btn.disabled = true;
+        if (q.options[idx].correct) {
+          btn.classList.remove('bg-slate-950/70', 'border-slate-800');
+          btn.classList.add('bg-emerald-950/70', 'border-emerald-500', 'text-emerald-200');
+        } else if (idx === chosenIndex && !isCorrect) {
+          btn.classList.remove('bg-slate-950/70', 'border-slate-800');
+          btn.classList.add('bg-rose-950/70', 'border-rose-500', 'text-rose-200');
+        }
+      });
+
+      if (isCorrect) {
+        quizScore++;
+        feedback.className = 'p-4 rounded-xl border bg-emerald-950/60 border-emerald-500/50 text-emerald-200 text-xs leading-relaxed';
+        feedback.innerHTML = `<b>🎉 ถูกต้อง!</b><br>${q.explanation}`;
+      } else {
+        feedback.className = 'p-4 rounded-xl border bg-rose-950/60 border-rose-500/50 text-rose-200 text-xs leading-relaxed';
+        feedback.innerHTML = `<b>❌ ยังไม่ถูกต้อง</b><br>${q.explanation}`;
+      }
+      feedback.classList.remove('hidden');
+
+      document.getElementById('quizScoreText').textContent = `${quizScore} / ${quizQuestions.length}`;
+
+      if (currentQuizIndex < quizQuestions.length - 1) {
+        document.getElementById('btnQuizNext').classList.remove('hidden');
+      } else {
+        document.getElementById('btnQuizRestart').classList.remove('hidden');
+      }
+    }
+
+    function nextQuestion() {
+      if (currentQuizIndex < quizQuestions.length - 1) {
+        currentQuizIndex++;
+        renderQuiz();
+      }
+    }
+
+    function restartQuiz() {
+      currentQuizIndex = 0;
+      quizScore = 0;
+      document.getElementById('quizScoreText').textContent = `0 / ${quizQuestions.length}`;
+      renderQuiz();
+    }
+
+    function switchMode(modeNum) {
+      currentMode = modeNum;
+      
+      // Update Tab Styles
+      document.querySelectorAll('.tab-btn').forEach((btn, index) => {
+        if (index + 1 === modeNum) {
+          btn.className = 'tab-btn flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-cyan-400 bg-slate-800 shadow transition-all';
+        } else {
+          btn.className = 'tab-btn flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-slate-400 hover:text-slate-200 transition-all';
+        }
+      });
+
+      // Show/Hide Containers
+      document.getElementById('mode-1-container').classList.toggle('hidden', modeNum !== 1);
+      document.getElementById('mode-2-container').classList.toggle('hidden', modeNum !== 2);
+      document.getElementById('mode-3-container').classList.toggle('hidden', modeNum !== 3);
+
+      if (modeNum === 1 && seismicChartInstance) {
+        setTimeout(() => seismicChartInstance.resize(), 100);
+      }
+      if (modeNum === 2) {
+        renderLayerStack();
+      }
+    }
+
+    function openShadowZoneModal() {
+      document.getElementById('shadowZoneModal').classList.remove('hidden');
+      document.getElementById('shadowZoneModal').classList.add('flex');
+    }
+
+    function closeShadowZoneModal() {
+      document.getElementById('shadowZoneModal').classList.add('hidden');
+      document.getElementById('shadowZoneModal').classList.remove('flex');
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      lucide.createIcons();
+      initChart();
+      updateProbe(700);
+      renderLayerStack();
+      renderQuiz();
+    });
+  </script>
+</body>
+</html>

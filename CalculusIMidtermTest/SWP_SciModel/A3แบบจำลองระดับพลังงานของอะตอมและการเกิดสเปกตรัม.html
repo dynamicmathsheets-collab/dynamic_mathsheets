@@ -1,0 +1,1318 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>แบบจำลองระดับพลังงานของอะตอมและการเกิดสเปกตรัม (Bohr Model & Spectrum Lab)</title>
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- MathJax Configuration & CDN สำหรับสูตรควอนตัมและสเปกตรัม -->
+  <script>
+    window.MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']],
+        displayMath: [['$$', '$$'], ['\\[', '\\]']],
+        processEscapes: true
+      },
+      options: {
+        skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+      }
+    };
+  </script>
+  <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+  <!-- Google Fonts: Prompt & JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Prompt:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+
+  <style>
+    body {
+      font-family: 'Prompt', sans-serif;
+      background-color: #050814;
+      color: #f1f5f9;
+    }
+    .font-mono-math {
+      font-family: 'JetBrains Mono', monospace;
+    }
+    /* ปรับแต่ง Scrollbar */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #0b0f19;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #334155;
+      border-radius: 3px;
+    }
+    mjx-container {
+      color: inherit !important;
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col antialiased selection:bg-purple-500 selection:text-white">
+
+  <!-- Header -->
+  <header class="bg-slate-900/90 backdrop-blur border-b border-slate-800 sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto px-4 py-3 sm:px-6 flex flex-wrap justify-between items-center gap-3">
+      <div>
+        <div class="flex items-center gap-2">
+          <span class="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-violet-600/20 text-violet-400 font-bold border border-violet-500/30">
+            19
+          </span>
+          <h1 class="text-lg sm:text-xl font-bold text-white tracking-tight">
+            บทที่ 19 ฟิสิกส์อะตอม: แบบจำลองระดับพลังงานและสเปกตรัม (Atomic Spectrum Lab)
+          </h1>
+        </div>
+        <p class="text-xs text-slate-400 mt-0.5 flex flex-wrap items-center gap-2">
+          <span>แนวคิดวิจัย: สร้างโมเดลทางความคิด (Mental Model) เชื่อมโยงระดับพลังงานกับการแผ่รังสีโฟตอน</span>
+          <span class="text-violet-400 font-medium">
+            (\( \Delta E = |E_f - E_i| = hf = \frac{hc}{\lambda} \), \( \frac{1}{\lambda} = R_H \left( \frac{1}{n_f^2} - \frac{1}{n_i^2} \right) \))
+          </span>
+        </p>
+      </div>
+      <div class="flex items-center gap-2">
+        <button onclick="window.print()" class="px-3 py-1.5 text-xs bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 rounded-lg transition-colors flex items-center gap-1.5 shadow-sm">
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/></svg>
+          พิมพ์รายงานสรุป
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Mode Switcher Nav -->
+  <nav class="bg-slate-900/60 border-b border-slate-800">
+    <div class="max-w-7xl mx-auto px-4 py-2 sm:px-6 flex items-center justify-between">
+      <div class="flex items-center gap-2 text-xs sm:text-sm">
+        <button id="tabModeExplore" onclick="switchLabMode('explore')" class="px-3 py-1.5 rounded-lg bg-violet-600 text-white font-medium shadow flex items-center gap-1.5">
+          <span>🔬 โหมดทดลองอิสระ (Forward Exploration)</span>
+        </button>
+        <button id="tabModeReverse" onclick="switchLabMode('reverse')" class="px-3 py-1.5 rounded-lg bg-slate-800 text-slate-300 hover:bg-slate-700 font-medium transition-colors flex items-center gap-1.5 border border-slate-700">
+          <span>🎯 โหมดโจทย์ย้อนกลับ (Reverse Challenge)</span>
+        </button>
+      </div>
+      <span class="text-xs text-slate-400 hidden sm:inline">
+        ระบบอะตอมไฮโดรเจน (\( Z = 1 \))
+      </span>
+    </div>
+  </nav>
+
+  <!-- Main Container -->
+  <main class="flex-1 max-w-7xl w-full mx-auto px-4 py-5 sm:px-6 space-y-6">
+
+    <!-- REVERSE CHALLENGE PANEL (ซ่อนไว้ เริ่มต้นแสดงในโหมดทดลอง) -->
+    <section id="reverseChallengeSection" class="hidden bg-gradient-to-r from-slate-900 to-indigo-950/40 border-2 border-indigo-500/40 rounded-xl p-4 sm:p-5 shadow-xl">
+      <div class="flex items-center justify-between pb-3 border-b border-indigo-500/20">
+        <div class="flex items-center gap-2">
+          <span class="px-2 py-0.5 rounded text-xs font-bold bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">ท้าทายความคิด</span>
+          <h2 class="text-base font-semibold text-white">สถานการณ์ย้อนกลับ: "เส้นสเปกตรัมนี้เกิดจากการเปลี่ยนระดับพลังงานใด?"</h2>
+        </div>
+        <button onclick="generateRandomChallenge()" class="px-3 py-1 text-xs bg-indigo-600 hover:bg-indigo-500 text-white rounded-md transition-colors shadow">
+          🎲 สุ่มโจทย์ใหม่
+        </button>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
+        <!-- การ์ดโจทย์ -->
+        <div class="bg-slate-950/70 p-4 rounded-lg border border-slate-800 flex flex-col justify-center items-center text-center">
+          <span class="text-xs text-slate-400 mb-1">ตรวจพบเส้นสเปกตรัมที่มีความยาวคลื่น:</span>
+          <div id="targetLambda" class="text-2xl font-bold font-mono-math text-white">486.1 nm</div>
+          <div class="flex items-center gap-2 mt-2">
+            <span id="targetColorBadge" class="w-4 h-4 rounded-full border border-white/40 shadow-sm" style="background-color: #00e5ff;"></span>
+            <span id="targetColorName" class="text-xs font-medium text-cyan-300">แสงสีฟ้าอมเขียว (Cyan)</span>
+          </div>
+          <span id="targetSeriesName" class="text-[11px] text-slate-500 mt-1">อนุกรมบาลเมอร์ (Balmer Series: \( n_f = 2 \))</span>
+        </div>
+
+        <!-- ตัวเลือกคำตอบของนักเรียน -->
+        <div class="bg-slate-950/70 p-4 rounded-lg border border-slate-800 flex flex-col justify-center space-y-3">
+          <label class="text-xs text-slate-300 font-medium">ระบุการเปลี่ยนระดับพลังงานของอิเล็กตรอน:</label>
+          <div class="flex items-center gap-3">
+            <div class="flex-1">
+              <span class="text-[11px] text-slate-400 block mb-1">ระดับเริ่มต้น (\( n_i \)):</span>
+              <select id="user_ni" class="w-full bg-slate-800 border border-slate-700 rounded-md p-1.5 text-xs text-amber-300 font-mono-math focus:outline-none">
+                <option value="6">n = 6 (-0.38 eV)</option>
+                <option value="5">n = 5 (-0.54 eV)</option>
+                <option value="4" selected>n = 4 (-0.85 eV)</option>
+                <option value="3">n = 3 (-1.51 eV)</option>
+              </select>
+            </div>
+            <span class="text-slate-500 pt-4 font-bold">➔</span>
+            <div class="flex-1">
+              <span class="text-[11px] text-slate-400 block mb-1">ระดับสุดท้าย (\( n_f \)):</span>
+              <select id="user_nf" class="w-full bg-slate-800 border border-slate-700 rounded-md p-1.5 text-xs text-emerald-300 font-mono-math focus:outline-none">
+                <option value="3">n = 3 (Paschen)</option>
+                <option value="2" selected>n = 2 (Balmer)</option>
+                <option value="1">n = 1 (Lyman)</option>
+              </select>
+            </div>
+          </div>
+          <button onclick="checkReverseAnswer()" class="w-full py-2 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold rounded-lg shadow transition-colors">
+            ตรวจสอบการเชื่อมโยง (Verify Transition)
+          </button>
+        </div>
+
+        <!-- กล่องเฉลยและฟีดแบ็ก -->
+        <div class="bg-slate-950/70 p-4 rounded-lg border border-slate-800 flex flex-col justify-center">
+          <span class="text-xs text-slate-400 mb-1">ผลการประเมินมโนทัศน์:</span>
+          <div id="challengeFeedback" class="text-xs text-slate-300 leading-relaxed">
+            เลือกจับคู่ค่า \( n_i \) และ \( n_f \) แล้วกดตรวจสอบเพื่อดูว่าโฟตอนที่ปล่อยออกมาจะมีความยาวคลื่นตรงกับเส้นสเปกตรัมที่กำหนดหรือไม่
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- STEP 1: PREDICTION PANEL -->
+    <section id="predictSection" class="bg-gradient-to-r from-slate-900 to-violet-950/30 border border-violet-500/20 rounded-xl p-4 sm:p-5 shadow-lg">
+      <div class="flex items-center gap-2 mb-2">
+        <span class="px-2 py-0.5 rounded text-xs font-bold bg-violet-500/20 text-violet-300 border border-violet-500/30">ขั้นที่ 1</span>
+        <h2 class="text-base font-semibold text-white">การทำนายความสัมพันธ์ก่อนสังเกตการณ์ (Prediction)</h2>
+      </div>
+      <p class="text-xs sm:text-sm text-slate-300 mb-4">
+        เมื่ออิเล็กตรอนของไฮโดรเจนเปลี่ยนระดับพลังงานจากระดับสูงลงสู่ระดับต่ำกว่า พลังงาน ความถี่ และความยาวคลื่นของแสงที่ปล่อยออกมาจะสัมพันธ์กันอย่างไร?
+      </p>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
+        <div class="bg-slate-800/60 p-3.5 rounded-lg border border-slate-700/60">
+          <label class="block font-medium text-slate-300 mb-2">
+            1. การตกจาก \( n=4 \rightarrow n=2 \) เทียบกับ \( n=3 \rightarrow n=2 \) โฟตอนใดมีพลังงานและได้แสงความยาวคลื่นสั้นกว่า?
+          </label>
+          <div class="space-y-1.5">
+            <label class="flex items-center gap-2 cursor-pointer bg-slate-700/40 hover:bg-slate-700/70 p-2 rounded border border-slate-600/50">
+              <input type="radio" name="pred_energy" value="4to2" class="accent-violet-500">
+              <span>\( n=4 \rightarrow n=2 \) พลังงานสูงกว่า จึงได้ความยาวคลื่นสั้นกว่า (เฉดสีค่อนไปทางน้ำเงิน/ม่วง)</span>
+            </label>
+            <label class="flex items-center gap-2 cursor-pointer bg-slate-700/40 hover:bg-slate-700/70 p-2 rounded border border-slate-600/50">
+              <input type="radio" name="pred_energy" value="3to2" class="accent-violet-500">
+              <span>\( n=3 \rightarrow n=2 \) พลังงานสูงกว่า เพราะอยู่ใกล้นิวเคลียสมากกว่า</span>
+            </label>
+            <label class="flex items-center gap-2 cursor-pointer bg-slate-700/40 hover:bg-slate-700/70 p-2 rounded border border-slate-600/50">
+              <input type="radio" name="pred_energy" value="equal" class="accent-violet-500">
+              <span>ให้พลังงานเท่ากันเพราะตกลงมาที่ระดับ \( n=2 \) เหมือนกัน</span>
+            </label>
+          </div>
+        </div>
+
+        <div class="bg-slate-800/60 p-3.5 rounded-lg border border-slate-700/60">
+          <label class="block font-medium text-slate-300 mb-2">
+            2. อนุกรมใดของไฮโดรเจนที่ให้เส้นสเปกตรัมที่ตามนุษย์มองเห็นได้ในช่วงแสงขาว (Visible light)?
+          </label>
+          <div class="space-y-1.5">
+            <label class="flex items-center gap-2 cursor-pointer bg-slate-700/40 hover:bg-slate-700/70 p-2 rounded border border-slate-600/50">
+              <input type="radio" name="pred_series" value="lyman" class="accent-violet-500">
+              <span>อนุกรมไลแมน (ตกลงสู่ \( n=1 \))</span>
+            </label>
+            <label class="flex items-center gap-2 cursor-pointer bg-slate-700/40 hover:bg-slate-700/70 p-2 rounded border border-slate-600/50">
+              <input type="radio" name="pred_series" value="balmer" class="accent-violet-500">
+              <span>อนุกรมบาลเมอร์ (ตกลงสู่ \( n=2 \))</span>
+            </label>
+            <label class="flex items-center gap-2 cursor-pointer bg-slate-700/40 hover:bg-slate-700/70 p-2 rounded border border-slate-600/50">
+              <input type="radio" name="pred_series" value="paschen" class="accent-violet-500">
+              <span>อนุกรมพาสเชน (ตกลงสู่ \( n=3 \))</span>
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <div class="mt-3 flex items-center justify-between">
+        <button onclick="savePrediction()" class="text-xs bg-violet-600 hover:bg-violet-500 text-white font-medium px-4 py-2 rounded-lg transition-colors shadow">
+          บันทึกการทำนายผล
+        </button>
+        <span id="predStatus" class="text-xs text-amber-400 font-medium"></span>
+      </div>
+    </section>
+
+    <!-- STEP 2: DUAL-CANVAS SIMULATION (ระดับพลังงาน + แบบจำลองวงโคจรบอร์) -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-5">
+      
+      <!-- Energy Levels & Bohr Atom Canvas (8 cols) -->
+      <section class="lg:col-span-8 bg-slate-900 border border-slate-800 rounded-xl p-4 flex flex-col shadow-lg">
+        <div class="flex items-center justify-between pb-3 border-b border-slate-800">
+          <div class="flex items-center gap-2">
+            <span class="px-2 py-0.5 rounded text-xs font-bold bg-violet-500/20 text-violet-300 border border-violet-500/30">ขั้นที่ 2</span>
+            <h2 class="text-base font-semibold text-white">แบบจำลองระดับพลังงานและวงโคจรอะตอม (Interactive Atom)</h2>
+          </div>
+          <div class="flex items-center gap-2">
+            <span class="text-xs text-slate-400">คลิกระดับพลังงานหรือกดปุ่มเพื่อย้ายอิเล็กตรอน</span>
+          </div>
+        </div>
+
+        <!-- Simulation View Area -->
+        <div class="relative w-full aspect-[16/9] bg-slate-950 rounded-lg overflow-hidden my-3 border border-slate-800">
+          <canvas id="atomCanvas" class="w-full h-full block cursor-pointer"></canvas>
+          
+          <!-- Live Transition Overlay Tag -->
+          <div class="absolute top-2 left-2 bg-slate-900/90 backdrop-blur border border-slate-700 rounded px-2.5 py-1 text-xs font-mono-math space-y-0.5">
+            <div class="text-slate-300">
+              สถานะ: <span id="overlay_transition" class="text-violet-400 font-bold">n = 3 ➔ n = 2</span>
+            </div>
+            <div class="text-[11px] text-slate-400">
+              พลังงานโฟตอน: <span id="overlay_dE" class="text-emerald-400 font-semibold">1.89 eV</span>
+            </div>
+          </div>
+
+          <div class="absolute bottom-2 right-2 bg-slate-900/85 backdrop-blur border border-slate-700 rounded px-2 py-1 text-[11px] text-slate-400">
+            💡 คลิกเลือกชั้นวงโคจรเพื่อดูการปลดปล่อยโฟตอน (Photon Emission)
+          </div>
+        </div>
+
+        <!-- Spectrum Spectrogram Bar (แถบสเปกตรัมที่สอดคล้องกับแสงที่ปล่อย) -->
+        <div class="bg-slate-950 p-3 rounded-lg border border-slate-800 space-y-1.5">
+          <div class="flex justify-between items-center text-xs">
+            <span class="text-slate-300 font-semibold flex items-center gap-1.5">
+              <span>🌈 แถบสเปกตรัมการเปล่งแสง (Emission Spectrum):</span>
+              <span id="spectrumCurrentName" class="text-cyan-400 font-mono-math">H-alpha (656.3 nm)</span>
+            </span>
+            <span class="text-[11px] text-slate-400 font-mono-math">380 nm (ม่วง) ➔ 750 nm (แดง)</span>
+          </div>
+
+          <div class="relative w-full h-10 bg-black rounded border border-slate-700 overflow-hidden">
+            <!-- สเปกตรัมเรนเดอร์ในนี้ -->
+            <canvas id="spectrumBarCanvas" class="w-full h-full block"></canvas>
+          </div>
+        </div>
+
+        <!-- Real-time Photon Readouts -->
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-3">
+          <div class="bg-slate-800/70 border border-violet-500/30 rounded-lg p-2.5 text-center">
+            <span class="text-[11px] text-slate-400 block font-medium">ผลต่างพลังงาน (\( \Delta E \))</span>
+            <span id="readout_dE_ev" class="text-lg font-bold text-violet-300 font-mono-math">1.89</span>
+            <span class="text-[10px] text-slate-400 block">eV</span>
+          </div>
+
+          <div class="bg-slate-800/70 border border-emerald-500/30 rounded-lg p-2.5 text-center">
+            <span class="text-[11px] text-slate-400 block font-medium">ความยาวคลื่น (\( \lambda \))</span>
+            <span id="readout_lambda" class="text-lg font-bold text-emerald-300 font-mono-math">656.3</span>
+            <span class="text-[10px] text-slate-400 block">nm</span>
+          </div>
+
+          <div class="bg-slate-800/70 border border-amber-500/30 rounded-lg p-2.5 text-center">
+            <span class="text-[11px] text-slate-400 block font-medium">ความถี่โฟตอน (\( f \))</span>
+            <span id="readout_freq" class="text-lg font-bold text-amber-300 font-mono-math">4.57</span>
+            <span class="text-[10px] text-slate-400 block">× 10¹⁴ Hz</span>
+          </div>
+
+          <div class="bg-slate-800/70 border border-cyan-500/30 rounded-lg p-2.5 text-center">
+            <span class="text-[11px] text-slate-400 block font-medium">บริเวณสเปกตรัม (Region)</span>
+            <span id="readout_region" class="text-sm font-bold text-cyan-300 font-mono-math truncate block mt-1">แสงสีแดง (Visible)</span>
+            <span id="readout_series" class="text-[10px] text-slate-400 block">Balmer Series</span>
+          </div>
+        </div>
+
+        <!-- Action Bar -->
+        <div class="mt-4 flex flex-wrap items-center justify-between gap-2 bg-slate-800/40 p-3 rounded-lg border border-slate-700/50">
+          <div class="text-xs text-slate-300">
+            บันทึกค่าการเปลี่ยนระดับพลังงานนี้ลงตาราง เพื่อนำไปวิเคราะห์
+          </div>
+          <button onclick="recordDataPoint()" class="px-4 py-2 text-xs bg-violet-600 hover:bg-violet-500 text-white font-semibold rounded-lg shadow flex items-center gap-1.5 transition-transform active:scale-95">
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+            บันทึกผลสเปกตรัม (Record Transition)
+          </button>
+        </div>
+      </section>
+
+      <!-- Transition Controls & Quick Presets (4 cols) -->
+      <section class="lg:col-span-4 bg-slate-900 border border-slate-800 rounded-xl p-4 flex flex-col justify-between shadow-lg">
+        <div>
+          <div class="pb-3 border-b border-slate-800">
+            <h2 class="text-base font-semibold text-white flex items-center gap-2">
+              <svg class="w-4 h-4 text-violet-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+              ควบคุมการเปลี่ยนระดับพลังงาน
+            </h2>
+            <p class="text-xs text-slate-400">เลือกระดับเริ่มต้น (\( n_i \)) และระดับสิ้นสุด (\( n_f \))</p>
+          </div>
+
+          <div class="space-y-4 mt-4 text-xs">
+            <!-- ปุ่มเปลี่ยนระดับพลังงานหลัก -->
+            <div>
+              <label class="block text-slate-300 font-medium mb-1">
+                ระดับพลังงานเริ่มต้น (\( n_i \)):
+              </label>
+              <div class="grid grid-cols-5 gap-1.5 font-mono-math">
+                <button onclick="setInitialLevel(2)" id="btn_ni_2" class="py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded border border-slate-700 font-semibold">n=2</button>
+                <button onclick="setInitialLevel(3)" id="btn_ni_3" class="py-1.5 bg-violet-600 text-white rounded border border-violet-500 font-semibold">n=3</button>
+                <button onclick="setInitialLevel(4)" id="btn_ni_4" class="py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded border border-slate-700 font-semibold">n=4</button>
+                <button onclick="setInitialLevel(5)" id="btn_ni_5" class="py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded border border-slate-700 font-semibold">n=5</button>
+                <button onclick="setInitialLevel(6)" id="btn_ni_6" class="py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded border border-slate-700 font-semibold">n=6</button>
+              </div>
+            </div>
+
+            <div>
+              <label class="block text-slate-300 font-medium mb-1">
+                ระดับพลังงานสิ้นสุด (\( n_f \)):
+              </label>
+              <div class="grid grid-cols-3 gap-2 font-mono-math">
+                <button onclick="setFinalLevel(1)" id="btn_nf_1" class="py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded border border-slate-700 font-semibold">
+                  n=1 (Lyman UV)
+                </button>
+                <button onclick="setFinalLevel(2)" id="btn_nf_2" class="py-1.5 bg-violet-600 text-white rounded border border-violet-500 font-semibold">
+                  n=2 (Balmer แสงขาว)
+                </button>
+                <button onclick="setFinalLevel(3)" id="btn_nf_3" class="py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded border border-slate-700 font-semibold">
+                  n=3 (Paschen IR)
+                </button>
+              </div>
+            </div>
+
+            <!-- อนุกรมมาตรฐานของไฮโดรเจน (Presets) -->
+            <div class="pt-3 border-t border-slate-800">
+              <span class="text-slate-300 font-medium block mb-2">เส้นสเปกตรัมหลักในอนุกรมบาลเมอร์ (Visible):</span>
+              <div class="grid grid-cols-2 gap-2 text-[11px]">
+                <button onclick="setTransition(3, 2)" class="p-2 bg-slate-800/80 hover:bg-slate-800 border-l-4 border-red-500 rounded text-left">
+                  <div class="font-bold text-red-400 font-mono-math">H-α: 656.3 nm</div>
+                  <div class="text-slate-400">n=3 ➔ n=2 (สีแดง)</div>
+                </button>
+                <button onclick="setTransition(4, 2)" class="p-2 bg-slate-800/80 hover:bg-slate-800 border-l-4 border-cyan-400 rounded text-left">
+                  <div class="font-bold text-cyan-300 font-mono-math">H-β: 486.1 nm</div>
+                  <div class="text-slate-400">n=4 ➔ n=2 (ฟ้าอมเขียว)</div>
+                </button>
+                <button onclick="setTransition(5, 2)" class="p-2 bg-slate-800/80 hover:bg-slate-800 border-l-4 border-blue-500 rounded text-left">
+                  <div class="font-bold text-blue-400 font-mono-math">H-γ: 434.0 nm</div>
+                  <div class="text-slate-400">n=5 ➔ n=2 (น้ำเงิน)</div>
+                </button>
+                <button onclick="setTransition(6, 2)" class="p-2 bg-slate-800/80 hover:bg-slate-800 border-l-4 border-violet-500 rounded text-left">
+                  <div class="font-bold text-violet-400 font-mono-math">H-δ: 410.2 nm</div>
+                  <div class="text-slate-400">n=6 ➔ n=2 (ม่วง)</div>
+                </button>
+              </div>
+            </div>
+
+            <!-- อนุกรมอื่นๆ -->
+            <div class="pt-2 border-t border-slate-800 flex gap-2">
+              <button onclick="setTransition(2, 1)" class="flex-1 py-1.5 text-[11px] bg-slate-800/60 hover:bg-slate-800 rounded border border-slate-700 text-slate-300">
+                Lyman-α (121.6 nm - UV)
+              </button>
+              <button onclick="setTransition(4, 3)" class="flex-1 py-1.5 text-[11px] bg-slate-800/60 hover:bg-slate-800 rounded border border-slate-700 text-slate-300">
+                Paschen-α (1875 nm - IR)
+              </button>
+            </div>
+
+          </div>
+        </div>
+
+        <div class="mt-4 pt-3 border-t border-slate-800">
+          <button onclick="emitPhotonAnimation()" class="w-full py-2 text-xs bg-emerald-700 hover:bg-emerald-600 text-white font-medium rounded-lg shadow transition-colors flex items-center justify-center gap-1.5">
+            <span>✨ ยิงโฟตอนซ้ำ (Re-play Emission)</span>
+          </button>
+        </div>
+      </section>
+    </div>
+
+    <!-- STEP 3 & STEP 4: DATA TABLE AND MENTAL MODEL ANALYSIS -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-5">
+      
+      <!-- DATA TABLE (7 cols) -->
+      <section class="lg:col-span-7 bg-slate-900 border border-slate-800 rounded-xl p-4 flex flex-col shadow-lg">
+        <div class="flex items-center justify-between pb-3 border-b border-slate-800">
+          <div class="flex items-center gap-2">
+            <span class="px-2 py-0.5 rounded text-xs font-bold bg-violet-500/20 text-violet-300 border border-violet-500/30">ขั้นที่ 3</span>
+            <h2 class="text-base font-semibold text-white">ตารางบันทึกการเปลี่ยนระดับพลังงาน (Transition Data)</h2>
+          </div>
+          <div class="flex items-center gap-1.5">
+            <button onclick="addPresetBalmerData()" class="px-2.5 py-1 text-xs bg-violet-600/30 hover:bg-violet-600/50 text-violet-300 border border-violet-500/30 rounded transition-colors">
+              + บันทึกอนุกรมบาลเมอร์ทั้งหมด
+            </button>
+            <button onclick="clearData()" class="px-2.5 py-1 text-xs bg-red-950/40 hover:bg-red-900/60 text-red-300 border border-red-800/40 rounded transition-colors">
+              ล้างตาราง
+            </button>
+          </div>
+        </div>
+
+        <p class="text-xs text-slate-400 my-2">
+          ตารางแสดงผลต่างพลังงาน \( \Delta E \), ความถี่ \( f \), และความยาวคลื่น \( \lambda \) ตามแบบจำลองของบอร์
+        </p>
+
+        <div class="flex-1 overflow-x-auto min-h-[220px]">
+          <table class="w-full text-left text-xs font-mono-math">
+            <thead class="bg-slate-800/80 text-slate-300 border-b border-slate-700 uppercase">
+              <tr>
+                <th class="p-2 text-center">#</th>
+                <th class="p-2 text-amber-300 font-bold">\( n_i \rightarrow n_f \)</th>
+                <th class="p-2 text-violet-300 font-bold">\( \Delta E \) (eV)</th>
+                <th class="p-2 text-amber-400">\( f \) (×10¹⁴ Hz)</th>
+                <th class="p-2 text-emerald-400 font-bold">\( \lambda \) (nm)</th>
+                <th class="p-2">สี / ช่วงคลื่น</th>
+                <th class="p-2 text-center">ลบ</th>
+              </tr>
+            </thead>
+            <tbody id="dataTableBody" class="divide-y divide-slate-800/60 text-slate-300">
+            </tbody>
+          </table>
+          <div id="tableEmptyMsg" class="py-10 text-center text-xs text-slate-500">
+            ยังไม่มีข้อมูล กรุณาเลือกการเปลี่ยนระดับพลังงานแล้วกด "บันทึกผลสเปกตรัม"
+          </div>
+        </div>
+      </section>
+
+      <!-- MENTAL MODEL RELATION DIAGRAM (5 cols) -->
+      <section class="lg:col-span-5 bg-slate-900 border border-slate-800 rounded-xl p-4 flex flex-col justify-between shadow-lg">
+        <div>
+          <div class="flex items-center gap-2 pb-3 border-b border-slate-800">
+            <span class="px-2 py-0.5 rounded text-xs font-bold bg-violet-500/20 text-violet-300 border border-violet-500/30">ขั้นที่ 4</span>
+            <h2 class="text-base font-semibold text-white">โมเดลความคิด: ความสัมพันธ์ \( \Delta E \leftrightarrow f \leftrightarrow \lambda \)</h2>
+          </div>
+
+          <p class="text-xs text-slate-400 my-2">
+            แผนภาพความสัมพันธ์ระหว่างตัวแปรเชิงควอนตัมของโฟตอน
+          </p>
+
+          <div class="space-y-3 mt-3">
+            <div class="bg-slate-950/70 p-3 rounded-lg border border-slate-800 text-xs space-y-1.5">
+              <div class="text-violet-400 font-semibold flex items-center gap-1.5">
+                <span>1. พลังงานและความถี่ (\( \Delta E \propto f \)):</span>
+              </div>
+              <p class="text-slate-300">
+                เมื่อช่วงชั้นพลังงานห่างกันมาก (\( \Delta E \) สูง) คลื่นโฟตอนจะสั่นด้วยความถี่สูงขึ้นตามกฎของพลังค์ \( E = hf \)
+              </p>
+            </div>
+
+            <div class="bg-slate-950/70 p-3 rounded-lg border border-slate-800 text-xs space-y-1.5">
+              <div class="text-emerald-400 font-semibold flex items-center gap-1.5">
+                <span>2. ความถี่และความยาวคลื่น (\( f \propto \frac{1}{\lambda} \)):</span>
+              </div>
+              <p class="text-slate-300">
+                เนื่องจากอัตราเร็วแสงในสุญญากาศคงที่ (\( c = f\lambda \)) ดังนั้น พลังงานสูง ➔ ความถี่สูง ➔ **ความยาวคลื่นจะยิ่งสั้นลง**
+              </p>
+            </div>
+
+            <div class="bg-slate-950/70 p-3 rounded-lg border border-slate-800 text-xs space-y-1.5">
+              <div class="text-cyan-400 font-semibold flex items-center gap-1.5">
+                <span>3. ทำไมเส้นสเปกตรัมจึงเป็นเส้นเดี่ยวไม่ต่อเนื่อง?</span>
+              </div>
+              <p class="text-slate-300">
+                เพราะระดับพลังงานของอิเล็กตรอนในอะตอมมีค่าเฉพาะตัวเป็นชั้นๆ (Quantized) อิเล็กตรอนไม่สามารถอยู่ระหว่างชั้นได้ ค่า \( \Delta E \) จึงมีค่าเฉพาะ ส่งผลให้เกิดเฉพาะความยาวคลื่นบางค่าเท่านั้น
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div class="mt-4 pt-3 border-t border-slate-800 text-center">
+          <span class="text-[11px] text-slate-500 font-mono-math">h = 6.626 × 10⁻³⁴ J·s | c = 3.0 × 10⁸ m/s | 1 eV = 1.6 × 10⁻¹⁹ J</span>
+        </div>
+      </section>
+    </div>
+
+    <!-- STEP 5: EXPLANATION & THEORY -->
+    <section class="bg-slate-900 border border-slate-800 rounded-xl p-4 sm:p-5 shadow-lg">
+      <div class="flex items-center gap-2 pb-3 border-b border-slate-800">
+        <span class="px-2 py-0.5 rounded text-xs font-bold bg-violet-500/20 text-violet-300 border border-violet-500/30">ขั้นที่ 5</span>
+        <h2 class="text-base font-semibold text-white">การอธิบายและทฤษฎีอะตอมของบอร์ (Scientific Explanation)</h2>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-5 mt-4">
+        <!-- ตรวจสอบสมมติฐาน -->
+        <div class="bg-slate-800/40 p-4 rounded-xl border border-slate-700/60 space-y-3">
+          <h3 class="text-sm font-semibold text-violet-300 flex items-center gap-1.5">
+            🔍 การตรวจสอบความถูกต้องของการทำนาย
+          </h3>
+          <div id="hypothesisEvaluation" class="text-xs text-slate-300 leading-relaxed space-y-2">
+            <p class="text-slate-400">กรุณาบันทึกการทำนายในขั้นที่ 1 และบันทึกข้อมูลอย่างน้อย 1 รายการเพื่อตรวจสอบความถูกต้อง</p>
+          </div>
+          <div class="pt-2">
+            <label class="block text-xs font-medium text-slate-300 mb-1">
+              สรุปมโนทัศน์ของนักเรียน: "อธิบายว่าทำไมสเปกตรัมแสงสีม่วงจึงมีพลังงานมากกว่าแสงสีแดง?"
+            </label>
+            <textarea id="studentNote" rows="3" placeholder="จากการทดลอง สรุปได้ว่าการเปลี่ยนระดับจากชั้นที่สูงกว่าทำให้เกิดผลต่างพลังงาน ΔE ที่... ส่งผลให้ความยาวคลื่น..." class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-xs text-slate-200 focus:outline-none focus:border-violet-500"></textarea>
+          </div>
+        </div>
+
+        <!-- กล่องสูตรคณิตศาสตร์และทฤษฎีของบอร์ เรนเดอร์ด้วย MathJax -->
+        <div class="bg-gradient-to-br from-slate-800/60 to-slate-900 p-4 rounded-xl border border-slate-700/80 space-y-4">
+          <h3 class="text-sm font-semibold text-amber-300 flex items-center gap-1.5">
+            📐 สมการและสมมติฐานของบอร์ (Bohr's Postulates)
+          </h3>
+
+          <div class="bg-slate-950/70 p-3 rounded-lg border border-slate-800">
+            <div class="text-xs font-semibold text-violet-400 mb-1">1. พลังงานในแต่ละวงโคจรของไฮโดรเจน:</div>
+            <div class="text-center py-1.5 text-sm text-white">
+              $$E_n = -\frac{13.6}{n^2} \text{ eV}$$
+            </div>
+            <p class="text-[11px] text-slate-400 mt-1">
+              ระดับชั้น \( n=1 \) เป็นสถานะพื้น (Ground state) ที่มีพลังงานต่ำสุด (\(-13.6\text{ eV}\)) เมื่อ \( n \) มากขึ้น พลังงานจะเข้าใกล้ศูนย์และระยะห่างระหว่างชั้นจะชิดกันมากขึ้นเรื่อยๆ
+            </p>
+          </div>
+
+          <div class="bg-slate-950/70 p-3 rounded-lg border border-slate-800">
+            <div class="text-xs font-semibold text-emerald-400 mb-1">2. สูตรของริดเบิร์ก (Rydberg Formula):</div>
+            <div class="text-center py-1.5 text-sm text-white">
+              $$\frac{1}{\lambda} = R_H \left( \frac{1}{n_f^2} - \frac{1}{n_i^2} \right) \quad \text{โดย } R_H \approx 1.097 \times 10^7 \text{ m}^{-1}$$
+            </div>
+            <p class="text-[11px] text-slate-400 mt-1">
+              สามารถคำนวณหาความยาวคลื่นของเส้นสเปกตรัมทุกเส้นในทุกอนุกรมได้อย่างแม่นยำ สอดคล้องกับผลการทดลองจริงในห้องปฏิบัติการฟิสิกส์
+            </p>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="mt-8 border-t border-slate-800 bg-slate-900/60 py-4 text-center text-xs text-slate-500">
+    แบบจำลองระดับพลังงานของอะตอมและการเกิดสเปกตรัม (Atomic Energy Levels & Spectrum Interactive Lab) | MathJax Rendering
+  </footer>
+
+  <!-- JAVASCRIPT LOGIC -->
+  <script>
+    // --- ค่าคงที่ทางฟิสิกส์ ---
+    const h = 6.62607015e-34; // J*s
+    const c = 299792458;      // m/s
+    const e_charge = 1.602176634e-19; // J/eV
+    const RH = 1.097373e7;    // m^-1
+
+    // สถานะของแบบจำลอง
+    const sim = {
+      ni: 3,                  // ระดับเริ่มต้น
+      nf: 2,                  // ระดับสิ้นสุด
+      electronOrbitN: 3,      // ชั้นที่อิเล็กตรอนกำลังหมุนอยู่
+      isTransitioning: false, // สถานะกำลังตก
+      photonAnimation: null,  // ข้อมูลอนิเมชันโฟตอน
+      mode: 'explore',        // 'explore' หรือ 'reverse'
+      reverseTarget: null     // เป้าหมายโจทย์ย้อนกลับ
+    };
+
+    const studentData = [];
+    let studentPrediction = { energy: null, series: null };
+
+    // Canvas references
+    const atomCanvas = document.getElementById('atomCanvas');
+    const atomCtx = atomCanvas.getContext('2d');
+    const specCanvas = document.getElementById('spectrumBarCanvas');
+    const specCtx = specCanvas.getContext('2d');
+
+    // รายการเส้นสเปกตรัมที่สำคัญของไฮโดรเจนสำหรับโหมดท้าทายย้อนกลับ
+    const spectrumChallenges = [
+      { ni: 3, nf: 2, lambda: 656.3, name: 'H-alpha (แดง)', color: '#ef4444', series: 'อนุกรมบาลเมอร์ (Balmer: nf=2)' },
+      { ni: 4, nf: 2, lambda: 486.1, name: 'H-beta (ฟ้าอมเขียว)', color: '#06b6d4', series: 'อนุกรมบาลเมอร์ (Balmer: nf=2)' },
+      { ni: 5, nf: 2, lambda: 434.0, name: 'H-gamma (น้ำเงิน)', color: '#3b82f6', series: 'อนุกรมบาลเมอร์ (Balmer: nf=2)' },
+      { ni: 6, nf: 2, lambda: 410.2, name: 'H-delta (ม่วง)', color: '#8b5cf6', series: 'อนุกรมบาลเมอร์ (Balmer: nf=2)' },
+      { ni: 2, nf: 1, lambda: 121.6, name: 'Lyman-alpha (อัลตราไวโอเลต)', color: '#9333ea', series: 'อนุกรมไลแมน (Lyman: nf=1)' },
+      { ni: 4, nf: 3, lambda: 1875.1, name: 'Paschen-alpha (อินฟราเรด)', color: '#b91c1c', series: 'อนุกรมพาสเชน (Paschen: nf=3)' }
+    ];
+
+    window.addEventListener('DOMContentLoaded', () => {
+      resizeCanvases();
+      updateTransitionPhysics();
+      drawSpectrumBar();
+      requestAnimationFrame(renderLoop);
+      window.addEventListener('resize', () => {
+        resizeCanvases();
+        drawSpectrumBar();
+      });
+    });
+
+    function resizeCanvases() {
+      // Atom canvas
+      const rectA = atomCanvas.getBoundingClientRect();
+      atomCanvas.width = rectA.width * window.devicePixelRatio;
+      atomCanvas.height = rectA.height * window.devicePixelRatio;
+      atomCtx.scale(window.devicePixelRatio, window.devicePixelRatio);
+
+      // Spectrum bar canvas
+      const rectS = specCanvas.getBoundingClientRect();
+      specCanvas.width = rectS.width * window.devicePixelRatio;
+      specCanvas.height = rectS.height * window.devicePixelRatio;
+      specCtx.scale(window.devicePixelRatio, window.devicePixelRatio);
+    }
+
+    // --- การคำนวณพลังงาน สเปกตรัม และสีของแสง ---
+    function getEnergyLevel(n) {
+      return -13.6 / (n * n); // eV
+    }
+
+    function calculateTransition(ni, nf) {
+      if (ni <= nf) return null;
+      const Ei = getEnergyLevel(ni);
+      const Ef = getEnergyLevel(nf);
+      const dE_ev = Ei - Ef;
+      const dE_joules = dE_ev * e_charge;
+
+      // ความถี่ f = dE / h
+      const freq = dE_joules / h;
+
+      // ความยาวคลื่น 1/lambda = RH * (1/nf^2 - 1/ni^2)
+      const invLambda = RH * (1 / (nf * nf) - 1 / (ni * ni));
+      const lambda_m = 1 / invLambda;
+      const lambda_nm = lambda_m * 1e9;
+
+      // หาสีและย่านคลื่น
+      let colorHex = '#ffffff';
+      let region = '';
+
+      if (lambda_nm < 380) {
+        region = 'รังสีอัลตราไวโอเลต (UV)';
+        colorHex = '#a855f7';
+      } else if (lambda_nm > 750) {
+        region = 'รังสีอินฟราเรด (IR)';
+        colorHex = '#ef4444';
+      } else {
+        // แสงขาวที่มองเห็นได้
+        colorHex = wavelengthToColor(lambda_nm);
+        if (lambda_nm >= 620) region = 'แสงสีแดง (Visible)';
+        else if (lambda_nm >= 590) region = 'แสงสีส้ม (Visible)';
+        else if (lambda_nm >= 570) region = 'แสงสีเหลือง (Visible)';
+        else if (lambda_nm >= 495) region = 'แสงสีเขียว (Visible)';
+        else if (lambda_nm >= 450) region = 'แสงสีฟ้า/น้ำเงิน (Visible)';
+        else region = 'แสงสีม่วง (Visible)';
+      }
+
+      let seriesName = (nf === 1) ? 'Lyman' : (nf === 2) ? 'Balmer' : (nf === 3) ? 'Paschen' : `Series (n=${nf})`;
+
+      return {
+        ni, nf, Ei, Ef, dE_ev, dE_joules, freq, lambda_nm, colorHex, region, seriesName
+      };
+    }
+
+    // ฟังก์ชันแปลงความยาวคลื่นนาโนเมตรเป็นสี RGB สมจริง
+    function wavelengthToColor(wavelength) {
+      let r = 0, g = 0, b = 0;
+      if (wavelength >= 380 && wavelength < 440) {
+        r = -(wavelength - 440) / (440 - 380);
+        b = 1.0;
+      } else if (wavelength >= 440 && wavelength < 490) {
+        g = (wavelength - 440) / (490 - 440);
+        b = 1.0;
+      } else if (wavelength >= 490 && wavelength < 510) {
+        g = 1.0;
+        b = -(wavelength - 510) / (510 - 490);
+      } else if (wavelength >= 510 && wavelength < 580) {
+        r = (wavelength - 510) / (580 - 510);
+        g = 1.0;
+      } else if (wavelength >= 580 && wavelength < 645) {
+        r = 1.0;
+        g = -(wavelength - 645) / (645 - 580);
+      } else if (wavelength >= 645 && wavelength <= 750) {
+        r = 1.0;
+      }
+      return `rgb(${Math.round(r * 255)}, ${Math.round(g * 255)}, ${Math.round(b * 255)})`;
+    }
+
+    // --- การเปลี่ยนระดับพลังงาน ---
+    function setInitialLevel(n) {
+      if (n <= sim.nf) {
+        alert('ระดับเริ่มต้น (n_i) ต้องสูงกว่าระดับสิ้นสุด (n_f)');
+        return;
+      }
+      sim.ni = n;
+      highlightLevelButtons();
+      updateTransitionPhysics();
+      emitPhotonAnimation();
+    }
+
+    function setFinalLevel(n) {
+      if (n >= sim.ni) {
+        alert('ระดับสิ้นสุด (n_f) ต้องต่ำกว่าระดับเริ่มต้น (n_i)');
+        return;
+      }
+      sim.nf = n;
+      highlightLevelButtons();
+      updateTransitionPhysics();
+      emitPhotonAnimation();
+    }
+
+    function setTransition(ni, nf) {
+      sim.ni = ni;
+      sim.nf = nf;
+      highlightLevelButtons();
+      updateTransitionPhysics();
+      emitPhotonAnimation();
+    }
+
+    function highlightLevelButtons() {
+      for (let i = 2; i <= 6; i++) {
+        const btn = document.getElementById(`btn_ni_${i}`);
+        if (!btn) continue;
+        if (i === sim.ni) {
+          btn.className = 'py-1.5 bg-violet-600 text-white rounded border border-violet-500 font-semibold';
+        } else {
+          btn.className = 'py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded border border-slate-700 font-semibold';
+        }
+      }
+
+      for (let f = 1; f <= 3; f++) {
+        const btn = document.getElementById(`btn_nf_${f}`);
+        if (!btn) continue;
+        if (f === sim.nf) {
+          btn.className = 'py-1.5 bg-violet-600 text-white rounded border border-violet-500 font-semibold';
+        } else {
+          btn.className = 'py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded border border-slate-700 font-semibold';
+        }
+      }
+    }
+
+    function updateTransitionPhysics() {
+      const trans = calculateTransition(sim.ni, sim.nf);
+      if (!trans) return;
+
+      document.getElementById('overlay_transition').textContent = `n = ${sim.ni} ➔ n = ${sim.nf}`;
+      document.getElementById('overlay_dE').textContent = `${trans.dE_ev.toFixed(2)} eV`;
+
+      document.getElementById('readout_dE_ev').textContent = trans.dE_ev.toFixed(2);
+      document.getElementById('readout_lambda').textContent = trans.lambda_nm.toFixed(1);
+      document.getElementById('readout_freq').textContent = (trans.freq / 1e14).toFixed(2);
+      document.getElementById('readout_region').textContent = trans.region;
+      document.getElementById('readout_series').textContent = `${trans.seriesName} Series`;
+
+      document.getElementById('spectrumCurrentName').textContent = 
+        `${trans.lambda_nm.toFixed(1)} nm (${trans.region})`;
+
+      drawSpectrumBar();
+    }
+
+    // --- อนิเมชันโฟตอนเคลื่อนที่ออกจากอะตอม ---
+    function emitPhotonAnimation() {
+      sim.isTransitioning = true;
+      sim.electronOrbitN = sim.ni;
+
+      const trans = calculateTransition(sim.ni, sim.nf);
+
+      sim.photonAnimation = {
+        active: true,
+        progress: 0,
+        startX: 0,
+        startY: 0,
+        color: trans ? trans.colorHex : '#ffffff',
+        lambda_nm: trans ? trans.lambda_nm : 500
+      };
+    }
+
+    // --- วาดแถบสเปกตรัมแนวยาว ---
+    function drawSpectrumBar() {
+      const rect = specCanvas.getBoundingClientRect();
+      const w = rect.width;
+      const h = rect.height;
+
+      specCtx.clearRect(0, 0, w, h);
+
+      // พื้นหลังมืด
+      specCtx.fillStyle = '#05070e';
+      specCtx.fillRect(0, 0, w, h);
+
+      // วาดสเปกตรัมพื้นหลังจางๆ ของแสงขาว 380 - 750 nm
+      const grad = specCtx.createLinearGradient(0, 0, w, 0);
+      grad.addColorStop(0.00, 'rgba(120, 0, 255, 0.2)');   // 380 nm ม่วง
+      grad.addColorStop(0.20, 'rgba(0, 100, 255, 0.2)');   // ฟ้า
+      grad.addColorStop(0.40, 'rgba(0, 255, 120, 0.2)');   // เขียว
+      grad.addColorStop(0.65, 'rgba(255, 230, 0, 0.2)');   // เหลือง
+      grad.addColorStop(0.85, 'rgba(255, 80, 0, 0.2)');    // ส้ม
+      grad.addColorStop(1.00, 'rgba(255, 0, 0, 0.2)');      // 750 nm แดง
+      specCtx.fillStyle = grad;
+      specCtx.fillRect(0, 0, w, h);
+
+      // วาดเส้นสเปกตรัมมาตรฐานของอนุกรมบาลเมอร์ (H-alpha, H-beta, H-gamma, H-delta)
+      const balmerLines = [
+        { l: 656.3, col: '#ef4444', label: 'H-α' },
+        { l: 486.1, col: '#06b6d4', label: 'H-β' },
+        { l: 434.0, col: '#3b82f6', label: 'H-γ' },
+        { l: 410.2, col: '#8b5cf6', label: 'H-δ' }
+      ];
+
+      balmerLines.forEach(line => {
+        const normX = (line.l - 380) / (750 - 380);
+        if (normX >= 0 && normX <= 1) {
+          const px = normX * w;
+          specCtx.strokeStyle = line.col;
+          specCtx.lineWidth = 2.5;
+          specCtx.beginPath();
+          specCtx.moveTo(px, 0);
+          specCtx.lineTo(px, h);
+          specCtx.stroke();
+
+          // ขีดกำกับด้านล่าง
+          specCtx.fillStyle = line.col;
+          specCtx.font = 'bold 9px JetBrains Mono';
+          specCtx.fillText(line.label, px - 8, h - 3);
+        }
+      });
+
+      // ไฮไลต์เส้นปัจจุบันที่เลือกอยู่
+      const trans = calculateTransition(sim.ni, sim.nf);
+      if (trans && trans.lambda_nm >= 380 && trans.lambda_nm <= 750) {
+        const curNormX = (trans.lambda_nm - 380) / (750 - 380);
+        const curPx = curNormX * w;
+
+        // วาดตัวชี้เรืองแสง
+        specCtx.save();
+        specCtx.strokeStyle = '#ffffff';
+        specCtx.shadowColor = trans.colorHex;
+        specCtx.shadowBlur = 12;
+        specCtx.lineWidth = 4;
+        specCtx.beginPath();
+        specCtx.moveTo(curPx, 0);
+        specCtx.lineTo(curPx, h);
+        specCtx.stroke();
+        specCtx.restore();
+
+        // ตัวชี้รูปสามเหลี่ยมด้านบน
+        specCtx.fillStyle = '#ffffff';
+        specCtx.beginPath();
+        specCtx.moveTo(curPx, 0);
+        specCtx.lineTo(curPx - 5, 8);
+        specCtx.lineTo(curPx + 5, 8);
+        specCtx.closePath();
+        specCtx.fill();
+      }
+    }
+
+    // --- CANVAS RENDER LOOP (ระดับพลังงาน + วงโคจรอะตอม) ---
+    let animAngle = 0;
+    function renderLoop() {
+      const rect = atomCanvas.getBoundingClientRect();
+      const w = rect.width;
+      const h = rect.height;
+
+      atomCtx.clearRect(0, 0, w, h);
+
+      // แบ่งหน้าจอ: ฝั่งซ้าย = แผนภาพระดับพลังงาน (Energy Level Diagram)
+      // ฝั่งขวา = แบบจำลองวงโคจรบอร์ (Bohr Atom Orbits)
+      const dividerX = w * 0.46;
+
+      drawEnergyDiagram(0, 0, dividerX, h);
+      drawBohrOrbits(dividerX, 0, w - dividerX, h);
+
+      animAngle += 0.04;
+      requestAnimationFrame(renderLoop);
+    }
+
+    // วาดแผนภาพระดับพลังงานฝั่งซ้าย
+    function drawEnergyDiagram(x, y, w, h) {
+      atomCtx.save();
+      // เส้นแกนดิ่งพลังงาน
+      atomCtx.strokeStyle = '#334155';
+      atomCtx.lineWidth = 2;
+      atomCtx.beginPath();
+      atomCtx.moveTo(x + 55, y + 25);
+      atomCtx.lineTo(x + 55, h - 35);
+      atomCtx.stroke();
+
+      // ลูกศรชี้ขึ้นของแกน E
+      atomCtx.fillStyle = '#94a3b8';
+      atomCtx.beginPath();
+      atomCtx.moveTo(x + 55, y + 15);
+      atomCtx.lineTo(x + 50, y + 25);
+      atomCtx.lineTo(x + 60, y + 25);
+      atomCtx.closePath();
+      atomCtx.fill();
+
+      atomCtx.font = 'bold 11px Prompt';
+      atomCtx.fillStyle = '#94a3b8';
+      atomCtx.fillText('พลังงาน E (eV)', x + 20, y + 14);
+
+      // เส้นระดับพลังงาน n = 1 ถึง 6
+      const levels = [
+        { n: 1, ev: -13.6, yPct: 0.88 },
+        { n: 2, ev: -3.40, yPct: 0.60 },
+        { n: 3, ev: -1.51, yPct: 0.42 },
+        { n: 4, ev: -0.85, yPct: 0.30 },
+        { n: 5, ev: -0.54, yPct: 0.22 },
+        { n: 6, ev: -0.38, yPct: 0.16 }
+      ];
+
+      levels.forEach(lvl => {
+        const lineY = y + h * lvl.yPct;
+        const isNi = (lvl.n === sim.ni);
+        const isNf = (lvl.n === sim.nf);
+
+        atomCtx.lineWidth = (isNi || isNf) ? 3 : 1.5;
+        atomCtx.strokeStyle = isNi ? '#a855f7' : isNf ? '#10b981' : '#475569';
+
+        atomCtx.beginPath();
+        atomCtx.moveTo(x + 55, lineY);
+        atomCtx.lineTo(x + w - 25, lineY);
+        atomCtx.stroke();
+
+        // ตัวเลขระดับ
+        atomCtx.fillStyle = isNi ? '#c084fc' : isNf ? '#34d399' : '#94a3b8';
+        atomCtx.font = 'bold 11px JetBrains Mono';
+        atomCtx.fillText(`n=${lvl.n}`, x + w - 20, lineY + 4);
+
+        // ค่า eV ทางซ้าย
+        atomCtx.fillStyle = '#64748b';
+        atomCtx.font = '10px JetBrains Mono';
+        atomCtx.textAlign = 'right';
+        atomCtx.fillText(`${lvl.ev.toFixed(2)}`, x + 50, lineY + 3);
+        atomCtx.textAlign = 'left';
+
+        // วาดอิเล็กตรอนบนชั้นระดับพลังงาน
+        if (lvl.n === sim.ni && !sim.isTransitioning) {
+          atomCtx.beginPath();
+          atomCtx.arc(x + w * 0.45, lineY, 6, 0, Math.PI * 2);
+          atomCtx.fillStyle = '#c084fc';
+          atomCtx.shadowColor = '#c084fc';
+          atomCtx.shadowBlur = 8;
+          atomCtx.fill();
+          atomCtx.shadowBlur = 0;
+        }
+      });
+
+      // วาดลูกศรการย้ายชั้นจาก ni ➔ nf
+      const fromY = y + h * levels.find(l => l.n === sim.ni).yPct;
+      const toY = y + h * levels.find(l => l.n === sim.nf).yPct;
+      const arrowX = x + w * 0.55;
+
+      const trans = calculateTransition(sim.ni, sim.nf);
+
+      atomCtx.strokeStyle = trans ? trans.colorHex : '#ffffff';
+      atomCtx.lineWidth = 2.5;
+      atomCtx.beginPath();
+      atomCtx.moveTo(arrowX, fromY);
+      atomCtx.lineTo(arrowX, toY);
+      atomCtx.stroke();
+
+      // หัวลูกศรชี้ลง
+      atomCtx.fillStyle = trans ? trans.colorHex : '#ffffff';
+      atomCtx.beginPath();
+      atomCtx.moveTo(arrowX, toY);
+      atomCtx.lineTo(arrowX - 4, toY - 8);
+      atomCtx.lineTo(arrowX + 4, toY - 8);
+      atomCtx.closePath();
+      atomCtx.fill();
+
+      // ป้ายกำกับ ΔE
+      atomCtx.font = 'bold 11px Prompt';
+      atomCtx.fillStyle = '#f8fafc';
+      atomCtx.fillText(`ΔE = ${trans ? trans.dE_ev.toFixed(2) : ''} eV`, arrowX + 8, (fromY + toY) / 2 + 4);
+
+      atomCtx.restore();
+    }
+
+    // วาดแบบจำลองวงโคจรบอร์ฝั่งขวา
+    function drawBohrOrbits(x, y, w, h) {
+      atomCtx.save();
+      const centerX = x + w / 2;
+      const centerY = y + h / 2;
+      const maxRadius = Math.min(w, h) * 0.44;
+
+      // นิวเคลียสใจกลาง (+ Proton)
+      atomCtx.beginPath();
+      atomCtx.arc(centerX, centerY, 9, 0, Math.PI * 2);
+      atomCtx.fillStyle = '#ef4444';
+      atomCtx.shadowColor = '#ef4444';
+      atomCtx.shadowBlur = 10;
+      atomCtx.fill();
+      atomCtx.shadowBlur = 0;
+
+      atomCtx.fillStyle = '#ffffff';
+      atomCtx.font = 'bold 10px JetBrains Mono';
+      atomCtx.textAlign = 'center';
+      atomCtx.fillText('+e', centerX, centerY + 3.5);
+      atomCtx.textAlign = 'left';
+
+      // วงโคจร n = 1 ถึง 6
+      const radii = [0, 0.22, 0.38, 0.54, 0.70, 0.85, 1.0].map(r => r * maxRadius);
+
+      for (let n = 1; n <= 6; n++) {
+        const r = radii[n];
+        atomCtx.beginPath();
+        atomCtx.arc(centerX, centerY, r, 0, Math.PI * 2);
+
+        if (n === sim.ni) {
+          atomCtx.strokeStyle = 'rgba(168, 85, 247, 0.6)';
+          atomCtx.lineWidth = 2;
+        } else if (n === sim.nf) {
+          atomCtx.strokeStyle = 'rgba(16, 185, 129, 0.6)';
+          atomCtx.lineWidth = 2;
+        } else {
+          atomCtx.strokeStyle = 'rgba(71, 85, 105, 0.35)';
+          atomCtx.lineWidth = 1;
+        }
+        atomCtx.setLineDash([3, 4]);
+        atomCtx.stroke();
+        atomCtx.setLineDash([]);
+      }
+
+      // วาดอิเล็กตรอนโคจร
+      let curR = radii[sim.nf];
+      if (sim.isTransitioning) {
+        // อนิเมชันตกลงมา
+        sim.photonAnimation.progress += 0.025;
+        if (sim.photonAnimation.progress >= 1.0) {
+          sim.isTransitioning = false;
+          curR = radii[sim.nf];
+        } else {
+          curR = radii[sim.ni] - (radii[sim.ni] - radii[sim.nf]) * sim.photonAnimation.progress;
+        }
+      }
+
+      const eX = centerX + Math.cos(animAngle) * curR;
+      const eY = centerY + Math.sin(animAngle) * curR;
+
+      atomCtx.beginPath();
+      atomCtx.arc(eX, eY, 5, 0, Math.PI * 2);
+      atomCtx.fillStyle = '#38bdf8';
+      atomCtx.shadowColor = '#38bdf8';
+      atomCtx.shadowBlur = 8;
+      atomCtx.fill();
+      atomCtx.shadowBlur = 0;
+
+      // วาดโฟตอนพุ่งออกจากจุดตก
+      if (sim.photonAnimation && sim.photonAnimation.progress > 0.3) {
+        const pProg = (sim.photonAnimation.progress - 0.3) / 0.7;
+        const waveLen = 40;
+        const photonDist = pProg * (maxRadius * 1.2);
+        const pAngle = animAngle + Math.PI / 2;
+
+        const pX = centerX + Math.cos(pAngle) * (radii[sim.nf] + photonDist);
+        const pY = centerY + Math.sin(pAngle) * (radii[sim.nf] + photonDist);
+
+        // วาดคลื่นไซน์โฟตอน (Photon wave packet)
+        atomCtx.save();
+        atomCtx.strokeStyle = sim.photonAnimation.color;
+        atomCtx.shadowColor = sim.photonAnimation.color;
+        atomCtx.shadowBlur = 10;
+        atomCtx.lineWidth = 2.5;
+
+        atomCtx.beginPath();
+        for (let i = 0; i <= 20; i++) {
+          const t = i / 20;
+          const waveX = pX + Math.cos(pAngle) * (t * waveLen);
+          const waveY = pY + Math.sin(pAngle) * (t * waveLen) + Math.sin(t * Math.PI * 4) * 4;
+          if (i === 0) atomCtx.moveTo(waveX, waveY);
+          else atomCtx.lineTo(waveX, waveY);
+        }
+        atomCtx.stroke();
+
+        atomCtx.fillStyle = sim.photonAnimation.color;
+        atomCtx.font = 'bold 10px JetBrains Mono';
+        atomCtx.fillText(`hν (${sim.photonAnimation.lambda_nm.toFixed(0)} nm)`, pX + 15, pY);
+        atomCtx.restore();
+      }
+
+      atomCtx.restore();
+    }
+
+    // --- STEP 1: PREDICTION HANDLING ---
+    function savePrediction() {
+      const predE = document.querySelector('input[name="pred_energy"]:checked');
+      const predS = document.querySelector('input[name="pred_series"]:checked');
+
+      if (!predE || !predS) {
+        alert('กรุณาเลือกคำตอบทำนายผลทั้ง 2 ข้อ');
+        return;
+      }
+
+      studentPrediction.energy = predE.value;
+      studentPrediction.series = predS.value;
+
+      const statusEl = document.getElementById('predStatus');
+      statusEl.textContent = '✓ บันทึกการทำนายผลสำเร็จแล้ว! ไปทดลองย้ายระดับพลังงานและสังเกตสเปกตรัม';
+      statusEl.className = 'text-xs text-emerald-400 font-semibold';
+
+      evaluateHypothesis();
+    }
+
+    // --- STEP 3: DATA RECORDING ---
+    function recordDataPoint() {
+      const trans = calculateTransition(sim.ni, sim.nf);
+      if (!trans) return;
+
+      const point = {
+        id: studentData.length + 1,
+        transition: `n=${trans.ni} ➔ n=${trans.nf}`,
+        dE_ev: trans.dE_ev.toFixed(2),
+        freq: (trans.freq / 1e14).toFixed(2),
+        lambda: trans.lambda_nm.toFixed(1),
+        region: trans.region,
+        colorHex: trans.colorHex
+      };
+
+      studentData.push(point);
+      renderTable();
+      evaluateHypothesis();
+    }
+
+    function renderTable() {
+      const tbody = document.getElementById('dataTableBody');
+      const emptyMsg = document.getElementById('tableEmptyMsg');
+      tbody.innerHTML = '';
+
+      if (studentData.length === 0) {
+        emptyMsg.style.display = 'block';
+        return;
+      }
+      emptyMsg.style.display = 'none';
+
+      studentData.forEach((d, idx) => {
+        const tr = document.createElement('tr');
+        tr.className = "hover:bg-slate-800/40 border-b border-slate-800/50";
+        tr.innerHTML = `
+          <td class="p-2 text-center text-slate-400">${idx + 1}</td>
+          <td class="p-2 text-amber-300 font-bold">${d.transition}</td>
+          <td class="p-2 text-violet-300 font-bold">${d.dE_ev}</td>
+          <td class="p-2 text-amber-400">${d.freq}</td>
+          <td class="p-2 text-emerald-400 font-bold">${d.lambda}</td>
+          <td class="p-2 flex items-center gap-1.5">
+            <span class="w-3 h-3 rounded-full border border-white/20 inline-block" style="background-color: ${d.colorHex}"></span>
+            <span>${d.region}</span>
+          </td>
+          <td class="p-2 text-center">
+            <button onclick="removeDataPoint(${idx})" class="text-slate-500 hover:text-red-400 text-xs">✕</button>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function removeDataPoint(index) {
+      studentData.splice(index, 1);
+      renderTable();
+      evaluateHypothesis();
+    }
+
+    function clearData() {
+      if (confirm('คุณต้องการล้างชุดข้อมูลในตารางทั้งหมดใช่หรือไม่?')) {
+        studentData.length = 0;
+        renderTable();
+        evaluateHypothesis();
+      }
+    }
+
+    function addPresetBalmerData() {
+      studentData.length = 0;
+      const transitions = [[3,2], [4,2], [5,2], [6,2]];
+      transitions.forEach((pair, idx) => {
+        const trans = calculateTransition(pair[0], pair[1]);
+        studentData.push({
+          id: idx + 1,
+          transition: `n=${trans.ni} ➔ n=${trans.nf}`,
+          dE_ev: trans.dE_ev.toFixed(2),
+          freq: (trans.freq / 1e14).toFixed(2),
+          lambda: trans.lambda_nm.toFixed(1),
+          region: trans.region,
+          colorHex: trans.colorHex
+        });
+      });
+      renderTable();
+      evaluateHypothesis();
+    }
+
+    // --- REVERSE CHALLENGE MODE HANDLING ---
+    function switchLabMode(mode) {
+      sim.mode = mode;
+      const btnExp = document.getElementById('tabModeExplore');
+      const btnRev = document.getElementById('tabModeReverse');
+      const revSec = document.getElementById('reverseChallengeSection');
+
+      if (mode === 'reverse') {
+        btnRev.className = 'px-3 py-1.5 rounded-lg bg-indigo-600 text-white font-medium shadow flex items-center gap-1.5';
+        btnExp.className = 'px-3 py-1.5 rounded-lg bg-slate-800 text-slate-300 hover:bg-slate-700 font-medium transition-colors border border-slate-700';
+        revSec.classList.remove('hidden');
+        generateRandomChallenge();
+      } else {
+        btnExp.className = 'px-3 py-1.5 rounded-lg bg-violet-600 text-white font-medium shadow flex items-center gap-1.5';
+        btnRev.className = 'px-3 py-1.5 rounded-lg bg-slate-800 text-slate-300 hover:bg-slate-700 font-medium transition-colors border border-slate-700';
+        revSec.classList.add('hidden');
+      }
+    }
+
+    function generateRandomChallenge() {
+      const randIdx = Math.floor(Math.random() * spectrumChallenges.length);
+      sim.reverseTarget = spectrumChallenges[randIdx];
+
+      document.getElementById('targetLambda').textContent = `${sim.reverseTarget.lambda} nm`;
+      document.getElementById('targetColorBadge').style.backgroundColor = sim.reverseTarget.color;
+      document.getElementById('targetColorName').textContent = sim.reverseTarget.name;
+      document.getElementById('targetSeriesName').textContent = sim.reverseTarget.series;
+
+      document.getElementById('challengeFeedback').innerHTML = 
+        `<span class="text-indigo-300 font-medium">โจทย์ใหม่พร้อมแล้ว!</span> ลากเลือกระดับ \( n_i \) และ \( n_f \) ที่คุณคิดว่าเป็นต้นกำเนิดของเส้นนี้`;
+
+      if (window.MathJax && MathJax.typesetPromise) {
+        MathJax.typesetPromise([document.getElementById('reverseChallengeSection')]);
+      }
+    }
+
+    function checkReverseAnswer() {
+      if (!sim.reverseTarget) return;
+
+      const userNi = parseInt(document.getElementById('user_ni').value);
+      const userNf = parseInt(document.getElementById('user_nf').value);
+      const fb = document.getElementById('challengeFeedback');
+
+      if (userNi === sim.reverseTarget.ni && userNf === sim.reverseTarget.nf) {
+        fb.innerHTML = `
+          <div class="text-emerald-400 font-semibold flex items-start gap-1.5">
+            <span>✓</span>
+            <div><strong>ยอดเยี่ยม! การเชื่อมโยงถูกต้องสมบูรณ์</strong><br>
+            เส้น ${sim.reverseTarget.lambda} nm เกิดจากการที่อิเล็กตรอนตกจาก \( n=${userNi} \) ลงสู่ \( n=${userNf} \) จริง ส่งผลให้ปล่อยโฟตอนพลังงานตรงกันพอดี!</div>
+          </div>
+        `;
+        // ย้ายอะตอมไปที่ค่านั้นให้ดูทันที
+        setTransition(userNi, userNf);
+      } else {
+        const testTrans = calculateTransition(userNi, userNf);
+        fb.innerHTML = `
+          <div class="text-amber-400 font-semibold flex items-start gap-1.5">
+            <span>✕</span>
+            <div><strong>ยังไม่ถูกต้อง:</strong><br>
+            คู่ \( n=${userNi} \rightarrow n=${userNf} \) ให้ความยาวคลื่น <span class="underline">${testTrans ? testTrans.lambda_nm.toFixed(1) : ''} nm</span> ซึ่งไม่ตรงกับเป้าหมาย (${sim.reverseTarget.lambda} nm) ลองวิเคราะห์พลังงานใหม่ดูนะครับ</div>
+          </div>
+        `;
+      }
+
+      if (window.MathJax && MathJax.typesetPromise) {
+        MathJax.typesetPromise([fb]);
+      }
+    }
+
+    // --- STEP 5: EVALUATION AND MATHJAX ---
+    function evaluateHypothesis() {
+      const container = document.getElementById('hypothesisEvaluation');
+
+      if (!studentPrediction.energy || !studentPrediction.series) {
+        container.innerHTML = `<p class="text-slate-400">กรุณาทำนายผลในขั้นที่ 1 ก่อนเพื่อเปรียบเทียบผลการทดลอง</p>`;
+        return;
+      }
+
+      if (studentData.length === 0) {
+        container.innerHTML = `<p class="text-amber-400 font-medium">บันทึกผลการทำนายแล้ว: รอข้อมูลจากการทดลองเพื่อเปรียบเทียบมโนทัศน์...</p>`;
+        return;
+      }
+
+      const correctEnergy = (studentPrediction.energy === '4to2');
+      const correctSeries = (studentPrediction.series === 'balmer');
+
+      let html = `<div class="space-y-2">`;
+
+      if (correctEnergy) {
+        html += `
+          <div class="flex items-start gap-2 text-emerald-400">
+            <span>✓</span>
+            <div><strong>พลังงานและความยาวคลื่น:</strong> การทำนายของคุณ <span class="underline">ถูกต้อง</span> (การเปลี่ยนจาก \( n=4 \rightarrow n=2 \) มี \( \Delta E = 2.55\text{ eV} \) ซึ่งมากกว่า \( n=3 \rightarrow n=2 \) ที่มีเพียง \( 1.89\text{ eV} \) จึงให้ความยาวคลื่นสั้นกว่าคือ \( 486.1\text{ nm} \) สีฟ้าอมเขียว)</div>
+          </div>`;
+      } else {
+        html += `
+          <div class="flex items-start gap-2 text-amber-400">
+            <span>✕</span>
+            <div><strong>พลังงานและความยาวคลื่น:</strong> การเปลี่ยนจากระดับที่สูงกว่า (\( n=4 \rightarrow n=2 \)) จะให้พลังงานโฟตอนสูงกว่า ส่งผลให้ความยาวคลื่นสั้นกว่า (\( \lambda \propto \frac{1}{\Delta E} \))</div>
+          </div>`;
+      }
+
+      if (correctSeries) {
+        html += `
+          <div class="flex items-start gap-2 text-emerald-400">
+            <span>✓</span>
+            <div><strong>อนุกรมสเปกตรัม:</strong> ถูกต้อง อนุกรมบาลเมอร์ (\( n_f = 2 \)) เป็นอนุกรมเดียวของไฮโดรเจนที่ปลดปล่อยโฟตอนในช่วงแสงที่ตามนุษย์มองเห็นได้ (\( 380 - 750\text{ nm} \))</div>
+          </div>`;
+      } else {
+        html += `
+          <div class="flex items-start gap-2 text-amber-400">
+            <span>✕</span>
+            <div><strong>อนุกรมสเปกตรัม:</strong> อนุกรมไลแมน (\( n_f=1 \)) ให้รังสี UV ที่ตามองไม่เห็น ส่วนพาสเชน (\( n_f=3 \)) ให้รังสีอินฟราเรด มีเพียง **บาลเมอร์ (\( n_f=2 \))** เท่านั้นที่เป็นแสงที่ตามองเห็น</div>
+          </div>`;
+      }
+
+      html += `</div>`;
+      container.innerHTML = html;
+
+      if (window.MathJax && MathJax.typesetPromise) {
+        MathJax.typesetPromise([container]).catch(err => console.error(err));
+      }
+    }
+  </script>
+</body>
+</html>

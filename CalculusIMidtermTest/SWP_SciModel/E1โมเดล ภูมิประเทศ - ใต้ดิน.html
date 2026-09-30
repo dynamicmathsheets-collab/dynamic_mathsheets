@@ -1,0 +1,974 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>โมเดล ภูมิประเทศ → ใต้ดิน (Map to Cross-Section Simulator)</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Google Fonts: Prompt & Space Grotesk -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <!-- Three.js for 3D Cutaway Block Model -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
+  <style>
+    body { font-family: 'Prompt', sans-serif; }
+    .font-mono-code { font-family: 'Space Grotesk', monospace; }
+    
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar { width: 5px; height: 5px; }
+    ::-webkit-scrollbar-track { background: #090d16; }
+    ::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
+
+    /* Cross-section interactive zone */
+    .profile-canvas-container {
+      background-image: 
+        linear-gradient(to right, rgba(51, 65, 85, 0.25) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(51, 65, 85, 0.25) 1px, transparent 1px);
+      background-size: 20px 20px;
+    }
+
+    .strike-dip-tick {
+      transform-origin: center;
+      transition: transform 0.2s ease;
+    }
+
+    /* Spatial thinking pulse animation */
+    @keyframes projectPulse {
+      0% { stroke-dashoffset: 0; }
+      100% { stroke-dashoffset: -20; }
+    }
+    .projection-guide-active {
+      stroke-dasharray: 4, 4;
+      animation: projectPulse 0.8s linear infinite;
+    }
+  </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col selection:bg-cyan-500 selection:text-black">
+
+  <header class="bg-slate-900/90 border-b border-slate-800 sticky top-0 z-40 backdrop-blur">
+    <div class="max-w-7xl mx-auto px-4 py-3 flex flex-wrap items-center justify-between gap-3">
+      <!-- Title & Branding -->
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-cyan-600 via-indigo-600 to-emerald-500 flex items-center justify-center text-white shadow-lg shadow-cyan-950/50">
+          <i data-lucide="map" class="w-5 h-5"></i>
+        </div>
+        <div>
+          <div class="flex items-center gap-2">
+            <h1 class="text-sm sm:text-base font-bold text-white tracking-wide">โมเดล ภูมิประเทศ → ใต้ดิน</h1>
+            <span class="text-[10px] px-2 py-0.5 rounded-full bg-cyan-950 border border-cyan-500/40 text-cyan-300 font-medium">Spatial Reasoning Lab</span>
+          </div>
+          <p class="text-xs text-slate-400">แปลงข้อมูลแผนที่ 2 มิติ สู่ภาพตัดขวางโครงสร้างธรณีวิทยา 3 มิติ</p>
+        </div>
+      </div>
+
+      <!-- Scenarios Selector -->
+      <div class="flex items-center gap-2">
+        <span class="text-xs text-slate-400 hidden sm:inline flex items-center gap-1">
+          <i data-lucide="compass" class="w-3.5 h-3.5 text-cyan-400"></i> เลือกสถานการณ์:
+        </span>
+        <select id="scenarioSelector" onchange="changeScenario(this.value)" class="bg-slate-950 border border-slate-800 text-xs text-cyan-300 rounded-xl px-3 py-2 font-medium focus:ring-1 focus:ring-cyan-500 outline-none cursor-pointer">
+          <option value="folded">สถานการณ์ 1: โครงสร้างประทุนหงายและประทุนคว่ำ (Folds)</option>
+          <option value="faulted">สถานการณ์ 2: ชั้นหินเอียงเทและรอยเลื่อนปกติ (Faulted Block)</option>
+          <option value="unconformity">สถานการณ์ 3: รอยชั้นไม่ต่อเนื่องและหินแทรกซอน (Unconformity)</option>
+        </select>
+        
+        <button onclick="toggleGuideModal()" class="bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs px-3 py-2 rounded-xl transition flex items-center gap-1.5" title="คู่มือกฎทางธรณีวิทยา">
+          <i data-lucide="book-open" class="w-3.5 h-3.5 text-amber-400"></i>
+          <span class="hidden md:inline">คู่มืออ่านแผนที่</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main class="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-5 flex flex-col gap-5">
+
+    <!-- Pedagogical Workflow Progress Bar -->
+    <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-3 flex flex-wrap items-center justify-between gap-3 text-xs">
+      <div class="flex items-center gap-2 font-medium text-slate-300">
+        <span class="w-6 h-6 rounded-lg bg-cyan-600/30 border border-cyan-500/50 text-cyan-300 flex items-center justify-center font-bold">1</span>
+        <span>อ่านแผนที่ & ทิศทางมุมเท (Strike/Dip)</span>
+        <i data-lucide="chevron-right" class="w-3.5 h-3.5 text-slate-600"></i>
+        <span class="w-6 h-6 rounded-lg bg-indigo-600/30 border border-indigo-500/50 text-indigo-300 flex items-center justify-center font-bold">2</span>
+        <span>โปรเจกต์แนวสัมผัสลงเส้นภูมิประเทศ</span>
+        <i data-lucide="chevron-right" class="w-3.5 h-3.5 text-slate-600"></i>
+        <span class="w-6 h-6 rounded-lg bg-emerald-600/30 border border-emerald-500/50 text-emerald-300 flex items-center justify-center font-bold">3</span>
+        <span>ตีความโครงสร้าง & ถอดบล็อก 3D ตรวจสอบ</span>
+      </div>
+
+      <div class="flex items-center gap-2">
+        <button id="btnToggle3D" onclick="toggle3DModal()" class="bg-gradient-to-r from-indigo-600 to-cyan-600 hover:from-indigo-500 hover:to-cyan-500 text-white text-xs font-semibold px-4 py-1.5 rounded-xl shadow-md transition flex items-center gap-1.5">
+          <i data-lucide="box" class="w-4 h-4"></i>
+          <span>โมเดล 3D ถอดชิ้นส่วนผ่าตรวจ</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Dual Workspace: Upper Map Panel & Lower Cross-Section Studio -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-5">
+      
+      <!-- Panel 1: Topographic & Geological Map View (6 Cols) -->
+      <section class="lg:col-span-6 bg-slate-900/90 border border-slate-800 rounded-2xl p-4 flex flex-col gap-3 shadow-xl">
+        <div class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-800 pb-2.5">
+          <div>
+            <h2 class="text-sm font-bold text-white flex items-center gap-2">
+              <i data-lucide="map-pin" class="w-4 h-4 text-cyan-400"></i> แผนที่ภูมิประเทศและแผนที่ธรณีวิทยา (2D Map)
+            </h2>
+            <p class="text-[11px] text-slate-400">คลิกหรือเลื่อนเมาส์ตามแนวเส้นตัด A-B เพื่อฉายเส้นไกด์ไลน์ลงด้านล่าง</p>
+          </div>
+
+          <!-- Map Filter Toggles -->
+          <div class="flex items-center gap-1 bg-slate-950 p-1 rounded-xl border border-slate-800 text-[11px]">
+            <button id="layer-contour-toggle" onclick="toggleMapLayer('contour')" class="px-2 py-1 rounded-lg bg-cyan-950 border border-cyan-500/40 text-cyan-300 font-medium">
+              เส้นชั้นความสูง
+            </button>
+            <button id="layer-geology-toggle" onclick="toggleMapLayer('geology')" class="px-2 py-1 rounded-lg bg-indigo-950 border border-indigo-500/40 text-indigo-300 font-medium">
+              หน่วยหิน
+            </button>
+            <button id="layer-dip-toggle" onclick="toggleMapLayer('dip')" class="px-2 py-1 rounded-lg bg-amber-950 border border-amber-500/40 text-amber-300 font-medium">
+              Strike/Dip
+            </button>
+          </div>
+        </div>
+
+        <!-- SVG Map Canvas (Responsive) -->
+        <div class="relative w-full aspect-[4/3] bg-slate-950 rounded-xl overflow-hidden border border-slate-800 select-none">
+          <svg id="topoGeoSvg" viewBox="0 0 600 450" class="w-full h-full cursor-crosshair">
+            <!-- Injected dynamically based on scenario -->
+          </svg>
+
+          <!-- Interactive Hover Coordinate Tooltip -->
+          <div id="mapTooltip" class="absolute pointer-events-none hidden bg-slate-900/95 border border-slate-700 text-[11px] px-2.5 py-1.5 rounded-lg shadow-xl text-slate-200"></div>
+        </div>
+
+        <!-- Map Legend & Scale Info -->
+        <div id="mapLegendContainer" class="flex flex-wrap items-center justify-between gap-2 p-2.5 rounded-xl bg-slate-950/80 border border-slate-800/80 text-[11px]">
+          <!-- Injected dynamically -->
+        </div>
+      </section>
+
+      <!-- Panel 2: Subsurface Cross-Section Builder Studio (6 Cols) -->
+      <section class="lg:col-span-6 bg-slate-900/90 border border-slate-800 rounded-2xl p-4 flex flex-col justify-between gap-3 shadow-xl">
+        <div class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-800 pb-2.5">
+          <div>
+            <h2 class="text-sm font-bold text-white flex items-center gap-2">
+              <i data-lucide="scissors" class="w-4 h-4 text-emerald-400"></i> สตูดิโอสร้างภาพตัดขวาง (Cross-Section A-B)
+            </h2>
+            <p class="text-[11px] text-slate-400">ลากเส้นชั้นหินใต้ผิวดิน และเลือกสมมติฐานโครงสร้างธรณี</p>
+          </div>
+
+          <!-- Quick Projection Tool Button -->
+          <button onclick="autoProjectElevationLine()" class="bg-slate-800 hover:bg-slate-700 text-cyan-300 text-xs px-2.5 py-1.5 rounded-lg transition flex items-center gap-1 border border-slate-700">
+            <i data-lucide="download" class="w-3.5 h-3.5"></i>
+            <span>โปรเจกต์แนวผิวดินอัตโนมัติ</span>
+          </button>
+        </div>
+
+        <!-- Cross-Section Canvas Display with Subsurface Zone -->
+        <div class="relative w-full aspect-[4/3] bg-slate-950 rounded-xl overflow-hidden border border-slate-800 profile-canvas-container flex flex-col justify-between p-3 select-none">
+          
+          <!-- Elevation Scale Axis on Left -->
+          <div class="absolute left-2 top-3 bottom-8 w-10 flex flex-col justify-between text-[10px] font-mono-code text-slate-500 pointer-events-none">
+            <span>500m</span>
+            <span>400m</span>
+            <span>300m</span>
+            <span>200m</span>
+            <span>100m</span>
+            <span>0m (ทะเล)</span>
+            <span>-200m</span>
+          </div>
+
+          <!-- SVG Interactive Drawing Workspace for Cross-Section -->
+          <svg id="crossSectionSvg" viewBox="0 0 600 450" class="w-full h-full cursor-crosshair ml-4">
+            <!-- Guidelines from surface drop down -->
+            <g id="dropGuidelinesGroup"></g>
+            <!-- Elevation Contour Topography Line -->
+            <path id="topoProfilePath" d="" fill="none" stroke="#38bdf8" stroke-width="2.5"/>
+            <!-- Surface Contact Points and Dip Ticks -->
+            <g id="surfaceContactsGroup"></g>
+            <!-- Subsurface student interpretation layers -->
+            <g id="subsurfaceLayersGroup"></g>
+            <!-- True cross-section overlay (revealed on check) -->
+            <g id="trueCrossSectionGroup" class="hidden opacity-85"></g>
+          </svg>
+
+          <!-- Profile Axis Labels (A on left, B on right) -->
+          <div class="flex justify-between items-center text-xs font-bold text-slate-400 px-4 font-mono-code border-t border-slate-800 pt-1">
+            <span class="flex items-center gap-1 text-cyan-400"><i data-lucide="chevron-left" class="w-3 h-3"></i> จุดตัด A (ทิศตะวันตกเฉียงใต้)</span>
+            <span class="text-[10px] text-slate-500 font-normal">ระยะทางแนวราบ ~3,000 เมตร</span>
+            <span class="flex items-center gap-1 text-cyan-400">จุดตัด B (ทิศตะวันออกเฉียงเหนือ) <i data-lucide="chevron-right" class="w-3 h-3"></i></span>
+          </div>
+        </div>
+
+        <!-- Structural Hypothesis Selector & Verification Button -->
+        <div class="space-y-2 pt-1">
+          <div class="flex flex-wrap items-center justify-between gap-2 text-xs">
+            <span class="text-slate-300 font-medium">สมมติฐานโครงสร้างใต้ดินของคุณ:</span>
+            <div class="flex items-center gap-1.5" id="hypothesisButtonsGroup">
+              <!-- Injected per scenario -->
+            </div>
+          </div>
+
+          <div class="flex items-center gap-2">
+            <button onclick="evaluateCrossSection()" class="flex-1 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-semibold text-xs sm:text-sm py-2.5 rounded-xl shadow-lg transition flex items-center justify-center gap-2">
+              <i data-lucide="check-check" class="w-4 h-4"></i>
+              <span>ตรวจคำตอบเทียบกับความจริงใต้ผิวดิน</span>
+            </button>
+            <button onclick="resetCurrentWorkspace()" class="bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs px-3 py-2.5 rounded-xl transition" title="ล้างการตอบ">
+              ล้าง
+            </button>
+          </div>
+        </div>
+
+      </section>
+
+    </div>
+
+    <!-- Diagnostic Reasoning Result Card (Shown after evaluation) -->
+    <div id="diagnosticFeedbackCard" class="hidden bg-slate-900/95 border border-slate-800 rounded-2xl p-4 sm:p-5 shadow-2xl flex-col gap-3">
+      <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+        <div class="flex items-center gap-2.5">
+          <div id="diagnosticIconBadge" class="w-8 h-8 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center font-bold">
+            <i data-lucide="award" class="w-4 h-4"></i>
+          </div>
+          <div>
+            <h3 id="diagnosticTitle" class="text-sm sm:text-base font-bold text-white">ผลการประเมินทักษะการแปลความหมายเชิงพื้นที่ (Spatial Reasoning)</h3>
+            <p id="diagnosticSubtitle" class="text-xs text-slate-400">วิเคราะห์ความสอดคล้องระหว่างข้อมูลแผนที่ 2 มิติ กับโครงสร้าง 3 มิติ</p>
+          </div>
+        </div>
+        <div class="text-right">
+          <span class="text-[10px] text-slate-400 uppercase font-mono-code block">คะแนนความแม่นยำ</span>
+          <span id="diagnosticScore" class="text-lg font-bold font-mono-code text-cyan-400">100%</span>
+        </div>
+      </div>
+
+      <div id="diagnosticExplanation" class="text-xs text-slate-300 leading-relaxed space-y-2">
+        <!-- Injected feedback explanation -->
+      </div>
+    </div>
+
+  </main>
+
+  <!-- 3D Exploded / Cutaway Block Modal -->
+  <div id="modal3DBlock" class="fixed inset-0 bg-black/85 backdrop-blur-md hidden items-center justify-center p-3 sm:p-6 z-50">
+    <div class="bg-slate-900 border border-slate-700 max-w-4xl w-full rounded-2xl overflow-hidden shadow-2xl flex flex-col max-h-[92vh]">
+      
+      <!-- Modal Header -->
+      <div class="px-5 py-3.5 border-b border-slate-800 flex items-center justify-between bg-slate-950/70">
+        <div class="flex items-center gap-2">
+          <i data-lucide="box" class="w-5 h-5 text-indigo-400"></i>
+          <div>
+            <h3 class="text-sm sm:text-base font-bold text-white">โมเดลบล็อก 3D ถอดชิ้นส่วนผ่าตรวจ (3D Cutaway Block Model)</h3>
+            <p class="text-xs text-slate-400">หมุนมุมมอง และเลื่อนสไลด์เพื่อผ่าแยกบล็อกตามแนวเส้นตัด A-B</p>
+          </div>
+        </div>
+        <button onclick="toggle3DModal()" class="text-slate-400 hover:text-white text-lg p-1">✕</button>
+      </div>
+
+      <!-- 3D Canvas Viewport -->
+      <div class="relative flex-1 min-h-[360px] sm:min-h-[420px] bg-slate-950 flex items-center justify-center">
+        <div id="threeJsContainer" class="w-full h-full cursor-grab active:cursor-grabbing"></div>
+
+        <!-- 3D Controls Overlay -->
+        <div class="absolute top-3 left-3 bg-slate-900/85 backdrop-blur border border-slate-800 px-3 py-2 rounded-xl text-[11px] text-slate-300 flex flex-col gap-1 pointer-events-none">
+          <span class="flex items-center gap-1.5"><i data-lucide="mouse-pointer" class="w-3 h-3 text-cyan-400"></i> คลิกซ้าย + ลาก: หมุนโมเดล (Rotate)</span>
+          <span class="flex items-center gap-1.5"><i data-lucide="move" class="w-3 h-3 text-cyan-400"></i> ล้อเมาส์: ซูมเข้า/ออก (Zoom)</span>
+        </div>
+      </div>
+
+      <!-- Slider Controller to Explode/Split along A-B Line -->
+      <div class="p-4 bg-slate-900 border-t border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-4">
+        <div class="flex items-center gap-3 w-full sm:w-2/3">
+          <span class="text-xs font-semibold text-cyan-400 whitespace-nowrap flex items-center gap-1">
+            <i data-lucide="split" class="w-4 h-4"></i> เลื่อนผ่าบล็อกตามเส้น A-B:
+          </span>
+          <input id="sliderSplitBlock" type="range" min="0" max="100" value="0" oninput="onSlideSplit(this.value)" class="w-full h-2 bg-slate-950 rounded-lg appearance-none cursor-pointer accent-cyan-400 border border-slate-700">
+          <span id="splitValueBadge" class="text-xs font-mono-code text-slate-400 w-12 text-right">0%</span>
+        </div>
+
+        <div class="flex items-center gap-2">
+          <button onclick="reset3DCamera()" class="text-xs bg-slate-800 hover:bg-slate-700 text-slate-300 px-3 py-1.5 rounded-lg transition">
+            รีเซ็ตมุมกล้อง
+          </button>
+          <button onclick="toggle3DModal()" class="text-xs bg-indigo-600 hover:bg-indigo-500 text-white font-medium px-4 py-1.5 rounded-lg shadow transition">
+            กลับสู่แบบฝึกหัด
+          </button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Geological Guidance & Rule of V's Modal -->
+  <div id="guideModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm hidden items-center justify-center p-4 z-50">
+    <div class="bg-slate-900 border border-slate-700 max-w-2xl w-full rounded-2xl p-5 sm:p-6 shadow-2xl space-y-4 max-h-[90vh] overflow-y-auto">
+      <div class="flex justify-between items-center border-b border-slate-800 pb-3">
+        <h4 class="text-base font-bold text-amber-400 flex items-center gap-2">
+          <i data-lucide="book-marked" class="w-5 h-5"></i> กฎและหลักการแปลงแผนที่สู่ภาพตัดขวาง
+        </h4>
+        <button onclick="toggleGuideModal()" class="text-slate-400 hover:text-white text-lg">✕</button>
+      </div>
+
+      <div class="text-xs text-slate-300 space-y-3 leading-relaxed">
+        <div class="p-3 bg-slate-950 rounded-xl border border-slate-800">
+          <b class="text-cyan-400 text-sm block mb-1">1. สัญลักษณ์ทิศทางและมุมเท (Strike and Dip)</b>
+          <p class="text-slate-400">
+            • <b>เส้นขนาดยาว (Strike):</b> แนวระดับของระนาบชั้นหิน<br>
+            • <b>ขีดสั้นตั้งฉาก (Dip Direction):</b> ทิศทางที่ชั้นหินเอียงเทมุดลงใต้ผิวดิน<br>
+            • <b>ตัวเลขกำกับ (Dip Angle):</b> องศาความชันของชั้นหินที่ทำกับแนวราบ (0° = ราบเรียบ, 90° = ชันดิ่ง)
+          </p>
+        </div>
+
+        <div class="p-3 bg-slate-950 rounded-xl border border-slate-800">
+          <b class="text-indigo-400 text-sm block mb-1">2. โครงสร้างประทุนหงาย (Syncline) vs ประทุนคว่ำ (Anticline)</b>
+          <p class="text-slate-400">
+            • <b>ประทุนหงาย (Syncline):</b> สัญลักษณ์ Dip จะ <em>เอียงเทเข้าหากันสู่แกนกลาง</em> ชั้นหินตรงกลางจะ "อ่อนที่สุด (Youngest)"<br>
+            • <b>ประทุนคว่ำ (Anticline):</b> สัญลักษณ์ Dip จะ <em>เอียงเทออกจากกัน</em> ชั้นหินที่แกนกลางจะ "แก่ที่สุด (Oldest)"
+          </p>
+        </div>
+
+        <div class="p-3 bg-slate-950 rounded-xl border border-slate-800">
+          <b class="text-emerald-400 text-sm block mb-1">3. กฎของตัว V (Rule of V's)</b>
+          <p class="text-slate-400">
+            เมื่อแนวสัมผัสชั้นหินตัดผ่านหุบเขาแม่น้ำ (เส้นชั้นความสูงรูปตัว V ชี้ขึ้นสู่ต้นน้ำ):<br>
+            - ถ้าชั้นหินเอียงเทตามทิศน้ำไหล รูปตัว V ของชั้นหินจะชี้ไปตามน้ำ<br>
+            - ถ้าชั้นหินวางตัวในแนวราบ แนวสัมผัสจะขนานไปกับเส้นชั้นความสูงทุกจุด
+          </p>
+        </div>
+      </div>
+
+      <div class="pt-2 text-right">
+        <button onclick="toggleGuideModal()" class="bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs px-4 py-2 rounded-xl transition font-medium">เข้าใจแล้ว ปิดหน้าต่าง</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Geological Scenarios Configuration
+    const scenarios = {
+      folded: {
+        title: "เทือกเขาประทุนหงายและประทุนคว่ำ (Folded Strata)",
+        desc: "ชั้นหินคดโค้งโก่งงอจากการบีบอัด เกิดแนวประทุนหงายและประทุนคว่ำสลับกัน",
+        elevationPoints: [
+          { dist: 0, elev: 350 },
+          { dist: 80, elev: 420 },
+          { dist: 160, elev: 480 }, // Ridge 1
+          { dist: 250, elev: 280 }, // Valley (Syncline core)
+          { dist: 350, elev: 460 }, // Ridge 2 (Anticline core)
+          { dist: 450, elev: 320 },
+          { dist: 600, elev: 220 }
+        ],
+        contacts: [
+          { x: 120, rockA: 'A', rockB: 'B', dip: 35, dipDir: 'right' },
+          { x: 250, rockA: 'B', rockB: 'C', dip: 0, dipDir: 'syncline_axis' },
+          { x: 380, rockA: 'C', rockB: 'B', dip: 40, dipDir: 'left' },
+          { x: 490, rockA: 'B', rockB: 'A', dip: 30, dipDir: 'right' }
+        ],
+        hypotheses: [
+          { id: 'folds_syn_anti', label: 'ประทุนหงาย (ซ้าย) + ประทุนคว่ำ (ขวา)', correct: true },
+          { id: 'tilted_uniform', label: 'ชั้นหินเอียงเททางเดียวไปทางทิศตะวันออก', correct: false },
+          { id: 'horizontal', label: 'ชั้นหินวางตัวราบเรียบสลับกัน', correct: false }
+        ],
+        rocks: [
+          { id: 'A', name: 'หินทราย A (Sandstone)', color: '#fde047', stroke: '#ca8a04', age: 'แก่สุด' },
+          { id: 'B', name: 'หินดินดาน B (Shale)', color: '#94a3b8', stroke: '#475569', age: 'ปานกลาง' },
+          { id: 'C', name: 'หินปูน C (Limestone)', color: '#67e8f9', stroke: '#0891b2', age: 'อ่อนสุด' }
+        ],
+        explanation: "<b>คำอธิบายเชิงธรณีโครงสร้าง:</b> สังเกตว่าสัญลักษณ์มุมเท (Dip) ฝั่งซ้ายเอียงเทเข้าหากันที่ระยะ X ~ 250m ซึ่งเป็นร่องเขาที่มีหินปูน C (หินอ่อนสุด) อยู่ตรงกลาง จึงเป็นโครงสร้าง <b>ประทุนหงาย (Syncline)</b> ส่วนที่ X ~ 380-490m สัญลักษณ์มุมเทเอียงเทออกจากกัน และมีหินทราย A (หินแก่สุด) โผล่ขึ้นมาตรงยอดเขา จึงเป็น <b>ประทุนคว่ำ (Anticline)</b>"
+      },
+
+      faulted: {
+        title: "ชั้นหินเอียงเทและรอยเลื่อนปกติ (Tilted Strata & Normal Fault)",
+        desc: "ชั้นหินเอียงเทสม่ำเสมอไปทางทิศตะวันตกเฉียงใต้ และถูกรอยเลื่อนตัดขาดเลื่อนตัวลง",
+        elevationPoints: [
+          { dist: 0, elev: 200 },
+          { dist: 120, elev: 310 },
+          { dist: 280, elev: 490 }, // Fault scarp peak
+          { dist: 310, elev: 280 }, // Drop cliff along fault
+          { dist: 460, elev: 380 },
+          { dist: 600, elev: 300 }
+        ],
+        contacts: [
+          { x: 150, rockA: 'A', rockB: 'B', dip: 30, dipDir: 'left' },
+          { x: 300, rockA: 'FAULT', rockB: 'FAULT', dip: 65, dipDir: 'right' },
+          { x: 430, rockA: 'A', rockB: 'B', dip: 30, dipDir: 'left' }
+        ],
+        hypotheses: [
+          { id: 'normal_fault', label: 'ชั้นหินเอียงซ้าย + รอยเลื่อนปกติเลื่อนลงขวา', correct: true },
+          { id: 'anticline', label: 'โครงสร้างประทุนคว่ำสมมาตร', correct: false },
+          { id: 'thrust_fault', label: 'รอยเลื่อนย้อนมุมต่ำ (Thrust)', correct: false }
+        ],
+        rocks: [
+          { id: 'A', name: 'หินทรายแป้ง A (Siltstone)', color: '#fca5a5', stroke: '#dc2626', age: 'ชั้นล่าง' },
+          { id: 'B', name: 'หินปูนฟอสซิล B (Limestone)', color: '#86efac', stroke: '#16a34a', age: 'ชั้นบน' }
+        ],
+        explanation: "<b>คำอธิบายเชิงธรณีโครงสร้าง:</b> ชั้นหิน A และ B โผล่ซ้ำสองรอบบนผิวดิน โดยมีทิศมุมเทเอียงไปทางซ้ายเท่ากัน (30°) และมีหน้าผาชันตัดตรงจุด X=300m พร้อมรอยเลื่อนปกติเอียงขวา (Dip 65°) ทำให้บล็อกฝั่งขวา (Hanging Wall) เลื่อนตัวทรุดต่ำลง"
+      },
+
+      unconformity: {
+        title: "รอยชั้นไม่ต่อเนื่องและหินอัคนีแทรกซอน (Unconformity & Dike)",
+        desc: "ชั้นหินตอนล่างเอียงตัว ถูกกัดกร่อนจนราบ แล้วมีชั้นหินใหม่ทับแนวนอน พร้อมพนังหินอัคนีตัดผ่าน",
+        elevationPoints: [
+          { dist: 0, elev: 250 },
+          { dist: 180, elev: 350 },
+          { dist: 320, elev: 390 }, // Plateau mesa
+          { dist: 480, elev: 380 },
+          { dist: 600, elev: 260 }
+        ],
+        contacts: [
+          { x: 190, rockA: 'TILT', rockB: 'FLAT', dip: 0, dipDir: 'horizontal' },
+          { x: 360, rockA: 'DIKE', rockB: 'DIKE', dip: 75, dipDir: 'right' }
+        ],
+        hypotheses: [
+          { id: 'angular_unconformity', label: 'รอยชั้นไม่ต่อเนื่องเชิงมุม + หินอัคนีแทรก', correct: true },
+          { id: 'simple_flat', label: 'ชั้นหินสะสมตัวแนวนอนปกติไร้รอยตัด', correct: false },
+          { id: 'syncline_basin', label: 'แอ่งตะกอนประทุนหงาย', correct: false }
+        ],
+        rocks: [
+          { id: 'A', name: 'หินดินดานเอียงโบราณ A', color: '#cbd5e1', stroke: '#475569', age: 'แก่สุด' },
+          { id: 'B', name: 'หินทรายราบเรียบ B', color: '#fde047', stroke: '#ca8a04', age: 'อ่อนกว่า' },
+          { id: 'D', name: 'พนังหินอัคนีแทรกซอน (Dike)', color: '#f43f5e', stroke: '#9f1239', age: 'ใหม่สุด' }
+        ],
+        explanation: "<b>คำอธิบายเชิงธรณีโครงสร้าง:</b> แนวเส้นชั้นความสูงด้านบนแสดงภูมิประเทศแบบที่ราบสูง (Mesa) ชั้นหิน B วางตัวราบเรียบปิดทับชั้นหิน A ที่วางตัวเอียงเท บ่งชี้ <b>รอยชั้นไม่ต่อเนื่องเชิงมุม (Angular Unconformity)</b> และมีหินอัคนีแทรก D ตัดผ่านขึ้นมาเกือบถึงผิวดิน"
+      }
+    };
+
+    let currentScenarioKey = 'folded';
+    let selectedHypothesis = null;
+    let mapLayersVisible = { contour: true, geology: true, dip: true };
+    let projectedLineReady = false;
+
+    // Three.js Globals
+    let scene, camera, renderer, blockMeshGroup, leftBlock, rightBlock;
+    let isSplitSliding = false;
+    let splitDistance = 0;
+
+    function render2DMap() {
+      const scenario = scenarios[currentScenarioKey];
+      const svg = document.getElementById('topoGeoSvg');
+      svg.innerHTML = '';
+
+      // Base Geology Polygons / Bands
+      if (mapLayersVisible.geology) {
+        if (currentScenarioKey === 'folded') {
+          // Banded geological outcrops
+          svg.innerHTML += `
+            <polygon points="0,0 120,0 120,450 0,450" fill="#fde047" opacity="0.8" />
+            <polygon points="120,0 210,0 210,450 120,450" fill="#94a3b8" opacity="0.85" />
+            <polygon points="210,0 310,0 310,450 210,450" fill="#67e8f9" opacity="0.9" />
+            <polygon points="310,0 420,0 420,450 310,450" fill="#94a3b8" opacity="0.85" />
+            <polygon points="420,0 600,0 600,450 420,450" fill="#fde047" opacity="0.8" />
+          `;
+        } else if (currentScenarioKey === 'faulted') {
+          svg.innerHTML += `
+            <polygon points="0,0 150,0 150,450 0,450" fill="#fca5a5" opacity="0.85" />
+            <polygon points="150,0 300,0 300,450 150,450" fill="#86efac" opacity="0.85" />
+            <polygon points="300,0 430,0 430,450 300,450" fill="#fca5a5" opacity="0.85" />
+            <polygon points="430,0 600,0 600,450 430,450" fill="#86efac" opacity="0.85" />
+            <!-- Fault line on surface -->
+            <line x1="300" y1="0" x2="300" y2="450" stroke="#ef4444" stroke-width="4" stroke-dasharray="6,4" />
+            <text x="306" y="30" fill="#ef4444" font-weight="bold" font-size="12">รอยเลื่อน F (Fault)</text>
+          `;
+        } else {
+          svg.innerHTML += `
+            <rect width="600" height="450" fill="#fde047" opacity="0.85" />
+            <polygon points="0,0 190,0 190,450 0,450" fill="#cbd5e1" opacity="0.8" />
+            <!-- Dike on surface -->
+            <polygon points="350,0 370,0 370,450 350,450" fill="#f43f5e" opacity="0.9" />
+            <text x="380" y="40" fill="#f43f5e" font-weight="bold" font-size="12">พนังหินอัคนี D</text>
+          `;
+        }
+      }
+
+      // Contour Lines Overlay
+      if (mapLayersVisible.contour) {
+        // Draw smoothed concentric or transverse contour curves
+        if (currentScenarioKey === 'folded') {
+          // Ridge 1 (X~160), Valley (X~250), Ridge 2 (X~350)
+          svg.innerHTML += `
+            <path d="M0,100 Q160,50 300,100 T600,110" fill="none" stroke="#64748b" stroke-width="1.2" />
+            <path d="M0,180 Q160,110 300,180 T600,170" fill="none" stroke="#cbd5e1" stroke-width="1.5" />
+            <text x="20" y="175" fill="#e2e8f0" font-size="10" font-weight="bold">300m</text>
+
+            <path d="M60,225 Q160,170 240,225" fill="none" stroke="#f8fafc" stroke-width="2" />
+            <text x="145" y="165" fill="#ffffff" font-size="10" font-weight="bold">450m (ยอดเขา 1)</text>
+
+            <path d="M280,225 Q350,170 440,225" fill="none" stroke="#f8fafc" stroke-width="2" />
+            <text x="340" y="165" fill="#ffffff" font-size="10" font-weight="bold">460m (ยอดเขา 2)</text>
+
+            <path d="M0,320 Q160,270 300,320 T600,310" fill="none" stroke="#cbd5e1" stroke-width="1.5" />
+            <text x="20" y="315" fill="#e2e8f0" font-size="10" font-weight="bold">300m</text>
+          `;
+        } else if (currentScenarioKey === 'faulted') {
+          svg.innerHTML += `
+            <path d="M0,80 L290,80 M310,130 L600,130" fill="none" stroke="#cbd5e1" stroke-width="1.5" />
+            <path d="M0,170 L290,170 M310,230 L600,230" fill="none" stroke="#f8fafc" stroke-width="2" />
+            <text x="40" y="165" fill="#ffffff" font-size="10" font-weight="bold">450m (หน้าผาชัน)</text>
+            <text x="420" y="225" fill="#ffffff" font-size="10" font-weight="bold">350m (บล็อกทรุด)</text>
+            <path d="M0,280 L290,280 M310,340 L600,340" fill="none" stroke="#64748b" stroke-width="1.2" />
+          `;
+        } else {
+          // Plateau mesa flat contours
+          svg.innerHTML += `
+            <rect x="200" y="60" width="280" height="330" rx="30" fill="none" stroke="#f8fafc" stroke-width="2.5" />
+            <text x="220" y="90" fill="#ffffff" font-size="10" font-weight="bold">400m (ที่ราบสูง Mesa)</text>
+            <rect x="150" y="30" width="380" height="390" rx="45" fill="none" stroke="#cbd5e1" stroke-width="1.5" />
+            <text x="160" y="55" fill="#cbd5e1" font-size="10" font-weight="bold">300m</text>
+          `;
+        }
+      }
+
+      // Strike and Dip Symbols
+      if (mapLayersVisible.dip) {
+        scenario.contacts.forEach((c) => {
+          if (c.dipDir === 'right') {
+            // Dip pointing right (east)
+            svg.innerHTML += `
+              <g transform="translate(${c.x}, 225)">
+                <line x1="0" y1="-14" x2="0" y2="14" stroke="#f59e0b" stroke-width="3" />
+                <line x1="0" y1="0" x2="10" y2="0" stroke="#f59e0b" stroke-width="2.5" />
+                <text x="13" y="4" fill="#fbbf24" font-size="11" font-weight="bold">${c.dip}°</text>
+              </g>
+            `;
+          } else if (c.dipDir === 'left') {
+            // Dip pointing left (west)
+            svg.innerHTML += `
+              <g transform="translate(${c.x}, 225)">
+                <line x1="0" y1="-14" x2="0" y2="14" stroke="#f59e0b" stroke-width="3" />
+                <line x1="0" y1="0" x2="-10" y2="0" stroke="#f59e0b" stroke-width="2.5" />
+                <text x="-26" y="4" fill="#fbbf24" font-size="11" font-weight="bold">${c.dip}°</text>
+              </g>
+            `;
+          } else if (c.dipDir === 'syncline_axis') {
+            svg.innerHTML += `
+              <g transform="translate(${c.x}, 225)">
+                <line x1="0" y1="-18" x2="0" y2="18" stroke="#38bdf8" stroke-width="3" />
+                <polygon points="-8,-5 0,0 -8,5" fill="#38bdf8"/>
+                <polygon points="8,-5 0,0 8,5" fill="#38bdf8"/>
+                <text x="-25" y="-12" fill="#38bdf8" font-size="10" font-weight="bold">แกนประทุนหงาย</text>
+              </g>
+            `;
+          }
+        });
+      }
+
+      // Section Cut Line A - B
+      svg.innerHTML += `
+        <line x1="20" y1="225" x2="580" y2="225" stroke="#ef4444" stroke-width="3" stroke-dasharray="8,5" />
+        <circle cx="20" cy="225" r="7" fill="#ef4444" stroke="#ffffff" stroke-width="2" />
+        <text x="12" y="210" fill="#f87171" font-weight="bold" font-size="15">A</text>
+        <circle cx="580" cy="225" r="7" fill="#ef4444" stroke="#ffffff" stroke-width="2" />
+        <text x="575" y="210" fill="#f87171" font-weight="bold" font-size="15">B</text>
+      `;
+
+      // Interactive Dynamic Guideline Hover Tracker on Map
+      svg.onmousemove = (e) => {
+        const rect = svg.getBoundingClientRect();
+        const x = (e.clientX - rect.left) * (600 / rect.width);
+        dropGuideLine(x);
+      };
+      svg.onmouseleave = () => {
+        clearGuideLine();
+      };
+
+      renderLegend();
+    }
+
+    function renderLegend() {
+      const scenario = scenarios[currentScenarioKey];
+      const container = document.getElementById('mapLegendContainer');
+      container.innerHTML = '';
+
+      scenario.rocks.forEach(r => {
+        const item = document.createElement('div');
+        item.className = 'flex items-center gap-1.5';
+        item.innerHTML = `
+          <span class="w-3.5 h-3.5 rounded border" style="background-color: ${r.color}; border-color: ${r.stroke};"></span>
+          <span class="text-slate-300 font-medium">${r.name}</span>
+          <span class="text-[10px] text-slate-500">(${r.age})</span>
+        `;
+        container.appendChild(item);
+      });
+
+      // Strike/Dip legend symbol
+      const dipLegend = document.createElement('div');
+      dipLegend.className = 'flex items-center gap-1 text-amber-400 font-medium';
+      dipLegend.innerHTML = `<span>┠ 35°</span><span class="text-slate-400 text-[10px]">= มุมเทของชั้นหิน</span>`;
+      container.appendChild(dipLegend);
+    }
+
+    // Toggle Map Overlays
+    function toggleMapLayer(layer) {
+      mapLayersVisible[layer] = !mapLayersVisible[layer];
+      const btn = document.getElementById(`layer-${layer}-toggle`);
+      if (mapLayersVisible[layer]) {
+        btn.classList.add('bg-cyan-950', 'text-cyan-300', 'border-cyan-500/40');
+        btn.classList.remove('bg-slate-900', 'text-slate-500', 'border-slate-800');
+      } else {
+        btn.classList.remove('bg-cyan-950', 'text-cyan-300', 'border-cyan-500/40');
+        btn.classList.add('bg-slate-900', 'text-slate-500', 'border-slate-800');
+      }
+      render2DMap();
+    }
+
+    function dropGuideLine(x) {
+      if (x < 20 || x > 580) return;
+      const guideGroup = document.getElementById('dropGuidelinesGroup');
+      guideGroup.innerHTML = `
+        <line x1="${x}" y1="0" x2="${x}" y2="450" stroke="#38bdf8" stroke-width="1.5" class="projection-guide-active" opacity="0.7"/>
+        <circle cx="${x}" cy="${getElevationYAt(x)}" r="4" fill="#38bdf8" stroke="#ffffff" stroke-width="1.5" />
+      `;
+    }
+
+    function clearGuideLine() {
+      document.getElementById('dropGuidelinesGroup').innerHTML = '';
+    }
+
+    function getElevationYAt(x) {
+      const scenario = scenarios[currentScenarioKey];
+      const pts = scenario.elevationPoints;
+      // Interpolate elevation along line
+      for (let i = 0; i < pts.length - 1; i++) {
+        if (x >= pts[i].dist && x <= pts[i+1].dist) {
+          const ratio = (x - pts[i].dist) / (pts[i+1].dist - pts[i].dist);
+          const elev = pts[i].elev + ratio * (pts[i+1].elev - pts[i].elev);
+          // Scale: 500m -> Y: 30, 0m -> Y: 330
+          return 330 - (elev / 500) * 300;
+        }
+      }
+      return 200;
+    }
+
+    // Step 1: Auto Project Elevation Line along A-B
+    function autoProjectElevationLine() {
+      const scenario = scenarios[currentScenarioKey];
+      const pathEl = document.getElementById('topoProfilePath');
+      const pts = scenario.elevationPoints;
+
+      let d = `M ${pts[0].dist},${330 - (pts[0].elev / 500) * 300}`;
+      for (let i = 1; i < pts.length; i++) {
+        const x = pts[i].dist;
+        const y = 330 - (pts[i].elev / 500) * 300;
+        d += ` L ${x},${y}`;
+      }
+      pathEl.setAttribute('d', d);
+
+      // Plot Surface Contacts and Dip markers
+      plotSurfaceContacts();
+      projectedLineReady = true;
+    }
+
+    function plotSurfaceContacts() {
+      const scenario = scenarios[currentScenarioKey];
+      const group = document.getElementById('surfaceContactsGroup');
+      group.innerHTML = '';
+
+      scenario.contacts.forEach(c => {
+        const surfaceY = getElevationYAt(c.x);
+        let dipIndicator = '';
+        if (c.dipDir === 'right') {
+          dipIndicator = `<line x1="${c.x}" y1="${surfaceY}" x2="${c.x + 22}" y2="${surfaceY + 18}" stroke="#f59e0b" stroke-width="2.5" />`;
+        } else if (c.dipDir === 'left') {
+          dipIndicator = `<line x1="${c.x}" y1="${surfaceY}" x2="${c.x - 22}" y2="${surfaceY + 18}" stroke="#f59e0b" stroke-width="2.5" />`;
+        }
+
+        group.innerHTML += `
+          <circle cx="${c.x}" cy="${surfaceY}" r="5" fill="#f59e0b" stroke="#ffffff" stroke-width="2" />
+          ${dipIndicator}
+        `;
+      });
+    }
+
+    function setupHypothesisOptions() {
+      const scenario = scenarios[currentScenarioKey];
+      const container = document.getElementById('hypothesisButtonsGroup');
+      container.innerHTML = '';
+
+      scenario.hypotheses.forEach((h, idx) => {
+        const btn = document.createElement('button');
+        btn.className = `hypothesis-btn px-2.5 py-1.5 rounded-xl border text-[11px] font-medium transition ${
+          selectedHypothesis === h.id 
+            ? 'bg-cyan-950 border-cyan-400 text-cyan-200' 
+            : 'bg-slate-950/80 border-slate-800 text-slate-400 hover:text-slate-200'
+        }`;
+        btn.textContent = h.label;
+        btn.onclick = () => selectHypothesis(h.id);
+        container.appendChild(btn);
+      });
+    }
+
+    function selectHypothesis(id) {
+      selectedHypothesis = id;
+      setupHypothesisOptions();
+      drawSubsurfaceInterpretation(id);
+    }
+
+    // Step 2 & 3: Interactive Subsurface extrapolation
+    function drawSubsurfaceInterpretation(hypothesisId) {
+      const group = document.getElementById('subsurfaceLayersGroup');
+      group.innerHTML = '';
+
+      if (hypothesisId === 'folds_syn_anti') {
+        // True fold curved strata below surface
+        group.innerHTML = `
+          <!-- Folded limbs curving smoothly under syncline and anticline -->
+          <path d="M 0,220 Q 250,440 370,180 T 600,400 L 600,450 L 0,450 Z" fill="#fde047" opacity="0.45" stroke="#ca8a04" stroke-dasharray="4,4"/>
+          <path d="M 120,240 Q 250,380 370,220 T 490,380 L 490,450 L 120,450 Z" fill="#94a3b8" opacity="0.45" stroke="#475569" stroke-dasharray="4,4"/>
+          <path d="M 210,280 Q 250,330 310,270 L 310,450 L 210,450 Z" fill="#67e8f9" opacity="0.55" stroke="#0891b2"/>
+        `;
+      } else if (hypothesisId === 'normal_fault') {
+        group.innerHTML = `
+          <!-- Normal fault line dipping 65 deg right -->
+          <line x1="300" y1="280" x2="380" y2="450" stroke="#ef4444" stroke-width="3" stroke-dasharray="6,4"/>
+          <!-- Tilted rock blocks dipping left -->
+          <polygon points="0,200 150,290 120,450 0,450" fill="#fca5a5" opacity="0.5" />
+          <polygon points="150,290 300,280 380,450 120,450" fill="#86efac" opacity="0.5" />
+          <!-- Downthrown hanging wall on right -->
+          <polygon points="300,280 430,370 380,450" fill="#fca5a5" opacity="0.5" />
+          <polygon points="430,370 600,300 600,450 380,450" fill="#86efac" opacity="0.5" />
+        `;
+      } else if (hypothesisId === 'angular_unconformity') {
+        group.innerHTML = `
+          <!-- Horizontal Unconformity surface -->
+          <line x1="0" y1="360" x2="600" y2="360" stroke="#f59e0b" stroke-width="3" stroke-dasharray="6,4"/>
+          <text x="40" y="355" fill="#f59e0b" font-size="11" font-weight="bold">~~~ แนวสัมผัสไม่ต่อเนื่อง (Unconformity) ~~~</text>
+          <!-- Tilted strata below unconformity -->
+          <line x1="50" y1="360" x2="0" y2="450" stroke="#475569" stroke-width="2"/>
+          <line x1="150" y1="360" x2="100" y2="450" stroke="#475569" stroke-width="2"/>
+          <line x1="250" y1="360" x2="200" y2="450" stroke="#475569" stroke-width="2"/>
+          <!-- Dike cutting through -->
+          <polygon points="360,250 380,250 420,450 400,450" fill="#f43f5e" opacity="0.75" />
+        `;
+      } else {
+        // Flat/Tilted erroneous placeholder
+        group.innerHTML = `
+          <line x1="0" y1="300" x2="600" y2="300" stroke="#94a3b8" stroke-width="2" stroke-dasharray="4,4"/>
+          <line x1="0" y1="380" x2="600" y2="380" stroke="#94a3b8" stroke-width="2" stroke-dasharray="4,4"/>
+        `;
+      }
+    }
+
+    function evaluateCrossSection() {
+      const scenario = scenarios[currentScenarioKey];
+      const correctHypo = scenario.hypotheses.find(h => h.correct);
+      const isCorrect = selectedHypothesis === correctHypo.id;
+
+      const card = document.getElementById('diagnosticFeedbackCard');
+      card.classList.remove('hidden');
+      card.classList.add('flex');
+
+      const badge = document.getElementById('diagnosticIconBadge');
+      const score = document.getElementById('diagnosticScore');
+      const title = document.getElementById('diagnosticTitle');
+      const subtitle = document.getElementById('diagnosticSubtitle');
+      const expl = document.getElementById('diagnosticExplanation');
+
+      if (isCorrect) {
+        badge.className = 'w-8 h-8 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center font-bold';
+        badge.innerHTML = `<i data-lucide="check" class="w-4 h-4"></i>`;
+        score.textContent = '100%';
+        score.className = 'text-lg font-bold font-mono-code text-emerald-400';
+        title.textContent = '🎉 ยอดเยี่ยมมาก! การตีความภาพตัดขวาง 3 มิติถูกต้องสมบูรณ์';
+        subtitle.textContent = 'คุณเชื่อมโยงข้อมูลเส้นชั้นความสูงและทิศมุมเทสู่โครงสร้างใต้ดินได้อย่างแม่นยำ';
+      } else {
+        badge.className = 'w-8 h-8 rounded-xl bg-rose-500/20 text-rose-400 flex items-center justify-center font-bold';
+        badge.innerHTML = `<i data-lucide="alert-circle" class="w-4 h-4"></i>`;
+        score.textContent = '40%';
+        score.className = 'text-lg font-bold font-mono-code text-rose-400';
+        title.textContent = '⚠️ การแปลความหมายเชิงพื้นที่ยังไม่สอดคล้องกับหลักฐาน';
+        subtitle.textContent = 'สังเกตทิศทางของมุมเท (Dip) ที่ชี้เอียงเทลงไปใต้ผิวดินอีกครั้ง';
+      }
+
+      expl.innerHTML = `
+        <p>${scenario.explanation}</p>
+        <div class="pt-2 flex items-center gap-2">
+          <button onclick="toggle3DModal()" class="bg-indigo-600 hover:bg-indigo-500 text-white text-xs px-4 py-2 rounded-xl transition flex items-center gap-1.5 font-medium shadow">
+            <i data-lucide="box" class="w-4 h-4"></i>
+            <span>เปิดโมเดล 3D ผ่าบล็อกดูคำตอบเฉลย</span>
+          </button>
+        </div>
+      `;
+      lucide.createIcons();
+
+      // Show true overlay in cross section
+      drawSubsurfaceInterpretation(correctHypo.id);
+    }
+
+    function resetCurrentWorkspace() {
+      selectedHypothesis = null;
+      document.getElementById('diagnosticFeedbackCard').classList.add('hidden');
+      document.getElementById('subsurfaceLayersGroup').innerHTML = '';
+      setupHypothesisOptions();
+    }
+
+    function changeScenario(newKey) {
+      currentScenarioKey = newKey;
+      selectedHypothesis = null;
+      document.getElementById('diagnosticFeedbackCard').classList.add('hidden');
+      render2DMap();
+      autoProjectElevationLine();
+      setupHypothesisOptions();
+      build3DBlockGeometry();
+    }
+
+    function initThreeJS() {
+      const container = document.getElementById('threeJsContainer');
+      const width = container.clientWidth || 800;
+      const height = container.clientHeight || 420;
+
+      scene = new THREE.Scene();
+      scene.background = new THREE.Color(0x020617);
+
+      camera = new THREE.PerspectiveCamera(40, width / height, 0.1, 1000);
+      camera.position.set(16, 14, 22);
+      camera.lookAt(0, 0, 0);
+
+      renderer = new THREE.WebGLRenderer({ antialias: true });
+      renderer.setSize(width, height);
+      renderer.setPixelRatio(window.devicePixelRatio);
+      renderer.shadowMap.enabled = true;
+      container.appendChild(renderer.domElement);
+
+      // Lighting
+      const ambientLight = new THREE.AmbientLight(0xffffff, 0.75);
+      scene.add(ambientLight);
+
+      const dirLight = new THREE.DirectionalLight(0xffffff, 0.8);
+      dirLight.position.set(15, 25, 15);
+      scene.add(dirLight);
+
+      blockMeshGroup = new THREE.Group();
+      scene.add(blockMeshGroup);
+
+      build3DBlockGeometry();
+
+      // Simple Orbit Controls using mouse drag
+      let isDragging = false;
+      let prevMousePos = { x: 0, y: 0 };
+
+      container.addEventListener('mousedown', (e) => {
+        isDragging = true;
+        prevMousePos = { x: e.clientX, y: e.clientY };
+      });
+
+      window.addEventListener('mousemove', (e) => {
+        if (!isDragging) return;
+        const deltaX = e.clientX - prevMousePos.x;
+        const deltaY = e.clientY - prevMousePos.y;
+
+        blockMeshGroup.rotation.y += deltaX * 0.008;
+        blockMeshGroup.rotation.x += deltaY * 0.005;
+
+        prevMousePos = { x: e.clientX, y: e.clientY };
+      });
+
+      window.addEventListener('mouseup', () => { isDragging = false; });
+
+      // Wheel Zoom
+      container.addEventListener('wheel', (e) => {
+        e.preventDefault();
+        camera.position.z = Math.max(10, Math.min(35, camera.position.z + e.deltaY * 0.02));
+      });
+
+      // Animation loop
+      function animate() {
+        requestAnimationFrame(animate);
+        renderer.render(scene, camera);
+      }
+      animate();
+    }
+
+    function build3DBlockGeometry() {
+      if (!blockMeshGroup) return;
+      // Clear previous meshes
+      while (blockMeshGroup.children.length > 0) {
+        blockMeshGroup.remove(blockMeshGroup.children[0]);
+      }
+
+      // We create two halves: Left Block & Right Block separated along Z-axis (Line A-B)
+      const blockWidth = 14;
+      const blockHeight = 6;
+      const blockDepth = 10;
+
+      // Materials with geological strata textures
+      const matTopA = new THREE.MeshLambertMaterial({ color: 0xfde047 });
+      const matTopB = new THREE.MeshLambertMaterial({ color: 0x94a3b8 });
+      const matCoreC = new THREE.MeshLambertMaterial({ color: 0x67e8f9 });
+      const matCutFace = new THREE.MeshLambertMaterial({ color: 0x38bdf8, side: THREE.DoubleSide });
+
+      // Left Half Block
+      const geomLeft = new THREE.BoxGeometry(blockWidth, blockHeight, blockDepth / 2);
+      leftBlock = new THREE.Mesh(geomLeft, [
+        matTopA, matTopB, matTopA, matTopB, matCutFace, matTopA
+      ]);
+      leftBlock.position.set(0, 0, -blockDepth / 4);
+
+      // Right Half Block (The one that slides away along the A-B cut line)
+      const geomRight = new THREE.BoxGeometry(blockWidth, blockHeight, blockDepth / 2);
+      rightBlock = new THREE.Mesh(geomRight, [
+        matTopA, matTopB, matTopA, matTopB, matTopA, matCutFace
+      ]);
+      rightBlock.position.set(0, 0, blockDepth / 4);
+
+      blockMeshGroup.add(leftBlock);
+      blockMeshGroup.add(rightBlock);
+
+      // Reset slider
+      document.getElementById('sliderSplitBlock').value = 0;
+      document.getElementById('splitValueBadge').textContent = '0%';
+    }
+
+    function onSlideSplit(value) {
+      const offset = (value / 100) * 8; // Slide outward up to 8 units
+      if (leftBlock && rightBlock) {
+        leftBlock.position.z = -2.5 - offset;
+        rightBlock.position.z = 2.5 + offset;
+      }
+      document.getElementById('splitValueBadge').textContent = `${value}%`;
+    }
+
+    function reset3DCamera() {
+      camera.position.set(16, 14, 22);
+      camera.lookAt(0, 0, 0);
+      blockMeshGroup.rotation.set(0, 0, 0);
+      document.getElementById('sliderSplitBlock').value = 0;
+      onSlideSplit(0);
+    }
+
+    // Modal Toggles
+    function toggle3DModal() {
+      const modal = document.getElementById('modal3DBlock');
+      const isHidden = modal.classList.contains('hidden');
+      modal.classList.toggle('hidden', !isHidden);
+      modal.classList.toggle('flex', isHidden);
+      if (isHidden && renderer) {
+        setTimeout(() => {
+          const container = document.getElementById('threeJsContainer');
+          renderer.setSize(container.clientWidth, container.clientHeight);
+          camera.aspect = container.clientWidth / container.clientHeight;
+          camera.updateProjectionMatrix();
+        }, 100);
+      }
+    }
+
+    function toggleGuideModal() {
+      const modal = document.getElementById('guideModal');
+      modal.classList.toggle('hidden');
+      modal.classList.toggle('flex');
+    }
+
+    // Initialize on window load
+    window.addEventListener('DOMContentLoaded', () => {
+      lucide.createIcons();
+      render2DMap();
+      autoProjectElevationLine();
+      setupHypothesisOptions();
+      initThreeJS();
+    });
+  </script>
+</body>
+</html>

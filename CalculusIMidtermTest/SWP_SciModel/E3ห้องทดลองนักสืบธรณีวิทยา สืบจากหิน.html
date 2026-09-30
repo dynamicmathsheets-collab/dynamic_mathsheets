@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ห้องทดลองนักสืบธรณีวิทยา (Geological Detective)</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Prompt', sans-serif; }
+    .cross-section-elem {
+      transition: filter 0.2s, stroke-width 0.2s;
+      cursor: pointer;
+    }
+    .cross-section-elem:hover {
+      filter: brightness(1.15) drop-shadow(0 0 4px rgba(255,255,255,0.7));
+    }
+    .cross-section-elem.active {
+      filter: brightness(1.25) drop-shadow(0 0 6px #f59e0b);
+      stroke: #f59e0b !important;
+      stroke-width: 3px !important;
+    }
+    .drag-item {
+      user-select: none;
+      touch-action: none;
+    }
+  </style>
+</head>
+<body class="bg-slate-900 text-slate-100 min-h-screen flex flex-col">
+
+  <!-- Header -->
+  <header class="bg-slate-800 border-b border-slate-700 py-4 px-6 shadow-md">
+    <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-4">
+      <div>
+        <h1 class="text-xl md:text-2xl font-bold text-amber-400 flex items-center gap-2">
+          <span>⛏️</span> ห้องทดลองนักสืบธรณีวิทยา: สืบจากหิน (Relative Dating)
+        </h1>
+        <p class="text-sm text-slate-400">สืบย้อนลำดับเหตุการณ์ทางธรณีวิทยาจากหลักฐานในภาคตัดขวาง</p>
+      </div>
+      <div class="flex items-center gap-2">
+        <button id="btnHint" class="bg-indigo-600 hover:bg-indigo-500 text-white text-sm px-4 py-2 rounded-lg font-medium shadow transition">
+          💡 กฎทางธรณีวิทยา (Hint)
+        </button>
+        <button id="btnReset" class="bg-slate-700 hover:bg-slate-600 text-slate-200 text-sm px-4 py-2 rounded-lg font-medium transition">
+          🔄 เริ่มจัดใหม่
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content Grid -->
+  <main class="flex-1 max-w-7xl w-full mx-auto p-4 md:p-6 grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+    <!-- Left: SVG Cross-Section Model (7 cols) -->
+    <section class="lg:col-span-7 bg-slate-800/90 border border-slate-700 rounded-2xl p-4 md:p-5 flex flex-col shadow-xl">
+      <div class="flex items-center justify-between mb-3">
+        <h2 class="font-semibold text-slate-200 flex items-center gap-2">
+          <span>🗺️</span> ภาคตัดขวางธรณีวิทยา (Geological Cross-Section)
+        </h2>
+        <span class="text-xs bg-slate-700 text-slate-300 px-2.5 py-1 rounded-full">
+          แตะ/คลิกชิ้นส่วนเพื่อดูหลักฐาน
+        </span>
+      </div>
+
+      <!-- SVG Visualization Canvas -->
+      <div class="relative w-full aspect-[4/3] bg-slate-950 rounded-xl overflow-hidden border border-slate-700/80 flex items-center justify-center">
+        <svg viewBox="0 0 800 600" class="w-full h-full select-none" id="geoSvg">
+          <defs>
+            <!-- Patterns for rocks -->
+            <!-- Limestone brick pattern for Layer A -->
+            <pattern id="pat-limestone" width="40" height="20" patternUnits="userSpaceOnUse">
+              <rect width="40" height="20" fill="#3b4252" />
+              <path d="M0 10 L40 10 M0 20 L40 20 M20 0 L20 10 M0 10 L0 20 M40 10 L40 20 M10 10 L10 20 M30 10 L30 20" stroke="#4c566a" stroke-width="1.5" />
+            </pattern>
+            <!-- Shale lines for Layer B -->
+            <pattern id="pat-shale" width="20" height="10" patternUnits="userSpaceOnUse">
+              <rect width="20" height="10" fill="#434c5e" />
+              <path d="M0 5 L20 5 M5 10 L15 10" stroke="#2e3440" stroke-width="1.5" />
+            </pattern>
+            <!-- Sandstone dots for Layer C -->
+            <pattern id="pat-sandstone" width="20" height="20" patternUnits="userSpaceOnUse">
+              <rect width="20" height="20" fill="#d08770" />
+              <circle cx="5" cy="5" r="1.5" fill="#bf616a" />
+              <circle cx="15" cy="12" r="1.5" fill="#bf616a" />
+              <circle cx="8" cy="16" r="1.2" fill="#ab545d" />
+            </pattern>
+            <!-- Conglomerate for Layer D -->
+            <pattern id="pat-conglomerate" width="50" height="40" patternUnits="userSpaceOnUse">
+              <rect width="50" height="40" fill="#ebcb8b" />
+              <ellipse cx="15" cy="15" rx="8" ry="5" fill="#d08770" stroke="#b48ead" stroke-width="1" />
+              <ellipse cx="38" cy="28" rx="6" ry="7" fill="#a3be8c" stroke="#8fbcbb" stroke-width="1" />
+              <ellipse cx="32" cy="10" rx="4" ry="3" fill="#88c0d0" />
+            </pattern>
+            <!-- Igneous Intrusion (Crosses / crystals) -->
+            <pattern id="pat-igneous" width="24" height="24" patternUnits="userSpaceOnUse">
+              <rect width="24" height="24" fill="#bf616a" />
+              <path d="M12 6 L12 18 M6 12 L18 12 M4 4 L8 8 M16 16 L20 20" stroke="#eceff4" stroke-width="1.5" />
+            </pattern>
+          </defs>
+
+          <!-- LAYER A (หินปูน - ล่างสุด) -->
+          <g id="layer-A" class="cross-section-elem" data-id="A" data-name="ชั้นหิน A (หินปูน)" data-type="ชั้นหินตะกอน">
+            <polygon points="0,460 800,460 800,600 0,600" fill="url(#pat-limestone)" stroke="#2e3440" stroke-width="2"/>
+            <text x="70" y="540" fill="#eceff4" font-weight="bold" font-size="24">ชั้น A</text>
+            <!-- Fossil Icon in A (Trilobite representation) -->
+            <g transform="translate(180, 500) scale(0.7)">
+              <ellipse cx="20" cy="30" rx="18" ry="24" fill="#eceff4" opacity="0.8"/>
+              <path d="M10 20 L30 20 M8 30 L32 30 M12 40 L28 40" stroke="#2e3440" stroke-width="2"/>
+              <text x="-10" y="70" fill="#e5e9f0" font-size="14">ฟอสซิลไตรโลไบต์</text>
+            </g>
+          </g>
+
+          <!-- LAYER B (หินดินดาน) -->
+          <g id="layer-B" class="cross-section-elem" data-id="B" data-name="ชั้นหิน B (หินดินดาน)" data-type="ชั้นหินตะกอน">
+            <polygon points="0,320 800,320 800,460 0,460" fill="url(#pat-shale)" stroke="#2e3440" stroke-width="2"/>
+            <text x="70" y="400" fill="#eceff4" font-weight="bold" font-size="24">ชั้น B</text>
+            <!-- Fossil Icon in B (Ammonite representation) -->
+            <g transform="translate(220, 360) scale(0.6)">
+              <circle cx="30" cy="30" r="24" fill="none" stroke="#eceff4" stroke-width="6" opacity="0.85"/>
+              <circle cx="30" cy="30" r="14" fill="none" stroke="#eceff4" stroke-width="4" opacity="0.85"/>
+              <text x="-5" y="75" fill="#e5e9f0" font-size="16">ฟอสซิลแอมโมไนต์</text>
+            </g>
+          </g>
+
+          <!-- LAYER C (หินทราย) -->
+          <g id="layer-C" class="cross-section-elem" data-id="C" data-name="ชั้นหิน C (หินทราย)" data-type="ชั้นหินตะกอน">
+            <!-- ขอบบนของชั้น C โดนการกัดกร่อนเป็นคลื่นรอยหยัก (Unconformity) -->
+            <path d="M0,180 Q120,165 240,195 T480,175 T650,190 T800,170 L800,320 L0,320 Z" fill="url(#pat-sandstone)" stroke="#2e3440" stroke-width="2"/>
+            <text x="70" y="260" fill="#2e3440" font-weight="bold" font-size="24">ชั้น C</text>
+          </g>
+
+          <!-- IGNEOUS INTRUSION E (พนังหินอัคนีแทรกซอน ตัดผ่าน A, B, C แต่ไม่ผ่าน D) -->
+          <g id="intrusion-E" class="cross-section-elem" data-id="E" data-name="พนังหินอัคนี E (Dike)" data-type="หินอัคนีแทรกซอน">
+            <!-- รูปร่างพนังแทรกเอียงเฉียงขึ้นมาจากใต้ดิน ตัดทะลุถึงแค่รอยกัดกร่อนด้านบน C -->
+            <path d="M480,600 L560,600 L660,190 Q620,185 580,188 L430,600 Z" fill="url(#pat-igneous)" stroke="#880000" stroke-width="3"/>
+            <!-- แนวสัมผัสความร้อน (Contact Metamorphism) -->
+            <path d="M475,595 L425,595 M435,550 L420,555 M465,470 L450,475 M520,330 L505,335 M590,200 L575,205" stroke="#e5e9f0" stroke-width="3" stroke-linecap="round" stroke-dasharray="4,4"/>
+            <text x="515" y="470" fill="#ffffff" font-weight="bold" font-size="22" style="text-shadow: 2px 2px 4px #000;">หินแทรก E</text>
+          </g>
+
+          <!-- UNCONFORMITY U (รอยชั้นไม่ต่อเนื่องจากการกัดกร่อน) -->
+          <g id="unconformity-U" class="cross-section-elem" data-id="U" data-name="รอยชั้นไม่ต่อเนื่อง U (Unconformity)" data-type="พื้นผิวการกัดกร่อน">
+            <path d="M0,180 Q120,165 240,195 T480,175 T650,190 T800,170" fill="none" stroke="#f59e0b" stroke-width="6" stroke-dasharray="8,6"/>
+            <text x="630" y="160" fill="#fbbf24" font-weight="bold" font-size="16" style="text-shadow: 1px 1px 3px #000;">⚡ แนวผุกร่อน-กัดกร่อน (U)</text>
+          </g>
+
+          <!-- LAYER D (หินกรวดมน ทับถมหลังการกัดกร่อน) -->
+          <g id="layer-D" class="cross-section-elem" data-id="D" data-name="ชั้นหิน D (หินกรวดมน)" data-type="ชั้นหินตะกอนบนสุด">
+            <path d="M0,40 L800,40 L800,170 Q650,190 480,175 T240,195 T0,180 Z" fill="url(#pat-conglomerate)" stroke="#2e3440" stroke-width="2"/>
+            <text x="70" y="110" fill="#2e3440" font-weight="bold" font-size="24">ชั้น D</text>
+            <text x="250" y="90" fill="#4c566a" font-size="15">พบเศษหินชิ้นเล็กของหินแทรก E ปนอยู่ในชั้นนี้</text>
+          </g>
+
+          <!-- FAULT F (รอยเลื่อนตัดผ่านทุกชั้นรวมถึง D) -->
+          <g id="fault-F" class="cross-section-elem" data-id="F" data-name="รอยเลื่อน F (Fault)" data-type="โครงสร้างทางธรณี">
+            <line x1="380" y1="20" x2="220" y2="590" stroke="#ef4444" stroke-width="6" stroke-dasharray="10,6"/>
+            <!-- Arrow indicators -->
+            <polygon points="340,140 330,120 350,125" fill="#ef4444"/>
+            <polygon points="260,420 270,440 250,435" fill="#ef4444"/>
+            <text x="350" y="45" fill="#ef4444" font-weight="bold" font-size="20" style="text-shadow: 1px 1px 3px #000;">รอยเลื่อน F</text>
+          </g>
+
+          <!-- ผิวเปลือกโลกปัจจุบัน -->
+          <line x1="0" y1="40" x2="800" y2="40" stroke="#10b981" stroke-width="5"/>
+          <text x="15" y="30" fill="#10b981" font-size="14" font-weight="bold">🌱 ผิวภูมิประเทศปัจจุบัน (Surface)</text>
+        </svg>
+      </div>
+
+      <!-- Evidence Inspector Card -->
+      <div id="inspectorCard" class="mt-4 bg-slate-900/90 border border-slate-700 p-4 rounded-xl">
+        <div class="flex items-center gap-2 mb-1">
+          <span class="text-amber-400 font-bold" id="inspTitle">คลิกเลือกองค์ประกอบในภาพตัดขวาง</span>
+          <span class="text-xs px-2 py-0.5 rounded bg-slate-800 text-slate-400" id="inspType">ยังไม่ได้เลือก</span>
+        </div>
+        <p class="text-sm text-slate-300 leading-relaxed" id="inspDesc">
+          คลิกที่ชั้นหิน A, B, C, D หรือหินแทรก E, รอยกัดกร่อน U, หรือรอยเลื่อน F เพื่อดูหลักฐานทางธรณีวิทยาที่ซ่อนอยู่
+        </p>
+      </div>
+    </section>
+
+    <!-- Right: Student Timeline Reconstruction (5 cols) -->
+    <section class="lg:col-span-5 bg-slate-800/90 border border-slate-700 rounded-2xl p-4 md:p-5 flex flex-col shadow-xl">
+      <div class="mb-3">
+        <h2 class="font-semibold text-slate-200 flex items-center gap-2">
+          <span>⏳</span> เรียงลำดับไทม์ไลน์ (Timeline)
+        </h2>
+        <p class="text-xs text-slate-400">
+          ลากหรือกดสลับการ์ดเพื่อเรียงลำดับเหตุการณ์จาก <b>"เกิดก่อน (เก่าแก่สุด)"</b> ไปหา <b>"เกิดหลัง (ใหม่สุด)"</b>
+        </p>
+      </div>
+
+      <!-- Droppable Timeline List -->
+      <div id="timelineContainer" class="flex-1 space-y-2 overflow-y-auto pr-1">
+        <!-- Rendered via JS -->
+      </div>
+
+      <!-- Action Buttons & Validation -->
+      <div class="pt-4 border-t border-slate-700 flex flex-col gap-2">
+        <button id="btnCheck" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-medium py-2.5 rounded-xl shadow-md transition">
+          ✅ ตรวจสอบคำตอบ
+        </button>
+        <div id="feedbackBox" class="hidden p-3 rounded-xl text-sm"></div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Geological Law Modal (Hints) -->
+  <div id="hintModal" class="fixed inset-0 bg-black/75 hidden items-center justify-center p-4 z-50">
+    <div class="bg-slate-800 border border-slate-700 max-w-lg w-full rounded-2xl p-6 shadow-2xl space-y-4">
+      <div class="flex justify-between items-center border-b border-slate-700 pb-3">
+        <h3 class="text-lg font-bold text-amber-400">📖 หลักการลำดับชั้นหิน (Geological Principles)</h3>
+        <button id="btnCloseHint" class="text-slate-400 hover:text-white text-xl">✕</button>
+      </div>
+      <ul class="text-sm space-y-3 text-slate-300 leading-relaxed list-disc list-inside">
+        <li><strong class="text-slate-100">กฎการซ้อนทับ (Superposition):</strong> ในชั้นหินตะกอนที่ยังไม่เอียงคว่ำ ชั้นหินด้านล่างจะสะสมตัวก่อน (เก่ากว่า) ชั้นหินด้านบน</li>
+        <li><strong class="text-slate-100">ความสัมพันธ์ของการตัดผ่าน (Cross-Cutting):</strong> หินอัคนีแทรกซอนหรือรอยเลื่อนที่ตัดผ่านชั้นหินอื่น <em>ต้องเกิดขึ้นทีหลัง</em> หินที่มันตัดผ่านเสมอ</li>
+        <li><strong class="text-slate-100">รอยชั้นไม่ต่อเนื่อง (Unconformity):</strong> แนวรอยหยัก/ผุกร่อนบ่งบอกถึงช่วงเวลาที่การสะสมตัวหยุดชะงัก หรือเกิดการยกตัวขึ้นมาถูกกัดกร่อนก่อนมีชั้นใหม่ทับ</li>
+        <li><strong class="text-slate-100">การสืบลำดับด้วยซากดึกดำบรรพ์ (Faunal Succession):</strong> สิ่งมีชีวิตในอดีตเปลี่ยนแปลงไปตามยุค ไตรโลไบต์ (พาลีโอโซอิก) เกิดก่อน แอมโมไนต์ (มีโซโซอิก)</li>
+      </ul>
+      <div class="pt-2 text-right">
+        <button id="btnCloseHint2" class="bg-slate-700 hover:bg-slate-600 px-4 py-1.5 rounded-lg text-sm text-slate-200">เข้าใจแล้ว</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Data definition for Geological Elements
+    const elementsData = {
+      'A': {
+        name: 'ชั้นหิน A (หินปูน)',
+        type: 'ชั้นหินตะกอน',
+        desc: 'พบฟอสซิล "ไตรโลไบต์" (สิ่งมีชีวิตยุคพาลีโอโซอิกตอนต้น) วางตัวอยู่ใต้ชั้น B และถูกหินอัคนี E ตัดผ่าน บ่งชี้ว่าเป็นชั้นที่สะสมตัวก่อนเพื่อนในบริเวณนี้'
+      },
+      'B': {
+        name: 'ชั้นหิน B (หินดินดาน)',
+        type: 'ชั้นหินตะกอน',
+        desc: 'พบฟอสซิล "แอมโมไนต์" วางตัวปิดทับชั้นหิน A และวางอยู่ใต้ชั้น C ถูกหินอัคนี E แทรกตัดผ่านเช่นกัน'
+      },
+      'C': {
+        name: 'ชั้นหิน C (หินทราย)',
+        type: 'ชั้นหินตะกอน',
+        desc: 'วางตัวทับชั้น B ขอบบนสุดพบพื้นผิวขรุขระถูกกัดกร่อน (U) และถูกหินอัคนี E ตัดทะลุเข้ามา'
+      },
+      'E': {
+        name: 'พนังหินอัคนี E (Dike)',
+        type: 'หินอัคนีแทรกซอน',
+        desc: 'มีรอยแปรสภาพสัมผัสความร้อนตัดทะลุผ่านชั้น A, B, C แต่ส่วนยอดถูกตัดขาดแบนเรียบเสมอกับแนวการกัดกร่อน U และไม่แทรกเข้าไปในชั้น D แปลว่า E เกิดหลัง C แต่เกิดก่อน D'
+      },
+      'U': {
+        name: 'แนวการกัดกร่อน U (Unconformity)',
+        type: 'รอยชั้นไม่ต่อเนื่อง',
+        desc: 'เป็นรอยหยักขรุขระที่ตัดยอดของทั้งชั้น C และหินแทรก E แสดงว่าพื้นที่เคยยกตัวขึ้นสู่ผิวน้ำ มีการกัดกร่อนยาวนานจนหินหายไปบางส่วน ก่อนที่ชั้น D จะมาตกตะกอนทับ'
+      },
+      'D': {
+        name: 'ชั้นหิน D (หินกรวดมน)',
+        type: 'ชั้นหินตะกอนบนสุด',
+        desc: 'ตกตะกอนปิดทับแนวการกัดกร่อน U มีกรวดมนของหินอัคนี E ปะปนอยู่ (Inclusions) แปลว่าเกิดทีหลัง E แน่นอน'
+      },
+      'F': {
+        name: 'รอยเลื่อน F (Fault)',
+        type: 'โครงสร้างทางธรณี',
+        desc: 'รอยเลื่อนตัดเฉียงขาดทะลุชั้นหินทั้งหมดตั้งแต่ A, B, C, E, U จนถึงชั้น D ด้านบนสุด ทำให้ชั้นหินทุกชั้นเคลื่อนเหลื่อมกัน แสดงว่ารอยเลื่อนนี้เป็นเหตุการณ์ล่าสุด (ใหม่อันดับสุดท้าย)'
+      }
+    };
+
+    // Correct chronological sequence: Oldest (Index 0) to Youngest (Index 6)
+    // 1. A (หินปูน)
+    // 2. B (หินดินดาน)
+    // 3. C (หินทราย)
+    // 4. E (หินอัคนีแทรกซอน)
+    // 5. U (การกัดกร่อน/รอยชั้นไม่ต่อเนื่อง)
+    // 6. D (หินกรวดมนสะสมทับ)
+    // 7. F (รอยเลื่อนตัดขาดทุกอย่าง)
+    const correctOrder = ['A', 'B', 'C', 'E', 'U', 'D', 'F'];
+
+    // Initial student order (Shuffled initially)
+    let currentOrder = ['D', 'A', 'F', 'B', 'U', 'C', 'E'];
+
+    // DOM Elements
+    const timelineContainer = document.getElementById('timelineContainer');
+    const inspTitle = document.getElementById('inspTitle');
+    const inspType = document.getElementById('inspType');
+    const inspDesc = document.getElementById('inspDesc');
+    const btnCheck = document.getElementById('btnCheck');
+    const btnReset = document.getElementById('btnReset');
+    const feedbackBox = document.getElementById('feedbackBox');
+    const hintModal = document.getElementById('hintModal');
+    const btnHint = document.getElementById('btnHint');
+    const btnCloseHint = document.getElementById('btnCloseHint');
+    const btnCloseHint2 = document.getElementById('btnCloseHint2');
+
+    // Render Timeline Items
+    function renderTimeline() {
+      timelineContainer.innerHTML = '';
+      currentOrder.forEach((id, index) => {
+        const itemData = elementsData[id];
+        const card = document.createElement('div');
+        card.className = 'drag-item bg-slate-700/80 hover:bg-slate-700 p-3 rounded-xl flex items-center justify-between border border-slate-600 transition shadow-sm';
+        card.setAttribute('draggable', 'true');
+        card.dataset.index = index;
+        card.dataset.id = id;
+
+        card.innerHTML = `
+          <div class="flex items-center gap-3">
+            <span class="w-6 h-6 rounded-full bg-slate-900 border border-slate-600 text-xs flex items-center justify-center font-bold text-amber-400">
+              ${index + 1}
+            </span>
+            <div>
+              <div class="font-semibold text-slate-100 text-sm">${itemData.name}</div>
+              <div class="text-xs text-slate-400">${itemData.type}</div>
+            </div>
+          </div>
+          <div class="flex items-center gap-1 text-slate-400">
+            <button class="btn-up p-1 hover:text-white rounded" title="เลื่อนขึ้น" ${index === 0 ? 'disabled style="opacity:0.3"' : ''}>▲</button>
+            <button class="btn-down p-1 hover:text-white rounded" title="เลื่อนลง" ${index === currentOrder.length - 1 ? 'disabled style="opacity:0.3"' : ''}>▼</button>
+          </div>
+        `;
+
+        // Up / Down Button Event Handlers
+        card.querySelector('.btn-up')?.addEventListener('click', (e) => {
+          e.stopPropagation();
+          if (index > 0) swapItems(index, index - 1);
+        });
+
+        card.querySelector('.btn-down')?.addEventListener('click', (e) => {
+          e.stopPropagation();
+          if (index < currentOrder.length - 1) swapItems(index, index + 1);
+        });
+
+        // Click on timeline card highlights in diagram
+        card.addEventListener('click', () => {
+          highlightElement(id);
+        });
+
+        // Drag & Drop Handlers
+        card.addEventListener('dragstart', handleDragStart);
+        card.addEventListener('dragover', handleDragOver);
+        card.addEventListener('drop', handleDrop);
+        card.addEventListener('dragend', handleDragEnd);
+
+        timelineContainer.appendChild(card);
+      });
+    }
+
+    function swapItems(fromIndex, toIndex) {
+      const temp = currentOrder[fromIndex];
+      currentOrder[fromIndex] = currentOrder[toIndex];
+      currentOrder[toIndex] = temp;
+      renderTimeline();
+      clearFeedback();
+    }
+
+    // Drag and Drop Variables & Logic
+    let dragSrcIndex = null;
+
+    function handleDragStart(e) {
+      dragSrcIndex = Number(this.dataset.index);
+      e.dataTransfer.effectAllowed = 'move';
+      this.classList.add('opacity-40');
+    }
+
+    function handleDragOver(e) {
+      e.preventDefault();
+      e.dataTransfer.dropEffect = 'move';
+    }
+
+    function handleDrop(e) {
+      e.stopPropagation();
+      const dropTargetIndex = Number(this.dataset.index);
+      if (dragSrcIndex !== null && dragSrcIndex !== dropTargetIndex) {
+        const itemToMove = currentOrder.splice(dragSrcIndex, 1)[0];
+        currentOrder.splice(dropTargetIndex, 0, itemToMove);
+        renderTimeline();
+        clearFeedback();
+      }
+    }
+
+    function handleDragEnd() {
+      this.classList.remove('opacity-40');
+      dragSrcIndex = null;
+    }
+
+    // Highlight Element in SVG & Inspector
+    function highlightElement(id) {
+      // Remove previous active classes
+      document.querySelectorAll('.cross-section-elem').forEach(el => el.classList.remove('active'));
+
+      // Highlight target element
+      const target = document.querySelector(`[data-id="${id}"]`);
+      if (target) {
+        target.classList.add('active');
+      }
+
+      // Update Inspector
+      const data = elementsData[id];
+      if (data) {
+        inspTitle.textContent = data.name;
+        inspType.textContent = data.type;
+        inspDesc.textContent = data.desc;
+      }
+    }
+
+    function clearFeedback() {
+      feedbackBox.className = 'hidden p-3 rounded-xl text-sm';
+      feedbackBox.innerHTML = '';
+    }
+
+    // Check Answers
+    btnCheck.addEventListener('click', () => {
+      let isAllCorrect = true;
+      let incorrectPositions = [];
+
+      currentOrder.forEach((id, index) => {
+        if (id !== correctOrder[index]) {
+          isAllCorrect = false;
+          incorrectPositions.push(index + 1);
+        }
+      });
+
+      feedbackBox.classList.remove('hidden');
+
+      if (isAllCorrect) {
+        feedbackBox.className = 'p-3 rounded-xl text-sm bg-emerald-950/80 border border-emerald-500 text-emerald-200';
+        feedbackBox.innerHTML = `
+          🎉 <b>ยอดเยี่ยมมาก! คุณสืบลำดับถูกต้อง 100%</b><br>
+          <span class="text-xs text-emerald-300">
+            ลำดับที่ถูก: A (หินปูนล่างสุด) ➔ B (หินดินดาน) ➔ C (หินทราย) ➔ E (หินอัคนีแทรกซอน) ➔ U (การกัดกร่อน) ➔ D (หินกรวดมนตกทับ) ➔ F (รอยเลื่อนตัดขาดทั้งหมด)
+          </span>
+        `;
+      } else {
+        feedbackBox.className = 'p-3 rounded-xl text-sm bg-rose-950/80 border border-rose-500 text-rose-200';
+        feedbackBox.innerHTML = `
+          ⚠️ <b>ยังมีตำแหน่งที่ยังไม่ถูกต้อง</b> (ตำแหน่งที่: ${incorrectPositions.join(', ')})<br>
+          <span class="text-xs text-rose-300">
+            คำใบ้: สังเกตว่า หินแทรก E โดนแนว U ตัดยอดหรือไม่? และรอยเลื่อน F ตัดทะลุชั้นใดบ้าง?
+          </span>
+        `;
+      }
+    });
+
+    // Reset button
+    btnReset.addEventListener('click', () => {
+      currentOrder = ['D', 'A', 'F', 'B', 'U', 'C', 'E'];
+      renderTimeline();
+      clearFeedback();
+      inspTitle.textContent = 'คลิกเลือกองค์ประกอบในภาพตัดขวาง';
+      inspType.textContent = 'ยังไม่ได้เลือก';
+      inspDesc.textContent = 'คลิกที่ชั้นหิน A, B, C, D หรือหินแทรก E, รอยกัดกร่อน U, หรือรอยเลื่อน F เพื่อดูหลักฐานทางธรณีวิทยาที่ซ่อนอยู่';
+      document.querySelectorAll('.cross-section-elem').forEach(el => el.classList.remove('active'));
+    });
+
+    // SVG elements click setup
+    document.querySelectorAll('.cross-section-elem').forEach(elem => {
+      elem.addEventListener('click', () => {
+        const id = elem.getAttribute('data-id');
+        highlightElement(id);
+      });
+    });
+
+    // Modal Hint toggles
+    btnHint.addEventListener('click', () => hintModal.classList.remove('hidden'), hintModal.classList.add('flex'));
+    const closeModal = () => {
+      hintModal.classList.add('hidden');
+      hintModal.classList.remove('flex');
+    };
+    btnCloseHint.addEventListener('click', closeModal);
+    btnCloseHint2.addEventListener('click', closeModal);
+
+    // Initial render
+    renderTimeline();
+  </script>
+</body>
+</html>

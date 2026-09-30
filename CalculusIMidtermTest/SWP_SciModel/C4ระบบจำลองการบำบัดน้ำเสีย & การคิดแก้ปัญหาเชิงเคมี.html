@@ -1,0 +1,1220 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>เคมี ม.6 บทที่ 14: ระบบจำลองการบำบัดน้ำเสียทางเคมีและการประเมินประสิทธิภาพ</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Google Fonts: Sarabun & JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com">
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Sarabun:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <!-- Font Awesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- Canvas Confetti -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Sarabun', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace'],
+          },
+          colors: {
+            lab: {
+              50: '#f0f9ff',
+              500: '#0284c7',
+              600: '#0369a1',
+              900: '#0c4a6e',
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    body {
+      font-family: 'Sarabun', sans-serif;
+    }
+    .custom-scroll::-webkit-scrollbar {
+      width: 5px;
+      height: 5px;
+    }
+    .custom-scroll::-webkit-scrollbar-track {
+      background: rgba(15, 23, 42, 0.6);
+    }
+    .custom-scroll::-webkit-scrollbar-thumb {
+      background: #334155;
+      border-radius: 4px;
+    }
+    .custom-scroll::-webkit-scrollbar-thumb:hover {
+      background: #475569;
+    }
+    @keyframes pulseGlow {
+      0%, 100% { opacity: 0.9; }
+      50% { opacity: 0.4; }
+    }
+    .sensor-pulse {
+      animation: pulseGlow 1.8s ease-in-out infinite;
+    }
+  </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col selection:bg-sky-500 selection:text-slate-950">
+
+  <header class="bg-slate-900/90 backdrop-blur border-b border-slate-800 sticky top-0 z-40 px-4 py-3 shadow-lg">
+    <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-3">
+      <div class="flex items-center space-x-3">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-sky-500 to-indigo-600 flex items-center justify-center shadow-lg shadow-sky-500/20 text-white text-lg">
+          <i class="fa-solid fa-water"></i>
+        </div>
+        <div>
+          <h1 class="text-base sm:text-lg font-bold text-white flex items-center gap-2">
+            เคมี ม.6 บทที่ 14: ระบบจำลองการบำบัดน้ำเสีย & การคิดแก้ปัญหาเชิงเคมี
+            <span class="text-[11px] px-2 py-0.5 rounded-full bg-sky-500/20 border border-sky-500/40 text-sky-300 font-medium">Problem-Based Lab</span>
+          </h1>
+          <p class="text-xs text-slate-400">บูรณาการ: สมดุลกรด-เบส • สมดุลการละลาย (Ksp) • การตกตะกอน • กระบวนการดูดซับ • การตัดสินใจเชิงวิศวกรรม</p>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-2">
+        <div class="bg-slate-950 p-1 rounded-xl border border-slate-800 flex text-xs font-semibold">
+          <button id="tab-lab-btn" onclick="switchViewTab('lab')" class="px-3.5 py-1.5 rounded-lg bg-sky-600 text-white transition flex items-center gap-1.5 shadow">
+            <i class="fa-solid fa-flask-vial"></i> แผงห้องปฏิบัติการ
+          </button>
+          <button id="tab-challenge-btn" onclick="switchViewTab('challenge')" class="px-3.5 py-1.5 rounded-lg text-slate-400 hover:text-white transition flex items-center gap-1.5">
+            <i class="fa-solid fa-trophy text-amber-400"></i> โจทย์วิจัยท้าทาย
+          </button>
+        </div>
+        <button onclick="toggleModal('theory-modal', true)" class="w-8 h-8 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 flex items-center justify-center transition text-sm" title="กลไกเคมีและคู่มือเกณฑ์มาตรฐาน">
+          <i class="fa-solid fa-book-bookmark"></i>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main class="max-w-7xl mx-auto w-full p-3 sm:p-4 lg:p-6 flex-1 flex flex-col gap-4">
+    
+    <!-- Research Challenge Banner (conditionally displayed) -->
+    <section id="challenge-banner" class="hidden bg-gradient-to-r from-amber-950/40 via-slate-900 to-slate-900 border-2 border-amber-500/40 rounded-2xl p-4 shadow-xl">
+      <div class="flex flex-col md:flex-row md:items-center justify-between gap-3">
+        <div class="space-y-1">
+          <div class="flex items-center gap-2">
+            <span class="px-2.5 py-0.5 rounded-full bg-amber-500/20 text-amber-400 font-bold text-xs uppercase tracking-wider border border-amber-500/30">
+              <i class="fa-solid fa-medal mr-1"></i> ภารกิจวิจัยที่ <span id="challenge-num">1</span>
+            </span>
+            <span id="challenge-score" class="text-xs font-mono text-slate-300">คะแนนสะสม: 0 คะแนน</span>
+          </div>
+          <h2 id="challenge-title" class="text-base font-bold text-amber-100">กำลังโหลดโจทย์วิจัย...</h2>
+          <p id="challenge-objective" class="text-xs text-slate-300"></p>
+        </div>
+        <div class="flex items-center gap-2">
+          <button onclick="verifyChallengeSolution()" class="px-4 py-2 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold rounded-xl text-xs transition shadow-lg flex items-center gap-1.5">
+            <i class="fa-solid fa-circle-check"></i> ตรวจสอบผลงานวิจัย
+          </button>
+          <button onclick="nextChallenge()" class="px-3 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 font-semibold rounded-xl text-xs transition border border-slate-700 flex items-center gap-1">
+            <i class="fa-solid fa-angles-right"></i> เปลี่ยนโจทย์
+          </button>
+        </div>
+      </div>
+      <div id="challenge-feedback" class="hidden mt-3 p-3 rounded-xl text-xs border font-medium"></div>
+    </section>
+
+    <!-- Top Diagnostic Station: Source Wastewater Selector & Sensors -->
+    <section class="bg-slate-900/80 border border-slate-800 rounded-2xl p-4 shadow-xl backdrop-blur">
+      <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+        
+        <!-- Wastewater Source Selector -->
+        <div class="flex flex-wrap items-center gap-3">
+          <label for="wastewater-type-select" class="text-xs font-bold uppercase tracking-wider text-slate-400 flex items-center gap-1.5 whitespace-nowrap">
+            <i class="fa-solid fa-industry text-sky-400"></i> แหล่งน้ำเสียอุตสาหกรรม:
+          </label>
+          <select id="wastewater-type-select" onchange="onWastewaterChange(this.value)" class="bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-sm text-sky-300 font-semibold focus:ring-2 focus:ring-sky-500 focus:outline-none transition">
+            <option value="plating">โรงงานชุบโลหะ (Electroplating) — กรดจัด & Cu²⁺, Fe³⁺ สูง</option>
+            <option value="textile">โรงงานฟอกย้อมสิ่งทอ (Textile Dyeing) — สีย้อมอินทรีย์, COD & เบสสูง</option>
+            <option value="chemical">โรงงานสังเคราะห์เคมี (Chemical Synthesis) — สารอินทรีย์ตกค้าง & กรดสูง</option>
+            <option value="mining">น้ำชะเหมืองแร่ (Mining Leachate) — โลหะหนักผสม, ตะกอนแขวนลอยสูง</option>
+          </select>
+        </div>
+
+        <!-- Sensor Metrics Bar -->
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 w-full lg:w-auto">
+          <!-- Sensor: pH -->
+          <div class="bg-slate-950/80 border border-slate-800 px-3 py-2 rounded-xl flex flex-col items-center">
+            <span class="text-[10px] uppercase font-bold text-slate-400 flex items-center gap-1">
+              <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 sensor-pulse"></span> ค่า pH
+            </span>
+            <span id="sensor-raw-ph" class="font-mono font-bold text-base text-rose-400">2.40</span>
+            <span id="sensor-ph-status" class="text-[9px] text-rose-300">กรดรุนแรง</span>
+          </div>
+
+          <!-- Sensor: Heavy Metal -->
+          <div class="bg-slate-950/80 border border-slate-800 px-3 py-2 rounded-xl flex flex-col items-center">
+            <span class="text-[10px] uppercase font-bold text-slate-400">โลหะหนัก (mg/L)</span>
+            <span id="sensor-raw-metal" class="font-mono font-bold text-base text-amber-400">45.0</span>
+            <span class="text-[9px] text-slate-400">เกณฑ์: &lt; 2.0 mg/L</span>
+          </div>
+
+          <!-- Sensor: COD -->
+          <div class="bg-slate-950/80 border border-slate-800 px-3 py-2 rounded-xl flex flex-col items-center">
+            <span class="text-[10px] uppercase font-bold text-slate-400">COD (mg/L)</span>
+            <span id="sensor-raw-cod" class="font-mono font-bold text-base text-purple-400">320</span>
+            <span class="text-[9px] text-slate-400">เกณฑ์: &lt; 120 mg/L</span>
+          </div>
+
+          <!-- Sensor: Turbidity -->
+          <div class="bg-slate-950/80 border border-slate-800 px-3 py-2 rounded-xl flex flex-col items-center">
+            <span class="text-[10px] uppercase font-bold text-slate-400">ความขุ่น (NTU)</span>
+            <span id="sensor-raw-turb" class="font-mono font-bold text-base text-sky-400">280</span>
+            <span class="text-[9px] text-slate-400">เกณฑ์: &lt; 20 NTU</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Main Workspace: Reactor Visualizer (Left) & Chemical Pipeline Controls (Right) -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-5">
+      
+      <!-- Left Column: Simulation Reactor Tank (7 cols) -->
+      <div class="lg:col-span-7 flex flex-col gap-4">
+        
+        <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-4 shadow-xl flex flex-col gap-3">
+          <div class="flex items-center justify-between border-b border-slate-800 pb-2.5">
+            <div class="flex items-center gap-2">
+              <span class="text-sky-400"><i class="fa-solid fa-atom"></i></span>
+              <h2 class="font-bold text-sm sm:text-base text-white">
+                ถังปฏิกรณ์บำบัดทางเคมี (Chemical Reactor Tank)
+              </h2>
+            </div>
+            
+            <div class="flex items-center gap-2">
+              <span id="reactor-stage-tag" class="text-xs px-2.5 py-1 rounded-lg bg-slate-800 border border-slate-700 font-mono text-sky-300">
+                สถานะ: พร้อมดำเนินการ
+              </span>
+              <button onclick="runSimulationStep()" id="btn-run-sim" class="px-3.5 py-1.5 bg-gradient-to-r from-sky-500 to-indigo-600 hover:from-sky-400 hover:to-indigo-500 text-white font-bold text-xs rounded-xl shadow-lg transition flex items-center gap-1.5">
+                <i class="fa-solid fa-play"></i> เริ่มกระบวนการบำบัด
+              </button>
+            </div>
+          </div>
+
+          <!-- Canvas Reactor Visualizer Container -->
+          <div class="relative w-full aspect-[16/10] bg-slate-950 rounded-xl overflow-hidden border border-slate-800 shadow-inner">
+            <canvas id="reactorCanvas" class="w-full h-full block"></canvas>
+            
+            <!-- Realtime Process Overlay HUD -->
+            <div class="absolute top-2 left-2 bg-slate-900/80 backdrop-blur border border-slate-800 rounded-lg px-2.5 py-1.5 text-[11px] font-mono text-slate-300 space-y-0.5 pointer-events-none">
+              <div>ความเร็วกวน: <strong id="hud-rpm" class="text-sky-400">0 RPM</strong></div>
+              <div>เวลาปฏิกิริยา: <strong id="hud-time" class="text-emerald-400">0 นาที</strong></div>
+            </div>
+
+            <div class="absolute top-2 right-2 bg-slate-900/80 backdrop-blur border border-slate-800 rounded-lg px-2.5 py-1.5 text-[11px] font-mono text-slate-300 text-right pointer-events-none">
+              <div>การตกตะกอน (Sludge): <strong id="hud-sludge" class="text-amber-400">0%</strong></div>
+              <div>ความโปร่งแสง: <strong id="hud-clarity" class="text-cyan-400">30%</strong></div>
+            </div>
+          </div>
+
+          <!-- Legend Bar -->
+          <div class="flex flex-wrap items-center justify-between text-[11px] text-slate-400 bg-slate-950/70 p-2.5 rounded-xl border border-slate-800 gap-2">
+            <div class="flex items-center gap-3">
+              <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-rose-500 inline-block"></span> ไอออนมลพิษ / สีย้อม</span>
+              <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-emerald-400 inline-block"></span> สารเคมีบำบัด</span>
+              <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-amber-400 inline-block"></span> ก้อนฟล็อก/ตะกอนไฮดรอกไซด์</span>
+            </div>
+            <div class="font-mono text-sky-400">
+              ปริมาตรถังจำลอง: 1,000 L (1 m³)
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Evaluation Dashboard: Standards Comparison & Cost Calculator -->
+        <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-4 shadow-xl flex flex-col gap-3">
+          <div class="flex items-center justify-between border-b border-slate-800 pb-2">
+            <div class="flex items-center gap-2">
+              <span class="text-emerald-400"><i class="fa-solid fa-chart-line"></i></span>
+              <h2 class="font-bold text-sm sm:text-base text-white">
+                การประเมินผลเทียบมาตรฐานน้ำทิ้ง & ต้นทุน (Evaluation Dashboard)
+              </h2>
+            </div>
+            <span class="text-xs text-slate-400">มาตรฐานประกาศกระทรวงอุตสาหกรรม</span>
+          </div>
+
+          <!-- Effluent Standards Verification Grid -->
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5 text-center">
+            
+            <!-- Result: pH -->
+            <div id="card-eval-ph" class="p-2.5 rounded-xl border bg-slate-950/70 border-slate-800 flex flex-col">
+              <span class="text-[10px] text-slate-400 uppercase font-semibold">pH หลังบำบัด</span>
+              <span id="eval-val-ph" class="text-base font-mono font-bold text-white">--</span>
+              <span class="text-[10px] text-slate-400">เกณฑ์ 5.5 - 9.0</span>
+              <span id="eval-badge-ph" class="mt-1 text-[10px] px-1.5 py-0.5 rounded bg-slate-800 text-slate-400 font-bold">รอประเมิน</span>
+            </div>
+
+            <!-- Result: Heavy Metal -->
+            <div id="card-eval-metal" class="p-2.5 rounded-xl border bg-slate-950/70 border-slate-800 flex flex-col">
+              <span class="text-[10px] text-slate-400 uppercase font-semibold">โลหะหนักคงเหลือ</span>
+              <span id="eval-val-metal" class="text-base font-mono font-bold text-white">--</span>
+              <span class="text-[10px] text-slate-400">เกณฑ์ &lt; 2.0 mg/L</span>
+              <span id="eval-badge-metal" class="mt-1 text-[10px] px-1.5 py-0.5 rounded bg-slate-800 text-slate-400 font-bold">รอประเมิน</span>
+            </div>
+
+            <!-- Result: COD -->
+            <div id="card-eval-cod" class="p-2.5 rounded-xl border bg-slate-950/70 border-slate-800 flex flex-col">
+              <span class="text-[10px] text-slate-400 uppercase font-semibold">COD ตกค้าง</span>
+              <span id="eval-val-cod" class="text-base font-mono font-bold text-white">--</span>
+              <span class="text-[10px] text-slate-400">เกณฑ์ &lt; 120 mg/L</span>
+              <span id="eval-badge-cod" class="mt-1 text-[10px] px-1.5 py-0.5 rounded bg-slate-800 text-slate-400 font-bold">รอประเมิน</span>
+            </div>
+
+            <!-- Result: Removal Efficiency -->
+            <div class="p-2.5 rounded-xl border bg-slate-950/70 border-slate-800 flex flex-col">
+              <span class="text-[10px] text-slate-400 uppercase font-semibold">ประสิทธิภาพกำจัด</span>
+              <span id="eval-val-eff" class="text-base font-mono font-bold text-cyan-400">--%</span>
+              <span class="text-[10px] text-slate-400">คำนวณจากทุกมลพิษ</span>
+              <span id="eval-badge-overall" class="mt-1 text-[10px] px-1.5 py-0.5 rounded bg-slate-800 text-slate-400 font-bold">--</span>
+            </div>
+          </div>
+
+          <!-- Cost and Sludge Economics Bar -->
+          <div class="bg-slate-950 border border-slate-800 p-3 rounded-xl flex flex-wrap items-center justify-between gap-3 text-xs">
+            <div class="flex items-center gap-2">
+              <i class="fa-solid fa-coins text-amber-400 text-base"></i>
+              <div>
+                <span class="text-slate-400">ต้นทุนสารเคมีรวม:</span>
+                <strong id="cost-total-display" class="font-mono text-sm text-amber-300 ml-1">0.00 บาท/m³</strong>
+              </div>
+            </div>
+
+            <div class="flex items-center gap-2">
+              <i class="fa-solid fa-dumpster text-orange-400 text-base"></i>
+              <div>
+                <span class="text-slate-400">ปริมาณกากตะกอนแห้ง (Sludge):</span>
+                <strong id="sludge-volume-display" class="font-mono text-sm text-orange-300 ml-1">0.00 kg/m³</strong>
+              </div>
+            </div>
+
+            <button onclick="logExperimentData()" class="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-lg text-xs font-semibold border border-slate-700 transition flex items-center gap-1.5">
+              <i class="fa-solid fa-clipboard-list text-sky-400"></i> บันทึกผลการทดลอง
+            </button>
+          </div>
+
+        </div>
+
+      </div>
+
+      <!-- Right Column: Treatment Pipeline Controls (5 cols) -->
+      <div class="lg:col-span-5 flex flex-col gap-4">
+        
+        <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-4 sm:p-5 shadow-xl flex flex-col gap-4">
+          <div class="flex items-center justify-between border-b border-slate-800 pb-2.5">
+            <h3 class="font-bold text-white text-sm sm:text-base flex items-center gap-2">
+              <i class="fa-solid fa-sliders text-sky-400"></i> ขั้นตอนการบำบัดทางเคมี (Treatment Pipeline)
+            </h3>
+            <button onclick="resetReagents()" class="text-xs text-slate-400 hover:text-white px-2 py-1 rounded bg-slate-800 hover:bg-slate-700 transition flex items-center gap-1">
+              <i class="fa-solid fa-rotate-left"></i> ล้างค่าสารเคมี
+            </button>
+          </div>
+
+          <!-- Step 1: pH Adjustment & Neutralization -->
+          <div class="bg-slate-950/70 border border-slate-800 p-3 rounded-xl space-y-2">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-bold text-sky-300 flex items-center gap-1.5">
+                <span class="w-4 h-4 rounded-full bg-sky-500/20 text-sky-400 flex items-center justify-center text-[10px]">1</span>
+                การปรับ pH (Neutralization & Ksp Tuning)
+              </span>
+              <span id="target-ph-preview" class="text-xs font-mono font-bold text-emerald-400">pH คาดการณ์: 2.40</span>
+            </div>
+            
+            <div class="grid grid-cols-2 gap-2 text-xs">
+              <div>
+                <label class="text-[11px] text-slate-400 block mb-1">ชนิดสารปรับ pH</label>
+                <select id="ph-reagent-type" onchange="calculatePreliminaryPhysics()" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-1.5 text-xs text-slate-200">
+                  <option value="NaOH">โซเดียมไฮดรอกไซด์ (NaOH)</option>
+                  <option value="CaOH2">ปูนขาว Ca(OH)₂ (ราคาถูก)</option>
+                  <option value="H2SO4">กรดซัลฟิวริก (H₂SO₄)</option>
+                </select>
+              </div>
+              <div>
+                <label class="text-[11px] text-slate-400 block mb-1">ปริมาณที่เติม (mg/L): <span id="ph-reagent-val" class="font-mono text-white">0</span></label>
+                <input type="range" id="ph-reagent-slider" min="0" max="800" step="20" value="0" oninput="onReagentSliderInput()" class="w-full h-1.5 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-sky-500 mt-2">
+              </div>
+            </div>
+          </div>
+
+          <!-- Step 2: Coagulation & Flocculation (Precipitation) -->
+          <div class="bg-slate-950/70 border border-slate-800 p-3 rounded-xl space-y-2">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-bold text-amber-300 flex items-center gap-1.5">
+                <span class="w-4 h-4 rounded-full bg-amber-500/20 text-amber-400 flex items-center justify-center text-[10px]">2</span>
+                การรวมตะกอนและโคแอกกูเลชัน (Coagulation)
+              </span>
+              <span id="coag-cost-badge" class="text-[11px] font-mono text-slate-400">-- บาท</span>
+            </div>
+
+            <div class="grid grid-cols-2 gap-2 text-xs">
+              <div>
+                <label class="text-[11px] text-slate-400 block mb-1">สารสร้างตะกอน (Coagulant)</label>
+                <select id="coag-type" onchange="calculatePreliminaryPhysics()" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-1.5 text-xs text-slate-200">
+                  <option value="alum">สารส้ม (Alum, Al₂(SO₄)₃)</option>
+                  <option value="pac">โพลีอะลูมิเนียมคลอไรด์ (PAC)</option>
+                  <option value="na2s">โซเดียมซัลไฟด์ Na₂S (ตกตะกอนโลหะ)</option>
+                </select>
+              </div>
+              <div>
+                <label class="text-[11px] text-slate-400 block mb-1">ปริมาณสารสร้างตะกอน: <span id="coag-val" class="font-mono text-white">0</span> mg/L</label>
+                <input type="range" id="coag-slider" min="0" max="300" step="10" value="0" oninput="onReagentSliderInput()" class="w-full h-1.5 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-amber-500 mt-2">
+              </div>
+            </div>
+          </div>
+
+          <!-- Step 3: Adsorption & Advanced Oxidation -->
+          <div class="bg-slate-950/70 border border-slate-800 p-3 rounded-xl space-y-2">
+            <span class="text-xs font-bold text-purple-300 flex items-center gap-1.5">
+              <span class="w-4 h-4 rounded-full bg-purple-500/20 text-purple-400 flex items-center justify-center text-[10px]">3</span>
+              การดูดซับ & กำจัดสารอินทรีย์ (COD & Color Removal)
+            </span>
+
+            <div class="space-y-2 text-xs">
+              <div>
+                <div class="flex justify-between text-[11px] text-slate-400 mb-1">
+                  <span>ถ่านกัมมันต์ผง (PAC Adsorption):</span>
+                  <span id="adsorb-val" class="font-mono text-purple-300">0 mg/L</span>
+                </div>
+                <input type="range" id="adsorb-slider" min="0" max="250" step="10" value="0" oninput="onReagentSliderInput()" class="w-full h-1.5 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-purple-500">
+              </div>
+
+              <div>
+                <div class="flex justify-between text-[11px] text-slate-400 mb-1">
+                  <span>ไฮโดรเจนเปอร์ออกไซด์ (H₂O₂ Oxidation):</span>
+                  <span id="oxidant-val" class="font-mono text-pink-300">0 mg/L</span>
+                </div>
+                <input type="range" id="oxidant-slider" min="0" max="150" step="5" value="0" oninput="onReagentSliderInput()" class="w-full h-1.5 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-pink-500">
+              </div>
+            </div>
+          </div>
+
+          <!-- Step 4: Physical Process Conditions (Speed & Time) -->
+          <div class="bg-slate-950/70 border border-slate-800 p-3 rounded-xl space-y-2">
+            <span class="text-xs font-bold text-emerald-300 flex items-center gap-1.5">
+              <span class="w-4 h-4 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center text-[10px]">4</span>
+              สภาวะทางกายภาพในถังปฏิกรณ์ (Agitation & Time)
+            </span>
+
+            <div class="grid grid-cols-2 gap-3 text-xs">
+              <div>
+                <div class="flex justify-between text-[11px] text-slate-400 mb-1">
+                  <span>ความเร็วใบกวน:</span>
+                  <span id="rpm-val" class="font-mono text-white">80 RPM</span>
+                </div>
+                <input type="range" id="rpm-slider" min="0" max="220" step="10" value="80" oninput="onReagentSliderInput()" class="w-full h-1.5 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-emerald-500">
+                <span class="text-[9px] text-slate-500">เร็ว (ผสม) ↔ ช้า (ตกตะกอน)</span>
+              </div>
+
+              <div>
+                <div class="flex justify-between text-[11px] text-slate-400 mb-1">
+                  <span>เวลาพักตกตะกอน:</span>
+                  <span id="time-val" class="font-mono text-white">20 นาที</span>
+                </div>
+                <input type="range" id="time-slider" min="5" max="60" step="5" value="20" oninput="onReagentSliderInput()" class="w-full h-1.5 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-emerald-500">
+                <span class="text-[9px] text-slate-500">ยิ่งนานตะกอนยิ่งตกสมบูรณ์</span>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- Bottom Section: Research Data Logger & Chemical Mechanism Explanations -->
+    <section class="bg-slate-900/80 border border-slate-800 rounded-2xl p-4 sm:p-5 shadow-xl flex flex-col gap-4">
+      <div class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-800 pb-3">
+        <div class="flex items-center gap-2">
+          <i class="fa-solid fa-book-journal-whills text-sky-400"></i>
+          <h3 class="font-bold text-sm sm:text-base text-white">
+            สมุดบันทึกการวิจัยและการตัดสินใจ (Research Data Logger & Chemical Reasoning)
+          </h3>
+        </div>
+        <button onclick="clearExperimentLog()" class="text-xs text-rose-400 hover:text-rose-300 font-semibold transition flex items-center gap-1">
+          <i class="fa-solid fa-trash-can"></i> ล้างประวัติการทดลอง
+        </button>
+      </div>
+
+      <div class="overflow-x-auto custom-scroll">
+        <table class="w-full text-left border-collapse text-xs font-sans">
+          <thead>
+            <tr class="border-b border-slate-800 text-slate-400 uppercase tracking-wider text-[11px]">
+              <th class="py-2.5 px-3">การทดลองที่</th>
+              <th class="py-2.5 px-3">ประเภทน้ำเสีย</th>
+              <th class="py-2.5 px-3">สูตรสารเคมีที่ใช้</th>
+              <th class="py-2.5 px-3 text-center">pH สุดท้าย</th>
+              <th class="py-2.5 px-3 text-center">โลหะหนัก (mg/L)</th>
+              <th class="py-2.5 px-3 text-center">COD (mg/L)</th>
+              <th class="py-2.5 px-3 text-center">ต้นทุน (บาท/m³)</th>
+              <th class="py-2.5 px-3 text-center">ผลการประเมิน</th>
+            </tr>
+          </thead>
+          <tbody id="experiment-log-body" class="divide-y divide-slate-800/80 font-mono text-slate-300">
+            <tr>
+              <td colspan="8" class="text-center py-4 text-slate-500 font-sans">
+                ยังไม่มีการบันทึกข้อมูลการทดลอง กดปุ่ม "บันทึกผลการทดลอง" เพื่อเก็บข้อมูลเปรียบเทียบ
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Chemical Mechanism Insights -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-3 pt-2 text-xs">
+        <div class="bg-slate-950 p-3 rounded-xl border border-slate-800">
+          <h4 class="font-bold text-sky-400 flex items-center gap-1.5 mb-1 font-sans">
+            <i class="fa-solid fa-vial-circle-check"></i> สมดุลการละลาย (Ksp & Precipitation)
+          </h4>
+          <p class="text-slate-300 leading-relaxed font-sans">
+            ไอออนโลหะหนัก เช่น $Cu^{2+}, Fe^{3+}$ จะตกตะกอนเป็นไฮดรอกไซด์เมื่อ pH เหมาะสม ($\approx 8.5-9.5$) ตามค่าผลคูณการละลาย $K_{sp}$ หากเติมกรดหรือเบสมากเกินไป ตะกอนบางชนิดอาจละลายกลับเป็นสารประกอบเชิงซ้อน
+          </p>
+        </div>
+
+        <div class="bg-slate-950 p-3 rounded-xl border border-slate-800">
+          <h4 class="font-bold text-amber-400 flex items-center gap-1.5 mb-1 font-sans">
+            <i class="fa-solid fa-magnet"></i> การจับกลุ่มอนุภาค (Coagulation)
+          </h4>
+          <p class="text-slate-300 leading-relaxed font-sans">
+            อนุภาคคอลลอยด์ในน้ำมีประจุลบผลักกัน การเติมสารส้มหรือ PAC ($Al^{3+}$) จะไปสะเทินประจุที่ผิวคอลลอยด์ (Charge Neutralization) ทำให้จับตัวเป็นก้อนฟล็อกขนาดใหญ่และจมตัวลงก้นถังได้อย่างรวดเร็ว
+          </p>
+        </div>
+
+        <div class="bg-slate-950 p-3 rounded-xl border border-slate-800">
+          <h4 class="font-bold text-purple-400 flex items-center gap-1.5 mb-1 font-sans">
+            <i class="fa-solid fa-chart-pie"></i> สมดุลต้นทุนทางวิศวกรรมเคมี
+          </h4>
+          <p class="text-slate-300 leading-relaxed font-sans">
+            การแก้ปัญหาทางเคมีในโลกจริงต้องคำนึงถึง <strong>ความคุ้มค่าทางเศรษฐศาสตร์</strong> การใช้สารเคมีปริมาณมหาศาลอาจทำให้น้ำสะอาด แต่ทำให้ต้นทุนสูงเกินจริงและสร้างกากตะกอน (Sludge) ที่ต้องนำไปฝังกลบเพิ่มขึ้น
+          </p>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Theory and Standards Reference Modal -->
+  <div id="theory-modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm hidden items-center justify-center p-4">
+    <div class="bg-slate-900 border border-slate-800 w-full max-w-3xl rounded-2xl p-6 shadow-2xl space-y-4 max-h-[90vh] overflow-y-auto custom-scroll">
+      <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+        <h3 class="text-lg font-bold text-white flex items-center gap-2">
+          <i class="fa-solid fa-book-open text-sky-400"></i> คู่มือเคมีบำบัดน้ำเสีย & เกณฑ์มาตรฐานน้ำทิ้ง (ม.6 บทที่ 14)
+        </h3>
+        <button onclick="toggleModal('theory-modal', false)" class="w-8 h-8 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 flex items-center justify-center transition">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <div class="space-y-4 text-xs sm:text-sm text-slate-300 leading-relaxed">
+        <div class="bg-slate-950 p-3.5 rounded-xl border border-slate-800">
+          <h4 class="font-bold text-sky-300 mb-1">1. เกณฑ์มาตรฐานควบคุมการระบายน้ำทิ้งจากโรงงานอุตสาหกรรม</h4>
+          <ul class="list-disc list-inside space-y-1 text-slate-300">
+            <li><strong>ค่า pH:</strong> ต้องอยู่ระหว่าง <strong>5.5 ถึง 9.0</strong></li>
+            <li><strong>โลหะหนักรวม:</strong> ไม่เกิน <strong>2.0 mg/L</strong> (เช่น ทองแดง Cu ไม่เกิน 2.0 mg/L)</li>
+            <li><strong>ซีโอดี (COD - Chemical Oxygen Demand):</strong> ไม่เกิน <strong>120 mg/L</strong></li>
+            <li><strong>ความขุ่น (Turbidity):</strong> ควรต่ำกว่า <strong>20 NTU</strong> เพื่อให้น้ำใสสะอาดก่อนปล่อยคืนสู่ธรรมชาติ</li>
+          </ul>
+        </div>
+
+        <div class="bg-slate-950 p-3.5 rounded-xl border border-slate-800">
+          <h4 class="font-bold text-amber-300 mb-1">2. ตารางราคาเฉลี่ยของสารเคมีอุตสาหกรรม (Industrial Chemical Pricing)</h4>
+          <div class="grid grid-cols-2 gap-2 text-xs font-mono">
+            <div>• NaOH (โซดาไฟ 50%): 22 บาท/kg</div>
+            <div>• Ca(OH)₂ (ปูนขาว): 6 บาท/kg (ประหยัดกว่า)</div>
+            <div>• Alum (สารส้ม): 12 บาท/kg</div>
+            <div>• PAC (โพลีอะลูมิเนียม): 28 บาท/kg</div>
+            <div>• ถ่านกัมมันต์ (Activated Carbon): 65 บาท/kg</div>
+            <div>• H₂O₂ (เปอร์ออกไซด์): 45 บาท/kg</div>
+          </div>
+        </div>
+
+        <div class="bg-slate-950 p-3.5 rounded-xl border border-slate-800">
+          <h4 class="font-bold text-emerald-300 mb-1">3. ทักษะกระบวนการคิดแก้ปัญหาทางเคมี (Chemical Inquiry Framework)</h4>
+          <p>
+            การทดลองนี้ฝึกฝนการเป็น "นักเคมีสิ่งแวดล้อม" ที่ต้องวิเคราะห์สาเหตุของปัญหา เลือกใช้ปฏิกิริยาเคมีที่ถูกต้อง (กรด-เบส, ตกตะกอน, การดูดซับ, รีดอกซ์) พร้อมทั้งปรับปริมาณสารเคมีให้พอดีที่สุดเพื่อประหยัดทรัพยากรและลดมลพิษทุติยภูมิ (Secondary Pollution)
+          </p>
+        </div>
+      </div>
+
+      <div class="pt-2 flex justify-end">
+        <button onclick="toggleModal('theory-modal', false)" class="px-5 py-2.5 bg-sky-600 hover:bg-sky-500 text-white font-bold rounded-xl transition text-sm">
+          เข้าใจแล้ว เริ่มการทดลอง
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="mt-auto border-t border-slate-800 bg-slate-950/80 py-3 px-4 text-center text-xs text-slate-500">
+    แบบจำลองสำหรับการจัดการเรียนรู้วิทยาศาสตร์และเคมี ม.6 บทที่ 14 • สื่อการเรียนรู้เชิงรุก (Active Learning) เพื่อการคิดแก้ปัญหาทางเคมี
+  </footer>
+
+  <script>
+    // -------------------------------------------------------------
+    // DATA CONFIGURATIONS: Wastewater profiles & Reagent Costs
+    // -------------------------------------------------------------
+    const WASTEWATER_PROFILES = {
+      plating: {
+        name: 'โรงงานชุบโลหะ (Electroplating)',
+        rawPh: 2.20,
+        rawMetal: 48.0, // mg/L (Cu2+, Fe3+)
+        rawCod: 65,     // mg/L
+        rawTurb: 180,   // NTU
+        color: [225, 29, 72], // reddish/copper tint
+        optimumPh: 9.0, // Best pH for Cu(OH)2 precipitation
+        desc: 'น้ำเสียมีความเป็นกรดสูงมากและมีไอออนทองแดง (Cu²⁺) ปนเปื้อน ต้องปรับเบสและตกตะกอน'
+      },
+      textile: {
+        name: 'โรงงานฟอกย้อมสิ่งทอ (Textile Dyeing)',
+        rawPh: 10.80,
+        rawMetal: 2.5,
+        rawCod: 420,    // High organic azo dyes
+        rawTurb: 320,
+        color: [147, 51, 234], // dark purple dye
+        optimumPh: 7.2,
+        desc: 'มีความเป็นเบสสูง สีเข้มจัด และค่า COD สูงมาก ต้องปรับกรด ดูดซับด้วยถ่าน หรือออกซิไดซ์'
+      },
+      chemical: {
+        name: 'โรงงานสังเคราะห์เคมี (Chemical Synthesis)',
+        rawPh: 3.40,
+        rawMetal: 8.0,
+        rawCod: 310,
+        rawTurb: 150,
+        color: [234, 88, 12], // amber/orange
+        optimumPh: 7.5,
+        desc: 'มีสารประกอบอินทรีย์ระเหยและกรดอินทรีย์ปนเปื้อน ต้องปรับสภาพกรดและกำจัด COD'
+      },
+      mining: {
+        name: 'น้ำชะเหมืองแร่ (Mining Leachate)',
+        rawPh: 3.80,
+        rawMetal: 36.0,
+        rawCod: 45,
+        rawTurb: 420,
+        color: [180, 83, 9], // muddy brown/iron
+        optimumPh: 8.8,
+        desc: 'มีตะกอนแขวนลอยหนาแน่นและมีไอออนเหล็ก/สังกะสี ต้องใช้สารสร้างตะกอน (PAC) และปรับ pH'
+      }
+    };
+
+    // Cost in THB per kg
+    const CHEMICAL_PRICES = {
+      NaOH: 22.0,
+      CaOH2: 6.0,
+      H2SO4: 14.0,
+      alum: 12.0,
+      pac: 28.0,
+      na2s: 35.0,
+      carbon: 65.0,
+      h2o2: 45.0
+    };
+
+    // Research Challenge Scenarios
+    const CHALLENGES = [
+      {
+        id: 1,
+        source: 'plating',
+        title: 'ภารกิจที่ 1: บำบัดน้ำเสียชุบโลหะให้ผ่านมาตรฐานด้วยต้นทุนต่ำที่สุด',
+        objective: 'น้ำเสียมี Cu²⁺ 48 mg/L และ pH 2.20 จงบำบัดให้น้ำผ่านมาตรฐานทุกข้อ (pH 5.5-9.0, โลหะ < 2 mg/L, COD < 120, ความขุ่น < 20 NTU) โดยให้มี "ต้นทุนสารเคมีรวมไม่เกิน 15 บาท/m³"',
+        maxCost: 15.0,
+        hint: 'เลือกใช้ปูนขาว Ca(OH)₂ แทน NaOH เพราะราคาถูกกว่ามาก และปรับ pH ให้อยู่ช่วง 8.5-9.2 เพื่อตกตะกอน Cu(OH)₂ สมบูรณ์ ร่วมกับใส่สารส้มเล็กน้อย'
+      },
+      {
+        id: 2,
+        source: 'textile',
+        title: 'ภารกิจที่ 2: ฟอกสีและลด COD น้ำเสียฟอกย้อมสิ่งทอ',
+        objective: 'น้ำเสียฟอกย้อมมี COD สูงถึง 420 mg/L และ pH 10.8 จงปรับลด COD ให้ต่ำกว่า 120 mg/L และปรับ pH ให้อยู่ในเกณฑ์มาตรฐาน โดยควบคุมต้นทุนไม่เกิน 35 บาท/m³',
+        maxCost: 35.0,
+        hint: 'เติมกรด H₂SO₄ เพื่อสะเทินเบสลงมาที่ pH 7.0 แล้วใช้ผงถ่านกัมมันต์ร่วมกับ H₂O₂ เพื่อดูดซับและออกซิไดซ์สีย้อม'
+      }
+    ];
+
+    // State Variables
+    let currentSourceKey = 'plating';
+    let challengeMode = false;
+    let currentChallengeIndex = 0;
+    let challengeScore = 0;
+    let experimentCounter = 1;
+
+    // Reagent inputs state
+    let reagentState = {
+      phType: 'NaOH',
+      phDose: 0,      // mg/L
+      coagType: 'alum',
+      coagDose: 0,    // mg/L
+      adsorbDose: 0,  // mg/L
+      oxidantDose: 0, // mg/L
+      rpm: 80,
+      time: 20
+    };
+
+    // Output treatment results state
+    let treatmentResults = {
+      finalPh: 2.20,
+      finalMetal: 48.0,
+      finalCod: 65,
+      finalTurb: 180,
+      removalEff: 0,
+      totalCost: 0,
+      sludgeMass: 0,
+      passed: false
+    };
+
+    // Canvas Reactor Physics & Animation
+    const canvas = document.getElementById('reactorCanvas');
+    const ctx = canvas.getContext('2d');
+    let particles = [];
+    let flocs = [];
+    let impellerAngle = 0;
+    let isSimulating = false;
+    let simProgress = 0; // 0 to 100
+
+    class Particle {
+      constructor(type, x, y, color) {
+        this.type = type; // 'pollutant', 'reagent', 'floc'
+        this.x = x;
+        this.y = y;
+        this.vx = (Math.random() - 0.5) * 1.5;
+        this.vy = (Math.random() - 0.5) * 1.5;
+        this.color = color;
+        this.radius = type === 'floc' ? 5 : 2.5;
+        this.isSettled = false;
+      }
+
+      update(width, height, currentRpm, sedimentationRate) {
+        if (this.isSettled) return;
+
+        // Influence of mixer impeller agitation
+        const centerX = width / 2;
+        const centerY = height / 2;
+        const dx = this.x - centerX;
+        const dy = this.y - centerY;
+        const dist = Math.sqrt(dx * dx + dy * dy) || 1;
+
+        if (currentRpm > 0) {
+          // Circular swirl
+          const swirlForce = (currentRpm / 200) * 1.8;
+          this.vx += (-dy / dist) * swirlForce * 0.15;
+          this.vy += (dx / dist) * swirlForce * 0.15;
+        }
+
+        // Downward gravity / sedimentation if floc
+        if (this.type === 'floc' && sedimentationRate > 0) {
+          this.vy += sedimentationRate * 0.08;
+        }
+
+        // Drag/friction
+        this.vx *= 0.94;
+        this.vy *= 0.94;
+
+        this.x += this.vx;
+        this.y += this.vy;
+
+        // Boundaries
+        const pad = 12;
+        if (this.x < pad) { this.x = pad; this.vx *= -0.6; }
+        if (this.x > width - pad) { this.x = width - pad; this.vx *= -0.6; }
+        if (this.y < pad) { this.y = pad; this.vy *= -0.6; }
+
+        // Settle at the bottom of the reactor tank
+        if (this.y > height - pad - 6) {
+          if (this.type === 'floc' && currentRpm < 60) {
+            this.isSettled = true;
+            this.y = height - pad - (Math.random() * 8);
+            this.vx = 0;
+            this.vy = 0;
+          } else {
+            this.y = height - pad - 6;
+            this.vy *= -0.5;
+          }
+        }
+      }
+
+      draw(context) {
+        context.beginPath();
+        context.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+        context.fillStyle = this.color;
+        context.fill();
+        if (this.type === 'floc') {
+          context.strokeStyle = 'rgba(255, 255, 255, 0.4)';
+          context.lineWidth = 1;
+          context.stroke();
+        }
+      }
+    }
+
+    function computeTreatmentChemistry() {
+      const src = WASTEWATER_PROFILES[currentSourceKey];
+      
+      // 1. pH Calculation (Acid-Base Reaction & Buffering)
+      let calcPh = src.rawPh;
+      const phDose = reagentState.phDose;
+      const phReagent = reagentState.phType;
+
+      if (phReagent === 'NaOH') {
+        calcPh += (phDose / 100) * 1.55;
+      } else if (phReagent === 'CaOH2') {
+        calcPh += (phDose / 100) * 1.40;
+      } else if (phReagent === 'H2SO4') {
+        calcPh -= (phDose / 100) * 1.60;
+      }
+      calcPh = Math.max(1.0, Math.min(13.5, calcPh));
+
+      // 2. Heavy Metal Precipitation (Ksp mechanism)
+      // Optimum removal occurs when pH is near target optimum
+      let metalRemoval = 0;
+      const deltaPh = Math.abs(calcPh - src.optimumPh);
+      if (deltaPh < 1.0) {
+        metalRemoval += 0.85; // 85% removal via hydroxide
+      } else if (deltaPh < 2.0) {
+        metalRemoval += 0.50;
+      }
+
+      // Sulfide precipitation effect (Na2S forms CuS with extremely low Ksp)
+      if (reagentState.coagType === 'na2s' && reagentState.coagDose > 30) {
+        metalRemoval += (reagentState.coagDose / 100) * 0.6;
+      }
+      metalRemoval = Math.min(0.98, metalRemoval);
+      const remainingMetal = Math.max(0.1, src.rawMetal * (1 - metalRemoval));
+
+      // 3. Coagulation & Turbidity Removal
+      let turbRemoval = 0;
+      const coagEffect = reagentState.coagType === 'pac' ? 1.25 : 1.0;
+      turbRemoval += (reagentState.coagDose / 150) * 0.70 * coagEffect;
+
+      // Influence of Mixing speed & Retention time
+      if (reagentState.rpm >= 40 && reagentState.rpm <= 120) {
+        turbRemoval += 0.15; // Optimal flocculation zone
+      } else if (reagentState.rpm > 160) {
+        turbRemoval -= 0.20; // Shear flocs broken!
+      }
+      if (reagentState.time >= 20) {
+        turbRemoval += Math.min(0.20, (reagentState.time - 20) * 0.005);
+      }
+      turbRemoval = Math.min(0.96, Math.max(0.05, turbRemoval));
+      const remainingTurb = Math.max(5, src.rawTurb * (1 - turbRemoval));
+
+      // 4. COD & Organic Dyes Removal (Adsorption & Oxidation)
+      let codRemoval = 0;
+      // Carbon adsorption
+      codRemoval += (reagentState.adsorbDose / 200) * 0.60;
+      // Advanced Oxidation (Fenton/Peroxide)
+      codRemoval += (reagentState.oxidantDose / 100) * 0.40;
+      codRemoval = Math.min(0.92, Math.max(0.05, codRemoval));
+      const remainingCod = Math.max(15, src.rawCod * (1 - codRemoval));
+
+      // 5. Total Chemical Cost calculation (THB per m3)
+      // Note: 1 mg/L = 1 g/m3 = 0.001 kg/m3
+      let totalCost = 0;
+      totalCost += (reagentState.phDose * 0.001) * CHEMICAL_PRICES[phReagent];
+      totalCost += (reagentState.coagDose * 0.001) * CHEMICAL_PRICES[reagentState.coagType];
+      totalCost += (reagentState.adsorbDose * 0.001) * CHEMICAL_PRICES.carbon;
+      totalCost += (reagentState.oxidantDose * 0.001) * CHEMICAL_PRICES.h2o2;
+
+      // 6. Sludge Generation (kg per m3)
+      const sludgeMass = (
+        (src.rawMetal - remainingMetal) * 0.002 + 
+        (reagentState.coagDose * 0.001 * 0.75) + 
+        (reagentState.adsorbDose * 0.001)
+      );
+
+      // Check compliance with industrial effluent regulations
+      const passPh = calcPh >= 5.5 && calcPh <= 9.0;
+      const passMetal = remainingMetal <= 2.0;
+      const passCod = remainingCod <= 120;
+      const passTurb = remainingTurb <= 25;
+      const allPassed = passPh && passMetal && passCod && passTurb;
+
+      // Overall Removal efficiency index
+      const avgRemoval = (
+        ((src.rawMetal - remainingMetal) / src.rawMetal) +
+        ((src.rawCod - remainingCod) / src.rawCod) +
+        ((src.rawTurb - remainingTurb) / src.rawTurb)
+      ) / 3 * 100;
+
+      return {
+        finalPh: calcPh,
+        finalMetal: remainingMetal,
+        finalCod: remainingCod,
+        finalTurb: remainingTurb,
+        removalEff: Math.max(0, avgRemoval),
+        totalCost: totalCost,
+        sludgeMass: sludgeMass,
+        passPh,
+        passMetal,
+        passCod,
+        passTurb,
+        passed: allPassed
+      };
+    }
+
+    function updateDashboardViews() {
+      treatmentResults = computeTreatmentChemistry();
+
+      // Update preliminary preview badges
+      document.getElementById('target-ph-preview').textContent = `pH คาดการณ์: ${treatmentResults.finalPh.toFixed(2)}`;
+      document.getElementById('coag-cost-badge').textContent = `${(reagentState.coagDose * 0.001 * CHEMICAL_PRICES[reagentState.coagType]).toFixed(2)} บาท/m³`;
+
+      // Update Evaluation Cards
+      const phCard = document.getElementById('card-eval-ph');
+      const metalCard = document.getElementById('card-eval-metal');
+      const codCard = document.getElementById('card-eval-cod');
+
+      document.getElementById('eval-val-ph').textContent = treatmentResults.finalPh.toFixed(2);
+      document.getElementById('eval-val-metal').textContent = treatmentResults.finalMetal.toFixed(2);
+      document.getElementById('eval-val-cod').textContent = Math.round(treatmentResults.finalCod);
+      document.getElementById('eval-val-eff').textContent = `${treatmentResults.removalEff.toFixed(1)}%`;
+
+      // Status badges
+      setBadge('eval-badge-ph', treatmentResults.passPh);
+      setBadge('eval-badge-metal', treatmentResults.passMetal);
+      setBadge('eval-badge-cod', treatmentResults.passCod);
+
+      const overallBadge = document.getElementById('eval-badge-overall');
+      if (treatmentResults.passed) {
+        overallBadge.className = 'mt-1 text-[10px] px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-300 font-bold border border-emerald-500/40';
+        overallBadge.textContent = 'ผ่านเกณฑ์มาตรฐาน';
+      } else {
+        overallBadge.className = 'mt-1 text-[10px] px-1.5 py-0.5 rounded bg-rose-500/20 text-rose-300 font-bold border border-rose-500/40';
+        overallBadge.textContent = 'ไม่ผ่านมาตรฐาน';
+      }
+
+      // Cost & Sludge
+      document.getElementById('cost-total-display').textContent = `${treatmentResults.totalCost.toFixed(2)} บาท/m³`;
+      document.getElementById('sludge-volume-display').textContent = `${treatmentResults.sludgeMass.toFixed(3)} kg/m³`;
+
+      // HUD Indicators
+      document.getElementById('hud-rpm').textContent = `${reagentState.rpm} RPM`;
+      document.getElementById('hud-time').textContent = `${reagentState.time} นาที`;
+      document.getElementById('hud-sludge').textContent = `${(treatmentResults.sludgeMass * 180).toFixed(0)}%`;
+      document.getElementById('hud-clarity').textContent = `${(100 - (treatmentResults.finalTurb / 4)).toFixed(0)}%`;
+    }
+
+    function setBadge(elementId, isPassed) {
+      const el = document.getElementById(elementId);
+      if (isPassed) {
+        el.className = 'mt-1 text-[10px] px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-300 font-bold border border-emerald-500/40';
+        el.textContent = '✓ ผ่านเกณฑ์';
+      } else {
+        el.className = 'mt-1 text-[10px] px-1.5 py-0.5 rounded bg-rose-500/20 text-rose-300 font-bold border border-rose-500/40';
+        el.textContent = '✗ ไม่ผ่าน';
+      }
+    }
+
+    function onWastewaterChange(newKey) {
+      currentSourceKey = newKey;
+      const src = WASTEWATER_PROFILES[newKey];
+
+      document.getElementById('sensor-raw-ph').textContent = src.rawPh.toFixed(2);
+      document.getElementById('sensor-raw-metal').textContent = src.rawMetal.toFixed(1);
+      document.getElementById('sensor-raw-cod').textContent = src.rawCod;
+      document.getElementById('sensor-raw-turb').textContent = src.rawTurb;
+
+      // Status text for pH
+      let phStatus = 'กรดจัด';
+      if (src.rawPh > 9.0) phStatus = 'เบสจัด';
+      else if (src.rawPh >= 5.5 && src.rawPh <= 8.5) phStatus = 'ปกติ';
+      document.getElementById('sensor-ph-status').textContent = phStatus;
+
+      resetReagents();
+      spawnReactorParticles();
+      updateDashboardViews();
+    }
+
+    function onReagentSliderInput() {
+      reagentState.phType = document.getElementById('ph-reagent-type').value;
+      reagentState.phDose = parseInt(document.getElementById('ph-reagent-slider').value, 10);
+      reagentState.coagType = document.getElementById('coag-type').value;
+      reagentState.coagDose = parseInt(document.getElementById('coag-slider').value, 10);
+      reagentState.adsorbDose = parseInt(document.getElementById('adsorb-slider').value, 10);
+      reagentState.oxidantDose = parseInt(document.getElementById('oxidant-slider').value, 10);
+      reagentState.rpm = parseInt(document.getElementById('rpm-slider').value, 10);
+      reagentState.time = parseInt(document.getElementById('time-slider').value, 10);
+
+      // Display numeric badges
+      document.getElementById('ph-reagent-val').textContent = reagentState.phDose;
+      document.getElementById('coag-val').textContent = reagentState.coagDose;
+      document.getElementById('adsorb-val').textContent = `${reagentState.adsorbDose} mg/L`;
+      document.getElementById('oxidant-val').textContent = `${reagentState.oxidantDose} mg/L`;
+      document.getElementById('rpm-val').textContent = `${reagentState.rpm} RPM`;
+      document.getElementById('time-val').textContent = `${reagentState.time} นาที`;
+
+      updateDashboardViews();
+    }
+
+    function resetReagents() {
+      document.getElementById('ph-reagent-slider').value = 0;
+      document.getElementById('coag-slider').value = 0;
+      document.getElementById('adsorb-slider').value = 0;
+      document.getElementById('oxidant-slider').value = 0;
+      document.getElementById('rpm-slider').value = 80;
+      document.getElementById('time-slider').value = 20;
+      onReagentSliderInput();
+    }
+
+    function resizeCanvas() {
+      const rect = canvas.getBoundingClientRect();
+      canvas.width = rect.width * window.devicePixelRatio || 500;
+      canvas.height = rect.height * window.devicePixelRatio || 320;
+    }
+
+    function spawnReactorParticles() {
+      resizeCanvas();
+      particles = [];
+      const w = canvas.width;
+      const h = canvas.height;
+      const src = WASTEWATER_PROFILES[currentSourceKey];
+
+      // Spawn baseline pollutant particles (density based on turbidity & COD)
+      const count = Math.min(140, Math.max(30, Math.floor(src.rawTurb / 3)));
+      for (let i = 0; i < count; i++) {
+        particles.push(new Particle(
+          'pollutant',
+          Math.random() * (w - 30) + 15,
+          Math.random() * (h - 40) + 20,
+          `rgba(${src.color[0]}, ${src.color[1]}, ${src.color[2]}, 0.85)`
+        ));
+      }
+    }
+
+    function runSimulationStep() {
+      const btn = document.getElementById('btn-run-sim');
+      const stageTag = document.getElementById('reactor-stage-tag');
+      btn.disabled = true;
+      btn.classList.add('opacity-50');
+
+      stageTag.textContent = 'สถานะ: กำลังผสมสารเคมี (Rapid Mix)...';
+      stageTag.className = 'text-xs px-2.5 py-1 rounded-lg bg-sky-950 border border-sky-600 font-mono text-sky-300 animate-pulse';
+
+      // Inject reagent particles
+      const w = canvas.width;
+      const h = canvas.height;
+      for (let i = 0; i < 25; i++) {
+        particles.push(new Particle(
+          'reagent',
+          w / 2 + (Math.random() - 0.5) * 40,
+          25 + Math.random() * 20,
+          '#38bdf8'
+        ));
+      }
+
+      setTimeout(() => {
+        stageTag.textContent = 'สถานะ: เกิดก้อนฟล็อกและการตกตะกอน (Flocculation)...';
+
+        // Form larger floc particles
+        if (reagentState.coagDose > 20) {
+          for (let f = 0; f < 20; f++) {
+            particles.push(new Particle(
+              'floc',
+              Math.random() * (w - 40) + 20,
+              Math.random() * (h / 2) + 40,
+              '#f59e0b'
+            ));
+          }
+        }
+      }, 1200);
+
+      setTimeout(() => {
+        stageTag.textContent = 'สถานะ: ตกตะกอนสมบูรณ์ (Clarified)';
+        stageTag.className = 'text-xs px-2.5 py-1 rounded-lg bg-emerald-950 border border-emerald-600 font-mono text-emerald-300';
+        btn.disabled = false;
+        btn.classList.remove('opacity-50');
+      }, 2600);
+    }
+
+    function renderReactorCanvas() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      const w = canvas.width;
+      const h = canvas.height;
+      const src = WASTEWATER_PROFILES[currentSourceKey];
+
+      // 1. Draw Liquid background tint based on final clarity
+      const clarityRatio = Math.min(1.0, Math.max(0.1, 1 - (treatmentResults.finalTurb / src.rawTurb)));
+      const [r, g, b] = src.color;
+      const alpha = Math.max(0.12, 0.75 * (1 - clarityRatio));
+      ctx.fillStyle = `rgba(${r}, ${g}, ${b}, ${alpha.toFixed(2)})`;
+      ctx.fillRect(8, 8, w - 16, h - 16);
+
+      // 2. Draw Mechanical Agitator / Mixer Impeller in center
+      const centerX = w / 2;
+      const shaftY = 8;
+      const impellerY = h * 0.58;
+
+      ctx.save();
+      // Shaft
+      ctx.strokeStyle = '#64748b';
+      ctx.lineWidth = 4;
+      ctx.beginPath();
+      ctx.moveTo(centerX, shaftY);
+      ctx.lineTo(centerX, impellerY);
+      ctx.stroke();
+
+      // Rotating blades
+      impellerAngle += (reagentState.rpm / 60) * 0.12;
+      ctx.translate(centerX, impellerY);
+      ctx.rotate(impellerAngle);
+      ctx.fillStyle = '#94a3b8';
+      ctx.fillRect(-28, -5, 56, 10);
+      ctx.fillStyle = '#38bdf8';
+      ctx.fillRect(-28, -7, 10, 14);
+      ctx.fillRect(18, -7, 10, 14);
+      ctx.restore();
+
+      // 3. Update & Draw Particles
+      const sedRate = reagentState.rpm < 70 ? (reagentState.time / 20) : 0;
+      particles.forEach(p => {
+        p.update(w, h, reagentState.rpm, sedRate);
+        p.draw(ctx);
+      });
+
+      requestAnimationFrame(renderReactorCanvas);
+    }
+
+    function logExperimentData() {
+      const tbody = document.getElementById('experiment-log-body');
+      if (experimentCounter === 1) {
+        tbody.innerHTML = '';
+      }
+
+      const row = document.createElement('tr');
+      row.className = 'hover:bg-slate-900/60 transition';
+      
+      const badgeHtml = treatmentResults.passed 
+        ? `<span class="px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 font-bold border border-emerald-500/30">ผ่าน</span>`
+        : `<span class="px-2 py-0.5 rounded bg-rose-500/20 text-rose-300 font-bold border border-rose-500/30">ไม่ผ่าน</span>`;
+
+      const formulaSummary = `${reagentState.phType}(${reagentState.phDose}) + ${reagentState.coagType}(${reagentState.coagDose}) + C(${reagentState.adsorbDose})`;
+
+      row.innerHTML = `
+        <td class="py-2 px-3 text-slate-400">#${experimentCounter++}</td>
+        <td class="py-2 px-3 font-sans text-slate-200">${WASTEWATER_PROFILES[currentSourceKey].name.split('(')[0]}</td>
+        <td class="py-2 px-3 text-[11px] text-sky-300">${formulaSummary}</td>
+        <td class="py-2 px-3 text-center font-bold ${treatmentResults.passPh ? 'text-emerald-400' : 'text-rose-400'}">${treatmentResults.finalPh.toFixed(2)}</td>
+        <td class="py-2 px-3 text-center ${treatmentResults.passMetal ? 'text-emerald-400' : 'text-rose-400'}">${treatmentResults.finalMetal.toFixed(1)}</td>
+        <td class="py-2 px-3 text-center ${treatmentResults.passCod ? 'text-emerald-400' : 'text-rose-400'}">${Math.round(treatmentResults.finalCod)}</td>
+        <td class="py-2 px-3 text-center font-bold text-amber-300">${treatmentResults.totalCost.toFixed(2)}</td>
+        <td class="py-2 px-3 text-center">${badgeHtml}</td>
+      `;
+
+      tbody.prepend(row);
+    }
+
+    function clearExperimentLog() {
+      experimentCounter = 1;
+      document.getElementById('experiment-log-body').innerHTML = `
+        <tr>
+          <td colspan="8" class="text-center py-4 text-slate-500 font-sans">
+            ล้างประวัติแล้ว กดปุ่ม "บันทึกผลการทดลอง" เพื่อเริ่มเก็บข้อมูลรอบใหม่
+          </td>
+        </tr>
+      `;
+    }
+
+    function switchViewTab(mode) {
+      const banner = document.getElementById('challenge-banner');
+      const labBtn = document.getElementById('tab-lab-btn');
+      const chalBtn = document.getElementById('tab-challenge-btn');
+
+      if (mode === 'challenge') {
+        challengeMode = true;
+        banner.classList.remove('hidden');
+        chalBtn.className = 'px-3.5 py-1.5 rounded-lg bg-amber-500 text-slate-950 font-bold transition flex items-center gap-1.5 shadow';
+        labBtn.className = 'px-3.5 py-1.5 rounded-lg text-slate-400 hover:text-white transition flex items-center gap-1.5';
+        loadChallenge(currentChallengeIndex);
+      } else {
+        challengeMode = false;
+        banner.classList.add('hidden');
+        labBtn.className = 'px-3.5 py-1.5 rounded-lg bg-sky-600 text-white transition flex items-center gap-1.5 shadow';
+        chalBtn.className = 'px-3.5 py-1.5 rounded-lg text-slate-400 hover:text-white transition flex items-center gap-1.5';
+      }
+    }
+
+    function loadChallenge(idx) {
+      const ch = CHALLENGES[idx];
+      document.getElementById('challenge-num').textContent = ch.id;
+      document.getElementById('challenge-title').textContent = ch.title;
+      document.getElementById('challenge-objective').textContent = ch.objective;
+      document.getElementById('challenge-feedback').classList.add('hidden');
+
+      // Switch to targeted wastewater automatically
+      document.getElementById('wastewater-type-select').value = ch.source;
+      onWastewaterChange(ch.source);
+    }
+
+    function nextChallenge() {
+      currentChallengeIndex = (currentChallengeIndex + 1) % CHALLENGES.length;
+      loadChallenge(currentChallengeIndex);
+    }
+
+    function verifyChallengeSolution() {
+      const ch = CHALLENGES[currentChallengeIndex];
+      const feedback = document.getElementById('challenge-feedback');
+      feedback.classList.remove('hidden');
+
+      const isCompliant = treatmentResults.passed;
+      const isCostEffective = treatmentResults.totalCost <= ch.maxCost;
+
+      if (isCompliant && isCostEffective) {
+        feedback.className = 'mt-3 p-3 rounded-xl text-xs border font-medium bg-emerald-950/70 border-emerald-500 text-emerald-200';
+        feedback.innerHTML = `
+          <div class="flex items-center gap-2 mb-1">
+            <i class="fa-solid fa-circle-check text-emerald-400 text-base"></i>
+            <strong class="text-white text-sm">ยินดีด้วย! คุณแก้ปัญหาสำเร็จตามหลักวิศวกรรมเคมี</strong>
+          </div>
+          <p>น้ำผ่านเกณฑ์มาตรฐานโรงงานทุกข้อ และควบคุมต้นทุนได้เพียง <strong>${treatmentResults.totalCost.toFixed(2)} บาท/m³</strong> (เป้าหมายไม่เกิน ${ch.maxCost} บาท)</p>
+          <div class="mt-2 pt-1 border-t border-emerald-800 text-[11px] text-emerald-300">💡 <strong>หลักการเคมี:</strong> ${ch.hint}</div>
+        `;
+        challengeScore += 20;
+        document.getElementById('challenge-score').textContent = `คะแนนสะสม: ${challengeScore} คะแนน`;
+        if (typeof confetti === 'function') {
+          confetti({ particleCount: 75, spread: 60, origin: { y: 0.6 } });
+        }
+      } else {
+        let errorMsg = '';
+        if (!isCompliant) {
+          errorMsg = 'น้ำเสียยังไม่ผ่านมาตรฐานน้ำทิ้ง (ตรวจสอบค่า pH, โลหะหนักตกค้าง หรือ COD)';
+        } else if (!isCostEffective) {
+          errorMsg = `น้ำผ่านมาตรฐานแล้ว แต่ต้นทุน ${treatmentResults.totalCost.toFixed(2)} บาท/m³ เกินงบที่กำหนด (${ch.maxCost} บาท/m³) ลองเปลี่ยนชนิดสารเคมีที่คุ้มค่ากว่า`;
+        }
+        feedback.className = 'mt-3 p-3 rounded-xl text-xs border font-medium bg-rose-950/70 border-rose-500 text-rose-200';
+        feedback.innerHTML = `
+          <div class="flex items-center gap-2 mb-1">
+            <i class="fa-solid fa-circle-xmark text-rose-400 text-base"></i>
+            <strong class="text-white">ยังไม่ผ่านเกณฑ์ภารกิจ</strong>
+          </div>
+          <p>${errorMsg}</p>
+          <p class="mt-1 text-[11px] text-slate-300"><b>คำใบ้:</b> ${ch.hint}</p>
+        `;
+      }
+    }
+
+    function toggleModal(id, show) {
+      const modal = document.getElementById(id);
+      if (show) {
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+      } else {
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+      }
+    }
+
+    window.addEventListener('resize', () => {
+      resizeCanvas();
+      spawnReactorParticles();
+    });
+
+    window.addEventListener('DOMContentLoaded', () => {
+      onWastewaterChange('plating');
+      renderReactorCanvas();
+    });
+  </script>
+</body>
+</html>

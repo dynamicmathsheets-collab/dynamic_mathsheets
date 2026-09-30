@@ -1,0 +1,989 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>แบบจำลองเสมือนจริง: การเตรียมสารละลายและความเข้มข้นระดับอนุภาค (ม.4)</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Google Fonts: Sarabun & JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Sarabun:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <!-- Font Awesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- Canvas Confetti -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Sarabun', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace'],
+          },
+          colors: {
+            cyanLab: {
+              50: '#ecfeff',
+              400: '#22d3ee',
+              500: '#06b6d4',
+              600: '#0891b2',
+              900: '#164e63',
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    body {
+      font-family: 'Sarabun', sans-serif;
+    }
+    .custom-scrollbar::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-track {
+      background: rgba(15, 23, 42, 0.6);
+      border-radius: 9999px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+      background: #334155;
+      border-radius: 9999px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+      background: #475569;
+    }
+    @keyframes liquidWave {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-3px); }
+    }
+    .wave-anim {
+      animation: liquidWave 4s ease-in-out infinite;
+    }
+  </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col selection:bg-cyan-500 selection:text-slate-950">
+
+  <header class="bg-slate-900/90 backdrop-blur-md border-b border-slate-800 sticky top-0 z-40 px-4 py-3 shadow-xl">
+    <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-3">
+      <div class="flex items-center space-x-3">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-cyan-500 to-blue-600 flex items-center justify-center shadow-lg shadow-cyan-500/20 text-white text-xl">
+          <i class="fa-solid fa-flask"></i>
+        </div>
+        <div>
+          <h1 class="text-base sm:text-lg font-bold tracking-tight text-white flex items-center gap-2">
+            เคมี ม.4: การเตรียมสารละลายและความเข้มข้นระดับอนุภาค
+            <span class="text-[11px] px-2 py-0.5 rounded-full bg-cyan-500/20 border border-cyan-500/40 text-cyan-300 font-medium">Model-Based Inquiry</span>
+          </h1>
+          <p class="text-xs text-slate-400">สำรวจ Johnstone's Triangle: ปริมาตรจริง (Macro) • อนุภาคไอออน (Submicro) • ความเข้มข้นโมลาร์ (Symbolic)</p>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-2">
+        <div class="bg-slate-950 p-1 rounded-xl border border-slate-800 flex text-xs font-semibold">
+          <button id="nav-mode-explore" onclick="switchMainTab('explore')" class="px-3.5 py-1.5 rounded-lg bg-cyan-600 text-white transition flex items-center gap-1.5 shadow">
+            <i class="fa-solid fa-flask-vial"></i> ห้องทดลองสำรวจ
+          </button>
+          <button id="nav-mode-inquiry" onclick="switchMainTab('inquiry')" class="px-3.5 py-1.5 rounded-lg text-slate-400 hover:text-white transition flex items-center gap-1.5">
+            <i class="fa-solid fa-brain"></i> ภารกิจสืบเสาะ (Inquiry)
+          </button>
+        </div>
+        <button onclick="toggleModal('info-modal', true)" class="w-8 h-8 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 flex items-center justify-center transition text-sm" title="หลักการทางเคมี">
+          <i class="fa-solid fa-circle-question"></i>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main class="max-w-7xl mx-auto w-full p-3 sm:p-4 lg:p-6 flex-1 flex flex-col gap-4">
+    
+    <!-- Solute selection and Quick Action Bar -->
+    <section class="bg-slate-900/80 border border-slate-800 rounded-2xl p-4 shadow-xl backdrop-blur flex flex-col md:flex-row items-center justify-between gap-4">
+      <div class="flex flex-wrap items-center gap-3 w-full md:w-auto">
+        <label for="solute-select" class="text-xs font-bold uppercase tracking-wider text-slate-400 whitespace-nowrap flex items-center gap-1.5">
+          <i class="fa-solid fa-vial text-cyan-400"></i> เลือกชนิดตัวถูกละลาย:
+        </label>
+        <select id="solute-select" onchange="onSoluteChange(this.value)" class="bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-sm text-cyan-300 font-semibold focus:ring-2 focus:ring-cyan-500 focus:outline-none transition">
+          <option value="CuSO4">คอปเปอร์(II) ซัลเฟต (CuSO₄) — สีฟ้าคราม</option>
+          <option value="KMnO4">โพแทสเซียมเปอร์แมงกาเนต (KMnO₄) — สีม่วงเข้ม</option>
+          <option value="K2Cr2O7">โพแทสเซียมไดโครเมต (K₂Cr₂O₇) — สีส้มสด</option>
+          <option value="NiCl2">นิกเกิล(II) คลอไรด์ (NiCl₂) — สีเขียวมรกต</option>
+          <option value="NaCl">โซเดียมคลอไรด์ (NaCl) — สารละลายใสไม่มีสี</option>
+        </select>
+      </div>
+
+      <!-- Quick Solute Characteristics Card -->
+      <div class="flex flex-wrap items-center gap-4 text-xs font-mono bg-slate-950/80 border border-slate-800 px-4 py-2 rounded-xl text-slate-300 w-full md:w-auto justify-between md:justify-end">
+        <div>มวลต่อโมล (<span class="text-slate-400 font-sans">Molar Mass</span>): <span id="solute-mw-display" class="font-bold text-cyan-400">159.61</span> g/mol</div>
+        <div class="border-l border-slate-800 pl-4">จุดอิ่มตัวสูงสุด: <span id="solute-sat-display" class="font-bold text-amber-400">1.40</span> M</div>
+      </div>
+    </section>
+
+    <section id="inquiry-challenge-card" class="hidden bg-gradient-to-r from-amber-950/40 via-slate-900 to-slate-900 border-2 border-amber-500/40 rounded-2xl p-4 sm:p-5 shadow-2xl transition">
+      <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+        <div class="space-y-1.5 flex-1">
+          <div class="flex items-center gap-2">
+            <span class="px-2.5 py-0.5 rounded-full bg-amber-500/20 text-amber-400 font-bold text-xs uppercase tracking-wider border border-amber-500/30">
+              <i class="fa-solid fa-trophy"></i> ภารกิจสืบเสาะสถานการณ์ย้อนกลับ
+            </span>
+            <span id="inquiry-score-badge" class="text-xs text-slate-400 font-mono font-semibold">คะแนนสะสม: 0 คะแนน</span>
+          </div>
+          <h2 id="inquiry-title" class="text-base sm:text-lg font-bold text-amber-100">กำลังโหลดโจทย์สืบเสาะ...</h2>
+          <p id="inquiry-description" class="text-xs sm:text-sm text-slate-300 leading-relaxed"></p>
+        </div>
+
+        <div class="flex flex-wrap items-center gap-2">
+          <button onclick="checkInquiryAnswer()" class="px-5 py-2.5 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold rounded-xl text-sm transition shadow-lg shadow-amber-500/20 flex items-center gap-2">
+            <i class="fa-solid fa-check"></i> ตรวจคำตอบการทดลอง
+          </button>
+          <button onclick="nextInquiryChallenge()" class="px-3.5 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-200 font-semibold rounded-xl text-sm transition border border-slate-700 flex items-center gap-1.5">
+            <i class="fa-solid fa-forward"></i> ข้อถัดไป
+          </button>
+        </div>
+      </div>
+
+      <!-- Feedback container -->
+      <div id="inquiry-feedback-box" class="hidden mt-3 p-3.5 rounded-xl text-sm border font-medium"></div>
+    </section>
+
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-5">
+      
+      <!-- Left Column: Visualizers (Macroscopic & Particle Canvas) (7 cols) -->
+      <div class="lg:col-span-7 flex flex-col gap-4">
+        
+        <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-4 shadow-xl flex flex-col gap-4">
+          <div class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-800 pb-3">
+            <div class="flex items-center gap-2">
+              <span class="text-cyan-400"><i class="fa-solid fa-eye"></i></span>
+              <h2 class="font-bold text-sm sm:text-base text-white">
+                แบบจำลองเปรียบเทียบ: มหภาค (Macro) & อนุภาค (Submicro)
+              </h2>
+            </div>
+
+            <!-- Particle visibility toggles -->
+            <div class="flex items-center gap-2 text-xs">
+              <button id="toggle-water-btn" onclick="toggleWaterMolecules()" class="px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-300 transition flex items-center gap-1">
+                <i class="fa-solid fa-droplet text-blue-400"></i> แสดงโมเลกุลน้ำ
+              </button>
+              <button id="sim-play-btn" onclick="toggleSimPause()" class="w-8 h-8 rounded-lg bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 transition flex items-center justify-center">
+                <i class="fa-solid fa-pause"></i>
+              </button>
+            </div>
+          </div>
+
+          <!-- Dual Simulation Containers -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            
+            <!-- Chamber 1: Macroscopic Glass Beaker -->
+            <div class="bg-slate-950/90 border border-slate-800 rounded-xl p-3 flex flex-col items-center relative overflow-hidden">
+              <div class="w-full flex items-center justify-between text-xs font-semibold text-slate-400 mb-2">
+                <span class="flex items-center gap-1"><i class="fa-solid fa-glass-water text-cyan-400"></i> บีกเกอร์แก้ว (Macro)</span>
+                <span id="beaker-vol-label" class="font-mono text-cyan-300">500 mL</span>
+              </div>
+
+              <!-- Interactive Beaker Container -->
+              <div class="relative w-44 h-64 border-b-4 border-l-4 border-r-4 border-slate-500/80 rounded-b-3xl bg-slate-900/30 flex items-end justify-center p-1 overflow-hidden shadow-2xl">
+                <!-- Volume graduation lines -->
+                <div class="absolute inset-y-0 left-1 w-6 flex flex-col justify-between py-4 text-[9px] font-mono text-slate-400 select-none pointer-events-none z-20">
+                  <div class="border-b border-slate-600 pl-1">1000 mL</div>
+                  <div class="border-b border-slate-600 pl-1">800 mL</div>
+                  <div class="border-b border-slate-600 pl-1">600 mL</div>
+                  <div class="border-b border-slate-600 pl-1">400 mL</div>
+                  <div class="border-b border-slate-600 pl-1">200 mL</div>
+                </div>
+
+                <!-- Liquid body -->
+                <div id="beaker-liquid" class="w-full rounded-b-2xl transition-all duration-300 relative flex items-start justify-center overflow-hidden" style="height: 50%; background-color: rgba(34, 211, 238, 0.45);">
+                  <!-- Surface wave highlight -->
+                  <div class="w-full h-2.5 bg-white/25 wave-anim"></div>
+                </div>
+
+                <!-- Precipitate at bottom if saturated -->
+                <div id="beaker-precipitate" class="absolute bottom-1 w-32 h-3 rounded-full hidden bg-cyan-400/90 border border-white/40 shadow-lg z-10 transition"></div>
+
+                <!-- Digital Concentration Floating Probe -->
+                <div id="concentration-probe" class="absolute top-8 right-2 bg-slate-900/90 border border-slate-700 rounded-lg p-1.5 shadow-xl flex items-center gap-1.5 z-20 font-mono text-[11px]">
+                  <div class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></div>
+                  <div><span class="text-slate-400">M: </span><strong id="probe-value" class="text-emerald-300">0.50 M</strong></div>
+                </div>
+              </div>
+
+              <!-- Beaker Faucet and drain valves -->
+              <div class="flex items-center justify-between w-full mt-3 px-2">
+                <button onclick="addWaterStep(100)" class="px-2.5 py-1 bg-blue-600/30 hover:bg-blue-600/50 border border-blue-500/40 rounded-lg text-xs text-blue-200 transition flex items-center gap-1">
+                  <i class="fa-solid fa-faucet-drip"></i> เติมน้ำ (+100 mL)
+                </button>
+                <button onclick="evaporateStep(100)" class="px-2.5 py-1 bg-amber-600/30 hover:bg-amber-600/50 border border-amber-500/40 rounded-lg text-xs text-amber-200 transition flex items-center gap-1">
+                  <i class="fa-solid fa-cloud-arrow-up"></i> ระเหยน้ำ (-100 mL)
+                </button>
+              </div>
+            </div>
+
+            <!-- Chamber 2: Submicroscopic Particle Canvas (Solute ions & H2O) -->
+            <div class="bg-slate-950/90 border border-slate-800 rounded-xl p-3 flex flex-col items-center relative overflow-hidden">
+              <div class="w-full flex items-center justify-between text-xs font-semibold text-slate-400 mb-2">
+                <span class="flex items-center gap-1"><i class="fa-solid fa-atom text-emerald-400"></i> อนุภาคไอออน (Submicro)</span>
+                <span id="canvas-particle-count" class="font-mono text-emerald-400">อนุภาค: 20 ตัว</span>
+              </div>
+
+              <!-- Particle Canvas -->
+              <div class="relative w-full aspect-[4/5] max-h-64 bg-slate-900 rounded-xl overflow-hidden border border-slate-800 shadow-inner">
+                <canvas id="particle-canvas" class="w-full h-full block"></canvas>
+                
+                <!-- Density Gauge Overlay -->
+                <div class="absolute bottom-2 left-2 right-2 bg-slate-950/80 backdrop-blur-sm border border-slate-800 px-2 py-1 rounded-lg flex items-center justify-between text-[10px] text-slate-300 pointer-events-none">
+                  <span>ความหนาแน่นอนุภาค:</span>
+                  <span id="density-text" class="font-mono font-bold text-cyan-300">0.04 อนุภาค/mL</span>
+                </div>
+              </div>
+
+              <div class="w-full mt-3 flex items-center justify-between text-[11px] text-slate-400 px-1">
+                <span class="flex items-center gap-1">
+                  <span id="solute-legend-dot" class="w-2.5 h-2.5 rounded-full bg-cyan-400 inline-block"></span> ไอออนตัวถูกละลาย
+                </span>
+                <span id="water-legend-badge" class="hidden items-center gap-1">
+                  <span class="w-2.5 h-2.5 rounded-full bg-blue-300 inline-block"></span> โมเลกุล H₂O
+                </span>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Saturation and State Indicator Bar -->
+          <div id="solution-status-bar" class="p-3 rounded-xl border border-slate-800 bg-slate-950/70 flex flex-wrap items-center justify-between gap-2 text-xs">
+            <div class="flex items-center gap-2">
+              <span id="status-icon" class="w-6 h-6 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center font-bold">
+                <i class="fa-solid fa-check"></i>
+              </span>
+              <div>
+                <strong id="status-heading" class="text-white">สารละลายไม่อิ่มตัว (Unsaturated Solution)</strong>
+                <p id="status-subtext" class="text-slate-400 text-[11px]">ตัวถูกละลายแตกตัวและละลายได้อย่างสมบูรณ์ทั่วทั้งสารละลาย</p>
+              </div>
+            </div>
+            <div class="font-mono text-xs">
+              ภาวะความเข้มข้น: <span id="saturation-percentage" class="text-cyan-400 font-bold">35.7%</span> ของจุดอิ่มตัว
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+
+      <div class="lg:col-span-5 flex flex-col gap-4">
+        
+        <!-- Symbolic Math & Formulation Card -->
+        <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-4 sm:p-5 shadow-xl flex flex-col gap-3">
+          <div class="flex items-center justify-between border-b border-slate-800 pb-2">
+            <h3 class="font-bold text-white text-sm sm:text-base flex items-center gap-2">
+              <i class="fa-solid fa-calculator text-cyan-400"></i> ระดับสัญลักษณ์และการคำนวณ (Symbolic)
+            </h3>
+            <span class="text-[11px] font-mono text-cyan-400 bg-cyan-950/60 px-2 py-0.5 rounded border border-cyan-800">
+              M = n / V
+            </span>
+          </div>
+
+          <!-- Formula Breakdown Graphic -->
+          <div class="bg-slate-950/90 border border-slate-800 p-3 rounded-xl space-y-2 text-xs">
+            <div class="flex items-center justify-between text-slate-300">
+              <span class="text-slate-400">ความเข้มข้นโมลาร์ (Molarity, M):</span>
+              <span class="font-mono font-bold text-base text-cyan-300" id="sym-molarity">0.50 M</span>
+            </div>
+            <div class="flex items-center justify-between text-slate-300">
+              <span class="text-slate-400">จำนวนโมลตัวถูกละลาย (Moles, n):</span>
+              <span class="font-mono font-bold text-emerald-400" id="sym-moles">0.25 mol</span>
+            </div>
+            <div class="flex items-center justify-between text-slate-300">
+              <span class="text-slate-400">มวลตัวถูกละลาย (Mass, g):</span>
+              <span class="font-mono font-bold text-amber-300" id="sym-grams">39.90 g</span>
+            </div>
+            <div class="flex items-center justify-between text-slate-300">
+              <span class="text-slate-400">ปริมาตรสารละลาย (Volume, V):</span>
+              <span class="font-mono font-bold text-purple-300" id="sym-volume">0.50 L (500 mL)</span>
+            </div>
+          </div>
+
+          <!-- Mathematical formula text highlight -->
+          <div class="bg-cyan-950/30 border border-cyan-500/20 p-2.5 rounded-lg text-xs font-mono text-cyan-200 text-center">
+            <span id="formula-text-expanded">M = 0.25 mol ÷ 0.50 L = 0.500 mol/L</span>
+          </div>
+        </div>
+
+        <!-- Dynamic Linked Controls Panel -->
+        <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-4 sm:p-5 shadow-xl flex flex-col gap-4">
+          <div class="flex items-center justify-between border-b border-slate-800 pb-2">
+            <h3 class="font-bold text-white text-sm sm:text-base flex items-center gap-2">
+              <i class="fa-solid fa-sliders text-cyan-400"></i> ตัวแปรเชื่อมโยง (Interlinked Sliders)
+            </h3>
+            <button onclick="resetToDefaults()" class="text-xs text-slate-400 hover:text-white px-2 py-1 rounded bg-slate-800 hover:bg-slate-700 transition flex items-center gap-1">
+              <i class="fa-solid fa-rotate-left"></i> รีเซ็ตค่า
+            </button>
+          </div>
+
+          <!-- Variable 1: Solute Quantity (Moles / Particles) -->
+          <div class="space-y-1.5 bg-slate-950/70 p-3 rounded-xl border border-slate-800">
+            <div class="flex items-center justify-between text-xs">
+              <label for="slider-moles" class="font-semibold text-slate-200 flex items-center gap-1.5">
+                <i class="fa-solid fa-cubes-stacked text-emerald-400"></i> ปริมาณตัวถูกละลาย (โมล & มวล):
+              </label>
+              <span id="slider-moles-val" class="font-mono font-bold text-emerald-400">0.25 mol (39.9 g)</span>
+            </div>
+            <input type="range" id="slider-moles" min="0.05" max="1.50" step="0.01" value="0.25" oninput="onMolesSliderInput(this.value)" class="w-full h-2 bg-slate-700 rounded-lg appearance-none cursor-pointer accent-emerald-500">
+            <div class="flex justify-between text-[10px] text-slate-500">
+              <span>0.05 mol</span>
+              <span>อนุภาค: <strong id="particle-equiv-badge" class="text-emerald-400">20</strong> อนุภาค</span>
+              <span>1.50 mol</span>
+            </div>
+          </div>
+
+          <!-- Variable 2: Solution Volume (mL) -->
+          <div class="space-y-1.5 bg-slate-950/70 p-3 rounded-xl border border-slate-800">
+            <div class="flex items-center justify-between text-xs">
+              <label for="slider-vol" class="font-semibold text-slate-200 flex items-center gap-1.5">
+                <i class="fa-solid fa-flask-vial text-purple-400"></i> ปริมาตรสารละลาย (Volume):
+              </label>
+              <span id="slider-vol-val" class="font-mono font-bold text-purple-400">500 mL (0.50 L)</span>
+            </div>
+            <input type="range" id="slider-vol" min="100" max="1000" step="20" value="500" oninput="onVolumeSliderInput(this.value)" class="w-full h-2 bg-slate-700 rounded-lg appearance-none cursor-pointer accent-purple-500">
+            <div class="flex justify-between text-[10px] text-slate-500">
+              <span>100 mL (0.1 L)</span>
+              <span>เจือจาง ↔ เข้มข้น</span>
+              <span>1000 mL (1.0 L)</span>
+            </div>
+          </div>
+
+          <!-- Variable 3: Direct Target Concentration (Inverse Variable Adjuster) -->
+          <div class="space-y-1.5 bg-slate-950/70 p-3 rounded-xl border border-slate-800">
+            <div class="flex items-center justify-between text-xs">
+              <label for="slider-conc" class="font-semibold text-slate-200 flex items-center gap-1.5">
+                <i class="fa-solid fa-gauge-high text-cyan-400"></i> กำหนดความเข้มข้นโดยตรง (Direct Conc):
+              </label>
+              <span id="slider-conc-val" class="font-mono font-bold text-cyan-400">0.50 M</span>
+            </div>
+            <input type="range" id="slider-conc" min="0.05" max="2.00" step="0.05" value="0.50" oninput="onConcentrationSliderInput(this.value)" class="w-full h-2 bg-slate-700 rounded-lg appearance-none cursor-pointer accent-cyan-500">
+            <div class="flex justify-between text-[10px] text-slate-500">
+              <span>0.05 M (เจือจางมาก)</span>
+              <span class="text-cyan-400 font-semibold">(ระบบคำนวณตัวถูกละลายย้อนกลับ)</span>
+              <span>2.00 M (เข้มข้นสูง)</span>
+            </div>
+          </div>
+
+          <!-- Common Pre-set scenarios -->
+          <div class="grid grid-cols-3 gap-2 text-xs font-semibold pt-1">
+            <button onclick="setQuickPreset('dilute')" class="py-2 px-2 bg-slate-800 hover:bg-slate-700 border border-slate-700 rounded-xl transition text-center text-slate-300">
+              <i class="fa-solid fa-water text-blue-400 block mb-1"></i> เจือจาง (0.1 M)
+            </button>
+            <button onclick="setQuickPreset('standard')" class="py-2 px-2 bg-slate-800 hover:bg-slate-700 border border-slate-700 rounded-xl transition text-center text-slate-300">
+              <i class="fa-solid fa-vial-circle-check text-cyan-400 block mb-1"></i> มาตรฐาน (0.5 M)
+            </button>
+            <button onclick="setQuickPreset('saturated')" class="py-2 px-2 bg-slate-800 hover:bg-slate-700 border border-slate-700 rounded-xl transition text-center text-slate-300">
+              <i class="fa-solid fa-layer-group text-amber-400 block mb-1"></i> สารละลายอิ่มตัว
+            </button>
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </main>
+
+  <div id="info-modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm hidden items-center justify-center p-4">
+    <div class="bg-slate-900 border border-slate-800 w-full max-w-2xl rounded-2xl p-6 shadow-2xl space-y-4 max-h-[90vh] overflow-y-auto custom-scrollbar">
+      <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+        <h3 class="text-lg font-bold text-white flex items-center gap-2">
+          <i class="fa-solid fa-graduation-cap text-cyan-400"></i> การคิด 3 ระดับกับเรื่องสารละลาย (Johnstone's Triangle)
+        </h3>
+        <button onclick="toggleModal('info-modal', false)" class="w-8 h-8 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 flex items-center justify-center transition">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <div class="space-y-3 text-sm text-slate-300 leading-relaxed">
+        <div class="bg-slate-950 p-3.5 rounded-xl border border-slate-800">
+          <h4 class="font-bold text-cyan-300 flex items-center gap-2 mb-1">
+            1. ปรากฏการณ์ระดับมหภาค (Macroscopic Level)
+          </h4>
+          <p>สิ่งที่เราสังเกตได้ด้วยตาเปล่าในห้องทดลอง ได้แก่ ปริมาตรของเหลวในบีกเกอร์ ความเข้มของสีสารละลาย (สารละลายเข้มข้นสีจะสดเข้ม สารละลายเจือจางสีจะจางโปร่งแสง) และการเกิดตะกอนสะสมที่ก้นภาชนะเมื่อถึงจุดอิ่มตัว</p>
+        </div>
+
+        <div class="bg-slate-950 p-3.5 rounded-xl border border-slate-800">
+          <h4 class="font-bold text-emerald-300 flex items-center gap-2 mb-1">
+            2. พฤติกรรมระดับอนุภาค (Submicroscopic Level)
+          </h4>
+          <p>การจัดเรียงและการเคลื่อนที่ของอนุภาคตัวถูกละลายที่แตกตัวเป็นไอออน หรือโมเลกุลที่ถูกล้อมรอบด้วยโมเลกุลของน้ำ (Solvation) <strong>"ความเข้มข้น" คือ อัตราส่วนความหนาแน่นของอนุภาคต่อปริมาตรพื้นที่</strong> เมื่อเติมน้ำ อนุภาคไม่ได้หายไปไหน แต่กระจายตัวห่างกันมากขึ้น</p>
+        </div>
+
+        <div class="bg-slate-950 p-3.5 rounded-xl border border-slate-800">
+          <h4 class="font-bold text-amber-300 flex items-center gap-2 mb-1">
+            3. ระดับสัญลักษณ์และการคำนวณ (Symbolic Level)
+          </h4>
+          <p>การแสดงความสัมพันธ์เชิงปริมาณผ่านสมการคณิตศาสตร์:
+            <br><code class="text-cyan-300 font-mono">Molarity (M) = mol / V(L) = (g / MW) ÷ V(L)</code>
+            <br>สูตรการเจือจาง: <code class="text-cyan-300 font-mono">M₁V₁ = M₂V₂</code> (เนื่องจากจำนวนโมลตัวถูกละลายคงที่ก่อนและหลังเติมน้ำ)
+          </p>
+        </div>
+      </div>
+
+      <div class="pt-2 flex justify-end">
+        <button onclick="toggleModal('info-modal', false)" class="px-5 py-2.5 bg-cyan-600 hover:bg-cyan-500 text-white font-bold rounded-xl transition text-sm">
+          เข้าสู่การทดลอง
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <footer class="mt-auto border-t border-slate-800 bg-slate-950/80 py-3 px-4 text-center text-xs text-slate-500">
+    สื่อการจัดการเรียนรู้วิทยาศาสตร์และเคมี ม.4 • พัฒนาขึ้นสำหรับการสอนแบบสืบเสาะโดยใช้แบบจำลองเป็นฐาน (Model-Based Inquiry)
+  </footer>
+
+  <script>
+    // Solute database definitions
+    const SOLUTES = {
+      CuSO4: {
+        name: 'คอปเปอร์(II) ซัลเฟต (CuSO₄)',
+        formula: 'CuSO₄',
+        mw: 159.61,
+        solubilityLimit: 1.40, // max M before precipitate
+        baseRgba: [34, 211, 238], // cyan/sky blue
+        ionColor: '#38bdf8',
+        ionName: 'Cu²⁺ / SO₄²⁻'
+      },
+      KMnO4: {
+        name: 'โพแทสเซียมเปอร์แมงกาเนต (KMnO₄)',
+        formula: 'KMnO₄',
+        mw: 158.03,
+        solubilityLimit: 0.45,
+        baseRgba: [168, 85, 247], // purple
+        ionColor: '#c084fc',
+        ionName: 'K⁺ / MnO₄⁻'
+      },
+      K2Cr2O7: {
+        name: 'โพแทสเซียมไดโครเมต (K₂Cr₂O₇)',
+        formula: 'K₂Cr₂O₇',
+        mw: 294.18,
+        solubilityLimit: 0.50,
+        baseRgba: [249, 115, 22], // orange
+        ionColor: '#fb923c',
+        ionName: 'K⁺ / Cr₂O₇²⁻'
+      },
+      NiCl2: {
+        name: 'นิกเกิล(II) คลอไรด์ (NiCl₂)',
+        formula: 'NiCl₂',
+        mw: 129.60,
+        solubilityLimit: 1.60,
+        baseRgba: [34, 197, 94], // emerald green
+        ionColor: '#4ade80',
+        ionName: 'Ni²⁺ / Cl⁻'
+      },
+      NaCl: {
+        name: 'โซเดียมคลอไรด์ (NaCl)',
+        formula: 'NaCl',
+        mw: 58.44,
+        solubilityLimit: 2.00,
+        baseRgba: [226, 232, 240], // near colorless
+        ionColor: '#cbd5e1',
+        ionName: 'Na⁺ / Cl⁻'
+      }
+    };
+
+    // State Variables
+    let currentSoluteKey = 'CuSO4';
+    let moles = 0.25;      // mol
+    let volume = 500;       // mL
+    let showWater = false;
+    let isSimPaused = false;
+    let currentTab = 'explore'; // 'explore' or 'inquiry'
+    let inquiryScore = 0;
+    let currentInquiryIndex = 0;
+
+    // Canvas particle engine
+    const canvas = document.getElementById('particle-canvas');
+    const ctx = canvas.getContext('2d');
+    let particles = []; // Solute ions
+    let waterParticles = []; // H2O molecules
+    let animId = null;
+
+    class Particle {
+      constructor(type, x, y, vx, vy, color, radius) {
+        this.type = type; // 'solute' or 'water'
+        this.x = x;
+        this.y = y;
+        this.vx = vx;
+        this.vy = vy;
+        this.color = color;
+        this.radius = radius;
+      }
+
+      update(width, height) {
+        if (isSimPaused) return;
+
+        this.x += this.vx;
+        this.y += this.vy;
+
+        // Wall collisions
+        if (this.x - this.radius < 0) {
+          this.x = this.radius;
+          this.vx *= -1;
+        } else if (this.x + this.radius > width) {
+          this.x = width - this.radius;
+          this.vx *= -1;
+        }
+
+        if (this.y - this.radius < 0) {
+          this.y = this.radius;
+          this.vy *= -1;
+        } else if (this.y + this.radius > height) {
+          this.y = height - this.radius;
+          this.vy *= -1;
+        }
+      }
+
+      draw(ctx) {
+        ctx.save();
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+        ctx.fillStyle = this.color;
+        ctx.fill();
+
+        if (this.type === 'solute') {
+          ctx.strokeStyle = '#ffffff';
+          ctx.lineWidth = 1;
+          ctx.stroke();
+        } else {
+          // Water molecule small H indicators
+          ctx.fillStyle = '#ffffff';
+          ctx.beginPath();
+          ctx.arc(this.x - 3, this.y - 3, 1.8, 0, Math.PI * 2);
+          ctx.arc(this.x + 3, this.y - 3, 1.8, 0, Math.PI * 2);
+          ctx.fill();
+        }
+        ctx.restore();
+      }
+    }
+
+    // Inquiry challenge scenarios
+    const INQUIRY_CHALLENGES = [
+      {
+        id: 1,
+        type: 'TARGET_CONC',
+        title: 'ภารกิจที่ 1: การเตรียมสารละลายตามความเข้มข้นที่กำหนด',
+        description: 'ห้องปฏิบัติการต้องการเตรียมสารละลาย CuSO₄ ปริมาตร 500 mL ที่มีความเข้มข้น 0.50 mol/L (M) จงใช้แบบจำลองปรับหาว่าต้องใช้ตัวถูกละลายกี่โมล หรือต้องชั่งมากี่กรัม?',
+        solute: 'CuSO4',
+        targetMoles: 0.25,
+        targetVol: 500,
+        targetM: 0.50,
+        explanation: 'จากสูตร M = n / V(L) จะได้ว่า n = M × V(L) = 0.50 mol/L × 0.50 L = 0.25 โมล คิดเป็นมวล = 0.25 mol × 159.61 g/mol = 39.90 กรัม'
+      },
+      {
+        id: 2,
+        type: 'DILUTION',
+        title: 'ภารกิจที่ 2: การเจือจางสารละลาย (M₁V₁ = M₂V₂)',
+        description: 'มีสารละลาย KMnO₄ 0.40 mol/L ปริมาตร 250 mL ต้องการเจือจางให้มีความเข้มข้นลดลงเหลือ 0.20 mol/L โดยไม่เพิ่มตัวถูกละลาย ต้องเติมน้ำให้ปริมาตรสุดท้ายเป็นเท่าใด?',
+        solute: 'KMnO4',
+        initialMoles: 0.10,
+        targetVol: 500,
+        targetM: 0.20,
+        explanation: 'จากสูตร M₁V₁ = M₂V₂ จะได้ว่า V₂ = (M₁V₁) / M₂ = (0.40 M × 250 mL) / 0.20 M = 500 mL ดังนั้นต้องเติมน้ำเพิ่มอีก 250 mL ให้ได้ปริมาตรรวม 500 mL'
+      },
+      {
+        id: 3,
+        type: 'AVOID_PRECIPITATE',
+        title: 'ภารกิจที่ 3: สารละลายอิ่มตัวและการตกตะกอน',
+        description: 'สารละลาย K₂Cr₂O₇ มีจุดอิ่มตัวสูงสุดที่ 0.50 M หากมีน้ำอยู่ 600 mL จงหาปริมาณโมลสูงสุดที่สามารถละลายได้หมดพอดีโดย "ไม่เกิดตะกอนตกที่ก้นบีกเกอร์"',
+        solute: 'K2Cr2O7',
+        targetVol: 600,
+        targetMoles: 0.30,
+        targetM: 0.50,
+        explanation: 'ที่จุดอิ่มตัว 0.50 M ในปริมาตร 0.60 L จะละลายตัวถูกละลายได้สูงสุด n = 0.50 mol/L × 0.60 L = 0.30 โมล หากเติมเกิน 0.30 โมล ตัวถูกละลายส่วนเกินจะไม่ละลายและตกตะกอน'
+      }
+    ];
+
+    function calculateConcentration() {
+      const volL = volume / 1000;
+      const molarity = moles / volL;
+      const soluteInfo = SOLUTES[currentSoluteKey];
+      const grams = moles * soluteInfo.mw;
+
+      // Check precipitation limit
+      const isSaturated = molarity >= soluteInfo.soluteLimit || molarity >= soluteInfo.solubilityLimit;
+      const dissolvedMolarity = Math.min(molarity, soluteInfo.solubilityLimit);
+      const dissolvedMoles = dissolvedMolarity * volL;
+      const precipitateMoles = Math.max(0, moles - dissolvedMoles);
+      const precipitateGrams = precipitateMoles * soluteInfo.mw;
+
+      return {
+        molarity,
+        dissolvedMolarity,
+        volL,
+        grams,
+        isSaturated: molarity > soluteInfo.solubilityLimit,
+        precipitateGrams
+      };
+    }
+
+    function updateSimulationViews() {
+      const info = SOLUTES[currentSoluteKey];
+      const stats = calculateConcentration();
+
+      // 1. Update Symbolic Header Numbers
+      document.getElementById('solute-mw-display').textContent = info.mw.toFixed(2);
+      document.getElementById('solute-sat-display').textContent = info.solubilityLimit.toFixed(2);
+      document.getElementById('sym-molarity').textContent = `${stats.molarity.toFixed(2)} M`;
+      document.getElementById('sym-moles').textContent = `${moles.toFixed(2)} mol`;
+      document.getElementById('sym-grams').textContent = `${stats.grams.toFixed(2)} g`;
+      document.getElementById('sym-volume').textContent = `${stats.volL.toFixed(2)} L (${volume} mL)`;
+      document.getElementById('formula-text-expanded').textContent = 
+        `M = ${moles.toFixed(2)} mol ÷ ${stats.volL.toFixed(2)} L = ${stats.molarity.toFixed(3)} mol/L`;
+
+      // 2. Update Slider values and badges
+      document.getElementById('slider-moles-val').textContent = `${moles.toFixed(2)} mol (${stats.grams.toFixed(1)} g)`;
+      document.getElementById('slider-vol-val').textContent = `${volume} mL (${stats.volL.toFixed(2)} L)`;
+      document.getElementById('slider-conc-val').textContent = `${stats.molarity.toFixed(2)} M`;
+      document.getElementById('beaker-vol-label').textContent = `${volume} mL`;
+
+      // 3. Update Macroscopic Beaker Visuals (Height & Color Tint)
+      const liquidEl = document.getElementById('beaker-liquid');
+      const precipitateEl = document.getElementById('beaker-precipitate');
+      const probeValueEl = document.getElementById('probe-value');
+
+      // Height % based on max 1000 mL
+      const heightPercent = Math.min(95, Math.max(15, (volume / 1000) * 90));
+      liquidEl.style.height = `${heightPercent}%`;
+
+      // Opacity based on dissolved concentration relative to saturation
+      const colorRatio = Math.min(1.0, stats.dissolvedMolarity / info.solubilityLimit);
+      const alpha = 0.15 + (colorRatio * 0.75); // between 0.15 and 0.90
+      const [r, g, b] = info.baseRgba;
+      liquidEl.style.backgroundColor = `rgba(${r}, ${g}, ${b}, ${alpha.toFixed(2)})`;
+
+      // Precipitate visibility
+      if (stats.isSaturated && stats.precipitateGrams > 0.1) {
+        precipitateEl.classList.remove('hidden');
+        precipitateEl.style.backgroundColor = `rgba(${r}, ${g}, ${b}, 0.95)`;
+        precipitateEl.title = `ตะกอนที่ไม่ละลาย: ${stats.precipitateGrams.toFixed(2)} g`;
+      } else {
+        precipitateEl.classList.add('hidden');
+      }
+
+      probeValueEl.textContent = `${stats.molarity.toFixed(2)} M`;
+
+      // 4. Update Status Banner
+      const statusBar = document.getElementById('solution-status-bar');
+      const statusIcon = document.getElementById('status-icon');
+      const statusHeading = document.getElementById('status-heading');
+      const statusSubtext = document.getElementById('status-subtext');
+      const satPercentEl = document.getElementById('saturation-percentage');
+
+      const satRatio = (stats.molarity / info.solubilityLimit) * 100;
+      satPercentEl.textContent = `${satRatio.toFixed(1)}%`;
+
+      if (stats.isSaturated) {
+        statusIcon.className = 'w-6 h-6 rounded-full bg-amber-500/20 text-amber-400 flex items-center justify-center font-bold';
+        statusIcon.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i>';
+        statusHeading.textContent = 'สารละลายอิ่มตัวยวดยิ่งและเกิดการตกตะกอน (Saturated with Precipitate)';
+        statusHeading.className = 'text-amber-300 font-bold';
+        statusSubtext.textContent = `เกินจุดอิ่มตัวสูงสุด (${info.solubilityLimit} M) เกิดตะกอนตกอยู่ก้นภาชนะ ${stats.precipitateGrams.toFixed(2)} g`;
+      } else {
+        statusIcon.className = 'w-6 h-6 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center font-bold';
+        statusIcon.innerHTML = '<i class="fa-solid fa-check"></i>';
+        statusHeading.textContent = 'สารละลายไม่อิ่มตัว (Unsaturated Solution)';
+        statusHeading.className = 'text-white font-bold';
+        statusSubtext.textContent = 'ตัวถูกละลายแตกตัวและละลายได้อย่างสมบูรณ์ทั่วทั้งสารละลาย';
+      }
+
+      // 5. Update Particle Canvas Counts
+      syncParticlesWithState(stats);
+    }
+
+    // Particle state synchronization
+    function syncParticlesWithState(stats) {
+      // Scale: 1 particle ~ 0.0125 mol (approx 80 particles at 1.0 mol)
+      const targetSoluteParticles = Math.min(100, Math.max(4, Math.round(moles * 70)));
+      document.getElementById('particle-equiv-badge').textContent = targetSoluteParticles;
+      document.getElementById('canvas-particle-count').textContent = `อนุภาค: ${targetSoluteParticles} ตัว`;
+
+      const density = (targetSoluteParticles / volume).toFixed(3);
+      document.getElementById('density-text').textContent = `${density} อนุภาค/mL`;
+
+      const info = SOLUTES[currentSoluteKey];
+      document.getElementById('solute-legend-dot').style.backgroundColor = info.ionColor;
+
+      // Adjust particle list length
+      while (particles.length < targetSoluteParticles) {
+        particles.push(new Particle(
+          'solute',
+          Math.random() * (canvas.width - 20) + 10,
+          Math.random() * (canvas.height - 20) + 10,
+          (Math.random() - 0.5) * 2.2,
+          (Math.random() - 0.5) * 2.2,
+          info.ionColor,
+          5.5
+        ));
+      }
+      while (particles.length > targetSoluteParticles) {
+        particles.pop();
+      }
+
+      // Update particle colors if solute type changed
+      particles.forEach(p => p.color = info.ionColor);
+
+      // Water particles sync
+      if (showWater) {
+        const targetWaterCount = Math.round((volume / 1000) * 80);
+        while (waterParticles.length < targetWaterCount) {
+          waterParticles.push(new Particle(
+            'water',
+            Math.random() * (canvas.width - 20) + 10,
+            Math.random() * (canvas.height - 20) + 10,
+            (Math.random() - 0.5) * 1.5,
+            (Math.random() - 0.5) * 1.5,
+            'rgba(96, 165, 250, 0.45)',
+            3.5
+          ));
+        }
+        while (waterParticles.length > targetWaterCount) {
+          waterParticles.pop();
+        }
+      } else {
+        waterParticles = [];
+      }
+    }
+
+    // Animation Loop
+    function renderParticleCanvas() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      // Draw solvent molecules in background if enabled
+      if (showWater) {
+        waterParticles.forEach(wp => {
+          wp.update(canvas.width, canvas.height);
+          wp.draw(ctx);
+        });
+      }
+
+      // Draw solute ions
+      particles.forEach(p => {
+        p.update(canvas.width, canvas.height);
+        p.draw(ctx);
+      });
+
+      animId = requestAnimationFrame(renderParticleCanvas);
+    }
+
+    function resizeCanvas() {
+      const rect = canvas.getBoundingClientRect();
+      canvas.width = rect.width * window.devicePixelRatio || 300;
+      canvas.height = rect.height * window.devicePixelRatio || 260;
+    }
+
+    function onSoluteChange(newSolute) {
+      currentSoluteKey = newSolute;
+      updateSimulationViews();
+    }
+
+    function onMolesSliderInput(val) {
+      moles = parseFloat(val);
+      updateSimulationViews();
+    }
+
+    function onVolumeSliderInput(val) {
+      volume = parseInt(val, 10);
+      updateSimulationViews();
+    }
+
+    // Inverse Variable Control: Direct concentration adjust changes moles needed
+    function onConcentrationSliderInput(targetM) {
+      const tM = parseFloat(targetM);
+      const volL = volume / 1000;
+      moles = Math.min(1.50, Math.max(0.05, tM * volL));
+      document.getElementById('slider-moles').value = moles;
+      updateSimulationViews();
+    }
+
+    function addWaterStep(delta) {
+      volume = Math.min(1000, volume + delta);
+      document.getElementById('slider-vol').value = volume;
+      updateSimulationViews();
+    }
+
+    function evaporateStep(delta) {
+      volume = Math.max(100, volume - delta);
+      document.getElementById('slider-vol').value = volume;
+      updateSimulationViews();
+    }
+
+    function setQuickPreset(type) {
+      const info = SOLUTES[currentSoluteKey];
+      if (type === 'dilute') {
+        volume = 800;
+        moles = 0.08;
+      } else if (type === 'standard') {
+        volume = 500;
+        moles = 0.25;
+      } else if (type === 'saturated') {
+        volume = 400;
+        moles = (info.solubilityLimit * 0.4) + 0.15; // slightly over saturation
+      }
+      document.getElementById('slider-moles').value = moles;
+      document.getElementById('slider-vol').value = volume;
+      updateSimulationViews();
+    }
+
+    function resetToDefaults() {
+      currentSoluteKey = 'CuSO4';
+      document.getElementById('solute-select').value = 'CuSO4';
+      moles = 0.25;
+      volume = 500;
+      document.getElementById('slider-moles').value = 0.25;
+      document.getElementById('slider-vol').value = 500;
+      updateSimulationViews();
+    }
+
+    function toggleWaterMolecules() {
+      showWater = !showWater;
+      const btn = document.getElementById('toggle-water-btn');
+      const legend = document.getElementById('water-legend-badge');
+      if (showWater) {
+        btn.classList.add('bg-blue-600', 'text-white');
+        legend.classList.remove('hidden');
+        legend.classList.add('flex');
+      } else {
+        btn.classList.remove('bg-blue-600', 'text-white');
+        legend.classList.add('hidden');
+        legend.classList.remove('flex');
+      }
+      updateSimulationViews();
+    }
+
+    function toggleSimPause() {
+      isSimPaused = !isSimPaused;
+      const btn = document.getElementById('sim-play-btn');
+      btn.innerHTML = isSimPaused ? '<i class="fa-solid fa-play"></i>' : '<i class="fa-solid fa-pause"></i>';
+    }
+
+    function switchMainTab(tab) {
+      currentTab = tab;
+      const exploreBtn = document.getElementById('nav-mode-explore');
+      const inquiryBtn = document.getElementById('nav-mode-inquiry');
+      const challengeCard = document.getElementById('inquiry-challenge-card');
+
+      if (tab === 'inquiry') {
+        exploreBtn.className = 'px-3.5 py-1.5 rounded-lg text-slate-400 hover:text-white transition flex items-center gap-1.5';
+        inquiryBtn.className = 'px-3.5 py-1.5 rounded-lg bg-amber-500 text-slate-950 font-bold transition flex items-center gap-1.5 shadow';
+        challengeCard.classList.remove('hidden');
+        loadInquiryChallenge(currentInquiryIndex);
+      } else {
+        exploreBtn.className = 'px-3.5 py-1.5 rounded-lg bg-cyan-600 text-white transition flex items-center gap-1.5 shadow';
+        inquiryBtn.className = 'px-3.5 py-1.5 rounded-lg text-slate-400 hover:text-white transition flex items-center gap-1.5';
+        challengeCard.classList.add('hidden');
+      }
+    }
+
+    function loadInquiryChallenge(idx) {
+      const ch = INQUIRY_CHALLENGES[idx];
+      document.getElementById('inquiry-title').textContent = ch.title;
+      document.getElementById('inquiry-description').textContent = ch.description;
+      document.getElementById('inquiry-feedback-box').classList.add('hidden');
+
+      // Set solute according to question
+      currentSoluteKey = ch.solute;
+      document.getElementById('solute-select').value = ch.solute;
+      updateSimulationViews();
+    }
+
+    function nextInquiryChallenge() {
+      currentInquiryIndex = (currentInquiryIndex + 1) % INQUIRY_CHALLENGES.length;
+      loadInquiryChallenge(currentInquiryIndex);
+    }
+
+    function checkInquiryAnswer() {
+      const ch = INQUIRY_CHALLENGES[currentInquiryIndex];
+      const stats = calculateConcentration();
+      const feedback = document.getElementById('inquiry-feedback-box');
+      feedback.classList.remove('hidden');
+
+      let isCorrect = false;
+      let note = '';
+
+      if (ch.type === 'TARGET_CONC') {
+        const diffM = Math.abs(stats.molarity - ch.targetM);
+        const diffVol = Math.abs(volume - ch.targetVol);
+        if (diffM <= 0.03 && diffVol <= 20) {
+          isCorrect = true;
+          note = `ยอดเยี่ยมมาก! คุณเตรียมสารละลายได้ความเข้มข้น ${stats.molarity.toFixed(2)} M ในปริมาตร ${volume} mL โดยใช้ตัวถูกละลาย ${moles.toFixed(2)} โมล (${stats.grams.toFixed(2)} กรัม)`;
+        } else {
+          note = `ยังไม่ตรงกับเป้าหมาย ปัจจุบันความเข้มข้นคือ ${stats.molarity.toFixed(2)} M ที่ปริมาตร ${volume} mL (เป้าหมายคือ ${ch.targetM} M ในปริมาตร ${ch.targetVol} mL)`;
+        }
+      } else if (ch.type === 'DILUTION') {
+        const diffVol = Math.abs(volume - ch.targetVol);
+        const diffM = Math.abs(stats.molarity - ch.targetM);
+        if (diffVol <= 30 && diffM <= 0.02) {
+          isCorrect = true;
+          note = `ถูกต้องสมบูรณ์แบบ! เมื่อเติมน้ำจนได้ปริมาตรรวม ${volume} mL โดยโมลเท่าเดิม ความเข้มข้นจะเจือจางลงเหลือ ${stats.molarity.toFixed(2)} M พอดีตามกฎ M₁V₁ = M₂V₂`;
+        } else {
+          note = `ยังไม่ถูกต้อง ปัจจุบันปริมาตรคือ ${volume} mL ความเข้มข้น ${stats.molarity.toFixed(2)} M ลองคิดว่าจาก 0.40 M ลดลงครึ่งหนึ่งเหลือ 0.20 M ปริมาตรต้องเพิ่มเป็นกี่เท่า`;
+        }
+      } else if (ch.type === 'AVOID_PRECIPITATE') {
+        const diffVol = Math.abs(volume - ch.targetVol);
+        const diffM = Math.abs(moles - ch.targetMoles);
+        if (diffVol <= 30 && diffM <= 0.04 && !stats.isSaturated) {
+          isCorrect = true;
+          note = `เฉียบคมมาก! ที่ปริมาตร ${volume} mL ตัวถูกละลาย 0.30 mol ละลายได้พอดีโดยไม่ตกตะกอน`;
+        } else if (stats.isSaturated) {
+          note = `เกิดตะกอนขึ้นที่ก้นบีกเกอร์แล้ว! ตัวถูกละลายมีปริมาณมากเกินจุดอิ่มตัว`;
+        } else {
+          note = `ยังใส่ตัวถูกละลายได้อีกโดยไม่ตกตะกอน (ปัจจุบันใส่เพียง ${moles.toFixed(2)} mol ในปริมาตร ${volume} mL)`;
+        }
+      }
+
+      if (isCorrect) {
+        feedback.className = 'mt-3 p-3.5 rounded-xl text-sm border font-medium bg-emerald-950/60 border-emerald-500 text-emerald-200';
+        feedback.innerHTML = `
+          <div class="flex items-center gap-2 mb-1"><i class="fa-solid fa-circle-check text-emerald-400 text-base"></i> <strong class="text-white">คำตอบถูกต้อง!</strong></div>
+          <p>${note}</p>
+          <div class="mt-2 text-xs text-emerald-300/80 border-t border-emerald-800/60 pt-1.5"><i class="fa-solid fa-lightbulb mr-1"></i> ${ch.explanation}</div>
+        `;
+        inquiryScore += 10;
+        document.getElementById('inquiry-score-badge').textContent = `คะแนนสะสม: ${inquiryScore} คะแนน`;
+        if (typeof confetti === 'function') {
+          confetti({ particleCount: 75, spread: 65, origin: { y: 0.65 } });
+        }
+      } else {
+        feedback.className = 'mt-3 p-3.5 rounded-xl text-sm border font-medium bg-rose-950/60 border-rose-500/60 text-rose-200';
+        feedback.innerHTML = `
+          <div class="flex items-center gap-2 mb-1"><i class="fa-solid fa-circle-xmark text-rose-400 text-base"></i> <strong class="text-white">ยังไม่ถูกต้อง</strong></div>
+          <p>${note}</p>
+        `;
+      }
+    }
+
+    function toggleModal(id, show) {
+      const modal = document.getElementById(id);
+      if (show) {
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+      } else {
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+      }
+    }
+
+    // Responsive setup and initial bindings
+    window.addEventListener('resize', () => {
+      resizeCanvas();
+      updateSimulationViews();
+    });
+
+    window.addEventListener('DOMContentLoaded', () => {
+      resizeCanvas();
+      updateSimulationViews();
+      renderParticleCanvas();
+    });
+  </script>
+</body>
+</html>

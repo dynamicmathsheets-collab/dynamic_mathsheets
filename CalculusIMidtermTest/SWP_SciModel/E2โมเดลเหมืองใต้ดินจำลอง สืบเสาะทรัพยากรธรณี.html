@@ -1,0 +1,899 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>โมเดลเหมืองใต้ดินจำลอง: การกระจายตัวของทรัพยากรธรณีเชิงหลักฐาน</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Google Fonts: Prompt & Space Grotesk -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <style>
+    body { font-family: 'Prompt', sans-serif; }
+    .font-mono-code { font-family: 'Space Grotesk', monospace; }
+    /* Grid cell styling */
+    .grid-cell {
+      transition: all 0.15s ease-out;
+      user-select: none;
+    }
+    .grid-cell:hover {
+      outline: 2px solid #38bdf8;
+      z-index: 10;
+    }
+    /* Core Sample Layer Stripes */
+    .pattern-granite { background: repeating-radial-gradient(circle, #fda4af 0, #fda4af 2px, #f43f5e 3px, #e11d48 4px); }
+    .pattern-limestone { background-color: #94a3b8; background-image: repeating-linear-gradient(0deg, #64748b, #64748b 1px, transparent 1px, transparent 8px), repeating-linear-gradient(90deg, #64748b, #64748b 1px, transparent 1px, transparent 16px); }
+    .pattern-sandstone { background-color: #fde047; background-image: radial-gradient(#d97706 0.8px, transparent 0.8px); background-size: 6px 6px; }
+    .pattern-shale { background-color: #475569; background-image: repeating-linear-gradient(0deg, #334155, #334155 1.5px, transparent 1.5px, transparent 6px); }
+    .pattern-alluvium { background-color: #a16207; background-image: radial-gradient(#ca8a04 1.5px, transparent 1.5px); background-size: 8px 8px; }
+    
+    /* Scrollbar */
+    ::-webkit-scrollbar { width: 5px; height: 5px; }
+    ::-webkit-scrollbar-track { background: #090d16; }
+    ::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
+  </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col selection:bg-amber-500 selection:text-black">
+
+  <header class="bg-slate-900/90 border-b border-slate-800 sticky top-0 z-30 backdrop-blur">
+    <div class="max-w-7xl mx-auto px-4 py-3 flex flex-wrap items-center justify-between gap-3">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-amber-600 via-yellow-500 to-emerald-500 flex items-center justify-center text-white shadow-lg shadow-amber-950/40">
+          <i data-lucide="pickaxe" class="w-5 h-5"></i>
+        </div>
+        <div>
+          <div class="flex items-center gap-2">
+            <h1 class="text-sm sm:text-base font-bold text-white tracking-wide">โมเดลเหมืองใต้ดินจำลอง: สืบเสาะทรัพยากรธรณี</h1>
+            <span class="text-[10px] px-2 py-0.5 rounded-full bg-amber-950 border border-amber-500/40 text-amber-300 font-medium">Inquiry-Based Lab</span>
+          </div>
+          <p class="text-xs text-slate-400">สืบย้อนความจริงใต้พิภพจากตัวอย่างหินเจาะสำรวจ และระวัง "หลักฐานลวง"</p>
+        </div>
+      </div>
+
+      <!-- Action & Budget Pill -->
+      <div class="flex items-center gap-3">
+        <div class="bg-slate-950 border border-slate-800 px-3 py-1.5 rounded-xl flex items-center gap-4 text-xs font-mono-code">
+          <div class="flex items-center gap-1.5">
+            <i data-lucide="wallet" class="w-4 h-4 text-emerald-400"></i>
+            <span class="text-slate-400">งบสำรวจ:</span>
+            <span id="budgetDisplay" class="font-bold text-emerald-400">฿100,000</span>
+          </div>
+          <div class="flex items-center gap-1.5 border-l border-slate-800 pl-3">
+            <i data-lucide="drill" class="w-4 h-4 text-cyan-400"></i>
+            <span class="text-slate-400">หลุมเจาะ:</span>
+            <span id="drillsUsedDisplay" class="font-bold text-cyan-300">0 / 6</span>
+          </div>
+        </div>
+
+        <button onclick="resetMission()" class="bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs px-3 py-2 rounded-xl transition flex items-center gap-1.5">
+          <i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i>
+          <span>เริ่มสำรวจใหม่</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main class="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 grid grid-cols-1 lg:grid-cols-12 gap-5">
+    
+    <!-- Left Section: Subsurface Cross-section & Drawing Canvas (8 Cols) -->
+    <div class="lg:col-span-8 flex flex-col gap-4">
+      
+      <!-- Toolbox Bar: Tools to Drill, Predict, Scan -->
+      <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-3.5 flex flex-wrap items-center justify-between gap-3 shadow-lg">
+        <div class="flex flex-wrap items-center gap-2">
+          <span class="text-xs text-slate-400 font-semibold flex items-center gap-1 mr-1">
+            <i data-lucide="wrench" class="w-3.5 h-3.5 text-amber-400"></i> โหมดการทำงาน:
+          </span>
+          <button id="tool-drill" onclick="setActiveTool('drill')" class="tool-btn active px-3 py-1.5 rounded-lg text-xs font-medium flex items-center gap-1.5 bg-cyan-600 text-white shadow">
+            <i data-lucide="arrow-down-to-dot" class="w-3.5 h-3.5"></i> เจาะสำรวจ Core Drilling (-฿15,000)
+          </button>
+          <button id="tool-geophys" onclick="runGeophysicalScan()" class="tool-btn px-3 py-1.5 rounded-lg text-xs font-medium flex items-center gap-1.5 bg-slate-800 text-slate-300 hover:text-white transition">
+            <i data-lucide="scan" class="w-3.5 h-3.5 text-purple-400"></i> เรดาร์แม่เหล็กฟิสิกส์ (-฿10,000)
+          </button>
+        </div>
+
+        <!-- Painting/Predicting Resource Layer -->
+        <div class="flex items-center gap-1.5 bg-slate-950 p-1 rounded-xl border border-slate-800">
+          <span class="text-[11px] text-slate-400 px-2 font-medium">ระบายคาดการณ์:</span>
+          <button onclick="setBrush('hydrothermal_ore')" id="brush-ore" class="brush-btn px-2.5 py-1 rounded-lg text-[11px] font-semibold bg-amber-500/20 text-amber-300 border border-amber-500/40">
+            🥇 สายแร่ทองคำ
+          </button>
+          <button onclick="setBrush('aquifer')" id="brush-aquifer" class="brush-btn px-2.5 py-1 rounded-lg text-[11px] font-semibold text-slate-400 hover:text-cyan-300">
+            💧 น้ำบาดาล
+          </button>
+          <button onclick="setBrush('petroleum')" id="brush-petro" class="brush-btn px-2.5 py-1 rounded-lg text-[11px] font-semibold text-slate-400 hover:text-emerald-300">
+            🛢️ ปิโตรเลียม
+          </button>
+          <button onclick="setBrush('eraser')" id="brush-eraser" class="brush-btn px-2 py-1 rounded-lg text-[11px] text-slate-400 hover:text-rose-400" title="ยางลบ">
+            <i data-lucide="eraser" class="w-3 h-3"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- Exploration Subsurface Box Canvas -->
+      <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-4 shadow-xl flex flex-col gap-2">
+        <div class="flex items-center justify-between text-xs text-slate-400 border-b border-slate-800 pb-2">
+          <div class="flex items-center gap-2">
+            <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
+            <span class="font-semibold text-slate-300">ภาคตัดขวางใต้ผิวดิน (Cross-Section 0 - 500m)</span>
+          </div>
+          <div class="flex items-center gap-4 text-[11px]">
+            <span class="flex items-center gap-1 text-slate-400"><i data-lucide="layers" class="w-3 h-3"></i> กว้าง 800m × ลึก 500m</span>
+            <button onclick="toggleGridHelpModal()" class="text-cyan-400 hover:underline flex items-center gap-1">
+              <i data-lucide="help-circle" class="w-3 h-3"></i> วิธีอ่านข้อมูล
+            </button>
+          </div>
+        </div>
+
+        <!-- The Interactive Subsurface Grid -->
+        <!-- 16 Columns x 10 Rows of Geological Cells -->
+        <div class="relative w-full aspect-[16/10] bg-slate-950 rounded-xl overflow-hidden border border-slate-800 select-none">
+          
+          <!-- Column Surface Drill Header (Clickable Drill Rigs) -->
+          <div id="drillRigsHeader" class="absolute top-0 left-0 right-0 h-7 grid grid-cols-16 z-20 pointer-events-auto bg-slate-950/70 border-b border-slate-800">
+            <!-- Drill buttons injected dynamically -->
+          </div>
+
+          <!-- The Underground Cells Container -->
+          <div id="gridContainer" class="absolute inset-0 pt-7 grid grid-cols-16 grid-rows-10 gap-0 z-10">
+            <!-- 160 Cells dynamically injected -->
+          </div>
+
+          <!-- Overlay Canvas for Student Predictions & Model Revelation -->
+          <canvas id="predictionCanvas" class="absolute inset-0 pt-7 w-full h-full pointer-events-none z-15"></canvas>
+          
+          <!-- Fault Lines & Geological Features SVG Overlay (Visible upon discovery) -->
+          <svg id="geoVectorOverlay" class="absolute inset-0 pt-7 w-full h-full pointer-events-none z-12"></svg>
+        </div>
+
+        <!-- Depth Ruler Indicator Bar -->
+        <div class="flex justify-between items-center px-1 text-[10px] text-slate-500 font-mono-code">
+          <span>0m (ผิวดิน)</span>
+          <span>100m</span>
+          <span>200m</span>
+          <span>300m</span>
+          <span>400m</span>
+          <span>500m (หินฐานราก)</span>
+        </div>
+      </div>
+
+      <!-- Action Verification Controls -->
+      <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-4 flex flex-wrap items-center justify-between gap-3 shadow-lg">
+        <div class="flex items-center gap-2">
+          <button onclick="verifyStudentModel()" class="bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-400 hover:to-yellow-400 text-slate-950 font-bold text-xs sm:text-sm px-5 py-2.5 rounded-xl shadow-md transition flex items-center gap-2">
+            <i data-lucide="check-circle-2" class="w-4 h-4"></i>
+            <span>ตรวจสอบและเปิดเผยความจริงธรณีวิทยา (Evaluate Model)</span>
+          </button>
+          <button onclick="clearPredictions()" class="bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs px-3.5 py-2.5 rounded-xl transition">
+            ล้างภาพคาดการณ์
+          </button>
+        </div>
+
+        <div id="modelScoreBadge" class="hidden items-center gap-2 text-xs font-mono-code bg-slate-950 border border-slate-800 px-3.5 py-2 rounded-xl">
+          <span class="text-slate-400">ความแม่นยำของโมเดล:</span>
+          <span id="scorePercentage" class="font-bold text-base text-amber-400">0%</span>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Right Section: Borehole Core Inspector & Evidence Log (4 Cols) -->
+    <div class="lg:col-span-4 flex flex-col gap-4">
+      
+      <!-- Inspector Card: Core Sample Analysis -->
+      <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-4 flex flex-col gap-3 shadow-xl">
+        <div class="flex items-center justify-between border-b border-slate-800 pb-2.5">
+          <div class="flex items-center gap-2">
+            <i data-lucide="test-tube-2" class="w-4 h-4 text-cyan-400"></i>
+            <h3 class="text-xs sm:text-sm font-bold text-white">ผลตรวจแท่งตัวอย่างหิน (Borehole Core)</h3>
+          </div>
+          <span id="inspectedHoleBadge" class="text-[10px] px-2 py-0.5 rounded bg-slate-800 text-slate-400 font-mono-code">
+            ยังไม่ได้เลือกหลุม
+          </span>
+        </div>
+
+        <!-- Selected Core Graphic Column & Data Sheet -->
+        <div id="coreEmptyState" class="p-8 text-center text-slate-500 text-xs flex flex-col items-center gap-2">
+          <i data-lucide="drill" class="w-8 h-8 stroke-1 text-slate-600"></i>
+          <span>คลิกที่ปุ่มแท่นเจาะ (หัวลูกศรด้านบน) หรือเซลล์ที่เปิดเผยแล้วเพื่อส่องดูแท่งหิน</span>
+        </div>
+
+        <div id="coreDataState" class="hidden flex-col gap-3">
+          <!-- Visual Core Tube Preview -->
+          <div class="flex items-center gap-3 bg-slate-950 p-2.5 rounded-xl border border-slate-800">
+            <!-- Simulated Core Tube -->
+            <div id="coreTubeVisual" class="w-10 h-36 rounded-lg border border-slate-700 overflow-hidden flex flex-col-reverse shadow-inner">
+              <!-- Stratum slices injected dynamically -->
+            </div>
+            
+            <div class="flex-1 space-y-1 text-xs">
+              <div class="text-slate-300 font-bold" id="coreSampleName">แท่งหินตัวอย่าง: หลุม #--</div>
+              <div class="text-slate-400 text-[11px]" id="coreLithology">ชนิดหินเด่น: --</div>
+              <div class="text-slate-400 text-[11px]" id="corePorosity">ความพรุนหิน (Porosity): --</div>
+              <div class="text-slate-400 text-[11px]" id="coreFluids">ของไหลในช่องว่าง: --</div>
+              <div class="text-amber-400 font-medium text-[11px] pt-1" id="coreMineralFound">แร่ที่พบ: --</div>
+            </div>
+          </div>
+
+          <!-- Nature of Science Analysis: True Evidence vs False Positive -->
+          <div id="evidenceCritiqueBox" class="p-3 rounded-xl border text-xs space-y-1.5">
+            <!-- Evidence critique description injected via JS -->
+          </div>
+        </div>
+      </div>
+
+      <!-- Geophysical Log & Legend -->
+      <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-4 flex flex-col gap-3 shadow-xl">
+        <h3 class="text-xs sm:text-sm font-bold text-white flex items-center gap-2">
+          <i data-lucide="book-open" class="w-4 h-4 text-amber-400"></i> คู่มือชั้นหินและทรัพยากร (Geological Legend)
+        </h3>
+
+        <div class="space-y-2 text-xs">
+          <!-- Item 1: Alluvium with placer false clue -->
+          <div class="flex items-center justify-between p-2 rounded-lg bg-slate-950 border border-slate-800/80">
+            <div class="flex items-center gap-2">
+              <span class="w-4 h-4 rounded pattern-alluvium border border-amber-900"></span>
+              <div>
+                <b class="text-slate-200">ตะกอนน้ำพาริมธาร (Alluvium)</b>
+                <span class="block text-[10px] text-slate-400">ตะกอนทรายร่วนผิวดิน อาจพบแร่ตกสะสม (Placer)</span>
+              </div>
+            </div>
+            <span class="text-[10px] bg-amber-950 text-amber-300 px-1.5 py-0.5 rounded">ระวังผลบวกปลอม</span>
+          </div>
+
+          <!-- Item 2: Sandstone Aquifer -->
+          <div class="flex items-center justify-between p-2 rounded-lg bg-slate-950 border border-slate-800/80">
+            <div class="flex items-center gap-2">
+              <span class="w-4 h-4 rounded pattern-sandstone border border-amber-600"></span>
+              <div>
+                <b class="text-slate-200">หินทรายความพรุนสูง (Sandstone)</b>
+                <span class="block text-[10px] text-slate-400">ช่องว่างระหว่างเม็ดตะกอนสูง มักเป็นชั้นกักเก็บน้ำบาดาล</span>
+              </div>
+            </div>
+            <span class="text-[10px] bg-cyan-950 text-cyan-300 px-1.5 py-0.5 rounded">แหล่งน้ำบาดาล</span>
+          </div>
+
+          <!-- Item 3: Shale Caprock -->
+          <div class="flex items-center justify-between p-2 rounded-lg bg-slate-950 border border-slate-800/80">
+            <div class="flex items-center gap-2">
+              <span class="w-4 h-4 rounded pattern-shale border border-slate-600"></span>
+              <div>
+                <b class="text-slate-200">หินดินดานเนื้อแน่น (Shale)</b>
+                <span class="block text-[10px] text-slate-400">หินเนื้อละเอียด น้ำซึมผ่านไม่ได้ เป็นหินปิดกั้น (Cap rock)</span>
+              </div>
+            </div>
+            <span class="text-[10px] bg-slate-800 text-slate-400 px-1.5 py-0.5 rounded">ชั้นหินปิดกั้น</span>
+          </div>
+
+          <!-- Item 4: Limestone / Skarn -->
+          <div class="flex items-center justify-between p-2 rounded-lg bg-slate-950 border border-slate-800/80">
+            <div class="flex items-center gap-2">
+              <span class="w-4 h-4 rounded pattern-limestone border border-slate-500"></span>
+              <div>
+                <b class="text-slate-200">หินปูน / รอยสัมผัสแปรสภาพ (Skarn)</b>
+                <span class="block text-[10px] text-slate-400">ทำปฏิกิริยากับน้ำร้อนใต้ดิน ตกผลึกแร่ทองแดง-ทองคำ</span>
+              </div>
+            </div>
+            <span class="text-[10px] bg-yellow-950 text-yellow-300 px-1.5 py-0.5 rounded">รอยสัมผัสแร่</span>
+          </div>
+
+          <!-- Item 5: Granite Intrusion -->
+          <div class="flex items-center justify-between p-2 rounded-lg bg-slate-950 border border-slate-800/80">
+            <div class="flex items-center gap-2">
+              <span class="w-4 h-4 rounded pattern-granite border border-rose-600"></span>
+              <div>
+                <b class="text-slate-200">มวลหินแกรนิตแทรกซอน (Granite)</b>
+                <span class="block text-[10px] text-slate-400">ต้นกำเนิดสารละลายน้ำร้อน (Hydrothermal Vent) ตามรอยเลื่อน</span>
+              </div>
+            </div>
+            <span class="text-[10px] bg-rose-950 text-rose-300 px-1.5 py-0.5 rounded">หินกำเนิดแร่</span>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Explanation Feedback Modal Card (Shown after evaluate) -->
+      <div id="evaluationFeedbackCard" class="hidden bg-slate-900/90 border border-amber-500/50 rounded-2xl p-4 flex-col gap-2.5 shadow-xl">
+        <div class="flex items-center justify-between">
+          <h4 class="text-xs sm:text-sm font-bold text-amber-400 flex items-center gap-2">
+            <i data-lucide="lightbulb" class="w-4 h-4"></i> ถอดรหัสธรรมชาติของวิทยาศาสตร์
+          </h4>
+          <span class="text-[10px] bg-amber-950 text-amber-300 px-2 py-0.5 rounded font-mono-code">NOS Insight</span>
+        </div>
+        <div id="feedbackContent" class="text-xs text-slate-300 space-y-2 leading-relaxed">
+          <!-- Dynamic post-evaluation critique -->
+        </div>
+      </div>
+
+    </div>
+
+  </main>
+
+  <!-- Help & Concept Modal -->
+  <div id="gridHelpModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm hidden items-center justify-center p-4 z-50">
+    <div class="bg-slate-900 border border-slate-700 max-w-xl w-full rounded-2xl p-5 sm:p-6 shadow-2xl space-y-4">
+      <div class="flex justify-between items-center border-b border-slate-800 pb-3">
+        <h4 class="text-base font-bold text-amber-400 flex items-center gap-2">
+          <i data-lucide="help-circle" class="w-5 h-5"></i> กลยุทธ์การสำรวจทรัพยากรธรณี
+        </h4>
+        <button onclick="toggleGridHelpModal()" class="text-slate-400 hover:text-white text-lg">✕</button>
+      </div>
+
+      <div class="text-xs text-slate-300 space-y-2.5 leading-relaxed">
+        <p><b>1. บริหารงบประมาณ:</b> คุณมีเงินทุน ฿100,000 การเจาะ 1 หลุมลึกใช้เงิน ฿15,000 คุณจึงไม่สามารถเจาะทุกช่องได้ ต้องตั้งสมมติฐานก่อนเจาะ</p>
+        <p><b>2. ความสัมพันธ์ทางธรณีวิทยา:</b>
+          <ul class="list-disc list-inside space-y-1 text-slate-400 pl-2">
+            <li><b>สายแร่ไฮโดรเทอร์มอล (Hydrothermal Ore):</b> มักแทรกตัวอยู่ตาม <em>แนวรอยเลื่อน (Fault Zone)</em> ที่เชื่อมต่อกับมวลหินอัคนีแทรกซอนแกรนิตด้านล่าง</li>
+            <li><b>แหล่งน้ำบาดาล (Aquifer):</b> อยู่ในชั้นหินทรายที่มีความพรุนสูง และต้องอยู่ต่ำกว่าระดับน้ำใต้ดิน</li>
+            <li><b>แหล่งปิโตรเลียม:</b> อยู่ในหินกักเก็บทรงกระทะคว่ำ (Anticline) ที่มีหินดินดาน (Shale) ปิดกั้นไม่ให้น้ำมันลอยหนีขึ้นสู่ผิวดิน</li>
+          </ul>
+        </p>
+        <p><b>3. ระวังหลักฐานลวง (Misleading Clues):</b> การพบเศษแร่ทองคำชิ้นเล็กๆ ที่ผิวดินริมธาร อาจเป็นเพียงแร่ที่แม่น้ำพัดพามาไกล (Placer deposit) หรือการพบแร่ไพไรต์ (แร่ทองคนโง่) เคลือบผิวหิน อย่าเพิ่งด่วนสรุปว่าเป็นสายแร่ขนาดใหญ่ใต้พิภพ!</p>
+      </div>
+
+      <div class="pt-2 text-right">
+        <button onclick="toggleGridHelpModal()" class="bg-amber-600 hover:bg-amber-500 text-slate-950 font-bold text-xs px-4 py-2 rounded-xl transition">เข้าใจแล้ว เริ่มสืบเสาะ</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Grid Dimensions: 16 cols x 10 rows (160 blocks)
+    const COLS = 16;
+    const ROWS = 10;
+    const DRILL_COST = 15000;
+    const GEOPHYS_COST = 10000;
+    const MAX_DRILLS = 6;
+
+    let budget = 100000;
+    let drillsUsed = 0;
+    let activeTool = 'drill'; // 'drill' or 'predict'
+    let currentBrush = 'hydrothermal_ore'; // 'hydrothermal_ore', 'aquifer', 'petroleum', 'eraser'
+    let selectedDrillCol = null;
+
+    // Simulation Grid Definition
+    // Rock Types: alluvium, sandstone, shale, limestone, granite
+    // Resources: hydrothermal_ore, aquifer, petroleum, false_placer, false_pyrite, none
+    let geologicalGrid = [];
+    let discoveredGrid = []; // true/false for each cell
+    let studentPredictions = {}; // key: "c,r" -> value: resource type
+
+    // Define Ground Truth Geology Matrix (Realistic Subsurface Geometry)
+    // - Fault line passing through cols 4,5 at depth
+    // - Granite batholith at bottom right (cols 10-15, rows 7-9)
+    // - Hydrothermal vein emerging along fault zone (cols 5-8, rows 5-7)
+    // - Sandstone layer folded in cols 1-6, rows 2-4 acting as aquifer
+    // - Anticlinal fold in cols 8-11, rows 3-4 with Shale seal above (petroleum reservoir)
+    // - Trap 1: Col 1-2, Row 0 has "Placer Gold flakes" in river silt (Misleading surface deposit)
+    // - Trap 2: Col 13, Row 3 has "Pyrite (Fool's gold)" cubes in cold limestone (Not ore body)
+    function generateSubsurfaceWorld() {
+      geologicalGrid = [];
+      discoveredGrid = [];
+      studentPredictions = {};
+
+      for (let r = 0; r < ROWS; r++) {
+        const row = [];
+        const discRow = [];
+        for (let c = 0; c < COLS; c++) {
+          let rock = 'sandstone';
+          let resource = 'none';
+          let porosity = '15%';
+          let desc = 'หินทรายปานกลาง';
+          let falseClue = false;
+          let clueNote = '';
+
+          // Row 0: Alluvium / Soil
+          if (r === 0) {
+            rock = 'alluvium';
+            porosity = '35% (ตะกอนร่วน)';
+            desc = 'ดินตะกอนธารน้ำและกรวดทรายร่วนผิวดิน';
+            // Trap 1: Surface Placer Gold Flakes (Misleading!)
+            if (c === 2) {
+              resource = 'false_placer';
+              falseClue = true;
+              clueNote = '⚠️ หลักฐานลวง: พบเศษทองคำบางๆ ในตะกอนแม่น้ำ แต่ไม่มีสายแร่ใต้ดิน เป็นเพียงเศษที่ถูกน้ำพัดพามาจากภูเขาที่อยู่ห่างออกไปนับสิบกิโลเมตร!';
+            }
+          }
+          // Granite Batholith (Bottom Right)
+          else if ((c >= 10 && r >= 7) || (c >= 12 && r >= 6)) {
+            rock = 'granite';
+            porosity = '< 1% (เนื้อแน่นมาก)';
+            desc = 'หินแกรนิตเนื้อผลึกหยาบ มวลหินอัคนีแทรกซอนลึก';
+          }
+          // Hydrothermal Ore Vein (Along Fault / Contact zone: cols 6-9, rows 5-7)
+          else if ((c === 7 && r >= 5 && r <= 7) || (c === 8 && r >= 5 && r <= 6) || (c === 9 && r === 6)) {
+            rock = 'limestone'; // Skarn
+            resource = 'hydrothermal_ore';
+            porosity = '6%';
+            desc = 'หินสการ์นรอยสัมผัสแร่ อุดมด้วยแร่คาลโคไพไรต์และสายแร่ควอตซ์-ทองคำ';
+          }
+          // Trap 2: Fool's Gold (Pyrite in cold limestone, far from intrusion)
+          else if (c === 14 && r === 3) {
+            rock = 'limestone';
+            resource = 'false_pyrite';
+            falseClue = true;
+            clueNote = '⚠️ หลักฐานลวง: พบผลึกลูกบาศก์สีทองแวววาว ตรวจสอบทางเคมีคือ "แร่ไพไรต์ (แร่ทองคนโง่)" อยู่ในหินปูนเย็นตัว ไม่มีทองคำแท้หรือสารละลายไฮโดรเทอร์มอล';
+          }
+          // Petroleum Reservoir (Under Anticlinal Shale Cap, cols 9-12, rows 3-4)
+          else if ((c >= 10 && c <= 12) && (r === 4)) {
+            rock = 'sandstone';
+            resource = 'petroleum';
+            porosity = '24%';
+            desc = 'หินทรายกักเก็บปิโตรเลียม มีน้ำมันดิบแทรกอยู่ในโพรงหินใต้ชั้นหินดินดาน';
+          }
+          // Shale Seal (Cap Rock for Petroleum)
+          else if ((c >= 9 && c <= 13) && (r === 2 || r === 3)) {
+            rock = 'shale';
+            porosity = '2% (ทึบน้ำ/ทึบของไหล)';
+            desc = 'หินดินดานเนื้อละเอียด ทึบน้ำมัน ทำหน้าที่เป็นหินปิดกั้น (Cap Rock)';
+          }
+          // Deep Limestone
+          else if (r >= 5) {
+            rock = 'limestone';
+            porosity = '4%';
+            desc = 'หินปูนทะเลดึกดำบรรพ์เนื้อแน่น';
+          }
+          // Aquifer Layer (Sandstone permeable saturated with water, cols 1-6, rows 2-4)
+          else if (c <= 6 && (r === 2 || r === 3 || r === 4)) {
+            rock = 'sandstone';
+            resource = 'aquifer';
+            porosity = '28% (อิ่มตัวด้วยน้ำ)';
+            desc = 'หินทรายชั้นน้ำบาดาล กักเก็บน้ำสะอาดบริสุทธิ์แรงดันสูง';
+          }
+          // Default Upper Sedimentary
+          else if (r === 1) {
+            rock = 'shale';
+            porosity = '5%';
+            desc = 'ชั้นหินดินดานผุกร่อนใกล้ผิวดิน';
+          }
+
+          row.push({
+            col: c,
+            row: r,
+            rock: rock,
+            resource: resource,
+            porosity: porosity,
+            desc: desc,
+            falseClue: falseClue,
+            clueNote: clueNote
+          });
+          discRow.push(false);
+        }
+        geologicalGrid.push(row);
+        discoveredGrid.push(discRow);
+      }
+    }
+
+    function renderGridUI() {
+      const gridContainer = document.getElementById('gridContainer');
+      const drillRigsHeader = document.getElementById('drillRigsHeader');
+      gridContainer.innerHTML = '';
+      drillRigsHeader.innerHTML = '';
+
+      // Create Drill Rig Buttons at the Surface
+      for (let c = 0; c < COLS; c++) {
+        const rigBtn = document.createElement('button');
+        rigBtn.className = `drill-col-btn h-full flex items-center justify-center border-r border-slate-800 text-[10px] font-mono-code transition relative ${
+          selectedDrillCol === c ? 'bg-cyan-600 text-white font-bold' : 'hover:bg-slate-800 text-slate-400'
+        }`;
+        rigBtn.innerHTML = `<span>#${c + 1}</span>`;
+        rigBtn.title = `คลิกเพื่อเจาะสำรวจแนวดิ่งที่คอลัมน์ #${c + 1} (-฿15,000)`;
+        rigBtn.onclick = () => handleColDrillClick(c);
+        drillRigsHeader.appendChild(rigBtn);
+      }
+
+      // Create 160 Subsurface Cells
+      for (let r = 0; r < ROWS; r++) {
+        for (let c = 0; c < COLS; c++) {
+          const cell = geologicalGrid[r][c];
+          const isDiscovered = discoveredGrid[r][c];
+          const cellDiv = document.createElement('div');
+          cellDiv.className = `grid-cell border-b border-r border-slate-900/60 relative cursor-pointer flex items-center justify-center`;
+          cellDiv.dataset.col = c;
+          cellDiv.dataset.row = r;
+
+          // Paint according to discovery or fog of war
+          if (isDiscovered) {
+            applyCellDiscoveredStyle(cellDiv, cell);
+          } else {
+            // Fog of war
+            cellDiv.classList.add('bg-slate-900', 'hover:bg-slate-800/80');
+            // Subtle depth gradient
+            cellDiv.style.opacity = `${0.95 - (r * 0.04)}`;
+          }
+
+          // Prediction Overlay marker if student marked it
+          const predKey = `${c},${r}`;
+          if (studentPredictions[predKey]) {
+            const predMark = document.createElement('div');
+            predMark.className = `absolute inset-0 z-10 pointer-events-none opacity-80 border-2 ${getPredBorder(studentPredictions[predKey])} ${getPredBg(studentPredictions[predKey])}`;
+            cellDiv.appendChild(predMark);
+          }
+
+          cellDiv.onclick = () => handleCellClick(c, r);
+          gridContainer.appendChild(cellDiv);
+        }
+      }
+
+      drawVectorFaults();
+    }
+
+    function applyCellDiscoveredStyle(element, cell) {
+      element.classList.remove('bg-slate-900');
+      // Apply rock pattern
+      if (cell.rock === 'granite') element.classList.add('pattern-granite');
+      else if (cell.rock === 'limestone') element.classList.add('pattern-limestone');
+      else if (cell.rock === 'sandstone') element.classList.add('pattern-sandstone');
+      else if (cell.rock === 'shale') element.classList.add('pattern-shale');
+      else if (cell.rock === 'alluvium') element.classList.add('pattern-alluvium');
+
+      // Visual resource badge icon
+      if (cell.resource === 'hydrothermal_ore') {
+        element.innerHTML = `<span class="text-xs filter drop-shadow animate-bounce">🥇</span>`;
+      } else if (cell.resource === 'aquifer') {
+        element.innerHTML = `<span class="text-xs filter drop-shadow">💧</span>`;
+      } else if (cell.resource === 'petroleum') {
+        element.innerHTML = `<span class="text-xs filter drop-shadow">🛢️</span>`;
+      } else if (cell.resource === 'false_placer') {
+        element.innerHTML = `<span class="text-xs filter drop-shadow" title="เศษทองผิวดิน">✨</span>`;
+      } else if (cell.resource === 'false_pyrite') {
+        element.innerHTML = `<span class="text-xs filter drop-shadow" title="ผลึกแร่ทองคนโง่">🔷</span>`;
+      }
+    }
+
+    function getPredBorder(type) {
+      if (type === 'hydrothermal_ore') return 'border-amber-400';
+      if (type === 'aquifer') return 'border-cyan-400';
+      if (type === 'petroleum') return 'border-emerald-400';
+      return 'border-transparent';
+    }
+
+    function getPredBg(type) {
+      if (type === 'hydrothermal_ore') return 'bg-amber-500/30';
+      if (type === 'aquifer') return 'bg-cyan-500/30';
+      if (type === 'petroleum') return 'bg-emerald-500/30';
+      return 'bg-transparent';
+    }
+
+    function setActiveTool(tool) {
+      activeTool = tool;
+      document.querySelectorAll('.tool-btn').forEach(btn => {
+        btn.classList.remove('bg-cyan-600', 'text-white', 'shadow');
+        btn.classList.add('bg-slate-800', 'text-slate-300');
+      });
+      if (tool === 'drill') {
+        const btn = document.getElementById('tool-drill');
+        btn.classList.remove('bg-slate-800', 'text-slate-300');
+        btn.classList.add('bg-cyan-600', 'text-white', 'shadow');
+      }
+    }
+
+    function setBrush(brushType) {
+      currentBrush = brushType;
+      activeTool = 'predict';
+      
+      document.querySelectorAll('.brush-btn').forEach(btn => {
+        btn.className = 'brush-btn px-2.5 py-1 rounded-lg text-[11px] font-semibold text-slate-400 hover:text-white transition';
+      });
+
+      const activeBtnMap = {
+        'hydrothermal_ore': 'brush-ore',
+        'aquifer': 'brush-aquifer',
+        'petroleum': 'brush-petro',
+        'eraser': 'brush-eraser'
+      };
+
+      const el = document.getElementById(activeBtnMap[brushType]);
+      if (el) {
+        el.className = 'brush-btn px-2.5 py-1 rounded-lg text-[11px] font-semibold bg-amber-500/20 text-amber-300 border border-amber-500/40';
+      }
+    }
+
+    function handleColDrillClick(colIndex) {
+      selectedDrillCol = colIndex;
+      
+      // Check budget & limit
+      if (drillsUsed >= MAX_DRILLS) {
+        showTemporaryNotice('⚠️ คุณใช้โควตาหลุมเจาะครบ 6 หลุมแล้ว! ให้ใช้ข้อมูลที่มีสร้างแบบจำลอง');
+        return;
+      }
+      if (budget < DRILL_COST) {
+        showTemporaryNotice('⚠️ งบประมาณสำรวจไม่เพียงพอสำหรับการเจาะหลุมใหม่!');
+        return;
+      }
+
+      // Check if already drilled
+      const alreadyDrilled = discoveredGrid.some(row => row[colIndex] === true);
+      if (alreadyDrilled) {
+        inspectBorehole(colIndex);
+        renderGridUI();
+        return;
+      }
+
+      // Perform drilling
+      budget -= DRILL_COST;
+      drillsUsed++;
+      updateBudgetUI();
+
+      // Reveal whole vertical column
+      for (let r = 0; r < ROWS; r++) {
+        discoveredGrid[r][colIndex] = true;
+      }
+
+      inspectBorehole(colIndex);
+      renderGridUI();
+    }
+
+    function handleCellClick(c, r) {
+      if (activeTool === 'predict') {
+        const key = `${c},${r}`;
+        if (currentBrush === 'eraser') {
+          delete studentPredictions[key];
+        } else {
+          studentPredictions[key] = currentBrush;
+        }
+        renderGridUI();
+      } else {
+        // If clicked on discovered column, inspect it
+        if (discoveredGrid[r][c]) {
+          selectedDrillCol = c;
+          inspectBorehole(c);
+          renderGridUI();
+        } else {
+          handleColDrillClick(c);
+        }
+      }
+    }
+
+    function runGeophysicalScan() {
+      if (budget < GEOPHYS_COST) {
+        showTemporaryNotice('⚠️ งบประมาณไม่พอสำหรับสแกนคลื่นแม่เหล็กฟิสิกส์!');
+        return;
+      }
+      budget -= GEOPHYS_COST;
+      updateBudgetUI();
+
+      // Geophysical radar hints 3 random strategic cells (anomalies)
+      const scanColumns = [7, 11, 4];
+      scanColumns.forEach(c => {
+        discoveredGrid[ROWS - 2][c] = true;
+        discoveredGrid[ROWS - 3][c] = true;
+      });
+
+      showTemporaryNotice('📡 สแกนธรณีฟิสิกส์สำเร็จ! ตรวจพบความผิดปกติของสนามแม่เหล็กและความต้านทานไฟฟ้าที่ระดับความลึก 300-400m');
+      renderGridUI();
+    }
+
+    function updateBudgetUI() {
+      document.getElementById('budgetDisplay').textContent = `฿${budget.toLocaleString()}`;
+      document.getElementById('drillsUsedDisplay').textContent = `${drillsUsed} / ${MAX_DRILLS}`;
+    }
+
+    function inspectBorehole(col) {
+      document.getElementById('coreEmptyState').classList.add('hidden');
+      const dataState = document.getElementById('coreDataState');
+      dataState.classList.remove('hidden');
+      dataState.classList.add('flex');
+
+      document.getElementById('inspectedHoleBadge').textContent = `หลุมเจาะ #${col + 1} (พิกัด X: ${col * 50}m)`;
+      document.getElementById('coreSampleName').textContent = `แท่งตัวอย่างหินหลุม #${col + 1}`;
+
+      // Assemble Core Tube Visual
+      const tubeVisual = document.getElementById('coreTubeVisual');
+      tubeVisual.innerHTML = '';
+      
+      let dominantRocks = [];
+      let foundResources = [];
+      let trapNotice = null;
+
+      for (let r = 0; r < ROWS; r++) {
+        const cell = geologicalGrid[r][col];
+        const slice = document.createElement('div');
+        slice.className = 'w-full flex-1 border-t border-slate-900/40';
+        
+        if (cell.rock === 'granite') slice.classList.add('pattern-granite');
+        else if (cell.rock === 'limestone') slice.classList.add('pattern-limestone');
+        else if (cell.rock === 'sandstone') slice.classList.add('pattern-sandstone');
+        else if (cell.rock === 'shale') slice.classList.add('pattern-shale');
+        else if (cell.rock === 'alluvium') slice.classList.add('pattern-alluvium');
+
+        tubeVisual.appendChild(slice);
+
+        if (!dominantRocks.includes(cell.rock)) dominantRocks.push(cell.rock);
+        if (cell.resource !== 'none' && !foundResources.includes(cell.resource)) {
+          foundResources.push(cell.resource);
+        }
+        if (cell.falseClue) {
+          trapNotice = cell.clueNote;
+        }
+      }
+
+      // Lithology & Fluids Info
+      const rockNamesTh = {
+        alluvium: 'ดินตะกอนร่วน',
+        sandstone: 'หินทราย',
+        shale: 'หินดินดาน',
+        limestone: 'หินปูน/สการ์น',
+        granite: 'หินแกรนิต'
+      };
+      document.getElementById('coreLithology').textContent = `ลำดับชั้นหิน: ${dominantRocks.map(r => rockNamesTh[r]).join(' ➔ ')}`;
+      
+      const midCell = geologicalGrid[4][col];
+      document.getElementById('corePorosity').textContent = `ความพรุนเฉลี่ย: ${midCell.porosity}`;
+      
+      let fluidText = 'น้ำบาดาลจืดทั่วไปในรูพรุน';
+      if (foundResources.includes('petroleum')) fluidText = 'คราบไฮโดรคาร์บอน/น้ำมันดิบความดันสูง';
+      if (foundResources.includes('hydrothermal_ore')) fluidText = 'ร่องรอยสารละลายไฮโดรเทอร์มอลอุณหภูมิสูง';
+      document.getElementById('coreFluids').textContent = `ของไหลในช่องว่าง: ${fluidText}`;
+
+      // Mineral description
+      let mineralText = 'ไม่พบสายแร่เศรษฐกิจสำคัญ';
+      if (foundResources.includes('hydrothermal_ore')) {
+        mineralText = '🥇 ตรวจพบสายแร่ทองคำ-ทองแดงไฮโดรเทอร์มอล (เกรดสูง 8.5 g/t)!';
+      } else if (foundResources.includes('aquifer')) {
+        mineralText = '💧 ชั้นหินอุ้มน้ำคุณภาพสูง (อัตราการไหล 45 ลบ.ม./ชม.)';
+      } else if (foundResources.includes('petroleum')) {
+        mineralText = '🛢️ แหล่งสะสมน้ำมันดิบเกรดเบา (API 38°)';
+      } else if (foundResources.includes('false_placer')) {
+        mineralText = '✨ พบเกล็ดทองคำขนาดจิ๋วที่ผิวหน้าดิน (Placer gold)';
+      } else if (foundResources.includes('false_pyrite')) {
+        mineralText = '🔷 ตรวจพบผลึกลูกบาศก์สีทองแวววาว (แร่ไพไรต์ FeS2)';
+      }
+      document.getElementById('coreMineralFound').textContent = `แร่/ทรัพยากร: ${mineralText}`;
+
+      // Nature of Science Evidence Critique Card
+      const critiqueBox = document.getElementById('evidenceCritiqueBox');
+      if (trapNotice) {
+        critiqueBox.className = 'p-3 rounded-xl border bg-amber-950/70 border-amber-500/60 text-amber-200 text-xs space-y-1';
+        critiqueBox.innerHTML = `
+          <div class="font-bold flex items-center gap-1.5"><i data-lucide="alert-triangle" class="w-4 h-4 text-amber-400"></i> ข้อควรระวังเชิงหลักฐาน:</div>
+          <p class="leading-relaxed text-[11px]">${trapNotice}</p>
+        `;
+      } else if (foundResources.includes('hydrothermal_ore')) {
+        critiqueBox.className = 'p-3 rounded-xl border bg-emerald-950/70 border-emerald-500/60 text-emerald-200 text-xs space-y-1';
+        critiqueBox.innerHTML = `
+          <div class="font-bold flex items-center gap-1.5"><i data-lucide="check-circle" class="w-4 h-4 text-emerald-400"></i> หลักฐานทางธรณีวิทยาสอดคล้อง:</div>
+          <p class="leading-relaxed text-[11px]">พบสายแร่สัมผัสใกล้แนวรอยเลื่อนและมวลหินอัคนีแกรนิตด้านล่าง ซึ่งเป็นแหล่งกำเนิดสารละลายน้ำร้อนแท้จริง</p>
+        `;
+      } else {
+        critiqueBox.className = 'p-3 rounded-xl border bg-slate-950 border-slate-800 text-slate-400 text-xs space-y-1';
+        critiqueBox.innerHTML = `
+          <div class="font-bold text-slate-300">การตีความ:</div>
+          <p class="leading-relaxed text-[11px]">ชั้นหินมีความต่อเนื่องทางกายภาพ ใช้คาดคะเนแนวการเอียงเทของชั้นหินข้างเคียงได้</p>
+        `;
+      }
+      lucide.createIcons();
+    }
+
+    function drawVectorFaults() {
+      const svg = document.getElementById('geoVectorOverlay');
+      svg.innerHTML = `
+        <!-- Geological Fault Line Zone (Col 5 down to Col 8) -->
+        <line x1="33%" y1="20%" x2="52%" y2="95%" stroke="#ef4444" stroke-width="2.5" stroke-dasharray="5,4" opacity="0.6"/>
+        <text x="35%" y="28%" fill="#f87171" font-size="9" font-weight="bold">แนวรอยเลื่อนระบายน้ำร้อน (Fault Line)</text>
+      `;
+    }
+
+    function verifyStudentModel() {
+      let totalActualTargetCells = 0;
+      let correctlyPredictedCells = 0;
+      let fellForTraps = 0;
+
+      for (let r = 0; r < ROWS; r++) {
+        for (let c = 0; c < COLS; c++) {
+          const actual = geologicalGrid[r][c];
+          const predicted = studentPredictions[`${c},${r}`];
+
+          // Count target resource cells
+          if (actual.resource === 'hydrothermal_ore' || actual.resource === 'aquifer' || actual.resource === 'petroleum') {
+            totalActualTargetCells++;
+            if (predicted === actual.resource) {
+              correctlyPredictedCells++;
+            }
+          }
+
+          // Check if student fell for false traps
+          if (actual.falseClue && predicted && predicted !== 'eraser') {
+            fellForTraps++;
+          }
+        }
+      }
+
+      // Reveal all cells to let students compare
+      for (let r = 0; r < ROWS; r++) {
+        for (let c = 0; c < COLS; c++) {
+          discoveredGrid[r][c] = true;
+        }
+      }
+      renderGridUI();
+
+      // Calculate Accuracy Score
+      const accuracy = Math.round((correctlyPredictedCells / Math.max(1, totalActualTargetCells)) * 100);
+      
+      const scoreBadge = document.getElementById('modelScoreBadge');
+      scoreBadge.classList.remove('hidden');
+      scoreBadge.classList.add('flex');
+      document.getElementById('scorePercentage').textContent = `${accuracy}%`;
+
+      // Show Feedback Card with Nature of Science Debrief
+      const feedbackCard = document.getElementById('evaluationFeedbackCard');
+      feedbackCard.classList.remove('hidden');
+      feedbackCard.classList.add('flex');
+
+      let critiqueHTML = '';
+      if (fellForTraps > 0) {
+        critiqueHTML += `
+          <div class="p-2.5 rounded-lg bg-rose-950/80 border border-rose-500/50 text-rose-200">
+            <b>⚠️ บทเรียนเรื่องหลักฐานลวง (Nature of Science):</b> คุณได้ทำเครื่องหมายสายแร่ในจุด "ข้อมูลหลอก" (เช่น เศษทองคำผิวดิน หรือแร่ไพไรต์ในหินปูน) นักธรณีวิทยาตัวจริงต้องแยกแยะระหว่าง <em>สิ่งแปลกปลอมบนผิวดิน (Weathering transport)</em> กับ <em>กลไกการเกิดแร่ใต้ดินจริง (Genetic geological model)</em>
+          </div>
+        `;
+      } else {
+        critiqueHTML += `
+          <div class="p-2.5 rounded-lg bg-emerald-950/80 border border-emerald-500/50 text-emerald-200">
+            <b>🎉 ยอดเยี่ยมมาก!</b> คุณไม่หลงกลข้อมูลหลอก และสามารถแยกแยะได้ว่าแร่ทองคำแท้ต้องสัมพันธ์กับรอยเลื่อนและมวลหินอัคนีแกรนิต
+          </div>
+        `;
+      }
+
+      critiqueHTML += `
+        <p><b>ความจริงของแบบจำลองใต้ผิวดิน:</b></p>
+        <ul class="list-disc list-inside space-y-1 text-slate-300 pl-1 text-[11px]">
+          <li><b>สายแร่ทองคำ:</b> แทรกซอนตามแนวรอยเลื่อน (Fault) โดยรับสารละลายน้ำร้อนมาจากมวลหินแกรนิตด้านล่างขวา</li>
+          <li><b>แหล่งน้ำบาดาล:</b> ถูกกักเก็บอยู่ในชั้นหินทรายความพรุนสูงฝั่งซ้ายลึก 100-250m</li>
+          <li><b>แหล่งปิโตรเลียม:</b> อยู่ใต้โครงสร้างกระทะคว่ำ โดยมีหินดินดาน (Shale) เนื้อละเอียดปิดกั้นด้านบน</li>
+        </ul>
+      `;
+
+      document.getElementById('feedbackContent').innerHTML = critiqueHTML;
+      lucide.createIcons();
+    }
+
+    function clearPredictions() {
+      studentPredictions = {};
+      renderGridUI();
+    }
+
+    function resetMission() {
+      budget = 100000;
+      drillsUsed = 0;
+      selectedDrillCol = null;
+      updateBudgetUI();
+      generateSubsurfaceWorld();
+      
+      document.getElementById('coreEmptyState').classList.remove('hidden');
+      document.getElementById('coreDataState').classList.add('hidden');
+      document.getElementById('modelScoreBadge').classList.add('hidden');
+      document.getElementById('evaluationFeedbackCard').classList.add('hidden');
+
+      renderGridUI();
+    }
+
+    function toggleGridHelpModal() {
+      const modal = document.getElementById('gridHelpModal');
+      modal.classList.toggle('hidden');
+      modal.classList.toggle('flex');
+    }
+
+    function showTemporaryNotice(text) {
+      const banner = document.createElement('div');
+      banner.className = 'fixed bottom-5 right-5 bg-slate-900 border border-amber-500 text-amber-200 px-4 py-3 rounded-xl shadow-2xl text-xs z-50 flex items-center gap-2 animate-bounce';
+      banner.innerHTML = `<i data-lucide="bell" class="w-4 h-4 text-amber-400"></i> <span>${text}</span>`;
+      document.body.appendChild(banner);
+      lucide.createIcons();
+      setTimeout(() => banner.remove(), 4000);
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      lucide.createIcons();
+      generateSubsurfaceWorld();
+      updateBudgetUI();
+      renderGridUI();
+    });
+  </script>
+</body>
+</html>

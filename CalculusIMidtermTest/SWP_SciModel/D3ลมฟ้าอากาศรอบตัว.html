@@ -1,0 +1,1029 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>แบบจำลองปฏิสัมพันธ์: ลมฟ้าอากาศรอบตัว ม.1</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Google Fonts: Kanit and Sarabun for Thai educational UI -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@400;500;600;700&family=Sarabun:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Sarabun', 'sans-serif'],
+            display: ['Kanit', 'sans-serif'],
+          },
+          colors: {
+            lowPressure: '#ef4444',
+            highPressure: '#3b82f6',
+            heatWarm: '#fb923c',
+            coolAir: '#60a5fa'
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    /* Custom animations & interactive polish */
+    @keyframes pulse-slow {
+      0%, 100% { transform: scale(1); opacity: 0.9; }
+      50% { transform: scale(1.08); opacity: 1; }
+    }
+    .animate-pulse-slow {
+      animation: pulse-slow 3s infinite ease-in-out;
+    }
+    input[type=range] {
+      accent-color: #3b82f6;
+    }
+    /* Custom scrollbar for control panels */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #f1f5f9;
+      border-radius: 4px;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 4px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #94a3b8;
+    }
+  </style>
+</head>
+<body class="bg-slate-900 text-slate-100 min-h-screen flex flex-col font-sans select-none antialiased">
+
+  <header class="bg-slate-800/90 backdrop-blur border-b border-slate-700/80 px-4 py-3 sticky top-0 z-40 shadow-lg">
+    <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-3">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-amber-500 via-rose-500 to-indigo-600 flex items-center justify-center shadow-md shadow-rose-500/20 text-white font-black text-xl">
+          ☁️
+        </div>
+        <div>
+          <h1 class="text-lg md:text-xl font-bold font-display text-white tracking-wide flex items-center gap-2">
+            ลมฟ้าอากาศรอบตัว
+            <span class="text-xs font-semibold px-2 py-0.5 rounded-full bg-cyan-500/20 text-cyan-300 border border-cyan-500/30">วิทยาศาสตร์ ม.1</span>
+          </h1>
+          <p class="text-xs text-slate-400">แบบจำลองเชื่อมโยง: อุณหภูมิ → ความกดอากาศ → ลม → เมฆและฝน</p>
+        </div>
+      </div>
+      <div class="flex items-center gap-2">
+        <button id="btnPlayPause" class="px-3.5 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 active:scale-95 text-xs font-semibold flex items-center gap-1.5 transition shadow">
+          <span id="playIcon">⏸️</span> <span id="playText">หยุดชั่วคราว</span>
+        </button>
+        <button id="btnReset" class="px-3 py-1.5 rounded-lg bg-slate-700 hover:bg-slate-600 active:scale-95 text-xs font-semibold text-slate-200 transition">
+          🔄 คืนค่าเริ่มต้น
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main class="max-w-7xl w-full mx-auto p-3 sm:p-4 grid grid-cols-1 lg:grid-cols-12 gap-4 flex-1">
+    
+    <!-- Simulation Viewport (Left/Top 8 cols) -->
+    <section class="lg:col-span-8 flex flex-col gap-3">
+      <div class="relative bg-slate-950 rounded-2xl overflow-hidden border border-slate-800 shadow-2xl flex-1 flex flex-col min-h-[460px] md:min-h-[520px]">
+        
+        <!-- Live Status Overlay Top Bar -->
+        <div class="absolute top-3 left-3 right-3 z-20 flex flex-wrap items-center justify-between gap-2 pointer-events-none">
+          <div class="bg-slate-900/80 backdrop-blur-md px-3 py-1.5 rounded-xl border border-slate-700/60 shadow flex items-center gap-3 text-xs">
+            <span class="flex items-center gap-1 font-medium text-slate-300">
+              สถานะ: <span id="currentScenarioBadge" class="font-bold text-amber-400">กลางวัน (แดดจัด)</span>
+            </span>
+            <span class="text-slate-600">|</span>
+            <span class="flex items-center gap-1 text-slate-300">
+              ความเร็วลม: <span id="windSpeedBadge" class="font-bold text-cyan-400 font-mono">0.0 m/s</span>
+            </span>
+          </div>
+
+          <div class="bg-slate-900/80 backdrop-blur-md px-3 py-1.5 rounded-xl border border-slate-700/60 shadow flex items-center gap-3 text-xs pointer-events-auto">
+            <label class="flex items-center gap-1.5 cursor-pointer text-slate-300 hover:text-white">
+              <input type="checkbox" id="chkStreamlines" checked class="rounded bg-slate-800 border-slate-600 text-cyan-500">
+              <span>กระแสลม</span>
+            </label>
+            <label class="flex items-center gap-1.5 cursor-pointer text-slate-300 hover:text-white">
+              <input type="checkbox" id="chkParticles" checked class="rounded bg-slate-800 border-slate-600 text-cyan-500">
+              <span>อนุภาคอากาศ</span>
+            </label>
+            <label class="flex items-center gap-1.5 cursor-pointer text-slate-300 hover:text-white">
+              <input type="checkbox" id="chkLabels" checked class="rounded bg-slate-800 border-slate-600 text-cyan-500">
+              <span>สัญลักษณ์ L / H</span>
+            </label>
+          </div>
+        </div>
+
+        <!-- Simulation Canvas -->
+        <canvas id="simCanvas" class="w-full h-full flex-1 block cursor-crosshair touch-none"></canvas>
+
+        <!-- Dynamic Meteorological Legend Inside Canvas Bottom -->
+        <div class="absolute bottom-2.5 left-2.5 right-2.5 z-20 pointer-events-none flex flex-wrap items-center justify-between gap-2 bg-slate-900/80 backdrop-blur-md px-3 py-2 rounded-xl border border-slate-800/80 text-[11px] text-slate-300">
+          <div class="flex items-center gap-3">
+            <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-red-500 inline-block"></span> L = หย่อมความกดอากาศต่ำ (อากาศร้อน ลอยตัว)</span>
+            <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-blue-500 inline-block"></span> H = หย่อมความกดอากาศสูง (อากาศเย็น จมตัว)</span>
+          </div>
+          <div class="flex items-center gap-2 text-cyan-400">
+            <span>💨 ลมพัดจาก <strong class="text-blue-400">H</strong> สู่ <strong class="text-red-400">L</strong> เสมอ</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="bg-slate-800/70 rounded-xl border border-slate-700/80 p-3.5 shadow">
+        <h2 class="text-xs font-bold text-slate-300 uppercase tracking-wider font-display mb-2.5 flex items-center gap-1.5">
+          <span>🔗</span> ห่วงโซ่เหตุและผลของลมฟ้าอากาศ (Cause & Effect Chain)
+        </h2>
+        <div class="grid grid-cols-2 md:grid-cols-5 gap-2 text-xs">
+          <!-- Step 1 -->
+          <div class="bg-slate-900/60 p-2.5 rounded-lg border border-slate-700/50 flex flex-col justify-between">
+            <div>
+              <span class="text-[10px] font-bold text-amber-400 block mb-1">ขั้นที่ 1: พลังงาน</span>
+              <p class="font-semibold text-slate-200" id="chainStep1Title">พื้นผิวรับความร้อนไม่เท่ากัน</p>
+            </div>
+            <p class="text-[11px] text-slate-400 mt-1" id="chainStep1Desc">ดินดูดกลืนความร้อนได้ไวกว่าน้ำ</p>
+          </div>
+          <!-- Step 2 -->
+          <div class="bg-slate-900/60 p-2.5 rounded-lg border border-slate-700/50 flex flex-col justify-between">
+            <div>
+              <span class="text-[10px] font-bold text-orange-400 block mb-1">ขั้นที่ 2: อุณหภูมิ</span>
+              <p class="font-semibold text-slate-200">อุณหภูมิอากาศแตกต่าง</p>
+            </div>
+            <p class="text-[11px] text-slate-400 mt-1 font-mono text-amber-300" id="chainStep2Desc">ΔT = 10.0 °C</p>
+          </div>
+          <!-- Step 3 -->
+          <div class="bg-slate-900/60 p-2.5 rounded-lg border border-slate-700/50 flex flex-col justify-between">
+            <div>
+              <span class="text-[10px] font-bold text-sky-400 block mb-1">ขั้นที่ 3: ความกดอากาศ</span>
+              <p class="font-semibold text-slate-200">เกิดหย่อม L และ H</p>
+            </div>
+            <p class="text-[11px] text-slate-400 mt-1" id="chainStep3Desc">อากาศร้อนขยายตัวเบาบาง (L)</p>
+          </div>
+          <!-- Step 4 -->
+          <div class="bg-slate-900/60 p-2.5 rounded-lg border border-slate-700/50 flex flex-col justify-between">
+            <div>
+              <span class="text-[10px] font-bold text-cyan-400 block mb-1">ขั้นที่ 4: การเคลื่อนที่</span>
+              <p class="font-semibold text-slate-200">เกิดการพัดของลม</p>
+            </div>
+            <p class="text-[11px] text-slate-400 mt-1" id="chainStep4Desc">ลมพัดจากทะเลสู่ฝั่ง (ลมทะเล)</p>
+          </div>
+          <!-- Step 5 -->
+          <div class="bg-slate-900/60 p-2.5 rounded-lg border border-slate-700/50 col-span-2 md:col-span-1 flex flex-col justify-between">
+            <div>
+              <span class="text-[10px] font-bold text-indigo-400 block mb-1">ขั้นที่ 5: เมฆและฝน</span>
+              <p class="font-semibold text-slate-200" id="chainStep5Title">การควบแน่น</p>
+            </div>
+            <p class="text-[11px] text-slate-400 mt-1" id="chainStep5Desc">อากาศชื้นยกตัว ก่อเมฆฝน</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Control Panels (Right 4 cols) -->
+    <aside class="lg:col-span-4 flex flex-col gap-3">
+      
+      <!-- Preset Scenarios Selector -->
+      <div class="bg-slate-800/80 rounded-2xl p-4 border border-slate-700/80 shadow">
+        <h2 class="text-sm font-bold text-white font-display flex items-center gap-2 mb-3">
+          <span>⚙️</span> เลือกสถานการณ์จำลอง (Presets)
+        </h2>
+        <div class="grid grid-cols-2 gap-2 text-xs">
+          <button class="preset-btn active py-2 px-2.5 rounded-xl border border-cyan-500/60 bg-cyan-500/20 text-cyan-200 font-medium text-left flex flex-col gap-0.5 transition hover:bg-cyan-500/30" data-preset="day_sea_breeze">
+            <span class="font-bold">☀️ กลางวัน (แดดจัด)</span>
+            <span class="text-[10px] text-slate-300">เกิด "ลมทะเล" (พัดเข้าหาฝั่ง)</span>
+          </button>
+          <button class="preset-btn py-2 px-2.5 rounded-xl border border-slate-700 bg-slate-900/50 text-slate-300 font-medium text-left flex flex-col gap-0.5 transition hover:bg-slate-700/50 hover:text-white" data-preset="night_land_breeze">
+            <span class="font-bold">🌙 กลางคืน (คายความร้อน)</span>
+            <span class="text-[10px] text-slate-400">เกิด "ลมบก" (พัดออกสู่ทะเล)</span>
+          </button>
+          <button class="preset-btn py-2 px-2.5 rounded-xl border border-slate-700 bg-slate-900/50 text-slate-300 font-medium text-left flex flex-col gap-0.5 transition hover:bg-slate-700/50 hover:text-white" data-preset="urban_heat_island">
+            <span class="font-bold">🏢 เมือง vs ป่าไม้</span>
+            <span class="text-[10px] text-slate-400">เกาะความร้อนเมือง (Urban Heat)</span>
+          </button>
+          <button class="preset-btn py-2 px-2.5 rounded-xl border border-slate-700 bg-slate-900/50 text-slate-300 font-medium text-left flex flex-col gap-0.5 transition hover:bg-slate-700/50 hover:text-white" data-preset="stormy_low">
+            <span class="font-bold">⛈️ พายุความกดต่ำจัด</span>
+            <span class="text-[10px] text-slate-400">ความชื้นสูง เมฆหนาและฝนตก</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Sliders Customization -->
+      <div class="bg-slate-800/80 rounded-2xl p-4 border border-slate-700/80 shadow flex flex-col gap-3.5">
+        <h2 class="text-sm font-bold text-white font-display flex items-center justify-between">
+          <span class="flex items-center gap-2"><span>🎛️</span> ปรับแต่งตัวแปรอิสระ</span>
+          <span class="text-[10px] font-normal text-slate-400 bg-slate-700/50 px-2 py-0.5 rounded-md">Realtime Tuning</span>
+        </h2>
+
+        <!-- Left Surface Temp -->
+        <div class="bg-slate-900/50 p-2.5 rounded-xl border border-slate-700/40">
+          <div class="flex justify-between items-center text-xs mb-1">
+            <label id="lblSurfaceA" class="font-medium text-slate-200">🏜️ ฝั่งซ้าย (พื้นดิน/เมือง):</label>
+            <span id="valTempA" class="font-bold text-amber-400 font-mono">35°C</span>
+          </div>
+          <input type="range" id="sliderTempA" min="15" max="45" value="35" class="w-full cursor-pointer h-1.5 bg-slate-700 rounded-lg">
+          <div class="flex justify-between text-[10px] text-slate-500 mt-1 font-mono">
+            <span>15°C (เย็น)</span>
+            <span>ความกดอากาศ: <span id="pressAVal" class="text-slate-300 font-bold">1006 hPa</span></span>
+            <span>45°C (ร้อนจัด)</span>
+          </div>
+        </div>
+
+        <!-- Right Surface Temp -->
+        <div class="bg-slate-900/50 p-2.5 rounded-xl border border-slate-700/40">
+          <div class="flex justify-between items-center text-xs mb-1">
+            <label id="lblSurfaceB" class="font-medium text-slate-200">🌊 ฝั่งขวา (พื้นน้ำ/ป่า):</label>
+            <span id="valTempB" class="font-bold text-sky-400 font-mono">25°C</span>
+          </div>
+          <input type="range" id="sliderTempB" min="15" max="45" value="25" class="w-full cursor-pointer h-1.5 bg-slate-700 rounded-lg">
+          <div class="flex justify-between text-[10px] text-slate-500 mt-1 font-mono">
+            <span>15°C (เย็น)</span>
+            <span>ความกดอากาศ: <span id="pressBVal" class="text-slate-300 font-bold">1016 hPa</span></span>
+            <span>45°C (ร้อนจัด)</span>
+          </div>
+        </div>
+
+        <!-- Relative Humidity Slider -->
+        <div class="bg-slate-900/50 p-2.5 rounded-xl border border-slate-700/40">
+          <div class="flex justify-between items-center text-xs mb-1">
+            <label class="font-medium text-slate-200">💧 ความชื้นสัมพัทธ์ในอากาศ (RH):</label>
+            <span id="valHumidity" class="font-bold text-indigo-400 font-mono">65%</span>
+          </div>
+          <input type="range" id="sliderHumidity" min="10" max="100" value="65" class="w-full cursor-pointer h-1.5 bg-slate-700 rounded-lg">
+          <div class="flex justify-between text-[10px] text-slate-500 mt-1">
+            <span>แห้งแล้ง (ไม่เกิดเมฆ)</span>
+            <span id="humidityStatus" class="text-indigo-300 font-medium">ความชื้นปานกลาง</span>
+            <span>อิ่มตัว 100% (ฝนตก)</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Weather Forecasting Insight Guide (ม.1 Curriculum) -->
+      <div class="bg-gradient-to-br from-slate-800 to-slate-850 rounded-2xl p-4 border border-slate-700/80 shadow flex-1">
+        <h2 class="text-sm font-bold text-white font-display flex items-center gap-2 mb-2">
+          <span>🌦️</span> สรุปเกร็ดการพยากรณ์อากาศเบื้องต้น
+        </h2>
+        
+        <div id="forecastBox" class="p-3 rounded-xl bg-slate-900/80 border border-amber-500/40 text-xs flex items-start gap-2.5">
+          <span class="text-2xl" id="forecastIcon">🌤️</span>
+          <div>
+            <h4 class="font-bold text-white text-xs mb-0.5" id="forecastTitle">ท้องฟ้าแจ่มใส มีเมฆบางส่วน</h4>
+            <p class="text-slate-300 text-[11px] leading-relaxed" id="forecastDescription">
+              ความแตกต่างของอุณหภูมิปานกลาง ทำให้มีลมพัดเอื่อยๆ ความชื้นยังไม่ถึงจุดอิ่มตัวที่จะกลั่นตัวเป็นฝนหนาแน่น
+            </p>
+          </div>
+        </div>
+
+        <div class="mt-3 space-y-1.5 text-[11px] text-slate-300">
+          <div class="flex items-center gap-1.5">
+            <span class="text-red-400 font-bold">● L (Low):</span> อากาศร้อนลอยตัว → บารอมิเตอร์ลดลง → มีโอกาสเกิดเมฆหนาและฝนฟ้าคะนอง
+          </div>
+          <div class="flex items-center gap-1.5">
+            <span class="text-blue-400 font-bold">● H (High):</span> อากาศเย็นจมตัว → ความชื้นระเหยยาก → ท้องฟ้าโปร่ง อากาศแจ่มใส
+          </div>
+          <div class="flex items-center gap-1.5">
+            <span class="text-amber-400 font-bold">● ความเร็วลม:</span> แปรผันตรงกับความต่างของความกดอากาศ (ยิ่งต่างมาก ลมยิ่งแรง)
+          </div>
+        </div>
+      </div>
+    </aside>
+  </main>
+
+  <script>
+    // --- Application State ---
+    const state = {
+      isRunning: true,
+      scenario: 'day_sea_breeze',
+      surfaceA: {
+        name: 'พื้นดิน (Land)',
+        type: 'land', // 'land', 'urban', 'forest'
+        temp: 35.0,   // °C
+        pressure: 1006.0 // hPa
+      },
+      surfaceB: {
+        name: 'พื้นน้ำ (Sea)',
+        type: 'sea',  // 'sea', 'forest'
+        temp: 25.0,   // °C
+        pressure: 1016.0 // hPa
+      },
+      humidity: 65,     // %
+      showStreamlines: true,
+      showParticles: true,
+      showLabels: true,
+      windSpeed: 3.5,   // m/s derived
+      windDirection: 'sea_to_land', // or 'land_to_sea'
+      clouds: [],
+      raindrops: [],
+      particles: [],
+      time: 0
+    };
+
+    // Canvas & Setup
+    const canvas = document.getElementById('simCanvas');
+    const ctx = canvas.getContext('2d');
+
+    // DOM Elements
+    const btnPlayPause = document.getElementById('btnPlayPause');
+    const playIcon = document.getElementById('playIcon');
+    const playText = document.getElementById('playText');
+    const btnReset = document.getElementById('btnReset');
+    const chkStreamlines = document.getElementById('chkStreamlines');
+    const chkParticles = document.getElementById('chkParticles');
+    const chkLabels = document.getElementById('chkLabels');
+
+    const sliderTempA = document.getElementById('sliderTempA');
+    const sliderTempB = document.getElementById('sliderTempB');
+    const sliderHumidity = document.getElementById('sliderHumidity');
+    const valTempA = document.getElementById('valTempA');
+    const valTempB = document.getElementById('valTempB');
+    const valHumidity = document.getElementById('valHumidity');
+    const pressAVal = document.getElementById('pressAVal');
+    const pressBVal = document.getElementById('pressBVal');
+    const currentScenarioBadge = document.getElementById('currentScenarioBadge');
+    const windSpeedBadge = document.getElementById('windSpeedBadge');
+    const presetButtons = document.querySelectorAll('.preset-btn');
+    const humidityStatus = document.getElementById('humidityStatus');
+
+    // Chain explanation elements
+    const chainStep1Title = document.getElementById('chainStep1Title');
+    const chainStep1Desc = document.getElementById('chainStep1Desc');
+    const chainStep2Desc = document.getElementById('chainStep2Desc');
+    const chainStep3Desc = document.getElementById('chainStep3Desc');
+    const chainStep4Desc = document.getElementById('chainStep4Desc');
+    const chainStep5Title = document.getElementById('chainStep5Title');
+    const chainStep5Desc = document.getElementById('chainStep5Desc');
+
+    // Forecast elements
+    const forecastBox = document.getElementById('forecastBox');
+    const forecastIcon = document.getElementById('forecastIcon');
+    const forecastTitle = document.getElementById('forecastTitle');
+    const forecastDescription = document.getElementById('forecastDescription');
+
+    // Resize Canvas dynamically
+    function resizeCanvas() {
+      const rect = canvas.getBoundingClientRect();
+      const dpr = window.devicePixelRatio || 1;
+      canvas.width = rect.width * dpr;
+      canvas.height = rect.height * dpr;
+      ctx.scale(dpr, dpr);
+    }
+    window.addEventListener('resize', resizeCanvas);
+
+    // Convection Air Particles
+    const PARTICLE_COUNT = 90;
+    function initParticles() {
+      state.particles = [];
+      const w = canvas.getBoundingClientRect().width || 800;
+      const h = canvas.getBoundingClientRect().height || 500;
+      for (let i = 0; i < PARTICLE_COUNT; i++) {
+        state.particles.push({
+          x: Math.random() * w,
+          y: Math.random() * (h * 0.72) + 20,
+          size: Math.random() * 2.5 + 2,
+          speedOffset: Math.random() * 0.4 + 0.8,
+          trail: []
+        });
+      }
+    }
+
+    // Clouds generation
+    function initClouds() {
+      state.clouds = [
+        { xRatio: 0.28, yRatio: 0.22, r: 42, opacity: 0.8 },
+        { xRatio: 0.32, yRatio: 0.20, r: 52, opacity: 0.85 },
+        { xRatio: 0.24, yRatio: 0.25, r: 36, opacity: 0.75 },
+        { xRatio: 0.72, yRatio: 0.18, r: 35, opacity: 0.4 },
+        { xRatio: 0.76, yRatio: 0.19, r: 28, opacity: 0.4 }
+      ];
+      state.raindrops = [];
+      for (let i = 0; i < 40; i++) {
+        state.raindrops.push({
+          xRatio: 0.2 + Math.random() * 0.2,
+          yRatio: 0.25 + Math.random() * 0.45,
+          speed: 4 + Math.random() * 4,
+          len: 8 + Math.random() * 8
+        });
+      }
+    }
+
+    function computeAtmosphericPhysics() {
+      // Barometric formula approximate offset: Higher temp -> lower air density -> lower ground pressure
+      const basePressure = 1013.25;
+      state.surfaceA.pressure = +(basePressure - (state.surfaceA.temp - 20) * 0.85).toFixed(1);
+      state.surfaceB.pressure = +(basePressure - (state.surfaceB.temp - 20) * 0.85).toFixed(1);
+
+      // Pressure gradient force (PGF) determines wind speed
+      const deltaP = state.surfaceB.pressure - state.surfaceA.pressure; // Positive = B is High, A is Low
+      const deltaT = +(Math.abs(state.surfaceA.temp - state.surfaceB.temp)).toFixed(1);
+
+      // Wind speed scales with deltaP
+      state.windSpeed = +(Math.abs(deltaP) * 0.8 + 0.2).toFixed(1);
+      state.windDirection = deltaP > 0 ? 'B_to_A' : 'A_to_B'; // If deltaP > 0, B is High, wind blows right-to-left towards A
+
+      // Update UI readings
+      valTempA.textContent = `${state.surfaceA.temp}°C`;
+      valTempB.textContent = `${state.surfaceB.temp}°C`;
+      pressAVal.textContent = `${state.surfaceA.pressure} hPa`;
+      pressBVal.textContent = `${state.surfaceB.pressure} hPa`;
+      valHumidity.textContent = `${state.humidity}%`;
+      windSpeedBadge.textContent = `${state.windSpeed} m/s`;
+
+      // Update Cause & Effect Step Texts
+      chainStep2Desc.textContent = `ΔT = ${deltaT} °C (ดินร้อนกว่าน้ำ/ป่า)`;
+      
+      const isALow = state.surfaceA.pressure < state.surfaceB.pressure;
+      const isBLow = state.surfaceB.pressure < state.surfaceA.pressure;
+
+      if (Math.abs(deltaP) < 0.5) {
+        chainStep3Desc.textContent = 'ความกดอากาศใกล้เคียงกัน (ไม่มีหย่อมเด่นชัด)';
+        chainStep4Desc.textContent = 'อากาศค่อนข้างสงบนิ่ง ลมพัดเบามาก';
+      } else if (isALow) {
+        chainStep3Desc.textContent = 'ฝั่งซ้ายร้อนยกตัว (L) / ฝั่งขวาจมตัว (H)';
+        chainStep4Desc.textContent = state.surfaceA.type === 'urban' ? 'ลมพัดเข้าสู่ตัวเมือง (Urban Breeze)' : 'ลมพัดจากทะเลเข้าหาฝั่ง (ลมทะเล)';
+      } else {
+        chainStep3Desc.textContent = 'ฝั่งขวาร้อนกว่า (L) / ฝั่งซ้ายเย็นจมตัว (H)';
+        chainStep4Desc.textContent = 'ลมพัดจากฝั่งออกสู่ทะเล (ลมบก)';
+      }
+
+      // Humidity & Rain Formation
+      if (state.humidity < 40) {
+        humidityStatus.textContent = 'อากาศแห้ง (โอกาสเกิดเมฆน้อย)';
+        chainStep5Title.textContent = 'อากาศแห้ง ท้องฟ้าโปร่ง';
+        chainStep5Desc.textContent = 'ไอน้ำน้อย ไม่สามารถรวมตัวเป็นเมฆ';
+      } else if (state.humidity < 75) {
+        humidityStatus.textContent = 'ความชื้นปานกลาง (มีเมฆกระจาย)';
+        chainStep5Title.textContent = 'ไอน้ำควบแน่นเป็นเมฆ';
+        chainStep5Desc.textContent = 'อากาศลอยตัวกระทบความเย็น เกิดหยดน้ำขนาดเล็กเป็นเมฆ';
+      } else {
+        humidityStatus.textContent = 'ความชื้นสูงจัด (เสี่ยงฝนตก)';
+        chainStep5Title.textContent = 'หยดน้ำรวมตัวกลายเป็นฝน';
+        chainStep5Desc.textContent = 'หยดน้ำในเมฆหนักเกินกว่าแรงพยุง อากาศจึงตกลงมาเป็นฝน';
+      }
+
+      // Weather forecast logic based on M.1 standard
+      updateForecastingSummary(isALow, deltaT);
+    }
+
+    function updateForecastingSummary(isALow, deltaT) {
+      if (state.humidity >= 75 && (isALow || deltaT > 6)) {
+        forecastIcon.textContent = '⛈️';
+        forecastTitle.textContent = 'พยากรณ์: เสี่ยงเกิดพายุฝนฟ้าคะนองในพื้นที่หย่อม L';
+        forecastDescription.textContent = 'ความกดอากาศต่ำร่วมกับความชื้นสัมพัทธ์สูง กระตุ้นให้อากาศร้อนชื้นลอยตัวอย่างรวดเร็ว ก่อตัวเป็นเมฆคิวมูโลนิมบัสหนาทึบและมีฝนตกหนัก';
+        forecastBox.className = 'p-3 rounded-xl bg-slate-900/80 border border-rose-500/50 text-xs flex items-start gap-2.5';
+      } else if (state.humidity >= 50) {
+        forecastIcon.textContent = '⛅';
+        forecastTitle.textContent = 'พยากรณ์: มีเมฆเป็นส่วนมาก ลมพัดปานกลาง';
+        forecastDescription.textContent = `ความกดอากาศต่างกัน ${Math.abs(state.surfaceA.pressure - state.surfaceB.pressure).toFixed(1)} hPa เกิดการไหลเวียนของลมต่อเนื่อง เหมาะกับการระบายอากาศ`;
+        forecastBox.className = 'p-3 rounded-xl bg-slate-900/80 border border-amber-500/40 text-xs flex items-start gap-2.5';
+      } else {
+        forecastIcon.textContent = '☀️';
+        forecastTitle.textContent = 'พยากรณ์: ท้องฟ้าโปร่ง อากาศแห้ง แดดแรง';
+        forecastDescription.textContent = 'ความชื้นในอากาศต่ำมาก แม้จะมีความร้อนแต่ขาดไอน้ำในการก่อตัวของเมฆ โอกาสเกิดฝนตกน้อยมาก';
+        forecastBox.className = 'p-3 rounded-xl bg-slate-900/80 border border-sky-500/40 text-xs flex items-start gap-2.5';
+      }
+    }
+
+    function drawSimulation() {
+      const w = canvas.getBoundingClientRect().width;
+      const h = canvas.getBoundingClientRect().height;
+      if (!w || !h) return;
+
+      ctx.clearRect(0, 0, w, h);
+
+      const groundY = h * 0.72;
+      const midX = w * 0.5;
+
+      // 1. Sky Gradient based on scenario (Day / Night)
+      const isNight = state.scenario === 'night_land_breeze';
+      const skyGrad = ctx.createLinearGradient(0, 0, 0, groundY);
+      if (isNight) {
+        skyGrad.addColorStop(0, '#020617');
+        skyGrad.addColorStop(0.6, '#0f172a');
+        skyGrad.addColorStop(1, '#1e293b');
+      } else {
+        skyGrad.addColorStop(0, '#0284c7');
+        skyGrad.addColorStop(0.5, '#38bdf8');
+        skyGrad.addColorStop(1, '#bae6fd');
+      }
+      ctx.fillStyle = skyGrad;
+      ctx.fillRect(0, 0, w, groundY);
+
+      // Celestial body (Sun / Moon)
+      ctx.save();
+      if (isNight) {
+        // Moon
+        ctx.fillStyle = '#fef08a';
+        ctx.shadowColor = '#fef08a';
+        ctx.shadowBlur = 18;
+        ctx.beginPath();
+        ctx.arc(w * 0.88, h * 0.15, 22, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.fillStyle = '#0f172a';
+        ctx.shadowBlur = 0;
+        ctx.beginPath();
+        ctx.arc(w * 0.85, h * 0.14, 18, 0, Math.PI * 2);
+        ctx.fill();
+      } else {
+        // Sun with radiation rays
+        const sunX = w * 0.14;
+        const sunY = h * 0.14;
+        ctx.fillStyle = '#f59e0b';
+        ctx.shadowColor = '#fbbf24';
+        ctx.shadowBlur = 24;
+        ctx.beginPath();
+        ctx.arc(sunX, sunY, 26, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Sun heat radiation waves toward surface A
+        ctx.shadowBlur = 0;
+        ctx.strokeStyle = 'rgba(251, 191, 36, 0.4)';
+        ctx.lineWidth = 2;
+        ctx.setLineDash([4, 4]);
+        for (let r = 36; r <= 70; r += 16) {
+          ctx.beginPath();
+          ctx.arc(sunX, sunY, r, 0.2, 1.4);
+          ctx.stroke();
+        }
+        ctx.setLineDash([]);
+      }
+      ctx.restore();
+
+      // Left Surface Terrain (Land / Urban)
+      if (state.surfaceA.type === 'urban') {
+        // Urban Concrete & Buildings
+        ctx.fillStyle = '#334155';
+        ctx.fillRect(0, groundY, midX, h - groundY);
+        // Draw cityscape silhouettes
+        drawCitySilhouette(0, groundY, midX);
+      } else {
+        // Natural Land / Soil & Greenery
+        const landGrad = ctx.createLinearGradient(0, groundY, 0, h);
+        landGrad.addColorStop(0, '#582f0e');
+        landGrad.addColorStop(0.15, '#7f4f24');
+        landGrad.addColorStop(1, '#3a1f0a');
+        ctx.fillStyle = landGrad;
+        ctx.fillRect(0, groundY, midX, h - groundY);
+
+        // Grass top edge
+        ctx.fillStyle = '#65a30d';
+        ctx.fillRect(0, groundY - 5, midX, 6);
+        // Small trees
+        drawTree(midX * 0.25, groundY - 5);
+        drawTree(midX * 0.65, groundY - 5);
+      }
+
+      // Right Surface Terrain (Water / Forest)
+      if (state.surfaceB.type === 'sea') {
+        // Sea Water with animated ripples
+        const seaGrad = ctx.createLinearGradient(midX, groundY, midX, h);
+        seaGrad.addColorStop(0, '#0284c7');
+        seaGrad.addColorStop(0.3, '#0369a1');
+        seaGrad.addColorStop(1, '#0c4a6e');
+        ctx.fillStyle = seaGrad;
+        ctx.fillRect(midX, groundY, midX, h - groundY);
+
+        // Animated ocean waves
+        ctx.strokeStyle = 'rgba(255, 255, 255, 0.35)';
+        ctx.lineWidth = 1.5;
+        const waveOffset = state.time * 2;
+        for (let y = groundY + 12; y < h; y += 18) {
+          ctx.beginPath();
+          for (let x = midX; x <= w; x += 15) {
+            const waveY = y + Math.sin((x + waveOffset) * 0.05) * 2.5;
+            if (x === midX) ctx.moveTo(x, waveY);
+            else ctx.lineTo(x, waveY);
+          }
+          ctx.stroke();
+        }
+      } else {
+        // Dense Forest Terrain
+        ctx.fillStyle = '#14532d';
+        ctx.fillRect(midX, groundY, midX, h - groundY);
+        ctx.fillStyle = '#16a34a';
+        ctx.fillRect(midX, groundY - 6, midX, 7);
+        for (let fx = midX + 30; fx < w - 20; fx += 55) {
+          drawTree(fx, groundY - 6);
+        }
+      }
+
+      const isALow = state.surfaceA.pressure < state.surfaceB.pressure;
+      const isBLow = state.surfaceB.pressure < state.surfaceA.pressure;
+
+      // Draw Convection Streamlines if toggled
+      if (state.showStreamlines) {
+        drawConvectionLoop(w, groundY, midX, isALow);
+      }
+
+      // Draw Pressure & Temperature Badges on Left and Right Grounds
+      if (state.showLabels) {
+        drawPressureIndicators(w, groundY, midX, isALow, isBLow);
+      }
+
+      // Draw Clouds and Rain over the Low Pressure Region (where warm air ascends)
+      drawAtmosphericMoisture(w, groundY, midX, isALow);
+
+      // Draw Animated Air Particles
+      if (state.showParticles) {
+        updateAndDrawParticles(w, groundY, midX, isALow);
+      }
+    }
+
+    function drawCitySilhouette(startX, groundY, endX) {
+      ctx.fillStyle = '#1e293b';
+      const buildings = [
+        { x: 30, w: 35, h: 55 },
+        { x: 75, w: 50, h: 80 },
+        { x: 135, w: 40, h: 65 },
+        { x: 185, w: 60, h: 95 },
+        { x: 255, w: 45, h: 50 }
+      ];
+      buildings.forEach(b => {
+        if (startX + b.x + b.w < endX) {
+          ctx.fillRect(startX + b.x, groundY - b.h, b.w, b.h);
+          // Windows
+          ctx.fillStyle = '#fbbf24';
+          for (let wy = groundY - b.h + 8; wy < groundY - 10; wy += 12) {
+            for (let wx = startX + b.x + 6; wx < startX + b.x + b.w - 6; wx += 10) {
+              if (Math.sin(wx * wy) > -0.2) {
+                ctx.fillRect(wx, wy, 4, 6);
+              }
+            }
+          }
+          ctx.fillStyle = '#1e293b';
+        }
+      });
+    }
+
+    function drawTree(x, y) {
+      // Trunk
+      ctx.fillStyle = '#451a03';
+      ctx.fillRect(x - 3, y - 18, 6, 18);
+      // Leaves foliage
+      ctx.fillStyle = '#15803d';
+      ctx.beginPath();
+      ctx.arc(x, y - 24, 14, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillStyle = '#22c55e';
+      ctx.beginPath();
+      ctx.arc(x - 3, y - 28, 10, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
+    function drawConvectionLoop(w, groundY, midX, isALow) {
+      ctx.save();
+      const radiusX = w * 0.34;
+      const radiusY = groundY * 0.38;
+      const centerX = midX;
+      const centerY = groundY * 0.48;
+
+      ctx.lineWidth = 3;
+      ctx.setLineDash([8, 6]);
+
+      // Clockwise vs Counter-Clockwise flow
+      // If A is Low (hot) -> Air rises on left, moves right at altitude, sinks on right, returns at ground from right to left
+      const isCounterClockwise = isALow; 
+      
+      // Vector paths
+      ctx.strokeStyle = isCounterClockwise ? 'rgba(56, 189, 248, 0.65)' : 'rgba(249, 115, 22, 0.65)';
+      ctx.beginPath();
+      ctx.ellipse(centerX, centerY, radiusX, radiusY, 0, 0, Math.PI * 2);
+      ctx.stroke();
+
+      // Draw primary surface wind arrow
+      const arrowY = groundY - 20;
+      const arrowStartX = isCounterClockwise ? midX + radiusX * 0.75 : midX - radiusX * 0.75;
+      const arrowEndX = isCounterClockwise ? midX - radiusX * 0.75 : midX + radiusX * 0.75;
+
+      ctx.setLineDash([]);
+      ctx.lineWidth = 3.5;
+      ctx.strokeStyle = '#38bdf8';
+      ctx.fillStyle = '#38bdf8';
+      
+      drawArrow(arrowStartX, arrowY, arrowEndX, arrowY, 12);
+
+      // Label on surface wind
+      ctx.font = 'bold 12px Kanit, sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillStyle = '#ffffff';
+      ctx.shadowColor = '#000000';
+      ctx.shadowBlur = 4;
+      const windLabel = isCounterClockwise 
+        ? `💨 ทิศทางลมผิวพื้น: พัดเข้าหาหย่อม L (ความเร็ว ${state.windSpeed} m/s)`
+        : `💨 ทิศทางลมผิวพื้น: พัดเข้าหาหย่อม L (ความเร็ว ${state.windSpeed} m/s)`;
+      ctx.fillText(windLabel, centerX, arrowY - 10);
+
+      ctx.restore();
+    }
+
+    function drawArrow(fromX, fromY, toX, toY, headLength) {
+      const angle = Math.atan2(toY - fromY, toX - fromX);
+      ctx.beginPath();
+      ctx.moveTo(fromX, fromY);
+      ctx.lineTo(toX, toY);
+      ctx.stroke();
+
+      ctx.beginPath();
+      ctx.moveTo(toX, toY);
+      ctx.lineTo(toX - headLength * Math.cos(angle - Math.PI / 6), toY - headLength * Math.sin(angle - Math.PI / 6));
+      ctx.lineTo(toX - headLength * Math.cos(angle + Math.PI / 6), toY - headLength * Math.sin(angle + Math.PI / 6));
+      ctx.closePath();
+      ctx.fill();
+    }
+
+    function drawPressureIndicators(w, groundY, midX, isALow, isBLow) {
+      const leftCenterX = midX * 0.5;
+      const rightCenterX = midX + (w - midX) * 0.5;
+
+      // Surface A Badge
+      drawSystemBadge(leftCenterX, groundY - 80, isALow ? 'L' : 'H', isALow, state.surfaceA.temp, state.surfaceA.pressure, state.surfaceA.name);
+
+      // Surface B Badge
+      drawSystemBadge(rightCenterX, groundY - 80, isBLow ? 'L' : 'H', isBLow, state.surfaceB.temp, state.surfaceB.pressure, state.surfaceB.name);
+    }
+
+    function drawSystemBadge(x, y, symbol, isLow, temp, pressure, label) {
+      ctx.save();
+      const circleR = 26;
+      ctx.shadowColor = 'rgba(0,0,0,0.5)';
+      ctx.shadowBlur = 10;
+
+      // Glow circle
+      ctx.beginPath();
+      ctx.arc(x, y, circleR, 0, Math.PI * 2);
+      ctx.fillStyle = isLow ? '#ef4444' : '#2563eb';
+      ctx.fill();
+      ctx.lineWidth = 3;
+      ctx.strokeStyle = '#ffffff';
+      ctx.stroke();
+
+      // Big Letter
+      ctx.shadowBlur = 0;
+      ctx.font = '900 28px Kanit, sans-serif';
+      ctx.fillStyle = '#ffffff';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(symbol, x, y + 1);
+
+      // Descriptive tags below
+      ctx.font = '600 12px Kanit, sans-serif';
+      ctx.fillStyle = isLow ? '#fca5a5' : '#93c5fd';
+      const actionText = isLow ? 'ความกดต่ำ (อากาศร้อนยกตัว ↑)' : 'ความกดสูง (อากาศเย็นจมตัว ↓)';
+      ctx.fillText(actionText, x, y + 36);
+
+      ctx.font = '500 11px Sarabun, sans-serif';
+      ctx.fillStyle = '#f8fafc';
+      ctx.fillText(`${label}: ${temp}°C | ${pressure} hPa`, x, y + 52);
+
+      ctx.restore();
+    }
+
+    function drawAtmosphericMoisture(w, groundY, midX, isALow) {
+      const cloudAreaX = isALow ? midX * 0.5 : midX + (w - midX) * 0.5;
+      const cloudBaseY = groundY * 0.28;
+
+      // Only form clouds if humidity is sufficient (> 35%)
+      if (state.humidity < 35) return;
+
+      const cloudScale = (state.humidity - 30) / 70; // 0.1 to 1.0
+      const cloudDensity = isALow ? 1.0 : 0.4; // Low pressure zones produce far more clouds
+
+      ctx.save();
+      // Render Cloud Puffs
+      ctx.fillStyle = state.humidity > 80 
+        ? `rgba(100, 116, 139, ${0.85 * cloudDensity})` // Dark raincloud
+        : `rgba(241, 245, 249, ${0.9 * cloudDensity})`; // White fluffy cloud
+      
+      const puffs = [
+        { dx: -35, dy: 10, r: 28 * cloudScale },
+        { dx: 0, dy: -6, r: 42 * cloudScale },
+        { dx: 35, dy: 6, r: 32 * cloudScale },
+        { dx: -15, dy: 14, r: 24 * cloudScale },
+        { dx: 22, dy: 12, r: 26 * cloudScale }
+      ];
+
+      puffs.forEach(p => {
+        ctx.beginPath();
+        ctx.arc(cloudAreaX + p.dx, cloudBaseY + p.dy, Math.max(12, p.r), 0, Math.PI * 2);
+        ctx.fill();
+      });
+
+      // Label Cloud Process
+      ctx.font = '500 11px Sarabun, sans-serif';
+      ctx.fillStyle = '#ffffff';
+      ctx.textAlign = 'center';
+      ctx.shadowColor = '#000000';
+      ctx.shadowBlur = 4;
+      if (isALow) {
+        ctx.fillText('☁️ อากาศร้อนชื้นลอยตัวควบแน่นเกิดเมฆ', cloudAreaX, cloudBaseY - 35);
+      }
+
+      // Rain if humidity >= 70% in Low Pressure region
+      if (state.humidity >= 70 && isALow) {
+        ctx.strokeStyle = 'rgba(147, 197, 253, 0.75)';
+        ctx.lineWidth = 1.8;
+        state.raindrops.forEach(drop => {
+          const rx = cloudAreaX - 45 + drop.xRatio * 90;
+          const ry = cloudBaseY + 25 + (drop.yRatio * (groundY - cloudBaseY - 35));
+          ctx.beginPath();
+          ctx.moveTo(rx, ry);
+          ctx.lineTo(rx - 2, ry + drop.len);
+          ctx.stroke();
+
+          // Move rain
+          drop.yRatio += 0.035;
+          if (drop.yRatio > 1) {
+            drop.yRatio = 0.05;
+          }
+        });
+      }
+      ctx.restore();
+    }
+
+    function updateAndDrawParticles(w, groundY, midX, isALow) {
+      const radiusX = w * 0.34;
+      const radiusY = groundY * 0.38;
+      const centerX = midX;
+      const centerY = groundY * 0.48;
+
+      ctx.save();
+      const speedFactor = (state.windSpeed * 0.012 + 0.004) * (state.isRunning ? 1 : 0);
+
+      state.particles.forEach(p => {
+        // Compute angle around convection ellipse
+        if (p.angle === undefined) {
+          p.angle = Math.atan2((p.y - centerY) / radiusY, (p.x - centerX) / radiusX);
+        }
+
+        // Direction: if isALow -> rises on left (PI), moves right at top, sinks on right (0)
+        // Counter-clockwise vs clockwise
+        if (isALow) {
+          p.angle += speedFactor * p.speedOffset;
+        } else {
+          p.angle -= speedFactor * p.speedOffset;
+        }
+
+        // Ellipse coordinate calculation
+        const px = centerX + Math.cos(p.angle) * radiusX + (Math.sin(p.angle * 3) * 12);
+        const py = centerY + Math.sin(p.angle) * radiusY + (Math.cos(p.angle * 2) * 8);
+
+        // Particle color according to altitude & temperature
+        // Lower left: Warm (Red/Orange) if A is warm
+        const isLowerAtmosphere = py > groundY * 0.45;
+        const isLeftHemisphere = px < midX;
+
+        let pColor;
+        if (isLowerAtmosphere) {
+          pColor = (isLeftHemisphere && state.surfaceA.temp > 28) ? '#f87171' : '#60a5fa';
+        } else {
+          pColor = '#93c5fd'; // Cool upper air
+        }
+
+        ctx.fillStyle = pColor;
+        ctx.beginPath();
+        ctx.arc(px, py, p.size, 0, Math.PI * 2);
+        ctx.fill();
+      });
+      ctx.restore();
+    }
+
+    function setupEventListeners() {
+      // Play/Pause button
+      btnPlayPause.addEventListener('click', () => {
+        state.isRunning = !state.isRunning;
+        playIcon.textContent = state.isRunning ? '⏸️' : '▶️';
+        playText.textContent = state.isRunning ? 'หยุดชั่วคราว' : 'เล่นต่อ';
+        btnPlayPause.classList.toggle('bg-emerald-600', state.isRunning);
+        btnPlayPause.classList.toggle('bg-amber-600', !state.isRunning);
+      });
+
+      // Reset Button
+      btnReset.addEventListener('click', () => {
+        loadScenario('day_sea_breeze');
+      });
+
+      // Toggles
+      chkStreamlines.addEventListener('change', e => state.showStreamlines = e.target.checked);
+      chkParticles.addEventListener('change', e => state.showParticles = e.target.checked);
+      chkLabels.addEventListener('change', e => state.showLabels = e.target.checked);
+
+      // Sliders
+      sliderTempA.addEventListener('input', e => {
+        state.surfaceA.temp = parseFloat(e.target.value);
+        setActivePresetButton(null);
+        currentScenarioBadge.textContent = 'ปรับแต่งเอง (Custom)';
+        computeAtmosphericPhysics();
+      });
+
+      sliderTempB.addEventListener('input', e => {
+        state.surfaceB.temp = parseFloat(e.target.value);
+        setActivePresetButton(null);
+        currentScenarioBadge.textContent = 'ปรับแต่งเอง (Custom)';
+        computeAtmosphericPhysics();
+      });
+
+      sliderHumidity.addEventListener('input', e => {
+        state.humidity = parseInt(e.target.value, 10);
+        computeAtmosphericPhysics();
+      });
+
+      // Preset Scenario buttons
+      presetButtons.forEach(btn => {
+        btn.addEventListener('click', () => {
+          const scenarioKey = btn.getAttribute('data-preset');
+          loadScenario(scenarioKey);
+        });
+      });
+    }
+
+    function setActivePresetButton(activeBtn) {
+      presetButtons.forEach(btn => {
+        if (btn === activeBtn) {
+          btn.classList.add('border-cyan-500/60', 'bg-cyan-500/20', 'text-cyan-200');
+          btn.classList.remove('border-slate-700', 'bg-slate-900/50', 'text-slate-300');
+        } else {
+          btn.classList.remove('border-cyan-500/60', 'bg-cyan-500/20', 'text-cyan-200');
+          btn.classList.add('border-slate-700', 'bg-slate-900/50', 'text-slate-300');
+        }
+      });
+    }
+
+    function loadScenario(presetKey) {
+      state.scenario = presetKey;
+      const targetBtn = document.querySelector(`[data-preset="${presetKey}"]`);
+      setActivePresetButton(targetBtn);
+
+      const lblSurfaceA = document.getElementById('lblSurfaceA');
+      const lblSurfaceB = document.getElementById('lblSurfaceB');
+
+      if (presetKey === 'day_sea_breeze') {
+        state.surfaceA = { name: 'พื้นดิน (ชายฝั่ง)', type: 'land', temp: 35.0, pressure: 1006.0 };
+        state.surfaceB = { name: 'พื้นน้ำ (ทะเล)', type: 'sea', temp: 25.0, pressure: 1016.0 };
+        state.humidity = 65;
+        lblSurfaceA.textContent = '🏜️ ชายฝั่ง (พื้นดิน):';
+        lblSurfaceB.textContent = '🌊 ทะเล (พื้นน้ำ):';
+        chainStep1Title.textContent = 'ดินรับความร้อนไวกว่าน้ำ';
+        chainStep1Desc.textContent = 'กลางวันแดดจัด ดินอุณหภูมิพุ่งสูงเร็ว';
+        currentScenarioBadge.textContent = 'กลางวัน (ลมทะเล)';
+      } 
+      else if (presetKey === 'night_land_breeze') {
+        state.surfaceA = { name: 'พื้นดิน (ชายฝั่ง)', type: 'land', temp: 20.0, pressure: 1018.0 };
+        state.surfaceB = { name: 'พื้นน้ำ (ทะเล)', type: 'sea', temp: 28.0, pressure: 1010.0 };
+        state.humidity = 50;
+        lblSurfaceA.textContent = '🏜️ ชายฝั่ง (พื้นดิน):';
+        lblSurfaceB.textContent = '🌊 ทะเล (พื้นน้ำ):';
+        chainStep1Title.textContent = 'ดินคายความร้อนไวกว่าน้ำ';
+        chainStep1Desc.textContent = 'กลางคืนดินเย็นลงเร็ว ทะเลยังอุ่น';
+        currentScenarioBadge.textContent = 'กลางคืน (ลมบก)';
+      } 
+      else if (presetKey === 'urban_heat_island') {
+        state.surfaceA = { name: 'เมือง/คอนกรีต', type: 'urban', temp: 39.0, pressure: 1003.0 };
+        state.surfaceB = { name: 'ป่าไม้ธรรมชาติ', type: 'forest', temp: 26.0, pressure: 1015.0 };
+        state.humidity = 45;
+        lblSurfaceA.textContent = '🏢 เมือง (ตึก/คอนกรีต):';
+        lblSurfaceB.textContent = '🌳 ป่าไม้ (พืชพรรณ):';
+        chainStep1Title.textContent = 'คอนกรีตดูดซับความร้อนสูง';
+        chainStep1Desc.textContent = 'เมืองสะสมความร้อน ป่าไม้คายน้ำเย็นกว่า';
+        currentScenarioBadge.textContent = 'เกาะความร้อนเมือง (Urban Heat)';
+      } 
+      else if (presetKey === 'stormy_low') {
+        state.surfaceA = { name: 'พื้นที่หย่อม L ลึก', type: 'land', temp: 38.0, pressure: 998.0 };
+        state.surfaceB = { name: 'มวลอากาศเย็น H', type: 'sea', temp: 22.0, pressure: 1020.0 };
+        state.humidity = 90;
+        lblSurfaceA.textContent = '🌀 ศูนย์กลางความกดต่ำ:';
+        lblSurfaceB.textContent = '🌊 มวลอากาศเย็นชื้น:';
+        chainStep1Title.textContent = 'ความกดอากาศต่างกันรุนแรง';
+        chainStep1Desc.textContent = 'อากาศร้อนชื้นยกตัวรวดเร็วมาก';
+        currentScenarioBadge.textContent = 'พายุความกดอากาศต่ำ (L)';
+      }
+
+      // Sync Sliders
+      sliderTempA.value = state.surfaceA.temp;
+      sliderTempB.value = state.surfaceB.temp;
+      sliderHumidity.value = state.humidity;
+
+      computeAtmosphericPhysics();
+    }
+
+    function animate() {
+      if (state.isRunning) {
+        state.time += 0.05;
+      }
+      drawSimulation();
+      requestAnimationFrame(animate);
+    }
+
+    // Initialization on load
+    window.addEventListener('DOMContentLoaded', () => {
+      resizeCanvas();
+      initParticles();
+      initClouds();
+      setupEventListeners();
+      loadScenario('day_sea_breeze');
+      animate();
+    });
+  </script>
+</body>
+</html>
