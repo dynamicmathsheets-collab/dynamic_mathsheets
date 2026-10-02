@@ -1,0 +1,2416 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>บทที่ 4 การลำดับชั้นหินและอายุทางธรณีวิทยา - Interactive Simulations & Assessment</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Google Fonts: Prompt & Sarabun -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@400;500;600;700&family=Sarabun:wght@300;400;500;600&display=swap" rel="stylesheet">
+  
+  <style>
+    body {
+      font-family: 'Sarabun', sans-serif;
+    }
+    h1, h2, h3, h4, .font-prompt {
+      font-family: 'Prompt', sans-serif;
+    }
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #f1f5f9;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #94a3b8;
+      border-radius: 4px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #64748b;
+    }
+
+    /* Print Setup for A4 Exact Page Fitting */
+    @page {
+      size: A4 portrait;
+      margin: 10mm 12mm 10mm 12mm;
+    }
+
+    @media print {
+      body {
+        background-color: #ffffff !important;
+        color: #000000 !important;
+        font-size: 11pt !important;
+        line-height: 1.35 !important;
+      }
+      /* Hide navigation, UI controls, canvases, and footers */
+      header, nav, footer, #tabBtnContainer, .no-print, button, input[type="range"], select {
+        display: none !important;
+      }
+      main {
+        max-width: 100% !important;
+        padding: 0 !important;
+        margin: 0 !important;
+      }
+      /* Force display worksheets */
+      .worksheet-printable {
+        display: block !important;
+        background: transparent !important;
+        border: 1px solid #94a3b8 !important;
+        box-shadow: none !important;
+        padding: 12px 16px !important;
+        page-break-inside: avoid !important;
+        break-inside: avoid !important;
+        height: 275mm !important; /* Fit within A4 297mm height */
+        box-sizing: border-box !important;
+      }
+      .page-break {
+        page-break-after: always !important;
+        break-after: page !important;
+      }
+      /* Ensure text is dark and legible */
+      .text-slate-600, .text-slate-700, .text-slate-800, .text-slate-900 {
+        color: #111827 !important;
+      }
+      /* Hide screen-only interactive blocks when printing */
+      .screen-interactive-block {
+        display: none !important;
+      }
+    }
+  </style>
+</head>
+<body class="bg-slate-100 text-slate-800 min-h-screen flex flex-col">
+
+  <!-- Header -->
+  <header class="bg-gradient-to-r from-slate-900 via-indigo-950 to-blue-900 text-white shadow-lg sticky top-0 z-50 no-print">
+    <div class="max-w-7xl mx-auto px-4 py-3 sm:px-6">
+      <div class="flex flex-col sm:flex-row items-center justify-between gap-3">
+        <div class="flex items-center gap-3 text-center sm:text-left">
+          <div class="p-2.5 bg-blue-500/20 backdrop-blur rounded-xl border border-blue-400/30">
+            <svg class="w-7 h-7 text-blue-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
+            </svg>
+          </div>
+          <div>
+            <span class="text-xs font-semibold uppercase tracking-wider text-blue-300">วิทยาศาสตร์โลกและอวกาศ (Earth Science) ม.4</span>
+            <h1 class="text-lg sm:text-xl font-bold tracking-tight">บทที่ 4 การลำดับชั้นหินและอายุทางธรณีวิทยา</h1>
+          </div>
+        </div>
+        <div class="flex items-center gap-2">
+          <button onclick="printAllWorksheets()" class="px-3.5 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-semibold shadow transition flex items-center gap-1.5">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path></svg>
+            🖨️ พิมพ์ใบกิจกรรมทั้งหมด (1-5 เล่มเดียวพอดี A4)
+          </button>
+        </div>
+      </div>
+
+      <!-- Navigation Tabs (6 Tabs) -->
+      <nav class="flex space-x-1 sm:space-x-2 mt-3 overflow-x-auto pb-1 text-sm border-t border-slate-700/60 pt-2" id="navTabs">
+        <button onclick="switchTab(1)" id="tabBtn1" class="tab-btn active px-3.5 py-2 rounded-lg font-medium whitespace-nowrap transition-all duration-200 bg-blue-600 text-white shadow-md">
+          1. การเกิดและลำดับชั้นหิน
+        </button>
+        <button onclick="switchTab(2)" id="tabBtn2" class="tab-btn px-3.5 py-2 rounded-lg font-medium whitespace-nowrap transition-all duration-200 text-slate-300 hover:text-white hover:bg-slate-800">
+          2. ลำดับเหตุการณ์ธรณีวิทยา
+        </button>
+        <button onclick="switchTab(3)" id="tabBtn3" class="tab-btn px-3.5 py-2 rounded-lg font-medium whitespace-nowrap transition-all duration-200 text-slate-300 hover:text-white hover:bg-slate-800">
+          3. การเทียบสัมพันธ์ด้วยซากดึกดำบรรพ์
+        </button>
+        <button onclick="switchTab(4)" id="tabBtn4" class="tab-btn px-3.5 py-2 rounded-lg font-medium whitespace-nowrap transition-all duration-200 text-slate-300 hover:text-white hover:bg-slate-800">
+          4. การหาอายุสัมบูรณ์ (ครึ่งชีวิต)
+        </button>
+        <button onclick="switchTab(5)" id="tabBtn5" class="tab-btn px-3.5 py-2 rounded-lg font-medium whitespace-nowrap transition-all duration-200 text-slate-300 hover:text-white hover:bg-slate-800">
+          5. มาตราธรณีกาล
+        </button>
+        <button onclick="switchTab(6)" id="tabBtn6" class="tab-btn px-3.5 py-2 rounded-lg font-medium whitespace-nowrap transition-all duration-200 text-amber-300 hover:text-amber-100 hover:bg-amber-900/40 border border-amber-500/40">
+          📝 6. แบบทดสอบวัดผลท้ายบท (15 ข้อ K-P-A)
+        </button>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Main Content Container -->
+  <main class="max-w-7xl mx-auto px-4 py-6 sm:px-6 flex-1 w-full">
+
+    <!-- ========================================== -->
+    <!-- TAB 1: การเกิดและลำดับชั้นหิน -->
+    <!-- ========================================== -->
+    <section id="tab1" class="tab-content block space-y-6">
+      
+      <!-- Interactive Screen Area (Hidden on Print) -->
+      <div class="screen-interactive-block space-y-6">
+        <!-- Step 1: Learn -->
+        <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-5">
+          <div class="flex items-center gap-2 mb-2">
+            <span class="px-2.5 py-1 text-xs font-semibold bg-blue-100 text-blue-700 rounded-md">ขั้นที่ 1</span>
+            <h2 class="text-lg font-bold text-slate-900">เรียนรู้หลักการสั้น ๆ: การตกสะสมตัวและกฎการซ้อนทับ</h2>
+          </div>
+          <p class="text-slate-600 text-sm leading-relaxed">
+            <strong>1. กฎการวางตัวตามแนวนอน (Law of Original Horizontality):</strong> ตะกอนจะสะสมตัวเป็นชั้นราบขนานกับผิวโลกตามแรงโน้มถ่วง หากพบชั้นหินเอียงเทหรือโค้งงอ แสดงว่ามีแรงแปรสัณฐานมากระทำภายหลัง<br>
+            <strong>2. กฎการซ้อนทับ (Law of Superposition):</strong> ในชั้นหินตะกอนที่ไม่ถูกรบกวน <em>"ชั้นหินที่อยู่ด้านล่างจะมีอายุแก่ที่สุด ส่วนชั้นหินที่สะสมอยู่ด้านบนจะมีอายุน้อยกว่าตามลำดับ"</em>
+          </p>
+        </div>
+
+        <!-- Step 2-4: Interactive Canvas -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-5 flex flex-col justify-between">
+            <div>
+              <div class="flex items-center gap-2 mb-4">
+                <span class="px-2.5 py-1 text-xs font-semibold bg-emerald-100 text-emerald-700 rounded-md">ขั้นที่ 2 & 3</span>
+                <h3 class="font-bold text-slate-800">เข้าโมเดล & ปรับตัวแปร</h3>
+              </div>
+              
+              <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">เลือกชนิดตะกอนเพื่อตกสะสมตัว:</label>
+              <div class="grid grid-cols-2 gap-2 mb-4">
+                <button onclick="addLayer('sandstone')" class="p-2.5 bg-amber-50 hover:bg-amber-100 border border-amber-200 rounded-lg text-left text-xs font-medium text-amber-900 transition flex items-center gap-2">
+                  <span class="w-3 h-3 rounded-full bg-amber-400"></span> หินทราย (Sandstone)
+                </button>
+                <button onclick="addLayer('shale')" class="p-2.5 bg-slate-100 hover:bg-slate-200 border border-slate-300 rounded-lg text-left text-xs font-medium text-slate-900 transition flex items-center gap-2">
+                  <span class="w-3 h-3 rounded-full bg-slate-500"></span> หินดินดาน (Shale)
+                </button>
+                <button onclick="addLayer('limestone')" class="p-2.5 bg-blue-50 hover:bg-blue-100 border border-blue-200 rounded-lg text-left text-xs font-medium text-blue-900 transition flex items-center gap-2">
+                  <span class="w-3 h-3 rounded-full bg-blue-400"></span> หินปูน (Limestone)
+                </button>
+                <button onclick="addLayer('conglomerate')" class="p-2.5 bg-orange-50 hover:bg-orange-100 border border-orange-200 rounded-lg text-left text-xs font-medium text-orange-900 transition flex items-center gap-2">
+                  <span class="w-3 h-3 rounded-full bg-orange-600"></span> หินกรวดมน (Conglomerate)
+                </button>
+              </div>
+
+              <div class="mb-4">
+                <div class="flex justify-between text-xs font-semibold text-slate-600 mb-1">
+                  <span>แรงแปรสัณฐาน (ปรับมุมเอียงเท):</span>
+                  <span id="tiltVal">0°</span>
+                </div>
+                <input type="range" id="tiltSlider" min="-25" max="25" value="0" step="1" oninput="updateTilt(this.value)" class="w-full accent-blue-600">
+              </div>
+
+              <div class="flex gap-2">
+                <button onclick="resetLayers()" class="w-full py-2 bg-slate-200 hover:bg-slate-300 text-slate-700 text-xs font-semibold rounded-lg transition">
+                  ล้างข้อมูลชั้นหินใหม่
+                </button>
+              </div>
+            </div>
+
+            <div class="mt-4 pt-4 border-t border-slate-100">
+              <span class="text-xs font-semibold text-slate-500">ลำดับชั้นหินที่สะสมตัว (ล่างสุด &rarr; บนสุด):</span>
+              <div id="layerList" class="mt-2 space-y-1 max-h-36 overflow-y-auto text-xs"></div>
+            </div>
+          </div>
+
+          <div class="lg:col-span-2 bg-white rounded-xl shadow-sm border border-slate-200 p-5 flex flex-col">
+            <div class="flex items-center justify-between mb-3">
+              <div class="flex items-center gap-2">
+                <span class="px-2.5 py-1 text-xs font-semibold bg-purple-100 text-purple-700 rounded-md">ขั้นที่ 4</span>
+                <h3 class="font-bold text-slate-800">สังเกตผล (Live Stratigraphic Column)</h3>
+              </div>
+              <span class="text-xs text-slate-500" id="layerCountText">จำนวนชั้นหิน: 0 ชั้น</span>
+            </div>
+
+            <div class="relative w-full h-80 bg-sky-50 rounded-lg border border-slate-300 overflow-hidden flex items-center justify-center">
+              <canvas id="canvas1" width="600" height="320" class="w-full h-full block"></canvas>
+              <div class="absolute right-3 top-3 bg-white/90 backdrop-blur px-2.5 py-1 rounded text-[11px] font-medium text-slate-600 border border-slate-200 shadow-sm pointer-events-none">
+                ⬆ อายุน้อยที่สุด (Youngest)<br>⬇ แก่ที่สุด (Oldest)
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Step 5: Reflection & Contextual Quiz -->
+        <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-5">
+          <div class="flex items-center justify-between mb-3">
+            <div class="flex items-center gap-2">
+              <span class="px-2.5 py-1 text-xs font-semibold bg-amber-100 text-amber-700 rounded-md">ขั้นที่ 5</span>
+              <h3 class="font-bold text-slate-800">อธิบายสิ่งที่เกิดขึ้น & ตรวจสอบความเข้าใจ (Dynamic Quiz)</h3>
+            </div>
+            <button onclick="printSingleWorksheet('ws1')" class="px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded text-xs font-medium shadow flex items-center gap-1">
+              🖨️️ พิมพ์ใบงานกิจกรรมที่ 1 (A4 พอดีหน้า)
+            </button>
+          </div>
+          
+          <div id="tab1QuizContainer" class="p-4 bg-slate-50 rounded-lg border border-slate-200">
+            <p class="text-xs text-slate-500 mb-2 italic">กดสะสมชั้นหินอย่างน้อย 2 ชั้นเพื่อปลดล็อกคำถามประเมินผลตามชั้นหินที่คุณสร้างจริง!</p>
+            <div id="tab1QuestionArea" class="hidden">
+              <p id="t1QuestionText" class="text-sm font-semibold text-slate-800 mb-3"></p>
+              <div id="t1Options" class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs"></div>
+              <div id="t1Feedback" class="mt-3 text-xs p-3 rounded-lg hidden font-medium"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ========================================================= -->
+      <!-- WORKSHEET 1 (PRINTABLE A4 FITTED) -->
+      <!-- ========================================================= -->
+      <div id="ws1" class="worksheet-printable bg-white rounded-xl border border-slate-300 p-5 page-break">
+        <!-- Worksheet Header -->
+        <div class="border-b-2 border-slate-800 pb-2 mb-3">
+          <div class="flex justify-between items-start">
+            <div>
+              <span class="text-[11px] font-bold text-slate-500 tracking-wider">กลุ่มสาระการเรียนรู้วิทยาศาสตร์และเทคโนโลยี • ม.4</span>
+              <h2 class="text-base font-bold text-slate-900">ใบกิจกรรมการเรียนรู้ที่ 1: การสะสมตัวและกฎการซ้อนทับของชั้นหิน</h2>
+              <span class="text-xs text-blue-700 font-semibold">ตัวชี้วัด ว 3.2 ม.6/4: อธิบายลำดับเหตุการณ์ทางธรณีวิทยาในอดีตจากการลำดับชั้นหิน</span>
+            </div>
+            <div class="text-right text-xs">
+              <span class="inline-block border border-slate-400 px-2 py-1 rounded bg-slate-50 font-bold">แบบประเมินทักษะ (P)</span>
+            </div>
+          </div>
+          <div class="grid grid-cols-3 gap-2 mt-2 pt-2 border-t border-slate-200 text-xs">
+            <div>ชื่อ-นามสกุล: ..............................................................</div>
+            <div>เลขที่: .............. ชั้น: ม.4/...........</div>
+            <div>วันที่: ....................................................</div>
+          </div>
+        </div>
+
+        <!-- Task 1: Observation & Data Record -->
+        <div class="mb-3">
+          <h3 class="text-xs font-bold text-slate-900 mb-1">ตอนที่ 1: การทดลองปรับตัวแปรและบันทึกผลเชิงประจักษ์ (จากแบบจำลอง)</h3>
+          <p class="text-[11px] text-slate-600 mb-1.5"><strong>คำชี้แจง:</strong> ให้นักเรียนจำลองการสะสมตะกอน 3–4 ชั้น แล้วปรับมุมเอียงเท วาดภาพหน้าตัดที่ได้ลงในกรอบ พร้อมระบุชื่อหิน</p>
+          
+          <div class="grid grid-cols-2 gap-3">
+            <div class="border border-dashed border-slate-400 rounded p-2 text-center h-36 flex flex-col justify-between">
+              <span class="text-[10px] text-slate-400">กรอบวาดภาพสเก็ตช์ลำดับชั้นหินที่สร้างขึ้น (แสดงความเอียงเท)</span>
+              <div class="border-t border-slate-200 pt-1 text-[10px] text-slate-500 flex justify-around">
+                <span>[ชั้นบนสุด: อายุน้อยสุด]</span>
+                <span>[ชั้นล่างสุด: อายุแก่สุด]</span>
+              </div>
+            </div>
+            <div class="border border-slate-300 rounded p-2 text-xs flex flex-col justify-between">
+              <div>
+                <span class="font-bold text-[11px] block mb-1">ตารางบันทึกผลการสะสมตัว:</span>
+                <div class="space-y-1 text-[11px]">
+                  <div>• ชั้นหินที่ 4 (บนสุด): ........................................................</div>
+                  <div>• ชั้นหินที่ 3: ....................................................................</div>
+                  <div>• ชั้นหินที่ 2: ....................................................................</div>
+                  <div>• ชั้นหินที่ 1 (ล่างสุด): .......................................................</div>
+                </div>
+              </div>
+              <div class="text-[11px] pt-1 border-t border-slate-200">
+                มุมเอียงเทที่ตั้งค่า: ............. องศา
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Task 2: Analysis & Scientific Reasoning -->
+        <div class="mb-3 space-y-2">
+          <h3 class="text-xs font-bold text-slate-900 mb-1">ตอนที่ 2: การวิเคราะห์และอธิบายหลักการทางธรณีวิทยา</h3>
+          <div class="text-xs space-y-1.5">
+            <div>
+              <strong>1. ตาม "กฎการซ้อนทับ" (Superposition):</strong> หินชนิดใดในแบบจำลองของนักเรียนมีอายุ <u>แก่ที่สุด</u> และชนิดใด <u>อายุน้อยที่สุด</u> เพราะเหตุใด?<br>
+              <div class="border-b border-dotted border-slate-400 mt-1 h-5"></div>
+              <div class="border-b border-dotted border-slate-400 mt-1 h-5"></div>
+            </div>
+            <div>
+              <strong>2. ตาม "กฎการวางตัวแนวราบเดิม" (Original Horizontality):</strong> เพราะเหตุใดตะกอนในธรรมชาติจึงตกสะสมตัวในแนวราบตั้งแต่แรก และการที่ชั้นหินเอียงเทเกิดจากสิ่งใด?<br>
+              <div class="border-b border-dotted border-slate-400 mt-1 h-5"></div>
+              <div class="border-b border-dotted border-slate-400 mt-1 h-5"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Task 3: Rubric Assessment -->
+        <div class="border-t border-slate-300 pt-2 text-[10px]">
+          <span class="font-bold block mb-1">เกณฑ์การประเมินทักษะกระบวนการ (P) โดยผู้สอน:</span>
+          <table class="w-full border-collapse border border-slate-300 text-center">
+            <thead>
+              <tr class="bg-slate-100">
+                <th class="border border-slate-300 p-1">ประเด็นการประเมิน</th>
+                <th class="border border-slate-300 p-1">ดีมาก (4)</th>
+                <th class="border border-slate-300 p-1">ดี (3)</th>
+                <th class="border border-slate-300 p-1">พอใช้ (2)</th>
+                <th class="border border-slate-300 p-1">ปรับปรุง (1)</th>
+                <th class="border border-slate-300 p-1">คะแนนที่ได้</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td class="border border-slate-300 p-1 text-left">1. การสังเกตและบันทึกผลการสะสมตัว</td>
+                <td class="border border-slate-300 p-1">วาดสเก็ตช์และระบุลำดับหินถูกต้องครบถ้วน</td>
+                <td class="border border-slate-300 p-1">ระบุถูกต้องเป็นส่วนใหญ่ ข้อมูลตกหล่นเล็กน้อย</td>
+                <td class="border border-slate-300 p-1">ระบุได้บางส่วน วาดภาพไม่ชัดเจน</td>
+                <td class="border border-slate-300 p-1">ไม่สามารถระบุลำดับชั้นหินได้ถูกต้อง</td>
+                <td class="border border-slate-300 p-1">....../4</td>
+              </tr>
+              <tr>
+                <td class="border border-slate-300 p-1 text-left">2. การลงความเห็นและอ้างอิงกฎธรณีวิทยา</td>
+                <td class="border border-slate-300 p-1">อ้างกฎการซ้อนทับและแนวราบเดิมได้สมบูรณ์</td>
+                <td class="border border-slate-300 p-1">อธิบายได้ถูกต้องแต่อ้างกฎไม่ครบถ้วน</td>
+                <td class="border border-slate-300 p-1">อธิบายได้บางส่วนตามคำชี้แนะ</td>
+                <td class="border border-slate-300 p-1">อธิบายไม่สอดคล้องกับหลักการ</td>
+                <td class="border border-slate-300 p-1">....../4</td>
+              </tr>
+            </tbody>
+          </table>
+          <div class="flex justify-between items-center mt-2 font-bold text-xs">
+            <span>รวมคะแนนทักษะ (P): ............. / 8 คะแนน</span>
+            <span>ลงชื่อผู้ประเมิน: ..............................................................</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================== -->
+    <!-- TAB 2: ลำดับเหตุการณ์ธรณีวิทยา -->
+    <!-- ========================================== -->
+    <section id="tab2" class="tab-content hidden space-y-6">
+      
+      <!-- Interactive Screen Area -->
+      <div class="screen-interactive-block space-y-6">
+        <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-5">
+          <div class="flex items-center gap-2 mb-2">
+            <span class="px-2.5 py-1 text-xs font-semibold bg-blue-100 text-blue-700 rounded-md">ขั้นที่ 1</span>
+            <h2 class="text-lg font-bold text-slate-900">เรียนรู้หลักการสั้น ๆ: กฎความสัมพันธ์การตัดผ่าน (Cross-Cutting Relationships)</h2>
+          </div>
+          <p class="text-slate-600 text-sm leading-relaxed">
+            หากมี <strong>หินอัคนีแทรกซอน (Igneous Intrusion)</strong> หรือ <strong>รอยเลื่อน (Fault)</strong> ตัดผ่านชั้นหินใด ๆ 
+            <em>"สิ่งหรือโครงสร้างธรณีที่ตัดผ่าน ย่อมมีอายุอ่อนกว่า (เกิดทีหลัง) ชั้นหินที่ถูกตัดเสมอ"</em>
+          </p>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-5 flex flex-col justify-between">
+            <div>
+              <div class="flex items-center gap-2 mb-4">
+                <span class="px-2.5 py-1 text-xs font-semibold bg-emerald-100 text-emerald-700 rounded-md">ขั้นที่ 2 & 3</span>
+                <h3 class="font-bold text-slate-800">ปรับตัวแปร: ลำดับเวลาของเหตุการณ์</h3>
+              </div>
+
+              <div class="space-y-4">
+                <div>
+                  <label class="block text-xs font-semibold text-slate-600 mb-1">ไทม์ไลน์เหตุการณ์ (Event Step 1 ถึง 5):</label>
+                  <input type="range" id="eventSlider" min="1" max="5" value="1" step="1" oninput="setEventStep(this.value)" class="w-full accent-blue-600">
+                  <div class="flex justify-between text-[11px] text-slate-400 font-mono mt-1">
+                    <span>1</span><span>2</span><span>3</span><span>4 (หินแทรก)</span><span>5 (รอยเลื่อน)</span>
+                  </div>
+                </div>
+
+                <div class="p-3 bg-slate-50 border border-slate-200 rounded-lg text-xs space-y-1.5" id="stepDesc"></div>
+
+                <div class="flex gap-2">
+                  <button onclick="playTimeline()" id="playBtn" class="flex-1 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold rounded-lg transition flex items-center justify-center gap-1">
+                    ▶ เล่นตามลำดับเวลา
+                  </button>
+                  <button onclick="setEventStep(1)" class="px-3 py-2 bg-slate-200 hover:bg-slate-300 text-slate-700 text-xs font-semibold rounded-lg transition">
+                    รีเซ็ต
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <div class="mt-6 pt-4 border-t border-slate-100 text-[11px] text-slate-500">
+              <strong>ทริกการวิเคราะห์:</strong> สังเกตว่ารอยเลื่อนและหินอัคนีแทรกซอนตัดผ่านชั้นใดบ้าง ชั้นที่ไม่ถูกตัดเกิดขึ้นหลังเหตุการณ์นั้น!
+            </div>
+          </div>
+
+          <div class="lg:col-span-2 bg-white rounded-xl shadow-sm border border-slate-200 p-5 flex flex-col">
+            <div class="flex items-center justify-between mb-3">
+              <div class="flex items-center gap-2">
+                <span class="px-2.5 py-1 text-xs font-semibold bg-purple-100 text-purple-700 rounded-md">ขั้นที่ 4</span>
+                <h3 class="font-bold text-slate-800">สังเกตผล: ภาคตัดขวางทางธรณีวิทยา (Cross-Section)</h3>
+              </div>
+            </div>
+            <div class="w-full h-80 bg-slate-900 rounded-lg border border-slate-700 overflow-hidden relative">
+              <canvas id="canvas2" width="600" height="320" class="w-full h-full block"></canvas>
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-5">
+          <div class="flex items-center justify-between mb-3">
+            <div class="flex items-center gap-2">
+              <span class="px-2.5 py-1 text-xs font-semibold bg-amber-100 text-amber-700 rounded-md">ขั้นที่ 5</span>
+              <h3 class="font-bold text-slate-800">อธิบายสิ่งที่เกิดขึ้น: วิเคราะห์ลำดับเหตุการณ์</h3>
+            </div>
+            <button onclick="printSingleWorksheet('ws2')" class="px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded text-xs font-medium shadow flex items-center gap-1">
+              🖨️ พิมพ์ใบงานกิจกรรมที่ 2 (A4 พอดีหน้า)
+            </button>
+          </div>
+          <p class="text-xs text-slate-600 mb-3">เมื่อปรับสไลเดอร์ไปที่ <strong>ขั้นที่ 5 (เหตุการณ์ครบทั้งหมด)</strong> จงวิเคราะห์ว่า ข้อใดเรียงลำดับเหตุการณ์จาก <em>"แก่ที่สุด ไปหา อ่อนที่สุด"</em> ได้ถูกต้อง?</p>
+          
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs" id="t2Options">
+            <button onclick="checkT2(1)" class="t2-opt p-3 bg-slate-50 hover:bg-blue-50 border border-slate-200 rounded-lg text-left transition">
+              ก. รอยเลื่อน E &rarr; หินอัคนี D &rarr; หินทราย C &rarr; หินดินดาน B &rarr; หินปูน A
+            </button>
+            <button onclick="checkT2(2)" class="t2-opt p-3 bg-slate-50 hover:bg-blue-50 border border-slate-200 rounded-lg text-left transition">
+              ข. หินปูน A &rarr; หินดินดาน B &rarr; หินทราย C &rarr; หินอัคนีแทรกซอน D &rarr; รอยเลื่อน E
+            </button>
+            <button onclick="checkT2(3)" class="t2-opt p-3 bg-slate-50 hover:bg-blue-50 border border-slate-200 rounded-lg text-left transition">
+              ค. หินอัคนีแทรกซอน D &rarr; หินปูน A &rarr; หินดินดาน B &rarr; หินทราย C &rarr; รอยเลื่อน E
+            </button>
+            <button onclick="checkT2(4)" class="t2-opt p-3 bg-slate-50 hover:bg-blue-50 border border-slate-200 rounded-lg text-left transition">
+              ง. รอยเลื่อน E &rarr; หินปูน A &rarr; หินดินดาน B &rarr; หินทราย C &rarr; หินอัคนี D
+            </button>
+          </div>
+          <div id="t2Feedback" class="mt-3 text-xs p-3 rounded-lg hidden font-medium"></div>
+        </div>
+      </div>
+
+      <!-- ========================================================= -->
+      <!-- WORKSHEET 2 (PRINTABLE A4 FITTED) -->
+      <!-- ========================================================= -->
+      <div id="ws2" class="worksheet-printable bg-white rounded-xl border border-slate-300 p-5 page-break">
+        <div class="border-b-2 border-slate-800 pb-2 mb-3">
+          <div class="flex justify-between items-start">
+            <div>
+              <span class="text-[11px] font-bold text-slate-500 tracking-wider">กลุ่มสาระการเรียนรู้วิทยาศาสตร์และเทคโนโลยี • ม.4</span>
+              <h2 class="text-base font-bold text-slate-900">ใบกิจกรรมการเรียนรู้ที่ 2: การอ่านลำดับเหตุการณ์ทางธรณีวิทยา</h2>
+              <span class="text-xs text-blue-700 font-semibold">ตัวชี้วัด ว 3.2 ม.6/4: อธิบายลำดับเหตุการณ์ทางธรณีวิทยาในอดีตจากการลำดับชั้นหินและรอยเลื่อน</span>
+            </div>
+            <div class="text-right text-xs">
+              <span class="inline-block border border-slate-400 px-2 py-1 rounded bg-slate-50 font-bold">แบบประเมินทักษะ (P)</span>
+            </div>
+          </div>
+          <div class="grid grid-cols-3 gap-2 mt-2 pt-2 border-t border-slate-200 text-xs">
+            <div>ชื่อ-นามสกุล: ..............................................................</div>
+            <div>เลขที่: .............. ชั้น: ม.4/...........</div>
+            <div>วันที่: ....................................................</div>
+          </div>
+        </div>
+
+        <div class="mb-3">
+          <h3 class="text-xs font-bold text-slate-900 mb-1">ตอนที่ 1: การสังเกตและถอดรหัสลำดับเหตุการณ์ธรณีวิทยา (Cross-Section Analysis)</h3>
+          <p class="text-[11px] text-slate-600 mb-2"><strong>คำชี้แจง:</strong> ให้นักเรียนจำลองการเลื่อนเหตุการณ์ Step 1 ถึง 5 บนแบบจำลอง แล้วนำตัวอักษรของโครงสร้างธรณี (A, B, C, D, E) มาเรียงลำดับเวลา</p>
+          
+          <div class="border border-slate-300 rounded p-3 bg-slate-50 text-xs">
+            <span class="font-bold block mb-1 text-[11px]">สัญลักษณ์โครงสร้างในแบบจำลอง:</span>
+            <div class="grid grid-cols-2 gap-2 text-[11px] mb-2">
+              <div>• <strong>A:</strong> หินปูน (Limestone)</div>
+              <div>• <strong>B:</strong> หินดินดาน (Shale)</div>
+              <div>• <strong>C:</strong> หินทราย (Sandstone)</div>
+              <div>• <strong>D:</strong> หินอัคนีแทรกซอน (Dyke)</div>
+              <div class="col-span-2">• <strong>E:</strong> รอยเลื่อนปกติ (Normal Fault)</div>
+            </div>
+
+            <div class="p-2 bg-white border border-slate-300 rounded font-bold text-center text-xs">
+              ลำดับเหตุการณ์จาก <u>แก่ที่สุด</u> &rarr; <u>อ่อนที่สุด</u>:<br>
+              <span class="text-blue-700 tracking-widest mt-1 inline-block">[ 1: ......... ] &rarr; [ 2: ......... ] &rarr; [ 3: ......... ] &rarr; [ 4: ......... ] &rarr; [ 5: ......... ]</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="mb-3 space-y-2">
+          <h3 class="text-xs font-bold text-slate-900 mb-1">ตอนที่ 2: การให้เหตุผลเชิงวิทยาศาสตร์ (Scientific Argumentation)</h3>
+          <div class="text-xs space-y-1.5">
+            <div>
+              <strong>1. กฎความสัมพันธ์การตัดผ่าน:</strong> นักเรียนใช้หลักฐานใดจากภาพภาคตัดขวางในการยืนยันว่า <strong>หินอัคนี D เกิดทีหลังหินชั้น C</strong>?<br>
+              <div class="border-b border-dotted border-slate-400 mt-1 h-5"></div>
+              <div class="border-b border-dotted border-slate-400 mt-1 h-5"></div>
+            </div>
+            <div>
+              <strong>2. การลำดับเหตุการณ์รอยเลื่อน:</strong> เพราะเหตุใดจึงสรุปได้ว่า <strong>รอยเลื่อน E เกิดขึ้นเป็นลำดับสุดท้าย</strong>?<br>
+              <div class="border-b border-dotted border-slate-400 mt-1 h-5"></div>
+              <div class="border-b border-dotted border-slate-400 mt-1 h-5"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="border-t border-slate-300 pt-2 text-[10px]">
+          <span class="font-bold block mb-1">เกณฑ์การประเมินทักษะกระบวนการ (P) โดยผู้สอน:</span>
+          <table class="w-full border-collapse border border-slate-300 text-center">
+            <thead>
+              <tr class="bg-slate-100">
+                <th class="border border-slate-300 p-1">ประเด็นการประเมิน</th>
+                <th class="border border-slate-300 p-1">ดีมาก (4)</th>
+                <th class="border border-slate-300 p-1">ดี (3)</th>
+                <th class="border border-slate-300 p-1">พอใช้ (2)</th>
+                <th class="border border-slate-300 p-1">ปรับปรุง (1)</th>
+                <th class="border border-slate-300 p-1">คะแนนที่ได้</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td class="border border-slate-300 p-1 text-left">1. การแปลความหมายภาพตัดขวาง</td>
+                <td class="border border-slate-300 p-1">เรียงลำดับ 5 เหตุการณ์ได้ถูกต้องทั้งหมด</td>
+                <td class="border border-slate-300 p-1">เรียงลำดับถูกต้อง 3-4 เหตุการณ์</td>
+                <td class="border border-slate-300 p-1">เรียงลำดับถูกต้อง 1-2 เหตุการณ์</td>
+                <td class="border border-slate-300 p-1">เรียงลำดับผิดพลาดทั้งหมด</td>
+                <td class="border border-slate-300 p-1">....../4</td>
+              </tr>
+              <tr>
+                <td class="border border-slate-300 p-1 text-left">2. การอ้างกฎความสัมพันธ์การตัดผ่าน</td>
+                <td class="border border-slate-300 p-1">ระบุหลักฐานสิ่งที่ตัดและถูกตัดได้ชัดเจนสมบูรณ์</td>
+                <td class="border border-slate-300 p-1">อธิบายได้ถูกต้องแต่ขาดรายละเอียดเชิงโครงสร้าง</td>
+                <td class="border border-slate-300 p-1">อธิบายได้บางส่วนเมื่อมีผู้ชี้แนะ</td>
+                <td class="border border-slate-300 p-1">ไม่สามารถอ้างอิงหลักฐานทางธรณีได้</td>
+                <td class="border border-slate-300 p-1">....../4</td>
+              </tr>
+            </tbody>
+          </table>
+          <div class="flex justify-between items-center mt-2 font-bold text-xs">
+            <span>รวมคะแนนทักษะ (P): ............. / 8 คะแนน</span>
+            <span>ลงชื่อผู้ประเมิน: ..............................................................</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================== -->
+    <!-- TAB 3: การเทียบสัมพันธ์ด้วยซากดึกดำบรรพ์ -->
+    <!-- ========================================== -->
+    <section id="tab3" class="tab-content hidden space-y-6">
+      
+      <!-- Interactive Screen Area -->
+      <div class="screen-interactive-block space-y-6">
+        <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-5">
+          <div class="flex items-center gap-2 mb-2">
+            <span class="px-2.5 py-1 text-xs font-semibold bg-blue-100 text-blue-700 rounded-md">ขั้นที่ 1</span>
+            <h2 class="text-lg font-bold text-slate-900">เรียนรู้หลักการสั้น ๆ: ซากดึกดำบรรพ์ดัชนี (Index Fossil Correlation)</h2>
+          </div>
+          <p class="text-slate-600 text-sm leading-relaxed">
+            <strong>ซากดึกดำบรรพ์ดัชนี</strong> คือ ฟอสซิลของสิ่งมีชีวิตที่มีคุณสมบัติ: <em>1) แพร่กระจายทางภูมิศาสตร์กว้างขวาง 2) มีปริมาณมาก หาง่าย 3) ดำรงชีวิตอยู่ในช่วงเวลาสั้น ๆ ทางธรณีวิทยา</em><br>
+            หากพบฟอสซิลดัชนีชนิดเดียวกันในชั้นหินต่างพื้นที่ แสดงว่า <strong>ชั้นหินทั้งสองเกิดในช่วงเวลาเดียวกัน (มีอายุเท่ากัน)</strong> แม้ความลึกหรือชนิดหินจะไม่เหมือนกันก็ตาม
+          </p>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-5 flex flex-col justify-between">
+            <div>
+              <div class="flex items-center gap-2 mb-4">
+                <span class="px-2.5 py-1 text-xs font-semibold bg-emerald-100 text-emerald-700 rounded-md">ขั้นที่ 2 & 3</span>
+                <h3 class="font-bold text-slate-800">เข้าโมเดล & เทียบสัมพันธ์</h3>
+              </div>
+              
+              <p class="text-xs text-slate-600 mb-3">กดเลือกฟอสซิลดัชนีเพื่อโยงเส้นเทียบสัมพันธ์ชั้นหินระหว่าง <strong>หน้าผาฝั่งทิศตะวันตก (พื้นที่ A)</strong> กับ <strong>หน้าผาฝั่งทิศตะวันออก (พื้นที่ B)</strong>:</p>
+
+              <div class="space-y-2">
+                <button onclick="toggleFossilLink('trilobite')" id="btn-trilobite" class="w-full p-2.5 bg-amber-50 hover:bg-amber-100 border border-amber-200 rounded-lg text-left text-xs font-medium text-amber-900 transition flex items-center justify-between">
+                  <span class="flex items-center gap-2"><span>🦀</span> ไทรโลไบต์ (Trilobite - ยุคพาลีโอโซอิก)</span>
+                  <span class="text-[10px] bg-amber-200 px-2 py-0.5 rounded text-amber-900" id="badge-trilobite">ปิดอยู่</span>
+                </button>
+                <button onclick="toggleFossilLink('ammonite')" id="btn-ammonite" class="w-full p-2.5 bg-indigo-50 hover:bg-indigo-100 border border-indigo-200 rounded-lg text-left text-xs font-medium text-indigo-900 transition flex items-center justify-between">
+                  <span class="flex items-center gap-2"><span>🐚</span> แอมโมไนต์ (Ammonite - ยุคมีโซโซอิก)</span>
+                  <span class="text-[10px] bg-indigo-200 px-2 py-0.5 rounded text-indigo-900" id="badge-ammonite">ปิดอยู่</span>
+                </button>
+                <button onclick="toggleFossilLink('graptolite')" id="btn-graptolite" class="w-full p-2.5 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 rounded-lg text-left text-xs font-medium text-emerald-900 transition flex items-center justify-between">
+                  <span class="flex items-center gap-2"><span>🌿</span> แกรปโตไลต์ (Graptolite - ออร์โดวิเชียน)</span>
+                  <span class="text-[10px] bg-emerald-200 px-2 py-0.5 rounded text-emerald-900" id="badge-graptolite">ปิดอยู่</span>
+                </button>
+              </div>
+            </div>
+
+            <div class="mt-6 pt-4 border-t border-slate-100 text-xs text-slate-500">
+              <strong>ข้อสังเกต:</strong> ชั้นหินที่ตรงกันอาจอยู่คนละความสูงเนื่องจากอัตราการตกสะสมตัวหรือการยกตัวของเปลือกโลกในแต่ละพื้นที่ไม่เท่ากัน
+            </div>
+          </div>
+
+          <div class="lg:col-span-2 bg-white rounded-xl shadow-sm border border-slate-200 p-5 flex flex-col">
+            <div class="flex items-center justify-between mb-3">
+              <div class="flex items-center gap-2">
+                <span class="px-2.5 py-1 text-xs font-semibold bg-purple-100 text-purple-700 rounded-md">ขั้นที่ 4</span>
+                <h3 class="font-bold text-slate-800">สังเกตผล: การเชื่อมโยงทางเวลา (Correlation Lines)</h3>
+              </div>
+            </div>
+            <div class="w-full h-80 bg-slate-800 rounded-lg border border-slate-700 overflow-hidden relative">
+              <canvas id="canvas3" width="600" height="320" class="w-full h-full block"></canvas>
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-5">
+          <div class="flex items-center justify-between mb-3">
+            <div class="flex items-center gap-2">
+              <span class="px-2.5 py-1 text-xs font-semibold bg-amber-100 text-amber-700 rounded-md">ขั้นที่ 5</span>
+              <h3 class="font-bold text-slate-800">อธิบายสิ่งที่เกิดขึ้น: การเทียบสัมพันธ์</h3>
+            </div>
+            <button onclick="printSingleWorksheet('ws3')" class="px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded text-xs font-medium shadow flex items-center gap-1">
+              🖨️ พิมพ์ใบงานกิจกรรมที่ 3 (A4 พอดีหน้า)
+            </button>
+          </div>
+          <p class="text-xs text-slate-600 mb-3">หากนักธรณีวิทยาพบ "ซากไทรโลไบต์" ในหินดินดานที่ภูเขา A ที่ระดับความสูง 800 เมตร และพบในหินปูนที่หน้าผา B ที่ระดับความสูง 200 เมตร เราสามารถสรุปได้อย่างไร?</p>
+          
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
+            <button onclick="checkT3(1)" class="p-3 bg-slate-50 hover:bg-blue-50 border border-slate-200 rounded-lg text-left transition">
+              ก. หินที่ภูเขา A มีอายุแก่กว่าหินที่หน้าผา B มาก เพราะอยู่สูงกว่า
+            </button>
+            <button onclick="checkT3(2)" class="p-3 bg-slate-50 hover:bg-blue-50 border border-slate-200 rounded-lg text-left transition">
+              ข. ชั้นหินที่มีไทรโลไบต์ของทั้งสองพื้นที่มีอายุในช่วงเวลาเดียวกัน แม้ชนิดหินและความสูงจะต่างกัน
+            </button>
+            <button onclick="checkT3(3)" class="p-3 bg-slate-50 hover:bg-blue-50 border border-slate-200 rounded-lg text-left transition">
+              ค. ฟอสซิลไทรโลไบต์ที่หน้าผา B ถูกพัดพามาจากภูเขา A ในภายหลัง
+            </button>
+            <button onclick="checkT3(4)" class="p-3 bg-slate-50 hover:bg-blue-50 border border-slate-200 rounded-lg text-left transition">
+              ง. ไม่สามารถเทียบความสัมพันธ์กันได้เลยเนื่องจากชนิดของหินไม่เหมือนกัน
+            </button>
+          </div>
+          <div id="t3Feedback" class="mt-3 text-xs p-3 rounded-lg hidden font-medium"></div>
+        </div>
+      </div>
+
+      <!-- ========================================================= -->
+      <!-- WORKSHEET 3 (PRINTABLE A4 FITTED) -->
+      <!-- ========================================================= -->
+      <div id="ws3" class="worksheet-printable bg-white rounded-xl border border-slate-300 p-5 page-break">
+        <div class="border-b-2 border-slate-800 pb-2 mb-3">
+          <div class="flex justify-between items-start">
+            <div>
+              <span class="text-[11px] font-bold text-slate-500 tracking-wider">กลุ่มสาระการเรียนรู้วิทยาศาสตร์และเทคโนโลยี • ม.4</span>
+              <h2 class="text-base font-bold text-slate-900">ใบกิจกรรมการเรียนรู้ที่ 3: ซากดึกดำบรรพ์กับการเทียบสัมพันธ์ชั้นหิน</h2>
+              <span class="text-xs text-blue-700 font-semibold">ตัวชี้วัด ว 3.2 ม.6/4: อธิบายลำดับเหตุการณ์ทางธรณีวิทยาในอดีตจากซากดึกดำบรรพ์</span>
+            </div>
+            <div class="text-right text-xs">
+              <span class="inline-block border border-slate-400 px-2 py-1 rounded bg-slate-50 font-bold">แบบประเมินทักษะ (P)</span>
+            </div>
+          </div>
+          <div class="grid grid-cols-3 gap-2 mt-2 pt-2 border-t border-slate-200 text-xs">
+            <div>ชื่อ-นามสกุล: ..............................................................</div>
+            <div>เลขที่: .............. ชั้น: ม.4/...........</div>
+            <div>วันที่: ....................................................</div>
+          </div>
+        </div>
+
+        <div class="mb-3">
+          <h3 class="text-xs font-bold text-slate-900 mb-1">ตอนที่ 1: การเทียบสัมพันธ์ชั้นหินข้ามพื้นที่ (Stratigraphic Correlation)</h3>
+          <p class="text-[11px] text-slate-600 mb-2"><strong>คำชี้แจง:</strong> โยงเส้นจับคู่ชั้นหินที่มีอายุร่วมสมัยกันระหว่าง หน้าผา A (ตะวันตก) และ หน้าผา B (ตะวันออก) โดยใช้ซากดึกดำบรรพ์ดัชนี</p>
+          
+          <div class="grid grid-cols-2 gap-4 border border-slate-300 rounded p-2.5 bg-slate-50 text-xs">
+            <!-- Col A -->
+            <div class="border border-slate-300 rounded p-2 bg-white">
+              <span class="font-bold text-[11px] block border-b pb-1 mb-1">หน้าผา A (ทิศตะวันตก)</span>
+              <div class="space-y-1.5 text-[11px]">
+                <div class="p-1 bg-amber-50 border rounded">[A1] ชั้นหินทรายบนสุด (ไม่พบฟอสซิล)</div>
+                <div class="p-1 bg-blue-50 border rounded flex justify-between"><span>[A2] ชั้นหินปูน</span> <span>🐚 แอมโมไนต์</span></div>
+                <div class="p-1 bg-slate-100 border rounded flex justify-between"><span>[A3] ชั้นหินดินดาน</span> <span>🦀 ไทรโลไบต์</span></div>
+                <div class="p-1 bg-slate-200 border rounded flex justify-between"><span>[A4] ชั้นหินดินดานล่าง</span> <span>🌿 แกรปโตไลต์</span></div>
+              </div>
+            </div>
+            <!-- Col B -->
+            <div class="border border-slate-300 rounded p-2 bg-white">
+              <span class="font-bold text-[11px] block border-b pb-1 mb-1">หน้าผา B (ทิศตะวันออก)</span>
+              <div class="space-y-1.5 text-[11px]">
+                <div class="p-1 bg-blue-50 border rounded flex justify-between"><span>[B1] ชั้นหินปูน</span> <span>🐚 แอมโมไนต์</span></div>
+                <div class="p-1 bg-amber-50 border rounded flex justify-between"><span>[B2] ชั้นหินทราย</span> <span>🦀 ไทรโลไบต์</span></div>
+                <div class="p-1 bg-slate-200 border rounded flex justify-between"><span>[B3] ชั้นหินดินดานดำ</span> <span>🌿 แกรปโตไลต์</span></div>
+                <div class="p-1 bg-slate-50 border border-dashed rounded text-slate-400 text-center">[ไม่มีชั้นหินทรายบน]</div>
+              </div>
+            </div>
+          </div>
+          <div class="text-[11px] mt-2 font-semibold text-slate-800">
+            ระบุคู่ชั้นหินที่มีอายุร่วมสมัยกัน: 
+            (1) ชั้น [A2] ตรงกับ [ ..... ] | (2) ชั้น [A3] ตรงกับ [ ..... ] | (3) ชั้น [A4] ตรงกับ [ ..... ]
+          </div>
+        </div>
+
+        <div class="mb-3 space-y-2">
+          <h3 class="text-xs font-bold text-slate-900 mb-1">ตอนที่ 2: การวิเคราะห์และลงข้อสรุปทางวิทยาศาสตร์</h3>
+          <div class="text-xs space-y-1.5">
+            <div>
+              <strong>1. ผลกระทบของชนิดหินและความสูง:</strong> ทำไมชั้นหินที่มีซากไทรโลไบต์ในหน้าผา A (หินดินดาน) และหน้าผา B (หินทราย) จึงสรุปว่าเกิดในยุคเดียวกัน แม้ชนิดหินและระดับความสูงจะต่างกัน?<br>
+              <div class="border-b border-dotted border-slate-400 mt-1 h-5"></div>
+              <div class="border-b border-dotted border-slate-400 mt-1 h-5"></div>
+            </div>
+            <div>
+              <strong>2. คุณลักษณะของฟอสซิลดัชนี:</strong> หากสิ่งมีชีวิตชนิดหนึ่งมีอายุขัยเผ่าพันธุ์ยาวนานตั้งแต่พรีแคมเบรียนจนถึงปัจจุบัน เหมาะเป็นฟอสซิลดัชนีหรือไม่ เพราะเหตุใด?<br>
+              <div class="border-b border-dotted border-slate-400 mt-1 h-5"></div>
+              <div class="border-b border-dotted border-slate-400 mt-1 h-5"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="border-t border-slate-300 pt-2 text-[10px]">
+          <span class="font-bold block mb-1">เกณฑ์การประเมินทักษะกระบวนการ (P) โดยผู้สอน:</span>
+          <table class="w-full border-collapse border border-slate-300 text-center">
+            <thead>
+              <tr class="bg-slate-100">
+                <th class="border border-slate-300 p-1">ประเด็นการประเมิน</th>
+                <th class="border border-slate-300 p-1">ดีมาก (4)</th>
+                <th class="border border-slate-300 p-1">ดี (3)</th>
+                <th class="border border-slate-300 p-1">พอใช้ (2)</th>
+                <th class="border border-slate-300 p-1">ปรับปรุง (1)</th>
+                <th class="border border-slate-300 p-1">คะแนนที่ได้</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td class="border border-slate-300 p-1 text-left">1. ทักษะการเทียบสัมพันธ์ชั้นหิน</td>
+                <td class="border border-slate-300 p-1">จับคู่ชั้นหินตรงตามฟอสซิลดัชนีครบ 3 คู่</td>
+                <td class="border border-slate-300 p-1">จับคู่ถูกต้อง 2 คู่</td>
+                <td class="border border-slate-300 p-1">จับคู่ถูกต้อง 1 คู่</td>
+                <td class="border border-slate-300 p-1">ไม่สามารถเทียบสัมพันธ์ได้</td>
+                <td class="border border-slate-300 p-1">....../4</td>
+              </tr>
+              <tr>
+                <td class="border border-slate-300 p-1 text-left">2. การลงข้อสรุปเกี่ยวกับฟอสซิลดัชนี</td>
+                <td class="border border-slate-300 p-1">อธิบายคุณสมบัติช่วงอายุสั้นและกระจายกว้างชัดเจน</td>
+                <td class="border border-slate-300 p-1">อธิบายได้ถูกต้องแต่ขาดมิติการกระจายตัว</td>
+                <td class="border border-slate-300 p-1">อธิบายได้บางส่วนเมื่อได้รับคำแนะแนว</td>
+                <td class="border border-slate-300 p-1">อธิบายไม่สอดคล้องกับหลักการ</td>
+                <td class="border border-slate-300 p-1">....../4</td>
+              </tr>
+            </tbody>
+          </table>
+          <div class="flex justify-between items-center mt-2 font-bold text-xs">
+            <span>รวมคะแนนทักษะ (P): ............. / 8 คะแนน</span>
+            <span>ลงชื่อผู้ประเมิน: ..............................................................</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================== -->
+    <!-- TAB 4: การหาอายุสัมบูรณ์ (ครึ่งชีวิต) -->
+    <!-- ========================================== -->
+    <section id="tab4" class="tab-content hidden space-y-6">
+      
+      <!-- Interactive Screen Area -->
+      <div class="screen-interactive-block space-y-6">
+        <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-5">
+          <div class="flex items-center gap-2 mb-2">
+            <span class="px-2.5 py-1 text-xs font-semibold bg-blue-100 text-blue-700 rounded-md">ขั้นที่ 1</span>
+            <h2 class="text-lg font-bold text-slate-900">เรียนรู้หลักการสั้น ๆ: การสลายตัวของไอโซโทปและครึ่งชีวิต (Half-life)</h2>
+          </div>
+          <p class="text-slate-600 text-sm leading-relaxed">
+            <strong>อายุสัมบูรณ์ (Absolute Age):</strong> คืออายุที่บอกเป็นตัวเลขปีที่ชัดเจน คำนวณจากการสลายตัวของ <em>ไอโซโทปกัมมันตรังสี (ธาตุแม่: Parent)</em> เปลี่ยนสภาพไปเป็น <em>ธาตุที่เสถียร (ธาตุลูก: Daughter)</em><br>
+            <strong>ครึ่งชีวิต ($T_{1/2}$):</strong> คือระยะเวลาที่ธาตุแม่สลายตัวจนเหลือปริมาณเพียง "ครึ่งหนึ่ง" ของเดิม เมื่อผ่านไป $n$ ครึ่งชีวิต ธาตุแม่จะเหลือ $(\frac{1}{2})^n$ เท่า
+          </p>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-5 flex flex-col justify-between">
+            <div>
+              <div class="flex items-center gap-2 mb-4">
+                <span class="px-2.5 py-1 text-xs font-semibold bg-emerald-100 text-emerald-700 rounded-md">ขั้นที่ 2 & 3</span>
+                <h3 class="font-bold text-slate-800">เข้าโมเดล & ปรับตัวแปร</h3>
+              </div>
+
+              <div class="space-y-4">
+                <div>
+                  <label class="block text-xs font-semibold text-slate-600 mb-1">เลือกคู่ไอโซโทป:</label>
+                  <select id="isotopeSelect" onchange="changeIsotope()" class="w-full p-2 bg-slate-50 border border-slate-300 rounded-lg text-xs font-medium focus:ring-2 focus:ring-blue-500">
+                    <option value="C14">คาร์บอน-14 (C-14 &rarr; N-14) | ครึ่งชีวิต 5,730 ปี</option>
+                    <option value="K40" selected>โพแทสเซียม-40 (K-40 &rarr; Ar-40) | ครึ่งชีวิต 1,250 ล้านปี</option>
+                    <option value="U238">ยูเรเนียม-238 (U-238 &rarr; Pb-206) | ครึ่งชีวิต 4,500 ล้านปี</option>
+                  </select>
+                </div>
+
+                <div>
+                  <div class="flex justify-between text-xs font-semibold text-slate-600 mb-1">
+                    <span>จำนวนครึ่งชีวิตที่ผ่านไป (n):</span>
+                    <span id="hlDisplay" class="font-mono text-blue-600 font-bold">0 ครึ่งชีวิต</span>
+                  </div>
+                  <input type="range" id="hlSlider" min="0" max="5" value="0" step="1" oninput="updateHalfLife(this.value)" class="w-full accent-blue-600">
+                  <div class="flex justify-between text-[11px] text-slate-400 font-mono">
+                    <span>0</span><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span>
+                  </div>
+                </div>
+
+                <div class="p-3 bg-slate-50 rounded-lg border border-slate-200 space-y-2 text-xs">
+                  <div class="flex justify-between items-center">
+                    <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-rose-500"></span> ธาตุแม่คงเหลือ:</span>
+                    <span id="parentPercent" class="font-bold text-rose-600 font-mono">100.0%</span>
+                  </div>
+                  <div class="flex justify-between items-center">
+                    <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-blue-500"></span> ธาตุลูกที่เกิดขึ้น:</span>
+                    <span id="daughterPercent" class="font-bold text-blue-600 font-mono">0.0%</span>
+                  </div>
+                  <div class="border-t border-slate-200 pt-1 flex justify-between items-center">
+                    <span class="font-semibold text-slate-700">อายุหินที่คำนวณได้:</span>
+                    <span id="rockAge" class="font-bold text-indigo-700 font-mono">0 ปี</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="mt-4 pt-3 border-t border-slate-100 text-[11px] text-slate-500">
+              สูตรคำนวณ: <em>อายุ = จำนวนครึ่งชีวิต (n) × ค่าครึ่งชีวิต (T<sub>1/2</sub>)</em>
+            </div>
+          </div>
+
+          <div class="lg:col-span-2 bg-white rounded-xl shadow-sm border border-slate-200 p-5 flex flex-col">
+            <div class="flex items-center justify-between mb-3">
+              <div class="flex items-center gap-2">
+                <span class="px-2.5 py-1 text-xs font-semibold bg-purple-100 text-purple-700 rounded-md">ขั้นที่ 4</span>
+                <h3 class="font-bold text-slate-800">สังเกตผล: อะตอมในผลึกแร่ & กราฟการสลายตัว</h3>
+              </div>
+              <div class="text-[11px] flex gap-3">
+                <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-rose-500"></span> แม่</span>
+                <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-blue-500"></span> ลูก</span>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 h-80">
+              <div class="h-full bg-slate-950 rounded-lg p-2 flex flex-col justify-between border border-slate-800">
+                <span class="text-[11px] text-slate-400 font-mono">แบบจำลองผลึกแร่ (100 อะตอม)</span>
+                <canvas id="canvas4Atoms" width="280" height="230" class="w-full flex-1 block"></canvas>
+              </div>
+              <div class="h-full bg-slate-900 rounded-lg p-2 flex flex-col justify-between border border-slate-800">
+                <span class="text-[11px] text-slate-400 font-mono">กราฟสัดส่วนการสลายตัว (Decay Curve)</span>
+                <canvas id="canvas4Graph" width="280" height="230" class="w-full flex-1 block"></canvas>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-5">
+          <div class="flex items-center justify-between mb-3">
+            <div class="flex items-center gap-2">
+              <span class="px-2.5 py-1 text-xs font-semibold bg-amber-100 text-amber-700 rounded-md">ขั้นที่ 5</span>
+              <h3 class="font-bold text-slate-800">อธิบายสิ่งที่เกิดขึ้น: คำนวณอายุสัมบูรณ์</h3>
+            </div>
+            <button onclick="printSingleWorksheet('ws4')" class="px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded text-xs font-medium shadow flex items-center gap-1">
+              🖨️ พิมพ์ใบงานกิจกรรมที่ 4 (A4 พอดีหน้า)
+            </button>
+          </div>
+          <p class="text-xs text-slate-600 mb-3" id="t4QuizText">
+            หากนำหินอัคนีไปตรวจวัดไอโซโทป <strong>โพแทสเซียม-40 (K-40)</strong> พบว่าเหลือธาตุแม่เพียง <strong>25%</strong> และมีธาตุลูกอาร์กอน-40 เกิดขึ้น <strong>75%</strong> หินก้อนนี้ผ่านครึ่งชีวิตมากี่รอบ และมีอายุเท่าใด? (กำหนดให้ $T_{1/2}$ ของ K-40 = 1,250 ล้านปี)
+          </p>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
+            <button onclick="checkT4(1)" class="p-3 bg-slate-50 hover:bg-blue-50 border border-slate-200 rounded-lg text-left transition">
+              ก. 1 ครึ่งชีวิต อายุประมาณ 1,250 ล้านปี
+            </button>
+            <button onclick="checkT4(2)" class="p-3 bg-slate-50 hover:bg-blue-50 border border-slate-200 rounded-lg text-left transition">
+              ข. 2 ครึ่งชีวิต อายุประมาณ 2,500 ล้านปี
+            </button>
+            <button onclick="checkT4(3)" class="p-3 bg-slate-50 hover:bg-blue-50 border border-slate-200 rounded-lg text-left transition">
+              ค. 3 ครึ่งชีวิต อายุประมาณ 3,750 ล้านปี
+            </button>
+            <button onclick="checkT4(4)" class="p-3 bg-slate-50 hover:bg-blue-50 border border-slate-200 rounded-lg text-left transition">
+              ง. 4 ครึ่งชีวิต อายุประมาณ 5,000 ล้านปี
+            </button>
+          </div>
+          <div id="t4Feedback" class="mt-3 text-xs p-3 rounded-lg hidden font-medium"></div>
+        </div>
+      </div>
+
+      <!-- ========================================================= -->
+      <!-- WORKSHEET 4 (PRINTABLE A4 FITTED) -->
+      <!-- ========================================================= -->
+      <div id="ws4" class="worksheet-printable bg-white rounded-xl border border-slate-300 p-5 page-break">
+        <div class="border-b-2 border-slate-800 pb-2 mb-3">
+          <div class="flex justify-between items-start">
+            <div>
+              <span class="text-[11px] font-bold text-slate-500 tracking-wider">กลุ่มสาระการเรียนรู้วิทยาศาสตร์และเทคโนโลยี • ม.4</span>
+              <h2 class="text-base font-bold text-slate-900">ใบกิจกรรมการเรียนรู้ที่ 4: การหาอายุสัมบูรณ์จากครึ่งชีวิตของไอโซโทป</h2>
+              <span class="text-xs text-blue-700 font-semibold">ตัวชี้วัด ว 3.2 ม.6/5: อธิบายและเปรียบเทียบการหาอายุเปรียบเทียบและอายุสัมบูรณ์</span>
+            </div>
+            <div class="text-right text-xs">
+              <span class="inline-block border border-slate-400 px-2 py-1 rounded bg-slate-50 font-bold">แบบประเมินทักษะ (P)</span>
+            </div>
+          </div>
+          <div class="grid grid-cols-3 gap-2 mt-2 pt-2 border-t border-slate-200 text-xs">
+            <div>ชื่อ-นามสกุล: ..............................................................</div>
+            <div>เลขที่: .............. ชั้น: ม.4/...........</div>
+            <div>วันที่: ....................................................</div>
+          </div>
+        </div>
+
+        <div class="mb-3">
+          <h3 class="text-xs font-bold text-slate-900 mb-1">ตอนที่ 1: การสังเกตและบันทึกข้อมูลการสลายตัวของไอโซโทป K-40 (T<sub>1/2</sub> = 1,250 ล้านปี)</h3>
+          <p class="text-[11px] text-slate-600 mb-2"><strong>คำชี้แจง:</strong> เลื่อนสไลเดอร์ $n = 0$ ถึง $4$ แล้วบันทึกร้อยละของธาตุแม่ ธาตุลูก และคำนวณอายุของหิน</p>
+          
+          <table class="w-full border-collapse border border-slate-300 text-center text-xs">
+            <thead class="bg-slate-100 font-bold">
+              <tr>
+                <th class="border border-slate-300 p-1.5">จำนวนครึ่งชีวิต ($n$)</th>
+                <th class="border border-slate-300 p-1.5 text-rose-700">ร้อยละธาตุแม่ K-40 (%)</th>
+                <th class="border border-slate-300 p-1.5 text-blue-700">ร้อยละธาตุลูก Ar-40 (%)</th>
+                <th class="border border-slate-300 p-1.5">อายุหินที่คำนวณได้ (ล้านปี)</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td class="border border-slate-300 p-1 font-mono">0</td>
+                <td class="border border-slate-300 p-1 font-mono">100.0%</td>
+                <td class="border border-slate-300 p-1 font-mono">0.0%</td>
+                <td class="border border-slate-300 p-1 font-mono">0</td>
+              </tr>
+              <tr>
+                <td class="border border-slate-300 p-1 font-mono">1</td>
+                <td class="border border-slate-300 p-1 font-mono">50.0%</td>
+                <td class="border border-slate-300 p-1 font-mono">50.0%</td>
+                <td class="border border-slate-300 p-1 font-mono">1,250</td>
+              </tr>
+              <tr>
+                <td class="border border-slate-300 p-1 font-mono">2</td>
+                <td class="border border-slate-300 p-1">....................</td>
+                <td class="border border-slate-300 p-1">....................</td>
+                <td class="border border-slate-300 p-1">....................</td>
+              </tr>
+              <tr>
+                <td class="border border-slate-300 p-1 font-mono">3</td>
+                <td class="border border-slate-300 p-1">....................</td>
+                <td class="border border-slate-300 p-1">....................</td>
+                <td class="border border-slate-300 p-1">....................</td>
+              </tr>
+              <tr>
+                <td class="border border-slate-300 p-1 font-mono">4</td>
+                <td class="border border-slate-300 p-1">....................</td>
+                <td class="border border-slate-300 p-1">....................</td>
+                <td class="border border-slate-300 p-1">....................</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="mb-3 space-y-2">
+          <h3 class="text-xs font-bold text-slate-900 mb-1">ตอนที่ 2: การคำนวณและการประยุกต์ใช้ความรู้</h3>
+          <div class="text-xs space-y-1.5">
+            <div>
+              <strong>โจทย์ปัญหา:</strong> หากนำตัวอย่างหินภูเขาไฟมาวิเคราะห์ พบว่ามีธาตุแม่เหลืออยู่ <strong>12.5%</strong> จงแสดงวิธีคำนวณหาอายุของหินก้อนนี้อย่างละเอียด<br>
+              <div class="border border-slate-300 rounded p-2 bg-slate-50 mt-1 h-20 text-[11px]">
+                <em>วิธีทำ:</em> .........................................................................................................................................................................<br>
+                ...........................................................................................................................................................................................<br>
+                <em>คำตอบ:</em> หินก้อนนี้มีอายุประมาณ .......................................... ล้านปี
+              </div>
+            </div>
+            <div>
+              <strong>การเลือกใช้เครื่องมือ:</strong> หากต้องการหาอายุของโครงกระดูกมนุษย์ยุคก่อนประวัติศาสตร์อายุราว 10,000 ปี เหตุใดจึงต้องใช้ คาร์บอน-14 แทนที่จะใช้ ยูเรเนียม-238?<br>
+              <div class="border-b border-dotted border-slate-400 mt-1 h-5"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="border-t border-slate-300 pt-2 text-[10px]">
+          <span class="font-bold block mb-1">เกณฑ์การประเมินทักษะกระบวนการ (P) โดยผู้สอน:</span>
+          <table class="w-full border-collapse border border-slate-300 text-center">
+            <thead>
+              <tr class="bg-slate-100">
+                <th class="border border-slate-300 p-1">ประเด็นการประเมิน</th>
+                <th class="border border-slate-300 p-1">ดีมาก (4)</th>
+                <th class="border border-slate-300 p-1">ดี (3)</th>
+                <th class="border border-slate-300 p-1">พอใช้ (2)</th>
+                <th class="border border-slate-300 p-1">ปรับปรุง (1)</th>
+                <th class="border border-slate-300 p-1">คะแนนที่ได้</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td class="border border-slate-300 p-1 text-left">1. การใช้ตัวเลขและการคำนวณ</td>
+                <td class="border border-slate-300 p-1">คำนวณร้อยละและอายุหินได้ถูกต้องแม่นยำทุกช่อง</td>
+                <td class="border border-slate-300 p-1">คำนวณถูกต้องเป็นส่วนใหญ่ ผิดพลาดเล็กน้อย</td>
+                <td class="border border-slate-300 p-1">คำนวณได้เมื่อตัวเลขเป็นจำนวนเท่าลงตัว</td>
+                <td class="border border-slate-300 p-1">คำนวณผิดพลาดส่วนใหญ่</td>
+                <td class="border border-slate-300 p-1">....../4</td>
+              </tr>
+              <tr>
+                <td class="border border-slate-300 p-1 text-left">2. การเลือกใช้ไอโซโทปตามบริบท</td>
+                <td class="border border-slate-300 p-1">เชื่อมโยงค่าครึ่งชีวิตกับช่วงเวลาที่วัดได้อย่างสมบูรณ์</td>
+                <td class="border border-slate-300 p-1">อธิบายได้ถูกต้องแต่ขาดการอ้างอิงช่วงเวลา</td>
+                <td class="border border-slate-300 p-1">อธิบายได้บางส่วนเมื่อมีผู้ชี้แนะ</td>
+                <td class="border border-slate-300 p-1">ไม่สามารถเชื่อมโยงค่าครึ่งชีวิตได้</td>
+                <td class="border border-slate-300 p-1">....../4</td>
+              </tr>
+            </tbody>
+          </table>
+          <div class="flex justify-between items-center mt-2 font-bold text-xs">
+            <span>รวมคะแนนทักษะ (P): ............. / 8 คะแนน</span>
+            <span>ลงชื่อผู้ประเมิน: ..............................................................</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================== -->
+    <!-- TAB 5: มาตราธรณีกาล -->
+    <!-- ========================================== -->
+    <section id="tab5" class="tab-content hidden space-y-6">
+      
+      <!-- Interactive Screen Area -->
+      <div class="screen-interactive-block space-y-6">
+        <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-5">
+          <div class="flex items-center gap-2 mb-2">
+            <span class="px-2.5 py-1 text-xs font-semibold bg-blue-100 text-blue-700 rounded-md">ขั้นที่ 1</span>
+            <h2 class="text-lg font-bold text-slate-900">เรียนรู้หลักการสั้น ๆ: มาตราธรณีกาล (Geological Time Scale)</h2>
+          </div>
+          <p class="text-slate-600 text-sm leading-relaxed">
+            โลกมีอายุประมาณ <strong>4,600 ล้านปี</strong> นักธรณีวิทยาแบ่งเวลาออกเป็น <em>บรมยุค (Eon) &rarr; มหายุค (Era) &rarr; ยุค (Period) &rarr; สมัย (Epoch)</em> โดยใช้หลักฐานการเปลี่ยนแปลงของเปลือกโลก วิวัฒนาการสิ่งมีชีวิต และเหตุการณ์การสูญพันธุ์ครั้งใหญ่ (Mass Extinction) เป็นจุดแบ่งเขต
+          </p>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-5 flex flex-col justify-between">
+            <div>
+              <div class="flex items-center gap-2 mb-4">
+                <span class="px-2.5 py-1 text-xs font-semibold bg-emerald-100 text-emerald-700 rounded-md">ขั้นที่ 2 & 3</span>
+                <h3 class="font-bold text-slate-800">เข้าโมเดล: เลื่อนแถบเวลาโลก</h3>
+              </div>
+
+              <label class="block text-xs font-semibold text-slate-600 mb-1">ลากสเกลเวลา (ล้านปีก่อนปัจจุบัน: Ma):</label>
+              <input type="range" id="timeSlider" min="0" max="4600" value="4600" step="50" oninput="updateGeoTime(this.value)" class="w-full accent-blue-600">
+              <div class="flex justify-between text-[11px] text-slate-400 font-mono mt-1">
+                <span>ปัจจุบัน (0)</span><span>66</span><span>252</span><span>541</span><span>4,600 Ma</span>
+              </div>
+
+              <div class="mt-4 p-4 bg-slate-50 rounded-lg border border-slate-200 space-y-2">
+                <div class="text-xs font-bold text-blue-700 font-mono text-base" id="timeDisplay">4,600 ล้านปีก่อน</div>
+                <div class="text-xs font-semibold text-slate-800" id="eraDisplay">มหายุค: พรีแคมเบรียน (Precambrian)</div>
+                <p class="text-xs text-slate-600 leading-relaxed" id="geoDesc">กำเนิดโลก โลกยังร้อนจัด เริ่มเกิดเปลือกโลกและมหาสมุทร ต่อมาจึงเริ่มพบสิ่งมีชีวิตเซลล์เดียว (สโตรมาโทไลต์)</p>
+              </div>
+            </div>
+
+            <div class="mt-4 pt-3 border-t border-slate-100 text-[11px] text-slate-500">
+              <strong>ความจริงที่น่าทึ่ง:</strong> มหายุคพรีแคมเบรียนกินเวลาถึง <strong>88%</strong> ของประวัติศาสตร์โลกทั้งหมด สิ่งมีชีวิตซับซ้อนเพิ่งกำเนิดมาในช่วงเวลาสั้น ๆ ล่าสุดนี้เอง!
+            </div>
+          </div>
+
+          <div class="lg:col-span-2 bg-white rounded-xl shadow-sm border border-slate-200 p-5 flex flex-col">
+            <div class="flex items-center justify-between mb-3">
+              <div class="flex items-center gap-2">
+                <span class="px-2.5 py-1 text-xs font-semibold bg-purple-100 text-purple-700 rounded-md">ขั้นที่ 4</span>
+                <h3 class="font-bold text-slate-800">สังเกตผล: สัดส่วนเวลาสัมบูรณ์ & เหตุการณ์สำคัญ</h3>
+              </div>
+            </div>
+            <div class="w-full h-80 bg-slate-900 rounded-lg border border-slate-800 overflow-hidden relative">
+              <canvas id="canvas5" width="600" height="320" class="w-full h-full block"></canvas>
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-5">
+          <div class="flex items-center justify-between mb-3">
+            <div class="flex items-center gap-2">
+              <span class="px-2.5 py-1 text-xs font-semibold bg-amber-100 text-amber-700 rounded-md">ขั้นที่ 5</span>
+              <h3 class="font-bold text-slate-800">อธิบายสิ่งที่เกิดขึ้น: มาตราธรณีกาล</h3>
+            </div>
+            <button onclick="printSingleWorksheet('ws5')" class="px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded text-xs font-medium shadow flex items-center gap-1">
+              🖨️ พิมพ์ใบงานกิจกรรมที่ 5 (A4 พอดีหน้า)
+            </button>
+          </div>
+          <p class="text-xs text-slate-600 mb-3">เหตุการณ์การสูญพันธุ์ครั้งใหญ่ที่สุดในประวัติศาสตร์โลกที่กำจัดสิ่งมีชีวิตในทะเลไปกว่า 90% (Great Dying) เป็นจุดสิ้นสุดของมหายุคใด และเริ่มต้นมหายุคใด?</p>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
+            <button onclick="checkT5(1)" class="p-3 bg-slate-50 hover:bg-blue-50 border border-slate-200 rounded-lg text-left transition">
+              ก. สิ้นสุดมหายุคพรีแคมเบรียน &rarr; เริ่มมหายุคพาลีโอโซอิก
+            </button>
+            <button onclick="checkT5(2)" class="p-3 bg-slate-50 hover:bg-blue-50 border border-slate-200 rounded-lg text-left transition">
+              ข. สิ้นสุดมหายุคพาลีโอโซอิก &rarr; เริ่มมหายุคมีโซโซอิก
+            </button>
+            <button onclick="checkT5(3)" class="p-3 bg-slate-50 hover:bg-blue-50 border border-slate-200 rounded-lg text-left transition">
+              ค. สิ้นสุดมหายุคมีโซโซอิก &rarr; เริ่มมหายุคซีโนโซอิก
+            </button>
+            <button onclick="checkT5(4)" class="p-3 bg-slate-50 hover:bg-blue-50 border border-slate-200 rounded-lg text-left transition">
+              ง. สิ้นสุดยุคจูแรสซิก &rarr; เริ่มยุคครีเทเชียส
+            </button>
+          </div>
+          <div id="t5Feedback" class="mt-3 text-xs p-3 rounded-lg hidden font-medium"></div>
+        </div>
+      </div>
+
+      <!-- ========================================================= -->
+      <!-- WORKSHEET 5 (PRINTABLE A4 FITTED) -->
+      <!-- ========================================================= -->
+      <div id="ws5" class="worksheet-printable bg-white rounded-xl border border-slate-300 p-5 page-break">
+        <div class="border-b-2 border-slate-800 pb-2 mb-3">
+          <div class="flex justify-between items-start">
+            <div>
+              <span class="text-[11px] font-bold text-slate-500 tracking-wider">กลุ่มสาระการเรียนรู้วิทยาศาสตร์และเทคโนโลยี • ม.4</span>
+              <h2 class="text-base font-bold text-slate-900">ใบกิจกรรมการเรียนรู้ที่ 5: มาตราธรณีกาลและวิวัฒนาการของสิ่งมีชีวิต</h2>
+              <span class="text-xs text-blue-700 font-semibold">ตัวชี้วัด ว 3.2 ม.6/6: อธิบายการแบ่งช่วงเวลาตามมาตราธรณีกาลและเหตุการณ์สำคัญ</span>
+            </div>
+            <div class="text-right text-xs">
+              <span class="inline-block border border-slate-400 px-2 py-1 rounded bg-slate-50 font-bold">แบบประเมินทักษะ (P)</span>
+            </div>
+          </div>
+          <div class="grid grid-cols-3 gap-2 mt-2 pt-2 border-t border-slate-200 text-xs">
+            <div>ชื่อ-นามสกุล: ..............................................................</div>
+            <div>เลขที่: .............. ชั้น: ม.4/...........</div>
+            <div>วันที่: ....................................................</div>
+          </div>
+        </div>
+
+        <div class="mb-3">
+          <h3 class="text-xs font-bold text-slate-900 mb-1">ตอนที่ 1: การวิเคราะห์สัดส่วนเวลาทางธรณีกาล (Geological Time Distribution)</h3>
+          <p class="text-[11px] text-slate-600 mb-2"><strong>คำชี้แจง:</strong> ศึกษาแถบสัดส่วนเวลาจากแบบจำลอง แล้วเติมข้อมูลเหตุการณ์สำคัญและวิวัฒนาการของสิ่งมีชีวิตลงในตาราง</p>
+          
+          <table class="w-full border-collapse border border-slate-300 text-center text-xs">
+            <thead class="bg-slate-100 font-bold">
+              <tr>
+                <th class="border border-slate-300 p-1.5">มหายุค (Era)</th>
+                <th class="border border-slate-300 p-1.5">ช่วงเวลา (ล้านปีก่อน)</th>
+                <th class="border border-slate-300 p-1.5">สิ่งมีชีวิตเด่น / เหตุการณ์สำคัญ</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td class="border border-slate-300 p-1 text-left font-semibold">1. พรีแคมเบรียน (Precambrian)</td>
+                <td class="border border-slate-300 p-1 font-mono">4,600 &ndash; 541</td>
+                <td class="border border-slate-300 p-1 text-left">กำเนิดโลก, สิ่งมีชีวิตเซลล์เดียว (ไซยาโนแบคทีเรีย)</td>
+              </tr>
+              <tr>
+                <td class="border border-slate-300 p-1 text-left font-semibold">2. พาลีโอโซอิก (Paleozoic)</td>
+                <td class="border border-slate-300 p-1 font-mono">541 &ndash; 252</td>
+                <td class="border border-slate-300 p-1 text-left">....................................................................................</td>
+              </tr>
+              <tr>
+                <td class="border border-slate-300 p-1 text-left font-semibold">3. มีโซโซอิก (Mesozoic)</td>
+                <td class="border border-slate-300 p-1 font-mono">252 &ndash; 66</td>
+                <td class="border border-slate-300 p-1 text-left">....................................................................................</td>
+              </tr>
+              <tr>
+                <td class="border border-slate-300 p-1 text-left font-semibold">4. ซีโนโซอิก (Cenozoic)</td>
+                <td class="border border-slate-300 p-1 font-mono">66 &ndash; ปัจจุบัน</td>
+                <td class="border border-slate-300 p-1 text-left">....................................................................................</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="mb-3 space-y-2">
+          <h3 class="text-xs font-bold text-slate-900 mb-1">ตอนที่ 2: การสะท้อนคิดต่อประวัติศาสตร์โลกและวิกฤตธรรมชาติ</h3>
+          <div class="text-xs space-y-1.5">
+            <div>
+              <strong>1. การสูญพันธุ์ครั้งใหญ่ (Mass Extinction):</strong> นักธรณีวิทยาใช้เกณฑ์ใดในการแบ่งรอยต่อระหว่างแต่ละมหายุค และเหตุการณ์สูญพันธุ์ส่งผลต่อการเกิดสายพันธุ์ใหม่ในยุคถัดไปอย่างไร?<br>
+              <div class="border-b border-dotted border-slate-400 mt-1 h-5"></div>
+              <div class="border-b border-dotted border-slate-400 mt-1 h-5"></div>
+            </div>
+            <div>
+              <strong>2. การอนุรักษ์สมดุลโลก (เจตคติ A):</strong> หากเทียบประวัติศาสตร์โลก 4,600 ล้านปี เป็นเวลา 24 ชั่วโมง มนุษย์เพิ่งปรากฏตัวเพียงไม่กี่วินาทีสุดท้าย การเรียนรู้นี้สร้างความตระหนักต่อการดูแลสิ่งแวดล้อมอย่างไร?<br>
+              <div class="border-b border-dotted border-slate-400 mt-1 h-5"></div>
+              <div class="border-b border-dotted border-slate-400 mt-1 h-5"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="border-t border-slate-300 pt-2 text-[10px]">
+          <span class="font-bold block mb-1">เกณฑ์การประเมินทักษะกระบวนการ (P) โดยผู้สอน:</span>
+          <table class="w-full border-collapse border border-slate-300 text-center">
+            <thead>
+              <tr class="bg-slate-100">
+                <th class="border border-slate-300 p-1">ประเด็นการประเมิน</th>
+                <th class="border border-slate-300 p-1">ดีมาก (4)</th>
+                <th class="border border-slate-300 p-1">ดี (3)</th>
+                <th class="border border-slate-300 p-1">พอใช้ (2)</th>
+                <th class="border border-slate-300 p-1">ปรับปรุง (1)</th>
+                <th class="border border-slate-300 p-1">คะแนนที่ได้</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td class="border border-slate-300 p-1 text-left">1. การจัดกระทำและสื่อความหมายข้อมูล</td>
+                <td class="border border-slate-300 p-1">สรุปมหายุคและวิวัฒนาการสิ่งมีชีวิตได้ถูกต้องครบถ้วน</td>
+                <td class="border border-slate-300 p-1">สรุปถูกต้อง 3 มหายุค</td>
+                <td class="border border-slate-300 p-1">สรุปถูกต้อง 1-2 มหายุค</td>
+                <td class="border border-slate-300 p-1">ระบุข้อมูลคลาดเคลื่อนส่วนใหญ่</td>
+                <td class="border border-slate-300 p-1">....../4</td>
+              </tr>
+              <tr>
+                <td class="border border-slate-300 p-1 text-left">2. การสะท้อนคิดเชิงระบบและสิ่งแวดล้อม</td>
+                <td class="border border-slate-300 p-1">สะท้อนมุมมองความเปราะบางของระบบนิเวศได้ลึกซึ้ง</td>
+                <td class="border border-slate-300 p-1">สะท้อนมุมมองได้ดีแต่ขาดตัวอย่างเชื่อมโยง</td>
+                <td class="border border-slate-300 p-1">ตอบได้บางส่วนเมื่อมีคำถามกระตุ้น</td>
+                <td class="border border-slate-300 p-1">ไม่แสดงความเห็นสะท้อนคิด</td>
+                <td class="border border-slate-300 p-1">....../4</td>
+              </tr>
+            </tbody>
+          </table>
+          <div class="flex justify-between items-center mt-2 font-bold text-xs">
+            <span>รวมคะแนนทักษะ (P): ............. / 8 คะแนน</span>
+            <span>ลงชื่อผู้ประเมิน: ..............................................................</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================== -->
+    <!-- TAB 6: แบบทดสอบวัดผลสัมฤทธิ์ท้ายบท (15 ข้อ K-P-A) -->
+    <!-- ========================================== -->
+    <section id="tab6" class="tab-content hidden space-y-6">
+      <div class="bg-gradient-to-r from-slate-900 to-indigo-900 text-white rounded-xl shadow-md p-6 border border-slate-800">
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+          <div>
+            <div class="inline-flex items-center gap-2 px-3 py-1 bg-amber-400/20 text-amber-300 rounded-full text-xs font-semibold mb-2 border border-amber-400/30">
+              <span>🎯 มาตรฐาน ว 3.2 ม.4-6</span>
+              <span>•</span>
+              <span>15 ข้อ 4 ตัวเลือก (สุ่มสลับตำแหน่ง ก ข ค ง ทุกครั้ง)</span>
+            </div>
+            <h2 class="text-xl sm:text-2xl font-bold font-prompt">แบบทดสอบวัดผลสัมฤทธิ์ท้ายบทที่ 4</h2>
+            <p class="text-xs sm:text-sm text-slate-300 mt-1">การประเมินรอบด้านตามหลักสูตรแกนกลาง: ด้านความรู้ (K: 5 ข้อ), ทักษะกระบวนการ (P: 5 ข้อ) และเจตคติ (A: 5 ข้อ)</p>
+          </div>
+          <div class="flex items-center gap-2">
+            <button onclick="restartFullQuiz()" class="px-4 py-2 bg-amber-500 hover:bg-amber-600 text-slate-950 font-semibold text-xs rounded-lg transition shadow flex items-center gap-1.5">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+              สุ่มตัวเลือกและเริ่มทำใหม่
+            </button>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 mt-5 pt-5 border-t border-slate-700/60 text-xs">
+          <div class="p-2.5 bg-slate-800/80 rounded-lg border border-slate-700">
+            <span class="font-bold text-blue-400 block mb-0.5">📌 ตัวชี้วัด ว 3.2 ม.6/4</span>
+            <span class="text-slate-300 text-[11px]">อธิบายลำดับเหตุการณ์ทางธรณีวิทยา รอยชั้นไม่ต่อเนื่อง และซากดึกดำบรรพ์</span>
+          </div>
+          <div class="p-2.5 bg-slate-800/80 rounded-lg border border-slate-700">
+            <span class="font-bold text-emerald-400 block mb-0.5">📌 ตัวชี้วัด ว 3.2 ม.6/5</span>
+            <span class="text-slate-300 text-[11px]">อธิบายและเปรียบเทียบการหาอายุเปรียบเทียบและอายุสัมบูรณ์</span>
+          </div>
+          <div class="p-2.5 bg-slate-800/80 rounded-lg border border-slate-700">
+            <span class="font-bold text-purple-400 block mb-0.5">📌 ตัวชี้วัด ว 3.2 ม.6/6</span>
+            <span class="text-slate-300 text-[11px]">อธิบายการแบ่งเวลาตามมาตราธรณีกาลและวิวัฒนาการสิ่งมีชีวิต</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-4">
+        <div class="flex justify-between items-center text-xs font-semibold mb-1.5">
+          <span class="text-slate-700">ความคืบหน้าในการทำแบบทดสอบ:</span>
+          <span id="quizProgressText" class="font-mono text-blue-600">0 / 15 ข้อ</span>
+        </div>
+        <div class="w-full bg-slate-100 rounded-full h-2.5 overflow-hidden">
+          <div id="quizProgressBar" class="bg-blue-600 h-2.5 rounded-full transition-all duration-300 w-0"></div>
+        </div>
+      </div>
+
+      <div id="quizQuestionsContainer" class="space-y-4"></div>
+
+      <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 text-center" id="scoreSummaryCard">
+        <button onclick="calculateFinalScore()" id="btnSubmitQuiz" class="px-8 py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl shadow-md transition text-sm">
+          ส่งคำตอบและประเมินผลคะแนน
+        </button>
+
+        <div id="resultArea" class="hidden mt-6 pt-6 border-t border-slate-200 text-left">
+          <div class="text-center mb-6">
+            <div class="inline-block p-4 rounded-full bg-blue-50 border border-blue-200 mb-2">
+              <span class="text-3xl font-extrabold text-blue-700 font-mono" id="totalScoreText">0 / 15</span>
+            </div>
+            <h3 class="text-lg font-bold text-slate-800" id="gradeTitle">สรุปผลการประเมิน</h3>
+            <p class="text-xs text-slate-500 mt-1" id="gradeFeedback"></p>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div class="p-4 bg-sky-50 rounded-xl border border-sky-200 text-center">
+              <div class="text-xs font-bold text-sky-800 uppercase tracking-wider">ด้านความรู้ (Knowledge: K)</div>
+              <div class="text-2xl font-black text-sky-600 font-mono my-1" id="kScore">0 / 5</div>
+              <p class="text-[11px] text-sky-700" id="kEval">-</p>
+            </div>
+            <div class="p-4 bg-emerald-50 rounded-xl border border-emerald-200 text-center">
+              <div class="text-xs font-bold text-emerald-800 uppercase tracking-wider">ทักษะกระบวนการ (Process: P)</div>
+              <div class="text-2xl font-black text-emerald-600 font-mono my-1" id="pScore">0 / 5</div>
+              <p class="text-[11px] text-emerald-700" id="pEval">-</p>
+            </div>
+            <div class="p-4 bg-purple-50 rounded-xl border border-purple-200 text-center">
+              <div class="text-xs font-bold text-purple-800 uppercase tracking-wider">เจตคติ/คุณลักษณะ (Attitude: A)</div>
+              <div class="text-2xl font-black text-purple-600 font-mono my-1" id="aScore">0 / 5</div>
+              <p class="text-[11px] text-purple-700" id="aEval">-</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="bg-white border-t border-slate-200 py-4 text-center text-xs text-slate-500 no-print">
+    แบบจำลองเชิงโต้ตอบและเครื่องมือวัดประเมินผล บทที่ 4 การลำดับชั้นหินและอายุทางธรณีวิทยา • วิทยาศาสตร์โลกและอวกาศ ม.4
+  </footer>
+
+  <!-- ============================================================== -->
+  <!-- JAVASCRIPT LOGIC & SIMULATION ENGINES                          -->
+  <!-- ============================================================== -->
+  <script>
+    // Print helpers
+    function printSingleWorksheet(wsId) {
+      // Hide all other worksheets temporarily for printing
+      const allWs = document.querySelectorAll('.worksheet-printable');
+      allWs.forEach(w => {
+        if (w.id !== wsId) w.style.display = 'none';
+        else w.style.display = 'block';
+      });
+      window.print();
+      // Restore
+      allWs.forEach(w => w.style.display = '');
+    }
+
+    function printAllWorksheets() {
+      // Show all tabs so their worksheets become visible in print mode
+      for (let i = 1; i <= 5; i++) {
+        const tab = document.getElementById('tab' + i);
+        if (tab) tab.classList.remove('hidden');
+      }
+      window.print();
+      // Restore active tab
+      switchTab(1);
+    }
+
+    function switchTab(tabIndex) {
+      for (let i = 1; i <= 6; i++) {
+        const content = document.getElementById('tab' + i);
+        const btn = document.getElementById('tabBtn' + i);
+        if (content && btn) {
+          if (i === tabIndex) {
+            content.classList.remove('hidden');
+            if (i === 6) {
+              btn.className = 'tab-btn active px-3.5 py-2 rounded-lg font-medium whitespace-nowrap transition-all duration-200 bg-amber-500 text-slate-950 font-bold shadow-md';
+            } else {
+              btn.className = 'tab-btn active px-3.5 py-2 rounded-lg font-medium whitespace-nowrap transition-all duration-200 bg-blue-600 text-white shadow-md';
+            }
+          } else {
+            content.classList.add('hidden');
+            if (i === 6) {
+              btn.className = 'tab-btn px-3.5 py-2 rounded-lg font-medium whitespace-nowrap transition-all duration-200 text-amber-300 hover:text-amber-100 hover:bg-amber-900/40 border border-amber-500/40';
+            } else {
+              btn.className = 'tab-btn px-3.5 py-2 rounded-lg font-medium whitespace-nowrap transition-all duration-200 text-slate-300 hover:text-white hover:bg-slate-800';
+            }
+          }
+        }
+      }
+
+      if (tabIndex === 1) renderTab1();
+      if (tabIndex === 2) renderTab2();
+      if (tabIndex === 3) renderTab3();
+      if (tabIndex === 4) { renderTab4Atoms(); renderTab4Graph(); }
+      if (tabIndex === 5) renderTab5();
+    }
+
+    // Tab 1 Logic
+    const rockDefs = {
+      sandstone: { name: 'หินทราย (Sandstone)', color: '#f59e0b', pattern: 'dots' },
+      shale: { name: 'หินดินดาน (Shale)', color: '#64748b', pattern: 'lines' },
+      limestone: { name: 'หินปูน (Limestone)', color: '#38bdf8', pattern: 'bricks' },
+      conglomerate: { name: 'หินกรวดมน (Conglomerate)', color: '#ea580c', pattern: 'circles' }
+    };
+
+    let userLayers = [];
+    let currentTilt = 0;
+
+    function addLayer(type) {
+      if (userLayers.length >= 6) {
+        alert('สะสมชั้นหินเต็มพื้นที่แล้ว (สูงสุด 6 ชั้น)');
+        return;
+      }
+      userLayers.push({
+        id: Date.now(),
+        type: type,
+        ...rockDefs[type]
+      });
+      updateLayerListUI();
+      renderTab1();
+      generateTab1Quiz();
+    }
+
+    function resetLayers() {
+      userLayers = [];
+      currentTilt = 0;
+      document.getElementById('tiltSlider').value = 0;
+      document.getElementById('tiltVal').innerText = '0°';
+      updateLayerListUI();
+      renderTab1();
+      generateTab1Quiz();
+    }
+
+    function updateTilt(val) {
+      currentTilt = parseInt(val);
+      document.getElementById('tiltVal').innerText = val + '°';
+      renderTab1();
+      generateTab1Quiz();
+    }
+
+    function updateLayerListUI() {
+      const list = document.getElementById('layerList');
+      const count = document.getElementById('layerCountText');
+      count.innerText = `จำนวนชั้นหิน: ${userLayers.length} ชั้น`;
+      list.innerHTML = '';
+      if (userLayers.length === 0) {
+        list.innerHTML = '<span class="text-slate-400 italic">ยังไม่มีการสะสมตัวของชั้นหิน</span>';
+        return;
+      }
+      [...userLayers].reverse().forEach((l, idx) => {
+        const isTop = (idx === 0);
+        const isBottom = (idx === userLayers.length - 1);
+        const badge = isTop ? '<span class="text-[10px] bg-emerald-100 text-emerald-800 px-1.5 py-0.5 rounded">อ่อนสุด</span>' :
+                      isBottom ? '<span class="text-[10px] bg-rose-100 text-rose-800 px-1.5 py-0.5 rounded">แก่สุด</span>' : '';
+        const item = document.createElement('div');
+        item.className = 'flex items-center justify-between p-1.5 bg-slate-50 border border-slate-200 rounded';
+        item.innerHTML = `<span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded" style="background:${l.color}"></span> ${l.name}</span> ${badge}`;
+        list.appendChild(item);
+      });
+    }
+
+    function renderTab1() {
+      const canvas = document.getElementById('canvas1');
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+      const w = canvas.width;
+      const h = canvas.height;
+
+      ctx.clearRect(0, 0, w, h);
+      ctx.fillStyle = '#f8fafc';
+      ctx.fillRect(0, 0, w, h);
+
+      ctx.fillStyle = '#334155';
+      ctx.fillRect(0, h - 35, w, 35);
+      ctx.fillStyle = '#94a3b8';
+      ctx.font = '10px Sarabun';
+      ctx.fillText('หินฐานเดิม (Bedrock / Basement)', 15, h - 14);
+
+      if (userLayers.length === 0) {
+        ctx.fillStyle = '#94a3b8';
+        ctx.font = '14px Sarabun';
+        ctx.textAlign = 'center';
+        ctx.fillText('กดเลือกชนิดหินทางซ้ายเพื่อเริ่มตกสะสมตัวตามแนวนอน', w / 2, h / 2 - 10);
+        return;
+      }
+
+      ctx.save();
+      ctx.translate(w / 2, h / 2);
+      ctx.rotate((currentTilt * Math.PI) / 180);
+      ctx.translate(-w / 2, -h / 2);
+
+      const layerThickness = Math.min(38, (h - 70) / Math.max(userLayers.length, 1));
+      let currentY = h - 35;
+
+      userLayers.forEach((layer, i) => {
+        currentY -= layerThickness;
+        ctx.fillStyle = layer.color;
+        ctx.fillRect(-60, currentY, w + 120, layerThickness);
+
+        ctx.strokeStyle = 'rgba(0,0,0,0.15)';
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.moveTo(-60, currentY);
+        ctx.lineTo(w + 120, currentY);
+        ctx.stroke();
+
+        ctx.fillStyle = '#ffffff';
+        ctx.font = 'bold 11px Prompt';
+        ctx.textAlign = 'left';
+        ctx.shadowColor = 'rgba(0,0,0,0.6)';
+        ctx.shadowBlur = 3;
+        ctx.fillText(`ชั้นที่ ${i + 1}: ${layer.name}`, 40, currentY + layerThickness / 2 + 4);
+        ctx.shadowBlur = 0;
+      });
+
+      ctx.restore();
+    }
+
+    function generateTab1Quiz() {
+      const container = document.getElementById('tab1QuestionArea');
+      const qText = document.getElementById('t1QuestionText');
+      const optDiv = document.getElementById('t1Options');
+      const feedback = document.getElementById('t1Feedback');
+      feedback.classList.add('hidden');
+
+      if (userLayers.length < 2) {
+        container.classList.add('hidden');
+        return;
+      }
+      container.classList.remove('hidden');
+
+      const oldest = userLayers[0];
+      const youngest = userLayers[userLayers.length - 1];
+      const isTilted = Math.abs(currentTilt) > 0;
+
+      qText.innerHTML = `จากสภาพชั้นหินที่คุณสร้าง (สะสม ${userLayers.length} ชั้น และเอียงเท ${currentTilt}°) ตาม <strong>กฎการซ้อนทับ</strong> หินชนิดใดมี <u>อายุแก่ที่สุด</u> และหินชนิดใดมี <u>อายุน้อยที่สุด</u>?`;
+
+      let choices = [
+        {
+          text: `แก่ที่สุด: ${oldest.name} | อ่อนที่สุด: ${youngest.name}`,
+          correct: true,
+          reason: `ถูกต้องแม่นยำ! ตามกฎการซ้อนทับ ชั้นที่ตกสะสมตัวก่อนจะอยู่ด้านล่างสุดจึงมีอายุแก่ที่สุด (${oldest.name}) และชั้นบนสุดจะอายุน้อยที่สุด (${youngest.name}) ${isTilted ? 'และการที่ชั้นหินเอียงเท ' + currentTilt + '° เกิดจากแรงแปรสัณฐานกระทำภายหลังตามกฎการวางตัวแนวราบเดิม' : ''}`
+        },
+        {
+          text: `แก่ที่สุด: ${youngest.name} | อ่อนที่สุด: ${oldest.name}`,
+          correct: false,
+          reason: `ยังไม่ถูกต้อง: หินชั้นบนสุด (${youngest.name}) ตกสะสมตัวทีหลังสุด จึงต้องมีอายุน้อยที่สุด ไม่ใช่แก่ที่สุด`
+        },
+        {
+          text: `ทุกชั้นมีอายุเท่ากัน เพราะสะสมตัวอยู่ในแอ่งเดียวกัน`,
+          correct: false,
+          reason: `ไม่ถูกต้อง: หินแต่ละชั้นสะสมตัวต่างช่วงเวลากัน ชั้นล่างสะสมตัวก่อนจึงมีอายุแก่กว่า`
+        },
+        {
+          text: `ไม่สามารถบอกได้เนื่องจากชั้นหินมีการเอียงเท`,
+          correct: false,
+          reason: `ไม่ถูกต้อง: แม้ชั้นหินจะเอียงเท แต่หากไม่มีการพลิกคว่ำ (Overturned) เรายังสามารถอ่านลำดับล่าง-บนได้ตามกฎการซ้อนทับ`
+        }
+      ];
+
+      shuffleArray(choices);
+
+      optDiv.innerHTML = '';
+      choices.forEach(c => {
+        const btn = document.createElement('button');
+        btn.className = 'p-3 bg-white hover:bg-blue-50 border border-slate-200 rounded-lg text-left transition font-medium text-slate-700';
+        btn.innerText = c.text;
+        btn.onclick = () => {
+          feedback.classList.remove('hidden');
+          if (c.correct) {
+            feedback.className = 'mt-3 text-xs p-3 rounded-lg font-medium bg-emerald-100 text-emerald-800 border border-emerald-300';
+            feedback.innerHTML = `✅ ${c.reason}`;
+          } else {
+            feedback.className = 'mt-3 text-xs p-3 rounded-lg font-medium bg-rose-100 text-rose-800 border border-rose-300';
+            feedback.innerHTML = `❌ ${c.reason}`;
+          }
+        };
+        optDiv.appendChild(btn);
+      });
+    }
+
+    // Tab 2 Logic
+    let currentEventStep = 1;
+    let playInterval = null;
+
+    const eventDescriptions = {
+      1: "<strong>เหตุการณ์ 1:</strong> การตกสะสมตัวของตะกอนหินปูน A ในทะเลดึกดำบรรพ์ตามกฎการวางตัวแนวนอน",
+      2: "<strong>เหตุการณ์ 2:</strong> สภาพแวดล้อมเปลี่ยนเป็นน้ำนิ่ง ตะกอนดินเหนียวตกสะสมตัวกลายเป็น หินดินดาน B ทับบนหินปูน A",
+      3: "<strong>เหตุการณ์ 3:</strong> ตะกอนทรายตกสะสมตัวกลายเป็น หินทราย C ทับบนหินดินดาน B",
+      4: "<strong>เหตุการณ์ 4:</strong> แมกมาแทรกดันตัวขึ้นมาจากด้านล่าง เย็นตัวกลายเป็น <strong>หินอัคนีแทรกซอน D</strong> ตัดผ่านชั้นหิน A, B และ C",
+      5: "<strong>เหตุการณ์ 5:</strong> เกิดแรงเค้นดึงในเปลือกโลก ทำให้เกิด <strong>รอยเลื่อน E (Fault)</strong> ตัดผ่านและเลื่อนทุกสิ่ง (หิน A, B, C และหินแทรกซอน D) ขาดออกจากกัน"
+    };
+
+    function setEventStep(step) {
+      currentEventStep = parseInt(step);
+      document.getElementById('eventSlider').value = step;
+      document.getElementById('stepDesc').innerHTML = eventDescriptions[step];
+      renderTab2();
+    }
+
+    function playTimeline() {
+      if (playInterval) clearInterval(playInterval);
+      let s = 1;
+      setEventStep(s);
+      playInterval = setInterval(() => {
+        s++;
+        if (s > 5) {
+          clearInterval(playInterval);
+        } else {
+          setEventStep(s);
+        }
+      }, 1400);
+    }
+
+    function renderTab2() {
+      const canvas = document.getElementById('canvas2');
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+      const w = canvas.width;
+      const h = canvas.height;
+
+      ctx.clearRect(0, 0, w, h);
+      ctx.fillStyle = '#0f172a';
+      ctx.fillRect(0, 0, w, h);
+
+      const faultX = w * 0.55;
+      const faultYOffset = (currentEventStep >= 5) ? 35 : 0;
+
+      function drawRockLayer(yStart, height, color, label, layerIndex) {
+        if (currentEventStep < layerIndex) return;
+
+        ctx.fillStyle = color;
+        ctx.beginPath();
+        ctx.moveTo(0, yStart);
+        ctx.lineTo(faultX - 40, yStart);
+        ctx.lineTo(faultX - 40 + (h - yStart) * 0.35, yStart + height);
+        ctx.lineTo(0, yStart + height);
+        ctx.closePath();
+        ctx.fill();
+
+        ctx.beginPath();
+        ctx.moveTo(faultX - 40, yStart + faultYOffset);
+        ctx.lineTo(w, yStart + faultYOffset);
+        ctx.lineTo(w, yStart + height + faultYOffset);
+        ctx.lineTo(faultX - 40 + (h - yStart) * 0.35, yStart + height + faultYOffset);
+        ctx.closePath();
+        ctx.fill();
+
+        ctx.fillStyle = '#ffffff';
+        ctx.font = 'bold 12px Prompt';
+        ctx.fillText(label, 30, yStart + height / 2 + 5);
+      }
+
+      drawRockLayer(220, 80, '#0284c7', '1. หินปูน A (Limestone)', 1);
+      drawRockLayer(150, 70, '#475569', '2. หินดินดาน B (Shale)', 2);
+      drawRockLayer(80, 70, '#d97706', '3. หินทราย C (Sandstone)', 3);
+
+      if (currentEventStep >= 4) {
+        ctx.fillStyle = '#dc2626';
+        ctx.beginPath();
+        const dykeX = 180;
+        ctx.moveTo(dykeX, h);
+        ctx.lineTo(dykeX + 25, 60);
+        ctx.lineTo(dykeX + 65, 60);
+        ctx.lineTo(dykeX + 35, h);
+        ctx.closePath();
+        ctx.fill();
+
+        ctx.fillStyle = '#ffffff';
+        ctx.font = 'bold 11px Prompt';
+        ctx.fillText('4. หินอัคนีแทรกซอน D (Dyke)', dykeX - 10, 50);
+      }
+
+      if (currentEventStep >= 5) {
+        ctx.strokeStyle = '#ef4444';
+        ctx.lineWidth = 4;
+        ctx.setLineDash([8, 6]);
+        ctx.beginPath();
+        ctx.moveTo(faultX - 40, 20);
+        ctx.lineTo(faultX + 70, h);
+        ctx.stroke();
+        ctx.setLineDash([]);
+
+        ctx.fillStyle = '#ef4444';
+        ctx.font = 'bold 12px Prompt';
+        ctx.fillText('5. รอยเลื่อน E (Fault)', faultX + 10, 40);
+
+        ctx.fillStyle = '#38bdf8';
+        ctx.fillText('▲ ฝั่งซ้ายยกตัว', faultX - 110, 100);
+        ctx.fillText('▼ ฝั่งขวาทรุดตัว', faultX + 80, 140);
+      }
+    }
+
+    function checkT2(opt) {
+      const fb = document.getElementById('t2Feedback');
+      fb.classList.remove('hidden');
+      if (opt === 2) {
+        fb.className = 'mt-3 text-xs p-3 rounded-lg font-medium bg-emerald-100 text-emerald-800 border border-emerald-300';
+        fb.innerHTML = '✅ <strong>ถูกต้องสมบูรณ์!</strong> ลำดับคือ A สะสมก่อน &rarr; B ทับบน A &rarr; C ทับบน B &rarr; หินอัคนี D แทรกตัดผ่านทั้งสาม &rarr; รอยเลื่อน E เกิดทีหลังสุดเพราะตัดผ่านทุกโครงสร้าง';
+      } else {
+        fb.className = 'mt-3 text-xs p-3 rounded-lg font-medium bg-rose-100 text-rose-800 border border-rose-300';
+        fb.innerHTML = '❌ <strong>ยังไม่ถูกต้อง:</strong> จำหลักการสำคัญ "สิ่งที่ตัดผ่านต้องเกิดทีหลังสิ่งที่ถูกตัด" รอยเลื่อน E ตัดผ่านทุกสิ่งจึงต้องอ่อนที่สุด (เกิดหลังสุด)';
+      }
+    }
+
+    // Tab 3 Logic
+    const activeLinks = { trilobite: false, ammonite: false, graptolite: false };
+
+    function toggleFossilLink(fossil) {
+      activeLinks[fossil] = !activeLinks[fossil];
+      const badge = document.getElementById('badge-' + fossil);
+      if (activeLinks[fossil]) {
+        badge.innerText = 'เทียบสัมพันธ์แล้ว';
+        badge.className = 'text-[10px] bg-emerald-500 px-2 py-0.5 rounded text-white font-bold';
+      } else {
+        badge.innerText = 'ปิดอยู่';
+        badge.className = 'text-[10px] bg-slate-300 px-2 py-0.5 rounded text-slate-800';
+      }
+      renderTab3();
+    }
+
+    function renderTab3() {
+      const canvas = document.getElementById('canvas3');
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+      const w = canvas.width;
+      const h = canvas.height;
+
+      ctx.clearRect(0, 0, w, h);
+      ctx.fillStyle = '#0f172a';
+      ctx.fillRect(0, 0, w, h);
+
+      const colA_x = 40;
+      const colA_w = 170;
+      const layersA = [
+        { name: 'หินทราย (บนสุด)', y: 40, h: 50, col: '#d97706', fossil: null },
+        { name: 'หินปูน (มีแอมโมไนต์)', y: 90, h: 60, col: '#0284c7', fossil: 'ammonite', fIcon: '🐚' },
+        { name: 'หินดินดาน (มีไทรโลไบต์)', y: 150, h: 70, col: '#475569', fossil: 'trilobite', fIcon: '🦀' },
+        { name: 'หินดินดานล่าง (มีแกรปโตไลต์)', y: 220, h: 60, col: '#334155', fossil: 'graptolite', fIcon: '🌿' }
+      ];
+
+      const colB_x = 390;
+      const colB_w = 170;
+      const layersB = [
+        { name: 'หินปูน (มีแอมโมไนต์)', y: 130, h: 55, col: '#0284c7', fossil: 'ammonite', fIcon: '🐚' },
+        { name: 'หินทราย (มีไทรโลไบต์)', y: 185, h: 65, col: '#b45309', fossil: 'trilobite', fIcon: '🦀' },
+        { name: 'หินดินดานดำ (มีแกรปโตไลต์)', y: 250, h: 50, col: '#1e293b', fossil: 'graptolite', fIcon: '🌿' }
+      ];
+
+      ctx.fillStyle = '#e2e8f0';
+      ctx.font = 'bold 12px Prompt';
+      ctx.fillText('หน้าผา A (ทิศตะวันตก)', colA_x, 30);
+
+      layersA.forEach(l => {
+        ctx.fillStyle = l.col;
+        ctx.fillRect(colA_x, l.y, colA_w, l.h);
+        ctx.strokeStyle = '#0f172a';
+        ctx.strokeRect(colA_x, l.y, colA_w, l.h);
+
+        ctx.fillStyle = '#ffffff';
+        ctx.font = '10px Sarabun';
+        ctx.fillText(l.name, colA_x + 8, l.y + 18);
+
+        if (l.fIcon) {
+          ctx.font = '16px serif';
+          ctx.fillText(l.fIcon, colA_x + colA_w - 30, l.y + l.h / 2 + 6);
+        }
+      });
+
+      ctx.fillStyle = '#e2e8f0';
+      ctx.font = 'bold 12px Prompt';
+      ctx.fillText('หน้าผา B (ทิศตะวันออก)', colB_x, 115);
+
+      layersB.forEach(l => {
+        ctx.fillStyle = l.col;
+        ctx.fillRect(colB_x, l.y, colB_w, l.h);
+        ctx.strokeStyle = '#0f172a';
+        ctx.strokeRect(colB_x, l.y, colB_w, l.h);
+
+        ctx.fillStyle = '#ffffff';
+        ctx.font = '10px Sarabun';
+        ctx.fillText(l.name, colB_x + 8, l.y + 18);
+
+        if (l.fIcon) {
+          ctx.font = '16px serif';
+          ctx.fillText(l.fIcon, colB_x + 10, l.y + l.h / 2 + 6);
+        }
+      });
+
+      function connectLayers(fName, strokeCol) {
+        if (!activeLinks[fName]) return;
+        const targetA = layersA.find(x => x.fossil === fName);
+        const targetB = layersB.find(x => x.fossil === fName);
+        if (targetA && targetB) {
+          const yA = targetA.y + targetA.h / 2;
+          const yB = targetB.y + targetB.h / 2;
+
+          ctx.strokeStyle = strokeCol;
+          ctx.lineWidth = 3;
+          ctx.setLineDash([6, 4]);
+          ctx.beginPath();
+          ctx.moveTo(colA_x + colA_w, yA);
+          ctx.lineTo(colB_x, yB);
+          ctx.stroke();
+          ctx.setLineDash([]);
+
+          ctx.fillStyle = strokeCol;
+          ctx.font = 'bold 11px Prompt';
+          ctx.fillText(`เทียบสัมพันธ์ยุคเดียวกัน (${fName})`, (colA_x + colA_w + colB_x) / 2 - 60, (yA + yB) / 2 - 6);
+        }
+      }
+
+      connectLayers('trilobite', '#f59e0b');
+      connectLayers('ammonite', '#60a5fa');
+      connectLayers('graptolite', '#34d399');
+    }
+
+    function checkT3(opt) {
+      const fb = document.getElementById('t3Feedback');
+      fb.classList.remove('hidden');
+      if (opt === 2) {
+        fb.className = 'mt-3 text-xs p-3 rounded-lg font-medium bg-emerald-100 text-emerald-800 border border-emerald-300';
+        fb.innerHTML = '✅ <strong>ถูกต้องยอดเยี่ยม!</strong> นี่คือหัวใจของ "การเทียบสัมพันธ์ชั้นหิน" ฟอสซิลดัชนีระบุอายุทางธรณีวิทยาที่ชัดเจน ดังนั้นชั้นหินที่มีฟอสซิลดัชนีเดียวกันย่อมมีอายุเท่ากัน แม้ปัจจุบันจะอยู่ต่างระดับความสูงหรือต่างชนิดหิน';
+      } else {
+        fb.className = 'mt-3 text-xs p-3 rounded-lg font-medium bg-rose-100 text-rose-800 border border-rose-300';
+        fb.innerHTML = '❌ <strong>ยังไม่ถูกต้อง:</strong> ระดับความสูงในปัจจุบันไม่สามารถชี้วัดอายุข้ามพื้นที่ได้เนื่องจากการยกตัว/การกัดเซาะ แต่ "ฟอสซิลดัชนี" เป็นหลักฐานสำคัญที่บอกว่าเกิดในยุคเดียวกัน';
+      }
+    }
+
+    // Tab 4 Logic
+    let currentHalfLives = 0;
+    const isotopeData = {
+      C14: { name: 'คาร์บอน-14', hl: 5730, unit: 'ปี', decayTo: 'ไนโตรเจน-14' },
+      K40: { name: 'โพแทสเซียม-40', hl: 1250, unit: 'ล้านปี', decayTo: 'อาร์กอน-40' },
+      U238: { name: 'ยูเรเนียม-238', hl: 4500, unit: 'ล้านปี', decayTo: 'ตะกั่ว-206' }
+    };
+    let currentIso = 'K40';
+
+    const crystalParticles = [];
+    for (let i = 0; i < 100; i++) {
+      crystalParticles.push({
+        x: 20 + (i % 10) * 24 + (Math.random() * 4 - 2),
+        y: 20 + Math.floor(i / 10) * 19 + (Math.random() * 4 - 2),
+        decayOrder: Math.random()
+      });
+    }
+    crystalParticles.sort((a, b) => a.decayOrder - b.decayOrder);
+
+    function changeIsotope() {
+      currentIso = document.getElementById('isotopeSelect').value;
+      updateHalfLife(currentHalfLives);
+    }
+
+    function updateHalfLife(n) {
+      currentHalfLives = parseInt(n);
+      document.getElementById('hlDisplay').innerText = `${n} ครึ่งชีวิต`;
+
+      const parentFraction = Math.pow(0.5, currentHalfLives);
+      const parentP = (parentFraction * 100).toFixed(1);
+      const daughterP = (100 - parentP).toFixed(1);
+
+      document.getElementById('parentPercent').innerText = `${parentP}%`;
+      document.getElementById('daughterPercent').innerText = `${daughterP}%`;
+
+      const iso = isotopeData[currentIso];
+      const age = currentHalfLives * iso.hl;
+      document.getElementById('rockAge').innerText = `${age.toLocaleString()} ${iso.unit}`;
+
+      renderTab4Atoms();
+      renderTab4Graph();
+    }
+
+    function renderTab4Atoms() {
+      const canvas = document.getElementById('canvas4Atoms');
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+      const w = canvas.width;
+      const h = canvas.height;
+
+      ctx.clearRect(0, 0, w, h);
+      ctx.fillStyle = '#090d16';
+      ctx.fillRect(0, 0, w, h);
+
+      const parentCount = Math.round(100 * Math.pow(0.5, currentHalfLives));
+
+      crystalParticles.forEach((p, idx) => {
+        const isParent = idx < parentCount;
+        ctx.fillStyle = isParent ? '#f43f5e' : '#3b82f6';
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, 6.5, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.fillStyle = 'rgba(255,255,255,0.4)';
+        ctx.beginPath();
+        ctx.arc(p.x - 2, p.y - 2, 2, 0, Math.PI * 2);
+        ctx.fill();
+      });
+
+      ctx.fillStyle = '#94a3b8';
+      ctx.font = '11px Sarabun';
+      ctx.fillText(`ธาตุแม่คงเหลือ: ${parentCount} อะตอม`, 15, h - 10);
+    }
+
+    function renderTab4Graph() {
+      const canvas = document.getElementById('canvas4Graph');
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+      const w = canvas.width;
+      const h = canvas.height;
+
+      ctx.clearRect(0, 0, w, h);
+      ctx.fillStyle = '#090d16';
+      ctx.fillRect(0, 0, w, h);
+
+      const padX = 35;
+      const padY = 25;
+      const gw = w - padX - 15;
+      const gh = h - padY - 25;
+
+      ctx.strokeStyle = '#334155';
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      ctx.moveTo(padX, padY);
+      ctx.lineTo(padX, padY + gh);
+      ctx.lineTo(padX + gw, padY + gh);
+      ctx.stroke();
+
+      ctx.fillStyle = '#64748b';
+      ctx.font = '9px Sarabun';
+      ctx.fillText('100%', 8, padY + 5);
+      ctx.fillText('50%', 12, padY + gh / 2);
+      ctx.fillText('0%', 16, padY + gh);
+
+      for (let n = 0; n <= 5; n++) {
+        const x = padX + (n / 5) * gw;
+        ctx.fillText(n, x - 3, padY + gh + 15);
+      }
+      ctx.fillText('(ครึ่งชีวิต)', padX + gw - 35, padY + gh + 15);
+
+      ctx.strokeStyle = '#f43f5e';
+      ctx.lineWidth = 2.5;
+      ctx.beginPath();
+      for (let px = 0; px <= gw; px++) {
+        const t = (px / gw) * 5;
+        const val = Math.pow(0.5, t);
+        const py = padY + gh * (1 - val);
+        if (px === 0) ctx.moveTo(padX + px, py);
+        else ctx.lineTo(padX + px, py);
+      }
+      ctx.stroke();
+
+      const curX = padX + (currentHalfLives / 5) * gw;
+      const curVal = Math.pow(0.5, currentHalfLives);
+      const curY = padY + gh * (1 - curVal);
+
+      ctx.fillStyle = '#38bdf8';
+      ctx.beginPath();
+      ctx.arc(curX, curY, 6, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.strokeStyle = '#ffffff';
+      ctx.lineWidth = 2;
+      ctx.stroke();
+
+      ctx.strokeStyle = 'rgba(56, 189, 248, 0.4)';
+      ctx.setLineDash([4, 4]);
+      ctx.beginPath();
+      ctx.moveTo(curX, padY + gh);
+      ctx.lineTo(curX, curY);
+      ctx.lineTo(padX, curY);
+      ctx.stroke();
+      ctx.setLineDash([]);
+    }
+
+    function checkT4(opt) {
+      const fb = document.getElementById('t4Feedback');
+      fb.classList.remove('hidden');
+      if (opt === 2) {
+        fb.className = 'mt-3 text-xs p-3 rounded-lg font-medium bg-emerald-100 text-emerald-800 border border-emerald-300';
+        fb.innerHTML = '✅ <strong>ถูกต้องยอดเยี่ยม!</strong> จาก 100% &rarr; ครึ่งชีวิตที่ 1 เหลือ 50% &rarr; ครึ่งชีวิตที่ 2 เหลือ 25% แสดงว่าผ่านไป 2 ครึ่งชีวิต อายุ = 2 × 1,250 = 2,500 ล้านปี';
+      } else {
+        fb.className = 'mt-3 text-xs p-3 rounded-lg font-medium bg-rose-100 text-rose-800 border border-rose-300';
+        fb.innerHTML = '❌ <strong>ยังไม่ถูกต้อง:</strong> เริ่มต้น 100% ผ่านไป 1 ครึ่งชีวิตเหลือ 50% และผ่านไปอีก 1 ครึ่งชีวิตจะลดเหลือ 25% ดังนั้นคือ 2 ครึ่งชีวิต';
+      }
+    }
+
+    // Tab 5 Logic
+    let currentGeoMa = 4600;
+
+    const geoEvents = [
+      { ma: 4600, era: 'บรมยุคพรีแคมเบรียน (Precambrian)', desc: 'กำเนิดโลก โลกยังร้อนจัด เริ่มเกิดเปลือกโลกและมหาสมุทร' },
+      { ma: 3800, era: 'บรมยุคพรีแคมเบรียน (Precambrian)', desc: 'สิ่งมีชีวิตเซลล์เดียวชนิดแรก (แบคทีเรียดึกดำบรรพ์) เริ่มสังเคราะห์แสงและสร้างออกซิเจน' },
+      { ma: 541, era: 'มหายุคพาลีโอโซอิก (Paleozoic)', desc: 'การระเบิดแห่งสิ่งมีชีวิตยุคแคมเบรียน สัตว์ไม่มีกระดูกสันหลังในทะเล ไทรโลไบต์ ปลายุคแรก' },
+      { ma: 252, era: 'มหายุคมีโซโซอิก (Mesozoic)', desc: 'ยุคของสัตว์เลื้อยคลานและไดโนเสาร์ กำเนิดแอมโมไนต์ พืชมีดอก และสัตว์เลี้ยงลูกด้วยนมตัวแรก' },
+      { ma: 66, era: 'มหายุคซีโนโซอิก (Cenozoic)', desc: 'อุกกาบาตพุ่งชนโลก ไดโนเสาร์สูญพันธุ์ ยุคทองของสัตว์เลี้ยงลูกด้วยนม กำเนิดมนุษย์' }
+    ];
+
+    function updateGeoTime(val) {
+      currentGeoMa = parseInt(val);
+      document.getElementById('timeDisplay').innerText = `${currentGeoMa.toLocaleString()} ล้านปีก่อน`;
+
+      let curInfo = geoEvents[0];
+      for (let i = 0; i < geoEvents.length; i++) {
+        if (currentGeoMa <= geoEvents[i].ma) {
+          curInfo = geoEvents[i];
+        }
+      }
+
+      document.getElementById('eraDisplay').innerText = `ช่วงเวลา: ${curInfo.era}`;
+      document.getElementById('geoDesc').innerText = curInfo.desc;
+      renderTab5();
+    }
+
+    function renderTab5() {
+      const canvas = document.getElementById('canvas5');
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+      const w = canvas.width;
+      const h = canvas.height;
+
+      ctx.clearRect(0, 0, w, h);
+      ctx.fillStyle = '#0f172a';
+      ctx.fillRect(0, 0, w, h);
+
+      const barY = 80;
+      const barH = 50;
+      const barW = w - 80;
+      const startX = 40;
+
+      const wPre = barW * ((4600 - 541) / 4600);
+      const wPal = barW * ((541 - 252) / 4600);
+      const wMes = barW * ((252 - 66) / 4600);
+      const wCen = barW * (66 / 4600);
+
+      ctx.fillStyle = '#475569';
+      ctx.fillRect(startX, barY, wPre, barH);
+      ctx.fillStyle = '#059669';
+      ctx.fillRect(startX + wPre, barY, wPal, barH);
+      ctx.fillStyle = '#d97706';
+      ctx.fillRect(startX + wPre + wPal, barY, wMes, barH);
+      ctx.fillStyle = '#3b82f6';
+      ctx.fillRect(startX + wPre + wPal + wMes, barY, wCen, barH);
+
+      ctx.fillStyle = '#ffffff';
+      ctx.font = 'bold 11px Prompt';
+      ctx.fillText('พรีแคมเบรียน (88.2% ของเวลาโลก)', startX + 20, barY + 30);
+      ctx.fillText('พาลีโอ', startX + wPre + 2, barY + 30);
+
+      const needleX = startX + ((4600 - currentGeoMa) / 4600) * barW;
+
+      ctx.strokeStyle = '#ef4444';
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      ctx.moveTo(needleX, barY - 20);
+      ctx.lineTo(needleX, barY + barH + 20);
+      ctx.stroke();
+
+      ctx.fillStyle = '#ef4444';
+      ctx.beginPath();
+      ctx.moveTo(needleX - 6, barY - 20);
+      ctx.lineTo(needleX + 6, barY - 20);
+      ctx.lineTo(needleX, barY - 8);
+      ctx.closePath();
+      ctx.fill();
+
+      ctx.fillStyle = '#94a3b8';
+      ctx.font = '10px Sarabun';
+      ctx.fillText('4,600 Ma (กำเนิดโลก)', startX, barY + barH + 35);
+      ctx.fillText('541 Ma', startX + wPre - 15, barY + barH + 35);
+      ctx.fillText('0 (ปัจจุบัน)', startX + barW - 30, barY + barH + 35);
+    }
+
+    function checkT5(opt) {
+      const fb = document.getElementById('t5Feedback');
+      fb.classList.remove('hidden');
+      if (opt === 2) {
+        fb.className = 'mt-3 text-xs p-3 rounded-lg font-medium bg-emerald-100 text-emerald-800 border border-emerald-300';
+        fb.innerHTML = '✅ <strong>ถูกต้องแม่นยำ!</strong> การสูญพันธุ์เพอร์เมียน-ไทรแอสซิก (The Great Dying) เกิดขึ้นเมื่อประมาณ 252 ล้านปีก่อน เป็นจุดสิ้นสุดมหายุคพาลีโอโซอิก และก้าวเข้าสู่มหายุคมีโซโซอิก';
+      } else {
+        fb.className = 'mt-3 text-xs p-3 rounded-lg font-medium bg-rose-100 text-rose-800 border border-rose-300';
+        fb.innerHTML = '❌ <strong>ยังไม่ถูกต้อง:</strong> จุดสิ้นสุดพาลีโอโซอิกเข้าสู่มีโซโซอิก (252 Ma) คือการสูญพันธุ์ครั้งรุนแรงที่สุด ส่วนการสูญพันธุ์ของไดโนเสาร์คือสิ้นสุดมีโซโซอิก (66 Ma)';
+      }
+    }
+
+    // Tab 6: 15 Questions Bank & Randomization
+    function shuffleArray(arr) {
+      for (let i = arr.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+      }
+      return arr;
+    }
+
+    const questionBankMaster = [
+      // K1-K5
+      {
+        id: 1, domain: 'K', domainLabel: 'ด้านความรู้ (Knowledge)', indicator: 'ว 3.2 ม.6/4', measure: 'ความเข้าใจกฎการซ้อนทับและกฎการวางตัวแนวราบเดิม',
+        question: 'ตาม "กฎการซ้อนทับ" (Law of Superposition) หากพบชั้นหินตะกอนวางซ้อนกันเป็นชั้นปกติโดยไม่มีการพลิกกลับ ข้อใดสรุปได้ถูกต้องที่สุด?',
+        choices: [
+          { text: 'ชั้นหินที่อยู่ล่างสุดมีอายุแก่ที่สุด และชั้นหินที่อยู่บนสุดมีอายุน้อยที่สุด', correct: true },
+          { text: 'ชั้นหินที่อยู่บนสุดมีอายุแก่ที่สุด เพราะได้รับแรงกดทับยาวนานกว่า', correct: false },
+          { text: 'ชั้นหินที่มีความหนามากที่สุดจะมีอายุแก่ที่สุดเสมอ', correct: false },
+          { text: 'หินทุกชั้นมีอายุเท่ากันเนื่องจากสะสมตัวอยู่ในแอ่งธรณีเดียวกัน', correct: false }
+        ],
+        explanation: 'กฎการซ้อนทับระบุว่า ในลำดับชั้นหินตะกอนที่ยังคงสภาพเดิม ชั้นที่สะสมตัวก่อนจะอยู่ข้างล่าง จึงมีอายุแก่ที่สุด และชั้นที่สะสมตัวตามมาจะอยู่ด้านบนตามลำดับ'
+      },
+      {
+        id: 2, domain: 'K', domainLabel: 'ด้านความรู้ (Knowledge)', indicator: 'ว 3.2 ม.6/4', measure: 'ความเข้าใจกฎความสัมพันธ์การตัดผ่านของโครงสร้างทางธรณีวิทยา',
+        question: 'หากพบ "พนังหินอัคนี" (Dyke) แทรกตัดผ่านชั้นหินทรายและชั้นหินปูนขึ้นมา ข้อใดสรุปความสัมพันธ์ของอายุทางธรณีวิทยาได้ถูกต้อง?',
+        choices: [
+          { text: 'พนังหินอัคนีมีอายุน้อยกว่า (เกิดทีหลัง) ทั้งหินทรายและหินปูนที่ถูกตัดผ่าน', correct: true },
+          { text: 'พนังหินอัคนีมีอายุแก่กว่า เพราะเป็นหินอัคนีที่มาจากใต้เปลือกโลก', correct: false },
+          { text: 'หินทรายและหินปูนต้องเกิดทีหลังพนังหินอัคนีเสมอ', correct: false },
+          { text: 'ไม่สามารถระบุลำดับก่อนหลังได้ หากไม่มีข้อมูลอายุสัมบูรณ์เป็นตัวเลข', correct: false }
+        ],
+        explanation: 'ตามกฎความสัมพันธ์การตัดผ่าน (Cross-Cutting Relationships) โครงสร้างหรือหินที่ตัดผ่านโครงสร้างอื่น ย่อมเกิดขึ้นภายหลังสิ่งที่ถูกมันตัดผ่านเสมอ'
+      },
+      {
+        id: 3, domain: 'K', domainLabel: 'ด้านความรู้ (Knowledge)', indicator: 'ว 3.2 ม.6/4', measure: 'คุณสมบัติของซากดึกดำบรรพ์ดัชนี (Index Fossil)',
+        question: 'ซากดึกดำบรรพ์ที่จะนำมาใช้เป็น "ซากดึกดำบรรพ์ดัชนี" (Index Fossil) ได้ดีที่สุด ควรมีคุณสมบัติตามข้อใด?',
+        choices: [
+          { text: 'มีช่วงอายุการดำรงเผ่าพันธุ์สั้น มีปริมาณมาก และแพร่กระจายทางภูมิศาสตร์กว้างขวาง', correct: true },
+          { text: 'มีช่วงอายุการดำรงเผ่าพันธุ์ยาวนานหลายร้อยล้านปี เพื่อพบได้ในหินทุกยุค', correct: false },
+          { text: 'พบได้เฉพาะในแหล่งน้ำจืดลึก และมีโครงสร้างขนาดใหญ่หายาก', correct: false },
+          { text: 'เป็นสิ่งมีชีวิตที่ยังคงไม่สูญพันธุ์และพบเห็นได้ในระบบนิเวศปัจจุบัน', correct: false }
+        ],
+        explanation: 'ฟอสซิลดัชนีที่ดีต้องมีช่วงอายุสั้น (ระบุยุคได้แคบแม่นยำ) กระจายตัวกว้าง (เทียบข้ามทวีปได้) และมีจำนวนมากหาง่าย เช่น ไทรโลไบต์ หรือ แอมโมไนต์'
+      },
+      {
+        id: 4, domain: 'K', domainLabel: 'ด้านความรู้ (Knowledge)', indicator: 'ว 3.2 ม.6/5', measure: 'นิยามและความหมายของครึ่งชีวิตในการหาอายุสัมบูรณ์',
+        question: 'คำว่า "ครึ่งชีวิต" (Half-life) ของไอโซโทปกัมมันตรังสี มีความหมายตรงกับข้อใด?',
+        choices: [
+          { text: 'ระยะเวลาที่ไอโซโทปของธาตุแม่สลายตัวไปจนเหลือปริมาณเพียงครึ่งหนึ่งของเดิม', correct: true },
+          { text: 'เวลาครึ่งหนึ่งของอายุขัยของสิ่งมีชีวิตก่อนกลายเป็นฟอสซิล', correct: false },
+          { text: 'ระยะเวลาที่ใช้ในการเปลี่ยนสภาพหินตะกอนให้กลายเป็นหินแปรไปครึ่งหนึ่ง', correct: false },
+          { text: 'อายุเฉลี่ยของหินในเปลือกโลกก่อนถูกมุดตัวกลับลงสู่ชั้นเนื้อโลก', correct: false }
+        ],
+        explanation: 'ครึ่งชีวิตคือค่าคงที่ทางฟิสิกส์นิวเคลียร์ หมายถึงช่วงเวลาที่นิวเคลียสของธาตุกัมมันตรังสี (ธาตุแม่) สลายตัวลดลงเหลือร้อยละ 50 ของปริมาณตั้งต้น'
+      },
+      {
+        id: 5, domain: 'K', domainLabel: 'ด้านความรู้ (Knowledge)', indicator: 'ว 3.2 ม.6/6', measure: 'การแบ่งหน่วยสเกลเวลาและสัดส่วนในมาตราธรณีกาล',
+        question: 'ช่วงเวลาในประวัติศาสตร์โลกที่กินระยะเวลายาวนานที่สุด คิดเป็นประมาณร้อยละ 88 ของอายุโลกทั้งหมด คือช่วงเวลาใด?',
+        choices: [
+          { text: 'บรมยุคพรีแคมเบรียน (Precambrian)', correct: true },
+          { text: 'มหายุคพาลีโอโซอิก (Paleozoic)', correct: false },
+          { text: 'มหายุคมีโซโซอิก (Mesozoic)', correct: false },
+          { text: 'มหายุคซีโนโซอิก (Cenozoic)', correct: false }
+        ],
+        explanation: 'พรีแคมเบรียนกินเวลาตั้งแต่กำเนิดโลก 4,600 ล้านปีก่อน จนถึง 541 ล้านปีก่อน กินเวลายาวนานถึงประมาณ 88% ของประวัติศาสตร์โลก'
+      },
+
+      // P6-P10
+      {
+        id: 6, domain: 'P', domainLabel: 'ทักษะกระบวนการ (Process/Skill)', indicator: 'ว 3.2 ม.6/4', measure: 'ทักษะการแปลความหมายภาพตัดขวางลำดับเหตุการณ์ทางธรณีวิทยา',
+        question: 'จากภาพตัดขวางทางธรณีวิทยา พบ: ชั้นหิน A อยู่ล่าง, ชั้นหิน B อยู่บน, มีรอยเลื่อน C ตัดผ่านหิน A และ B, และมีพนังหินอัคนี D แทรกตัดผ่านรอยเลื่อน C อีกทอดหนึ่ง ข้อใดเรียงลำดับเหตุการณ์จาก "แก่ที่สุด &rarr; อ่อนที่สุด" ได้ถูกต้อง?',
+        choices: [
+          { text: 'หิน A &rarr; หิน B &rarr; รอยเลื่อน C &rarr; หินอัคนี D', correct: true },
+          { text: 'หินอัคนี D &rarr; รอยเลื่อน C &rarr; หิน B &rarr; หิน A', correct: false },
+          { text: 'รอยเลื่อน C &rarr; หิน A &rarr; หิน B &rarr; หินอัคนี D', correct: false },
+          { text: 'หิน A &rarr; หินอัคนี D &rarr; หิน B &rarr; รอยเลื่อน C', correct: false }
+        ],
+        explanation: 'ลำดับคือ หิน A ตกสะสมตัวก่อน &rarr; หิน B ตกทับบน A &rarr; เกิดรอยเลื่อน C ตัดผ่าน A และ B &rarr; หินอัคนี D แทรกตัดผ่านรอยเลื่อน C แสดงว่า D เกิดหลังสุด'
+      },
+      {
+        id: 7, domain: 'P', domainLabel: 'ทักษะกระบวนการ (Process/Skill)', indicator: 'ว 3.2 ม.6/5', measure: 'ทักษะการคำนวณอายุสัมบูรณ์ของหินจากสัดส่วนไอโซโทป',
+        question: 'นักวิทยาศาสตร์นำตัวอย่างแร่ในหินแกรนิตไปตรวจวัด พบว่ามีอัตราส่วนของไอโซโทปโพแทสเซียม-40 (ธาตุแม่) เหลืออยู่ 12.5% และอาร์กอน-40 (ธาตุลูก) 87.5% ถ้าค่าครึ่งชีวิตของโพแทสเซียม-40 คือ 1,250 ล้านปี หินก้อนนี้มีอายุเท่าใด?',
+        choices: [
+          { text: '3,750 ล้านปี (ผ่านไป 3 ครึ่งชีวิต)', correct: true },
+          { text: '1,250 ล้านปี (ผ่านไป 1 ครึ่งชีวิต)', correct: false },
+          { text: '2,500 ล้านปี (ผ่านไป 2 ครึ่งชีวิต)', correct: false },
+          { text: '5,000 ล้านปี (ผ่านไป 4 ครึ่งชีวิต)', correct: false }
+        ],
+        explanation: 'เริ่มต้น 100% &rarr; (1 รอบ) 50% &rarr; (2 รอบ) 25% &rarr; (3 รอบ) 12.5% แสดงว่าผ่านไป 3 ครึ่งชีวิต อายุ = 3 × 1,250 = 3,750 ล้านปี'
+      },
+      {
+        id: 8, domain: 'P', domainLabel: 'ทักษะกระบวนการ (Process/Skill)', indicator: 'ว 3.2 ม.6/4', measure: 'ทักษะการเปรียบเทียบสัมพันธ์ลำดับชั้นหินข้ามพื้นที่',
+        question: 'นักธรณีวิทยาสำรวจหน้าผาห่างกัน 80 กิโลเมตร หน้าผาที่ 1 พบซากแอมโมไนต์ในชั้นหินปูนลึก 20 เมตร ส่วนหน้าผาที่ 2 พบซากแอมโมไนต์ชนิดเดียวกันในชั้นหินดินดานลึก 70 เมตร การอนุมานข้อใดถูกต้องตามหลักการทางวิทยาศาสตร์?',
+        choices: [
+          { text: 'ชั้นหินที่มีแอมโมไนต์ทั้งสองหน้าผาเกิดขึ้นในช่วงเวลาทางธรณีกาลเดียวกัน แม้ระดับความลึกและชนิดหินจะต่างกัน', correct: true },
+          { text: 'หน้าผาที่ 1 มีอายุแก่กว่าหน้าผาที่ 2 เพราะความลึกของชั้นหินน้อยกว่า', correct: false },
+          { text: 'ไม่สามารถเทียบสัมพันธ์กันได้เลยเนื่องจากชนิดของหินตะกอนไม่ตรงกัน', correct: false },
+          { text: 'หน้าผาที่ 2 ต้องมีอายุแก่กว่าหน้าผาที่ 1 เสมอเนื่องจากจมอยู่ลึกกว่า', correct: false }
+        ],
+        explanation: 'ฟอสซิลดัชนีชนิดเดียวกันเป็นตัวบ่งชี้ระนาบเวลาเดียวกัน (Time-equivalent) ส่วนชนิดหินที่ต่างกันสะท้อนถึงสภาพแวดล้อมการสะสมตัวเฉพาะที่ต่างกัน'
+      },
+      {
+        id: 9, domain: 'P', domainLabel: 'ทักษะกระบวนการ (Process/Skill)', indicator: 'ว 3.2 ม.6/5', measure: 'ทักษะการเลือกวิธีการและเครื่องมือทางวิทยาศาสตร์ให้เหมาะสมกับโจทย์',
+        question: 'หากขุดพบโครงกระดูกมนุษย์โบราณและเศษถ่านไม้ในถ้ำ ซึ่งคาดว่ามีอายุประมาณ 15,000 ถึง 20,000 ปี ควรเลือกใช้วิธีการหาอายุสัมบูรณ์ด้วยไอโซโทปคู่ใดจึงจะเหมาะสมและแม่นยำที่สุด?',
+        choices: [
+          { text: 'คาร์บอน-14 (C-14 สลายตัวเป็น N-14, ครึ่งชีวิต 5,730 ปี)', correct: true },
+          { text: 'ยูเรเนียม-238 (U-238 สลายตัวเป็น Pb-206, ครึ่งชีวิต 4,500 ล้านปี)', correct: false },
+          { text: 'โพแทสเซียม-40 (K-40 สลายตัวเป็น Ar-40, ครึ่งชีวิต 1,250 ล้านปี)', correct: false },
+          { text: 'รูบิเดียม-87 (Rb-87 สลายตัวเป็น Sr-87, ครึ่งชีวิต 47,000 ล้านปี)', correct: false }
+        ],
+        explanation: 'C-14 เหมาะสำหรับการหาอายุซากอินทรีย์ที่มีอายุไม่เกิน 50,000 - 60,000 ปี เนื่องจากมีครึ่งชีวิตสั้น (5,730 ปี) ขณะที่ไอโซโทปอื่นมีครึ่งชีวิตยาวนานหลายพันล้านปีจึงใช้วัดวัตถุอายุน้อยขนาดนี้ไม่ได้'
+      },
+      {
+        id: 10, domain: 'P', domainLabel: 'ทักษะกระบวนการ (Process/Skill)', indicator: 'ว 3.2 ม.6/4', measure: 'ทักษะการสืบเสาะและอนุมานหลักฐานรอยชั้นไม่ต่อเนื่องทางธรณีวิทยา',
+        question: 'หากพบชั้นหินปูนวางตัวในแนวราบทับอยู่บนชั้นหินแปรที่วางตัวเอียงชัน โดยมีระนาบผิวขรุขระคั่นกลาง ปรากฏการณ์นี้แสดงถึงลำดับเหตุการณ์อย่างไร?',
+        choices: [
+          { text: 'หินแปรถูกแรงบีบอัดจนเอียงตัว &rarr; ถูกกัดเซาะเว้าแหว่งจนเกิดรอยชั้นไม่ต่อเนื่อง &rarr; เกิดการตกสะสมตัวใหม่ของหินปูนในแนวราบ', correct: true },
+          { text: 'หินปูนสะสมตัวก่อน &rarr; เกิดการแปรสภาพกลายเป็นหินด้านล่าง &rarr; เกิดการพลิกกลับของชั้นหิน', correct: false },
+          { text: 'หินทั้งสองชนิดตกสะสมตัวพร้อมกัน แต่เกิดแรงผลักดันเฉพาะจุดทำให้ด้านล่างเอียง', correct: false },
+          { text: 'เกิดการแทรกซอนของหินปูนเหลวเข้าไปใต้ชั้นหินแปรเดิม', correct: false }
+        ],
+        explanation: 'นี่คือลักษณะของรอยชั้นไม่ต่อเนื่องแบบรอยชั้นเชิงมุม (Angular Unconformity) ซึ่งหินชุดล่างถูกแปรสัณฐานและกัดเซาะหายไปตามกาลเวลาก่อนที่หินชุดบนจะตกสะสมตัวทับ'
+      },
+
+      // A11-A15
+      {
+        id: 11, domain: 'A', domainLabel: 'เจตคติและค่านิยม (Attitude)', indicator: 'ว 3.2 ม.6/4', measure: 'ความตระหนักและจิตสำนึกในการอนุรักษ์มรดกทางธรณีวิทยา',
+        question: 'หากนักเรียนไปทัศนศึกษาแล้วพบชั้นหินที่มีฟอสซิลกระดูกไดโนเสาร์โผล่พ้นดินในพื้นที่สาธารณะ พฤติกรรมในข้อใดสะท้อนถึง "จิตวิทยาศาสตร์และการอนุรักษ์มรดกธรณี" ได้ดีที่สุด?',
+        choices: [
+          { text: 'ถ่ายภาพ บันทึกพิกัด GPS ไว้เป็นหลักฐาน และแจ้งกรมทรัพยากรธรณีหรือเจ้าหน้าที่ผู้เชี่ยวชาญเข้าตรวจสอบโดยไม่ขุดทำลาย', correct: true },
+          { text: 'รีบใช้ค้อนสกัดฟอสซิลออกมานำกลับมาเก็บรักษาไว้ที่บ้านเพื่อความปลอดภัย', correct: false },
+          { text: 'โพสต์ตำแหน่งลงโซเชียลมีเดียทันทีเพื่อให้ประชาชนทั่วไปมาชื่นชมและช่วยกันขุดค้น', correct: false },
+          { text: 'เก็บเงียบไว้ไม่สนใจ เพราะไม่ใช่ทรัพย์สินส่วนตัวและไม่มีผลกระทบต่อชีวิตประจำวัน', correct: false }
+        ],
+        explanation: 'การอนุรักษ์แหล่งธรณีวิทยาต้องไม่รบกวนหน้าตัดหินและบริบทของฟอสซิล (In situ) ควรบันทึกข้อมูลและแจ้งหน่วยงานที่มีหน้าที่รับผิดชอบโดยตรง'
+      },
+      {
+        id: 12, domain: 'A', domainLabel: 'เจตคติและค่านิยม (Attitude)', indicator: 'ว 3.2 ม.6/6', measure: 'ความตระหนักรู้ต่อประวัติศาสตร์โลกและวิกฤตความหลากหลายทางชีวภาพ',
+        question: 'การเรียนรู้เรื่อง "การสูญพันธุ์ครั้งใหญ่ในอดีต (Mass Extinctions)" ควรปลูกฝังมุมมองและข้อตระหนักใดต่อการดำรงชีวิตของมนุษย์ในปัจจุบันมากที่สุด?',
+        choices: [
+          { text: 'ตระหนักว่าระบบนิเวศของโลกมีความเปราะบาง การกระทำของมนุษย์อาจเร่งให้เกิดการสูญพันธุ์ครั้งที่ 6 จึงต้องร่วมมือกันอนุรักษ์สิ่งแวดล้อม', correct: true },
+          { text: 'มองว่าสิ่งมีชีวิตทุกชนิดต้องสูญพันธุ์ตามธรรมชาติอยู่แล้ว มนุษย์จึงไม่จำเป็นต้องวิตกกังวลต่อการเปลี่ยนแปลงสภาพภูมิอากาศ', correct: false },
+          { text: 'เชื่อมั่นว่าเทคโนโลยีสมัยใหม่จะสามารถสร้างสายพันธุ์ทดแทนได้ทุกชนิดเมื่อเกิดวิกฤต', correct: false },
+          { text: 'สรุปว่ามนุษย์เป็นสิ่งมีชีวิตที่ปรับตัวเก่งที่สุดและไม่มีทางสูญพันธุ์เหมือนไดโนเสาร์', correct: false }
+        ],
+        explanation: 'บทเรียนจากมาตราธรณีกาลช่วยให้มนุษย์ตระหนักถึงความสมดุลอันเปราะบางของชีวมณฑล และเห็นความสำคัญของการหยุดยั้งกิจกรรมที่ทำลายสมดุลโลก'
+      },
+      {
+        id: 13, domain: 'A', domainLabel: 'เจตคติและค่านิยม (Attitude)', indicator: 'ว 3.2 ม.6/5', measure: 'ความยึดมั่นในหลักฐานเชิงประจักษ์และการแสวงหาความจริงทางวิทยาศาสตร์',
+        question: 'เมื่อข้อสรุปจากการคำนวณอายุสัมบูรณ์ของหินด้วยวิธีไอโซโทป ขัดแย้งกับความเชื่อดั้งเดิมของชุมชน นักวิทยาศาสตร์ที่ดีควรมีท่าทีและปฏิบัติตนอย่างไร?',
+        choices: [
+          { text: 'ตรวจสอบความถูกต้องของการทดลองซ้ำ สื่อสารข้อเท็จจริงตามหลักฐานเชิงประจักษ์ด้วยความเคารพและเหตุผล', correct: true },
+          { text: 'ปรับเปลี่ยนตัวเลขผลการคำนวณในรายงานให้สอดคล้องกับความเชื่อเดิม เพื่อหลีกเลี่ยงความขัดแย้ง', correct: false },
+          { text: 'ประณามความเชื่อของชุมชนว่าล้าหลังและปฏิเสธการมีส่วนร่วมกับชุมชนทันที', correct: false },
+          { text: 'ยกเลิกการศึกษาวิจัยและทำลายข้อมูลทิ้งเพื่อความสบายใจของทุกฝ่าย', correct: false }
+        ],
+        explanation: 'จิตวิทยาศาสตร์ต้องยึดมั่นในความซื่อสัตย์ต่อหลักฐานเชิงประจักษ์ (Empirical Evidence) พร้อมตรวจสอบซ้ำและสื่อสารด้วยเหตุผลอย่างสร้างสรรค์'
+      },
+      {
+        id: 14, domain: 'A', domainLabel: 'เจตคติและค่านิยม (Attitude)', indicator: 'ว 3.2 ม.6/4', measure: 'การคิดอย่างมีวิจารณญาณและการแยกแยะข่าวสารทางวิทยาศาสตร์',
+        question: 'หากมีข่าวเผยแพร่บนโลกออนไลน์ว่า "พบก้อนหินที่มีรอยเท้ามนุษย์ปนอยู่กับรอยเท้าไดโนเสาร์ในชั้นหินยุคจูแรสซิก" ผู้มีเจตคติทางวิทยาศาสตร์ควรตอบสนองต่อข่าวนี้อย่างไร?',
+        choices: [
+          { text: 'ตรวจสอบแหล่งที่มาของข่าว ตรวจสอบรายงานวิจัยจากสถาบันธรณีวิทยาที่น่าเชื่อถือ และใช้วิจารณญาณก่อนเชื่อหรือแชร์', correct: true },
+          { text: 'เชื่อทันทีและกดแชร์ต่อเพื่อเตือนให้ทุกคนรู้ว่าทฤษฎีวิวัฒนาการเป็นเรื่องหลอกลวง', correct: false },
+          { text: 'ปฏิเสธทันทีโดยไม่ดูหลักฐาน เพราะเชื่อว่าทุกข่าวในอินเทอร์เน็ตเป็นเรื่องเท็จทั้งหมด', correct: false },
+          { text: 'แสดงความคิดเห็นสนับสนุนทันทีเพื่อสร้างกระแสความสนใจในกลุ่มเพื่อน', correct: false }
+        ],
+        explanation: 'ผู้มีเจตคติทางวิทยาศาสตร์ต้องไม่ด่วนสรุป แต่ต้องสืบค้นหลักฐานอ้างอิง ตรวจสอบความถูกต้องทางวิชาการ (Peer review) ก่อนส่งต่อข้อมูล'
+      },
+      {
+        id: 15, domain: 'A', domainLabel: 'เจตคติและค่านิยม (Attitude)', indicator: 'ว 3.2 ม.6/4', measure: 'การเห็นคุณค่าของการนำความรู้ธรณีวิทยาไปประยุกต์ใช้เพื่อความปลอดภัยสาธารณะ',
+        question: 'ข้อใดแสดงถึงการเห็นคุณค่าของการศึกษาโครงสร้างทางธรณีวิทยาและรอยเลื่อนต่อความปลอดภัยของชุมชนได้ชัดเจนที่สุด?',
+        choices: [
+          { text: 'การนำแผนที่แนวรอยเลื่อนมีพลังไปใช้วางแผนผังเมืองและกำหนดมาตรฐานวิศวกรรมอาคารต้านแผ่นดินไหว', correct: true },
+          { text: 'การนำแผนที่ธรณีวิทยาไปใช้เก็งกำไรและกว้านซื้อที่ดินราคาถูกเพื่อขายต่อ', correct: false },
+          { text: 'การปกปิดข้อมูลแนวรอยเลื่อนไม่ให้ประชาชนทราบ เพื่อป้องกันไม่ให้เกิดความตระหนก', correct: false },
+          { text: 'การปล่อยให้มีการสร้างเขื่อนขนาดใหญ่ทับแนวรอยเลื่อนโดยตรงเพื่อความสะดวกในการก่อสร้าง', correct: false }
+        ],
+        explanation: 'การศึกษาธรณีวิทยามีคุณค่าสูงสุดเมื่อนำข้อมูลความรู้มาใช้วางแผนป้องกันภัยพิบัติ ปกป้องชีวิตและทรัพย์สินของประชาชนในสังคม'
+      }
+    ];
+
+    let dynamicQuizState = [];
+    let userAnswers = {};
+
+    function initQuizData() {
+      userAnswers = {};
+      dynamicQuizState = questionBankMaster.map(item => {
+        const clonedChoices = item.choices.map(c => ({ ...c }));
+        shuffleArray(clonedChoices);
+        return {
+          ...item,
+          shuffledChoices: clonedChoices
+        };
+      });
+      renderQuizUI();
+      updateProgressBar();
+    }
+
+    function renderQuizUI() {
+      const container = document.getElementById('quizQuestionsContainer');
+      container.innerHTML = '';
+
+      dynamicQuizState.forEach((q, idx) => {
+        const qNum = idx + 1;
+        const qCard = document.createElement('div');
+        qCard.className = 'bg-white rounded-xl shadow-sm border border-slate-200 p-5 transition hover:border-slate-300';
+        qCard.id = `qCard_${qNum}`;
+
+        const domainColor = q.domain === 'K' ? 'bg-sky-100 text-sky-800 border-sky-200' :
+                            q.domain === 'P' ? 'bg-emerald-100 text-emerald-800 border-emerald-200' :
+                                               'bg-purple-100 text-purple-800 border-purple-200';
+
+        const thaiPrefixes = ['ก.', 'ข.', 'ค.', 'ง.'];
+
+        let choicesHtml = '';
+        q.shuffledChoices.forEach((ch, chIdx) => {
+          const isSelected = (userAnswers[qNum] === chIdx);
+          choicesHtml += `
+            <label class="flex items-start gap-3 p-3 rounded-lg border text-xs cursor-pointer transition ${
+              isSelected ? 'bg-blue-50 border-blue-500 font-semibold text-blue-950' : 'bg-slate-50 border-slate-200 hover:bg-slate-100 text-slate-700'
+            }">
+              <input type="radio" name="q_${qNum}" value="${chIdx}" ${isSelected ? 'checked' : ''} onchange="handleSelectChoice(${qNum}, ${chIdx})" class="mt-0.5 accent-blue-600">
+              <span><strong>${thaiPrefixes[chIdx]}</strong> ${ch.text}</span>
+            </label>
+          `;
+        });
+
+        qCard.innerHTML = `
+          <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
+            <div class="flex items-center gap-2">
+              <span class="px-2.5 py-1 text-xs font-bold rounded-md border ${domainColor}">ข้อ ${qNum} • ${q.domainLabel}</span>
+              <span class="px-2 py-0.5 text-[11px] bg-slate-100 text-slate-600 rounded border border-slate-200 font-mono">${q.indicator}</span>
+            </div>
+            <span class="text-[11px] text-slate-500 font-medium">🎯 วัดอะไร: ${q.measure}</span>
+          </div>
+
+          <h4 class="text-sm font-semibold text-slate-900 mb-3 leading-relaxed">${q.question}</h4>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+            ${choicesHtml}
+          </div>
+
+          <div id="solution_${qNum}" class="hidden mt-3 p-3 rounded-lg text-xs leading-relaxed"></div>
+        `;
+
+        container.appendChild(qCard);
+      });
+    }
+
+    function handleSelectChoice(qNum, choiceIndex) {
+      userAnswers[qNum] = choiceIndex;
+      updateProgressBar();
+      renderQuizUI();
+    }
+
+    function updateProgressBar() {
+      const answeredCount = Object.keys(userAnswers).length;
+      const total = dynamicQuizState.length;
+      const pct = (answeredCount / total) * 100;
+
+      document.getElementById('quizProgressText').innerText = `${answeredCount} / ${total} ข้อ`;
+      document.getElementById('quizProgressBar').style.width = `${pct}%`;
+    }
+
+    function calculateFinalScore() {
+      const totalQuestions = dynamicQuizState.length;
+      const answeredCount = Object.keys(userAnswers).length;
+
+      if (answeredCount < totalQuestions) {
+        if (!confirm(`คุณยังตอบไม่ครบ (ทำไปแล้ว ${answeredCount}/${totalQuestions} ข้อ) ต้องการส่งคำตอบและดูเฉลยเลยหรือไม่?`)) {
+          return;
+        }
+      }
+
+      let totalCorrect = 0;
+      let kCorrect = 0;
+      let pCorrect = 0;
+      let aCorrect = 0;
+
+      const thaiPrefixes = ['ก.', 'ข.', 'ค.', 'ง.'];
+
+      dynamicQuizState.forEach((q, idx) => {
+        const qNum = idx + 1;
+        const selectedIndex = userAnswers[qNum];
+        const solutionDiv = document.getElementById(`solution_${qNum}`);
+
+        const correctIndex = q.shuffledChoices.findIndex(c => c.correct);
+        const isCorrect = (selectedIndex === correctIndex);
+
+        if (isCorrect) {
+          totalCorrect++;
+          if (q.domain === 'K') kCorrect++;
+          if (q.domain === 'P') pCorrect++;
+          if (q.domain === 'A') aCorrect++;
+        }
+
+        if (solutionDiv) {
+          solutionDiv.classList.remove('hidden');
+          if (isCorrect) {
+            solutionDiv.className = 'mt-3 p-3 rounded-lg text-xs leading-relaxed bg-emerald-50 text-emerald-900 border border-emerald-300';
+            solutionDiv.innerHTML = `
+              <div class="font-bold flex items-center gap-1 text-emerald-700 mb-1">
+                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>
+                ถูกต้อง!
+              </div>
+              <div><strong>เฉลย:</strong> ${thaiPrefixes[correctIndex]} ${q.shuffledChoices[correctIndex].text}</div>
+              <div class="text-[11px] text-emerald-800 mt-1"><strong>คำอธิบาย:</strong> ${q.explanation}</div>
+            `;
+          } else {
+            solutionDiv.className = 'mt-3 p-3 rounded-lg text-xs leading-relaxed bg-rose-50 text-rose-900 border border-rose-300';
+            const userChosenText = selectedIndex !== undefined ? `${thaiPrefixes[selectedIndex]} ${q.shuffledChoices[selectedIndex].text}` : 'ไม่ได้ตอบ';
+            solutionDiv.innerHTML = `
+              <div class="font-bold flex items-center gap-1 text-rose-700 mb-1">
+                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"></path></svg>
+                ยังไม่ถูกต้อง (คุณเลือก: ${userChosenText})
+              </div>
+              <div><strong>คำตอบที่ถูกต้องคือ:</strong> ${thaiPrefixes[correctIndex]} ${q.shuffledChoices[correctIndex].text}</div>
+              <div class="text-[11px] text-rose-800 mt-1"><strong>คำอธิบาย:</strong> ${q.explanation}</div>
+            `;
+          }
+        }
+      });
+
+      const resultArea = document.getElementById('resultArea');
+      resultArea.classList.remove('hidden');
+      document.getElementById('totalScoreText').innerText = `${totalCorrect} / 15`;
+
+      const pct = (totalCorrect / 15) * 100;
+      let grade = '';
+      let comment = '';
+
+      if (pct >= 80) {
+        grade = 'ระดับดีเยี่ยม (Mastery Level)';
+        comment = 'ยอดเยี่ยมมาก! คุณมีความเข้าใจมโนทัศน์ธรณีวิทยา ทักษะการวิเคราะห์ และเจตคติทางวิทยาศาสตร์อย่างครบถ้วนสมบูรณ์';
+      } else if (pct >= 60) {
+        grade = 'ระดับผ่านเกณฑ์ดี (Proficient Level)';
+        comment = 'ทำได้ดี! มีความรู้ความเข้าใจในระดับมาตรฐาน สามารถทบทวนเพิ่มเติมในข้อที่ตอบผิดได้จากคำอธิบายใต้ข้อ';
+      } else {
+        grade = 'ควรพัฒนาเพิ่มเติม (Basic / Needs Improvement)';
+        comment = 'แนะนำให้กลับไปทดลองเล่นแบบจำลองในแถบที่ 1 ถึง 5 อีกครั้งเพื่อเสริมสร้างความเข้าใจเชิงมโนทัศน์';
+      }
+
+      document.getElementById('gradeTitle').innerText = grade;
+      document.getElementById('gradeFeedback').innerText = comment;
+
+      document.getElementById('kScore').innerText = `${kCorrect} / 5`;
+      document.getElementById('kEval').innerText = kCorrect >= 4 ? 'ความรู้แม่นยำสูง' : 'ทบทวนนิยามและกฎธรณีวิทยา';
+
+      document.getElementById('pScore').innerText = `${pCorrect} / 5`;
+      document.getElementById('pEval').innerText = pCorrect >= 4 ? 'ทักษะการแปลความหมายดีเยี่ยม' : 'ฝึกวิเคราะห์ภาพตัดขวางและการคำนวณ';
+
+      document.getElementById('aScore').innerText = `${aCorrect} / 5`;
+      document.getElementById('aEval').innerText = aCorrect >= 4 ? 'จิตวิทยาศาสตร์และความตระหนักสูง' : 'ควรเสริมมุมมองด้านการอนุรักษ์';
+
+      resultArea.scrollIntoView({ behavior: 'smooth' });
+    }
+
+    function restartFullQuiz() {
+      initQuizData();
+      document.getElementById('resultArea').classList.add('hidden');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    window.addEventListener('load', () => {
+      renderTab1();
+      setEventStep(1);
+      updateHalfLife(0);
+      updateGeoTime(4600);
+      initQuizData();
+    });
+  </script>
+</body>
+</html>
