@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>แบบจำลองการเกิดลูกเห็บและพายุฝนฟ้าคะนอง</title>
+  <style>
+    :root {
+      --bg-color: #0f172a;
+      --panel-bg: #1e293b;
+      --accent: #38bdf8;
+      --text: #f8fafc;
+      --text-muted: #94a3b8;
+      --danger: #ef4444;
+      --warning: #f59e0b;
+      --success: #10b981;
+    }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    body {
+      background-color: var(--bg-color);
+      color: var(--text);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+      padding: 20px;
+    }
+    .header {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    .header h1 {
+      font-size: 1.8rem;
+      color: var(--accent);
+      margin-bottom: 6px;
+    }
+    .header p {
+      color: var(--text-muted);
+      font-size: 0.95rem;
+    }
+    .main-container {
+      display: flex;
+      flex-direction: row;
+      gap: 24px;
+      max-width: 1100px;
+      width: 100%;
+      background: var(--panel-bg);
+      padding: 20px;
+      border-radius: 16px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+    }
+    .canvas-wrapper {
+      position: relative;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    canvas {
+      background: #182234;
+      border-radius: 12px;
+      box-shadow: inset 0 0 20px rgba(0,0,0,0.4);
+      width: 100%;
+      max-width: 500px;
+      height: 540px;
+    }
+    .controls-wrapper {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+    .control-card {
+      background: #0f172a;
+      padding: 14px 18px;
+      border-radius: 10px;
+      border: 1px solid #334155;
+    }
+    .control-card label {
+      display: flex;
+      justify-content: space-between;
+      font-weight: 600;
+      font-size: 0.95rem;
+      margin-bottom: 8px;
+    }
+    .control-card label span.val {
+      color: var(--accent);
+    }
+    input[type=range] {
+      width: 100%;
+      accent-color: var(--accent);
+      cursor: pointer;
+    }
+    .desc {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      margin-top: 4px;
+    }
+    .results-panel {
+      background: #090d16;
+      border-radius: 12px;
+      padding: 16px;
+      border: 1px solid #334155;
+    }
+    .results-title {
+      font-size: 1rem;
+      font-weight: bold;
+      margin-bottom: 12px;
+      color: #e2e8f0;
+      border-bottom: 1px solid #334155;
+      padding-bottom: 6px;
+    }
+    .tag-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+    .tag {
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      opacity: 0.3;
+      transition: all 0.3s;
+    }
+    .tag.active {
+      opacity: 1;
+      transform: scale(1.05);
+      box-shadow: 0 0 10px rgba(255,255,255,0.2);
+    }
+    .tag-rain { background: #0284c7; color: #fff; }
+    .tag-hail { background: #a855f7; color: #fff; }
+    .tag-wind { background: #eab308; color: #000; }
+    .tag-calm { background: #475569; color: #fff; }
+    .explanation {
+      font-size: 0.88rem;
+      line-height: 1.5;
+      color: #cbd5e1;
+      background: rgba(255,255,255,0.03);
+      padding: 10px;
+      border-radius: 8px;
+    }
+    @media (max-width: 850px) {
+      .main-container {
+        flex-direction: column;
+      }
+      canvas {
+        max-width: 100%;
+        height: 400px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="header">
+    <h1>แบบจำลองกลไกการเกิดลูกเห็บและพายุฝนฟ้าคะนอง</h1>
+    <p>ปรับตัวแปรด้านขวาเพื่อศึกษาเงื่อนไขในการเกิดฝน ลมกระโชกแรง และลูกเห็บ</p>
+  </div>
+
+  <div class="main-container">
+    <div class="canvas-wrapper">
+      <canvas id="simCanvas" width="500" height="540"></canvas>
+    </div>
+
+    <div class="controls-wrapper">
+      <!-- Updraft -->
+      <div class="control-card">
+        <label>
+          <span>ความแรงลมยกตัว (Updraft)</span>
+          <span class="val" id="valUpdraft">35 m/s</span>
+        </label>
+        <input type="range" id="updraft" min="5" max="60" value="35">
+        <div class="desc">ลมพยุงและพัดหยดน้ำขึ้นสู่อากาศเย็นด้านบนซ้ำ ๆ ยิ่งแรงยิ่งพยุงก้อนน้ำแข็งขนาดใหญ่ได้</div>
+      </div>
+
+      <!-- Cloud Top Temp -->
+      <div class="control-card">
+        <label>
+          <span>อุณหภูมิยอดเมฆ (Cloud Top Temp)</span>
+          <span class="val" id="valTemp">-25 °C</span>
+        </label>
+        <input type="range" id="temp" min="-60" max="10" value="-25">
+        <div class="desc">ยิ่งติดลบมาก ยิ่งมีหยดน้ำเย็นยิ่งยวด (Supercooled Water) และผลึกน้ำแข็งสะสมตัวเป็นชั้น</div>
+      </div>
+
+      <!-- Moisture -->
+      <div class="control-card">
+        <label>
+          <span>ความชื้นสัมพัทธ์ในอากาศ (Moisture)</span>
+          <span class="val" id="valMoist">75 %</span>
+        </label>
+        <input type="range" id="moist" min="10" max="100" value="75">
+        <div class="desc">ปริมาณไอน้ำและหยดน้ำในเมฆที่จะเกาะพอกพูนเป็นเม็ดฝนหรือชั้นน้ำแข็ง</div>
+      </div>
+
+      <!-- Surface Temp -->
+      <div class="control-card">
+        <label>
+          <span>อุณหภูมิที่พื้นดิน (Surface Temp)</span>
+          <span class="val" id="valSurface">36 °C</span>
+        </label>
+        <input type="range" id="surface" min="20" max="42" value="36">
+        <div class="desc">พื้นผิวยิ่งร้อน ความต่างอุณหภูมิยิ่งสูง ก่อให้เกิดกระแสอากาศปั่นป่วนและลมกระโชกแรง</div>
+      </div>
+
+      <!-- Results -->
+      <div class="results-panel">
+        <div class="results-title">ปรากฏการณ์ที่เกิดขึ้น ณ สภาพอากาศนี้:</div>
+        <div class="tag-container">
+          <div class="tag tag-rain" id="tagRain">🌧️ ฝนตก</div>
+          <div class="tag tag-hail" id="tagHail">🧊 ลูกเห็บตก</div>
+          <div class="tag tag-wind" id="tagWind">💨 ลมกระโชกแรง</div>
+          <div class="tag tag-calm" id="tagCalm">☁️ เมฆทั่วไป/ฝนปรอย</div>
+        </div>
+        <div class="explanation" id="expText">กำลังประมวลผลสภาพอากาศ...</div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const canvas = document.getElementById('simCanvas');
+    const ctx = canvas.getContext('2d');
+
+    // Controls
+    const sliderUpdraft = document.getElementById('updraft');
+    const sliderTemp = document.getElementById('temp');
+    const sliderMoist = document.getElementById('moist');
+    const sliderSurface = document.getElementById('surface');
+
+    const valUpdraft = document.getElementById('valUpdraft');
+    const valTemp = document.getElementById('valTemp');
+    const valMoist = document.getElementById('valMoist');
+    const valSurface = document.getElementById('valSurface');
+
+    const tagRain = document.getElementById('tagRain');
+    const tagHail = document.getElementById('tagHail');
+    const tagWind = document.getElementById('tagWind');
+    const tagCalm = document.getElementById('tagCalm');
+    const expText = document.getElementById('expText');
+
+    let particles = [];
+    const MAX_PARTICLES = 160;
+
+    // Boundary definitions
+    const FREEZING_Y = 220; // 0 C line
+    const GROUND_Y = 480;
+
+    class Particle {
+      constructor() {
+        this.reset(true);
+      }
+
+      reset(init = false) {
+        this.x = 80 + Math.random() * 340;
+        this.y = init ? 100 + Math.random() * 360 : 440;
+        this.vx = (Math.random() - 0.5) * 1.5;
+        this.vy = - (1 + Math.random() * 2);
+        this.size = 2 + Math.random() * 2;
+        this.isHail = false;
+        this.layers = 0;
+        this.weight = 1;
+      }
+
+      update(updraftPower, cloudTopTemp, moistVal) {
+        // Growth & Phase dynamics
+        if (this.y < FREEZING_Y && cloudTopTemp < 0) {
+          // Freezing zone
+          if (!this.isHail && Math.random() < 0.05) {
+            this.isHail = true;
+          }
+          if (this.isHail) {
+            // Hail grows by collecting supercooled droplets
+            this.layers += (moistVal / 100) * 0.04;
+            this.size = 3 + this.layers * 1.8;
+            this.weight = 1 + (this.size * 0.4);
+          }
+        }
+
+        // Vertical Forces: Updraft vs Weight/Gravity
+        const effectiveUpdraft = (updraftPower / 25) * 4.2;
+        const gravity = this.weight * 1.5;
+        this.vy += (gravity - effectiveUpdraft) * 0.08;
+
+        // Turbulence in center
+        this.vx += (Math.random() - 0.5) * 0.6;
+        this.x += this.vx;
+        this.y += this.vy;
+
+        // Containment inside cloud width
+        if (this.x < 70) this.x = 70;
+        if (this.x > 430) this.x = 430;
+
+        // Reaching top: pushed downward toward edges
+        if (this.y < 70) {
+          this.y = 70;
+          this.vy = 2;
+          this.vx += (this.x > 250 ? 2 : -2);
+        }
+
+        // Falling to ground
+        if (this.y >= GROUND_Y) {
+          this.reset();
+        }
+      }
+
+      draw(ctx) {
+        ctx.beginPath();
+        if (this.isHail) {
+          // Draw Hailstone with rings/layers
+          ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+          ctx.fillStyle = '#ffffff';
+          ctx.fill();
+          ctx.strokeStyle = '#38bdf8';
+          ctx.lineWidth = 1.5;
+          ctx.stroke();
+
+          // Internal core indicator
+          if (this.size > 5) {
+            ctx.beginPath();
+            ctx.arc(this.x, this.y, this.size * 0.5, 0, Math.PI * 2);
+            ctx.fillStyle = 'rgba(168, 85, 247, 0.4)';
+            ctx.fill();
+          }
+        } else {
+          // Rain / Liquid droplet
+          ctx.arc(this.x, this.y, Math.min(this.size, 3), 0, Math.PI * 2);
+          ctx.fillStyle = 'rgba(56, 189, 248, 0.7)';
+          ctx.fill();
+        }
+      }
+    }
+
+    // Init particles
+    for (let i = 0; i < MAX_PARTICLES; i++) {
+      particles.push(new Particle());
+    }
+
+    function updateLogic() {
+      const updraft = parseInt(sliderUpdraft.value);
+      const temp = parseInt(sliderTemp.value);
+      const moist = parseInt(sliderMoist.value);
+      const surface = parseInt(sliderSurface.value);
+
+      valUpdraft.textContent = `${updraft} m/s`;
+      valTemp.textContent = `${temp} °C`;
+      valMoist.textContent = `${moist} %`;
+      valSurface.textContent = `${surface} °C`;
+
+      // Weather Rules
+      const isRain = moist >= 45;
+      const isHail = (updraft >= 30) && (temp <= -15) && (moist >= 55);
+      const isWind = (surface - temp >= 50) && (updraft >= 25);
+      const isCalm = !isRain && !isHail && !isWind;
+
+      tagRain.classList.toggle('active', isRain);
+      tagHail.classList.toggle('active', isHail);
+      tagWind.classList.toggle('active', isWind);
+      tagCalm.classList.toggle('active', isCalm);
+
+      // Dynamic Explanations
+      let notes = [];
+      if (isHail) {
+        notes.push("⭐ <b>เกิดลูกเห็บ:</b> ลมยกตัวแรงจัด (" + updraft + " m/s) พยุงก้อนน้ำแข็งวนสะสมชั้นในโซนหนาวจัด (" + temp + " °C) จนก้อนมีน้ำหนักมากเกินกว่าจะพยุงได้ จึงตกลงสู่พื้นแม้พื้นดินจะร้อน");
+      } else if (temp > -10 && updraft >= 30) {
+        notes.push("⚠️ <b>ไม่เกิดลูกเห็บ:</b> ลมยกตัวแรงมากพอก็จริง แต่ยอดเมฆไม่อุณหภูมิต่ำพอที่จะสร้างหยดน้ำเย็นยิ่งยวดปริมาณมาก");
+      } else if (updraft < 30 && temp <= -15) {
+        notes.push("⚠️ <b>ไม่เกิดลูกเห็บ:</b> ยอดเมฆเย็นจัด แต่กระแสลมยกตัวเบาเกินไป ไม่สามารถพยุงก้อนน้ำแข็งให้วนซ้ำจนสะสมเป็นชั้นลูกเห็บได้ ละลายเป็นเม็ดฝนก่อนถึงพื้น");
+      }
+
+      if (isWind) {
+        notes.push("💨 <b>ลมกระโชกแรง:</b> ผลต่างอุณหภูมิระหว่างพื้นดินกับยอดเมฆสูงมาก เกิด Downburst / Microburst พัดปะทะพื้นดินอย่างรุนแรง");
+      }
+
+      if (isRain && !isHail) {
+        notes.push("🌧️ <b>ฝนตกทั่วไป:</b> ความชื้นเพียงพอเกิดเมฆฝนฟ้าคะนองปกติ น้ำแข็งด้านบนละลายหมดก่อนตกลงถึงพื้น");
+      }
+
+      if (isCalm) {
+        notes.push("☁️ สภาพอากาศสงบหรือมีเพียงเมฆบางส่วน ความชื้นไม่พอจะเกิดฝนตกหนัก");
+      }
+
+      expText.innerHTML = notes.join('<br><br>');
+
+      return { updraft, temp, moist, surface, isWind };
+    }
+
+    function drawBackground(ctx, state) {
+      // Clear
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      // Sky gradient
+      let skyGrad = ctx.createLinearGradient(0, 0, 0, GROUND_Y);
+      skyGrad.addColorStop(0, '#0c1a2d');
+      skyGrad.addColorStop(0.5, '#1e293b');
+      skyGrad.addColorStop(1, '#475569');
+      ctx.fillStyle = skyGrad;
+      ctx.fillRect(0, 0, canvas.width, GROUND_Y);
+
+      // Freezing level dashed line (0°C)
+      ctx.save();
+      ctx.setLineDash([6, 6]);
+      ctx.strokeStyle = 'rgba(56, 189, 248, 0.6)';
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      ctx.moveTo(30, FREEZING_Y);
+      ctx.lineTo(470, FREEZING_Y);
+      ctx.stroke();
+      ctx.restore();
+
+      ctx.fillStyle = '#38bdf8';
+      ctx.font = '12px Segoe UI';
+      ctx.fillText('โซนหนาวจัด (อุณหภูมิ < 0°C หยดน้ำเย็นยิ่งยวด / ก้อนลูกเห็บ)', 40, FREEZING_Y - 8);
+      ctx.fillStyle = '#f59e0b';
+      ctx.fillText('โซนละลาย (อุณหภูมิ > 0°C ฝนเหลว)', 40, FREEZING_Y + 16);
+
+      // Updraft Arrows
+      const arrowCount = 4;
+      ctx.strokeStyle = 'rgba(239, 68, 68, 0.4)';
+      ctx.lineWidth = 3;
+      for (let i = 0; i < arrowCount; i++) {
+        let x = 160 + i * 60;
+        let headY = 160;
+        let tailY = 420;
+
+        ctx.beginPath();
+        ctx.moveTo(x, tailY);
+        ctx.lineTo(x, headY);
+        ctx.stroke();
+
+        // Arrow head
+        ctx.beginPath();
+        ctx.moveTo(x - 6, headY + 10);
+        ctx.lineTo(x, headY);
+        ctx.lineTo(x + 6, headY + 10);
+        ctx.stroke();
+      }
+
+      ctx.fillStyle = 'rgba(239, 68, 68, 0.8)';
+      ctx.font = 'bold 12px Segoe UI';
+      ctx.fillText('กระแสลมยกตัว (Updraft) ⬆️', 170, 440);
+
+      // Ground
+      ctx.fillStyle = '#1e293b';
+      ctx.fillRect(0, GROUND_Y, canvas.width, canvas.height - GROUND_Y);
+      ctx.fillStyle = '#64748b';
+      ctx.font = '13px Segoe UI';
+      ctx.fillText('ระดับพื้นดิน (ความร้อนสะสม ' + state.surface + '°C)', 20, GROUND_Y + 32);
+
+      // Gust front indicator
+      if (state.isWind) {
+        ctx.strokeStyle = '#eab308';
+        ctx.lineWidth = 3;
+        ctx.beginPath();
+        ctx.moveTo(100, GROUND_Y - 5);
+        ctx.lineTo(40, GROUND_Y - 5);
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.moveTo(400, GROUND_Y - 5);
+        ctx.lineTo(460, GROUND_Y - 5);
+        ctx.stroke();
+        ctx.fillStyle = '#eab308';
+        ctx.font = 'bold 11px Segoe UI';
+        ctx.fillText('💨 ลมกระโชกปะทะพื้น', 180, GROUND_Y - 10);
+      }
+    }
+
+    function animate() {
+      const state = updateLogic();
+      drawBackground(ctx, state);
+
+      // Number of active particles scaled by moisture
+      const activeCount = Math.floor((state.moist / 100) * MAX_PARTICLES);
+      for (let i = 0; i < activeCount; i++) {
+        particles[i].update(state.updraft, state.temp, state.moist);
+        particles[i].draw(ctx);
+      }
+
+      requestAnimationFrame(animate);
+    }
+
+    [sliderUpdraft, sliderTemp, sliderMoist, sliderSurface].forEach(input => {
+      input.addEventListener('input', updateLogic);
+    });
+
+    // Start
+    animate();
+  </script>
+</body>
+</html>

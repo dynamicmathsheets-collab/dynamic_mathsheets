@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>แบบจำลองบริหารจัดการน้ำและป้องกันน้ำท่วมเมือง</title>
+  <style>
+    :root {
+      --bg: #090e17;
+      --panel: #162032;
+      --panel-border: #223249;
+      --text: #f1f5f9;
+      --text-muted: #94a3b8;
+      --accent: #38bdf8;
+      --danger: #ef4444;
+      --warning: #f59e0b;
+      --success: #10b981;
+    }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Sarabun', 'Segoe UI', Tahoma, sans-serif;
+    }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 16px;
+      min-height: 100vh;
+    }
+    header {
+      text-align: center;
+      margin-bottom: 16px;
+    }
+    header h1 {
+      color: var(--accent);
+      font-size: 1.6rem;
+      margin-bottom: 4px;
+    }
+    header p {
+      color: var(--text-muted);
+      font-size: 0.9rem;
+    }
+    .main-layout {
+      display: flex;
+      flex-direction: row;
+      gap: 20px;
+      max-width: 1280px;
+      width: 100%;
+      background: var(--panel);
+      padding: 20px;
+      border-radius: 16px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.6);
+      border: 1px solid var(--panel-border);
+    }
+    .visual-column {
+      flex: 1.25;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    canvas {
+      width: 100%;
+      height: 480px;
+      background: #0d1524;
+      border-radius: 12px;
+      border: 1px solid var(--panel-border);
+    }
+    .metrics-bar {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+    }
+    .metric-card {
+      background: #0c1421;
+      border: 1px solid var(--panel-border);
+      border-radius: 8px;
+      padding: 10px;
+      text-align: center;
+    }
+    .metric-card span {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      display: block;
+      margin-bottom: 4px;
+    }
+    .metric-card strong {
+      font-size: 1.1rem;
+    }
+    .controls-column {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      max-height: 840px;
+      overflow-y: auto;
+      padding-right: 6px;
+    }
+    .controls-column::-webkit-scrollbar {
+      width: 6px;
+    }
+    .controls-column::-webkit-scrollbar-thumb {
+      background: #334155;
+      border-radius: 4px;
+    }
+    .section-title {
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: var(--accent);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-top: 6px;
+      border-bottom: 1px solid #1e293b;
+      padding-bottom: 4px;
+    }
+    .slider-card {
+      background: #0c1421;
+      border: 1px solid var(--panel-border);
+      border-radius: 8px;
+      padding: 8px 12px;
+    }
+    .slider-header {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.82rem;
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+    .slider-header .val {
+      color: var(--accent);
+    }
+    input[type=range] {
+      width: 100%;
+      height: 5px;
+      accent-color: var(--accent);
+      cursor: pointer;
+    }
+    .slider-desc {
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+    .budget-warning {
+      color: var(--danger) !important;
+      font-weight: bold;
+    }
+    .status-badge {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 12px;
+      font-size: 0.75rem;
+      font-weight: bold;
+    }
+    .status-safe { background: rgba(16, 185, 129, 0.2); color: #10b981; }
+    .status-warn { background: rgba(245, 158, 11, 0.2); color: #f59e0b; }
+    .status-danger { background: rgba(239, 68, 68, 0.2); color: #ef4444; }
+    @media (max-width: 990px) {
+      .main-layout { flex-direction: column; }
+      canvas { height: 380px; }
+      .metrics-bar { grid-template-columns: repeat(2, 1fr); }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>แบบจำลองสมดุลน้ำและการบริหารเมือง (City Flood Simulator)</h1>
+    <p>ทดลองปรับ 8 ตัวแปรเชิงระบบ เพื่อค้นหาวิธีป้องกันน้ำท่วมเมืองอย่างมีประสิทธิภาพ</p>
+  </header>
+
+  <div class="main-layout">
+    <div class="visual-column">
+      <canvas id="cityCanvas" width="640" height="480"></canvas>
+      
+      <div class="metrics-bar">
+        <div class="metric-card">
+          <span>อัตราน้ำไหลเข้าเมือง</span>
+          <strong id="mInflow" style="color: var(--accent);">0 m³/s</strong>
+        </div>
+        <div class="metric-card">
+          <span>ความสามารถระบายออก</span>
+          <strong id="mOutflow" style="color: var(--success);">0 m³/s</strong>
+        </div>
+        <div class="metric-card">
+          <span>ระดับน้ำท่วมผิวเมือง</span>
+          <strong id="mWaterLevel">0 ซม.</strong>
+        </div>
+        <div class="metric-card">
+          <span>งบประมาณที่ใช้</span>
+          <strong id="mBudget">0 ล้าน บ.</strong>
+        </div>
+      </div>
+    </div>
+
+    <div class="controls-column">
+      <div class="section-title">กลุ่มที่ 1: แหล่งน้ำเข้า (Inflow)</div>
+      
+      <!-- 1. Rain -->
+      <div class="slider-card">
+        <div class="slider-header">
+          <span>1. ปริมาณน้ำฝน (Rainfall)</span>
+          <span class="val" id="vRain">40 มม./ชม.</span>
+        </div>
+        <input type="range" id="sRain" min="0" max="150" value="40">
+        <div class="slider-desc">ความเข้มข้นของฝนที่ตกบนพื้นที่เมืองโดยตรง</div>
+      </div>
+
+      <!-- 2. River Inflow -->
+      <div class="slider-card">
+        <div class="slider-header">
+          <span>2. น้ำหลากจากภายนอก/น้ำเหนือ (Inflow)</span>
+          <span class="val" id="vInflow">30 %</span>
+        </div>
+        <input type="range" id="sInflow" min="0" max="100" value="30">
+        <div class="slider-desc">มวลน้ำเหนือหรือน้ำหลากจากพื้นที่รอบข้างที่ไหลบ่าเข้าเมือง</div>
+      </div>
+
+      <div class="section-title">กลุ่มที่ 2: สภาพผิวเมืองและการหน่วงน้ำ (Storage & Absorption)</div>
+
+      <!-- 3. Concrete/Impervious Ratio -->
+      <div class="slider-card">
+        <div class="slider-header">
+          <span>3. สัดส่วนคอนกรีต/พื้นที่ดาดแข็ง</span>
+          <span class="val" id="vPave">60 %</span>
+        </div>
+        <input type="range" id="sPave" min="10" max="100" value="60">
+        <div class="slider-desc">ยิ่งเป็นคอนกรีตมาก น้ำจะซึมลงดินได้น้อย เกิดน้ำหลากบนผิวถนนทันที</div>
+      </div>
+
+      <!-- 4. Retention Basin -->
+      <div class="slider-card">
+        <div class="slider-header">
+          <span>4. ขนาดพื้นที่แก้มลิงหน่วงน้ำ</span>
+          <span class="val" id="vBasin">30 %</span>
+        </div>
+        <input type="range" id="sBasin" min="0" max="100" value="30">
+        <div class="slider-desc">สระกักเก็บน้ำชั่วคราวเพื่อชะลอไม่ให้น้ำทะลักลงท่อพร้อมกัน (ใช้งบก่อสร้าง)</div>
+      </div>
+
+      <div class="section-title">กลุ่มที่ 3: ระบบระบายและการลำเลียง (Drainage Infrastructure)</div>
+
+      <!-- 5. Pipe & Pump Capacity -->
+      <div class="slider-card">
+        <div class="slider-header">
+          <span>5. ขนาดท่อและกำลังสถานีสูบน้ำ</span>
+          <span class="val" id="vPump">50 %</span>
+        </div>
+        <input type="range" id="sPump" min="10" max="100" value="50">
+        <div class="slider-desc">ขนาดของอุโมงค์ระบายน้ำและกำลังวัตต์ปั๊มสูบน้ำ (ใช้งบประมาณสูง)</div>
+      </div>
+
+      <!-- 6. Blockage / Debris -->
+      <div class="slider-card">
+        <div class="slider-header">
+          <span>6. ระดับขยะและตะกอนอุดตันในท่อ</span>
+          <span class="val" id="vBlock">25 %</span>
+        </div>
+        <input type="range" id="sBlock" min="0" max="90" value="25">
+        <div class="slider-desc">ขยะและดินเลนที่ทำให้ท่อสูญเสียประสิทธิภาพการส่งน้ำ</div>
+      </div>
+
+      <div class="section-title">กลุ่มที่ 4: สภาพแวดล้อมปลายทาง (Boundary Condition)</div>
+
+      <!-- 7. Sea/Tide Level -->
+      <div class="slider-card">
+        <div class="slider-header">
+          <span>7. ระดับน้ำทะเลหนุน/แม่น้ำปลายทาง</span>
+          <span class="val" id="vTide">0.8 ม.</span>
+        </div>
+        <input type="range" id="sTide" min="0" max="30" value="8">
+        <div class="slider-desc">ถ้าระดับน้ำปลายทางสูง น้ำจะระบายออกตามแรงโน้มถ่วงไม่ได้ ต้องพึ่งปั๊มสูบเท่านั้น</div>
+      </div>
+
+      <div class="section-title">กลุ่มที่ 5: การบริหารจัดการและงบประมาณ (Management)</div>
+
+      <!-- 8. Budget Limit -->
+      <div class="slider-card">
+        <div class="slider-header">
+          <span>8. เพดานงบประมาณพัฒนาเมือง</span>
+          <span class="val" id="vBudgetLimit">80 ล้าน บ.</span>
+        </div>
+        <input type="range" id="sBudgetLimit" min="30" max="150" value="80">
+        <div class="slider-desc">ข้อจำกัดทางการเงิน: งบรวม = งบขยายท่อ/ปั๊ม + งบเวนคืนที่ดินทำแก้มลิง + งบลอกท่อ</div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const canvas = document.getElementById('cityCanvas');
+    const ctx = canvas.getContext('2d');
+
+    // Controls
+    const sRain = document.getElementById('sRain');
+    const sInflow = document.getElementById('sInflow');
+    const sPave = document.getElementById('sPave');
+    const sBasin = document.getElementById('sBasin');
+    const sPump = document.getElementById('sPump');
+    const sBlock = document.getElementById('sBlock');
+    const sTide = document.getElementById('sTide');
+    const sBudgetLimit = document.getElementById('sBudgetLimit');
+
+    const vRain = document.getElementById('vRain');
+    const vInflow = document.getElementById('vInflow');
+    const vPave = document.getElementById('vPave');
+    const vBasin = document.getElementById('vBasin');
+    const vPump = document.getElementById('vPump');
+    const vBlock = document.getElementById('vBlock');
+    const vTide = document.getElementById('vTide');
+    const vBudgetLimit = document.getElementById('vBudgetLimit');
+
+    const mInflow = document.getElementById('mInflow');
+    const mOutflow = document.getElementById('mOutflow');
+    const mWaterLevel = document.getElementById('mWaterLevel');
+    const mBudget = document.getElementById('mBudget');
+
+    // City physical geometry
+    const CITY_LEFT = 160;
+    const CITY_RIGHT = 450;
+    const CITY_GROUND_Y = 280;
+    const RIVER_LEFT_X = 60;
+    const SEA_X = 540;
+
+    let currentWaterDepth = 0; // cm
+    let basinStoredWater = 0; // %
+    let rainDrops = [];
+
+    for (let i = 0; i < 100; i++) {
+      rainDrops.push({
+        x: CITY_LEFT + Math.random() * (CITY_RIGHT - CITY_LEFT),
+        y: Math.random() * CITY_GROUND_Y,
+        length: 8 + Math.random() * 8,
+        speed: 4 + Math.random() * 6
+      });
+    }
+
+    function calculateState() {
+      const rain = parseInt(sRain.value);
+      const inflow = parseInt(sInflow.value);
+      const pave = parseInt(sPave.value);
+      const basin = parseInt(sBasin.value);
+      const pump = parseInt(sPump.value);
+      const block = parseInt(sBlock.value);
+      const tide = parseInt(sTide.value) / 10; // meters
+      const budgetLimit = parseInt(sBudgetLimit.value);
+
+      vRain.textContent = `${rain} มม./ชม.`;
+      vInflow.textContent = `${inflow} %`;
+      vPave.textContent = `${pave} %`;
+      vBasin.textContent = `${basin} %`;
+      vPump.textContent = `${pump} %`;
+      vBlock.textContent = `${block} %`;
+      vTide.textContent = `${tide.toFixed(1)} ม.`;
+      vBudgetLimit.textContent = `${budgetLimit} ล้าน บ.`;
+
+      // Budget Calculation: Pump (40%) + Basin (40%) + Maintenance for blockage reduction (20%)
+      const pumpCost = Math.round(pump * 0.6);
+      const basinCost = Math.round(basin * 0.5);
+      const cleanCost = Math.round((100 - block) * 0.2);
+      const totalBudgetSpent = pumpCost + basinCost + cleanCost;
+
+      const isBudgetOver = totalBudgetSpent > budgetLimit;
+      mBudget.innerHTML = `${totalBudgetSpent} / ${budgetLimit} ล้าน บ.`;
+      mBudget.className = isBudgetOver ? 'budget-warning' : '';
+
+      // Inflow rate = (Direct Rainfall * Runoff coefficient from pave) + External upstream inflow
+      const runoffCoef = 0.2 + (pave / 100) * 0.75;
+      const rainRunoff = rain * runoffCoef * 1.8;
+      const externalRunoff = inflow * 1.5;
+      const totalInflow = rainRunoff + externalRunoff;
+
+      // Retention effect: Basin absorbs peak water
+      const basinAbsorptionCapacity = basin * 0.8;
+      const netInflow = Math.max(0, totalInflow - basinAbsorptionCapacity);
+      basinStoredWater = Math.min(100, (totalInflow / (basinAbsorptionCapacity + 1)) * 40);
+
+      // Outflow rate: Pump and Pipes throttled by Blockage and opposed by Tide
+      const effectivePump = pump * (1 - block / 100);
+      const gravityPenalty = Math.max(0, (tide - 0.5) * 20); // Tide restricts natural discharge
+      const totalOutflow = Math.max(5, (effectivePump * 1.3) - gravityPenalty);
+
+      // Water Balance differential
+      const netWaterDelta = netInflow - totalOutflow;
+      if (netWaterDelta > 0) {
+        currentWaterDepth = Math.min(120, currentWaterDepth + netWaterDelta * 0.04);
+      } else {
+        currentWaterDepth = Math.max(0, currentWaterDepth + netWaterDelta * 0.08);
+      }
+
+      // Display metrics
+      mInflow.textContent = `${Math.round(totalInflow * 10)} m³/s`;
+      mOutflow.textContent = `${Math.round(totalOutflow * 10)} m³/s`;
+
+      const depthCm = Math.round(currentWaterDepth);
+      let statusClass = "status-safe";
+      let statusLabel = "ปกติ";
+      if (depthCm > 40) {
+        statusClass = "status-danger";
+        statusLabel = "วิกฤต (รถจม/อาคารพัง)";
+      } else if (depthCm > 10) {
+        statusClass = "status-warn";
+        statusLabel = "น้ำรอการระบาย";
+      }
+
+      mWaterLevel.innerHTML = `${depthCm} ซม. <span class="status-badge ${statusClass}">${statusLabel}</span>`;
+
+      return {
+        rain,
+        inflow,
+        pave,
+        basin,
+        pump,
+        block,
+        tide,
+        depthCm,
+        totalInflow,
+        totalOutflow
+      };
+    }
+
+    function render(state) {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      // 1. Sky & Clouds
+      let skyGrad = ctx.createLinearGradient(0, 0, 0, CITY_GROUND_Y);
+      skyGrad.addColorStop(0, state.rain > 60 ? '#111827' : '#1e293b');
+      skyGrad.addColorStop(1, '#334155');
+      ctx.fillStyle = skyGrad;
+      ctx.fillRect(0, 0, canvas.width, CITY_GROUND_Y);
+
+      // Cloud graphics
+      if (state.rain > 15) {
+        ctx.fillStyle = state.rain > 70 ? '#1f2937' : '#475569';
+        ctx.beginPath();
+        ctx.arc(200, 40, 45, 0, Math.PI * 2);
+        ctx.arc(260, 30, 60, 0, Math.PI * 2);
+        ctx.arc(330, 40, 50, 0, Math.PI * 2);
+        ctx.arc(400, 45, 45, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Raindrops
+        ctx.strokeStyle = 'rgba(56, 189, 248, 0.6)';
+        ctx.lineWidth = 1.5;
+        for (let drop of rainDrops) {
+          drop.y += drop.speed + (state.rain / 20);
+          if (drop.y > CITY_GROUND_Y) {
+            drop.y = 20;
+            drop.x = CITY_LEFT + Math.random() * (CITY_RIGHT - CITY_LEFT);
+          }
+          ctx.beginPath();
+          ctx.moveTo(drop.x, drop.y);
+          ctx.lineTo(drop.x - 2, drop.y + drop.length);
+          ctx.stroke();
+        }
+      }
+
+      // 2. Upstream River (Left side)
+      ctx.fillStyle = '#1e3a5f';
+      ctx.fillRect(0, CITY_GROUND_Y - 20, CITY_LEFT - 30, canvas.height - CITY_GROUND_Y + 20);
+      let upWaterH = 20 + (state.inflow * 0.8);
+      ctx.fillStyle = '#0284c7';
+      ctx.fillRect(0, CITY_GROUND_Y - upWaterH, CITY_LEFT - 30, upWaterH + 30);
+      ctx.fillStyle = '#e0f2fe';
+      ctx.font = 'bold 11px sans-serif';
+      ctx.fillText('น้ำเหนือ/น้ำหลาก ➔', 10, CITY_GROUND_Y - upWaterH - 8);
+
+      // 3. Ground Structure (City cross section)
+      // Permeable Soil vs Concrete
+      ctx.fillStyle = state.pave > 70 ? '#475569' : '#334155';
+      ctx.fillRect(CITY_LEFT - 30, CITY_GROUND_Y, (CITY_RIGHT - CITY_LEFT) + 40, canvas.height - CITY_GROUND_Y);
+      
+      // City Buildings
+      const buildings = [
+        {x: 180, w: 35, h: 70},
+        {x: 230, w: 45, h: 105},
+        {x: 290, w: 30, h: 55},
+        {x: 390, w: 40, h: 85}
+      ];
+      ctx.fillStyle = '#0f172a';
+      for (let b of buildings) {
+        ctx.fillRect(b.x, CITY_GROUND_Y - b.h, b.w, b.h);
+        // windows
+        ctx.fillStyle = '#fef08a';
+        for (let wy = CITY_GROUND_Y - b.h + 8; wy < CITY_GROUND_Y - 10; wy += 16) {
+          ctx.fillRect(b.x + 6, wy, 8, 8);
+          ctx.fillRect(b.x + b.w - 14, wy, 8, 8);
+        }
+        ctx.fillStyle = '#0f172a';
+      }
+
+      // Retention Basin (Middle of city)
+      if (state.basin > 5) {
+        const basinWidth = 45 + (state.basin * 0.4);
+        const basinX = 330;
+        ctx.fillStyle = '#0f172a';
+        ctx.fillRect(basinX, CITY_GROUND_Y, basinWidth, 35);
+        // Basin water
+        const basinFill = (basinStoredWater / 100) * 32;
+        ctx.fillStyle = '#38bdf8';
+        ctx.fillRect(basinX, CITY_GROUND_Y + 35 - basinFill, basinWidth, basinFill);
+        ctx.fillStyle = '#94a3b8';
+        ctx.font = '10px sans-serif';
+        ctx.fillText('แก้มลิง', basinX + 5, CITY_GROUND_Y + 46);
+      }
+
+      // 4. Underground Drainage Pipe
+      const pipeY = CITY_GROUND_Y + 70;
+      const pipeH = 15 + (state.pump * 0.25);
+      ctx.fillStyle = '#1e293b';
+      ctx.fillRect(CITY_LEFT - 10, pipeY, 320, pipeH);
+      ctx.strokeStyle = '#64748b';
+      ctx.strokeRect(CITY_LEFT - 10, pipeY, 320, pipeH);
+
+      // Pipe Water Flow
+      ctx.fillStyle = 'rgba(56, 189, 248, 0.7)';
+      ctx.fillRect(CITY_LEFT - 10, pipeY + 2, 320, pipeH - 4);
+
+      // Debris/Blockage in pipe
+      if (state.block > 0) {
+        const blockW = (state.block / 100) * 70;
+        ctx.fillStyle = '#78350f';
+        ctx.fillRect(CITY_LEFT + 140, pipeY + 2, blockW, pipeH - 4);
+        ctx.fillStyle = '#fef08a';
+        ctx.font = '10px sans-serif';
+        ctx.fillText('ขยะอุดตัน', CITY_LEFT + 145, pipeY - 4);
+      }
+
+      // 5. Pumping Station
+      ctx.fillStyle = '#dc2626';
+      ctx.fillRect(CITY_RIGHT - 20, pipeY - 25, 30, pipeH + 25);
+      ctx.fillStyle = '#ffffff';
+      ctx.font = 'bold 9px sans-serif';
+      ctx.fillText('สูบน้ำ', CITY_RIGHT - 18, pipeY - 10);
+
+      // 6. Sea / Receiving River (Right side)
+      const seaLevelY = CITY_GROUND_Y + 20 - (state.tide * 18);
+      ctx.fillStyle = '#0369a1';
+      ctx.fillRect(CITY_RIGHT + 10, seaLevelY, canvas.width - (CITY_RIGHT + 10), canvas.height - seaLevelY);
+      ctx.fillStyle = '#bae6fd';
+      ctx.font = 'bold 11px sans-serif';
+      ctx.fillText('ทะเลหนุน/แม่น้ำปลายทาง', CITY_RIGHT + 15, seaLevelY - 8);
+
+      // 7. Surface Flood Water
+      if (state.depthCm > 0) {
+        const floodVisualHeight = Math.min(50, state.depthCm * 0.5);
+        ctx.fillStyle = 'rgba(14, 165, 233, 0.6)';
+        ctx.fillRect(CITY_LEFT - 30, CITY_GROUND_Y - floodVisualHeight, (CITY_RIGHT - CITY_LEFT) + 40, floodVisualHeight);
+
+        // Water level line
+        ctx.strokeStyle = '#38bdf8';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(CITY_LEFT - 30, CITY_GROUND_Y - floodVisualHeight);
+        ctx.lineTo(CITY_RIGHT + 10, CITY_GROUND_Y - floodVisualHeight);
+        ctx.stroke();
+
+        ctx.fillStyle = '#ffffff';
+        ctx.font = 'bold 12px sans-serif';
+        ctx.fillText(`น้ำท่วม ${state.depthCm} cm`, 220, CITY_GROUND_Y - floodVisualHeight - 6);
+      }
+    }
+
+    function loop() {
+      const state = calculateState();
+      render(state);
+      requestAnimationFrame(loop);
+    }
+
+    // Attach listeners
+    [sRain, sInflow, sPave, sBasin, sPump, sBlock, sTide, sBudgetLimit].forEach(el => {
+      el.addEventListener('input', calculateState);
+    });
+
+    loop();
+  </script>
+</body>
+</html>

@@ -1,0 +1,1038 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>โมเดลเมืองจำลอง : น้ำท่วมกรุงเทพฯ (8 ตัวแปร)</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-header: #0284c7;
+      --bg-page: #0f172a;
+      --card-bg: #1e293b;
+      --card-inner: #0f172a;
+      --border: #334155;
+      --accent: #38bdf8;
+      --text: #f8fafc;
+      --text-muted: #94a3b8;
+      --danger: #ef4444;
+      --warning: #f59e0b;
+      --success: #10b981;
+    }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Sarabun', sans-serif;
+    }
+    body {
+      background-color: var(--bg-page);
+      color: var(--text);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+      padding-bottom: 24px;
+    }
+    /* Top Header Bar */
+    .top-bar {
+      width: 100%;
+      background: linear-gradient(90deg, #0284c7 0%, #0369a1 100%);
+      padding: 16px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+    }
+    .top-title {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .top-title h1 {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: #fff;
+    }
+    .top-title p {
+      font-size: 0.9rem;
+      color: #e0f2fe;
+    }
+    .top-slogan {
+      text-align: right;
+    }
+    .top-slogan strong {
+      display: block;
+      font-size: 1rem;
+      color: #fff;
+    }
+    .top-slogan span {
+      font-size: 0.8rem;
+      color: #bae6fd;
+    }
+
+    /* Main Container Grid */
+    .container {
+      max-width: 1400px;
+      width: 96%;
+      margin-top: 18px;
+      display: grid;
+      grid-template-columns: 340px 1fr 310px;
+      gap: 16px;
+    }
+
+    /* Card Panels */
+    .panel {
+      background: var(--card-bg);
+      border-radius: 14px;
+      padding: 16px;
+      border: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .panel-title {
+      font-size: 1rem;
+      font-weight: 700;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    /* Left Sliders */
+    .slider-item {
+      background: var(--card-inner);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 10px 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .slider-header {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.82rem;
+      font-weight: 600;
+    }
+    .slider-header span.val {
+      color: var(--accent);
+      font-weight: 700;
+    }
+    input[type=range] {
+      width: 100%;
+      height: 5px;
+      accent-color: var(--accent);
+      cursor: pointer;
+    }
+    .slider-sub {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.68rem;
+      color: var(--text-muted);
+    }
+
+    /* Center Visual Area */
+    .center-column {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+    .canvas-container {
+      position: relative;
+      background: #090f1d;
+      border-radius: 14px;
+      border: 1px solid var(--border);
+      overflow: hidden;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    canvas {
+      width: 100%;
+      height: 480px;
+    }
+
+    /* Presets Strip */
+    .presets-box {
+      background: var(--card-bg);
+      border-radius: 14px;
+      padding: 14px;
+      border: 1px solid var(--border);
+    }
+    .presets-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 8px;
+      margin-top: 8px;
+    }
+    .preset-btn {
+      background: var(--card-inner);
+      border: 1px solid var(--border);
+      color: var(--text);
+      border-radius: 8px;
+      padding: 8px 6px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-size: 0.78rem;
+    }
+    .preset-btn:hover {
+      background: #334155;
+      border-color: var(--accent);
+    }
+    .preset-btn .icon {
+      font-size: 1.3rem;
+      display: block;
+      margin-bottom: 2px;
+    }
+    .preset-btn .sub {
+      color: var(--text-muted);
+      font-size: 0.68rem;
+      display: block;
+    }
+
+    /* Right Column: Measures & Budget */
+    .budget-display {
+      background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
+      border-radius: 12px;
+      padding: 14px;
+      color: white;
+      text-align: center;
+    }
+    .budget-display span {
+      font-size: 0.85rem;
+      opacity: 0.9;
+    }
+    .budget-display h2 {
+      font-size: 1.6rem;
+      font-weight: 700;
+    }
+    .measure-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: var(--card-inner);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 10px;
+      cursor: pointer;
+      transition: border 0.2s;
+    }
+    .measure-item:hover {
+      border-color: var(--accent);
+    }
+    .measure-info {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .measure-info .icon {
+      font-size: 1.3rem;
+    }
+    .measure-info strong {
+      font-size: 0.82rem;
+      display: block;
+    }
+    .measure-info span {
+      font-size: 0.7rem;
+      color: var(--text-muted);
+    }
+    .measure-cost {
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: var(--warning);
+      margin-right: 6px;
+    }
+    input[type=checkbox] {
+      width: 18px;
+      height: 18px;
+      accent-color: var(--accent);
+      cursor: pointer;
+    }
+    .budget-bar-box {
+      margin-top: 4px;
+    }
+    .budget-bar-labels {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.75rem;
+      margin-bottom: 4px;
+    }
+    .bar-bg {
+      width: 100%;
+      height: 8px;
+      background: #334155;
+      border-radius: 4px;
+      overflow: hidden;
+    }
+    .bar-fill {
+      height: 100%;
+      width: 0%;
+      background: var(--accent);
+      transition: width 0.3s, background-color 0.3s;
+    }
+
+    /* Bottom Results Section */
+    .bottom-row {
+      max-width: 1400px;
+      width: 96%;
+      margin-top: 14px;
+      display: grid;
+      grid-template-columns: 1.5fr 1fr;
+      gap: 16px;
+    }
+    .result-gauge-card {
+      background: var(--card-bg);
+      border-radius: 14px;
+      padding: 16px;
+      border: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .gauge-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 12px;
+    }
+    .gauge-item {
+      background: var(--card-inner);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 10px;
+      text-align: center;
+    }
+    .gauge-item span {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      display: block;
+      margin-bottom: 4px;
+    }
+    .gauge-item strong {
+      font-size: 1.2rem;
+      color: #fff;
+    }
+    .insight-box {
+      background: rgba(16, 185, 129, 0.1);
+      border: 1px solid rgba(16, 185, 129, 0.3);
+      color: #6ee7b7;
+      padding: 10px 14px;
+      border-radius: 10px;
+      font-size: 0.82rem;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    /* Footer Slogan Bar */
+    footer {
+      margin-top: 20px;
+      display: flex;
+      gap: 24px;
+      font-size: 0.82rem;
+      color: var(--text-muted);
+    }
+    footer span {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    @media (max-width: 1100px) {
+      .container { grid-template-columns: 1fr; }
+      .bottom-row { grid-template-columns: 1fr; }
+      .presets-grid { grid-template-columns: repeat(3, 1fr); }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Bar -->
+  <div class="top-bar">
+    <div class="top-title">
+      <div style="font-size: 2rem;">🌧️</div>
+      <div>
+        <h1>โมเดลเมืองจำลอง : น้ำท่วมกรุงเทพฯ</h1>
+        <p>ทดลองปรับตัวแปร 8 ด้าน แล้วดูว่า... เมืองจะท่วมมากหรือน้อยแค่ไหน</p>
+      </div>
+    </div>
+    <div class="top-slogan">
+      <strong>คิดเป็น เห็นผลจริง สร้างอนาคตได้</strong>
+      <span>เพราะการแก้ปัญหา ไม่ใช่แค่การลงงบ แต่คือการ "บริหารจัดการ"</span>
+    </div>
+  </div>
+
+  <!-- Main Container -->
+  <div class="container">
+    
+    <!-- Left Column: 8 Variables Sliders -->
+    <div class="panel">
+      <div class="panel-title">🎛️ ปรับตัวแปรทั้ง 8 ด้าน</div>
+
+      <!-- 1. Rain -->
+      <div class="slider-item">
+        <div class="slider-header">
+          <span>1. ปริมาณฝน</span>
+          <span class="val" id="vRain">40 มม.</span>
+        </div>
+        <input type="range" id="sRain" min="0" max="150" value="40">
+        <div class="slider-sub"><span>น้อย (20 มม.)</span><span>หนักมาก (150 มม.)</span></div>
+      </div>
+
+      <!-- 2. River/Upstream -->
+      <div class="slider-item">
+        <div class="slider-header">
+          <span>2. น้ำเหนือ / น้ำจากรอบข้าง</span>
+          <span class="val" id="vInflow">25 %</span>
+        </div>
+        <input type="range" id="sInflow" min="0" max="100" value="25">
+        <div class="slider-sub"><span>ต่ำ</span><span>สูงมาก</span></div>
+      </div>
+
+      <!-- 3. Concrete/Impervious -->
+      <div class="slider-item">
+        <div class="slider-header">
+          <span>3. สัดส่วนคอนกรีต (ผิวดาดแข็ง)</span>
+          <span class="val" id="vPave">70 %</span>
+        </div>
+        <input type="range" id="sPave" min="10" max="100" value="70">
+        <div class="slider-sub"><span>ป่า/สวนซึมน้ำดี</span><span>ตึก/ถนนเต็มเมือง</span></div>
+      </div>
+
+      <!-- 4. Retention Basins -->
+      <div class="slider-item">
+        <div class="slider-header">
+          <span>4. แก้มลิง / บ่อพักน้ำชะลอท่อ</span>
+          <span class="val" id="vBasin">30 %</span>
+        </div>
+        <input type="range" id="sBasin" min="0" max="100" value="30">
+        <div class="slider-sub"><span>ไม่มีเลย</span><span>บ่อแก้มลิงขนาดใหญ่</span></div>
+      </div>
+
+      <!-- 5. Drainage Capacity -->
+      <div class="slider-item">
+        <div class="slider-header">
+          <span>5. กำลังท่อและสถานีสูบน้ำ</span>
+          <span class="val" id="vPump">45 %</span>
+        </div>
+        <input type="range" id="sPump" min="10" max="100" value="45">
+        <div class="slider-sub"><span>ต่ำ (ท่อเล็ก)</span><span>สูง (อุโมงค์ยักษ์)</span></div>
+      </div>
+
+      <!-- 6. Debris/Blockage -->
+      <div class="slider-item">
+        <div class="slider-header">
+          <span>6. ขยะและสิ่งกีดขวางในท่อ</span>
+          <span class="val" id="vBlock">30 %</span>
+        </div>
+        <input type="range" id="sBlock" min="0" max="90" value="30">
+        <div class="slider-sub"><span>ท่อโล่งสะอาด</span><span>ขยะอุดตันแน่น</span></div>
+      </div>
+
+      <!-- 7. Sea/Tide Level -->
+      <div class="slider-item">
+        <div class="slider-header">
+          <span>7. ระดับน้ำทะเลหนุนปลายทาง</span>
+          <span class="val" id="vTide">1.0 ม.</span>
+        </div>
+        <input type="range" id="sTide" min="0" max="30" value="10">
+        <div class="slider-sub"><span>น้ำลง (ระบายคล่อง)</span><span>หนุนสูงวิกฤต (3.0 ม.)</span></div>
+      </div>
+
+      <!-- 8. City Budget Ceiling -->
+      <div class="slider-item">
+        <div class="slider-header">
+          <span>8. เพดานงบประมาณเมือง</span>
+          <span class="val" id="vBudgetCeil">100 ล้าน</span>
+        </div>
+        <input type="range" id="sBudgetCeil" min="40" max="150" value="100">
+        <div class="slider-sub"><span>งบจำกัด (40 ล.)</span><span>งบเต็มที่ (150 ล.)</span></div>
+      </div>
+
+    </div>
+
+    <!-- Center Column: City Visual & Scenarios -->
+    <div class="center-column">
+      <div class="canvas-container">
+        <canvas id="cityCanvas" width="700" height="480"></canvas>
+      </div>
+
+      <!-- Presets / Scenarios -->
+      <div class="presets-box">
+        <div style="font-size: 0.85rem; font-weight: 700; color: #cbd5e1;">⚡ เลือกจำลองสถานการณ์ฝน & วิกฤตน้ำ</div>
+        <div class="presets-grid">
+          <div class="preset-btn" onclick="applyPreset(20, 15, 70, 30, 45, 20, 8)">
+            <span class="icon">🌤️</span>
+            <strong>ฝนปกติ</strong>
+            <span class="sub">(20 มม.)</span>
+          </div>
+          <div class="preset-btn" onclick="applyPreset(100, 30, 80, 20, 50, 35, 12)">
+            <span class="icon">🌧️</span>
+            <strong>ฝนตกหนัก</strong>
+            <span class="sub">(100 มม.)</span>
+          </div>
+          <div class="preset-btn" onclick="applyPreset(130, 40, 85, 20, 50, 40, 15)">
+            <span class="icon">⛈️</span>
+            <strong>ฝนตกต่อเนื่อง</strong>
+            <span class="sub">(ตกสะสม 3 วัน)</span>
+          </div>
+          <div class="preset-btn" onclick="applyPreset(40, 95, 70, 30, 40, 30, 18)">
+            <span class="icon">🌊</span>
+            <strong>น้ำเหนือหลาก</strong>
+            <span class="sub">(มวลน้ำภายนอกสูง)</span>
+          </div>
+          <div class="preset-btn" onclick="applyPreset(120, 80, 85, 20, 60, 50, 26)">
+            <span class="icon">🚨</span>
+            <strong>วิกฤตรอบด้าน</strong>
+            <span class="sub">(ฝน + เหนือ + ทะเลหนุน)</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right Column: Mitigation Measures & Budget Spent -->
+    <div class="panel">
+      <div class="budget-display">
+        <span>งบประมาณที่ตั้งไว้</span>
+        <h2 id="txtBudgetCap">100 ล้านบาท</h2>
+      </div>
+
+      <div class="panel-title" style="font-size: 0.9rem;">🛠️ เลือกมาตรการ (ใช้เงินตามงบ)</div>
+
+      <!-- Measures Checkboxes -->
+      <div class="measure-item" onclick="toggleMeasure('m1')">
+        <div class="measure-info">
+          <span class="icon">🚜</span>
+          <div>
+            <strong>ขุดลอกคูคลองและท่อ</strong>
+            <span>ลดสิ่งกีดขวาง เพิ่มอัตราไหล</span>
+          </div>
+        </div>
+        <div style="display:flex; align-items:center;">
+          <span class="measure-cost">10 ล.</span>
+          <input type="checkbox" id="m1" onchange="calcLogic()">
+        </div>
+      </div>
+
+      <div class="measure-item" onclick="toggleMeasure('m2')">
+        <div class="measure-info">
+          <span class="icon">🏛️</span>
+          <div>
+            <strong>เพิ่มสถานีสูบน้ำไฟฟ้า</strong>
+            <span>ดันน้ำออกเร็วขึ้นแม้ทะเลหนุน</span>
+          </div>
+        </div>
+        <div style="display:flex; align-items:center;">
+          <span class="measure-cost">20 ล.</span>
+          <input type="checkbox" id="m2" onchange="calcLogic()">
+        </div>
+      </div>
+
+      <div class="measure-item" onclick="toggleMeasure('m3')">
+        <div class="measure-info">
+          <span class="icon">🔧</span>
+          <div>
+            <strong>ขยายท่อระบายน้ำสายหลัก</strong>
+            <span>เพิ่มขนาดท่อใต้ผิวถนน</span>
+          </div>
+        </div>
+        <div style="display:flex; align-items:center;">
+          <span class="measure-cost">15 ล.</span>
+          <input type="checkbox" id="m3" onchange="calcLogic()">
+        </div>
+      </div>
+
+      <div class="measure-item" onclick="toggleMeasure('m4')">
+        <div class="measure-info">
+          <span class="icon">🏞️</span>
+          <div>
+            <strong>ขยายพื้นที่แก้มลิงหน่วงน้ำ</strong>
+            <span>พักน้ำส่วนเกินก่อนเข้าเมือง</span>
+          </div>
+        </div>
+        <div style="display:flex; align-items:center;">
+          <span class="measure-cost">15 ล.</span>
+          <input type="checkbox" id="m4" onchange="calcLogic()">
+        </div>
+      </div>
+
+      <div class="measure-item" onclick="toggleMeasure('m5')">
+        <div class="measure-info">
+          <span class="icon">🗑️</span>
+          <div>
+            <strong>ตะแกรงดักขยะอัตโนมัติ</strong>
+            <span>ลดขยะอุดตันท่อลงอย่างถาวร</span>
+          </div>
+        </div>
+        <div style="display:flex; align-items:center;">
+          <span class="measure-cost">10 ล.</span>
+          <input type="checkbox" id="m5" onchange="calcLogic()">
+        </div>
+      </div>
+
+      <div class="measure-item" onclick="toggleMeasure('m6')">
+        <div class="measure-info">
+          <span class="icon">🌳</span>
+          <div>
+            <strong>เพิ่มสวนฟองน้ำซึมน้ำ</strong>
+            <span>ลด Runoff พื้นที่ดาดแข็ง</span>
+          </div>
+        </div>
+        <div style="display:flex; align-items:center;">
+          <span class="measure-cost">10 ล.</span>
+          <input type="checkbox" id="m6" onchange="calcLogic()">
+        </div>
+      </div>
+
+      <!-- Budget Usage Bar -->
+      <div class="budget-bar-box">
+        <div class="budget-bar-labels">
+          <span>งบที่ใช้ไป:</span>
+          <strong id="txtBudgetUsed">0 / 100 ล้านบาท</strong>
+        </div>
+        <div class="bar-bg">
+          <div class="bar-fill" id="barBudgetFill"></div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Bottom Results Section -->
+  <div class="bottom-row">
+    <div class="result-gauge-card">
+      <div class="panel-title">📊 ผลลัพธ์ที่ประเมินได้จากสภาพเมือง</div>
+      <div class="gauge-row">
+        <div class="gauge-item">
+          <span>ระดับน้ำท่วมขังในเมือง</span>
+          <strong id="gaugeDepth" style="color: var(--accent);">0 ซม.</strong>
+        </div>
+        <div class="gauge-item">
+          <span>ระยะเวลาน้ำลดสู่ปกติ</span>
+          <strong id="gaugeTime" style="color: var(--warning);">0 ชม.</strong>
+        </div>
+        <div class="gauge-item">
+          <span>พื้นที่เมืองที่เสียหาย</span>
+          <strong id="gaugeArea" style="color: var(--danger);">0 %</strong>
+        </div>
+      </div>
+      <div class="insight-box" id="insightBox">
+        <span style="font-size: 1.2rem;">💡</span>
+        <span id="insightText">เมืองอยู่ในเกณฑ์ปลอดภัย น้ำระบายได้ทันท่วงที</span>
+      </div>
+    </div>
+
+    <!-- Legend Panel -->
+    <div class="result-gauge-card">
+      <div class="panel-title">🏷️ คำอธิบายสัญลักษณ์ในแผนภาพ</div>
+      <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 8px; font-size: 0.78rem;">
+        <div style="display:flex; align-items:center; gap:8px;">
+          <div style="width:14px; height:14px; background:#0284c7; border-radius:3px;"></div>
+          <span>น้ำท่วมผิวเมือง</span>
+        </div>
+        <div style="display:flex; align-items:center; gap:8px;">
+          <div style="width:14px; height:14px; background:#38bdf8; border-radius:3px;"></div>
+          <span>บ่อแก้มลิงชะลอน้ำ</span>
+        </div>
+        <div style="display:flex; align-items:center; gap:8px;">
+          <div style="width:14px; height:14px; background:#10b981; border-radius:3px;"></div>
+          <span>พื้นที่สีเขียว/ดินซึมน้ำ</span>
+        </div>
+        <div style="display:flex; align-items:center; gap:8px;">
+          <div style="width:14px; height:14px; background:#334155; border-radius:3px;"></div>
+          <span>ท่อระบายน้ำใต้ดิน</span>
+        </div>
+        <div style="display:flex; align-items:center; gap:8px;">
+          <div style="width:14px; height:14px; background:#ef4444; border-radius:3px;"></div>
+          <span>สถานีสูบน้ำ / ขยะตัน</span>
+        </div>
+        <div style="display:flex; align-items:center; gap:8px;">
+          <div style="width:14px; height:14px; background:#0369a1; border-radius:3px;"></div>
+          <span>แม่น้ำเจ้าพระยา / ทะเล</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer>
+    <span>🌱 เข้าใจธรรมชาติ</span>
+    <span>•</span>
+    <span>🛡️ รู้เท่าทันความเสี่ยง</span>
+    <span>•</span>
+    <span>🏙️ สร้างเมืองที่ยั่งยืน</span>
+  </footer>
+
+  <script>
+    const canvas = document.getElementById('cityCanvas');
+    const ctx = canvas.getContext('2d');
+
+    // Inputs
+    const sRain = document.getElementById('sRain');
+    const sInflow = document.getElementById('sInflow');
+    const sPave = document.getElementById('sPave');
+    const sBasin = document.getElementById('sBasin');
+    const sPump = document.getElementById('sPump');
+    const sBlock = document.getElementById('sBlock');
+    const sTide = document.getElementById('sTide');
+    const sBudgetCeil = document.getElementById('sBudgetCeil');
+
+    // Labels
+    const vRain = document.getElementById('vRain');
+    const vInflow = document.getElementById('vInflow');
+    const vPave = document.getElementById('vPave');
+    const vBasin = document.getElementById('vBasin');
+    const vPump = document.getElementById('vPump');
+    const vBlock = document.getElementById('vBlock');
+    const vTide = document.getElementById('vTide');
+    const vBudgetCeil = document.getElementById('vBudgetCeil');
+
+    // Measures Checkboxes
+    const m1 = document.getElementById('m1');
+    const m2 = document.getElementById('m2');
+    const m3 = document.getElementById('m3');
+    const m4 = document.getElementById('m4');
+    const m5 = document.getElementById('m5');
+    const m6 = document.getElementById('m6');
+
+    // Budget display
+    const txtBudgetCap = document.getElementById('txtBudgetCap');
+    const txtBudgetUsed = document.getElementById('txtBudgetUsed');
+    const barBudgetFill = document.getElementById('barBudgetFill');
+
+    // Gauge outputs
+    const gaugeDepth = document.getElementById('gaugeDepth');
+    const gaugeTime = document.getElementById('gaugeTime');
+    const gaugeArea = document.getElementById('gaugeArea');
+    const insightText = document.getElementById('insightText');
+    const insightBox = document.getElementById('insightBox');
+
+    // Dynamic Variables
+    let animatedWaterLevel = 0;
+    let rainDrops = [];
+    for (let i = 0; i < 90; i++) {
+      rainDrops.push({
+        x: 140 + Math.random() * 380,
+        y: Math.random() * 220,
+        len: 6 + Math.random() * 6,
+        spd: 4 + Math.random() * 5
+      });
+    }
+
+    function toggleMeasure(id) {
+      const cb = document.getElementById(id);
+      cb.checked = !cb.checked;
+      calcLogic();
+    }
+
+    function applyPreset(r, inf, pav, bas, pmp, blk, tid) {
+      sRain.value = r;
+      sInflow.value = inf;
+      sPave.value = pav;
+      sBasin.value = bas;
+      sPump.value = pmp;
+      sBlock.value = blk;
+      sTide.value = tid;
+      calcLogic();
+    }
+
+    function calcLogic() {
+      // 1. Gather baseline values
+      let rain = parseInt(sRain.value);
+      let inflow = parseInt(sInflow.value);
+      let pave = parseInt(sPave.value);
+      let basin = parseInt(sBasin.value);
+      let pump = parseInt(sPump.value);
+      let block = parseInt(sBlock.value);
+      let tide = parseInt(sTide.value) / 10;
+      let budgetCeil = parseInt(sBudgetCeil.value);
+
+      // 2. Calculate Measure Costs & Modifier Effects
+      let cost = 0;
+      if (m1.checked) { cost += 10; block = Math.max(0, block - 25); }
+      if (m2.checked) { cost += 20; pump += 30; }
+      if (m3.checked) { cost += 15; pump += 20; }
+      if (m4.checked) { cost += 15; basin += 35; }
+      if (m5.checked) { cost += 10; block = Math.max(0, block - 35); }
+      if (m6.checked) { cost += 10; pave = Math.max(10, pave - 25); }
+
+      // Update Sliders Text
+      vRain.textContent = `${rain} มม.`;
+      vInflow.textContent = `${inflow} %`;
+      vPave.textContent = `${pave} %`;
+      vBasin.textContent = `${basin} %`;
+      vPump.textContent = `${pump} %`;
+      vBlock.textContent = `${block} %`;
+      vTide.textContent = `${tide.toFixed(1)} ม.`;
+      vBudgetCeil.textContent = `${budgetCeil} ล้าน`;
+
+      // Update Budget UI
+      txtBudgetCap.textContent = `${budgetCeil} ล้านบาท`;
+      txtBudgetUsed.textContent = `${cost} / ${budgetCeil} ล้านบาท`;
+      const budgetPct = Math.min(100, (cost / budgetCeil) * 100);
+      barBudgetFill.style.width = `${budgetPct}%`;
+
+      if (cost > budgetCeil) {
+        barBudgetFill.style.background = 'var(--danger)';
+        txtBudgetUsed.style.color = 'var(--danger)';
+      } else {
+        barBudgetFill.style.background = 'var(--accent)';
+        txtBudgetUsed.style.color = 'var(--text)';
+      }
+
+      // 3. Water Balance Physics Formula
+      // Inflow rate = Rain Runoff + External Upstream Inflow
+      const runoffFactor = 0.2 + (pave / 100) * 0.75; // Concrete yields high runoff
+      const rainWater = rain * runoffFactor * 1.5;
+      const externalWater = inflow * 1.3;
+      const totalWaterIn = rainWater + externalWater;
+
+      // Retention Absorbed
+      const retentionCapacity = basin * 0.9;
+      const waterAfterBasin = Math.max(0, totalWaterIn - retentionCapacity);
+
+      // Outflow = Pump throttled by Blockage - Tidal Opposing Pressure
+      const effectivePump = pump * (1 - (block / 100));
+      const tidalBlockade = Math.max(0, (tide - 0.7) * 22);
+      const totalOutflow = Math.max(6, (effectivePump * 1.1) - tidalBlockade);
+
+      // Net Accumulation (cm of flood)
+      const floodDiff = waterAfterBasin - totalOutflow;
+      let finalDepth = 0;
+      if (floodDiff > 0) {
+        finalDepth = Math.round(floodDiff * 0.95);
+      } else {
+        finalDepth = 0;
+      }
+      finalDepth = Math.min(120, finalDepth);
+
+      // Drain Time & Affected Area
+      let drainHours = finalDepth === 0 ? 0 : Math.round(1.5 + (finalDepth / (totalOutflow * 0.35)));
+      let affectedArea = Math.min(100, Math.round(finalDepth * 0.85));
+
+      // Display metrics
+      gaugeDepth.textContent = `${finalDepth} ซม.`;
+      gaugeTime.textContent = `${Math.min(36, drainHours)} ชม.`;
+      gaugeArea.textContent = `${affectedArea} %`;
+
+      if (finalDepth > 40) {
+        gaugeDepth.style.color = 'var(--danger)';
+        insightBox.style.background = 'rgba(239, 68, 68, 0.15)';
+        insightBox.style.borderColor = 'rgba(239, 68, 68, 0.4)';
+        insightBox.style.color = '#fca5a5';
+        insightText.textContent = "วิกฤต! น้ำท่วมสูงเกิน 40 ซม. คมนาคมเป็นอัมพาตและอาคารเสียหาย ควรเพิ่มสถานีสูบหรือขยายแก้มลิงด่วน";
+      } else if (finalDepth > 10) {
+        gaugeDepth.style.color = 'var(--warning)';
+        insightBox.style.background = 'rgba(245, 158, 11, 0.15)';
+        insightBox.style.borderColor = 'rgba(245, 158, 11, 0.4)';
+        insightBox.style.color = '#fde68a';
+        insightText.textContent = "มีน้ำท่วมขังรอการระบายตามผิวจราจร แนะนำให้ลอกท่อลดขยะและเปิดทางน้ำไหล";
+      } else {
+        gaugeDepth.style.color = 'var(--accent)';
+        insightBox.style.background = 'rgba(16, 185, 129, 0.15)';
+        insightBox.style.borderColor = 'rgba(16, 185, 129, 0.4)';
+        insightBox.style.color = '#6ee7b7';
+        insightText.textContent = "เมืองอยู่ในเกณฑ์ปลอดภัย ระบบระบายน้ำและแก้มลิงสามารถรองรับปริมาณน้ำได้ดี";
+      }
+
+      return {
+        rain,
+        inflow,
+        pave,
+        basin,
+        pump,
+        block,
+        tide,
+        finalDepth
+      };
+    }
+
+    // Canvas Cross-section & Isometric Rendering
+    function drawScene(st) {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      // Smooth depth transition
+      animatedWaterLevel += (st.finalDepth - animatedWaterLevel) * 0.1;
+
+      const GROUND_Y = 270;
+      const CITY_X1 = 150;
+      const CITY_X2 = 520;
+
+      // 1. Sky & Cloud
+      let skyGrad = ctx.createLinearGradient(0, 0, 0, GROUND_Y);
+      skyGrad.addColorStop(0, st.rain > 50 ? '#0b1324' : '#1e293b');
+      skyGrad.addColorStop(1, '#334155');
+      ctx.fillStyle = skyGrad;
+      ctx.fillRect(0, 0, canvas.width, GROUND_Y);
+
+      // Cumulonimbus Storm Clouds
+      if (st.rain > 15) {
+        ctx.fillStyle = st.rain > 70 ? '#1e2538' : '#475569';
+        ctx.beginPath();
+        ctx.arc(220, 50, 45, 0, Math.PI * 2);
+        ctx.arc(310, 40, 65, 0, Math.PI * 2);
+        ctx.arc(400, 55, 50, 0, Math.PI * 2);
+        ctx.arc(460, 65, 35, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Rain particles
+        ctx.strokeStyle = 'rgba(56, 189, 248, 0.7)';
+        ctx.lineWidth = 1.5;
+        for (let drop of rainDrops) {
+          drop.y += drop.spd + (st.rain / 20);
+          if (drop.y > GROUND_Y) {
+            drop.y = 30;
+            drop.x = CITY_X1 + Math.random() * (CITY_X2 - CITY_X1);
+          }
+          ctx.beginPath();
+          ctx.moveTo(drop.x, drop.y);
+          ctx.lineTo(drop.x - 2, drop.y + drop.len);
+          ctx.stroke();
+        }
+      }
+
+      // 2. Upstream River (Left side)
+      ctx.fillStyle = '#1e3a5f';
+      ctx.fillRect(0, GROUND_Y - 40, CITY_X1 - 20, canvas.height);
+      let upstreamH = 20 + (st.inflow * 0.75);
+      ctx.fillStyle = '#0284c7';
+      ctx.fillRect(0, GROUND_Y - upstreamH, CITY_X1 - 20, upstreamH + 40);
+      ctx.fillStyle = '#e0f2fe';
+      ctx.font = 'bold 11px Sarabun';
+      ctx.fillText('น้ำจากภาคเหนือ ➔', 15, GROUND_Y - upstreamH - 8);
+
+      // 3. City Ground / Cross-section Soil
+      // Green vs Concrete mix
+      const soilGrad = ctx.createLinearGradient(CITY_X1 - 20, GROUND_Y, CITY_X2, canvas.height);
+      soilGrad.addColorStop(0, st.pave > 60 ? '#475569' : '#2e3d30');
+      soilGrad.addColorStop(1, '#1e293b');
+      ctx.fillStyle = soilGrad;
+      ctx.fillRect(CITY_X1 - 20, GROUND_Y, (CITY_X2 - CITY_X1) + 20, canvas.height - GROUND_Y);
+
+      // Infiltration Arrows (Water sinking into soil)
+      if (st.pave < 70) {
+        ctx.strokeStyle = 'rgba(56, 189, 248, 0.4)';
+        ctx.lineWidth = 2;
+        for (let ix = CITY_X1 + 25; ix < CITY_X2 - 40; ix += 55) {
+          ctx.beginPath();
+          ctx.moveTo(ix, GROUND_Y + 15);
+          ctx.lineTo(ix, GROUND_Y + 45);
+          ctx.stroke();
+        }
+        ctx.fillStyle = '#38bdf8';
+        ctx.font = '10px Sarabun';
+        ctx.fillText('น้ำซึมลงดิน (พื้นที่สีเขียว)', CITY_X1 + 15, GROUND_Y + 58);
+      }
+
+      // 4. Retention Basin (แก้มลิง)
+      if (st.basin > 10) {
+        const basinX = 320;
+        const basinW = 60 + (st.basin * 0.35);
+        ctx.fillStyle = '#090f1d';
+        ctx.fillRect(basinX, GROUND_Y, basinW, 35);
+        // Stored water in basin
+        const fill = Math.min(30, (st.basin / 100) * 32);
+        ctx.fillStyle = '#38bdf8';
+        ctx.fillRect(basinX, GROUND_Y + 35 - fill, basinW, fill);
+        ctx.fillStyle = '#cbd5e1';
+        ctx.font = '10px Sarabun';
+        ctx.fillText('แก้มลิงชะลอน้ำ', basinX + 6, GROUND_Y + 47);
+      }
+
+      // 5. Buildings
+      const bldgs = [
+        { x: 165, w: 32, h: 65 },
+        { x: 215, w: 42, h: 100 },
+        { x: 275, w: 30, h: 50 },
+        { x: 440, w: 35, h: 80 },
+        { x: 485, w: 25, h: 45 }
+      ];
+      for (let b of bldgs) {
+        ctx.fillStyle = '#1e293b';
+        ctx.fillRect(b.x, GROUND_Y - b.h, b.w, b.h);
+        // Windows
+        ctx.fillStyle = '#fef08a';
+        for (let wy = GROUND_Y - b.h + 8; wy < GROUND_Y - 8; wy += 14) {
+          ctx.fillRect(b.x + 5, wy, 6, 6);
+          ctx.fillRect(b.x + b.w - 11, wy, 6, 6);
+        }
+      }
+
+      // 6. Underground Pipe & Drainage
+      const pipeY = GROUND_Y + 85;
+      const pipeH = 22 + (st.pump * 0.15);
+      ctx.fillStyle = '#0f172a';
+      ctx.fillRect(CITY_X1 - 10, pipeY, 390, pipeH);
+      ctx.strokeStyle = '#64748b';
+      ctx.strokeRect(CITY_X1 - 10, pipeY, 390, pipeH);
+
+      // Water flow inside pipe
+      ctx.fillStyle = 'rgba(56, 189, 248, 0.7)';
+      ctx.fillRect(CITY_X1 - 10, pipeY + 2, 390, pipeH - 4);
+
+      // Trash / Blockage
+      if (st.block > 0) {
+        const blkW = (st.block / 100) * 80;
+        ctx.fillStyle = '#b45309';
+        ctx.fillRect(CITY_X1 + 160, pipeY + 2, blkW, pipeH - 4);
+        ctx.fillStyle = '#fef08a';
+        ctx.font = '10px Sarabun';
+        ctx.fillText('ขยะอุดตันท่อ', CITY_X1 + 162, pipeY - 5);
+      }
+
+      // 7. Pumping Station
+      ctx.fillStyle = '#0284c7';
+      ctx.fillRect(CITY_X2 - 25, pipeY - 35, 40, pipeH + 35);
+      ctx.fillStyle = '#ffffff';
+      ctx.font = 'bold 10px Sarabun';
+      ctx.fillText('สถานีสูบน้ำ', CITY_X2 - 24, pipeY - 14);
+
+      // 8. Gulf / Chao Phraya River (Right side)
+      const seaLevelY = GROUND_Y + 25 - (st.tide * 25);
+      ctx.fillStyle = '#0369a1';
+      ctx.fillRect(CITY_X2 + 20, seaLevelY, canvas.width - (CITY_X2 + 20), canvas.height - seaLevelY);
+      ctx.fillStyle = '#bae6fd';
+      ctx.font = 'bold 11px Sarabun';
+      ctx.fillText('แม่น้ำเจ้าพระยา / ทะเล ➔', CITY_X2 + 25, seaLevelY - 8);
+
+      // 9. Surface Flood Water Layer
+      if (animatedWaterLevel > 0.5) {
+        const fVisualH = Math.min(55, animatedWaterLevel * 0.55);
+        ctx.fillStyle = 'rgba(2, 132, 199, 0.65)';
+        ctx.fillRect(CITY_X1 - 20, GROUND_Y - fVisualH, (CITY_X2 - CITY_X1) + 40, fVisualH);
+
+        // Water surface highlight line
+        ctx.strokeStyle = '#38bdf8';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(CITY_X1 - 20, GROUND_Y - fVisualH);
+        ctx.lineTo(CITY_X2 + 20, GROUND_Y - fVisualH);
+        ctx.stroke();
+
+        ctx.fillStyle = '#ffffff';
+        ctx.font = 'bold 12px Sarabun';
+        ctx.fillText(`ระดับน้ำท่วมผิวเมือง ${Math.round(animatedWaterLevel)} ซม.`, 220, GROUND_Y - fVisualH - 8);
+      }
+    }
+
+    function mainLoop() {
+      const state = calcLogic();
+      drawScene(state);
+      requestAnimationFrame(mainLoop);
+    }
+
+    // Attach listeners
+    [sRain, sInflow, sPave, sBasin, sPump, sBlock, sTide, sBudgetCeil].forEach(slider => {
+      slider.addEventListener('input', calcLogic);
+    });
+
+    mainLoop();
+  </script>
+</body>
+</html>
