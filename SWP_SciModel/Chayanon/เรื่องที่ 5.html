@@ -1,0 +1,626 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>สมการเชิงเส้นตัวแปรเดียว: สมการกับสถานการณ์จริง (ม.1)</title>
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- Google Fonts: Sarabun & Prompt -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@400;500;600;700&family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- MathJax v3 Configuration & CDN -->
+  <script>
+    window.MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']],
+        displayMath: [['$$', '$$'], ['\\[', '\\]']],
+        processEscapes: true
+      },
+      options: {
+        skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+      }
+    };
+  </script>
+  <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+  <style>
+    body {
+      font-family: 'Sarabun', sans-serif;
+      background-color: #f8fafc;
+      color: #1e293b;
+    }
+    h1, h2, h3, h4, .font-heading {
+      font-family: 'Prompt', sans-serif;
+    }
+    
+    /* ควบคุมการพิมพ์: พิมพ์เฉพาะส่วนใบงาน 5 ข้อเท่านั้น */
+    @media print {
+      body {
+        background-color: #ffffff !important;
+        color: #000000 !important;
+        padding: 0 !important;
+        margin: 0 !important;
+      }
+      header, 
+      section:not(.worksheet-container),
+      .no-print {
+        display: none !important;
+      }
+      .worksheet-container {
+        border: none !important;
+        box-shadow: none !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        width: 100% !important;
+        max-width: 100% !important;
+      }
+      @page {
+        size: A4 portrait;
+        margin: 10mm 14mm 10mm 14mm;
+      }
+    }
+    
+    .rubric-table th, .rubric-table td {
+      border: 1px solid #cbd5e1;
+    }
+  </style>
+</head>
+<body class="p-4 md:p-8">
+
+  <div class="max-w-5xl mx-auto space-y-8">
+
+    <!-- ส่วนที่ 1: ชื่อเรื่องและส่วนหัว (หน้าเว็บแสดง / เวลาพิมพ์จะซ่อน) -->
+    <header class="bg-gradient-to-r from-blue-700 via-indigo-700 to-sky-600 text-white rounded-2xl p-6 md:p-8 shadow-lg">
+      <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+        <div>
+          <span class="inline-block bg-blue-500/40 text-blue-100 text-xs md:text-sm font-medium px-3 py-1 rounded-full mb-3 backdrop-blur-sm border border-blue-300/30">
+            คณิตศาสตร์พื้นฐาน ม.1 | สาระที่ 1 จำนวนและพีชคณิต (ค 1.3 ม.1/1)
+          </span>
+          <h1 class="text-2xl md:text-4xl font-bold tracking-tight">เรื่อง “สมการเชิงเส้นตัวแปรเดียว”</h1>
+          <p class="text-blue-100 mt-2 text-base md:text-lg font-light">
+            เรื่องที่ 5: สมการกับสถานการณ์จริง (การประยุกต์และแก้โจทย์ปัญหา)
+          </p>
+        </div>
+        <div class="bg-white/10 p-3 rounded-xl backdrop-blur-md border border-white/20 text-xs md:text-sm text-right hidden md:block">
+          <div>วิเคราะห์ปัญหา & แปลงเป็นสมการ</div>
+          <div class="text-yellow-300 font-semibold mt-1">ระบบสร้างโจทย์พลวัต (Dynamic Generator)</div>
+        </div>
+      </div>
+    </header>
+
+    <!-- ส่วนที่ 2: สรุปเนื้อหาสำคัญ (หน้าเว็บแสดง / เวลาพิมพ์จะซ่อน) -->
+    <section class="bg-white rounded-2xl p-6 md:p-8 shadow-sm border border-slate-200">
+      <div class="border-b border-slate-100 pb-4 mb-6">
+        <h2 class="text-xl md:text-2xl font-bold text-slate-800 flex items-center gap-2">
+          <span class="w-2.5 h-6 bg-blue-600 rounded-full inline-block"></span>
+          สรุปขั้นตอนการแก้โจทย์ปัญหาสมการเชิงเส้นตัวแปรเดียว
+        </h2>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <!-- บล็อก 1 -->
+        <div class="bg-slate-50 p-5 rounded-xl border border-slate-200">
+          <h3 class="font-bold text-blue-900 text-lg mb-2 flex items-center gap-2">
+            <span class="w-6 h-6 rounded-full bg-blue-100 text-blue-700 inline-flex items-center justify-center text-xs font-bold">1</span>
+            การวิเคราะห์ข้อมูลและกำหนดตัวแปร
+          </h3>
+          <ul class="text-slate-700 text-sm space-y-1.5 list-disc list-inside">
+            <li><strong>อ่านและวิเคราะห์:</strong> แยกแยะสิ่งที่โจทย์กำหนดให้ กับสิ่งที่โจทย์ต้องการทราบ</li>
+            <li><strong>กำหนดตัวแปร:</strong> มักสมมุติให้สิ่งที่โจทย์ถามหาหรือสิ่งที่ไม่ทราบค่าแทนด้วยตัวแปร เช่น $x$ พร้อมระบุหน่วยให้ชัดเจน</li>
+            <li><strong>เขียนปริมาณอื่นในรูปตัวแปร:</strong> เชื่อมโยงข้อมูลที่เหลือให้อยู่ในรูปตัวแปรเดียวกัน เช่น สองเท่าของ $x$ คือ $2x$ หรือ มากกว่า $x$ อยู่ $5$ คือ $x + 5$</li>
+          </ul>
+        </div>
+
+        <!-- บล็อก 2 -->
+        <div class="bg-slate-50 p-5 rounded-xl border border-slate-200">
+          <h3 class="font-bold text-blue-900 text-lg mb-2 flex items-center gap-2">
+            <span class="w-6 h-6 rounded-full bg-blue-100 text-blue-700 inline-flex items-center justify-center text-xs font-bold">2</span>
+            การสร้างสมการจากความสัมพันธ์
+          </h3>
+          <p class="text-slate-700 leading-relaxed text-sm">
+            หาข้อความในโจทย์ที่บ่งบอกถึง <strong>"ความเท่ากัน"</strong> (คำว่า เท่ากับ, คิดเป็น, รวมเป็น, เท่ากัน) เพื่อตั้งเป็นสมการ:
+          </p>
+          <div class="mt-2 bg-white p-3 rounded-lg border border-slate-200 text-xs text-slate-700">
+            <strong>ตัวอย่าง:</strong> "ซื้อสมุด $3$ เล่ม เล่มละ $x$ บาท รวมกับปากกา $15$ บาท จ่ายเงินไป $75$ บาท"<br>
+            $\longrightarrow$ เขียนสมการได้คือ $3x + 15 = 75$
+          </div>
+        </div>
+
+        <!-- บล็อก 3 -->
+        <div class="bg-slate-50 p-5 rounded-xl border border-slate-200">
+          <h3 class="font-bold text-blue-900 text-lg mb-2 flex items-center gap-2">
+            <span class="w-6 h-6 rounded-full bg-blue-100 text-blue-700 inline-flex items-center justify-center text-xs font-bold">3</span>
+            การดำเนินการแก้สมการ
+          </h3>
+          <p class="text-slate-700 leading-relaxed text-sm">
+            ใช้สมบัติของการเท่ากันในการย้ายข้างและดำเนินการย้อนกลับตามลำดับเพื่อหาค่าของตัวแปร $x$ อย่างเป็นขั้นตอนและรัดกุม
+          </p>
+          <div class="mt-2 bg-indigo-50/70 p-3 rounded-lg border border-indigo-200/60 text-xs text-indigo-900 font-mono">
+            $3x + 15 = 75 \longrightarrow 3x = 60 \longrightarrow x = 20$
+          </div>
+        </div>
+
+        <!-- บล็อก 4 -->
+        <div class="bg-slate-50 p-5 rounded-xl border border-slate-200">
+          <h3 class="font-bold text-blue-900 text-lg mb-2 flex items-center gap-2">
+            <span class="w-6 h-6 rounded-full bg-blue-100 text-blue-700 inline-flex items-center justify-center text-xs font-bold">4</span>
+            การตรวจคำตอบและความสมเหตุสมผล
+          </h3>
+          <ul class="text-slate-700 text-xs space-y-1 bg-white p-3 rounded-lg border border-slate-200">
+            <li>• <strong>ตรวจกับเงื่อนไขโจทย์:</strong> นำคำตอบที่ได้ไปทดสอบกับข้อความจริงในโจทย์ (ไม่ใช่ตรวจกับสมการที่ตั้งไว้เพียงอย่างเดียว)</li>
+            <li>• <strong>พิจารณาความเป็นไปได้จริง:</strong> เช่น อายุ จำนวนคน หรือสิ่งของต้องเป็นจำนวนเต็มบวก ความยาวและราคาต้องไม่ติดลบ</li>
+            <li>• <strong>สรุปคำตอบ:</strong> ตอบคำถามให้ตรงประเด็นพร้อมระบุหน่วยให้ถูกต้องครบถ้วน</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- ส่วนที่ 3: สุ่มโจทย์ฝึกทักษะเดี่ยว (หน้าเว็บแสดง / พิมพ์ซ่อน) -->
+    <section class="bg-white rounded-2xl p-6 md:p-8 shadow-sm border border-slate-200 no-print">
+      <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-slate-100 pb-4 mb-6">
+        <div>
+          <h2 class="text-xl md:text-2xl font-bold text-slate-800 flex items-center gap-2">
+            <span class="w-2.5 h-6 bg-indigo-600 rounded-full inline-block"></span>
+            สุ่มโจทย์ฝึกทักษะ
+          </h2>
+          <p class="text-sm text-slate-500 mt-1">วิเคราะห์และแก้โจทย์ปัญหาสถานการณ์จริง พร้อมเฉลยทีละขั้นตอน</p>
+        </div>
+        <div class="flex items-center gap-2">
+          <button onclick="generateSinglePractice()" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-sm font-semibold transition-all shadow-sm flex items-center gap-2">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+            สุ่มโจทย์ใหม่
+          </button>
+          <button onclick="toggleSingleAnswer()" id="btn-toggle-answer" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-sm font-semibold transition-all border border-slate-300">
+            แสดงเฉลย
+          </button>
+        </div>
+      </div>
+
+      <div class="bg-gradient-to-br from-indigo-50/50 to-slate-50 p-6 rounded-xl border border-indigo-100 mb-6">
+        <div class="text-xs font-bold uppercase tracking-wider text-indigo-700 mb-1">โจทย์ฝึกทักษะ (สุ่มตัวเลขแบบพลวัต)</div>
+        <div id="practice-question" class="text-base md:text-lg font-medium text-slate-800 leading-relaxed">
+          กำลังสุ่มสร้างโจทย์...
+        </div>
+      </div>
+
+      <div id="practice-solution" class="hidden bg-emerald-50/80 border border-emerald-200 rounded-xl p-6 transition-all duration-300">
+        <div class="flex items-center gap-2 text-emerald-800 font-bold mb-3 text-sm md:text-base">
+          <svg class="w-5 h-5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+          วิธีทำทีละบรรทัด:
+        </div>
+        <div id="practice-steps" class="space-y-2 text-slate-700 font-mono text-sm md:text-base bg-white/80 p-4 rounded-lg border border-emerald-100">
+        </div>
+      </div>
+    </section>
+
+    <!-- ส่วนที่ 4: ใบงาน 5 ข้อ (เฉพาะส่วนนี้ที่จะพิมพ์ออกมา) -->
+    <section class="bg-white rounded-2xl p-6 md:p-8 shadow-sm border border-slate-200 worksheet-container">
+      
+      <!-- เมนูควบคุมบนหน้าเว็บ (ไม่ถูกพิมพ์) -->
+      <div class="no-print bg-slate-50 p-4 rounded-xl border border-slate-200 mb-8">
+        <div class="flex flex-wrap items-center justify-between gap-4">
+          <div>
+            <h2 class="text-lg font-bold text-slate-800">เครื่องมือสร้างและพิมพ์ใบงาน</h2>
+            <p class="text-xs text-slate-500">ระบบจะสั่งพิมพ์เฉพาะส่วนของใบงาน 5 ข้อนี้เท่านั้น (ไม่นำส่วนสรุปมาพิมพ์)</p>
+          </div>
+          <div class="flex flex-wrap items-center gap-2">
+            <button onclick="generateFiveQuestions()" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-semibold transition-all shadow-sm flex items-center gap-1.5">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+              สุ่มโจทย์ 5 ข้อ
+            </button>
+            <button onclick="printStudentWorksheet()" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-sm font-semibold transition-all shadow-sm flex items-center gap-1.5">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/></svg>
+              พิมพ์ใบงานสำหรับนักเรียน
+            </button>
+            <button onclick="printTeacherKey()" class="px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white rounded-lg text-sm font-semibold transition-all shadow-sm flex items-center gap-1.5">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+              พิมพ์เฉลยสำหรับครู
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ส่วนหัวใบงาน (พิมพ์ออกมาบนหัวกระดาษ A4) -->
+      <div class="border-b-2 border-slate-800 pb-3 mb-5">
+        <div class="text-center space-y-0.5">
+          <h2 class="text-xl font-bold tracking-tight text-slate-900">
+            ใบงานคณิตศาสตร์: สมการกับสถานการณ์จริง
+          </h2>
+          <p class="text-xs text-slate-600">กลุ่มสาระการเรียนรู้คณิตศาสตร์ ชั้นมัธยมศึกษาปีที่ 1</p>
+        </div>
+
+        <div class="grid grid-cols-12 gap-3 mt-4 text-sm">
+          <div class="col-span-12 sm:col-span-6 flex items-baseline">
+            <span class="font-semibold whitespace-nowrap mr-2">ชื่อ-นามสกุล:</span>
+            <span class="flex-1 border-b border-dotted border-slate-600 min-h-[20px]"></span>
+          </div>
+          <div class="col-span-6 sm:col-span-3 flex items-baseline">
+            <span class="font-semibold whitespace-nowrap mr-2">ชั้น ม.1 /:</span>
+            <span class="flex-1 border-b border-dotted border-slate-600 min-h-[20px]"></span>
+          </div>
+          <div class="col-span-6 sm:col-span-3 flex items-baseline">
+            <span class="font-semibold whitespace-nowrap mr-2">เลขที่:</span>
+            <span class="flex-1 border-b border-dotted border-slate-600 min-h-[20px]"></span>
+          </div>
+        </div>
+        
+        <div class="flex justify-between items-center mt-2.5 pt-2 border-t border-slate-200 text-xs text-slate-600">
+          <div><strong>คำชี้แจง:</strong> จงกำหนดตัวแปร สร้างสมการ แสดงวิธีแก้สมการ และสรุปคำตอบให้ตรงกับสถานการณ์</div>
+          <div class="font-bold border border-slate-400 px-2.5 py-0.5 rounded bg-slate-50 text-slate-800">
+            คะแนนเต็ม 10 คะแนน (ได้: .....)
+          </div>
+        </div>
+      </div>
+
+      <!-- สลับมุมมองหน้าจอ -->
+      <div class="no-print flex justify-end mb-4">
+        <span class="inline-flex rounded-md shadow-sm">
+          <button type="button" onclick="setViewMode(false)" id="tab-student" class="px-3 py-1.5 text-xs font-medium rounded-l-lg border border-slate-300 bg-blue-50 text-blue-700">
+            มุมมองแบบฝึกหัดนักเรียน
+          </button>
+          <button type="button" onclick="setViewMode(true)" id="tab-teacher" class="px-3 py-1.5 text-xs font-medium rounded-r-lg border border-l-0 border-slate-300 bg-white text-slate-600 hover:bg-slate-50">
+            มุมมองพร้อมเฉลย
+          </button>
+        </span>
+      </div>
+
+      <!-- รายการโจทย์ 5 ข้อ -->
+      <div id="worksheet-questions-list" class="space-y-4">
+      </div>
+    </section>
+
+    <!-- ส่วนที่ 5: เกณฑ์การประเมิน (หน้าเว็บแสดง / พิมพ์ซ่อน) -->
+    <section class="bg-white rounded-2xl p-6 md:p-8 shadow-sm border border-slate-200">
+      <div class="border-b border-slate-100 pb-4 mb-6">
+        <h2 class="text-xl md:text-2xl font-bold text-slate-800 flex items-center gap-2">
+          <span class="w-2.5 h-6 bg-slate-700 rounded-full inline-block"></span>
+          เกณฑ์การประเมินใบงาน (Rubric Score)
+        </h2>
+        <p class="text-sm text-slate-500 mt-1">เกณฑ์การให้คะแนนแบบแบ่ง 3 ระดับคุณภาพตามตัวชี้วัด</p>
+      </div>
+
+      <div class="overflow-x-auto">
+        <table class="w-full text-left text-sm rubric-table border-collapse">
+          <thead>
+            <tr class="bg-slate-100 text-slate-800 font-heading">
+              <th class="p-3.5 w-1/4">ประเด็นการประเมิน</th>
+              <th class="p-3.5 w-1/4 text-emerald-800 bg-emerald-50/50">ดีมาก (3 คะแนน)</th>
+              <th class="p-3.5 w-1/4 text-amber-800 bg-amber-50/50">ปานกลาง / พอใช้ (2 คะแนน)</th>
+              <th class="p-3.5 w-1/4 text-rose-800 bg-rose-50/50">ปรับปรุง (1 คะแนน)</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-slate-200 text-slate-700">
+            <tr>
+              <td class="p-3.5 font-semibold bg-slate-50/50">1. การวิเคราะห์ปัญหาและสร้างสมการ</td>
+              <td class="p-3.5">กำหนดตัวแปรและหน่วยชัดเจน แปลงความสัมพันธ์จากสถานการณ์เป็นสมการได้อย่างถูกต้องสมบูรณ์</td>
+              <td class="p-3.5">กำหนดตัวแปรได้ สร้างสมการถูกต้องเป็นส่วนใหญ่ แต่อาจมีข้อผิดพลาดทางสัมประสิทธิ์หรือค่าคงที่เล็กน้อย</td>
+              <td class="p-3.5">ไม่สามารถกำหนดตัวแปรหรือสร้างสมการที่ไม่สอดคล้องกับสถานการณ์</td>
+            </tr>
+            <tr>
+              <td class="p-3.5 font-semibold bg-slate-50/50">2. กระบวนการแก้สมการ</td>
+              <td class="p-3.5">แสดงลำดับขั้นตอนการแก้สมการทีละบรรทัดอย่างเป็นระเบียบ ถูกต้องตามหลักคณิตศาสตร์ทุกประการ</td>
+              <td class="p-3.5">ขั้นตอนการแก้สมการถูกต้องเป็นส่วนใหญ่ มีข้อผิดพลาดในการคำนวณตัวเลขบางจุด</td>
+              <td class="p-3.5">แก้สมการผิดหลักการ หรือเขียนเพียงคำตอบเดี่ยวโดยไม่มีขั้นตอนแสดงวิธีทำ</td>
+            </tr>
+            <tr>
+              <td class="p-3.5 font-semibold bg-slate-50/50">3. การสรุปคำตอบและความสมเหตุสมผล</td>
+              <td class="p-3.5">สรุปคำตอบตรงกับคำถามของโจทย์ ระบุหน่วยถูกต้องชัดเจน และมีความสมเหตุสมผลตามบริบทความเป็นจริง</td>
+              <td class="p-3.5">สรุปคำตอบถูกต้อง แต่ลืมระบุหน่วย หรือไม่ได้เชื่อมโยงกลับไปยังสิ่งที่โจทย์ถามหา</td>
+              <td class="p-3.5">สรุปคำตอบไม่ถูกต้อง หรือคำตอบไม่สมเหตุสมผลกับสถานการณ์จริง</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 mt-5 text-xs text-slate-600">
+        <div class="p-3 bg-slate-50 rounded-lg border border-slate-200">
+          <strong class="text-emerald-700 font-semibold">ระดับ 3 (ดีมาก):</strong> ได้คะแนนรวม 8–10 คะแนน (ร้อยละ 80 ขึ้นไป)
+        </div>
+        <div class="p-3 bg-slate-50 rounded-lg border border-slate-200">
+          <strong class="text-amber-700 font-semibold">ระดับ 2 (ปานกลาง):</strong> ได้คะแนนรวม 5–7 คะแนน (ร้อยละ 50–79)
+        </div>
+        <div class="p-3 bg-slate-50 rounded-lg border border-slate-200">
+          <strong class="text-rose-700 font-semibold">ระดับ 1 (ปรับปรุง):</strong> ได้คะแนนรวมต่ำกว่า 5 คะแนน (ต่ำกว่าร้อยละ 50)
+        </div>
+      </div>
+    </section>
+
+  </div>
+
+  <!-- Javascript: Dynamic Math Generator -->
+  <script>
+    function randInt(min, max, omitZero = false) {
+      let val = 0;
+      do {
+        val = Math.floor(Math.random() * (max - min + 1)) + min;
+      } while (omitZero && val === 0);
+      return val;
+    }
+
+    const NAMES = ["สมชาย", "กานดา", "วิภา", "ธนพล", "นารี", "อนันต์", "สุดา", "มานะ", "ปิติ", "ชูใจ"];
+    const ITEMS = [
+      { name: "สมุด", unit: "เล่ม" },
+      { name: "ปากกา", unit: "ด้าม" },
+      { name: "แฟ้มเอกสาร", unit: "อัน" },
+      { name: "แก้วน้ำ", unit: "ใบ" },
+      { name: "กล่องดินสอ", unit: "กล่อง" }
+    ];
+
+    function pickName() {
+      return NAMES[Math.floor(Math.random() * NAMES.length)];
+    }
+    function pickItem() {
+      return ITEMS[Math.floor(Math.random() * ITEMS.length)];
+    }
+
+    // ระบบสุ่มสถานการณ์พลวัต 6 รูปแบบตามหลักสูตร ม.1
+    const generators = [
+      // 1. สถานการณ์ซื้อขายสินค้า: ซื้อของ n ชิ้น ชิ้นละ x บาท รวมกับของอื่นราคาคงที่ เป็นเงินทั้งหมด T บาท
+      function genShopping() {
+        const person = pickName();
+        const item = pickItem();
+        const count = randInt(3, 7);
+        const pricePerUnit = randInt(12, 35);
+        const otherPrice = randInt(15, 60);
+        const total = count * pricePerUnit + otherPrice;
+
+        return {
+          question: `${person}ซื้อ${item.name}จำนวน ${count} ${item.unit} และซื้อขนมราคา ${otherPrice} บาท รวมเป็นเงินที่ต้องจ่ายทั้งหมด ${total} บาท จงหาว่า${item.name}ราคา${item.unit}ละกี่บาท`,
+          steps: [
+            `1) กำหนดตัวแปร: ให้ $x$ แทนราคาของ${item.name}ต่อหนึ่ง${item.unit} (บาท)`,
+            `2) วิเคราะห์ความสัมพันธ์: ซื้อ ${count} ${item.unit} คิดเป็นเงิน $${count}x$ บาท รวมกับขนม ${otherPrice} บาท`,
+            `3) สร้างสมการ: $${count}x + ${otherPrice} = ${total}$`,
+            `4) แก้สมการ: $${count}x = ${total} - ${otherPrice} \\longrightarrow ${count}x = ${total - otherPrice}$`,
+            `5) นำ $${count}$ หารทั้งสองข้าง: $x = \\frac{${total - otherPrice}}{${count}} \\longrightarrow x = ${pricePerUnit}$`,
+            `6) สรุปคำตอบ: ${item.name}ราคา${item.unit}ละ <strong>${pricePerUnit} บาท</strong>`
+          ]
+        };
+      },
+
+      // 2. สถานการณ์เกี่ยวกับอายุ: ปัจจุบัน A อายุมากกว่า/น้อยกว่า B และผลรวมอายุทั้งสองคนเท่ากับ T ปี
+      function genAgeProblem() {
+        const p1 = pickName();
+        let p2 = pickName();
+        while (p2 === p1) p2 = pickName();
+
+        const diff = randInt(3, 8);
+        const ageP2 = randInt(11, 16);
+        const ageP1 = ageP2 + diff;
+        const totalAge = ageP1 + ageP2;
+
+        return {
+          question: `ปัจจุบัน ${p1} มีอายุมากกว่า ${p2} อยู่ ${diff} ปี ถ้าผลรวมอายุของทั้งสองคนเท่ากับ ${totalAge} ปี จงหาว่าปัจจุบัน ${p2} มีอายุกี่ปี`,
+          steps: [
+            `1) กำหนดตัวแปร: ให้อายุของ ${p2} คือ $x$ ปี`,
+            `2) เขียนอายุของ ${p1} ในรูปตัวแปร: เนื่องจากมากกว่าอยู่ ${diff} ปี จะได้ว่า ${p1} มีอายุ $x + ${diff}$ ปี`,
+            `3) สร้างสมการจากผลรวมอายุ: $x + (x + ${diff}) = ${totalAge}$`,
+            `4) รวมพจน์และแก้สมการ: $2x + ${diff} = ${totalAge} \\longrightarrow 2x = ${totalAge} - ${diff} \\longrightarrow 2x = ${totalAge - diff}$`,
+            `5) หาค่า $x$: $x = \\frac{${totalAge - diff}}{2} \\longrightarrow x = ${ageP2}$`,
+            `6) สรุปคำตอบ: ปัจจุบัน ${p2} มีอายุ <strong>${ageP2} ปี</strong> (และ ${p1} มีอายุ ${ageP1} ปี)`
+          ]
+        };
+      },
+
+      // 3. สถานการณ์เกี่ยวกับจำนวนเต็มเรียงกัน: จำนวนเต็มสามจำนวนเรียงติดกัน มีผลบวกเท่ากับ S
+      function genConsecutiveNumbers() {
+        const startNum = randInt(12, 45);
+        const sumVal = 3 * startNum + 3; // n + (n+1) + (n+2) = 3n + 3
+
+        return {
+          question: `จำนวนเต็มบวกสามจำนวนเรียงติดกัน มีผลรวมเท่ากับ ${sumVal} จงหาจำนวนที่น้อยที่สุดในสามจำนวนนี้`,
+          steps: [
+            `1) กำหนดตัวแปร: ให้ $x$ แทนจำนวนเต็มบวกที่น้อยที่สุด`,
+            `2) จำนวนอีกสองจำนวนที่เรียงติดกัน คือ $x + 1$ และ $x + 2$`,
+            `3) สร้างสมการจากผลรวม: $x + (x + 1) + (x + 2) = ${sumVal}$`,
+            `4) รวมพจน์คล้าย: $3x + 3 = ${sumVal}$`,
+            `5) แก้สมการ: $3x = ${sumVal} - 3 \\longrightarrow 3x = ${sumVal - 3} \\longrightarrow x = ${startNum}$`,
+            `6) สรุปคำตอบ: จำนวนที่น้อยที่สุด คือ <strong>${startNum}</strong> (ทั้งสามจำนวนคือ ${startNum}, ${startNum + 1}, ${startNum + 2})`
+          ]
+        };
+      },
+
+      // 4. สถานการณ์เรขาคณิต: ความยาวรอบรูปสี่เหลี่ยมผืนผ้า ด้านยาวยาวกว่าด้านกว้าง d ซม.
+      function genPerimeter() {
+        const width = randInt(6, 18);
+        const diff = randInt(3, 9);
+        const length = width + diff;
+        const perimeter = 2 * (length + width);
+
+        return {
+          question: `รูปสี่เหลี่ยมผืนผ้ารูปหนึ่ง มีด้านยาวยาวกว่าด้านกว้างอยู่ ${diff} เซนติเมตร ถ้าความยาวรอบรูปเท่ากับ ${perimeter} เซนติเมตร จงหาความกว้างของรูปสี่เหลี่ยมนี้`,
+          steps: [
+            `1) กำหนดตัวแปร: ให้ด้านกว้างของสี่เหลี่ยมผืนผ้ายาว $x$ เซนติเมตร`,
+            `2) ด้านยาวยาวกว่าด้านกว้าง ${diff} ซม. จะได้ด้านยาวยาว $x + ${diff}$ เซนติเมตร`,
+            `3) สูตรความยาวรอบรูป: $2 \\times (ด้านกว้าง + ด้านยาว) = ${perimeter}$`,
+            `4) สร้างสมการ: $2[x + (x + ${diff})] = ${perimeter} \\longrightarrow 2(2x + ${diff}) = ${perimeter}$`,
+            `5) แก้สมการ: $4x + ${2 * diff} = ${perimeter} \\longrightarrow 4x = ${perimeter - 2 * diff} \\longrightarrow x = ${width}$`,
+            `6) สรุปคำตอบ: ความกว้างของรูปสี่เหลี่ยมผืนผ้าเท่ากับ <strong>${width} เซนติเมตร</strong>`
+          ]
+        };
+      },
+
+      // 5. สถานการณ์การสะสมเงิน / เหรียญ: มีเงินอยู่เดิม n บาท หยอดกระปุกทุกวัน วันละ x บาท รวม t วัน มีเงินทั้งหมด T บาท
+      function genSavingMoney() {
+        const person = pickName();
+        const initMoney = randInt(40, 150);
+        const days = randInt(5, 14);
+        const dailySave = randInt(15, 30);
+        const totalMoney = initMoney + days * dailySave;
+
+        return {
+          question: `${person}มีเงินเก็บเดิมอยู่ ${initMoney} บาท และเริ่มหยอดกระปุกออมสินทุกวัน วันละเท่า ๆ กัน เป็นเวลา ${days} วัน เมื่อเปิดดูพบว่ามีเงินรวมทั้งหมด ${totalMoney} บาท จงหาว่า${person}หยอดกระปุกวันละกี่บาท`,
+          steps: [
+            `1) กำหนดตัวแปร: ให้ $x$ แทนจำนวนเงินที่${person}หยอดกระปุกต่อวัน (บาท)`,
+            `2) ระยะเวลา ${days} วัน จะมีเงินออมเพิ่มขึ้น $${days}x$ บาท`,
+            `3) สร้างสมการเงินรวม: $${initMoney} + ${days}x = ${totalMoney}$`,
+            `4) แก้สมการ: $${days}x = ${totalMoney} - ${initMoney} \\longrightarrow ${days}x = ${totalMoney - initMoney}$`,
+            `5) นำ $${days}$ หารทั้งสองข้าง: $x = \\frac{${totalMoney - initMoney}}{${days}} \\longrightarrow x = ${dailySave}$`,
+            `6) สรุปคำตอบ: ${person}หยอดกระปุกออมสินวันละ <strong>${dailySave} บาท</strong>`
+          ]
+        };
+      },
+
+      // 6. สถานการณ์การแบ่งสิ่งของ / เศษส่วน: แบ่งขนม/เงิน ให้ผู้อื่นไปเศษส่วนหนึ่ง แล้วเหลืออยู่ k ชิ้น/บาท
+      function genFractionSharing() {
+        const person = pickName();
+        const denom = randInt(3, 5); // 3, 4, 5
+        const ansTotal = randInt(4, 10) * denom; // ให้จำนวนเต็มลงตัว
+        const givenPart = ansTotal / denom; // แบ่งไป 1/denom
+        const remain = ansTotal - givenPart;
+
+        return {
+          question: `${person}มีส้มอยู่จำนวนหนึ่ง ได้แบ่งให้เพื่อนไป $\\frac{1}{${denom}}$ ของจำนวนส้มทั้งหมด ปรากฏว่ายังเหลือส้มอยู่อีก ${remain} ผล จงหาว่าเดิม${person}มีส้มทั้งหมดกี่ผล`,
+          steps: [
+            `1) กำหนดตัวแปร: ให้ $x$ แทนจำนวนส้มเดิมทั้งหมดที่${person}มี (ผล)`,
+            `2) แบ่งให้เพื่อนไป $\\frac{1}{${denom}}x$ ผล`,
+            `3) จำนวนส้มที่เหลืออยู่คือ: $x - \\frac{1}{${denom}}x = \\frac{${denom - 1}}{${denom}}x$ ผล`,
+            `4) สร้างสมการ: $\\frac{${denom - 1}}{${denom}}x = ${remain}$`,
+            `5) นำ $${denom}$ มาคูณทั้งสองข้าง: $${denom - 1}x = ${remain} \\times ${denom} \\longrightarrow ${denom - 1}x = ${remain * denom}$`,
+            `6) แก้หาค่า $x$: $x = \\frac{${remain * denom}}{${denom - 1}} \\longrightarrow x = ${ansTotal}$`,
+            `7) สรุปคำตอบ: เดิม${person}มีส้มทั้งหมด <strong>${ansTotal} ผล</strong>`
+          ]
+        };
+      }
+    ];
+
+    let currentSingleQuestion = null;
+    let singleAnswerVisible = false;
+    let currentWorksheetQuestions = [];
+    let showTeacherSolutions = false;
+
+    function generateSinglePractice() {
+      const gen = generators[Math.floor(Math.random() * generators.length)];
+      currentSingleQuestion = gen();
+      
+      document.getElementById("practice-question").innerHTML = currentSingleQuestion.question;
+      
+      const stepsContainer = document.getElementById("practice-steps");
+      stepsContainer.innerHTML = currentSingleQuestion.steps.map(step => `<div class="py-0.5">${step}</div>`).join("");
+      
+      singleAnswerVisible = false;
+      document.getElementById("practice-solution").classList.add("hidden");
+      document.getElementById("btn-toggle-answer").innerText = "แสดงเฉลย";
+      
+      triggerMathJax();
+    }
+
+    function toggleSingleAnswer() {
+      singleAnswerVisible = !singleAnswerVisible;
+      const sol = document.getElementById("practice-solution");
+      const btn = document.getElementById("btn-toggle-answer");
+      
+      if (singleAnswerVisible) {
+        sol.classList.remove("hidden");
+        btn.innerText = "ซ่อนเฉลย";
+        triggerMathJax();
+      } else {
+        sol.classList.add("hidden");
+        btn.innerText = "แสดงเฉลย";
+      }
+    }
+
+    function generateFiveQuestions() {
+      const shuffledGens = [...generators].sort(() => 0.5 - Math.random()).slice(0, 5);
+      currentWorksheetQuestions = shuffledGens.map(fn => fn());
+      renderWorksheet();
+    }
+
+    function setViewMode(isTeacher) {
+      showTeacherSolutions = isTeacher;
+      const tabStudent = document.getElementById("tab-student");
+      const tabTeacher = document.getElementById("tab-teacher");
+      
+      if (isTeacher) {
+        tabTeacher.className = "px-3 py-1.5 text-xs font-medium rounded-r-lg border border-l-0 border-slate-300 bg-amber-50 text-amber-800";
+        tabStudent.className = "px-3 py-1.5 text-xs font-medium rounded-l-lg border border-slate-300 bg-white text-slate-600 hover:bg-slate-50";
+      } else {
+        tabStudent.className = "px-3 py-1.5 text-xs font-medium rounded-l-lg border border-slate-300 bg-blue-50 text-blue-700";
+        tabTeacher.className = "px-3 py-1.5 text-xs font-medium rounded-r-lg border border-l-0 border-slate-300 bg-white text-slate-600 hover:bg-slate-50";
+      }
+      renderWorksheet();
+    }
+
+    function renderWorksheet() {
+      const listEl = document.getElementById("worksheet-questions-list");
+      listEl.innerHTML = "";
+
+      currentWorksheetQuestions.forEach((qData, idx) => {
+        const qNum = idx + 1;
+        const itemDiv = document.createElement("div");
+        itemDiv.className = "p-3 bg-slate-50/60 rounded-xl border border-slate-200";
+
+        let html = `
+          <div class="font-bold text-slate-900 text-sm mb-2 flex items-start gap-2">
+            <span class="text-blue-700 font-heading whitespace-nowrap">ข้อที่ ${qNum}.</span>
+            <div class="flex-1 leading-relaxed">${qData.question}</div>
+            <span class="text-xs font-normal text-slate-500 whitespace-nowrap">(2 คะแนน)</span>
+          </div>
+        `;
+
+        if (showTeacherSolutions) {
+          html += `
+            <div class="bg-amber-50/80 border border-amber-200 rounded-lg p-2.5 text-xs text-slate-800">
+              <div class="font-bold text-amber-900 mb-1 flex items-center gap-1.5 text-xs uppercase tracking-wider">
+                <span class="w-1.5 h-1.5 rounded-full bg-amber-600"></span> แนวคิดและวิธีทำทีละบรรทัด:
+              </div>
+              <div class="space-y-1 pl-3 font-mono text-xs">
+                ${qData.steps.map(s => `<div>${s}</div>`).join("")}
+              </div>
+            </div>
+          `;
+        } else {
+          html += `
+            <div class="mt-1 text-xs text-slate-700 space-y-2.5">
+              <div class="flex items-baseline gap-2">
+                <span class="font-semibold text-slate-800 whitespace-nowrap flex-shrink-0">วิธีทำ:</span>
+                <div class="flex-1 border-b border-dotted border-slate-400 min-h-[22px]"></div>
+              </div>
+              <div class="border-b border-dotted border-slate-400 min-h-[22px] ml-12"></div>
+              <div class="border-b border-dotted border-slate-400 min-h-[22px] ml-12"></div>
+              <div class="flex items-baseline gap-2 pt-0.5">
+                <span class="font-semibold text-slate-800 whitespace-nowrap flex-shrink-0">ตอบ:</span>
+                <div class="flex-1 border-b border-dotted border-slate-400 min-h-[22px]"></div>
+              </div>
+            </div>
+          `;
+        }
+
+        itemDiv.innerHTML = html;
+        listEl.appendChild(itemDiv);
+      });
+
+      triggerMathJax();
+    }
+
+    function printStudentWorksheet() {
+      setViewMode(false);
+      setTimeout(() => {
+        window.print();
+      }, 300);
+    }
+
+    function printTeacherKey() {
+      setViewMode(true);
+      setTimeout(() => {
+        window.print();
+      }, 300);
+    }
+
+    function triggerMathJax() {
+      if (window.MathJax && window.MathJax.typesetPromise) {
+        window.MathJax.typesetPromise();
+      }
+    }
+
+    window.addEventListener("DOMContentLoaded", () => {
+      generateSinglePractice();
+      generateFiveQuestions();
+    });
+  </script>
+</body>
+</html>
