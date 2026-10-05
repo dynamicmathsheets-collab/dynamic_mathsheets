@@ -1,0 +1,919 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>สื่อการเรียนรู้อินเทอร์แอกทีฟ: การแยกตัวประกอบและการทำตัวส่วนร่วมเพื่อหาลิมิต</title>
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- KaTeX CSS & JS พร้อม Auto-render Extension -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js"></script>
+  
+  <!-- Google Fonts: Sarabun & Chakra Petch -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;700&family=Sarabun:ital,wght@0,300;0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
+
+  <style>
+    body {
+      font-family: 'Sarabun', sans-serif;
+      background-color: #f8fafc;
+      color: #1e293b;
+      overflow-x: hidden;
+    }
+    .heading-font {
+      font-family: 'Chakra Petch', sans-serif;
+    }
+
+    /* เส้นประสำหรับเขียนตอบของนักเรียน */
+    .dotted-line {
+      border-bottom: 1.5px dotted #94a3b8;
+      height: 25px;
+      width: 100%;
+    }
+
+    /* ==========================================
+       Print Stylesheet: ตัดหน้าเปล่าและล็อกบล็อกข้อ
+       ========================================== */
+    @media print {
+      @page {
+        size: A4 portrait;
+        margin: 1cm 1.2cm;
+      }
+      
+      #main-app-container,
+      header,
+      section,
+      nav,
+      footer,
+      .no-print {
+        display: none !important;
+      }
+
+      #print-area {
+        display: block !important;
+        position: static !important;
+        width: 100% !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        background: white !important;
+        color: black !important;
+      }
+
+      .print-item {
+        break-inside: avoid !important;
+        page-break-inside: avoid !important;
+        margin-bottom: 0.9rem !important;
+      }
+    }
+  </style>
+</head>
+<body class="p-3 sm:p-6 md:p-8">
+
+  <!-- MAIN APP CONTAINER -->
+  <div id="main-app-container" class="max-w-4xl mx-auto space-y-8">
+
+    <!-- ส่วนที่ 1: ส่วนหัวเรื่อง -->
+    <header class="bg-gradient-to-r from-emerald-800 via-teal-700 to-sky-700 text-white rounded-2xl p-6 sm:p-8 shadow-lg">
+      <div class="inline-block px-3 py-1 bg-white/20 backdrop-blur rounded-full text-xs font-semibold tracking-wider uppercase mb-3">
+        คณิตศาสตร์เพิ่มเติม ม.6 • แคลคูลัสเบื้องต้น
+      </div>
+      <h1 class="text-2xl sm:text-4xl font-bold heading-font tracking-wide">
+        เรื่องที่ 5: การแยกตัวประกอบและการทำตัวส่วนร่วมเพื่อหาลิมิต
+      </h1>
+      <p class="mt-2 text-teal-100 text-sm sm:text-base leading-relaxed">
+        เมื่อการแทนค่าให้ผลลัพธ์ในรูป $\frac{0}{0}$ การจัดรูปพีชคณิตด้วย "การแยกตัวประกอบ" และ "การทำเศษส่วนให้มีตัวส่วนร่วม (หา ค.ร.น.)" จะช่วยกำจัดตัวหารร่วมที่ทำให้ส่วนเป็นศูนย์ออกไปได้อย่างหมดจด
+      </p>
+    </header>
+
+    <!-- ส่วนที่ 2: สรุปมโนทัศน์สำคัญ -->
+    <section class="bg-white rounded-2xl p-6 shadow-sm border border-slate-200">
+      <h2 class="text-xl font-bold text-slate-800 flex items-center gap-2 mb-4 heading-font">
+        <span class="w-3 h-3 rounded-full bg-emerald-600"></span>
+        ยุทธวิธีทางพีชคณิตในการขจัดรูปแบบ $\frac{0}{0}$
+      </h2>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+        <div class="bg-emerald-50/60 p-4 rounded-xl border border-emerald-200">
+          <h3 class="font-bold text-emerald-950 mb-1 flex items-center gap-1.5">
+            <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+            1. เทคนิคการแยกตัวประกอบ (Factoring Technique)
+          </h3>
+          <p class="text-slate-600 mb-2 leading-relaxed">
+            เหมาะสำหรับพหุนามดีกรีสองหรือสาม โดยใช้สูตรผลต่างกำลังสอง $a^2 - b^2 = (a-b)(a+b)$ หรือการแยกตัวประกอบสองวงเล็บเพื่อดึง $(x - a)$ ออกมาตัดทอน
+          </p>
+          <div class="text-center font-semibold text-emerald-800 text-xs py-1.5 bg-white rounded-lg border border-emerald-100">
+            $$\lim_{x \to a} \frac{P(x)}{Q(x)} = \lim_{x \to a} \frac{(x - a)M(x)}{(x - a)N(x)} = \lim_{x \to a} \frac{M(x)}{N(x)}$$
+          </div>
+        </div>
+        <div class="bg-teal-50/60 p-4 rounded-xl border border-teal-200">
+          <h3 class="font-bold text-teal-950 mb-1 flex items-center gap-1.5">
+            <span class="w-2 h-2 rounded-full bg-teal-500"></span>
+            2. เทคนิคการทำตัวส่วนร่วม (Common Denominator)
+          </h3>
+          <p class="text-slate-600 mb-2 leading-relaxed">
+            เหมาะสำหรับเศษส่วนซ้อน (Complex Fractions) โดยหา ค.ร.น. ของตัวส่วนย่อย รวมพจน์ตัวเศษให้เป็นก้อนเดียว แล้วดึงตัวร่วมเพื่อทอนตัวส่วนหลักที่ทำให้เกิดศูนย์
+          </p>
+          <div class="text-center font-semibold text-teal-800 text-xs py-1.5 bg-white rounded-lg border border-teal-100">
+            $$\frac{\frac{1}{x} - \frac{1}{a}}{x - a} = \frac{\frac{a - x}{ax}}{x - a} = \frac{-(x - a)}{ax(x - a)} = -\frac{1}{ax}$$
+          </div>
+        </div>
+      </div>
+      <div class="mt-4 p-3 bg-sky-50 rounded-xl border border-sky-200 text-xs sm:text-sm text-sky-900 flex items-start gap-2">
+        <span class="font-bold text-base">💡 กฎหัวใจสำคัญ:</span>
+        <div>การตัดทอนพจน์ $(x - a)$ ในการหาลิมิตสามารถทำได้อย่างถูกต้องตามหลักคณิตศาสตร์ เพราะแนวคิดของลิมิตคือ $x \to a$ หมายถึง $x$ เข้าใกล้ $a$ แต่ <strong>$x \neq a$ จึงทำให้ $x - a \neq 0$</strong> สามารถนำมาหารทั้งเศษและส่วนได้เสมอ</div>
+      </div>
+    </section>
+
+    <!-- ส่วนที่ 3: สื่ออินเทอร์แอกทีฟ ห้องทดลองจัดรูปพีชคณิตทีละขั้น -->
+    <section class="bg-white rounded-2xl p-6 shadow-sm border border-slate-200">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4">
+        <div>
+          <h2 class="text-xl font-bold text-slate-800 flex items-center gap-2 heading-font">
+            <span class="w-3 h-3 rounded-full bg-teal-600"></span>
+            ห้องทดลองอินเทอร์แอกทีฟ: ประกอบกระบวนการจัดรูปพีชคณิต
+          </h2>
+          <p class="text-xs sm:text-sm text-slate-500">ทดลองคลิกแปลงรูปนิพจน์ทีละขั้นตอน เพื่อสังเกตการเปลี่ยนผ่านจากรูป $\frac{0}{0}$ ไปสู่รูปที่แทนค่าได้</p>
+        </div>
+        <div class="bg-slate-100 px-3 py-1.5 rounded-lg text-xs font-mono text-slate-700">
+          โหมด: <strong class="text-teal-700" id="labModeBadge">การแยกตัวประกอบ</strong>
+        </div>
+      </div>
+
+      <!-- แถบเลือกโจทย์สำหรับทดลองจัดรูป 4 รูปแบบ -->
+      <div class="mb-4">
+        <label class="block text-xs font-bold text-slate-600 mb-1.5">เลือกรูปแบบนิพจน์เพื่อทดลองจัดรูป:</label>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2">
+          <button onclick="selectTransformLab(0)" id="tBtn0" class="t-btn p-2 rounded-lg border text-left text-xs transition bg-emerald-50 border-emerald-500 text-emerald-950 font-semibold shadow-xs">
+            1. $\frac{x^2 - 16}{x - 4}$ ($x \to 4$)<br><span class="text-[10px] text-slate-500 font-normal">ผลต่างกำลังสอง</span>
+          </button>
+          <button onclick="selectTransformLab(1)" id="tBtn1" class="t-btn p-2 rounded-lg border border-slate-200 text-left text-xs transition hover:bg-slate-50 text-slate-700 font-medium">
+            2. $\frac{x^2 - 2x - 8}{x - 4}$ ($x \to 4$)<br><span class="text-[10px] text-slate-500 font-normal">แยกสองวงเล็บ</span>
+          </button>
+          <button onclick="selectTransformLab(2)" id="tBtn2" class="t-btn p-2 rounded-lg border border-slate-200 text-left text-xs transition hover:bg-slate-50 text-slate-700 font-medium">
+            3. $\frac{\frac{1}{x} - \frac{1}{3}}{x - 3}$ ($x \to 3$)<br><span class="text-[10px] text-slate-500 font-normal">เศษส่วนซ้อน (ทำส่วนร่วม)</span>
+          </button>
+          <button onclick="selectTransformLab(3)" id="tBtn3" class="t-btn p-2 rounded-lg border border-slate-200 text-left text-xs transition hover:bg-slate-50 text-slate-700 font-medium">
+            4. $\frac{\frac{1}{x+2} - \frac{1}{2}}{x}$ ($x \to 0$)<br><span class="text-[10px] text-slate-500 font-normal">เศษส่วนซ้อน (ส่วนร่วม ค.ร.น.)</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Canvas Plot เปรียบเทียบกราฟเส้นจริงกับจุดรูโหว่ -->
+      <div class="relative bg-slate-950 rounded-xl overflow-hidden shadow-inner aspect-[16/8] w-full max-h-[290px]">
+        <canvas id="transformCanvas" class="w-full h-full block"></canvas>
+      </div>
+
+      <!-- บล็อกโต้ตอบ: ปุ่มกดแปลงรูปพีชคณิตทีละขั้น -->
+      <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-3 mt-4">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+          <div class="text-xs font-bold text-slate-700">ลำดับการดำเนินการจัดรูปทีละขั้น:</div>
+          <div class="flex gap-2">
+            <button onclick="resetLabStep()" class="px-2.5 py-1 bg-white hover:bg-slate-100 rounded border border-slate-300 text-xs font-semibold text-slate-600">
+              ⟲ เริ่มต้นใหม่
+            </button>
+            <button id="nextStepBtn" onclick="advanceLabStep()" class="px-3.5 py-1 bg-emerald-700 hover:bg-emerald-800 text-white rounded text-xs font-semibold shadow-xs">
+              ⚡ ดำเนินการขั้นถัดไป
+            </button>
+          </div>
+        </div>
+
+        <!-- หน้าต่างแสดงวิวัฒนาการของนิพจน์ -->
+        <div class="p-4 bg-white rounded-lg border border-slate-300 flex flex-col items-center justify-center min-h-[90px]">
+          <div class="text-xs text-slate-400 mb-1 font-semibold" id="stepStatusLabel">สถานะ: รูปเดิมก่อนจัดรูป (แทนค่าแล้วได้ 0/0)</div>
+          <div class="text-lg sm:text-xl font-bold text-slate-900" id="currentExprMath">
+            <!-- KaTeX Math expression updated here -->
+          </div>
+        </div>
+
+        <!-- คำอธิบายสิ่งที่เกิดขึ้นในขั้นนั้น -->
+        <div class="text-xs text-slate-600 bg-emerald-50/70 p-2.5 rounded-lg border border-emerald-200 leading-relaxed" id="stepExplanation">
+          <!-- Step explanation text -->
+        </div>
+      </div>
+    </section>
+
+    <!-- ส่วนที่ 4: โจทย์สุ่มฝึกคิด พร้อมเฉลยทีละขั้นตอน -->
+    <section class="bg-white rounded-2xl p-6 shadow-sm border border-slate-200">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-5">
+        <div>
+          <h2 class="text-xl font-bold text-slate-800 flex items-center gap-2 heading-font">
+            <span class="w-3 h-3 rounded-full bg-purple-600"></span>
+            โจทย์สุ่มฝึกคิด: การจัดรูปแยกตัวประกอบและทำตัวส่วนร่วม
+          </h2>
+          <p class="text-xs sm:text-sm text-slate-500">สุ่มโจทย์แบบพลวัต พร้อมแสดงขั้นตอนการแยกตัวประกอบ/การคูณ ค.ร.น. และตัดทอนทีละบรรทัด</p>
+        </div>
+        <div class="flex gap-2">
+          <button onclick="generateSingleExercise()" class="px-3.5 py-1.5 bg-purple-600 hover:bg-purple-700 text-white rounded-lg text-sm font-medium shadow-sm transition">
+            ⟳ สุ่มโจทย์ใหม่
+          </button>
+          <button id="btnRevealNext" onclick="revealNextStep()" class="px-3.5 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-sm font-medium shadow-sm transition">
+            ↓ แสดงเฉลยบรรทัดถัดไป
+          </button>
+        </div>
+      </div>
+
+      <div class="bg-purple-50/40 p-5 rounded-xl border border-purple-100">
+        <div class="text-xs font-semibold text-purple-700 uppercase tracking-wider mb-2" id="exTypeBadge">
+          รูปแบบ: กำลังโหลด...
+        </div>
+        <div class="text-lg sm:text-xl font-semibold text-slate-900 mb-4 flex items-center gap-2 flex-wrap" id="exQuestion"></div>
+
+        <div class="border-t border-purple-200/60 pt-4">
+          <div class="text-xs font-bold text-slate-500 mb-2">ขั้นตอนการจัดรูปและวิธีทำอย่างเป็นระบบ:</div>
+          <div id="exStepList" class="space-y-2.5"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ส่วนที่ 5: ระบบสร้างและพิมพ์ใบงาน 5 ข้อ -->
+    <section class="bg-white rounded-2xl p-6 shadow-sm border border-slate-200">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
+        <div>
+          <h2 class="text-xl font-bold text-slate-800 flex items-center gap-2 heading-font">
+            <span class="w-3 h-3 rounded-full bg-teal-600"></span>
+            ระบบใบงาน 5 ข้อ (Worksheet Generator)
+          </h2>
+          <p class="text-xs sm:text-sm text-slate-500">สุ่มชุดข้อสอบใหม่ พิมพ์เฉพาะใบงานนักเรียน (มีเส้นบรรทัด) หรือพิมพ์ฉบับเฉลยละเอียดสำหรับครู</p>
+        </div>
+        <div class="flex flex-wrap gap-2">
+          <button onclick="generateFiveQuestions()" class="px-3 py-1.5 bg-slate-800 hover:bg-black text-white rounded-lg text-xs font-semibold">
+            ⟳ สุ่มชุด 5 ข้อใหม่
+          </button>
+          <button onclick="printWorksheet(false)" class="px-3 py-1.5 bg-teal-600 hover:bg-teal-700 text-white rounded-lg text-xs font-semibold flex items-center gap-1">
+            🖨 พิมพ์ใบงานนักเรียน
+          </button>
+          <button onclick="printWorksheet(true)" class="px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-xs font-semibold flex items-center gap-1">
+            📑 พิมพ์เฉลยสำหรับครู
+          </button>
+        </div>
+      </div>
+
+      <!-- Preview ในหน้าจอ (นักเรียนเห็นแต่โจทย์และเส้นบรรทัดสำหรับฝึกทำ) -->
+      <div class="border border-slate-200 rounded-xl p-4 bg-slate-50/50">
+        <div class="text-xs font-bold text-slate-600 mb-3 flex items-center justify-between">
+          <span>พรีวิวใบงานสำหรับฝึกทำ (ชุดปัจจุบัน):</span>
+          <span class="text-teal-700 bg-teal-50 px-2 py-0.5 rounded border border-teal-200">โหมดซ่อนเฉลย (พร้อมฝึกเขียน)</span>
+        </div>
+        
+        <div id="worksheetPreview" class="space-y-4"></div>
+      </div>
+    </section>
+
+    <!-- ส่วนที่ 6: เกณฑ์การให้คะแนน (Scoring Rubric) -->
+    <section class="bg-white rounded-2xl p-6 shadow-sm border border-slate-200">
+      <h2 class="text-xl font-bold text-slate-800 flex items-center gap-2 mb-3 heading-font">
+        <span class="w-3 h-3 rounded-full bg-amber-500"></span>
+        เกณฑ์การประเมินการตรวจใบงาน (Scoring Rubric 3 ระดับ)
+      </h2>
+      <p class="text-xs sm:text-sm text-slate-500 mb-4">เกณฑ์การตรวจให้คะแนนตามมาตรฐานการวัดผลทางคณิตศาสตร์ เรื่อง การแยกตัวประกอบและทำตัวส่วนร่วม (ข้อละ 2 คะแนน รวม 10 คะแนน)</p>
+
+      <div class="overflow-x-auto">
+        <table class="w-full text-left text-xs sm:text-sm border-collapse">
+          <thead>
+            <tr class="bg-slate-100 text-slate-700 border-b border-slate-200">
+              <th class="p-3 font-bold w-1/4">ประเด็นการประเมิน</th>
+              <th class="p-3 font-bold text-emerald-800 bg-emerald-50/50">ดีมาก (2 คะแนน)</th>
+              <th class="p-3 font-bold text-blue-800 bg-blue-50/50">ปานกลาง (1 คะแนน)</th>
+              <th class="p-3 font-bold text-rose-800 bg-rose-50/50">ปรับปรุง (0 คะแนน)</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-slate-200 text-slate-600">
+            <tr>
+              <td class="p-3 font-semibold text-slate-800">1. การวิเคราะห์รูป $\frac{0}{0}$ และการเลือกวิธีจัดรูป</td>
+              <td class="p-3">ตรวจสอบการแทนค่าพบรูป $\frac{0}{0}$ ชัดเจน และเลือกใช้การแยกตัวประกอบหรือทำส่วนร่วมได้อย่างถูกต้องเหมาะสมกับรูปโจทย์</td>
+              <td class="p-3">ทราบว่าต้องจัดรูป แต่ไม่แสดงการตรวจรูป $\frac{0}{0}$ หรือเลือกวิธีจัดรูปยังไม่คล่องตัวนัก</td>
+              <td class="p-3">ไม่ตรวจสอบรูป $\frac{0}{0}$ หรือใช้วิธีจัดรูปผิดหลักการอย่างสิ้นเชิง</td>
+            </tr>
+            <tr>
+              <td class="p-3 font-semibold text-slate-800">2. ความถูกต้องของการจัดรูปพีชคณิต / หา ค.ร.น.</td>
+              <td class="p-3">แยกตัวประกอบได้ถูกต้องครบถ้วน หรือรวมเศษส่วนย่อยด้วย ค.ร.น. และทอนพจน์ปัญหา $(x - a)$ ออกได้อย่างสมบูรณ์</td>
+              <td class="p-3">จัดรูปถูกต้องเป็นส่วนใหญ่ มีจุดผิดพลาดเล็กน้อยในเครื่องหมายหรือการคูณกระจายตัวเลข</td>
+              <td class="p-3">แยกตัวประกอบผิดพลาดจนทอนพจน์ไม่ได้ หรือรวมเศษส่วนซ้อนผิดหลักการ</td>
+            </tr>
+            <tr>
+              <td class="p-3 font-semibold text-slate-800">3. การแทนค่าและการสรุปคำตอบสุดท้าย</td>
+              <td class="p-3">เขียนสัญลักษณ์ $\lim\limits_{x \to a}$ กำกับถูกต้องตลอดขั้นตอน แทนค่าในพจน์ที่ทอนแล้ว และสรุปคำตอบเป็นเศษส่วนอย่างต่ำถูกต้อง</td>
+              <td class="p-3">คำนวณถูกต้องเกือบทั้งหมด แต่ตกหล่นสัญลักษณ์ลิมิต หรือตอบในรูปเศษส่วนที่ยังไม่ได้ตัดทอนอย่างต่ำ</td>
+              <td class="p-3">ไม่สามารถหาคำตอบสุดท้ายได้ หรือคำตอบไม่สอดคล้องกับวิธีทำ</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+  </div>
+
+  <!-- แท่นพิมพ์ที่ซ่อนไว้ (แสดงเฉพาะเวลาสั่ง Print A4) -->
+  <div id="print-area" style="display: none;"></div>
+
+  <!-- SCRIPT LOGIC -->
+  <script>
+    function renderMathEverywhere(element) {
+      const target = element || document.body;
+      if (window.renderMathInElement) {
+        renderMathInElement(target, {
+          delimiters: [
+            {left: '$$', right: '$$', display: true},
+            {left: '\\[', right: '\\]', display: true},
+            {left: '\\(', right: '\\)', display: false},
+            {left: '$', right: '$', display: false}
+          ],
+          throwOnError: false
+        });
+      }
+    }
+
+    // -------------------------------------------------------------
+    // ฟังก์ชันโมเดลสำหรับห้องทดลองจัดรูปพีชคณิต (Transformation Lab)
+    // -------------------------------------------------------------
+    const transformLabs = [
+      {
+        title: 'ผลต่างกำลังสอง',
+        badge: 'การแยกตัวประกอบ',
+        targetA: 4,
+        minX: 1,
+        maxX: 7,
+        minY: 4,
+        maxY: 12,
+        evalSim: (x) => x + 4,
+        limitVal: 8,
+        stages: [
+          {
+            label: 'ขั้นที่ 0: รูปเดิมของฟังก์ชัน (เกิดรูป 0/0)',
+            math: `\\lim_{x \\to 4} \\frac{x^2 - 16}{x - 4}`,
+            desc: 'เมื่อแทนค่า $x = 4$ จะได้ $\\frac{4^2 - 16}{4 - 4} = \\frac{0}{0}$ เป็นรูปแบบยังไม่กำหนด สังเกตตัวเศษ $x^2 - 16$ อยู่ในรูปผลต่างกำลังสอง'
+          },
+          {
+            label: 'ขั้นที่ 1: แยกตัวประกอบตัวเศษด้วยสูตร a² - b²',
+            math: `\\lim_{x \\to 4} \\frac{(x - 4)(x + 4)}{x - 4}`,
+            desc: 'แยก $x^2 - 16 = x^2 - 4^2 = (x - 4)(x + 4)$ ทำให้เห็นพจน์ $(x - 4)$ ชัดเจนทั้งในเศษและส่วน'
+          },
+          {
+            label: 'ขั้นที่ 2: ตัดทอนตัวประกอบร่วมที่ทำให้เป็นศูนย์',
+            math: `\\lim_{x \\to 4} (x + 4)`,
+            desc: 'เนื่องจาก $x \\to 4$ หมายถึง $x \\neq 4$ ดังนั้น $x - 4 \\neq 0$ เราจึงตัดทอน $(x - 4)$ ออกได้ เหลือเพียงนิพจน์พหุนามอย่างง่าย'
+          },
+          {
+            label: 'ขั้นที่ 3: แทนค่าตรงเพื่อหาคำตอบสุดท้าย',
+            math: `4 + 4 = 8`,
+            desc: 'แทนค่า $x = 4$ ลงในพจน์ที่เหลืออยู่ ได้ผลลัพธ์ของลิมิตเท่ากับ 8 อย่างสมบูรณ์'
+          }
+        ]
+      },
+      {
+        title: 'แยกตัวประกอบสองวงเล็บ',
+        badge: 'การแยกตัวประกอบ',
+        targetA: 4,
+        minX: 1,
+        maxX: 7,
+        minY: 2,
+        maxY: 10,
+        evalSim: (x) => x + 2,
+        limitVal: 6,
+        stages: [
+          {
+            label: 'ขั้นที่ 0: รูปเดิมของฟังก์ชัน (เกิดรูป 0/0)',
+            math: `\\lim_{x \\to 4} \\frac{x^2 - 2x - 8}{x - 4}`,
+            desc: 'เมื่อแทนค่า $x = 4$ จะได้ $\\frac{16 - 8 - 8}{4 - 4} = \\frac{0}{0}$ ตัวเศษเป็นพหุนามดีกรีสองที่แยกตัวประกอบได้'
+          },
+          {
+            label: 'ขั้นที่ 1: แยกพหุนามดีกรีสองเป็นสองวงเล็บ',
+            math: `\\lim_{x \\to 4} \\frac{(x - 4)(x + 2)}{x - 4}`,
+            desc: 'หาเลขสองจำนวนที่คูณกันได้ -8 และบวกกันได้ -2 คือ -4 และ +2 จึงแยกได้เป็น $(x - 4)(x + 2)$'
+          },
+          {
+            label: 'ขั้นที่ 2: ตัดทอนพจน์ปัญหา (x - 4) ออก',
+            math: `\\lim_{x \\to 4} (x + 2)`,
+            desc: 'ตัดตัวประกอบร่วม $(x - 4)$ ซึ่งเป็นสาเหตุที่ทำให้เศษและส่วนกลายเป็นศูนย์ออกไป'
+          },
+          {
+            label: 'ขั้นที่ 3: แทนค่าตรงหาลิมิต',
+            math: `4 + 2 = 6`,
+            desc: 'แทนค่า $x = 4$ จะได้คำตอบเท่ากับ 6'
+          }
+        ]
+      },
+      {
+        title: 'เศษส่วนซ้อนแบบง่าย',
+        badge: 'การทำตัวส่วนร่วม',
+        targetA: 3,
+        minX: 1,
+        maxX: 6,
+        minY: -0.5,
+        maxY: 0,
+        evalSim: (x) => -1 / (3 * x),
+        limitVal: -1 / 9,
+        stages: [
+          {
+            label: 'ขั้นที่ 0: รูปเดิมของเศษส่วนซ้อน',
+            math: `\\lim_{x \\to 3} \\frac{\\frac{1}{x} - \\frac{1}{3}}{x - 3}`,
+            desc: 'เมื่อแทนค่า $x = 3$ จะได้ $\\frac{\\frac{1}{3} - \\frac{1}{3}}{3 - 3} = \\frac{0}{0}$ เป็นเศษส่วนซ้อน ต้องจัดรูปตัวเศษด้านบนก่อน'
+          },
+          {
+            label: 'ขั้นที่ 1: ทำตัวส่วนร่วมของตัวเศษด้วย ค.ร.น. 3x',
+            math: `\\lim_{x \\to 3} \\frac{\\frac{3 - x}{3x}}{x - 3}`,
+            desc: 'รวมเศษส่วนด้านบน $\\frac{1}{x} - \\frac{1}{3} = \\frac{3 - x}{3x}$'
+          },
+          {
+            label: 'ขั้นที่ 2: ดึงเครื่องหมายลบและยุบเศษส่วนซ้อน',
+            math: `\\lim_{x \\to 3} \\frac{-(x - 3)}{3x(x - 3)}`,
+            desc: 'สังเกตว่า $3 - x = -(x - 3)$ จึงดึงลบออกมาเพื่อให้เกิดพจน์ $(x - 3)$ ที่ตรงกับตัวส่วนหลัก'
+          },
+          {
+            label: 'ขั้นที่ 3: ตัดทอน (x - 3) และแทนค่า x = 3',
+            math: `\\lim_{x \\to 3} \\left(-\\frac{1}{3x}\\right) = -\\frac{1}{3(3)} = -\\frac{1}{9}`,
+            desc: 'ตัด $(x - 3)$ ออก เหลือ $-\\frac{1}{3x}$ แล้วแทน $x = 3$ ได้คำตอบ $-\\frac{1}{9}$'
+          }
+        ]
+      },
+      {
+        title: 'เศษส่วนซ้อนที่มีพจน์บวก',
+        badge: 'การทำตัวส่วนร่วม',
+        targetA: 0,
+        minX: -1,
+        maxX: 3,
+        minY: -0.6,
+        maxY: 0,
+        evalSim: (x) => -1 / (2 * (x + 2)),
+        limitVal: -0.25,
+        stages: [
+          {
+            label: 'ขั้นที่ 0: รูปเดิมเมื่อ x เข้าใกล้ 0',
+            math: `\\lim_{x \\to 0} \\frac{\\frac{1}{x+2} - \\frac{1}{2}}{x}`,
+            desc: 'เมื่อแทนค่า $x = 0$ จะได้ $\\frac{\\frac{1}{2} - \\frac{1}{2}}{0} = \\frac{0}{0}$ ต้องรวมเศษส่วนด้านบน'
+          },
+          {
+            label: 'ขั้นที่ 1: หา ค.ร.น. ตัวส่วนย่อย คือ 2(x + 2)',
+            math: `\\lim_{x \\to 0} \\frac{\\frac{2 - (x + 2)}{2(x + 2)}}{x}`,
+            desc: 'คูณไขว้เพื่อรวมเศษ $\\frac{1}{x+2} - \\frac{1}{2} = \\frac{2 - (x + 2)}{2(x + 2)}$'
+          },
+          {
+            label: 'ขั้นที่ 2: กระจายเครื่องหมายลบที่ตัวเศษ',
+            math: `\\lim_{x \\to 0} \\frac{\\frac{-x}{2(x + 2)}}{x} = \\lim_{x \\to 0} \\frac{-x}{2x(x + 2)}`,
+            desc: 'ตัวเศษยุบรูป $2 - x - 2 = -x$ และนำตัวส่วนย่อยลงมาคูณกับ $x$ ตัวล่าง'
+          },
+          {
+            label: 'ขั้นที่ 3: ตัดทอน x และแทนค่า x = 0',
+            math: `\\lim_{x \\to 0} \\left(-\\frac{1}{2(x + 2)}\\right) = -\\frac{1}{2(0 + 2)} = -\\frac{1}{4}`,
+            desc: 'ตัดพจน์ปัญหา $x$ ออก เหลือ $-\\frac{1}{2(x + 2)}$ แล้วแทน $x = 0$ ได้ $-\\frac{1}{4}$'
+          }
+        ]
+      }
+    ];
+
+    let currentTLabIdx = 0;
+    let currentStepIdx = 0;
+
+    // -------------------------------------------------------------
+    // Canvas Graph Engine
+    // -------------------------------------------------------------
+    const tCanvas = document.getElementById('transformCanvas');
+    const tCtx = tCanvas.getContext('2d');
+
+    function resizeTransformCanvas() {
+      const rect = tCanvas.getBoundingClientRect();
+      tCanvas.width = rect.width * window.devicePixelRatio;
+      tCanvas.height = rect.height * window.devicePixelRatio;
+      tCtx.scale(window.devicePixelRatio, window.devicePixelRatio);
+      drawTransformPlot();
+    }
+    window.addEventListener('resize', resizeTransformCanvas);
+
+    function drawTransformPlot() {
+      const w = tCanvas.getBoundingClientRect().width;
+      const h = tCanvas.getBoundingClientRect().height;
+      tCtx.clearRect(0, 0, w, h);
+
+      const lab = transformLabs[currentTLabIdx];
+      const minX = lab.minX;
+      const maxX = lab.maxX;
+      const minY = lab.minY;
+      const maxY = lab.maxY;
+
+      const toScreenX = (x) => ((x - minX) / (maxX - minX)) * (w - 70) + 50;
+      const toScreenY = (y) => h - 30 - ((y - minY) / (maxY - minY)) * (h - 55);
+
+      // Grid
+      tCtx.strokeStyle = '#1e293b';
+      tCtx.lineWidth = 1;
+      tCtx.beginPath();
+      for (let gx = Math.ceil(minX); gx <= Math.floor(maxX); gx++) {
+        const sx = toScreenX(gx);
+        tCtx.moveTo(sx, 15);
+        tCtx.lineTo(sx, h - 25);
+      }
+      tCtx.stroke();
+
+      // Axes
+      tCtx.strokeStyle = '#475569';
+      tCtx.lineWidth = 1.2;
+      
+      // X Axis
+      if (minY <= 0 && maxY >= 0) {
+        const zy = toScreenY(0);
+        tCtx.beginPath();
+        tCtx.moveTo(40, zy);
+        tCtx.lineTo(w - 15, zy);
+        tCtx.stroke();
+      }
+      // Y Axis
+      if (minX <= 0 && maxX >= 0) {
+        const zx = toScreenX(0);
+        tCtx.beginPath();
+        tCtx.moveTo(zx, 15);
+        tCtx.lineTo(zx, h - 25);
+        tCtx.stroke();
+      }
+
+      // Axis labels
+      tCtx.fillStyle = '#94a3b8';
+      tCtx.font = '10px monospace';
+      for (let gx = Math.ceil(minX); gx <= Math.floor(maxX); gx++) {
+        const sx = toScreenX(gx);
+        const sy = (minY <= 0 && maxY >= 0) ? toScreenY(0) + 14 : h - 10;
+        tCtx.fillText(gx, sx - 3, sy);
+      }
+
+      // Vertical line at x = a
+      const targetScreenX = toScreenX(lab.targetA);
+      tCtx.setLineDash([3, 3]);
+      tCtx.strokeStyle = '#10b981';
+      tCtx.lineWidth = 1.2;
+      tCtx.beginPath();
+      tCtx.moveTo(targetScreenX, 15);
+      tCtx.lineTo(targetScreenX, h - 25);
+      tCtx.stroke();
+      tCtx.setLineDash([]);
+      tCtx.fillStyle = '#34d399';
+      tCtx.fillText(`x = ${lab.targetA}`, targetScreenX - 14, 12);
+
+      // Curve
+      tCtx.strokeStyle = '#38bdf8';
+      tCtx.lineWidth = 2.5;
+      tCtx.beginPath();
+      let started = false;
+      const step = (maxX - minX) / 120;
+      for (let x = minX; x <= maxX; x += step) {
+        const sx = toScreenX(x);
+        const sy = toScreenY(lab.evalSim(x));
+        if (!started) { tCtx.moveTo(sx, sy); started = true; }
+        else { tCtx.lineTo(sx, sy); }
+      }
+      tCtx.stroke();
+
+      // Hole at target
+      const holeX = toScreenX(lab.targetA);
+      const holeY = toScreenY(lab.limitVal);
+      tCtx.fillStyle = '#020617';
+      tCtx.beginPath();
+      tCtx.arc(holeX, holeY, 5.5, 0, Math.PI * 2);
+      tCtx.fill();
+      tCtx.strokeStyle = currentStepIdx === 3 ? '#10b981' : '#f43f5e';
+      tCtx.lineWidth = 2.2;
+      tCtx.stroke();
+
+      // ข้อความกำกับจุด
+      tCtx.fillStyle = currentStepIdx === 3 ? '#34d399' : '#f87171';
+      tCtx.fillText(currentStepIdx === 3 ? `L = ${lab.limitVal.toFixed(3)} (หาค่าสำเร็จ)` : 'จุดรูโหว่ (0/0)', holeX + 10, holeY + 4);
+    }
+
+    function selectTransformLab(idx) {
+      currentTLabIdx = idx;
+      currentStepIdx = 0;
+      const lab = transformLabs[idx];
+
+      for (let i = 0; i < 4; i++) {
+        const btn = document.getElementById(`tBtn${i}`);
+        if (i === idx) {
+          btn.className = 't-btn p-2 rounded-lg border text-left text-xs transition bg-emerald-50 border-emerald-500 text-emerald-950 font-semibold shadow-xs';
+        } else {
+          btn.className = 't-btn p-2 rounded-lg border border-slate-200 text-left text-xs transition hover:bg-slate-50 text-slate-700 font-medium';
+        }
+      }
+
+      document.getElementById('labModeBadge').textContent = lab.badge;
+      updateLabDisplay();
+    }
+
+    function resetLabStep() {
+      currentStepIdx = 0;
+      updateLabDisplay();
+    }
+
+    function advanceLabStep() {
+      const lab = transformLabs[currentTLabIdx];
+      if (currentStepIdx < lab.stages.length - 1) {
+        currentStepIdx++;
+        updateLabDisplay();
+      }
+    }
+
+    function updateLabDisplay() {
+      const lab = transformLabs[currentTLabIdx];
+      const stage = lab.stages[currentStepIdx];
+
+      document.getElementById('stepStatusLabel').textContent = stage.label;
+      const mathBox = document.getElementById('currentExprMath');
+      mathBox.innerHTML = `$$${stage.math}$$`;
+      document.getElementById('stepExplanation').innerHTML = stage.desc;
+
+      const nextBtn = document.getElementById('nextStepBtn');
+      if (currentStepIdx >= lab.stages.length - 1) {
+        nextBtn.disabled = true;
+        nextBtn.classList.add('opacity-50', 'cursor-not-allowed');
+        nextBtn.textContent = '✓ จัดรูปครบถ้วนแล้ว';
+      } else {
+        nextBtn.disabled = false;
+        nextBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+        nextBtn.textContent = '⚡ ดำเนินการขั้นถัดไป';
+      }
+
+      renderMathEverywhere(mathBox);
+      renderMathEverywhere(document.getElementById('stepExplanation'));
+      drawTransformPlot();
+    }
+
+    // -------------------------------------------------------------
+    // Procedural Math Engine (แก้ไขข้อความ LaTeX ปิด $ ครบถ้วน 100%)
+    // -------------------------------------------------------------
+    function generateFactorCommonProblem(typeIndex) {
+      if (typeIndex === 1) {
+        // ผลต่างกำลังสอง: lim_{x->a} (x^2 - a^2) / (x - a)
+        const a = Math.floor(Math.random() * 5) + 2; // 2..6
+        const a2 = a * a;
+        const ans = 2 * a;
+
+        return {
+          category: 'การแยกตัวประกอบ: ผลต่างกำลังสอง',
+          rawLatex: `\\lim_{x \\to ${a}} \\frac{x^2 - ${a2}}{x - ${a}}`,
+          steps: [
+            `<strong>ตรวจสอบรูปแบบ:</strong> แทนค่า $x = ${a}$ จะได้ $\\frac{(${a})^2 - ${a2}}{${a} - ${a}} = \\frac{0}{0}$ (รูปแบบยังไม่กำหนด)`,
+            `<strong>แยกตัวประกอบตัวเศษ:</strong> จัดรูปด้วยสูตร $a^2 - b^2 = (a-b)(a+b)$ ได้เป็น $\\lim\\limits_{x \\to ${a}} \\frac{(x - ${a})(x + ${a})}{x - ${a}}$`,
+            `<strong>ทอนตัวประกอบร่วม:</strong> เนื่องจาก $x \\to ${a}$ ($x \\neq ${a}$) จึงตัดทอน $(x - ${a})$ ได้ เหลือ $\\lim\\limits_{x \\to ${a}} (x + ${a})$`,
+            `<strong>แทนค่าหาลิมิต:</strong> ได้ $(${a}) + ${a} = ${ans}$`
+          ],
+          finalAnswer: ans
+        };
+      } else if (typeIndex === 2) {
+        // พหุนามดีกรีสอง: lim_{x->a} (x^2 + (b-a)x - ab) / (x - a)
+        const a = Math.floor(Math.random() * 4) + 1; // 1..4
+        let b = Math.floor(Math.random() * 5) + 2; // 2..6
+        if (b === a) b = a + 3;
+        const sumCoeff = b - a;
+        const prod = a * b;
+        const midSign = sumCoeff > 0 ? `+ ${sumCoeff === 1 ? '' : sumCoeff}x` : `- ${Math.abs(sumCoeff) === 1 ? '' : Math.abs(sumCoeff)}x`;
+        const ans = a + b;
+
+        return {
+          category: 'การแยกตัวประกอบ: พหุนามดีกรีสอง',
+          rawLatex: `\\lim_{x \\to ${a}} \\frac{x^2 ${midSign} - ${prod}}{x - ${a}}`,
+          steps: [
+            `<strong>ตรวจสอบรูปแบบ:</strong> แทนค่า $x = ${a}$ ในเศษและส่วน ได้ผลลัพธ์ $\\frac{0}{0}$`,
+            `<strong>แยกตัวประกอบตัวเศษเป็นสองวงเล็บ:</strong> ได้ $\\lim\\limits_{x \\to ${a}} \\frac{(x - ${a})(x + ${b})}{x - ${a}}$`,
+            `<strong>ตัดทอนตัวประกอบร่วม:</strong> ตัดพจน์ $(x - ${a})$ ออก เหลือ $\\lim\\limits_{x \\to ${a}} (x + ${b})$`,
+            `<strong>แทนค่าลิมิต:</strong> ได้ $(${a}) + ${b} = ${ans}$`
+          ],
+          finalAnswer: ans
+        };
+      } else if (typeIndex === 3) {
+        // ดึงตัวร่วมและผลต่างกำลังสอง: lim_{x->a} (k*x^2 - k*a^2) / (x - a)
+        const k = Math.floor(Math.random() * 3) + 2; // 2..4
+        const a = Math.floor(Math.random() * 3) + 2; // 2..4
+        const ka2 = k * a * a;
+        const ans = 2 * k * a;
+
+        return {
+          category: 'การแยกตัวประกอบ: ดึงตัวร่วมสัมประสิทธิ์',
+          rawLatex: `\\lim_{x \\to ${a}} \\frac{${k}x^2 - ${ka2}}{x - ${a}}`,
+          steps: [
+            `<strong>ตรวจสอบรูปแบบ:</strong> แทนค่า $x = ${a}$ ได้ $\\frac{${k}(${a})^2 - ${ka2}}{${a} - ${a}} = \\frac{0}{0}$`,
+            `<strong>ดึงตัวประกอบร่วม ${k} ออกก่อน:</strong> $\\lim\\limits_{x \\to ${a}} \\frac{${k}(x^2 - ${a * a})}{x - ${a}}$`,
+            `<strong>แยกผลต่างกำลังสองและตัดทอน:</strong> $\\lim\\limits_{x \\to ${a}} \\frac{${k}(x - ${a})(x + ${a})}{x - ${a}} = \\lim\\limits_{x \\to ${a}} ${k}(x + ${a})$`,
+            `<strong>แทนค่าลิมิต:</strong> ได้ $${k}(${a} + ${a}) = ${k}(${2 * a}) = ${ans}$`
+          ],
+          finalAnswer: ans
+        };
+      } else if (typeIndex === 4) {
+        // เศษส่วนซ้อน: lim_{x->a} (1/x - 1/a) / (x - a) -> -1/(a^2)
+        const a = Math.floor(Math.random() * 4) + 2; // 2..5
+        const a2 = a * a;
+
+        return {
+          category: 'การทำตัวส่วนร่วม: เศษส่วนซ้อนพื้นฐาน',
+          rawLatex: `\\lim_{x \\to ${a}} \\frac{\\frac{1}{x} - \\frac{1}{${a}}}{x - ${a}}`,
+          steps: [
+            `<strong>ตรวจสอบรูปแบบ:</strong> แทนค่า $x = ${a}$ ได้ $\\frac{\\frac{1}{${a}} - \\frac{1}{${a}}}{${a} - ${a}} = \\frac{0}{0}$`,
+            `<strong>รวมตัวเศษด้วย ค.ร.น. คือ ${a}x:</strong> $\\lim\\limits_{x \\to ${a}} \\frac{\\frac{${a} - x}{${a}x}}{x - ${a}}$`,
+            `<strong>ดึงเครื่องหมายลบและทอนพจน์ปัญหา:</strong> เนื่องจาก $${a} - x = -(x - ${a})$ จึงได้ $\\lim\\limits_{x \\to ${a}} \\frac{-(x - ${a})}{${a}x(x - ${a})} = \\lim\\limits_{x \\to ${a}} \\left(-\\frac{1}{${a}x}\\right)$`,
+            `<strong>แทนค่าลิมิต:</strong> ได้ $-\\frac{1}{${a}(${a})} = -\\frac{1}{${a2}}$`
+          ],
+          finalAnswer: `-\\frac{1}{${a2}}`
+        };
+      } else {
+        // เศษส่วนซ้อน: lim_{x->0} (1/(x+k) - 1/k) / x -> -1/(k^2)
+        const k = Math.floor(Math.random() * 3) + 2; // 2..4
+        const k2 = k * k;
+
+        return {
+          category: 'การทำตัวส่วนร่วม: เศษส่วนซ้อน ค.ร.น. ทวินาม',
+          rawLatex: `\\lim_{x \\to 0} \\frac{\\frac{1}{x + ${k}} - \\frac{1}{${k}}}{x}`,
+          steps: [
+            `<strong>ตรวจสอบรูปแบบ:</strong> แทนค่า $x = 0$ ได้ $\\frac{\\frac{1}{${k}} - \\frac{1}{${k}}}{0} = \\frac{0}{0}$`,
+            `<strong>รวมตัวเศษด้วย ค.ร.น. คือ ${k}(x + ${k}):</strong> $\\lim\\limits_{x \\to 0} \\frac{\\frac{${k} - (x + ${k})}{${k}(x + ${k})}}{x}$`,
+            `<strong>ยุบรูปตัวเศษและตัดทอน x:</strong> ตัวเศษได้ $${k} - x - ${k} = -x$ ดังนั้น $\\lim\\limits_{x \\to 0} \\frac{-x}{${k}x(x + ${k})} = \\lim\\limits_{x \\to 0} \\left(-\\frac{1}{${k}(x + ${k})}\\right)$`,
+            `<strong>แทนค่าลิมิต $x = 0$:</strong> ได้ $-\\frac{1}{${k}(0 + ${k})} = -\\frac{1}{${k2}}$`
+          ],
+          finalAnswer: `-\\frac{1}{${k2}}`
+        };
+      }
+    }
+
+    // -------------------------------------------------------------
+    // Single Exercise Logic
+    // -------------------------------------------------------------
+    let currentSingle = null;
+    let singleStepIdx = 0;
+
+    function generateSingleExercise() {
+      const type = Math.floor(Math.random() * 5) + 1;
+      currentSingle = generateFactorCommonProblem(type);
+      singleStepIdx = 0;
+
+      document.getElementById('exTypeBadge').textContent = `รูปแบบ: ${currentSingle.category}`;
+      const qBox = document.getElementById('exQuestion');
+      qBox.innerHTML = `<span>จงหาค่าของ:</span> $$${currentSingle.rawLatex}$$`;
+      
+      const stepList = document.getElementById('exStepList');
+      stepList.innerHTML = '<div class="text-xs text-slate-400 italic">กดปุ่ม "แสดงเฉลยบรรทัดถัดไป" เพื่อดูวิธีคิดทีละขั้น</div>';
+
+      const btn = document.getElementById('btnRevealNext');
+      btn.disabled = false;
+      btn.classList.remove('opacity-50', 'cursor-not-allowed');
+
+      renderMathEverywhere(qBox);
+    }
+
+    function revealNextStep() {
+      if (!currentSingle) return;
+      const stepList = document.getElementById('exStepList');
+      
+      if (singleStepIdx === 0) {
+        stepList.innerHTML = '';
+      }
+
+      if (singleStepIdx < currentSingle.steps.length) {
+        const item = document.createElement('div');
+        item.className = 'p-3 bg-white rounded-lg border border-purple-200 text-sm text-slate-700 leading-relaxed';
+        item.innerHTML = `<span class="font-semibold text-purple-700">ขั้นที่ ${singleStepIdx + 1}:</span> ${currentSingle.steps[singleStepIdx]}`;
+        stepList.appendChild(item);
+        singleStepIdx++;
+        renderMathEverywhere(item);
+      }
+
+      if (singleStepIdx >= currentSingle.steps.length) {
+        const btn = document.getElementById('btnRevealNext');
+        btn.disabled = true;
+        btn.classList.add('opacity-50', 'cursor-not-allowed');
+      }
+    }
+
+    // -------------------------------------------------------------
+    // 5-Question Worksheet Generator
+    // -------------------------------------------------------------
+    let worksheetQuestions = [];
+
+    function generateFiveQuestions() {
+      worksheetQuestions = [
+        generateFactorCommonProblem(1),
+        generateFactorCommonProblem(2),
+        generateFactorCommonProblem(3),
+        generateFactorCommonProblem(4),
+        generateFactorCommonProblem(5)
+      ];
+      renderWorksheetPreview();
+    }
+
+    function renderWorksheetPreview() {
+      const container = document.getElementById('worksheetPreview');
+      container.innerHTML = '';
+
+      worksheetQuestions.forEach((q, idx) => {
+        const card = document.createElement('div');
+        card.className = 'bg-white p-4 rounded-xl border border-slate-200 shadow-sm';
+        card.innerHTML = `
+          <div class="flex justify-between text-xs text-slate-500 font-semibold mb-1">
+            <span>ข้อที่ ${idx + 1} (${q.category})</span>
+            <span>(2 คะแนน)</span>
+          </div>
+          <div class="text-base font-semibold text-slate-900 my-2">
+            <span>จงหาค่าของ:</span> $$${q.rawLatex}$$
+          </div>
+          <div class="space-y-2 mt-3 bg-slate-50/60 p-3 rounded-lg border border-dashed border-slate-200">
+            <div class="text-xs text-slate-400 font-medium">วิธีทำ:</div>
+            <div class="dotted-line"></div>
+            <div class="dotted-line"></div>
+            <div class="dotted-line"></div>
+            <div class="dotted-line"></div>
+            <div class="text-right text-xs font-semibold text-slate-600 pt-2">
+              ตอบ: ............................................................................
+            </div>
+          </div>
+        `;
+        container.appendChild(card);
+      });
+
+      renderMathEverywhere(container);
+    }
+
+    // -------------------------------------------------------------
+    // Print Logic (Student vs Teacher)
+    // -------------------------------------------------------------
+    function printWorksheet(isTeacherKey) {
+      const printArea = document.getElementById('print-area');
+
+      let html = `
+        <div class="text-center pb-2 border-b-2 border-black mb-4">
+          <h1 class="text-xl font-bold font-serif">ใบงานวิชาคณิตศาสตร์: เรื่อง การแยกตัวประกอบและทำตัวส่วนร่วมเพื่อหาลิมิต</h1>
+          <p class="text-xs mt-0.5">${isTeacherKey ? '<span class="font-bold text-red-600 underline">ฉบับเฉลยวิธีทำละเอียดสำหรับครู</span>' : 'ฉบับแบบฝึกหัดสำหรับนักเรียน'}</p>
+          <div class="flex justify-between text-xs mt-2 pt-1 border-t border-slate-300">
+            <span>ชื่อ-นามสกุล: ............................................................................</span>
+            <span>ชั้น ม.6/...... เลขที่: ........</span>
+            <span>คะแนนเต็ม 10 ได้: .............</span>
+          </div>
+        </div>
+        <div>
+      `;
+
+      worksheetQuestions.forEach((q, idx) => {
+        html += `
+          <div class="print-item text-sm">
+            <div class="font-bold flex justify-between">
+              <span>ข้อที่ ${idx + 1}. จงหาค่าลิมิตต่อไปนี้:</span>
+              <span class="text-xs font-normal">(2 คะแนน)</span>
+            </div>
+            <div class="my-1 text-base">
+              $$${q.rawLatex}$$
+            </div>
+        `;
+
+        if (isTeacherKey) {
+          html += `
+            <div class="bg-slate-50 p-2 rounded border border-slate-300 text-xs space-y-1 my-1">
+              <div class="font-bold text-slate-700 underline">ขั้นตอนวิธีทำละเอียด:</div>
+              ${q.steps.map(s => `<div>• ${s}</div>`).join('')}
+              <div class="font-bold text-slate-900 mt-1">คำตอบสุดท้าย: $${q.finalAnswer}$</div>
+            </div>
+          `;
+        } else {
+          html += `
+            <div class="mt-1 space-y-1.5">
+              <div class="text-xs text-slate-500">วิธีทำ:</div>
+              <div class="dotted-line"></div>
+              <div class="dotted-line"></div>
+              <div class="dotted-line"></div>
+              <div class="dotted-line"></div>
+              <div class="text-right text-xs pt-1">
+                ตอบ: .............................................................................................
+              </div>
+            </div>
+          `;
+        }
+
+        html += `</div>`;
+      });
+
+      html += `
+        </div>
+        <div class="mt-4 pt-2 border-t border-slate-300 text-[10px] text-center text-slate-500">
+          เอกสารประกอบการจัดการเรียนรู้ กลุ่มสาระการเรียนรู้คณิตศาสตร์ เรื่อง แคลคูลัสเบื้องต้น
+        </div>
+      `;
+
+      printArea.innerHTML = html;
+      renderMathEverywhere(printArea);
+
+      setTimeout(() => {
+        window.print();
+      }, 350);
+    }
+
+    // เริ่มต้นทำงานทันทีที่โหลดหน้าเสร็จ
+    window.addEventListener('load', () => {
+      const checkKaTeX = setInterval(() => {
+        if (window.renderMathInElement) {
+          clearInterval(checkKaTeX);
+          renderMathEverywhere();
+          resizeTransformCanvas();
+          selectTransformLab(0);
+          generateSingleExercise();
+          generateFiveQuestions();
+        }
+      }, 50);
+    });
+  </script>
+</body>
+</html>

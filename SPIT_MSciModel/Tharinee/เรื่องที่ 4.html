@@ -1,0 +1,983 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>สื่อการเรียนรู้อินเทอร์แอกทีฟ: การหาลิมิตเมื่อแทนค่าแล้วได้รูป 0/0</title>
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- KaTeX CSS & JS พร้อม Auto-render Extension ครบชุด -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js"></script>
+  
+  <!-- Google Fonts: Sarabun & Chakra Petch -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;700&family=Sarabun:ital,wght@0,300;0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
+
+  <style>
+    body {
+      font-family: 'Sarabun', sans-serif;
+      background-color: #f8fafc;
+      color: #1e293b;
+      overflow-x: hidden;
+    }
+    .heading-font {
+      font-family: 'Chakra Petch', sans-serif;
+    }
+
+    /* เส้นประสำหรับเขียนตอบของนักเรียน */
+    .dotted-line {
+      border-bottom: 1.5px dotted #94a3b8;
+      height: 25px;
+      width: 100%;
+    }
+
+    /* ==========================================
+       Print Stylesheet: ตัดหน้าเปล่าและล็อกบล็อกข้อ
+       ========================================== */
+    @media print {
+      @page {
+        size: A4 portrait;
+        margin: 1cm 1.2cm;
+      }
+      
+      #main-app-container,
+      header,
+      section,
+      nav,
+      footer,
+      .no-print {
+        display: none !important;
+      }
+
+      #print-area {
+        display: block !important;
+        position: static !important;
+        width: 100% !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        background: white !important;
+        color: black !important;
+      }
+
+      .print-item {
+        break-inside: avoid !important;
+        page-break-inside: avoid !important;
+        margin-bottom: 0.9rem !important;
+      }
+    }
+  </style>
+</head>
+<body class="p-3 sm:p-6 md:p-8">
+
+  <!-- MAIN APP CONTAINER -->
+  <div id="main-app-container" class="max-w-4xl mx-auto space-y-8">
+
+    <!-- ส่วนที่ 1: ส่วนหัวเรื่อง -->
+    <header class="bg-gradient-to-r from-amber-600 via-orange-600 to-rose-600 text-white rounded-2xl p-6 sm:p-8 shadow-lg">
+      <div class="inline-block px-3 py-1 bg-white/20 backdrop-blur rounded-full text-xs font-semibold tracking-wider uppercase mb-3">
+        คณิตศาสตร์เพิ่มเติม ม.6 • แคลคูลัสเบื้องต้น
+      </div>
+      <h1 class="text-2xl sm:text-4xl font-bold heading-font tracking-wide">
+        เรื่องที่ 4: การหาลิมิตเมื่อแทนค่าแล้วได้รูป 0/0 (Indeterminate Form 0/0)
+      </h1>
+      <p class="mt-2 text-amber-100 text-sm sm:text-base leading-relaxed">
+        เมื่อแทนค่าตัวแปร $x = a$ แล้วได้ผลลัพธ์ในรูป $\frac{0}{0}$ เรียกว่า "รูปแบบยังไม่กำหนด" ซึ่งไม่ได้แปลว่าลิมิตไม่มีค่า แต่หมายความว่าต้องอาศัยการจัดรูปพีชคณิตเพื่อค้นหาค่าลิมิตที่แท้จริง
+      </p>
+    </header>
+
+    <!-- ส่วนที่ 2: สรุปมโนทัศน์สำคัญ -->
+    <section class="bg-white rounded-2xl p-6 shadow-sm border border-slate-200">
+      <h2 class="text-xl font-bold text-slate-800 flex items-center gap-2 mb-4 heading-font">
+        <span class="w-3 h-3 rounded-full bg-amber-500"></span>
+        ธรรมชาติของรูปแบบยังไม่กำหนด $\frac{0}{0}$
+      </h2>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+        <div class="bg-amber-50/60 p-4 rounded-xl border border-amber-200">
+          <h3 class="font-bold text-amber-900 mb-1">1. ความหมายของ $\frac{0}{0}$</h3>
+          <p class="text-slate-600 mb-2">เมื่อแทน $x = a$ แล้วเศษเป็น 0 และส่วนเป็น 0 แปลว่า:</p>
+          <div class="text-center font-semibold text-amber-800 text-xs py-1">
+            ทั้งเศษและส่วนมีพจน์ $(x - a)$ เป็นตัวประกอบร่วมแฝงอยู่
+          </div>
+        </div>
+        <div class="bg-orange-50/60 p-4 rounded-xl border border-orange-200">
+          <h3 class="font-bold text-orange-900 mb-1">2. ทำไมถึงสรุปไม่ได้ทันที?</h3>
+          <p class="text-slate-600 mb-2">เพราะที่จุด $x = a$ ฟังก์ชันไม่นิยาม แต่ลิมิตสนใจแนวโน้มเมื่อ $x \to a$ ($x \neq a$):</p>
+          <div class="text-center font-semibold text-orange-800">
+            $$\lim_{x \to a} f(x) \neq f(a)$$
+          </div>
+        </div>
+        <div class="bg-rose-50/60 p-4 rounded-xl border border-rose-200">
+          <h3 class="font-bold text-rose-900 mb-1">3. กุญแจสำคัญในการแก้ปัญหา</h3>
+          <p class="text-slate-600 mb-2">กำจัดพจน์ปัญหาที่ทำให้ส่วนเป็นศูนย์ ($x - a$):</p>
+          <div class="text-center font-semibold text-rose-900 text-xs py-1">
+            แยกตัวประกอบ / คูณสังยุค $\to$ ทอน $(x - a)$ ออก $\to$ แทนค่าใหม่
+          </div>
+        </div>
+      </div>
+      <div class="mt-4 p-3 bg-red-50 rounded-xl border border-red-200 text-xs sm:text-sm text-red-900 flex items-start gap-2">
+        <span class="font-bold text-base">⚠️ ข้อควรระวังสูงสุด:</span>
+        <div>ห้ามตอบว่า <strong>"หาค่าไม่ได้"</strong> หรือ <strong>"ตอบ 0"</strong> ทันทีที่พบรูป $\frac{0}{0}$ โดยเด็ดขาด! เพราะรูป $\frac{0}{0}$ อาจมีค่าลิมิตเป็นจำนวนจริงใด ๆ ก็ได้เมื่อจัดรูปพีชคณิตสำเร็จ</div>
+      </div>
+    </section>
+
+    <!-- ส่วนที่ 3: สื่ออินเทอร์แอกทีฟ สถานการณ์ปัญหาจุดวิกฤต 0/0 -->
+    <section class="bg-white rounded-2xl p-6 shadow-sm border border-slate-200">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4">
+        <div>
+          <h2 class="text-xl font-bold text-slate-800 flex items-center gap-2 heading-font">
+            <span class="w-3 h-3 rounded-full bg-orange-500"></span>
+            ห้องทดลองสถานการณ์ปัญหา: การปะทะกับรูปแบบ $\frac{0}{0}$
+          </h2>
+          <p class="text-xs sm:text-sm text-slate-500">ทดลองแทนค่าที่จุด $x = a$ เพื่อสัมผัสปัญหา จากนั้นเลื่อนค่า $x$ เข้าใกล้เพื่อดูแนวโน้มค่าจริง</p>
+        </div>
+        <div class="bg-slate-100 px-3 py-1.5 rounded-lg text-xs font-mono text-slate-700">
+          จุดวิกฤต: <strong class="text-orange-600" id="targetBadge">a = 2.00</strong>
+        </div>
+      </div>
+
+      <!-- แถบเลือกโจทย์สถานการณ์ปัญหา 4 รูปแบบ -->
+      <div class="mb-4">
+        <label class="block text-xs font-bold text-slate-600 mb-1.5">เลือกฟังก์ชันสถานการณ์ปัญหา:</label>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2">
+          <button onclick="selectZeroFunction(0)" id="zBtn0" class="z-btn p-2 rounded-lg border text-left text-xs transition bg-amber-50 border-amber-500 text-amber-900 font-semibold shadow-xs">
+            1. $f(x) = \frac{x^2 - 4}{x - 2}$<br><span class="text-[10px] text-slate-500 font-normal">ผลต่างกำลังสอง ที่ $x \to 2$</span>
+          </button>
+          <button onclick="selectZeroFunction(1)" id="zBtn1" class="z-btn p-2 rounded-lg border border-slate-200 text-left text-xs transition hover:bg-slate-50 text-slate-700 font-medium">
+            2. $f(x) = \frac{x^2 + x - 6}{x - 2}$<br><span class="text-[10px] text-slate-500 font-normal">แยกสองวงเล็บ ที่ $x \to 2$</span>
+          </button>
+          <button onclick="selectZeroFunction(2)" id="zBtn2" class="z-btn p-2 rounded-lg border border-slate-200 text-left text-xs transition hover:bg-slate-50 text-slate-700 font-medium">
+            3. $f(x) = \frac{x^2 - 9}{x - 3}$<br><span class="text-[10px] text-slate-500 font-normal">ผลต่างกำลังสอง ที่ $x \to 3$</span>
+          </button>
+          <button onclick="selectZeroFunction(3)" id="zBtn3" class="z-btn p-2 rounded-lg border border-slate-200 text-left text-xs transition hover:bg-slate-50 text-slate-700 font-medium">
+            4. $f(x) = \frac{\sqrt{x} - 2}{x - 4}$<br><span class="text-[10px] text-slate-500 font-normal">ติดกรณฑ์ (สังยุค) ที่ $x \to 4$</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Canvas Plot แสดงกราฟพร้อมจุดโปร่งเจาะรูโบ๋ -->
+      <div class="relative bg-slate-950 rounded-xl overflow-hidden shadow-inner aspect-[16/8] w-full max-h-[300px]">
+        <canvas id="zeroCanvas" class="w-full h-full block"></canvas>
+      </div>
+
+      <!-- Controls Slider -->
+      <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-3 mt-4">
+        <div class="flex justify-between items-center text-sm font-semibold">
+          <span class="text-slate-700">ขยับค่า $x$ เข้าใกล้จุดวิกฤต:</span>
+          <span class="text-orange-700 font-mono text-base" id="sliderVal">x = 1.500</span>
+        </div>
+        <input type="range" id="zeroSlider" min="0" max="4" step="0.005" value="1.5" 
+               class="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-orange-600">
+
+        <!-- ปุ่มบังคับกดจุด a เพื่อให้เกิดข้อขัดแย้ง -->
+        <div class="flex flex-wrap items-center gap-2 text-xs pt-1">
+          <span class="text-slate-500 font-medium">จุดทดสอบสำคัญ:</span>
+          <button id="quickLeftBtn" onclick="setZeroX(1.999)" class="px-2.5 py-1 bg-amber-100 hover:bg-amber-200 text-amber-900 rounded font-mono font-bold">1.999 (ชิดซ้าย)</button>
+          <button id="quickExactBtn" onclick="setZeroX(2.0)" class="px-3.5 py-1.5 bg-rose-600 hover:bg-rose-700 text-white rounded font-mono font-bold shadow-sm animate-pulse">
+            💥 ลองแทนค่าตรงที่ x = a
+          </button>
+          <button id="quickRightBtn" onclick="setZeroX(2.001)" class="px-2.5 py-1 bg-orange-100 hover:bg-orange-200 text-orange-900 rounded font-mono font-bold">2.001 (ชิดขวา)</button>
+        </div>
+      </div>
+
+      <!-- กล่องข้อความแจ้งเตือนข้อขัดแย้ง & ตารางลู่เข้า -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+        <!-- กล่องวิเคราะห์สถานการณ์ความขัดแย้ง -->
+        <div id="conflictBox" class="p-4 rounded-xl border transition-all flex flex-col justify-between bg-amber-50/60 border-amber-300 text-slate-800">
+          <div>
+            <div class="text-xs font-bold uppercase tracking-wide mb-2 flex items-center justify-between" id="conflictHeader">
+              <span>สถานะการคำนวณ ณ จุดปัจจุบัน</span>
+              <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-200 text-amber-900" id="conflictBadge">กำลังเข้าใกล้</span>
+            </div>
+            <div class="text-sm space-y-2" id="conflictContent">
+              <!-- Rendered by JS -->
+            </div>
+          </div>
+          <div class="mt-3 pt-2 border-t border-slate-200 flex justify-between items-center text-xs font-semibold">
+            <span class="text-slate-600">แนวโน้มลิมิตที่แท้จริง ($L$):</span>
+            <span class="text-emerald-700 font-mono text-base font-bold" id="exactLVal">4.00</span>
+          </div>
+        </div>
+
+        <!-- ตารางสังเกตค่าการลู่เข้าเชิงตัวเลข (Convergence Observation) -->
+        <div class="p-4 bg-slate-50 rounded-xl border border-slate-200">
+          <div class="text-xs font-bold text-slate-600 uppercase tracking-wide mb-2">
+            ตารางสำรวจพฤติกรรมรอบจุด $\frac{0}{0}$ (ทศนิยม 5 ตำแหน่ง)
+          </div>
+          <div class="overflow-x-auto">
+            <table class="w-full text-xs text-center border-collapse">
+              <thead>
+                <tr class="bg-slate-200/70 text-slate-700">
+                  <th class="p-1.5 border border-slate-300">ระยะห่าง</th>
+                  <th class="p-1.5 border border-slate-300 font-mono">ค่า $x$</th>
+                  <th class="p-1.5 border border-slate-300 font-mono">ค่าคำนวณ $f(x)$</th>
+                </tr>
+              </thead>
+              <tbody id="zeroTableBody" class="font-mono divide-y divide-slate-200 text-slate-700 bg-white">
+                <!-- Dynamically generated rows -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ส่วนที่ 4: โจทย์สุ่มฝึกคิด พร้อมเฉลยทีละขั้นตอน -->
+    <section class="bg-white rounded-2xl p-6 shadow-sm border border-slate-200">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-5">
+        <div>
+          <h2 class="text-xl font-bold text-slate-800 flex items-center gap-2 heading-font">
+            <span class="w-3 h-3 rounded-full bg-purple-600"></span>
+            โจทย์สุ่มฝึกคิด: การวิเคราะห์และหาลิมิตรูป $\frac{0}{0}$
+          </h2>
+          <p class="text-xs sm:text-sm text-slate-500">แสดงการตรวจรูป $\frac{0}{0}$ การจัดรูปพีชคณิต และการแทนค่าทีละบรรทัดอย่างเป็นระบบ</p>
+        </div>
+        <div class="flex gap-2">
+          <button onclick="generateSingleExercise()" class="px-3.5 py-1.5 bg-purple-600 hover:bg-purple-700 text-white rounded-lg text-sm font-medium shadow-sm transition">
+            ⟳ สุ่มโจทย์ใหม่
+          </button>
+          <button id="btnRevealNext" onclick="revealNextStep()" class="px-3.5 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-sm font-medium shadow-sm transition">
+            ↓ แสดงเฉลยบรรทัดถัดไป
+          </button>
+        </div>
+      </div>
+
+      <div class="bg-purple-50/40 p-5 rounded-xl border border-purple-100">
+        <div class="text-xs font-semibold text-purple-700 uppercase tracking-wider mb-2" id="exTypeBadge">
+          รูปแบบ: กำลังโหลด...
+        </div>
+        <div class="text-lg sm:text-xl font-semibold text-slate-900 mb-4 flex items-center gap-2 flex-wrap" id="exQuestion"></div>
+
+        <div class="border-t border-purple-200/60 pt-4">
+          <div class="text-xs font-bold text-slate-500 mb-2">ขั้นตอนวิธีทำอย่างเป็นระบบ:</div>
+          <div id="exStepList" class="space-y-2.5"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ส่วนที่ 5: ระบบสร้างและพิมพ์ใบงาน 5 ข้อ -->
+    <section class="bg-white rounded-2xl p-6 shadow-sm border border-slate-200">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
+        <div>
+          <h2 class="text-xl font-bold text-slate-800 flex items-center gap-2 heading-font">
+            <span class="w-3 h-3 rounded-full bg-amber-500"></span>
+            ระบบใบงาน 5 ข้อ (Worksheet Generator)
+          </h2>
+          <p class="text-xs sm:text-sm text-slate-500">สุ่มชุดข้อสอบรูป $\frac{0}{0}$ พิมพ์เฉพาะใบงานนักเรียน (มีเส้นบรรทัด) หรือพิมพ์เฉลยละเอียดสำหรับครู</p>
+        </div>
+        <div class="flex flex-wrap gap-2">
+          <button onclick="generateFiveQuestions()" class="px-3 py-1.5 bg-slate-800 hover:bg-black text-white rounded-lg text-xs font-semibold">
+            ⟳ สุ่มชุด 5 ข้อใหม่
+          </button>
+          <button onclick="printWorksheet(false)" class="px-3 py-1.5 bg-teal-600 hover:bg-teal-700 text-white rounded-lg text-xs font-semibold flex items-center gap-1">
+            🖨 พิมพ์ใบงานนักเรียน
+          </button>
+          <button onclick="printWorksheet(true)" class="px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-xs font-semibold flex items-center gap-1">
+            📑 พิมพ์เฉลยสำหรับครู
+          </button>
+        </div>
+      </div>
+
+      <!-- Preview ในหน้าจอ (นักเรียนเห็นแต่โจทย์และเส้นบรรทัดสำหรับฝึกทำ) -->
+      <div class="border border-slate-200 rounded-xl p-4 bg-slate-50/50">
+        <div class="text-xs font-bold text-slate-600 mb-3 flex items-center justify-between">
+          <span>พรีวิวใบงานสำหรับฝึกทำ (ชุดปัจจุบัน):</span>
+          <span class="text-teal-700 bg-teal-50 px-2 py-0.5 rounded border border-teal-200">โหมดซ่อนเฉลย (พร้อมฝึกเขียน)</span>
+        </div>
+        
+        <div id="worksheetPreview" class="space-y-4"></div>
+      </div>
+    </section>
+
+    <!-- ส่วนที่ 6: เกณฑ์การให้คะแนน (Scoring Rubric) -->
+    <section class="bg-white rounded-2xl p-6 shadow-sm border border-slate-200">
+      <h2 class="text-xl font-bold text-slate-800 flex items-center gap-2 mb-3 heading-font">
+        <span class="w-3 h-3 rounded-full bg-amber-500"></span>
+        เกณฑ์การประเมินการตรวจใบงาน (Scoring Rubric 3 ระดับ)
+      </h2>
+      <p class="text-xs sm:text-sm text-slate-500 mb-4">เกณฑ์การตรวจให้คะแนนตามมาตรฐานการวัดผลทางคณิตศาสตร์ เรื่อง การหาลิมิตรูป $\frac{0}{0}$ (ข้อละ 2 คะแนน รวม 10 คะแนน)</p>
+
+      <div class="overflow-x-auto">
+        <table class="w-full text-left text-xs sm:text-sm border-collapse">
+          <thead>
+            <tr class="bg-slate-100 text-slate-700 border-b border-slate-200">
+              <th class="p-3 font-bold w-1/4">ประเด็นการประเมิน</th>
+              <th class="p-3 font-bold text-emerald-800 bg-emerald-50/50">ดีมาก (2 คะแนน)</th>
+              <th class="p-3 font-bold text-blue-800 bg-blue-50/50">ปานกลาง (1 คะแนน)</th>
+              <th class="p-3 font-bold text-rose-800 bg-rose-50/50">ปรับปรุง (0 คะแนน)</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-slate-200 text-slate-600">
+            <tr>
+              <td class="p-3 font-semibold text-slate-800">1. การตรวจสอบรูปแบบไม่กำหนด $\frac{0}{0}$</td>
+              <td class="p-3">แทนค่าตรวจสอบทั้งเศษและส่วนอย่างชัดเจน แสดงรูป $\frac{0}{0}$ และระบุความจำเป็นในการจัดรูปได้อย่างถูกต้อง</td>
+              <td class="p-3">ตรวจพบว่าส่วนเป็นศูนย์ แต่ไม่ได้แสดงการคำนวณเศษและส่วน หรือสรุปรูป $\frac{0}{0}$ ไม่ชัดเจน</td>
+              <td class="p-3">ไม่ตรวจสอบการแทนค่า หรือสรุปว่าหาค่าไม่ได้ทันทีโดยไม่ได้จัดรูป</td>
+            </tr>
+            <tr>
+              <td class="p-3 font-semibold text-slate-800">2. การจัดรูปพีชคณิต / สังยุคเพื่อตัดทอน</td>
+              <td class="p-3">แยกตัวประกอบหรือคูณสังยุคถูกต้องสมบูรณ์ และทอนตัวประกอบร่วม $(x - a)$ ออกได้อย่างถูกต้องตามหลักคณิตศาสตร์</td>
+              <td class="p-3">เลือกใช้วิธีจัดรูปถูกต้อง แต่มีข้อผิดพลาดเล็กน้อยในเครื่องหมายบวก/ลบ หรือแยกตัวประกอบคลาดเคลื่อน</td>
+              <td class="p-3">จัดรูปผิดพลาดจนโครงสร้างพหุนามเปลี่ยน หรือตัดทอนพจน์โดยไม่มีหลักการ</td>
+            </tr>
+            <tr>
+              <td class="p-3 font-semibold text-slate-800">3. การแทนค่าหาลิมิตและคำตอบสุดท้าย</td>
+              <td class="p-3">เขียนสัญลักษณ์ $\lim\limits_{x \to a}$ กำกับถูกต้องตลอดขั้นตอน แทนค่าในพจน์ที่ทอนแล้ว และได้คำตอบถูกต้องสมบูรณ์</td>
+              <td class="p-3">แทนค่าในพจน์ที่ทอนแล้วถูกต้อง แต่ตกหล่นสัญลักษณ์ลิมิต หรือคำตอบสุดท้ายคลาดเคลื่อนเล็กน้อย</td>
+              <td class="p-3">ไม่สามารถหาคำตอบสุดท้ายได้ หรือคำตอบไม่สอดคล้องกับวิธีทำ</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+  </div>
+
+  <!-- แท่นพิมพ์ที่ซ่อนไว้ (แสดงเฉพาะตอนสั่ง Print A4) -->
+  <div id="print-area" style="display: none;"></div>
+
+  <!-- SCRIPT LOGIC -->
+  <script>
+    function renderMathEverywhere(element) {
+      const target = element || document.body;
+      if (window.renderMathInElement) {
+        renderMathInElement(target, {
+          delimiters: [
+            {left: '$$', right: '$$', display: true},
+            {left: '\\[', right: '\\]', display: true},
+            {left: '\\(', right: '\\)', display: false},
+            {left: '$', right: '$', display: false}
+          ],
+          throwOnError: false
+        });
+      }
+    }
+
+    function formatDec5(num) {
+      if (Number.isInteger(num)) return num.toString();
+      let s = num.toFixed(5);
+      return parseFloat(s).toString();
+    }
+
+    // -------------------------------------------------------------
+    // ฟังก์ชันโมเดลสำหรับห้องทดลองสถานการณ์ปัญหา (Zero Form Models)
+    // -------------------------------------------------------------
+    const zeroFunctions = [
+      {
+        id: 'diffsq',
+        title: 'f(x) = (x^2 - 4) / (x - 2)',
+        targetA: 2,
+        minRange: 0,
+        maxRange: 4,
+        initVal: 1.5,
+        minY: 0,
+        maxY: 7,
+        evalRaw: (x) => (x * x - 4) / (x - 2),
+        evalSim: (x) => x + 2,
+        limitVal: 4,
+        numStr: (x) => `(${x.toFixed(3)})^2 - 4 = ${(x * x - 4).toFixed(4)}`,
+        denStr: (x) => `${x.toFixed(3)} - 2 = ${(x - 2).toFixed(4)}`,
+        factorStr: `\\frac{(x - 2)(x + 2)}{x - 2} = x + 2`
+      },
+      {
+        id: 'trinomial',
+        title: 'f(x) = (x^2 + x - 6) / (x - 2)',
+        targetA: 2,
+        minRange: 0,
+        maxRange: 4,
+        initVal: 1.5,
+        minY: 0,
+        maxY: 8,
+        evalRaw: (x) => (x * x + x - 6) / (x - 2),
+        evalSim: (x) => x + 3,
+        limitVal: 5,
+        numStr: (x) => `(${x.toFixed(3)})^2 + (${x.toFixed(3)}) - 6 = ${(x * x + x - 6).toFixed(4)}`,
+        denStr: (x) => `${x.toFixed(3)} - 2 = ${(x - 2).toFixed(4)}`,
+        factorStr: `\\frac{(x - 2)(x + 3)}{x - 2} = x + 3`
+      },
+      {
+        id: 'diffsq3',
+        title: 'f(x) = (x^2 - 9) / (x - 3)',
+        targetA: 3,
+        minRange: 1,
+        maxRange: 5,
+        initVal: 2.5,
+        minY: 2,
+        maxY: 9,
+        evalRaw: (x) => (x * x - 9) / (x - 3),
+        evalSim: (x) => x + 3,
+        limitVal: 6,
+        numStr: (x) => `(${x.toFixed(3)})^2 - 9 = ${(x * x - 9).toFixed(4)}`,
+        denStr: (x) => `${x.toFixed(3)} - 3 = ${(x - 3).toFixed(4)}`,
+        factorStr: `\\frac{(x - 3)(x + 3)}{x - 3} = x + 3`
+      },
+      {
+        id: 'radical',
+        title: 'f(x) = (sqrt(x) - 2) / (x - 4)',
+        targetA: 4,
+        minRange: 2,
+        maxRange: 6,
+        initVal: 3.5,
+        minY: 0.1,
+        maxY: 0.4,
+        evalRaw: (x) => (Math.sqrt(x) - 2) / (x - 4),
+        evalSim: (x) => 1 / (Math.sqrt(x) + 2),
+        limitVal: 0.25,
+        numStr: (x) => `\\sqrt{${x.toFixed(3)}} - 2 = ${(Math.sqrt(x) - 2).toFixed(4)}`,
+        denStr: (x) => `${x.toFixed(3)} - 4 = ${(x - 4).toFixed(4)}`,
+        factorStr: `\\frac{\\sqrt{x} - 2}{(\\sqrt{x} - 2)(\\sqrt{x} + 2)} = \\frac{1}{\\sqrt{x} + 2}`
+      }
+    ];
+
+    let currentZIdx = 0;
+    const zeroSlider = document.getElementById('zeroSlider');
+
+    // -------------------------------------------------------------
+    // Canvas Graph Engine แสดงกราฟมีรูโหว่ชัดเจน
+    // -------------------------------------------------------------
+    const zCanvas = document.getElementById('zeroCanvas');
+    const zCtx = zCanvas.getContext('2d');
+
+    function resizeZeroCanvas() {
+      const rect = zCanvas.getBoundingClientRect();
+      zCanvas.width = rect.width * window.devicePixelRatio;
+      zCanvas.height = rect.height * window.devicePixelRatio;
+      zCtx.scale(window.devicePixelRatio, window.devicePixelRatio);
+      drawZeroPlot();
+    }
+    window.addEventListener('resize', resizeZeroCanvas);
+
+    function drawZeroPlot() {
+      const w = zCanvas.getBoundingClientRect().width;
+      const h = zCanvas.getBoundingClientRect().height;
+      zCtx.clearRect(0, 0, w, h);
+
+      const fn = zeroFunctions[currentZIdx];
+      const minX = fn.minRange;
+      const maxX = fn.maxRange;
+      const minY = fn.minY;
+      const maxY = fn.maxY;
+
+      const toScreenX = (x) => ((x - minX) / (maxX - minX)) * (w - 70) + 50;
+      const toScreenY = (y) => h - 30 - ((y - minY) / (maxY - minY)) * (h - 55);
+
+      // Grid
+      zCtx.strokeStyle = '#1e293b';
+      zCtx.lineWidth = 1;
+      zCtx.beginPath();
+      for (let gx = Math.ceil(minX); gx <= Math.floor(maxX); gx++) {
+        const sx = toScreenX(gx);
+        zCtx.moveTo(sx, 15);
+        zCtx.lineTo(sx, h - 25);
+      }
+      zCtx.stroke();
+
+      // Axes
+      zCtx.strokeStyle = '#475569';
+      zCtx.lineWidth = 1.2;
+      
+      // X Axis
+      if (minY <= 0 && maxY >= 0) {
+        const zy = toScreenY(0);
+        zCtx.beginPath();
+        zCtx.moveTo(40, zy);
+        zCtx.lineTo(w - 15, zy);
+        zCtx.stroke();
+      }
+      // Y Axis
+      if (minX <= 0 && maxX >= 0) {
+        const zx = toScreenX(0);
+        zCtx.beginPath();
+        zCtx.moveTo(zx, 15);
+        zCtx.lineTo(zx, h - 25);
+        zCtx.stroke();
+      }
+
+      // Axis labels
+      zCtx.fillStyle = '#94a3b8';
+      zCtx.font = '10px monospace';
+      for (let gx = Math.ceil(minX); gx <= Math.floor(maxX); gx++) {
+        const sx = toScreenX(gx);
+        const sy = (minY <= 0 && maxY >= 0) ? toScreenY(0) + 14 : h - 10;
+        zCtx.fillText(gx, sx - 3, sy);
+      }
+
+      // Vertical Target Line at x = a
+      const targetScreenX = toScreenX(fn.targetA);
+      zCtx.setLineDash([3, 3]);
+      zCtx.strokeStyle = '#f97316';
+      zCtx.lineWidth = 1.2;
+      zCtx.beginPath();
+      zCtx.moveTo(targetScreenX, 15);
+      zCtx.lineTo(targetScreenX, h - 25);
+      zCtx.stroke();
+      zCtx.setLineDash([]);
+      zCtx.fillStyle = '#fb923c';
+      zCtx.fillText(`x = ${fn.targetA}`, targetScreenX - 14, 12);
+
+      // Function Curve
+      zCtx.strokeStyle = '#38bdf8';
+      zCtx.lineWidth = 2.5;
+      zCtx.beginPath();
+      let started = false;
+      const step = (maxX - minX) / 120;
+      for (let x = minX; x <= maxX; x += step) {
+        const sx = toScreenX(x);
+        const sy = toScreenY(fn.evalSim(x));
+        if (!started) { zCtx.moveTo(sx, sy); started = true; }
+        else { zCtx.lineTo(sx, sy); }
+      }
+      zCtx.stroke();
+
+      // Hole at x = a (เพราะ f(a) เป็นรูป 0/0 ไม่นิยาม)
+      const holeX = toScreenX(fn.targetA);
+      const holeY = toScreenY(fn.limitVal);
+      zCtx.fillStyle = '#020617';
+      zCtx.beginPath();
+      zCtx.arc(holeX, holeY, 5.5, 0, Math.PI * 2);
+      zCtx.fill();
+      zCtx.strokeStyle = '#ef4444';
+      zCtx.lineWidth = 2.2;
+      zCtx.stroke();
+
+      // Current Point from Slider
+      const curX = parseFloat(zeroSlider.value);
+      const isExactA = Math.abs(curX - fn.targetA) < 1e-4;
+      const curY = fn.evalSim(curX);
+      const curPtX = toScreenX(curX);
+      const curPtY = toScreenY(curY);
+
+      if (!isExactA) {
+        // Projection
+        zCtx.setLineDash([3, 3]);
+        zCtx.strokeStyle = '#fbbf24';
+        zCtx.lineWidth = 1.2;
+        zCtx.beginPath();
+        zCtx.moveTo(curPtX, (minY <= 0 && maxY >= 0) ? toScreenY(0) : h - 25);
+        zCtx.lineTo(curPtX, curPtY);
+        zCtx.lineTo(45, curPtY);
+        zCtx.stroke();
+        zCtx.setLineDash([]);
+
+        // Moving Dot
+        zCtx.fillStyle = '#fbbf24';
+        zCtx.beginPath();
+        zCtx.arc(curPtX, curPtY, 6, 0, Math.PI * 2);
+        zCtx.fill();
+        zCtx.strokeStyle = '#ffffff';
+        zCtx.lineWidth = 2;
+        zCtx.stroke();
+      }
+    }
+
+    function selectZeroFunction(idx) {
+      currentZIdx = idx;
+      const fn = zeroFunctions[idx];
+
+      for (let i = 0; i < 4; i++) {
+        const btn = document.getElementById(`zBtn${i}`);
+        if (i === idx) {
+          btn.className = 'z-btn p-2 rounded-lg border text-left text-xs transition bg-amber-50 border-amber-500 text-amber-900 font-semibold shadow-xs';
+        } else {
+          btn.className = 'z-btn p-2 rounded-lg border border-slate-200 text-left text-xs transition hover:bg-slate-50 text-slate-700 font-medium';
+        }
+      }
+
+      document.getElementById('targetBadge').textContent = `a = ${fn.targetA.toFixed(2)}`;
+      zeroSlider.min = fn.minRange;
+      zeroSlider.max = fn.maxRange;
+      zeroSlider.value = fn.initVal;
+
+      document.getElementById('quickLeftBtn').textContent = `${(fn.targetA - 0.001).toFixed(3)} (ชิดซ้าย)`;
+      document.getElementById('quickLeftBtn').onclick = () => setZeroX(fn.targetA - 0.001);
+      document.getElementById('quickExactBtn').onclick = () => setZeroX(fn.targetA);
+      document.getElementById('quickRightBtn').textContent = `${(fn.targetA + 0.001).toFixed(3)} (ชิดขวา)`;
+      document.getElementById('quickRightBtn').onclick = () => setZeroX(fn.targetA + 0.001);
+
+      updateZeroSimulation();
+    }
+
+    function setZeroX(val) {
+      zeroSlider.value = val;
+      updateZeroSimulation();
+    }
+
+    function updateZeroSimulation() {
+      const x = parseFloat(zeroSlider.value);
+      const fn = zeroFunctions[currentZIdx];
+      const isExactA = Math.abs(x - fn.targetA) < 1e-4;
+
+      document.getElementById('sliderVal').textContent = `x = ${formatDec5(x)}`;
+
+      const cBox = document.getElementById('conflictBox');
+      const cBadge = document.getElementById('conflictBadge');
+      const cContent = document.getElementById('conflictContent');
+
+      if (isExactA) {
+        // สถานะเกิดรูป 0/0 ชัดเจน
+        cBox.className = 'p-4 rounded-xl border transition-all flex flex-col justify-between bg-rose-50 border-rose-300 text-slate-900 shadow-sm ring-2 ring-rose-400';
+        cBadge.className = 'px-2 py-0.5 rounded text-[10px] font-bold bg-rose-600 text-white';
+        cBadge.textContent = 'วิกฤต: รูปแบบ 0/0 !';
+
+        cContent.innerHTML = `
+          <div class="text-rose-700 font-bold flex items-center gap-1.5">
+            <span>🚨 แทนค่าตรง $x = ${fn.targetA}$ ได้ผลลัพธ์:</span>
+            <span class="text-base font-mono underline">0 / 0</span>
+          </div>
+          <div class="text-xs text-slate-600 leading-relaxed">
+            • ตัวเศษคำนวณได้: $0$<br>
+            • ตัวส่วนคำนวณได้: $0$<br>
+            <strong>สรุป:</strong> อยู่ใน "รูปแบบยังไม่กำหนด" ทำให้ไม่สามารถสรุปค่าลิมิตจากการแทนค่าตรงได้ จำเป็นต้องจัดรูปพีชคณิตเพื่อทอน $(x - ${fn.targetA})$ ออก
+          </div>
+        `;
+      } else {
+        // สถานะค่าใกล้เคียง
+        const curY = fn.evalSim(x);
+        cBox.className = 'p-4 rounded-xl border transition-all flex flex-col justify-between bg-amber-50/60 border-amber-300 text-slate-800';
+        cBadge.className = 'px-2 py-0.5 rounded text-[10px] font-bold bg-amber-200 text-amber-900';
+        cBadge.textContent = 'กำลังเข้าใกล้ (x ≠ a)';
+
+        cContent.innerHTML = `
+          <div class="text-amber-900 font-semibold">
+            ที่ตำแหน่ง $x = ${formatDec5(x)}$ (ห่างจากจุดวิกฤต ${Math.abs(x - fn.targetA).toFixed(4)}):
+          </div>
+          <div class="text-xs text-slate-600 leading-relaxed space-y-1">
+            <div>เศษ $\\approx ${fn.numStr(x)}$</div>
+            <div>ส่วน $\\approx ${fn.denStr(x)}$</div>
+            <div class="font-bold text-slate-900 pt-1">ผลหาร $f(x) \\approx ${formatDec5(curY)}$ (กำลังลู่เข้าสู่ ${fn.limitVal})</div>
+          </div>
+        `;
+      }
+
+      document.getElementById('exactLVal').textContent = formatDec5(fn.limitVal);
+
+      // อัปเดตตารางค่าลู่เข้า
+      const offsets = [-0.1, -0.01, -0.001, 0, 0.001, 0.01, 0.1];
+      const tbody = document.getElementById('zeroTableBody');
+      tbody.innerHTML = '';
+
+      offsets.forEach(off => {
+        const curX = fn.targetA + off;
+        const isCenter = off === 0;
+        
+        let label = '';
+        let valStr = '';
+
+        if (off < 0) {
+          label = `ซ้าย (${off.toFixed(3)})`;
+          valStr = formatDec5(fn.evalSim(curX));
+        } else if (off > 0) {
+          label = `ขวา (+${off.toFixed(3)})`;
+          valStr = formatDec5(fn.evalSim(curX));
+        } else {
+          label = `<strong>แทนตรง x = a</strong>`;
+          valStr = `<span class="text-rose-600 font-bold bg-rose-100 px-1 rounded">0/0 (ไม่นิยาม)</span>`;
+        }
+
+        const tr = document.createElement('tr');
+        if (isCenter) {
+          tr.className = 'bg-rose-50/80 font-bold';
+        }
+        tr.innerHTML = `
+          <td class="p-1 border border-slate-200 text-xs">${label}</td>
+          <td class="p-1 border border-slate-200">${curX.toFixed(3)}</td>
+          <td class="p-1 border border-slate-200">${valStr}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+
+      renderMathEverywhere(cBox);
+      drawZeroPlot();
+    }
+
+    zeroSlider.addEventListener('input', updateZeroSimulation);
+
+    // -------------------------------------------------------------
+    // Procedural Math Engine (โจทย์สุ่มรูป 0/0 5 รูปแบบ)
+    // -------------------------------------------------------------
+    function generateZeroProblem(typeIndex) {
+      if (typeIndex === 1) {
+        // ผลต่างกำลังสอง: lim_{x->a} (x^2 - a^2) / (x - a)
+        const a = Math.floor(Math.random() * 5) + 2; // 2..6
+        const a2 = a * a;
+        const ans = 2 * a;
+
+        return {
+          category: 'ผลต่างกำลังสอง (รูปไม่กำหนด 0/0)',
+          rawLatex: `\\lim_{x \\to ${a}} \\frac{x^2 - ${a2}}{x - ${a}}`,
+          steps: [
+            `<strong>1. ตรวจสอบรูปแบบ:</strong> แทนค่า $x = ${a}$ ในเศษและส่วน จะได้ $\\frac{(${a})^2 - ${a2}}{${a} - ${a}} = \\frac{0}{0}$ (เป็นรูปแบบยังไม่กำหนด ต้องจัดรูปพีชคณิต)`,
+            `<strong>2. แยกตัวประกอบตัวเศษ:</strong> ใช้สูตร $x^2 - a^2 = (x-a)(x+a)$ ได้เป็น $\\lim\\limits_{x \\to ${a}} \\frac{(x - ${a})(x + ${a})}{x - ${a}}$`,
+            `<strong>3. ตัดทอนตัวประกอบร่วม:</strong> เพราะ $x \\to ${a}$ ($x \\neq ${a}$) จึงตัดทอน $(x - ${a})$ ได้ เหลือ $\\lim\\limits_{x \\to ${a}} (x + ${a})$`,
+            `<strong>4. แทนค่าหาคำตอบ:</strong> แทน $x = ${a}$ จะได้ $(${a}) + ${a} = ${ans}$`
+          ],
+          finalAnswer: ans
+        };
+      } else if (typeIndex === 2) {
+        // แยกตัวประกอบสองวงเล็บ: lim_{x->a} (x^2 + (b-a)x - ab) / (x - a)
+        const a = Math.floor(Math.random() * 4) + 1; // 1..4
+        let b = Math.floor(Math.random() * 5) + 2; // 2..6
+        if (b === a) b = a + 2;
+        const sumCoeff = b - a;
+        const prod = a * b;
+        const midSign = sumCoeff > 0 ? `+ ${sumCoeff === 1 ? '' : sumCoeff}x` : `- ${Math.abs(sumCoeff) === 1 ? '' : Math.abs(sumCoeff)}x`;
+        const ans = a + b;
+
+        return {
+          category: 'แยกตัวประกอบพหุนามดีกรีสอง (รูปไม่กำหนด 0/0)',
+          rawLatex: `\\lim_{x \\to ${a}} \\frac{x^2 ${midSign} - ${prod}}{x - ${a}}`,
+          steps: [
+            `<strong>1. ตรวจสอบรูปแบบ:</strong> แทนค่า $x = ${a}$ ได้ $\\frac{(${a})^2 ${midSign.replace('x', `(${a})`)} - ${prod}}{${a} - ${a}} = \\frac{0}{0}$ ต้องแยกตัวประกอบ`,
+            `<strong>2. แยกตัวประกอบตัวเศษ:</strong> แยกได้เป็น $\\lim\\limits_{x \\to ${a}} \\frac{(x - ${a})(x + ${b})}{x - ${a}}$`,
+            `<strong>3. ทอนพจน์ร่วม:</strong> ตัดพจน์ $(x - ${a})$ ออก เหลือ $\\lim\\limits_{x \\to ${a}} (x + ${b})$`,
+            `<strong>4. แทนค่าลิมิต:</strong> ได้ $(${a}) + ${b} = ${ans}$`
+          ],
+          finalAnswer: ans
+        };
+      } else if (typeIndex === 3) {
+        // ส่วนอยู่ด้านบน (ตัวเศษเป็นเชิงเส้น): lim_{x->a} (x - a) / (x^2 - a^2)
+        const a = Math.floor(Math.random() * 4) + 2; // 2..5
+        const a2 = a * a;
+        const ansDen = 2 * a;
+
+        return {
+          category: 'ตัวประกอบร่วมที่ตัวส่วน (รูปไม่กำหนด 0/0)',
+          rawLatex: `\\lim_{x \\to ${a}} \\frac{x - ${a}}{x^2 - ${a2}}`,
+          steps: [
+            `<strong>1. ตรวจสอบรูปแบบ:</strong> แทนค่า $x = ${a}$ ได้ผลลัพธ์ $\\frac{${a} - ${a}}{(${a})^2 - ${a2}} = \\frac{0}{0}$`,
+            `<strong>2. แยกตัวประกอบตัวส่วน:</strong> ได้เป็น $\\lim\\limits_{x \\to ${a}} \\frac{x - ${a}}{(x - ${a})(x + ${a})}$`,
+            `<strong>3. ทอนพจน์ร่วม:</strong> ตัด $(x - ${a})$ ออก เหลือ $\\lim\\limits_{x \\to ${a}} \\frac{1}{x + ${a}}$`,
+            `<strong>4. แทนค่าลิมิต:</strong> ได้ $\\frac{1}{${a} + ${a}} = \\frac{1}{${ansDen}}$`
+          ],
+          finalAnswer: `\\frac{1}{${ansDen}}`
+        };
+      } else if (typeIndex === 4) {
+        // การคูณด้วยสังยุค: lim_{x->k^2} (sqrt(x) - k) / (x - k^2)
+        const k = Math.floor(Math.random() * 3) + 2; // 2..4
+        const a = k * k; // 4, 9, 16
+        const ansDen = 2 * k;
+
+        return {
+          category: 'การคูณด้วยสังยุค (Conjugate Method)',
+          rawLatex: `\\lim_{x \\to ${a}} \\frac{\\sqrt{x} - ${k}}{x - ${a}}`,
+          steps: [
+            `<strong>1. ตรวจสอบรูปแบบ:</strong> แทนค่า $x = ${a}$ ได้ $\\frac{\\sqrt{${a}} - ${k}}{${a} - ${a}} = \\frac{0}{0}$ ต้องคูณสังยุค`,
+            `<strong>2. คูณด้วยสังยุค $(\\sqrt{x} + ${k})$ ทั้งเศษและส่วน:</strong> $\\lim\\limits_{x \\to ${a}} \\frac{(\\sqrt{x} - ${k})(\\sqrt{x} + ${k})}{(x - ${a})(\\sqrt{x} + ${k})}$`,
+            `<strong>3. ยุบรูปตัวเศษ:</strong> $(\\sqrt{x})^2 - ${k}^2 = x - ${a}$ จึงตัดกับตัวส่วนได้ เหลือ $\\lim\\limits_{x \\to ${a}} \\frac{1}{\\sqrt{x} + ${k}}$`,
+            `<strong>4. แทนค่าลิมิต:</strong> ได้ $\\frac{1}{\\sqrt{${a}} + ${k}} = \\frac{1}{${k} + ${k}} = \\frac{1}{${ansDen}}$`
+          ],
+          finalAnswer: `\\frac{1}{${ansDen}}`
+        };
+      } else {
+        // พหุนามดีกรีสองทั้งเศษและส่วน: lim_{x->a} (x^2 - a^2) / (x^2 + (c-a)x - ac)
+        const a = Math.floor(Math.random() * 3) + 2; // 2..4
+        let c = Math.floor(Math.random() * 3) + 1; // 1..3
+        const a2 = a * a;
+        const midSign = (c - a) >= 0 ? `+ ${c - a === 0 ? '' : (c - a === 1 ? 'x' : `${c - a}x`)}` : `- ${Math.abs(c - a) === 1 ? 'x' : `${Math.abs(c - a)}x`}`;
+        const prod = a * c;
+        const numAns = 2 * a;
+        const denAns = a + c;
+
+        return {
+          category: 'แยกตัวประกอบทั้งเศษและส่วน (รูปไม่กำหนด 0/0)',
+          rawLatex: `\\lim_{x \\to ${a}} \\frac{x^2 - ${a2}}{x^2 ${midSign} - ${prod}}`,
+          steps: [
+            `<strong>1. ตรวจสอบรูปแบบ:</strong> แทนค่า $x = ${a}$ ได้ $\\frac{(${a})^2 - ${a2}}{(${a})^2 ${midSign.replace('x', `(${a})`)} - ${prod}} = \\frac{0}{0}$`,
+            `<strong>2. แยกตัวประกอบทั้งเศษและส่วน:</strong> $\\lim\\limits_{x \\to ${a}} \\frac{(x - ${a})(x + ${a})}{(x - ${a})(x + ${c})}$`,
+            `<strong>3. ตัดทอนตัวประกอบร่วม $(x - ${a})$:</strong> เหลือ $\\lim\\limits_{x \\to ${a}} \\frac{x + ${a}}{x + ${c}}$`,
+            `<strong>4. แทนค่าลิมิต:</strong> ได้ $\\frac{${a} + ${a}}{${a} + ${c}} = \\frac{${numAns}}{${denAns}}$`
+          ],
+          finalAnswer: numAns % denAns === 0 ? `${numAns / denAns}` : `\\frac{${numAns}}{${denAns}}`
+        };
+      }
+    }
+
+    // -------------------------------------------------------------
+    // Single Exercise Logic
+    // -------------------------------------------------------------
+    let currentSingle = null;
+    let singleStepIdx = 0;
+
+    function generateSingleExercise() {
+      const type = Math.floor(Math.random() * 5) + 1;
+      currentSingle = generateZeroProblem(type);
+      singleStepIdx = 0;
+
+      document.getElementById('exTypeBadge').textContent = `รูปแบบ: ${currentSingle.category}`;
+      const qBox = document.getElementById('exQuestion');
+      qBox.innerHTML = `<span>จงหาค่าของ:</span> $$${currentSingle.rawLatex}$$`;
+      
+      const stepList = document.getElementById('exStepList');
+      stepList.innerHTML = '<div class="text-xs text-slate-400 italic">กดปุ่ม "แสดงเฉลยบรรทัดถัดไป" เพื่อดูวิธีคิดทีละขั้น</div>';
+
+      const btn = document.getElementById('btnRevealNext');
+      btn.disabled = false;
+      btn.classList.remove('opacity-50', 'cursor-not-allowed');
+
+      renderMathEverywhere(qBox);
+    }
+
+    function revealNextStep() {
+      if (!currentSingle) return;
+      const stepList = document.getElementById('exStepList');
+      
+      if (singleStepIdx === 0) {
+        stepList.innerHTML = '';
+      }
+
+      if (singleStepIdx < currentSingle.steps.length) {
+        const item = document.createElement('div');
+        item.className = 'p-3 bg-white rounded-lg border border-purple-200 text-sm text-slate-700 leading-relaxed';
+        item.innerHTML = `<span class="font-semibold text-purple-700">ขั้นที่ ${singleStepIdx + 1}:</span> ${currentSingle.steps[singleStepIdx]}`;
+        stepList.appendChild(item);
+        singleStepIdx++;
+        renderMathEverywhere(item);
+      }
+
+      if (singleStepIdx >= currentSingle.steps.length) {
+        const btn = document.getElementById('btnRevealNext');
+        btn.disabled = true;
+        btn.classList.add('opacity-50', 'cursor-not-allowed');
+      }
+    }
+
+    // -------------------------------------------------------------
+    // 5-Question Worksheet Generator
+    // -------------------------------------------------------------
+    let worksheetQuestions = [];
+
+    function generateFiveQuestions() {
+      worksheetQuestions = [
+        generateZeroProblem(1),
+        generateZeroProblem(2),
+        generateZeroProblem(3),
+        generateZeroProblem(4),
+        generateZeroProblem(5)
+      ];
+      renderWorksheetPreview();
+    }
+
+    function renderWorksheetPreview() {
+      const container = document.getElementById('worksheetPreview');
+      container.innerHTML = '';
+
+      worksheetQuestions.forEach((q, idx) => {
+        const card = document.createElement('div');
+        card.className = 'bg-white p-4 rounded-xl border border-slate-200 shadow-sm';
+        card.innerHTML = `
+          <div class="flex justify-between text-xs text-slate-500 font-semibold mb-1">
+            <span>ข้อที่ ${idx + 1} (${q.category})</span>
+            <span>(2 คะแนน)</span>
+          </div>
+          <div class="text-base font-semibold text-slate-900 my-2">
+            <span>จงหาค่าของ:</span> $$${q.rawLatex}$$
+          </div>
+          <div class="space-y-2 mt-3 bg-slate-50/60 p-3 rounded-lg border border-dashed border-slate-200">
+            <div class="text-xs text-slate-400 font-medium">วิธีทำ:</div>
+            <div class="dotted-line"></div>
+            <div class="dotted-line"></div>
+            <div class="dotted-line"></div>
+            <div class="dotted-line"></div>
+            <div class="text-right text-xs font-semibold text-slate-600 pt-2">
+              ตอบ: ............................................................................
+            </div>
+          </div>
+        `;
+        container.appendChild(card);
+      });
+
+      renderMathEverywhere(container);
+    }
+
+    // -------------------------------------------------------------
+    // Print Logic (Student vs Teacher)
+    // -------------------------------------------------------------
+    function printWorksheet(isTeacherKey) {
+      const printArea = document.getElementById('print-area');
+
+      let html = `
+        <div class="text-center pb-2 border-b-2 border-black mb-4">
+          <h1 class="text-xl font-bold font-serif">ใบงานวิชาคณิตศาสตร์: เรื่อง การหาลิมิตเมื่อแทนค่าแล้วได้รูป 0/0</h1>
+          <p class="text-xs mt-0.5">${isTeacherKey ? '<span class="font-bold text-red-600 underline">ฉบับเฉลยวิธีทำละเอียดสำหรับครู</span>' : 'ฉบับแบบฝึกหัดสำหรับนักเรียน'}</p>
+          <div class="flex justify-between text-xs mt-2 pt-1 border-t border-slate-300">
+            <span>ชื่อ-นามสกุล: ............................................................................</span>
+            <span>ชั้น ม.6/...... เลขที่: ........</span>
+            <span>คะแนนเต็ม 10 ได้: .............</span>
+          </div>
+        </div>
+        <div>
+      `;
+
+      worksheetQuestions.forEach((q, idx) => {
+        html += `
+          <div class="print-item text-sm">
+            <div class="font-bold flex justify-between">
+              <span>ข้อที่ ${idx + 1}. จงหาค่าลิมิตต่อไปนี้:</span>
+              <span class="text-xs font-normal">(2 คะแนน)</span>
+            </div>
+            <div class="my-1 text-base">
+              $$${q.rawLatex}$$
+            </div>
+        `;
+
+        if (isTeacherKey) {
+          html += `
+            <div class="bg-slate-50 p-2 rounded border border-slate-300 text-xs space-y-1 my-1">
+              <div class="font-bold text-slate-700 underline">ขั้นตอนวิธีทำละเอียด:</div>
+              ${q.steps.map(s => `<div>• ${s}</div>`).join('')}
+              <div class="font-bold text-slate-900 mt-1">คำตอบสุดท้าย: $${q.finalAnswer}$</div>
+            </div>
+          `;
+        } else {
+          html += `
+            <div class="mt-1 space-y-1.5">
+              <div class="text-xs text-slate-500">วิธีทำ:</div>
+              <div class="dotted-line"></div>
+              <div class="dotted-line"></div>
+              <div class="dotted-line"></div>
+              <div class="dotted-line"></div>
+              <div class="text-right text-xs pt-1">
+                ตอบ: .............................................................................................
+              </div>
+            </div>
+          `;
+        }
+
+        html += `</div>`;
+      });
+
+      html += `
+        </div>
+        <div class="mt-4 pt-2 border-t border-slate-300 text-[10px] text-center text-slate-500">
+          เอกสารประกอบการจัดการเรียนรู้ กลุ่มสาระการเรียนรู้คณิตศาสตร์ เรื่อง แคลคูลัสเบื้องต้น
+        </div>
+      `;
+
+      printArea.innerHTML = html;
+      renderMathEverywhere(printArea);
+
+      setTimeout(() => {
+        window.print();
+      }, 350);
+    }
+
+    // เริ่มต้นทำงานทันทีที่โหลดหน้าเสร็จ
+    window.addEventListener('load', () => {
+      const checkKaTeX = setInterval(() => {
+        if (window.renderMathInElement) {
+          clearInterval(checkKaTeX);
+          renderMathEverywhere();
+          resizeZeroCanvas();
+          selectZeroFunction(0);
+          generateSingleExercise();
+          generateFiveQuestions();
+        }
+      }, 50);
+    });
+  </script>
+</body>
+</html>

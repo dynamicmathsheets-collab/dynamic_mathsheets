@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>คณิตศาสตร์ ม.6: แคลคูลัสเบื้องต้น (ลิมิตของฟังก์ชัน)</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&family=Chakra+Petch:wght@500;600;700&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Sarabun', sans-serif;
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+      background-color: #020617;
+    }
+    .font-heading {
+      font-family: 'Chakra Petch', sans-serif;
+    }
+    .tab-btn {
+      transition: all 0.2s ease;
+      white-space: nowrap;
+    }
+    .tab-btn.active {
+      background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+      color: #ffffff !important;
+      border-color: #60a5fa;
+      box-shadow: 0 2px 8px rgba(37, 99, 235, 0.4);
+    }
+    .tab-btn-quiz.active {
+      background: linear-gradient(135deg, #059669 0%, #047857 100%) !important;
+      color: #ffffff !important;
+      border-color: #34d399 !important;
+      box-shadow: 0 2px 8px rgba(5, 150, 105, 0.4);
+    }
+    .view-frame {
+      width: 100%;
+      height: calc(100vh - 56px);
+      border: none;
+      display: none;
+    }
+    .view-frame.active {
+      display: block;
+    }
+  </style>
+</head>
+<body class="h-screen w-screen flex flex-col bg-slate-950">
+
+  <!-- แถบนำทางด้านบน (Top Navigation Tabs) -->
+  <header class="h-14 bg-slate-950 text-white shadow-xl flex items-center justify-between px-3 sm:px-6 border-b border-blue-900/50 z-50 shrink-0">
+    <div class="flex items-center space-x-2.5 mr-3 shrink-0">
+      <span class="p-1.5 bg-blue-500/20 rounded-lg border border-blue-400/30 text-xl">♾️</span>
+      <div class="hidden xl:block">
+        <span class="text-[10px] uppercase tracking-wider text-blue-400 font-semibold font-heading block leading-none">คณิตศาสตร์เพิ่มเติม ม.6 (ค 3.2)</span>
+        <h1 class="text-xs sm:text-sm font-bold text-white font-heading mt-0.5">ลิมิตของฟังก์ชัน (Limits of Functions)</h1>
+      </div>
+    </div>
+
+    <!-- แถบปุ่มคลิกเลือก 8 เรื่อง + แบบทดสอบ -->
+    <nav class="flex items-center gap-1.5 overflow-x-auto py-1 text-xs font-heading scrollbar-none">
+      <button onclick="switchTab(1)" id="tab-btn-1" class="tab-btn active px-3 py-1.5 rounded-lg border border-slate-700 bg-slate-900 text-slate-300 hover:text-white hover:bg-slate-800">
+        1. ความหมายของลิมิต
+      </button>
+      <button onclick="switchTab(2)" id="tab-btn-2" class="tab-btn px-3 py-1.5 rounded-lg border border-slate-700 bg-slate-900 text-slate-300 hover:text-white hover:bg-slate-800">
+        2. การหาลิมิตจากกราฟ
+      </button>
+      <button onclick="switchTab(3)" id="tab-btn-3" class="tab-btn px-3 py-1.5 rounded-lg border border-slate-700 bg-slate-900 text-slate-300 hover:text-white hover:bg-slate-800">
+        3. การแทนค่าโดยตรง
+      </button>
+      <button onclick="switchTab(4)" id="tab-btn-4" class="tab-btn px-3 py-1.5 rounded-lg border border-slate-700 bg-slate-900 text-slate-300 hover:text-white hover:bg-slate-800">
+        4. รูปแบบยังไม่กำหนด 0/0
+      </button>
+      <button onclick="switchTab(5)" id="tab-btn-5" class="tab-btn px-3 py-1.5 rounded-lg border border-slate-700 bg-slate-900 text-slate-300 hover:text-white hover:bg-slate-800">
+        5. การแยกตัวประกอบและส่วนร่วม
+      </button>
+      <button onclick="switchTab(6)" id="tab-btn-6" class="tab-btn px-3 py-1.5 rounded-lg border border-slate-700 bg-slate-900 text-slate-300 hover:text-white hover:bg-slate-800">
+        6. ลิมิตด้านซ้าย-ด้านขวา
+      </button>
+      <button onclick="switchTab(7)" id="tab-btn-7" class="tab-btn px-3 py-1.5 rounded-lg border border-slate-700 bg-slate-900 text-slate-300 hover:text-white hover:bg-slate-800">
+        7. ลิมิตที่อนันต์และเส้นกำกับ
+      </button>
+      <button onclick="switchTab(8)" id="tab-btn-8" class="tab-btn px-3 py-1.5 rounded-lg border border-slate-700 bg-slate-900 text-slate-300 hover:text-white hover:bg-slate-800">
+        8. แบบฝึกหัดสรุปและประยุกต์
+      </button>
+      <button onclick="switchTab(9)" id="tab-btn-9" class="tab-btn tab-btn-quiz px-3.5 py-1.5 rounded-lg border border-emerald-600/70 bg-emerald-950/80 text-emerald-300 hover:bg-emerald-900 hover:text-white font-bold ml-1 shrink-0">
+        📝 แบบทดสอบ (15 ข้อ K-P-A)
+      </button>
+    </nav>
+  </header>
+
+  <!-- กรอบแสดงผลแต่ละไฟล์ HTML -->
+  <main class="flex-grow w-full relative overflow-hidden bg-slate-900">
+    <iframe id="frame-1" class="view-frame active" src="เรื่องที่ 1.html"></iframe>
+    <iframe id="frame-2" class="view-frame" src="เรื่องที่ 2.html"></iframe>
+    <iframe id="frame-3" class="view-frame" src="เรื่องที่ 3.html"></iframe>
+    <iframe id="frame-4" class="view-frame" src="เรื่องที่ 4.html"></iframe>
+    <iframe id="frame-5" class="view-frame" src="เรื่องที่ 5.html"></iframe>
+    <iframe id="frame-6" class="view-frame" src="เรื่องที่ 6.html"></iframe>
+    <iframe id="frame-7" class="view-frame" src="เรื่องที่ 7.html"></iframe>
+    <iframe id="frame-8" class="view-frame" src="เรื่องที่ 8.html"></iframe>
+    <iframe id="frame-9" class="view-frame" src="แบบทดสอบ.html"></iframe>
+  </main>
+
+  <script>
+    function switchTab(tabIndex) {
+      for (let i = 1; i <= 9; i++) {
+        const btn = document.getElementById(`tab-btn-${i}`);
+        const frame = document.getElementById(`frame-${i}`);
+        if (btn && frame) {
+          if (i === tabIndex) {
+            btn.classList.add('active');
+            frame.classList.add('active');
+          } else {
+            btn.classList.remove('active');
+            frame.classList.remove('active');
+          }
+        }
+      }
+    }
+  </script>
+</body>
+</html>

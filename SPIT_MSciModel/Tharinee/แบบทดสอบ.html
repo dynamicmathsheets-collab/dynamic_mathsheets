@@ -1,0 +1,691 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ระบบแบบทดสอบออนไลน์: เรื่อง ลิมิตของฟังก์ชัน ม.6</title>
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- KaTeX CSS & JS พร้อม Auto-render Extension -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js"></script>
+  
+  <!-- Google Fonts: Sarabun & Chakra Petch -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;700&family=Sarabun:ital,wght@0,300;0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
+
+  <style>
+    body {
+      font-family: 'Sarabun', sans-serif;
+      background-color: #f8fafc;
+      color: #1e293b;
+      overflow-x: hidden;
+    }
+    .heading-font {
+      font-family: 'Chakra Petch', sans-serif;
+    }
+
+    .choice-label {
+      cursor: pointer;
+      transition: all 0.2s ease-in-out;
+    }
+    .choice-label:hover {
+      background-color: #f1f5f9;
+    }
+
+    /* เส้นประสำหรับทดเลข / เขียนคำตอบตอนพิมพ์ */
+    .dotted-line {
+      border-bottom: 1.5px dotted #94a3b8;
+      height: 24px;
+      width: 100%;
+    }
+
+    /* ==========================================
+       Print Stylesheet: ระบบตัดหน้าเปล่าและจัดหน้า A4
+       ========================================== */
+    @media print {
+      @page {
+        size: A4 portrait;
+        margin: 1cm 1.2cm;
+      }
+      
+      #main-app-container,
+      header,
+      nav,
+      footer,
+      .no-print {
+        display: none !important;
+      }
+
+      #print-area {
+        display: block !important;
+        position: static !important;
+        width: 100% !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        background: white !important;
+        color: black !important;
+      }
+
+      .print-item {
+        break-inside: avoid !important;
+        page-break-inside: avoid !important;
+        margin-bottom: 0.8rem !important;
+      }
+    }
+  </style>
+</head>
+<body class="p-3 sm:p-6 md:p-8">
+
+  <!-- MAIN APP CONTAINER -->
+  <div id="main-app-container" class="max-w-4xl mx-auto space-y-6">
+
+    <!-- ส่วนที่ 1: ส่วนหัวเรื่องแบบทดสอบ -->
+    <header class="bg-gradient-to-r from-slate-900 via-indigo-950 to-blue-900 text-white rounded-2xl p-6 sm:p-8 shadow-lg">
+      <div class="flex flex-wrap items-center justify-between gap-3 mb-3">
+        <span class="inline-block px-3 py-1 bg-white/20 backdrop-blur rounded-full text-xs font-semibold tracking-wider uppercase">
+          คณิตศาสตร์เพิ่มเติม ม.6 • สาระแคลคูลัส
+        </span>
+        <span class="text-xs font-mono text-blue-200">
+          จำนวน 15 ข้อ • 15 คะแนน
+        </span>
+      </div>
+      <h1 class="text-2xl sm:text-4xl font-bold heading-font tracking-wide">
+        แบบทดสอบวัดผลสัมฤทธิ์ทางการเรียน: เรื่อง ลิมิตของฟังก์ชัน
+      </h1>
+      <p class="mt-2 text-blue-100 text-sm sm:text-base leading-relaxed">
+        ระบบทดสอบออนไลน์เชิงโต้ตอบ: เลือกคำตอบ กดส่งตรวจประเมินผลคะแนนทันที พร้อมวิเคราะห์ผลสัมฤทธิ์แยกตามด้าน K, P, A และเฉลยวิธีทำละเอียด
+      </p>
+    </header>
+
+    <!-- ส่วนที่ 2: แถบสถานะความคืบหน้า & กล่องสรุปผลคะแนนหลังส่ง -->
+    <section class="bg-white rounded-2xl p-5 shadow-sm border border-slate-200 sticky top-3 z-30 shadow-md">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <div class="flex-1">
+          <div class="flex justify-between items-center text-xs font-bold text-slate-700 mb-1.5">
+            <span>ความคืบหน้าในการทำข้อสอบ:</span>
+            <span id="progressText" class="text-indigo-600 font-mono text-sm">0 / 15 ข้อ</span>
+          </div>
+          <div class="w-full bg-slate-100 h-2.5 rounded-full overflow-hidden">
+            <div id="progressBar" class="bg-gradient-to-r from-blue-600 to-indigo-600 h-full w-0 transition-all duration-300"></div>
+          </div>
+        </div>
+        <div class="flex flex-wrap items-center gap-2">
+          <button id="btnSubmitExam" onclick="submitExam()" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-bold shadow transition flex items-center gap-1.5">
+            ✓ ส่งกระดาษคำตอบและตรวจคะแนน
+          </button>
+          <button id="btnResetExam" onclick="resetExam()" class="hidden px-3.5 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-semibold border border-slate-300 transition">
+            ⟲ ทำข้อสอบใหม่
+          </button>
+          <button onclick="printExam(false)" class="px-3 py-2 bg-teal-600 hover:bg-teal-700 text-white rounded-xl text-xs font-semibold transition">
+            🖨 พิมพ์ข้อสอบ
+          </button>
+          <button onclick="printExam(true)" class="px-3 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-semibold transition">
+            📑 พิมพ์เฉลย
+          </button>
+        </div>
+      </div>
+
+      <!-- กล่องสรุปคะแนน (แสดงหลังกดส่ง) -->
+      <div id="scoreSummaryBox" class="hidden mt-4 pt-4 border-t border-slate-200 animate-fadeIn">
+        <div class="bg-gradient-to-r from-indigo-50 to-blue-50 p-4 rounded-xl border border-indigo-200">
+          <div class="flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div>
+              <div class="text-xs font-bold text-indigo-950 uppercase tracking-wide">ผลการประเมินคะแนนรวม</div>
+              <div class="text-3xl font-extrabold text-indigo-900 mt-1 font-mono" id="scoreDisplay">0 / 15</div>
+              <div class="text-xs font-medium text-slate-600 mt-0.5" id="scoreFeedback">กำลังประมวลผล...</div>
+            </div>
+            <!-- สรุปแยก K P A -->
+            <div class="grid grid-cols-3 gap-2 text-center text-xs w-full sm:w-auto">
+              <div class="bg-white p-2.5 rounded-lg border border-blue-200 shadow-xs">
+                <div class="text-[10px] text-blue-700 font-bold">ด้าน K (ความรู้)</div>
+                <div class="text-base font-bold font-mono text-slate-800 mt-0.5" id="scoreK">0/5</div>
+              </div>
+              <div class="bg-white p-2.5 rounded-lg border border-emerald-200 shadow-xs">
+                <div class="text-[10px] text-emerald-700 font-bold">ด้าน P (ทักษะ)</div>
+                <div class="text-base font-bold font-mono text-slate-800 mt-0.5" id="scoreP">0/5</div>
+              </div>
+              <div class="bg-white p-2.5 rounded-lg border border-amber-200 shadow-xs">
+                <div class="text-[10px] text-amber-700 font-bold">ด้าน A (เจตคติ)</div>
+                <div class="text-base font-bold font-mono text-slate-800 mt-0.5" id="scoreA">0/5</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ส่วนที่ 3: แบบทดสอบทั้ง 15 ข้อ -->
+    <div id="examQuestionsContainer" class="space-y-5">
+      <!-- ข้อสอบถูกเรนเดอร์โดย JavaScript -->
+    </div>
+
+  </div>
+
+  <!-- แท่นพิมพ์ที่ซ่อนไว้ (แสดงเฉพาะเวลาสั่ง Print A4) -->
+  <div id="print-area" style="display: none;"></div>
+
+  <!-- SCRIPT ENGINE -->
+  <script>
+    // ข้อมูลข้อสอบ 15 ข้อครบสมบูรณ์
+    const examQuestions = [
+      // ด้าน K (Knowledge)
+      {
+        no: 1,
+        indicator: "เข้าใจความหมาย ทฤษฎีบท และบทนิยามพื้นฐานของลิมิตของฟังก์ชัน",
+        difficulty: "ง่าย",
+        aspect: "K (Knowledge)",
+        question: "พิจารณาข้อความเกี่ยวกับลิมิตต่อไปนี้ ข้อใดกล่าวได้ถูกต้องตามหลักการทางคณิตศาสตร์",
+        choices: [
+          "ถ้า $\\lim\\limits_{x \\to a} f(x) = L$ แล้ว จะต้องสรุปได้ว่า $f(a) = L$ เสมอ",
+          "ถ้า $f(a)$ ไม่นิยาม แล้ว $\\lim\\limits_{x \\to a} f(x)$ จะต้องไม่มีค่าเสมอ",
+          "$\\lim\\limits_{x \\to a} f(x) = L$ ก็ต่อเมื่อ $\\lim\\limits_{x \\to a^-} f(x) = \\lim\\limits_{x \\to a^+} f(x) = L$",
+          "ถ้า $\\lim\\limits_{x \\to a^-} f(x) = 2$ และ $\\lim\\limits_{x \\to a^+} f(x) = -2$ แล้ว $\\lim\\limits_{x \\to a} f(x) = 0$"
+        ],
+        correct: 2,
+        explanation: "ตามบทนิยามทางคณิตศาสตร์ ลิมิตสองด้านจะมีค่าเท่ากับ $L$ ก็ต่อเมื่อลิมิตทางซ้ายและลิมิตทางขวามีค่าเท่ากันและเท่ากับ $L$ พอดี ส่วนค่าฟังก์ชัน $f(a)$ จะมีค่าหรือไม่ ไม่ใช่เงื่อนไขของการมีลิมิต"
+      },
+      {
+        no: 2,
+        indicator: "หาลิมิตของฟังก์ชันพหุนามโดยใช้สมบัติการแทนค่าโดยตรง",
+        difficulty: "ง่าย",
+        aspect: "K (Knowledge)",
+        question: "ค่าของ $\\lim\\limits_{x \\to -2} (3x^2 - 4x + 1)$ มีค่าตรงกับข้อใด",
+        choices: [
+          "$5$",
+          "$17$",
+          "$21$",
+          "$-3$"
+        ],
+        correct: 2,
+        explanation: "ฟังก์ชันพหุนามมีความต่อเนื่องบนเซตของจำนวนจริง จึงสามารถแทนค่าได้โดยตรง: $3(-2)^2 - 4(-2) + 1 = 3(4) + 8 + 1 = 12 + 8 + 1 = 21$"
+      },
+      {
+        no: 3,
+        indicator: "เข้าใจพฤติกรรมของฟังก์ชันจากกราฟและเส้นกำกับ",
+        difficulty: "ปานกลาง",
+        aspect: "K (Knowledge)",
+        question: "กำหนดกราฟของฟังก์ชัน $y = f(x)$ มีเส้นตรง $y = 3$ เป็นเส้นกำกับแนวนอน (Horizontal Asymptote) และมีเส้นตรง $x = -1$ เป็นเส้นกำกับแนวดิ่ง (Vertical Asymptote) ข้อความใดต่อไปนี้สอดคล้องกับบทนิยามทางคณิตศาสตร์",
+        choices: [
+          "$\\lim\\limits_{x \\to \\infty} f(x) = 3$ และ $\\lim\\limits_{x \\to -1^+} f(x) = \\pm\\infty$",
+          "$\\lim\\limits_{x \\to 3} f(x) = \\infty$ และ $f(-1) = 3$",
+          "$\\lim\\limits_{x \\to 0} f(x) = -1$ และ $\\lim\\limits_{x \\to \\infty} f(x) = -1$",
+          "$\\lim\\limits_{x \\to -1} f(x) = 3$ และ $f(3)$ ไม่นิยาม"
+        ],
+        correct: 0,
+        explanation: "เส้นกำกับแนวนอน $y = 3$ หมายถึงเมื่อ $x \\to \\infty$ ค่าของฟังก์ชันจะลู่เข้าสู่ 3 และเส้นกำกับแนวดิ่ง $x = -1$ หมายถึงเมื่อ $x$ เข้าใกล้ $-1$ ค่าของฟังก์ชันจะพุ่งขึ้นหรือดิ่งลงสู่อสงไขย ($\\pm\\infty$)"
+      },
+      {
+        no: 4,
+        indicator: "เข้าใจความหมายของรูปแบบยังไม่กำหนด 0/0 และการมีอยู่ของลิมิต",
+        difficulty: "ปานกลาง",
+        aspect: "K (Knowledge)",
+        question: "เมื่อแทนค่าตัวแปร $x = c$ ในฟังก์ชันตรรกยะ $\\frac{P(x)}{Q(x)}$ แล้วพบว่าได้ผลลัพธ์อยู่ในรูป $\\frac{0}{0}$ ข้อสรุปใดต่อไปนี้ถูกต้องที่สุด",
+        choices: [
+          "ลิมิตหาค่าไม่ได้ทันที เนื่องจากตัวส่วนมีค่าเป็นศูนย์",
+          "ลิมิตมีค่าเท่ากับ $0$ เสมอ เพราะตัวเศษมีค่าเป็นศูนย์",
+          "ทั้ง $P(x)$ และ $Q(x)$ ต่างมีพจน์ $(x - c)$ เป็นตัวประกอบร่วม จึงต้องจัดรูปก่อนสรุปผล",
+          "ค่าของฟังก์ชัน ณ จุดนั้นเท่ากับค่าลิมิตของฟังก์ชันพอดี"
+        ],
+        correct: 2,
+        explanation: "จากทฤษฎีบทเศษเหลือ หากแทนค่าแล้วได้ $0/0$ แปลว่าทั้งเศษและส่วนต่างมี $(x - c)$ เป็นตัวประกอบร่วม จึงจำเป็นต้องจัดรูปพีชคณิตเพื่อตัดทอนพจน์ดังกล่าวก่อนจึงจะสรุปค่าลิมิตได้"
+      },
+      {
+        no: 5,
+        indicator: "วิเคราะห์สมบัติของลิมิตและทฤษฎีบทพีชคณิตของลิมิต",
+        difficulty: "ยาก",
+        aspect: "K (Knowledge)",
+        question: "กำหนดให้ $f$ และ $g$ เป็นฟังก์ชันโดยที่ $\\lim\\limits_{x \\to 1} [2f(x) + g(x)] = 7$ และ $\\lim\\limits_{x \\to 1} [f(x) - 3g(x)] = -7$ ค่าของ $\\lim\\limits_{x \\to 1} \\frac{[f(x)]^2}{g(x) + 1}$ เท่ากับข้อใด",
+        choices: [
+          "$1$",
+          "$2$",
+          "$\\frac{4}{3}$",
+          "$\\frac{1}{4}$"
+        ],
+        correct: 0,
+        explanation: "ให้ $A = \\lim\\limits_{x \\to 1} f(x)$ และ $B = \\lim\\limits_{x \\to 1} g(x)$ แก้ระบบสมการ $2A + B = 7$ และ $A - 3B = -7$ ได้ $A = 2, B = 3$ ดังนั้น $\\frac{2^2}{3 + 1} = \\frac{4}{4} = 1$"
+      },
+
+      // ด้าน P (Process/Skill)
+      {
+        no: 6,
+        indicator: "หาลิมิตของฟังก์ชันตรรกยะที่อยู่ในรูปแบบยังไม่กำหนด 0/0 โดยการแยกตัวประกอบ",
+        difficulty: "ง่าย",
+        aspect: "P (Process/Skill)",
+        question: "ค่าของ $\\lim\\limits_{x \\to 3} \\frac{x^2 - 2x - 3}{x^2 - 9}$ มีค่าเท่ากับข้อใด",
+        choices: [
+          "$0$",
+          "$\\frac{2}{3}$",
+          "$\\frac{4}{3}$",
+          "หาค่าไม่ได้"
+        ],
+        correct: 1,
+        explanation: "แทนค่าได้รูป $\\frac{0}{0}$ แยกตัวประกอบ: $\\lim\\limits_{x \\to 3} \\frac{(x - 3)(x + 1)}{(x - 3)(x + 3)} = \\lim\\limits_{x \\to 3} \\frac{x + 1}{x + 3} = \\frac{3 + 1}{3 + 3} = \\frac{4}{6} = \\frac{2}{3}$"
+      },
+      {
+        no: 7,
+        indicator: "หาลิมิตของฟังก์ชันที่อยู่ในรูปแบบ 0/0 โดยกระบวนการคูณด้วยสังยุค (Conjugate)",
+        difficulty: "ปานกลาง",
+        aspect: "P (Process/Skill)",
+        question: "ค่าของ $\\lim\\limits_{x \\to 4} \\frac{\\sqrt{x} - 2}{x^2 - 3x - 4}$ มีค่าเท่ากับข้อใด",
+        choices: [
+          "$\\frac{1}{20}$",
+          "$\\frac{1}{10}$",
+          "$\\frac{1}{4}$",
+          "$\\frac{1}{5}$"
+        ],
+        correct: 0,
+        explanation: "คูณสังยุค $(\\sqrt{x} + 2)$: $\\frac{(\\sqrt{x}-2)(\\sqrt{x}+2)}{(x-4)(x+1)(\\sqrt{x}+2)} = \\frac{x-4}{(x-4)(x+1)(\\sqrt{x}+2)} = \\frac{1}{(x+1)(\\sqrt{x}+2)}$ แทนค่า $x = 4$ ได้ $\\frac{1}{(5)(4)} = \\frac{1}{20}$"
+      },
+      {
+        no: 8,
+        indicator: "คำนวณลิมิตด้านเดียวของฟังก์ชันที่มีค่าสัมบูรณ์",
+        difficulty: "ปานกลาง",
+        aspect: "P (Process/Skill)",
+        question: "กำหนดฟังก์ชัน $f(x) = \\frac{x^2 - 4}{|x - 2|}$ ค่าของ $\\lim\\limits_{x \\to 2^-} f(x) + \\lim\\limits_{x \\to 2^+} f(x)$ เท่ากับข้อใด",
+        choices: [
+          "$8$",
+          "$4$",
+          "$0$",
+          "หาค่าไม่ได้"
+        ],
+        correct: 2,
+        explanation: "ลิมิตซ้าย: เมื่อ $x < 2$ จะได้ $|x-2| = -(x-2)$ จึงได้ลิมิตเท่ากับ $-(2+2) = -4$ / ลิมิตขวา: เมื่อ $x > 2$ ได้ $|x-2| = x-2$ ลิมิตเท่ากับ $2+2 = 4$ ผลรวมคือ $(-4) + 4 = 0$"
+      },
+      {
+        no: 9,
+        indicator: "จัดรูปพีชคณิตเศษส่วนซ้อนและการทำตัวส่วนร่วมเพื่อหาลิมิต",
+        difficulty: "ยาก",
+        aspect: "P (Process/Skill)",
+        question: "ค่าของ $\\lim\\limits_{x \\to 0} \\frac{1}{x} \\left( \\frac{1}{(x + 2)^2} - \\frac{1}{4} \\right)$ มีค่าเท่ากับข้อใด",
+        choices: [
+          "$-\\frac{1}{4}$",
+          "$-\\frac{1}{8}$",
+          "$-\\frac{1}{16}$",
+          "$\\frac{1}{8}$"
+        ],
+        correct: 0,
+        explanation: "รวมเศษส่วนซ้อนด้วย ค.ร.น. $4(x+2)^2$: $\\frac{4 - (x^2+4x+4)}{4(x+2)^2} = \\frac{-x(x+4)}{4(x+2)^2}$ คูณด้วย $\\frac{1}{x}$ ตัดทอน $x$ ออก เหลือ $\\lim\\limits_{x \\to 0} \\frac{-(x+4)}{4(x+2)^2} = \\frac{-4}{4(4)} = -\\frac{1}{4}$"
+      },
+      {
+        no: 10,
+        indicator: "คำนวณลิมิตที่อนันต์และการจัดรูปนิพจน์ติดกรณฑ์ขั้นสูง",
+        difficulty: "ยาก",
+        aspect: "P (Process/Skill)",
+        question: "ค่าของ $\\lim\\limits_{x \\to \\infty} \\left( \\sqrt{4x^2 + 12x + 1} - 2x \\right)$ มีค่าเท่ากับข้อใด",
+        choices: [
+          "$0$",
+          "$2$",
+          "$3$",
+          "$6$"
+        ],
+        correct: 2,
+        explanation: "คูณสังยุค: $\\lim\\limits_{x \\to \\infty} \\frac{(4x^2+12x+1) - 4x^2}{\\sqrt{4x^2+12x+1} + 2x} = \\lim\\limits_{x \\to \\infty} \\frac{12x + 1}{\\sqrt{4x^2+12x+1} + 2x}$ นำ $x$ หารทุกพจน์ ได้ $\\frac{12}{\\sqrt{4} + 2} = \\frac{12}{4} = 3$"
+      },
+
+      // ด้าน A (Attitude/Value)
+      {
+        no: 11,
+        indicator: "ตรวจสอบความถูกต้องของการให้เหตุผลทางคณิตศาสตร์และการใช้สัญลักษณ์",
+        difficulty: "ง่าย",
+        aspect: "A (Attitude/Value)",
+        question: "นักเรียนคนหนึ่งแสดงวิธีทำ: $\\lim\\limits_{x \\to 2} \\frac{x^2 - 4}{x - 2} = \\lim\\limits_{x \\to 2} (x + 2) = 2 + 2 = 4$ การตัดทอนพจน์ $(x - 2)$ ทั้งเศษและส่วนสามารถทำได้อย่างสมเหตุสมผลตามหลักการทางคณิตศาสตร์เพราะเหตุใด",
+        choices: [
+          "เพราะสามารถประมาณให้ $x = 2$ ได้เลยตั้งแต่บรรทัดแรก",
+          "เพราะในการหาลิมิต $x \\to 2$ มีความหมายว่า $x$ เข้าใกล้ $2$ โดยที่ $x \\neq 2$ จึงส่งผลให้ $x - 2 \\neq 0$",
+          "เพราะศูนย์หารด้วยศูนย์มีค่าเท่ากับ $1$ เสมอ",
+          "เพราะสัญลักษณ์ $\\lim$ สามารถกระจายเข้าไปในเศษและส่วนโดยตรงได้ทันที"
+        ],
+        correct: 1,
+        explanation: "เนื่องจากนิยามของ $x \\to 2$ หมายถึง $x$ เข้าใกล้ 2 แต่ $x \\neq 2$ ทำให้พจน์ $x - 2 \\neq 0$ จึงสามารถนำมาหารทั้งเศษและส่วนได้โดยไม่ผิดกฎคณิตศาสตร์"
+      },
+      {
+        no: 12,
+        indicator: "วิจารณญาณในการเลือกใช้ยุทธวิธีแก้ปัญหาทางคณิตศาสตร์อย่างคุ้มค่าและรัดกุม",
+        difficulty: "ปานกลาง",
+        aspect: "A (Attitude/Value)",
+        question: "ในการหาค่าของ $\\lim\\limits_{x \\to 1} \\frac{x^3 + 2x^2 - x - 2}{x^2 + x - 2}$ ยุทธวิธีเริ่มต้นในข้อใดสะท้อนถึงความรอบคอบและเป็นระบบที่สุด",
+        choices: [
+          "ดำเนินการแยกตัวประกอบทันทีโดยไม่ต้องตรวจค่าตัวเลข",
+          "ทำการคูณด้วยสังยุคของตัวส่วนเพื่อกำจัดพจน์กำลังสอง",
+          "ทดลองแทนค่า $x = 1$ ก่อนเพื่อตรวจสอบว่าเกิดรูปแบบยังไม่กำหนด $\\frac{0}{0}$ จริงหรือไม่",
+          "หารพจน์ทุกพจน์ด้วย $x^3$ ตามหลักการของลิมิตที่อนันต์"
+        ],
+        correct: 2,
+        explanation: "ความรอบคอบทางคณิตศาสตร์ต้องเริ่มจากการทดสอบแทนค่าโดยตรงก่อนเสมอ หากแทนค่าแล้วได้จำนวนจริง จะเป็นคำตอบทันที ไม่จำเป็นต้องจัดรูปพีชคณิตให้ซับซ้อน"
+      },
+      {
+        no: 13,
+        indicator: "การประเมินและโต้แย้งข้อผิดพลาดเชิงมโนทัศน์ (Error Analysis)",
+        difficulty: "ปานกลาง",
+        aspect: "A (Attitude/Value)",
+        question: "เพื่อนร่วมชั้นสรุปว่า \"เนื่องจาก $\\lim\\limits_{x \\to 0} \\frac{1}{x^2} = \\infty$ ดังนั้นฟังก์ชัน $f(x) = \\frac{1}{x^2}$ จึงมีลิมิต ณ จุด $x = 0$ และค่าลิมิตคือ $\\infty$\" ข้อวิพากษ์ใดสะท้อนมุมมองที่ถูกต้องตามหลักวิชาการ",
+        choices: [
+          "ถูกต้องแล้ว เพราะกราฟพุ่งขึ้นสู่ด้านบนทั้งสองฝั่งอย่างสมมาตร",
+          "ไม่ถูกต้อง เพราะสัญลักษณ์ $\\infty$ ไม่ใช่จำนวนจริง การเขียนว่าเท่ากับ $\\infty$ เป็นเพียงการระบุพฤติกรรมว่าฟังก์ชันมีค่าเพิ่มขึ้นอย่างไม่มีขอบเขต แต่ในทางคณิตศาสตร์ถือว่า \"ไม่มีลิมิต\" (หาค่าไม่ได้)",
+          "ถูกต้อง เพราะค่าลิมิตทางซ้ายเท่ากับค่าลิมิตทางขวาเสมอ",
+          "ไม่ถูกต้อง เพราะลิมิตทางซ้ายเป็น $-\\infty$ แต่ลิมิตทางขวาเป็น $+\\infty$"
+        ],
+        correct: 1,
+        explanation: "ในระบบจำนวนจริง $\\infty$ ไม่ใช่จำนวนจริง หากลิมิตไม่ได้ลู่เข้าหาจำนวนจริง $L$ ใด ๆ ย่อมถือว่า 'ไม่มีลิมิต' (Does Not Exist) การระบุสัญลักษณ์ $\\infty$ เป็นเพียงการบอกพฤติกรรมเท่านั้น"
+      },
+      {
+        no: 14,
+        indicator: "การเชื่อมโยงคณิตศาสตร์กับการสร้างข้อสรุปที่รอบคอบในการจำลองสถานการณ์",
+        difficulty: "ยาก",
+        aspect: "A (Attitude/Value)",
+        question: "ในโมเดลจำลองปริมาณประชากร $P(t) = \\frac{500t + 100}{t + 2}$ เมื่อ $t$ คือเวลา (ปี) นักวิจัยสรุปว่า \"ในระยะยาว ปริมาณประชากรจะไม่สูญพันธุ์และจะไม่มีทางเพิ่มขึ้นเกิน 500 หน่วย\" ข้อสรุปของนักวิจัยมีความน่าเชื่อถือทางคณิตศาสตร์หรือไม่ เพราะเหตุใด",
+        choices: [
+          "ไม่น่าเชื่อถือ เพราะประชากรต้องเพิ่มขึ้นเรื่อย ๆ เมื่อเวลาผ่านไปอย่างไม่สิ้นสุด",
+          "น่าเชื่อถือ เพราะเมื่อพิจารณาลิมิตในระยะยาว $\\lim\\limits_{t \\to \\infty} P(t) = 500$ ซึ่งเป็นเส้นกำกับแนวนอนคุมขอบเขตบนไว้",
+          "ไม่น่าเชื่อถือ เพราะที่เวลาเริ่มต้น $t = 0$ ค่าประชากรเป็นศูนย์",
+          "น่าเชื่อถือ เพราะตัวส่วน $t + 2$ จะเข้าใกล้อนันต์ทำให้ประชากรลดลงเหลือศูนย์"
+        ],
+        correct: 1,
+        explanation: "การพิจารณาพฤติกรรมระยะยาวสอดคล้องกับ $\\lim\\limits_{t \\to \\infty} \\frac{500t + 100}{t + 2} = 500$ ซึ่งเป็นเส้นกำกับแนวนอนทำหน้าที่คุมขอบเขตบนของปริมาณประชากรไว้อย่างสมเหตุสมผล"
+      },
+      {
+        no: 15,
+        indicator: "การคิดเชิงวิพากษ์และตรวจสอบความสมบูรณ์ของเงื่อนไขทางคณิตศาสตร์",
+        difficulty: "ยาก",
+        aspect: "A (Attitude/Value)",
+        question: "พิจารณาข้อโต้แย้ง: นักเรียน ก อ้างว่า \"ถ้า $\\lim\\limits_{x \\to 0} [f(x) \\cdot g(x)] = 0$ แล้ว จะต้องมีฟังก์ชันใดฟังก์ชันหนึ่งที่ $\\lim\\limits_{x \\to 0} f(x) = 0$ หรือ $\\lim\\limits_{x \\to 0} g(x) = 0$ เสมอ\" ส่วน นักเรียน ข แย้งว่า \"ไม่จริง สามารถสร้างฟังก์ชันที่ทั้งสองฟังก์ชันไม่มีลิมิตที่จุดนั้น แต่ผลคูณของลิมิตกลับมีค่าเท่ากับ 0 ได้\" ข้อใดระบุการตัดสินพร้อมหลักฐานทางคณิตศาสตร์ที่ถูกต้อง",
+        choices: [
+          "นักเรียน ก ถูกต้อง เพราะสอดคล้องกับสมบัติของจำนวนจริงที่ว่าถ้า $ab = 0$ แล้ว $a = 0$ หรือ $b = 0$",
+          "นักเรียน ข ถูกต้อง โดยยกตัวอย่าง $f(x) = x$ และ $g(x) = \\frac{1}{x^2}$",
+          "นักเรียน ข ถูกต้อง โดยยกตัวอย่าง $f(x) = x$ และ $g(x) = \\frac{|x|}{x}$ ซึ่ง $\\lim\\limits_{x \\to 0} g(x)$ ไม่มีค่า แต่ $\\lim\\limits_{x \\to 0} [f(x)g(x)] = \\lim\\limits_{x \\to 0} |x| = 0$",
+          "นักเรียน ก ถูกต้อง เพราะทฤษฎีบทการคูณของลิมิตอนุญาตให้แยกตัวคูณได้เสมอโดยไม่มีเงื่อนไข"
+        ],
+        correct: 2,
+        explanation: "นักเรียน ข แย้งได้ถูกต้องตามหลักตรรกศาสตร์ เพราะตัวอย่างค้าน $f(x) = x$ และ $g(x) = \\frac{|x|}{x}$ แสดงให้เห็นว่าผลคูณมีลิมิตเป็น 0 แม้ว่า $g(x)$ จะไม่มีลิมิตก็ตาม"
+      }
+    ];
+
+    // เก็บคำตอบของนักเรียน { 1: 2, 2: 0, ... }
+    let userAnswers = {};
+    let isSubmitted = false;
+
+    function renderMathEverywhere(element) {
+      const target = element || document.body;
+      if (window.renderMathInElement) {
+        renderMathInElement(target, {
+          delimiters: [
+            {left: '$$', right: '$$', display: true},
+            {left: '\\[', right: '\\]', display: true},
+            {left: '\\(', right: '\\)', display: false},
+            {left: '$', right: '$', display: false}
+          ],
+          throwOnError: false
+        });
+      }
+    }
+
+    // ฟังก์ชันสร้าง UI แบบทดสอบ
+    function renderQuizCards() {
+      const container = document.getElementById('examQuestionsContainer');
+      container.innerHTML = '';
+      const choicePrefix = ['ก.', 'ข.', 'ค.', 'ง.'];
+
+      examQuestions.forEach(q => {
+        const card = document.createElement('div');
+        card.id = `q-card-${q.no}`;
+        card.className = 'bg-white rounded-2xl p-5 sm:p-6 shadow-sm border border-slate-200 transition-all';
+
+        const badgeAspectColor = q.aspect.startsWith('K') ? 'bg-blue-100 text-blue-800 border-blue-200' :
+                                 (q.aspect.startsWith('P') ? 'bg-emerald-100 text-emerald-800 border-emerald-200' : 'bg-amber-100 text-amber-800 border-amber-200');
+        const badgeDiffColor = q.difficulty === 'ง่าย' ? 'bg-slate-100 text-slate-700' :
+                               (q.difficulty === 'ปานกลาง' ? 'bg-indigo-100 text-indigo-700' : 'bg-rose-100 text-rose-700 font-bold');
+
+        let choicesHTML = '';
+        q.choices.forEach((ch, idx) => {
+          const isSelected = userAnswers[q.no] === idx;
+          let labelClass = 'choice-label p-3 rounded-xl border border-slate-200 flex items-start gap-2.5 text-sm';
+          let iconHTML = `<span class="w-5 h-5 rounded-full border border-slate-300 flex items-center justify-center text-xs font-bold text-slate-500 mt-0.5">${choicePrefix[idx]}</span>`;
+
+          if (isSubmitted) {
+            // หลังส่งกระดาษคำตอบ
+            if (idx === q.correct) {
+              labelClass = 'p-3 rounded-xl border-2 border-emerald-500 bg-emerald-50/80 text-emerald-950 font-semibold flex items-start gap-2.5 text-sm';
+              iconHTML = `<span class="w-5 h-5 rounded-full bg-emerald-500 text-white flex items-center justify-center text-xs font-bold mt-0.5">✓</span>`;
+            } else if (isSelected && idx !== q.correct) {
+              labelClass = 'p-3 rounded-xl border-2 border-rose-500 bg-rose-50/80 text-rose-950 font-semibold flex items-start gap-2.5 text-sm';
+              iconHTML = `<span class="w-5 h-5 rounded-full bg-rose-500 text-white flex items-center justify-center text-xs font-bold mt-0.5">✗</span>`;
+            } else {
+              labelClass = 'p-3 rounded-xl border border-slate-200 bg-slate-50/40 opacity-70 flex items-start gap-2.5 text-sm text-slate-600';
+            }
+          } else {
+            // ขณะทำข้อสอบ
+            if (isSelected) {
+              labelClass = 'choice-label p-3 rounded-xl border-2 border-indigo-600 bg-indigo-50/90 text-indigo-950 font-semibold flex items-start gap-2.5 text-sm shadow-xs';
+              iconHTML = `<span class="w-5 h-5 rounded-full bg-indigo-600 text-white flex items-center justify-center text-xs font-bold mt-0.5">${choicePrefix[idx]}</span>`;
+            }
+          }
+
+          choicesHTML += `
+            <div class="${labelClass}" onclick="${isSubmitted ? '' : `chooseOption(${q.no},${idx})`}">
+              ${iconHTML}
+              <div class="flex-1">${ch}</div>
+            </div>
+          `;
+        });
+
+        // กล่องเฉลยละเอียด (แสดงหลังกดส่ง)
+        let solutionBoxHTML = '';
+        if (isSubmitted) {
+          const isCorrect = userAnswers[q.no] === q.correct;
+          const statusBadge = isCorrect 
+            ? `<span class="px-2 py-0.5 rounded bg-emerald-100 text-emerald-800 font-bold">✓ ตอบถูกต้อง (+1 คะแนน)</span>`
+            : `<span class="px-2 py-0.5 rounded bg-rose-100 text-rose-800 font-bold">✗ ยังไม่ถูกต้อง (0 คะแนน)</span>`;
+
+          solutionBoxHTML = `
+            <div class="mt-4 p-4 rounded-xl border ${isCorrect ? 'bg-emerald-50/50 border-emerald-200' : 'bg-rose-50/50 border-rose-200'} text-xs text-slate-800 space-y-1.5 animate-fadeIn">
+              <div class="flex justify-between items-center pb-1 border-b ${isCorrect ? 'border-emerald-200' : 'border-rose-200'}">
+                <span class="font-bold text-slate-800">เฉลยที่ถูกต้อง: ข้อ ${choicePrefix[q.correct]}</span>
+                ${statusBadge}
+              </div>
+              <div class="text-slate-700 leading-relaxed pt-1">
+                <strong>แนวคิดและขั้นตอนวิธีทำ:</strong> ${q.explanation}
+              </div>
+            </div>
+          `;
+        }
+
+        card.innerHTML = `
+          <!-- ข้อมูลตัวชี้วัดกำกับเหนือข้อคำถาม -->
+          <div class="flex flex-wrap items-center justify-between gap-2 text-xs pb-2.5 mb-3 border-b border-slate-100">
+            <div class="flex items-center gap-1.5 flex-wrap">
+              <span class="px-2.5 py-0.5 rounded-md font-bold border ${badgeAspectColor}">${q.aspect}</span>
+              <span class="px-2 py-0.5 rounded-md ${badgeDiffColor}">ระดับ: ${q.difficulty}</span>
+            </div>
+            <div class="text-slate-500 text-[11px] font-medium flex-1 sm:text-right">
+              <strong>ตัวชี้วัด:</strong> ${q.indicator}
+            </div>
+          </div>
+
+          <!-- ตัวโจทย์ -->
+          <div class="text-base font-semibold text-slate-900 mb-3.5">
+            <span class="text-indigo-600 font-bold">ข้อที่ ${q.no}.</span> ${q.question}
+          </div>
+
+          <!-- รายการตัวเลือก 4 ตัวเลือก -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+            ${choicesHTML}
+          </div>
+
+          ${solutionBoxHTML}
+        `;
+
+        container.appendChild(card);
+      });
+
+      renderMathEverywhere(container);
+      updateProgress();
+    }
+
+    // ฟังก์ชันเลือกคำตอบ
+    function chooseOption(questionNo, choiceIndex) {
+      if (isSubmitted) return;
+      userAnswers[questionNo] = choiceIndex;
+      renderQuizCards();
+    }
+
+    // อัปเดตแถบความคืบหน้า
+    function updateProgress() {
+      const answeredCount = Object.keys(userAnswers).length;
+      document.getElementById('progressText').textContent = `${answeredCount} / 15 ข้อ`;
+      const pct = (answeredCount / 15) * 100;
+      document.getElementById('progressBar').style.width = `${pct}%`;
+    }
+
+    // ฟังก์ชันส่งข้อสอบและตรวจคะแนน
+    function submitExam() {
+      const answeredCount = Object.keys(userAnswers).length;
+      if (answeredCount < 15) {
+        if (!confirm(`คุณยังทำข้อสอบไม่ครบ (ทำไปแล้ว ${answeredCount} จาก 15 ข้อ)\nต้องการยืนยันส่งกระดาษคำตอบและตรวจคะแนนทันทีหรือไม่?`)) {
+          return;
+        }
+      }
+
+      isSubmitted = true;
+      let totalScore = 0;
+      let scoreK = 0, totalK = 0;
+      let scoreP = 0, totalP = 0;
+      let scoreA = 0, totalA = 0;
+
+      examQuestions.forEach(q => {
+        const isCorrect = userAnswers[q.no] === q.correct;
+        if (q.aspect.startsWith('K')) { totalK++; if (isCorrect) scoreK++; }
+        if (q.aspect.startsWith('P')) { totalP++; if (isCorrect) scoreP++; }
+        if (q.aspect.startsWith('A')) { totalA++; if (isCorrect) scoreA++; }
+        if (isCorrect) totalScore++;
+      });
+
+      // แสดงผลคะแนนใน UI
+      document.getElementById('scoreDisplay').textContent = `${totalScore} / 15`;
+      document.getElementById('scoreK').textContent = `${scoreK}/${totalK}`;
+      document.getElementById('scoreP').textContent = `${scoreP}/${totalP}`;
+      document.getElementById('scoreA').textContent = `${scoreA}/${totalA}`;
+
+      const pct = (totalScore / 15) * 100;
+      let feedback = '';
+      if (pct >= 80) feedback = '🌟 ยอดเยี่ยมมาก! คุณมีความรู้ความเข้าใจและทักษะเรื่องลิมิตในระดับดีเยี่ยม';
+      else if (pct >= 60) feedback = '👍 ผ่านเกณฑ์ในระดับดี! ควรทบทวนจุดที่ผิดพลาดเพิ่มเติมในขั้นตอนวิธีทำ';
+      else feedback = '📖 ควรทบทวนบทเรียนเพิ่มเติม ลองศึกษาแนวคิดและขั้นตอนวิธีทำในเฉลยด้านล่างอย่างละเอียด';
+      document.getElementById('scoreFeedback').textContent = `${feedback} (คิดเป็น ${pct.toFixed(1)}%)`;
+
+      document.getElementById('scoreSummaryBox').classList.remove('hidden');
+      document.getElementById('btnSubmitExam').classList.add('hidden');
+      document.getElementById('btnResetExam').classList.remove('hidden');
+
+      renderQuizCards();
+
+      // เลื่อนจอขึ้นไปดูกล่องคะแนน
+      window.scrollTo({ top: 120, behavior: 'smooth' });
+    }
+
+    // ฟังก์ชันเริ่มทำใหม่
+    function resetExam() {
+      if (!confirm('ต้องการล้างคำตอบทั้งหมดและทำข้อสอบใหม่อีกครั้งใช่หรือไม่?')) return;
+      userAnswers = {};
+      isSubmitted = false;
+      document.getElementById('scoreSummaryBox').classList.add('hidden');
+      document.getElementById('btnSubmitExam').classList.remove('hidden');
+      document.getElementById('btnResetExam').classList.add('hidden');
+      renderQuizCards();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // -------------------------------------------------------------
+    // ระบบการพิมพ์ A4 (แยกฉบับข้อสอบเปล่า / เฉลยละเอียด ไร้หน้าเปล่า 100%)
+    // -------------------------------------------------------------
+    function printExam(isTeacherKey) {
+      const printArea = document.getElementById('print-area');
+      const choicePrefix = ['ก.', 'ข.', 'ค.', 'ง.'];
+
+      let html = `
+        <div class="text-center pb-2 border-b-2 border-black mb-3">
+          <h1 class="text-lg font-bold font-serif">แบบทดสอบวัดผลสัมฤทธิ์ทางการเรียน วิชาคณิตศาสตร์เพิ่มเติม (ค33201)</h1>
+          <h2 class="text-sm font-semibold">เรื่อง ลิมิตของฟังก์ชัน ชั้นมัธยมศึกษาปีที่ 6 (จำนวน 15 ข้อ เวลา 60 นาที คะแนนเต็ม 15 คะแนน)</h2>
+          <p class="text-xs mt-0.5">${isTeacherKey ? '<span class="font-bold text-red-600 underline">ฉบับเฉลยละเอียดและวิเคราะห์ตัวชี้วัดสำหรับครู</span>' : 'ฉบับแบบทดสอบสำหรับนักเรียน'}</p>
+          <div class="flex justify-between text-xs mt-2 pt-1 border-t border-slate-300">
+            <span>ชื่อ-นามสกุล: ............................................................................</span>
+            <span>ชั้น ม.6/...... เลขที่: ........</span>
+            <span>คะแนนที่ได้: ......... / 15</span>
+          </div>
+        </div>
+        <div>
+      `;
+
+      examQuestions.forEach(q => {
+        html += `
+          <div class="print-item text-xs">
+            <!-- ข้อมูลตัวชี้วัดเหนือข้อ -->
+            <div class="flex justify-between items-center text-[10px] text-slate-600 border-b border-slate-200 pb-0.5 mb-1 font-mono">
+              <span><strong>[${q.aspect}]</strong> ระดับ: ${q.difficulty}</span>
+              <span>ตัวชี้วัด: ${q.indicator}</span>
+            </div>
+            
+            <!-- คำถาม -->
+            <div class="font-bold text-slate-900 mb-1">
+              ข้อที่ ${q.no}. ${q.question}
+            </div>
+
+            <!-- ตัวเลือก 4 ตัวเลือก -->
+            <div class="grid grid-cols-2 gap-x-4 gap-y-1 my-1 pl-2 text-slate-800">
+              ${q.choices.map((c, i) => `
+                <div class="${isTeacherKey && i === q.correct ? 'font-bold text-red-600 underline' : ''}">
+                  <span>${choicePrefix[i]}</span>${c}
+                </div>
+              `).join('')}
+            </div>
+        `;
+
+        if (isTeacherKey) {
+          html += `
+            <div class="bg-slate-50 p-1.5 rounded border border-slate-300 text-[10px] space-y-0.5 my-1">
+              <div class="font-bold text-slate-800">เฉลยข้อ: <span class="text-red-600">${choicePrefix[q.correct]}</span></div>
+              <div class="text-slate-600"><strong>แนวคิด:</strong> ${q.explanation}</div>
+            </div>
+          `;
+        } else {
+          html += `
+            <div class="my-1 space-y-1">
+              <div class="dotted-line"></div>
+            </div>
+          `;
+        }
+
+        html += `</div>`;
+      });
+
+      html += `
+        </div>
+        <div class="mt-3 pt-2 border-t border-slate-300 text-[10px] text-center text-slate-500">
+          เอกสารข้อสอบวัดผลสัมฤทธิ์ทางการเรียน กลุ่มสาระการเรียนรู้คณิตศาสตร์ ชั้นมัธยมศึกษาปีที่ 6
+        </div>
+      `;
+
+      printArea.innerHTML = html;
+      renderMathEverywhere(printArea);
+
+      setTimeout(() => {
+        window.print();
+      }, 350);
+    }
+
+    // เริ่มต้นทำงานทันทีที่โหลดหน้าเสร็จ
+    window.addEventListener('load', () => {
+      const checkKaTeX = setInterval(() => {
+        if (window.renderMathInElement) {
+          clearInterval(checkKaTeX);
+          renderQuizCards();
+        }
+      }, 50);
+    });
+  </script>
+</body>
+</html>
