@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>แบบทดสอบวัดผลสัมฤทธิ์ทางการเรียน - อัตราส่วน สัดส่วน และร้อยละ ม.1</title>
+  
+  <!-- Tailwind CSS & Google Fonts -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;600;700&family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  
+  <style>
+    body {
+      font-family: 'Sarabun', sans-serif;
+      background-color: #f8fafc;
+      color: #1e293b;
+    }
+    
+    .font-math {
+      font-family: 'Chakra Petch', sans-serif;
+    }
+
+    /* สไตล์เศษส่วนคณิตศาสตร์แท้จริง */
+    .math-frac {
+      display: inline-flex;
+      flex-direction: column;
+      vertical-align: middle;
+      text-align: center;
+      padding: 0 4px;
+      line-height: 1.1;
+      font-family: 'Chakra Petch', sans-serif;
+    }
+    .math-frac .num {
+      border-bottom: 2px solid currentColor;
+      padding-bottom: 2px;
+      font-weight: 600;
+    }
+    .math-frac .den {
+      padding-top: 2px;
+      font-weight: 600;
+    }
+
+    /* Print Stylesheet */
+    @page {
+      size: A4 portrait;
+      margin: 1.2cm 1.5cm;
+    }
+    @media print {
+      body {
+        background-color: #ffffff !important;
+        padding: 0 !important;
+        margin: 0 !important;
+      }
+      .no-print-section {
+        display: none !important;
+      }
+      #test-paper {
+        display: block !important;
+        width: 100% !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        border: none !important;
+        box-shadow: none !important;
+      }
+      .question-card {
+        page-break-inside: avoid;
+        border-color: #cbd5e1 !important;
+        box-shadow: none !important;
+      }
+      .choice-item {
+        background: transparent !important;
+      }
+    }
+  </style>
+</head>
+<body class="p-4 md:p-8 max-w-5xl mx-auto space-y-8">
+
+  <!-- แถบหัวเรื่องหลัก -->
+  <header class="no-print-section bg-gradient-to-r from-blue-700 via-indigo-700 to-purple-800 text-white p-6 md:p-8 rounded-3xl shadow-lg border border-blue-500/30">
+    <div class="flex flex-row justify-between items-start gap-4">
+      <div class="flex-1">
+        <span class="inline-block px-3 py-1 bg-white/20 backdrop-blur-md rounded-full text-xs font-semibold tracking-wide uppercase">
+          คลังข้อสอบมาตรฐานวัดผลสัมฤทธิ์ทางการเรียน
+        </span>
+        <h1 class="text-2xl md:text-3xl font-bold mt-2 font-math">แบบทดสอบวัดผลสัมฤทธิ์ทางการเรียน: อัตราส่วน สัดส่วน และร้อยละ</h1>
+        <p class="text-blue-100 text-sm md:text-base mt-1">
+          ระดับชั้นมัธยมศึกษาปีที่ 1 แบบปรนัย 4 ตัวเลือก จำนวน 15 ข้อ (ประเมิน K - P - A และระดับความยาก 3 ระดับ)
+        </p>
+      </div>
+      <div class="shrink-0 bg-white/10 backdrop-blur-sm px-4 py-2 rounded-2xl border border-white/20 text-center font-math">
+        <span class="text-xs text-blue-200 block">มาตรฐานการเรียนรู้</span>
+        <span class="text-base font-bold text-white">ค 1.1 ม.1</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- แผงเครื่องมือสั่งพิมพ์และตรวจข้อสอบ -->
+  <section class="no-print-section bg-white p-4 md:p-6 rounded-2xl border border-slate-200 shadow-sm flex flex-wrap justify-between items-center gap-4">
+    <div class="flex flex-wrap items-center gap-2">
+      <button onclick="printStudentTest()" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white rounded-xl text-xs md:text-sm font-medium shadow-sm transition flex items-center gap-1.5">
+        <span>🖨️</span> พิมพ์แบบทดสอบ (สำหรับนักเรียน)
+      </button>
+      <button onclick="printTeacherKey()" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 active:scale-95 text-white rounded-xl text-xs md:text-sm font-medium shadow-sm transition flex items-center gap-1.5">
+        <span>📝</span> พิมพ์แบบเฉลย (สำหรับครู)
+      </button>
+    </div>
+    
+    <div class="flex items-center gap-2">
+      <button onclick="resetAnswers()" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs md:text-sm font-medium border border-slate-300 transition">
+        ล้างคำตอบ
+      </button>
+      <button onclick="gradeTest()" class="px-5 py-2 bg-blue-600 hover:bg-blue-700 active:scale-95 text-white rounded-xl text-xs md:text-sm font-bold shadow-md transition flex items-center gap-1.5">
+        <span>✅</span> ตรวจคะแนนออนไลน์
+      </button>
+    </div>
+  </section>
+
+  <!-- แผงสรุปผลคะแนนแบบโต้ตอบ (แสดงหลังกดส่งคำตอบ) -->
+  <section id="score-summary-panel" class="hidden no-print-section bg-white rounded-3xl p-6 md:p-8 shadow-sm border border-slate-200 animate-fade-in">
+    <div class="flex items-center gap-3 mb-6">
+      <div class="w-3 h-8 bg-purple-600 rounded-full"></div>
+      <h2 class="text-xl md:text-2xl font-bold text-slate-800">ผลการประเมินผลสัมฤทธิ์ทางการเรียน</h2>
+    </div>
+
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+      <div class="p-4 bg-blue-50 border border-blue-200 rounded-2xl text-center">
+        <span class="text-xs text-blue-600 font-semibold block mb-1">คะแนนรวมทั้งหมด</span>
+        <div id="score-total" class="text-2xl md:text-3xl font-bold font-math text-blue-800">0 / 15</div>
+      </div>
+      <div class="p-4 bg-emerald-50 border border-emerald-200 rounded-2xl text-center">
+        <span class="text-xs text-emerald-600 font-semibold block mb-1">ด้านความรู้ (K)</span>
+        <div id="score-k" class="text-xl md:text-2xl font-bold font-math text-emerald-800">0 / 5</div>
+      </div>
+      <div class="p-4 bg-amber-50 border border-amber-200 rounded-2xl text-center">
+        <span class="text-xs text-amber-600 font-semibold block mb-1">ด้านทักษะกระบวนการ (P)</span>
+        <div id="score-p" class="text-xl md:text-2xl font-bold font-math text-amber-800">0 / 5</div>
+      </div>
+      <div class="p-4 bg-purple-50 border border-purple-200 rounded-2xl text-center">
+        <span class="text-xs text-purple-600 font-semibold block mb-1">ด้านคุณลักษณะ/เจตคติ (A)</span>
+        <div id="score-a" class="text-xl md:text-2xl font-bold font-math text-purple-800">0 / 5</div>
+      </div>
+    </div>
+    
+    <div id="score-feedback" class="p-4 rounded-2xl text-sm leading-relaxed border font-medium"></div>
+  </section>
+
+  <!-- ตัวแผ่นแบบทดสอบ (สำหรับทำออนไลน์และสั่งพิมพ์) -->
+  <main id="test-paper" class="bg-white p-6 md:p-10 rounded-3xl border border-slate-200 shadow-sm space-y-8">
+    
+    <!-- ส่วนหัวข้อสอบบนแผ่นกระดาษ -->
+    <div class="border-b-2 border-slate-800 pb-5">
+      <div class="flex justify-between items-start">
+        <div>
+          <h2 class="text-xl font-bold text-slate-900">แบบทดสอบวัดผลสัมฤทธิ์ทางการเรียน กลุ่มสาระการเรียนรู้คณิตศาสตร์</h2>
+          <p class="text-sm font-semibold text-slate-700 mt-1">เรื่อง อัตราส่วน สัดส่วน และร้อยละ | ชั้นมัธยมศึกษาปีที่ 1</p>
+          <p class="text-xs text-slate-500 mt-0.5">แบบทดสอบปรนัย 4 ตัวเลือก จำนวน 15 ข้อ เวลาทำแบบทดสอบ 50 นาที</p>
+        </div>
+        <div class="text-right text-xs space-y-1.5 font-sans">
+          <p>ชื่อ-นามสกุล: ..............................................................</p>
+          <p>ชั้น: ............... เลขที่: ........... วันที่: ........................</p>
+          <p class="font-bold text-slate-800">คะแนนที่ได้: ................. / 15 คะแนน</p>
+        </div>
+      </div>
+      <div class="mt-4 pt-3 border-t border-slate-200 text-xs text-slate-600">
+        <strong>คำชี้แจง:</strong> ให้นักเรียนเลือกคำตอบที่ถูกต้องที่สุดเพียงคำตอบเดียว แล้วทำเครื่องหมาย × หรือคลิกเลือกคำตอบที่ถูกต้อง
+      </div>
+    </div>
+
+    <!-- รายการข้อสอบทั้ง 15 ข้อ -->
+    <div id="questions-container" class="space-y-6">
+      <!-- ข้อคำถามจะถูกเรนเดอร์โดย JavaScript อัตโนมัติ -->
+    </div>
+
+  </main>
+
+  <!-- ข้อมูลโครงสร้างข้อสอบและ JavaScript จัดการระบบ -->
+  <script>
+    const examData = [
+      // === ด้านความรู้ (Knowledge : K) ข้อ 1 - 5 ===
+      {
+        id: 1,
+        aspect: "ด้านความรู้ (Knowledge : K)",
+        indicator: "ค 1.1 ม.1/3 เข้าใจและประยุกต์ใช้อัตราส่วน สัดส่วน และร้อยละ",
+        difficulty: "ง่าย",
+        question: "ข้อใดให้ความหมายของ <strong>\"อัตราส่วน (Ratio)\"</strong> ได้ถูกต้องและสมบูรณ์ที่สุดตามหลักคณิตศาสตร์",
+        choices: [
+          "ก. ผลบวกของจำนวนสองจำนวนที่มีหน่วยต่างกัน",
+          "ข. การเปรียบเทียบปริมาณของสิ่งของตั้งแต่สองสิ่งขึ้นไป",
+          "ค. การคูณจำนวนแรกด้วยจำนวนที่สอง",
+          "ง. สมการที่แสดงการเท่ากันของเศษส่วนสองชุด"
+        ],
+        ans: 1,
+        solution: "อัตราส่วนคือความสัมพันธ์ที่แสดงการเปรียบเทียบปริมาณของสิ่งของตั้งแต่สองสิ่งขึ้นไป โดยอาจมีหน่วยเหมือนกันหรือต่างกันก็ได้"
+      },
+      {
+        id: 2,
+        aspect: "ด้านความรู้ (Knowledge : K)",
+        indicator: "ค 1.1 ม.1/3 เข้าใจและประยุกต์ใช้อัตราส่วน สัดส่วน และร้อยละ",
+        difficulty: "ง่าย",
+        question: "อัตราส่วนในข้อใด <strong>เท่ากับ 3 : 5</strong>",
+        choices: [
+          "ก. 6 : 15",
+          "ข. 9 : 20",
+          "ค. 12 : 20",
+          "ง. 15 : 24"
+        ],
+        ans: 2,
+        solution: "นำ 4 มาคูณทั้งจำนวนแรกและจำนวนหลัง: (3 × 4) : (5 × 4) = 12 : 20 ดังนั้น 3 : 5 = 12 : 20"
+      },
+      {
+        id: 3,
+        aspect: "ด้านความรู้ (Knowledge : K)",
+        indicator: "ค 1.1 ม.1/3 เข้าใจและประยุกต์ใช้อัตราส่วน สัดส่วน และร้อยละ",
+        difficulty: "ปานกลาง",
+        question: "กำหนดสัดส่วน <span class=\"math-frac\"><span class=\"num\">a</span><span class=\"den\">b</span></span> = <span class=\"math-frac\"><span class=\"num\">c</span><span class=\"den\">d</span></span> (เมื่อ b, d ≠ 0) จากสมบัติการคูณไขว้ ข้อใดเป็นจริงเสมอ",
+        choices: [
+          "ก. a × c = b × d",
+          "ข. a × d = b × c",
+          "ค. a + d = b + c",
+          "ง. a − b = c − d"
+        ],
+        ans: 1,
+        solution: "สมบัติของสัดส่วนระบุว่า ถ้า a/b = c/d แล้วผลคูณไขว้ a × d จะต้องเท่ากับ b × c เสมอ"
+      },
+      {
+        id: 4,
+        aspect: "ด้านความรู้ (Knowledge : K)",
+        indicator: "ค 1.1 ม.1/3 เข้าใจและประยุกต์ใช้อัตราส่วน สัดส่วน และร้อยละ",
+        difficulty: "ปานกลาง",
+        question: "ร้อยละ 45 หรือ 45% เขียนให้อยู่ในรูป <strong>เศษส่วนอย่างต่ำ</strong> ได้ตรงกับข้อใด",
+        choices: [
+          "ก. <span class=\"math-frac\"><span class=\"num\">9</span><span class=\"den\">20</span></span>",
+          "ข. <span class=\"math-frac\"><span class=\"num\">4</span><span class=\"den\">5</span></span>",
+          "ค. <span class=\"math-frac\"><span class=\"num\">45</span><span class=\"den\">50</span></span>",
+          "ง. <span class=\"math-frac\"><span class=\"num\">9</span><span class=\"den\">10</span></span>"
+        ],
+        ans: 0,
+        solution: "45% = 45/100 นำ ห.ร.ม. คือ 5 มาทอนทั้งเศษและส่วน จะได้ (45 ÷ 5) / (100 ÷ 5) = 9/20"
+      },
+      {
+        id: 5,
+        aspect: "ด้านความรู้ (Knowledge : K)",
+        indicator: "ค 1.1 ม.1/3 เข้าใจและประยุกต์ใช้อัตราส่วน สัดส่วน และร้อยละ",
+        difficulty: "ยาก",
+        question: "พิจารณาข้อความต่อไปนี้ ข้อความใด <strong>ถูกต้อง</strong><br>1) 2 : 3 มีความหมายเหมือนกับ 3 : 2<br>2) สัดส่วนตรง เมื่อปริมาณหนึ่งเพิ่ม อีกปริมาณหนึ่งจะเพิ่มขึ้นตามด้วยอัตราส่วนคงที่<br>3) กราฟของความสัมพันธ์ที่เป็นสัดส่วนตรงเป็นเส้นตรงที่ผ่านจุดกำเนิด (0, 0)",
+        choices: [
+          "ก. ข้อความ 1) และ 2) ถูกต้อง",
+          "ข. ข้อความ 1) และ 3) ถูกต้อง",
+          "ค. ข้อความ 2) และ 3) ถูกต้อง",
+          "ง. ถูกต้องทั้งสามข้อความ"
+        ],
+        ans: 2,
+        solution: "ข้อ 1) ผิดเพราะลำดับของอัตราส่วนมีความสำคัญ 2 : 3 ≠ 3 : 2 ส่วนข้อ 2) และ 3) เป็นสมบัติที่ถูกต้องของสัดส่วนตรง"
+      },
+
+      // === ด้านทักษะและกระบวนการ (Process / Practice : P) ข้อ 6 - 10 ===
+      {
+        id: 6,
+        aspect: "ด้านทักษะกระบวนการ (Process : P)",
+        indicator: "ค 1.1 ม.1/3 เข้าใจและประยุกต์ใช้อัตราส่วน สัดส่วน และร้อยละ",
+        difficulty: "ง่าย",
+        question: "ถ้าดินสอ 4 แท่ง ราคา 20 บาท ดินสอ 12 แท่ง จะมีราคากี่บาท",
+        choices: [
+          "ก. 40 บาท",
+          "ข. 50 บาท",
+          "ค. 60 บาท",
+          "ง. 80 บาท"
+        ],
+        ans: 2,
+        solution: "ตั้งสัดส่วน 4/20 = 12/x จะได้ x = (20 × 12) ÷ 4 = 60 บาท"
+      },
+      {
+        id: 7,
+        aspect: "ด้านทักษะกระบวนการ (Process : P)",
+        indicator: "ค 1.1 ม.1/3 เข้าใจและประยุกต์ใช้อัตราส่วน สัดส่วน และร้อยละ",
+        difficulty: "ปานกลาง",
+        question: "กำหนดอัตราส่วน A : B = 2 : 3 และ B : C = 4 : 5 จงหาอัตราส่วน <strong>A : B : C</strong>",
+        choices: [
+          "ก. 2 : 3 : 5",
+          "ข. 8 : 12 : 15",
+          "ค. 6 : 12 : 15",
+          "ง. 8 : 12 : 20"
+        ],
+        ans: 1,
+        solution: "ตัวเชื่อมร่วมคือ B โดยมีค่าเป็น 3 และ 4 หา ค.ร.น. ของ 3 และ 4 คือ 12 ทำให้ A : B = (2×4) : (3×4) = 8 : 12 และ B : C = (4×3) : (5×3) = 12 : 15 ดังนั้น A : B : C = 8 : 12 : 15"
+      },
+      {
+        id: 8,
+        aspect: "ด้านทักษะกระบวนการ (Process : P)",
+        indicator: "ค 1.1 ม.1/3 เข้าใจและประยุกต์ใช้อัตราส่วน สัดส่วน และร้อยละ",
+        difficulty: "ปานกลาง",
+        question: "จงหาค่าของ m จากสัดส่วน <span class=\"math-frac\"><span class=\"num\">m</span><span class=\"den\">18</span></span> = <span class=\"math-frac\"><span class=\"num\">5</span><span class=\"den\">6</span></span>",
+        choices: [
+          "ก. 12",
+          "ข. 15",
+          "ค. 20",
+          "ง. 25"
+        ],
+        ans: 1,
+        solution: "คูณไขว้: m × 6 = 18 × 5 ➔ 6m = 90 ➔ m = 90 ÷ 6 = 15"
+      },
+      {
+        id: 9,
+        aspect: "ด้านทักษะกระบวนการ (Process : P)",
+        indicator: "ค 1.1 ม.1/3 เข้าใจและประยุกต์ใช้อัตราส่วน สัดส่วน และร้อยละ",
+        difficulty: "ยาก",
+        question: "แผนที่ฉบับหนึ่งใช้มาตราส่วน 1 : 250,000 ถ้าระยะทางระหว่างเมือง A และเมือง B บนแผนที่วัดได้ 8 เซนติเมตร ระยะทางจริงในภูมิประเทศห่างกันกี่กิโลเมตร",
+        choices: [
+          "ก. 16 กิโลเมตร",
+          "ข. 20 กิโลเมตร",
+          "ค. 25 กิโลเมตร",
+          "ง. 200 กิโลเมตร"
+        ],
+        ans: 1,
+        solution: "ระยะทางจริง = 8 × 250,000 = 2,000,000 เซนติเมตร แปลงเป็นเมตรโดยหาร 100 ได้ 20,000 เมตร และแปลงเป็นกิโลเมตรโดยหาร 1,000 ได้ 20 กิโลเมตร"
+      },
+      {
+        id: 10,
+        aspect: "ด้านทักษะกระบวนการ (Process : P)",
+        indicator: "ค 1.1 ม.1/3 เข้าใจและประยุกต์ใช้อัตราส่วน สัดส่วน และร้อยละ",
+        difficulty: "ยาก",
+        question: "แบ่งเงิน 7,200 บาท ให้ กิตติ, พิชัย และ วีระ ตามอัตราส่วน 2 : 3 : 4 ตามลำดับ อยากทราบว่า <strong>วีระ ได้รับเงินมากกว่า กิตติ กี่บาท</strong>",
+        choices: [
+          "ก. 800 บาท",
+          "ข. 1,600 บาท",
+          "ค. 2,400 บาท",
+          "ง. 3,200 บาท"
+        ],
+        ans: 1,
+        solution: "รวมจำนวนส่วน = 2 + 3 + 4 = 9 ส่วน เงิน 1 ส่วนคิดเป็น 7,200 ÷ 9 = 800 บาท วีระได้ 4 ส่วน กิตติได้ 2 ส่วน ผลต่างคือ 4 − 2 = 2 ส่วน คิดเป็นเงิน 2 × 800 = 1,600 บาท"
+      },
+
+      // === ด้านคุณลักษณะและเจตคติ (Attitude / Values : A) ข้อ 11 - 15 ===
+      {
+        id: 11,
+        aspect: "ด้านคุณลักษณะและเจตคติ (Attitude : A)",
+        indicator: "ค 1.1 ม.1/3 เข้าใจและประยุกต์ใช้อัตราส่วน สัดส่วน และร้อยละ",
+        difficulty: "ง่าย",
+        question: "ร้านค้า A ติดป้ายลดราคาเสื้อ 20% จากราคา 600 บาท ส่วนร้านค้า B ติดป้ายขายเสื้อแบบเดียวกันราคา 500 บาท โดยไม่ลดราคา ถ้าท่านเป็นผู้บริโภคที่ต้องการความคุ้มค่าและสมเหตุสมผล ควรเลือกร้านใด",
+        choices: [
+          "ก. ร้าน A เพราะลดราคาให้มากถึง 20%",
+          "ข. ร้าน A เพราะราคาหลังลดเหลือ 480 บาท ซึ่งถูกกว่าร้าน B",
+          "ค. ร้าน B เพราะราคาเริ่มต้นถูกกว่า",
+          "ง. ร้านใดก็ได้เพราะจ่ายเงินเท่ากัน"
+        ],
+        ans: 1,
+        solution: "ร้าน A ลด 20% ของ 600 คือลด (20/100) × 600 = 120 บาท เหลือราคา 480 บาท ซึ่งถูกกว่าร้าน B ที่ขาย 500 บาท การตัดสินใจเลือกโดยคำนวณจริงสะท้อนความสมเหตุสมผลในการใช้ชีวิต"
+      },
+      {
+        id: 12,
+        aspect: "ด้านคุณลักษณะและเจตคติ (Attitude : A)",
+        indicator: "ค 1.1 ม.1/3 เข้าใจและประยุกต์ใช้อัตราส่วน สัดส่วน และร้อยละ",
+        difficulty: "ปานกลาง",
+        question: "ในการทำขนมหวานตามสูตร ต้องใช้น้ำตาลทราย 100 กรัมต่อน้ำ 400 กรัม หากนักเรียนต้องการทำขนมเพิ่มขึ้นเป็น 3 เท่า เพื่อให้ขนมมีรสชาติมาตรฐานเหมือนเดิม นักเรียนควรปฏิบัติอย่างไรอย่างรอบคอบ",
+        choices: [
+          "ก. เพิ่มเฉพาะน้ำตาลทรายเป็น 300 กรัม แต่น้ำใช้เท่าเดิม",
+          "ข. ใช้น้ำตาลทราย 300 กรัม และน้ำ 1,200 กรัม เพื่อรักษาอัตราส่วน 1 : 4",
+          "ค. กะปริมาณด้วยสายตาเพื่อความสะดวกรวดเร็ว",
+          "ง. ใช้น้ำตาลทราย 200 กรัม และน้ำ 600 กรัม"
+        ],
+        ans: 1,
+        solution: "การรักษาอัตราส่วนเดิม (100 : 400 หรือ 1 : 4) โดยขยายด้วยตัวคูณเดียวกัน (คูณ 3 ทั้งคู่) สะท้อนความรอบคอบ ความถูกต้อง และการประยุกต์ใช้คณิตศาสตร์ในชีวิตจริง"
+      },
+      {
+        id: 13,
+        aspect: "ด้านคุณลักษณะและเจตคติ (Attitude : A)",
+        indicator: "ค 1.1 ม.1/3 เข้าใจและประยุกต์ใช้อัตราส่วน สัดส่วน และร้อยละ",
+        difficulty: "ปานกลาง",
+        question: "ในการตรวจสอบการคำนวณสัดส่วน <span class=\"math-frac\"><span class=\"num\">6</span><span class=\"den\">15</span></span> = <span class=\"math-frac\"><span class=\"num\">10</span><span class=\"den\">25</span></span> พฤติกรรมในข้อใดแสดงถึง <strong>\"การมีความมุมานะและตรวจทานความถูกต้องทางคณิตศาสตร์\"</strong>",
+        choices: [
+          "ก. เชื่อว่าเท่ากันทันทีเพราะตัวเลขลงท้ายด้วย 5 เหมือนกัน",
+          "ข. ใช้การคูณไขว้ 6 × 25 = 150 และ 15 × 10 = 150 เพื่อยืนยันว่าผลคูณเท่ากันจริง",
+          "ค. เลือกตอบตามเพื่อนโดยไม่คำนวณซ้ำ",
+          "ง. สรุปว่าไม่เท่ากันเพราะ 6 และ 10 เป็นคนละจำนวน"
+        ],
+        ans: 1,
+        solution: "การใช้การคูณไขว้เพื่อตรวจสอบผลคูณอย่างมีหลักการ (6×25 = 150 และ 15×10 = 150) แสดงถึงความมีวินัยและความละเอียดรอบคอบในการทำงานทางคณิตศาสตร์"
+      },
+      {
+        id: 14,
+        aspect: "ด้านคุณลักษณะและเจตคติ (Attitude : A)",
+        indicator: "ค 1.1 ม.1/3 เข้าใจและประยุกต์ใช้อัตราส่วน สัดส่วน และร้อยละ",
+        difficulty: "ยาก",
+        question: "ร้านค้าแห่งหนึ่งติดป้ายว่า \"สินค้าเพิ่มราคาขึ้น 50% แล้วลดราคาลง 50% ให้ลูกค้าทันที\" บุคคลใดแสดงการวิเคราะห์อย่างมีวิจารณญาณและไม่หลงเชื่อข้อความโฆษณา",
+        choices: [
+          "ก. สมศักดิ์คิดว่าราคาเท่าเดิมพอดีเพราะ +50% แล้ว −50%",
+          "ข. สมศรีวิเคราะห์ว่าราคาใหม่จะถูกกว่าราคาเดิม เพราะฐาน 50% ตอนลดราคามีมูลค่าสูงกว่าฐานเดิม",
+          "ค. สมชายคิดว่าทางร้านขายขาดทุนแน่นอน 50%",
+          "ง. สมพรคิดว่าราคาสินค้าแพงขึ้น 100%"
+        ],
+        ans: 1,
+        solution: "สมมุติสินค้าเดิมราคา 100 บาท เพิ่ม 50% เป็น 150 บาท จากนั้นลด 50% ของ 150 คือลด 75 บาท เหลือ 75 บาท ซึ่งถูกกว่าเดิม การมองเห็นว่า 'ค่าฐานของร้อยละเปลี่ยนไป' สะท้อนการมีวิจารณญาณทางคณิตศาสตร์อย่างแท้จริง"
+      },
+      {
+        id: 15,
+        aspect: "ด้านคุณลักษณะและเจตคติ (Attitude : A)",
+        indicator: "ค 1.1 ม.1/3 เข้าใจและประยุกต์ใช้อัตราส่วน สัดส่วน และร้อยละ",
+        difficulty: "ยาก",
+        question: "ในการออมเงินและการวางแผนการเงินในชีวิตประจำวัน หากครอบครัวหนึ่งมีรายได้เดือนละ 30,000 บาท ต้องการแบ่งเงินสำหรับ <strong>(ค่าใช้จ่ายจำเป็น : ออมฉุกเฉิน : ลงทุนพัฒนาตนเอง) เป็น 6 : 2 : 2</strong> การปฏิบัติตามอัตราส่วนนี้ส่งเสริมคุณลักษณะข้อใดชัดเจนที่สุด",
+        choices: [
+          "ก. ความประหยัดมัธยัสถ์แบบตระหนี่ถี่เหนียว",
+          "ข. การวางแผนทางการเงินอย่างมีระบบ วินัย และรอบคอบตามหลักปรัชญาของเศรษฐกิจพอเพียง",
+          "ค. การมุ่งเน้นผลกำไรสูงสุดในระยะสั้น",
+          "ง. การพึ่งพาผู้อื่นในการจัดสรรงบประมาณ"
+        ],
+        ans: 1,
+        solution: "การนำอัตราส่วนมาบริหารจัดการรายได้ (ใช้จ่าย 60%, ออม 20%, พัฒนาตนเอง 20%) เป็นการประยุกต์คณิตศาสตร์เพื่อสร้างวินัยทางการเงินและความมั่นคงตามหลักปรัชญาของเศรษฐกิจพอเพียง"
+      }
+    ];
+
+    // โครงสร้างเก็บคำตอบของนักเรียน
+    let studentAnswers = {};
+
+    // ฟังก์ชันสร้างข้อสอบลงในหน้าเว็บ
+    function renderExam() {
+      const container = document.getElementById('questions-container');
+      container.innerHTML = '';
+
+      examData.forEach((q, index) => {
+        // เลือกสีของป้ายกำกับตามมิติ K P A
+        let aspectBadgeClass = "bg-blue-100 text-blue-800 border-blue-200";
+        if (q.aspect.includes("P")) aspectBadgeClass = "bg-amber-100 text-amber-800 border-amber-200";
+        if (q.aspect.includes("A")) aspectBadgeClass = "bg-purple-100 text-purple-800 border-purple-200";
+
+        // สีของป้ายระดับความยาก
+        let diffBadgeClass = "bg-emerald-50 text-emerald-700 border-emerald-200";
+        if (q.difficulty === "ปานกลาง") diffBadgeClass = "bg-cyan-50 text-cyan-700 border-cyan-200";
+        if (q.difficulty === "ยาก") diffBadgeClass = "bg-rose-50 text-rose-700 border-rose-200";
+
+        const card = document.createElement('div');
+        card.className = "question-card p-5 rounded-2xl border border-slate-200 bg-white shadow-sm space-y-4";
+        card.id = `q-card-${q.id}`;
+
+        // แถบข้อมูลเหนือคำถาม (ตัวชี้วัด, มิติ K-P-A, ระดับความยาก)
+        const headerMeta = `
+          <div class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-100 pb-2.5">
+            <div class="flex flex-wrap items-center gap-2">
+              <span class="px-2.5 py-0.5 rounded-md text-xs font-bold border font-math ${aspectBadgeClass}">
+                ${q.aspect}
+              </span>
+              <span class="px-2.5 py-0.5 rounded-md text-xs font-bold border font-math ${diffBadgeClass}">
+                ระดับความยาก: ${q.difficulty}
+              </span>
+            </div>
+            <span class="text-[11px] text-slate-500 font-medium">
+              ตัวชี้วัด: ${q.indicator}
+            </span>
+          </div>
+        `;
+
+        // ตัวคำถาม
+        const questionBody = `
+          <div class="text-slate-800 font-medium text-base leading-relaxed">
+            <span class="font-bold text-slate-900 mr-1 font-math">ข้อที่ ${q.id}.</span> ${q.question}
+          </div>
+        `;
+
+        // ตัวเลือก 4 ข้อ
+        let choicesHtml = `<div class="grid grid-cols-1 md:grid-cols-2 gap-2.5 pt-1">`;
+        q.choices.forEach((choiceText, cIdx) => {
+          choicesHtml += `
+            <label class="choice-item flex items-center gap-3 p-3 rounded-xl border border-slate-200 hover:bg-slate-50 cursor-pointer transition text-sm">
+              <input type="radio" name="question-${q.id}" value="${cIdx}" onchange="selectChoice(${q.id}, ${cIdx})" class="w-4 h-4 text-blue-600 focus:ring-blue-500 border-slate-300">
+              <span class="choice-label flex-1 text-slate-700">${choiceText}</span>
+            </label>
+          `;
+        });
+        choicesHtml += `</div>`;
+
+        // ส่วนเฉลยและวิธีทำ (ซ่อนอยู่ จะแสดงเมื่อตรวจหรือสั่งพิมพ์เฉลย)
+        const solutionHtml = `
+          <div id="solution-${q.id}" class="solution-box hidden mt-3 p-3.5 bg-slate-50 rounded-xl border border-slate-200 text-xs md:text-sm text-slate-700 space-y-1">
+            <p class="font-bold text-indigo-700">เฉลย: ${q.choices[q.ans].substring(0, 2)} (${q.choices[q.ans].substring(3)})</p>
+            <p class="text-slate-600"><strong>วิธีคิด/เหตุผล:</strong> ${q.solution}</p>
+          </div>
+        `;
+
+        card.innerHTML = headerMeta + questionBody + choicesHtml + solutionHtml;
+        container.appendChild(card);
+      });
+    }
+
+    // บันทึกคำตอบ
+    function selectChoice(qid, choiceIdx) {
+      studentAnswers[qid] = choiceIdx;
+    }
+
+    // ฟังก์ชันตรวจคะแนนและวิเคราะห์ผล
+    function gradeTest() {
+      let scoreTotal = 0;
+      let scoreK = 0;
+      let scoreP = 0;
+      let scoreA = 0;
+
+      examData.forEach(q => {
+        const userChoice = studentAnswers[q.id];
+        const card = document.getElementById(`q-card-${q.id}`);
+        const solBox = document.getElementById(`solution-${q.id}`);
+        
+        // แสดงกล่องเฉลย
+        solBox.classList.remove('hidden');
+
+        if (userChoice !== undefined && userChoice === q.ans) {
+          scoreTotal++;
+          if (q.aspect.includes("K")) scoreK++;
+          if (q.aspect.includes("P")) scoreP++;
+          if (q.aspect.includes("A")) scoreA++;
+
+          card.classList.remove('border-rose-300', 'bg-rose-50/20');
+          card.classList.add('border-emerald-300', 'bg-emerald-50/20');
+        } else {
+          card.classList.remove('border-emerald-300', 'bg-emerald-50/20');
+          card.classList.add('border-rose-300', 'bg-rose-50/20');
+        }
+      });
+
+      // อัปเดตแผงสรุปคะแนน
+      document.getElementById('score-total').textContent = `${scoreTotal} / 15`;
+      document.getElementById('score-k').textContent = `${scoreK} / 5`;
+      document.getElementById('score-p').textContent = `${scoreP} / 5`;
+      document.getElementById('score-a').textContent = `${scoreA} / 5`;
+
+      const feedbackBox = document.getElementById('score-feedback');
+      const pct = Math.round((scoreTotal / 15) * 100);
+
+      if (pct >= 80) {
+        feedbackBox.className = "p-4 rounded-2xl text-sm leading-relaxed border font-medium bg-emerald-50 border-emerald-300 text-emerald-900";
+        feedbackBox.innerHTML = `🌟 <strong>ผลการประเมิน: ระดับดีเยี่ยม (${pct}%)</strong> คุณมีความเข้าใจมโนทัศน์ ทักษะการแก้โจทย์ และมีวิจารณญาณในการประยุกต์ใช้ความรู้อย่างยอดเยี่ยม`;
+      } else if (pct >= 60) {
+        feedbackBox.className = "p-4 rounded-2xl text-sm leading-relaxed border font-medium bg-blue-50 border-blue-300 text-blue-900";
+        feedbackBox.innerHTML = `👍 <strong>ผลการประเมิน: ระดับผ่านเกณฑ์มาตรฐาน (${pct}%)</strong> มีความรู้พื้นฐานและการคำนวณที่ดี ควรทบทวนการวิเคราะห์โจทย์ประยุกต์ที่ซับซ้อนเพิ่มเติม`;
+      } else {
+        feedbackBox.className = "p-4 rounded-2xl text-sm leading-relaxed border font-medium bg-amber-50 border-amber-300 text-amber-900";
+        feedbackBox.innerHTML = `📖 <strong>ผลการประเมิน: ควรได้รับการพัฒนาเพิ่มเติม (${pct}%)</strong> แนะนำให้กลับไปทบทวนเนื้อหาบทเรียนและโมเดลการทดลองในเรื่องที่ 1 ถึงเรื่องที่ 8 เพื่อเสริมความเข้าใจ`;
+      }
+
+      const summaryPanel = document.getElementById('score-summary-panel');
+      summaryPanel.classList.remove('hidden');
+      summaryPanel.scrollIntoView({ behavior: 'smooth' });
+    }
+
+    // ล้างคำตอบทั้งหมด
+    function resetAnswers() {
+      studentAnswers = {};
+      const radios = document.querySelectorAll('input[type="radio"]');
+      radios.forEach(r => r.checked = false);
+
+      examData.forEach(q => {
+        const card = document.getElementById(`q-card-${q.id}`);
+        const solBox = document.getElementById(`solution-${q.id}`);
+        card.classList.remove('border-emerald-300', 'bg-emerald-50/20', 'border-rose-300', 'bg-rose-50/20');
+        solBox.classList.add('hidden');
+      });
+
+      document.getElementById('score-summary-panel').classList.add('hidden');
+    }
+
+    // พิมพ์แบบทดสอบสำหรับนักเรียน (ซ่อนเฉลย)
+    function printStudentTest() {
+      examData.forEach(q => {
+        const solBox = document.getElementById(`solution-${q.id}`);
+        solBox.classList.add('hidden');
+      });
+      setTimeout(() => {
+        window.print();
+      }, 50);
+    }
+
+    // พิมพ์แบบเฉลยสำหรับครู (เปิดเฉลยทุกข้อ)
+    function printTeacherKey() {
+      examData.forEach(q => {
+        const solBox = document.getElementById(`solution-${q.id}`);
+        solBox.classList.remove('hidden');
+      });
+      setTimeout(() => {
+        window.print();
+      }, 50);
+    }
+
+    // เริ่มต้นระบบ
+    window.addEventListener('DOMContentLoaded', () => {
+      renderExam();
+    });
+  </script>
+</body>
+</html>
