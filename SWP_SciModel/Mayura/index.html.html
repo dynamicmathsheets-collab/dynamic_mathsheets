@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>เคมี ม.4 • หน่วยการเรียนรู้ที่ 4 : โมลและสูตรเคมี</title>
+
+  <!-- Google Fonts: Prompt & Sarabun -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&family=Prompt:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=Sarabun:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome 6 Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            prompt: ['Prompt', 'sans-serif'],
+            sarabun: ['Sarabun', 'sans-serif'],
+            mono: ['Fira Code', 'monospace']
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    body {
+      font-family: 'Prompt', sans-serif;
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+      background-color: #0b0f19;
+    }
+
+    /* Custom scrollbar for horizontal menu on mobile */
+    .no-scrollbar::-webkit-scrollbar {
+      display: none;
+    }
+    .no-scrollbar {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+
+    /* Active Tab Glow & Indicator */
+    .nav-btn {
+      position: relative;
+      transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .nav-btn.active {
+      background: linear-gradient(135deg, rgba(59, 130, 246, 0.25), rgba(99, 102, 241, 0.35));
+      border-color: #60a5fa !important;
+      color: #ffffff !important;
+      box-shadow: 0 0 15px rgba(96, 165, 250, 0.3);
+    }
+    .nav-btn.active::after {
+      content: '';
+      position: absolute;
+      bottom: -1px;
+      left: 20%;
+      width: 60%;
+      height: 3px;
+      background: linear-gradient(90deg, #38bdf8, #818cf8);
+      border-radius: 99px;
+      box-shadow: 0 0 8px #38bdf8;
+    }
+
+    /* Exam button specific active */
+    .nav-btn-exam.active {
+      background: linear-gradient(135deg, rgba(245, 158, 11, 0.25), rgba(239, 68, 68, 0.35)) !important;
+      border-color: #fbbf24 !important;
+      color: #fef08a !important;
+      box-shadow: 0 0 15px rgba(245, 158, 11, 0.35) !important;
+    }
+    .nav-btn-exam.active::after {
+      background: linear-gradient(90deg, #f59e0b, #ef4444) !important;
+      box-shadow: 0 0 8px #f59e0b !important;
+    }
+
+    /* Loading Spinner */
+    .loader {
+      border: 3px solid rgba(255, 255, 255, 0.1);
+      border-radius: 50%;
+      border-top: 3px solid #38bdf8;
+      width: 32px;
+      height: 32px;
+      animation: spin 0.8s linear infinite;
+    }
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+  </style>
+</head>
+<body class="h-screen w-screen flex flex-col antialiased select-none">
+
+  <!-- ========================================================================= -->
+  <!-- TOP MASTER NAVBAR (Glassmorphism Dark Gradient)                           -->
+  <!-- ========================================================================= -->
+  <header class="h-16 md:h-18 bg-slate-900/95 backdrop-blur-md border-b border-slate-800 text-white flex items-center justify-between px-3 sm:px-5 shrink-0 z-50 shadow-2xl">
+    
+    <!-- Left: Brand & Title -->
+    <div class="flex items-center gap-3 shrink-0 mr-2 sm:mr-4">
+      <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-blue-600 via-indigo-600 to-cyan-400 flex items-center justify-center text-white shadow-lg shadow-blue-500/30">
+        <i class="fa-solid fa-atom text-lg"></i>
+      </div>
+      <div class="hidden sm:block">
+        <div class="flex items-center gap-2">
+          <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-blue-500/20 text-cyan-300 border border-blue-400/30 tracking-wider">เคมี ม.4</span>
+          <span class="text-[11px] text-slate-400 font-sarabun">บทที่ 4</span>
+        </div>
+        <h1 class="text-sm md:text-base font-bold font-prompt tracking-tight text-white leading-tight">
+          โมลและสูตรเคมี
+        </h1>
+      </div>
+    </div>
+
+    <!-- Center: Horizontal Scrollable Module Buttons (Exact file names) -->
+    <nav class="flex-1 flex items-center gap-1.5 sm:gap-2 overflow-x-auto no-scrollbar py-1 px-1" id="nav-container">
+      
+      <!-- เรื่องที่ 1 -->
+      <button onclick="switchLesson(0)" id="nav-btn-0" class="nav-btn active shrink-0 px-3 py-1.5 rounded-xl border border-slate-700/70 bg-slate-800/60 hover:bg-slate-700/60 text-slate-300 text-xs sm:text-sm font-prompt font-semibold flex items-center gap-2">
+        <i class="fa-solid fa-circle-dot text-[10px] text-sky-400"></i>
+        <span>เรื่องที่ 1</span>
+        <span class="hidden lg:inline text-[11px] text-slate-400 font-normal">| มวลอะตอม</span>
+      </button>
+
+      <!-- เรื่องที่ 2 -->
+      <button onclick="switchLesson(1)" id="nav-btn-1" class="nav-btn shrink-0 px-3 py-1.5 rounded-xl border border-slate-700/70 bg-slate-800/60 hover:bg-slate-700/60 text-slate-300 text-xs sm:text-sm font-prompt font-semibold flex items-center gap-2">
+        <i class="fa-solid fa-cubes text-[10px] text-indigo-400"></i>
+        <span>เรื่องที่ 2</span>
+        <span class="hidden lg:inline text-[11px] text-slate-400 font-normal">| มวลโมเลกุล</span>
+      </button>
+
+      <!-- เรื่องที่ 3 -->
+      <button onclick="switchLesson(2)" id="nav-btn-2" class="nav-btn shrink-0 px-3 py-1.5 rounded-xl border border-slate-700/70 bg-slate-800/60 hover:bg-slate-700/60 text-slate-300 text-xs sm:text-sm font-prompt font-semibold flex items-center gap-2">
+        <i class="fa-solid fa-calculator text-[10px] text-emerald-400"></i>
+        <span>เรื่องที่ 3</span>
+        <span class="hidden lg:inline text-[11px] text-slate-400 font-normal">| โมลและอนุภาค</span>
+      </button>
+
+      <!-- เรื่องที่ 4 -->
+      <button onclick="switchLesson(3)" id="nav-btn-3" class="nav-btn shrink-0 px-3 py-1.5 rounded-xl border border-slate-700/70 bg-slate-800/60 hover:bg-slate-700/60 text-slate-300 text-xs sm:text-sm font-prompt font-semibold flex items-center gap-2">
+        <i class="fa-solid fa-wind text-[10px] text-teal-400"></i>
+        <span>เรื่องที่ 4</span>
+        <span class="hidden lg:inline text-[11px] text-slate-400 font-normal">| ปริมาตรแก๊ส</span>
+      </button>
+
+      <!-- เรื่องที่ 5 -->
+      <button onclick="switchLesson(4)" id="nav-btn-4" class="nav-btn shrink-0 px-3 py-1.5 rounded-xl border border-slate-700/70 bg-slate-800/60 hover:bg-slate-700/60 text-slate-300 text-xs sm:text-sm font-prompt font-semibold flex items-center gap-2">
+        <i class="fa-solid fa-flask text-[10px] text-cyan-400"></i>
+        <span>เรื่องที่ 5</span>
+        <span class="hidden lg:inline text-[11px] text-slate-400 font-normal">| องค์ประกอบสาร</span>
+      </button>
+
+      <!-- เรื่องที่ 6 -->
+      <button onclick="switchLesson(5)" id="nav-btn-5" class="nav-btn shrink-0 px-3 py-1.5 rounded-xl border border-slate-700/70 bg-slate-800/60 hover:bg-slate-700/60 text-slate-300 text-xs sm:text-sm font-prompt font-semibold flex items-center gap-2">
+        <i class="fa-solid fa-microscope text-[10px] text-violet-400"></i>
+        <span>เรื่องที่ 6</span>
+        <span class="hidden lg:inline text-[11px] text-slate-400 font-normal">| สูตรเคมี</span>
+      </button>
+
+      <!-- แบบทดสอบ (Special Accent) -->
+      <button onclick="switchLesson(6)" id="nav-btn-6" class="nav-btn nav-btn-exam shrink-0 px-3.5 py-1.5 rounded-xl border border-amber-500/50 bg-gradient-to-r from-amber-500/10 to-orange-500/15 hover:from-amber-500/20 hover:to-orange-500/25 text-amber-300 text-xs sm:text-sm font-prompt font-bold flex items-center gap-2 shadow-sm">
+        <i class="fa-solid fa-star text-[11px] text-amber-400"></i>
+        <span>แบบทดสอบ</span>
+        <span class="hidden xl:inline text-[10px] bg-amber-400/20 text-amber-300 border border-amber-400/30 px-1.5 py-0.2 rounded">30 ข้อ</span>
+      </button>
+
+    </nav>
+
+    <!-- Right: Utility Controls (Fullscreen & New Tab) -->
+    <div class="flex items-center gap-1.5 shrink-0 ml-2 pl-2 border-l border-slate-800">
+      
+      <!-- Open in new tab -->
+      <button onclick="openCurrentInNewTab()" title="เปิดไฟล์ปัจจุบันในแท็บใหม่" class="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white flex items-center justify-center text-xs sm:text-sm transition">
+        <i class="fa-solid fa-arrow-up-right-from-square"></i>
+      </button>
+
+      <!-- Fullscreen Toggle -->
+      <button onclick="toggleFullScreen()" title="ขยายเต็มหน้าจอ" class="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white flex items-center justify-center text-xs sm:text-sm transition">
+        <i class="fa-solid fa-expand" id="fs-icon"></i>
+      </button>
+
+    </div>
+
+  </header>
+
+  <!-- ========================================================================= -->
+  <!-- MAIN VIEWPORT CONTAINER (Seamless Full Height Iframe)                     -->
+  <!-- ========================================================================= -->
+  <main class="flex-1 w-full relative bg-slate-900">
+    
+    <!-- Loading Overlay -->
+    <div id="loading-overlay" class="absolute inset-0 bg-slate-950/80 backdrop-blur-sm flex flex-col items-center justify-center z-20 transition-opacity duration-300 opacity-0 pointer-events-none">
+      <div class="loader mb-3"></div>
+      <p class="text-xs font-prompt text-slate-300 font-semibold" id="loading-text">กำลังโหลดเนื้อหา...</p>
+    </div>
+
+    <!-- Active Frame Host -->
+    <iframe 
+      id="content-frame" 
+      src="เรื่องที่ 1.html" 
+      class="w-full h-full border-none block bg-slate-50"
+      onload="onFrameLoaded()"
+      allow="fullscreen">
+    </iframe>
+
+  </main>
+
+  <!-- ========================================================================= -->
+  <!-- JAVASCRIPT LOGIC                                                          -->
+  <!-- ========================================================================= -->
+  <script>
+    // Exact file paths as shown in the directory
+    const LESSONS = [
+      { id: 0, file: "เรื่องที่ 1.html", title: "เรื่องที่ 1 : มวลอะตอม" },
+      { id: 1, file: "เรื่องที่ 2.html", title: "เรื่องที่ 2 : มวลโมเลกุลและมวลสูตร" },
+      { id: 2, file: "เรื่องที่ 3.html", title: "เรื่องที่ 3 : โมลและจำนวนอนุภาค" },
+      { id: 3, file: "เรื่องที่ 4.html", title: "เรื่องที่ 4 : โมลกับมวลและปริมาตรแก๊ส" },
+      { id: 4, file: "เรื่องที่ 5.html", title: "เรื่องที่ 5 : องค์ประกอบของสารประกอบ" },
+      { id: 5, file: "เรื่องที่ 6.html", title: "เรื่องที่ 6 : สูตรเคมี" },
+      { id: 6, file: "แบบทดสอบ.html", title: "แบบทดสอบวัดผลสัมฤทธิ์ทางการเรียน (30 ข้อ)" }
+    ];
+
+    let currentIndex = 0;
+
+    function switchLesson(index) {
+      if (index === currentIndex) return;
+      currentIndex = index;
+
+      const lesson = LESSONS[index];
+      const frame = document.getElementById('content-frame');
+      const loader = document.getElementById('loading-overlay');
+      const loaderText = document.getElementById('loading-text');
+
+      // Update Navigation Button States
+      for (let i = 0; i < LESSONS.length; i++) {
+        const btn = document.getElementById(`nav-btn-${i}`);
+        if (btn) {
+          if (i === index) {
+            btn.classList.add('active');
+            btn.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+          } else {
+            btn.classList.remove('active');
+          }
+        }
+      }
+
+      // Show loader
+      if (loader) {
+        loaderText.textContent = `กำลังเปิด: ${lesson.title}...`;
+        loader.classList.remove('opacity-0', 'pointer-events-none');
+      }
+
+      // Change iframe source
+      if (frame) {
+        frame.src = encodeURI(lesson.file);
+      }
+
+      // Update document title
+      document.title = `เคมี ม.4 • ${lesson.title}`;
+    }
+
+    function onFrameLoaded() {
+      const loader = document.getElementById('loading-overlay');
+      if (loader) {
+        loader.classList.add('opacity-0', 'pointer-events-none');
+      }
+    }
+
+    function openCurrentInNewTab() {
+      const lesson = LESSONS[currentIndex];
+      window.open(encodeURI(lesson.file), '_blank');
+    }
+
+    function toggleFullScreen() {
+      const fsIcon = document.getElementById('fs-icon');
+      if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen().then(() => {
+          if (fsIcon) fsIcon.className = "fa-solid fa-compress";
+        }).catch(err => console.log(err));
+      } else {
+        if (document.exitFullscreen) {
+          document.exitFullscreen().then(() => {
+            if (fsIcon) fsIcon.className = "fa-solid fa-expand";
+          }).catch(err => console.log(err));
+        }
+      }
+    }
+
+    document.addEventListener('fullscreenchange', () => {
+      const fsIcon = document.getElementById('fs-icon');
+      if (fsIcon) {
+        fsIcon.className = document.fullscreenElement ? "fa-solid fa-compress" : "fa-solid fa-expand";
+      }
+    });
+
+    // Keyboard shortcuts (Left/Right arrow to cycle modules)
+    window.addEventListener('keydown', (e) => {
+      if (e.altKey && e.key === 'ArrowRight') {
+        const next = (currentIndex + 1) % LESSONS.length;
+        switchLesson(next);
+      } else if (e.altKey && e.key === 'ArrowLeft') {
+        const prev = (currentIndex - 1 + LESSONS.length) % LESSONS.length;
+        switchLesson(prev);
+      }
+    });
+  </script>
+</body>
+</html>

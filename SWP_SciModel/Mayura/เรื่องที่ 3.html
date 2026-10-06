@@ -1,0 +1,1321 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>เคมี ม.4 • โมลและสูตรเคมี เรื่องที่ 3: โมลและจำนวนอนุภาค</title>
+
+  <!-- Google Fonts: Prompt & Sarabun -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Prompt:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=Sarabun:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=Fira+Code:wght@400;500;600&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+
+  <!-- MathJax 3 Configuration -->
+  <script>
+    window.MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']],
+        displayMath: [['$$', '$$'], ['\\[', '\\]']],
+        processEscapes: true
+      },
+      options: {
+        skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+      }
+    };
+  </script>
+  <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            prompt: ['Prompt', 'sans-serif'],
+            sarabun: ['Sarabun', 'sans-serif'],
+            mono: ['Fira Code', 'monospace']
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    body {
+      font-family: 'Sarabun', sans-serif;
+      background-color: #f8fafc;
+      color: #1e293b;
+    }
+
+    h1, h2, h3, h4, .font-heading {
+      font-family: 'Prompt', sans-serif;
+    }
+
+    #particle-canvas {
+      background: radial-gradient(circle at center, #0a1120 0%, #030712 100%);
+    }
+
+    input[type=range] {
+      accent-color: #059669;
+    }
+
+    .math-step-container {
+      word-break: break-word;
+      overflow-x: hidden;
+    }
+
+    /* On-Screen Solution display toggles */
+    .teacher-solution {
+      display: none;
+    }
+    .teacher-solution.show {
+      display: block !important;
+    }
+
+    .student-write-area.hide-on-screen {
+      display: none !important;
+    }
+
+    /* ==============================================================
+       STRICT PRINT CONFIGURATION (ISOLATES WORKSHEET ONLY)
+       ============================================================== */
+    @media print {
+      @page {
+        size: A4;
+        margin: 14mm 12mm 14mm 12mm;
+      }
+
+      body {
+        background: #ffffff !important;
+        color: #000000 !important;
+        margin: 0 !important;
+        padding: 0 !important;
+      }
+
+      header,
+      #concept-section,
+      #interactive-section,
+      #rubric-section,
+      footer,
+      .no-print {
+        display: none !important;
+      }
+
+      #worksheet-section {
+        display: block !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        border: none !important;
+        box-shadow: none !important;
+      }
+
+      #printable-worksheet-card {
+        border: none !important;
+        box-shadow: none !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        width: 100% !important;
+      }
+
+      .question-card {
+        break-inside: avoid !important;
+        page-break-inside: avoid !important;
+        margin-bottom: 1.15rem !important;
+        border: 1px solid #94a3b8 !important;
+        background: #ffffff !important;
+        padding: 0.9rem !important;
+      }
+
+      .student-write-area {
+        min-height: 85px !important;
+        border: 1px dashed #94a3b8 !important;
+        background-color: #ffffff !important;
+      }
+
+      /* TEACHER PRINT MODE */
+      body.print-mode-teacher .teacher-solution {
+        display: block !important;
+        visibility: visible !important;
+        background-color: #f1f5f9 !important;
+        border-left: 4px solid #0f172a !important;
+        color: #0f172a !important;
+        padding: 10px 14px !important;
+        margin-top: 8px !important;
+        border-radius: 6px !important;
+      }
+
+      body.print-mode-teacher .student-write-area {
+        display: none !important;
+      }
+
+      /* STUDENT PRINT MODE */
+      body.print-mode-student .teacher-solution {
+        display: none !important;
+      }
+
+      body.print-mode-student .student-write-area {
+        display: block !important;
+      }
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col antialiased selection:bg-cyan-500 selection:text-white">
+
+  <!-- ========================================================================= -->
+  <!-- TOP BANNER                                                                -->
+  <!-- ========================================================================= -->
+  <header class="no-print bg-gradient-to-r from-slate-900 via-cyan-950 to-slate-900 text-white border-b border-cyan-900/60 shadow-lg py-8">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 text-center md:text-left">
+      <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyan-500/20 border border-cyan-400/30 text-cyan-300 text-xs font-semibold uppercase tracking-wider font-prompt mb-3">
+        <i class="fa-solid fa-atom"></i> รายวิชาเคมี ม.4 • หน่วยการเรียนรู้ที่ 4
+      </div>
+      <h1 class="text-3xl sm:text-4xl lg:text-5xl font-extrabold font-prompt tracking-tight text-white">
+        โมลและสูตรเคมี <span class="text-slate-400 font-normal">|</span> <span class="bg-clip-text text-transparent bg-gradient-to-r from-cyan-400 via-teal-300 to-sky-400">เรื่องที่ 3: โมลและจำนวนอนุภาค</span>
+      </h1>
+    </div>
+  </header>
+
+  <!-- Continuous Single-Page Flow -->
+  <main class="flex-grow max-w-6xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-16">
+
+    <!-- ========================================================================= -->
+    <!-- SECTION 1 : สรุปสาระสำคัญ (Cyan & Navy Blue Theme)                        -->
+    <!-- ========================================================================= -->
+    <section id="concept-section" class="space-y-8">
+      
+      <div class="flex items-center gap-3.5 pb-3 border-b-2 border-cyan-500">
+        <div class="w-10 h-10 rounded-xl bg-cyan-600 text-white flex items-center justify-center font-bold text-lg shadow-md shadow-cyan-200">
+          <i class="fa-solid fa-book-open"></i>
+        </div>
+        <div>
+          <span class="text-xs font-bold text-cyan-600 uppercase tracking-widest font-prompt">ทฤษฎีและหลักการพื้นฐาน</span>
+          <h2 class="text-2xl sm:text-3xl font-bold text-slate-900 font-prompt">สรุปสาระสำคัญ: โมลและจำนวนอนุภาค</h2>
+        </div>
+      </div>
+
+      <!-- Core Principle Cards -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        
+        <!-- Card 1: นิยามโมลและเลขอาโวกาโดร -->
+        <div class="bg-white rounded-3xl p-6 border-2 border-cyan-100 shadow-sm hover:shadow-md transition-all flex flex-col justify-between">
+          <div>
+            <div class="flex items-center justify-between mb-4">
+              <span class="px-3 py-1 rounded-full text-xs font-semibold bg-cyan-100 text-cyan-800 font-prompt">หลักการที่ 1</span>
+              <i class="fa-solid fa-hashtag text-cyan-500 text-xl"></i>
+            </div>
+            <h3 class="text-lg font-bold text-slate-900 font-prompt mb-2">โมลและค่าคงที่อาโวกาโดร</h3>
+            <p class="text-slate-600 text-sm leading-relaxed mb-4">
+              โมล ($\text{mol}$) เป็นหน่วยเอสไอสำหรับบอกปริมาณสาร โดยสาร $1\text{ mol}$ มีจำนวนอนุภาคเท่ากับเลขอาโวกาโดร ($N_A$) เสมอ
+            </p>
+
+            <div class="bg-cyan-50/90 rounded-2xl p-4 border border-cyan-200 text-xs text-cyan-950 space-y-2">
+              <div class="font-bold font-prompt text-cyan-900">ค่าคงที่อาโวกาโดร (Avogadro Constant):</div>
+              <div class="p-2.5 bg-white rounded-xl border border-cyan-100 text-center font-mono font-bold text-cyan-800 text-sm">
+                $N_A \approx 6.022 \times 10^{23} \text{ อนุภาค/mol}$
+              </div>
+              <p class="text-[11px] text-slate-600 leading-normal">
+                เปรียบเสมือนหน่วยนับขนาดใหญ่ เช่นเดียวกับ "1 โหล = 12 ชิ้น" แต่ "1 โมล = $6.022 \times 10^{23}$ อนุภาค"
+              </p>
+            </div>
+          </div>
+
+          <div class="mt-4 pt-3 border-t border-slate-100 text-xs text-slate-500 font-medium">
+            <i class="fa-solid fa-circle-check text-cyan-500 mr-1"></i> อนุภาคใน $1\text{ mol}$ สารใดๆ มีจำนวนหน่วยหลักเท่ากันเสมอ
+          </div>
+        </div>
+
+        <!-- Card 2: ชนิดของอนุภาคและการนับอนุภาคย่อย -->
+        <div class="bg-white rounded-3xl p-6 border-2 border-sky-100 shadow-sm hover:shadow-md transition-all flex flex-col justify-between">
+          <div>
+            <div class="flex items-center justify-between mb-4">
+              <span class="px-3 py-1 rounded-full text-xs font-semibold bg-sky-100 text-sky-800 font-prompt">หลักการที่ 2</span>
+              <i class="fa-solid fa-shapes text-sky-500 text-xl"></i>
+            </div>
+            <h3 class="text-lg font-bold text-slate-900 font-prompt mb-2">ชนิดของ "อนุภาค" และการนับย่อย</h3>
+            <p class="text-slate-600 text-sm leading-relaxed mb-4">
+              หน่วยอนุภาคจะขึ้นอยู่กับโครงสร้างทางเคมี และใน 1 โมเลกุลหรือ 1 หน่วยสูตร อาจประกอบด้วยอนุภาคย่อยหลายอะตอมหรือหลายไอออน
+            </p>
+
+            <div class="bg-sky-50/90 rounded-2xl p-3.5 border border-sky-200 text-xs text-sky-950 space-y-2">
+              <div class="flex justify-between items-center p-1.5 bg-white rounded-lg border border-sky-100">
+                <span class="font-bold text-sky-900 font-prompt">• อะตอมเดี่ยว ($\text{He}$):</span>
+                <span class="text-slate-600 font-mono">1 หน่วย = 1 อะตอม</span>
+              </div>
+              <div class="flex justify-between items-center p-1.5 bg-white rounded-lg border border-sky-100">
+                <span class="font-bold text-sky-900 font-prompt">• โมเลกุล ($\text{H}_2\text{O}$):</span>
+                <span class="text-slate-600 font-mono">1 โมเลกุล = 3 อะตอม</span>
+              </div>
+              <div class="flex justify-between items-center p-1.5 bg-white rounded-lg border border-sky-100">
+                <span class="font-bold text-sky-900 font-prompt">• ไอออนิก ($\text{CaCl}_2$):</span>
+                <span class="text-slate-600 font-mono">1 หน่วย = 3 ไอออน</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="mt-4 pt-3 border-t border-slate-100 text-xs text-slate-500 font-medium">
+            <i class="fa-solid fa-circle-check text-sky-500 mr-1"></i> เมื่อนับอนุภาคย่อย (อะตอม/ไอออน) ต้องคูณด้วยจำนวนในสูตร
+          </div>
+        </div>
+
+        <!-- Card 3: สะพานเชื่อมการคำนวณ -->
+        <div class="bg-white rounded-3xl p-6 border-2 border-indigo-100 shadow-sm hover:shadow-md transition-all flex flex-col justify-between">
+          <div>
+            <div class="flex items-center justify-between mb-4">
+              <span class="px-3 py-1 rounded-full text-xs font-semibold bg-indigo-100 text-indigo-800 font-prompt">หลักการที่ 3</span>
+              <i class="fa-solid fa-bridge-water text-indigo-500 text-xl"></i>
+            </div>
+            <h3 class="text-lg font-bold text-slate-900 font-prompt mb-2">สะพานเชื่อมมวลกับอนุภาค</h3>
+            <p class="text-slate-600 text-sm leading-relaxed mb-4">
+              การใช้โมลช่วยเชื่อมโยงสิ่งที่มองไม่เห็นในระดับอนุภาคกับปริมาณสารที่ชั่งตวงวัดได้จริงในห้องทดลอง
+            </p>
+
+            <div class="bg-indigo-50/90 rounded-2xl p-4 border border-indigo-200 text-xs text-indigo-950 space-y-2">
+              <div class="font-bold font-prompt text-indigo-900">สมการความสัมพันธ์หลัก:</div>
+              <div class="p-2.5 bg-white rounded-xl border border-indigo-100 text-center font-bold text-indigo-800 text-[14px]">
+                $$n = \frac{N}{N_A} \iff N = n \times 6.022 \times 10^{23}$$
+              </div>
+              <div class="text-[11px] text-center text-slate-600">
+                ($n = \text{จำนวนโมล}$, $N = \text{จำนวนอนุภาค}$)
+              </div>
+            </div>
+          </div>
+
+          <div class="mt-4 pt-3 border-t border-slate-100 text-xs text-slate-500 font-medium">
+            <i class="fa-solid fa-circle-check text-indigo-500 mr-1"></i> คำนวณกลับไปมาระหว่างโมลและอนุภาคได้ตลอดเวลา
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Calculation Walkthrough Card -->
+      <div class="bg-gradient-to-br from-slate-900 via-cyan-950 to-indigo-950 rounded-3xl p-6 sm:p-8 text-white shadow-xl">
+        <div class="max-w-4xl space-y-5">
+          <div class="flex items-center gap-2 text-cyan-300 font-prompt text-sm font-semibold tracking-wide uppercase">
+            <i class="fa-solid fa-square-root-variable"></i> ตัวอย่างการคำนวณละเอียด: เปรียบเทียบโมเลกุลกับอะตอมย่อย
+          </div>
+          <h3 class="text-xl sm:text-2xl font-bold font-prompt">การคิดจำนวนโมเลกุล เทียบกับ จำนวนอะตอมทั้งหมดในก๊าซมีเทน ($\text{CH}_4$) 1.65 โมล</h3>
+          
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
+            <div class="bg-white/10 backdrop-blur-md rounded-2xl p-5 border border-white/15 space-y-3 text-xs sm:text-sm">
+              <div class="flex justify-between items-center pb-2 border-b border-white/10">
+                <span class="font-bold text-cyan-300 font-prompt">1. นับในหน่วย "โมเลกุล" ($\text{CH}_4$)</span>
+                <span class="px-2 py-0.5 rounded bg-cyan-500/20 text-cyan-200 text-xs font-mono">1 หน่วย = 1 โมเลกุล</span>
+              </div>
+              <p class="text-slate-300">ใช้สูตรพื้นฐาน $N = n \times 6.022 \times 10^{23}$ :</p>
+              <div class="space-y-1 font-mono text-slate-200">
+                <div>$N = 1.65 \times 6.022 \times 10^{23}$</div>
+                <div class="text-cyan-300 font-bold">$= \mathbf{9.936 \times 10^{23}\text{ โมเลกุล}}$</div>
+              </div>
+            </div>
+
+            <div class="bg-white/10 backdrop-blur-md rounded-2xl p-5 border border-white/15 space-y-3 text-xs sm:text-sm">
+              <div class="flex justify-between items-center pb-2 border-b border-white/10">
+                <span class="font-bold text-amber-300 font-prompt">2. นับในหน่วย "อะตอมรวมทั้งหมด"</span>
+                <span class="px-2 py-0.5 rounded bg-amber-500/20 text-amber-200 text-xs font-mono">1 โมเลกุล = 5 อะตอม</span>
+              </div>
+              <p class="text-slate-300">ใน 1 โมเลกุล $\text{CH}_4$ มี 1C + 4H = 5 อะตอม :</p>
+              <div class="space-y-1 font-mono text-slate-200">
+                <div>$N_{\text{atoms}} = 5 \times (9.936 \times 10^{23})$</div>
+                <div class="text-amber-300 font-bold">$= \mathbf{4.968 \times 10^{24}\text{ อะตอม (ตัวเลขเปลี่ยนจริง)}}$</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================================================= -->
+    <!-- SECTION 2 : แบบจำลองเชิงโต้ตอบ (Emerald Green Theme)                      -->
+    <!-- ========================================================================= -->
+    <section id="interactive-section" class="space-y-8">
+      
+      <div class="flex items-center gap-3.5 pb-3 border-b-2 border-emerald-500">
+        <div class="w-10 h-10 rounded-xl bg-emerald-600 text-white flex items-center justify-center font-bold text-lg shadow-md shadow-emerald-200">
+          <i class="fa-solid fa-calculator"></i>
+        </div>
+        <div>
+          <span class="text-xs font-bold text-emerald-600 uppercase tracking-widest font-prompt">แบบจำลองเชิงโต้ตอบ</span>
+          <h2 class="text-2xl sm:text-3xl font-bold text-slate-900 font-prompt">โมเดลจำลอง: เครื่องนับอนุภาค–โมล และอนุภาคย่อยตามสูตรจริง</h2>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+        
+        <!-- Controls Column (7 Cols) -->
+        <div class="lg:col-span-7 bg-white rounded-3xl p-6 sm:p-8 border border-emerald-200 shadow-lg space-y-6">
+          
+          <!-- Chemical Substance Selector -->
+          <div class="space-y-3 pb-4 border-b border-slate-100">
+            <div class="flex items-center justify-between">
+              <label class="block text-xs font-bold text-slate-600 uppercase tracking-wider font-prompt">
+                1. เลือกสารตัวอย่าง (สังเกตความแตกต่างของจำนวนอนุภาคย่อย)
+              </label>
+              <span id="selected-substance-desc" class="text-xs font-mono font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-lg border border-emerald-200">
+                He: 1 อะตอม/อนุภาค
+              </span>
+            </div>
+
+            <div class="grid grid-cols-2 sm:grid-cols-3 gap-2">
+              <button type="button" onclick="selectSubstance('He')" id="btn-sub-He" class="p-3 rounded-2xl border-2 border-emerald-500 bg-emerald-50 text-emerald-950 font-prompt text-left transition hover:shadow-sm">
+                <div class="font-bold text-sm flex items-center justify-between">
+                  <span>He (ฮีเลียม)</span>
+                  <span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
+                </div>
+                <div class="text-[11px] text-slate-500 mt-0.5">อะตอมเดี่ยว (1 อะตอม)</div>
+              </button>
+
+              <button type="button" onclick="selectSubstance('O2')" id="btn-sub-O2" class="p-3 rounded-2xl border-2 border-slate-200 bg-white text-slate-700 font-prompt text-left transition hover:border-emerald-300">
+                <div class="font-bold text-sm flex items-center justify-between">
+                  <span>O₂ (ออกซิเจน)</span>
+                  <span class="w-2.5 h-2.5 rounded-full bg-sky-500"></span>
+                </div>
+                <div class="text-[11px] text-slate-500 mt-0.5">โมเลกุลคู่ (2 อะตอม)</div>
+              </button>
+
+              <button type="button" onclick="selectSubstance('H2O')" id="btn-sub-H2O" class="p-3 rounded-2xl border-2 border-slate-200 bg-white text-slate-700 font-prompt text-left transition hover:border-emerald-300">
+                <div class="font-bold text-sm flex items-center justify-between">
+                  <span>H₂O (น้ำ)</span>
+                  <span class="w-2.5 h-2.5 rounded-full bg-blue-500"></span>
+                </div>
+                <div class="text-[11px] text-slate-500 mt-0.5">โมเลกุล (3 อะตอม)</div>
+              </button>
+
+              <button type="button" onclick="selectSubstance('CH4')" id="btn-sub-CH4" class="p-3 rounded-2xl border-2 border-slate-200 bg-white text-slate-700 font-prompt text-left transition hover:border-emerald-300">
+                <div class="font-bold text-sm flex items-center justify-between">
+                  <span>CH₄ (มีเทน)</span>
+                  <span class="w-2.5 h-2.5 rounded-full bg-indigo-500"></span>
+                </div>
+                <div class="text-[11px] text-slate-500 mt-0.5">โมเลกุล (5 อะตอม)</div>
+              </button>
+
+              <button type="button" onclick="selectSubstance('NaCl')" id="btn-sub-NaCl" class="p-3 rounded-2xl border-2 border-slate-200 bg-white text-slate-700 font-prompt text-left transition hover:border-emerald-300">
+                <div class="font-bold text-sm flex items-center justify-between">
+                  <span>NaCl (เกลือแกง)</span>
+                  <span class="w-2.5 h-2.5 rounded-full bg-amber-500"></span>
+                </div>
+                <div class="text-[11px] text-slate-500 mt-0.5">ไอออนิก (2 ไอออน)</div>
+              </button>
+
+              <button type="button" onclick="selectSubstance('CaCl2')" id="btn-sub-CaCl2" class="p-3 rounded-2xl border-2 border-slate-200 bg-white text-slate-700 font-prompt text-left transition hover:border-emerald-300">
+                <div class="font-bold text-sm flex items-center justify-between">
+                  <span>CaCl₂</span>
+                  <span class="w-2.5 h-2.5 rounded-full bg-rose-500"></span>
+                </div>
+                <div class="text-[11px] text-slate-500 mt-0.5">ไอออนิก (3 ไอออน)</div>
+              </button>
+            </div>
+          </div>
+
+          <!-- Dual-Direction Input Controls -->
+          <div class="space-y-5">
+            
+            <!-- Direction A: Adjust Moles (n) -->
+            <div class="p-4 rounded-2xl bg-emerald-50/70 border border-emerald-200 space-y-3">
+              <div class="flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                  <span class="w-6 h-6 rounded-full bg-emerald-600 text-white flex items-center justify-center text-xs font-bold font-mono">A</span>
+                  <label class="text-xs font-bold text-emerald-950 uppercase font-prompt">กำหนดจำนวนโมล ($n$) :</label>
+                </div>
+                <div class="flex items-center gap-1">
+                  <input type="number" id="input-moles" step="0.05" min="0.05" max="10.0" value="1.65" oninput="onMoleInput(this.value)" class="w-24 text-right font-mono font-bold text-sm bg-white border border-emerald-300 rounded-xl px-2.5 py-1 text-emerald-900 focus:outline-none focus:ring-2 focus:ring-emerald-500">
+                  <span class="text-xs font-prompt font-semibold text-emerald-800">mol</span>
+                </div>
+              </div>
+              <input type="range" id="slider-moles" min="0.10" max="5.0" step="0.05" value="1.65" oninput="onMoleSlider(this.value)" class="w-full h-2.5 bg-emerald-200 rounded-lg cursor-pointer">
+              <div class="flex justify-between text-[11px] text-slate-500 font-mono">
+                <span>0.10 mol</span>
+                <span>2.50 mol</span>
+                <span>5.00 mol</span>
+              </div>
+            </div>
+
+            <!-- Direction B: Direct Particle Factor Input -->
+            <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-3">
+              <div class="flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                  <span class="w-6 h-6 rounded-full bg-slate-700 text-white flex items-center justify-center text-xs font-bold font-mono">B</span>
+                  <label class="text-xs font-bold text-slate-700 uppercase font-prompt">หรือกำหนดจำนวนหน่วยหลัก ($N = k \times 10^{23}$) :</label>
+                </div>
+                <div class="flex items-center gap-1.5">
+                  <span class="text-xs font-mono font-bold text-slate-600">$k =$</span>
+                  <input type="number" id="input-particle-k" step="0.1" min="0.1" max="60.0" value="9.94" oninput="onParticleKInput(this.value)" class="w-20 text-right font-mono font-bold text-sm bg-white border border-slate-300 rounded-xl px-2 py-1 text-slate-800 focus:outline-none focus:ring-2 focus:ring-emerald-500">
+                  <span class="text-xs font-mono text-slate-500">$\times 10^{23}$</span>
+                </div>
+              </div>
+              <p class="text-[11px] text-slate-500 leading-normal">
+                คำนวณย้อนกลับหาจำนวนโมลตามสมการ $n = \frac{N}{6.022 \times 10^{23}}$ ทันที
+              </p>
+            </div>
+
+          </div>
+
+          <!-- Conceptual Insight Banner -->
+          <div class="p-4 rounded-2xl bg-gradient-to-r from-emerald-600 to-teal-700 text-white space-y-1.5 shadow-md">
+            <div class="flex items-center gap-2 text-emerald-200 font-prompt text-xs font-bold">
+              <i class="fa-solid fa-lightbulb"></i> ข้อค้นพบสำคัญทางเคมี:
+            </div>
+            <p class="text-xs sm:text-sm text-emerald-50 leading-relaxed">
+              สำหรับสารปริมาณ <strong><span id="insight-moles">1.65</span> โมล</strong> เท่ากัน จะมีจำนวน <strong>"หน่วยหลัก" เท่ากันเสมอคือ <span id="insight-primary">9.936 × 10²³</span> หน่วย</strong> แต่เมื่อนับเป็น <strong>"อนุภาคย่อยทั้งหมด" ตัวเลขจะเปลี่ยนเป็น <span id="insight-total" class="font-bold text-amber-300 underline">...</span></strong> ขึ้นอยู่กับโครงสร้างโมเลกุล
+            </p>
+          </div>
+
+        </div>
+
+        <!-- Simulation & Mathematical Output (5 Cols) -->
+        <div class="lg:col-span-5 space-y-6">
+          
+          <!-- Live Result Card -->
+          <div class="bg-gradient-to-br from-slate-900 via-slate-800 to-teal-950 text-white rounded-3xl p-6 sm:p-7 border border-emerald-500/30 shadow-2xl">
+            
+            <div class="flex items-center justify-between pb-3 border-b border-slate-700">
+              <span id="current-particle-badge" class="px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 text-xs font-prompt font-bold border border-emerald-400/30">
+                สาร: He (ฮีเลียม)
+              </span>
+              <span class="text-[11px] font-mono text-slate-400">Live Chemistry Link</span>
+            </div>
+
+            <!-- Primary Count -->
+            <div class="my-4 text-center pb-4 border-b border-slate-700/60">
+              <span class="text-xs text-slate-400 font-prompt block mb-1" id="primary-count-label">1. จำนวนหน่วยหลัก ($N_{\text{unit}}$)</span>
+              <div class="text-3xl font-extrabold tracking-tight text-white font-mono" id="display-primary-count">
+                9.936 × 10²³
+              </div>
+              <span class="text-xs font-prompt text-emerald-300 mt-1 inline-block" id="display-primary-unit">อะตอม (atoms)</span>
+            </div>
+
+            <!-- Sub-Particles Count -->
+            <div class="my-4 text-center bg-white/5 p-3.5 rounded-2xl border border-white/10">
+              <div class="flex items-center justify-center gap-1.5 text-xs text-amber-300 font-prompt font-bold mb-1">
+                <i class="fa-solid fa-sparkles"></i>
+                <span id="sub-count-label">2. จำนวนอะตอมทั้งหมด (Total Atoms)</span>
+              </div>
+              <div class="text-3xl sm:text-4xl font-extrabold tracking-tight text-amber-300 font-mono" id="display-sub-count">
+                9.936 × 10²³
+              </div>
+              <span class="text-xs font-mono text-slate-300 mt-1 inline-block" id="display-sub-unit">อะตอมรวม (atoms)</span>
+              <p class="text-[11px] text-slate-400 mt-1 font-sarabun" id="display-sub-formula">
+                คำนวณจาก: 1 × (9.936 × 10²³)
+              </p>
+            </div>
+
+            <!-- Mathematical Substitution Steps -->
+            <div class="bg-black/50 rounded-2xl p-4 border border-slate-700/80 space-y-2 text-xs math-step-container">
+              <div class="text-slate-400 text-[11px] font-prompt font-semibold">ขั้นตอนการคำนวณแจกแจง:</div>
+              <div id="math-conversion-step" class="font-mono text-emerald-300 py-1 leading-relaxed text-xs">
+              </div>
+              <div class="pt-2 border-t border-slate-800 flex justify-between items-center text-xs text-emerald-400 font-prompt font-semibold">
+                <span>ปริมาณสารในหน่วยโมล:</span>
+                <span id="math-mole-final" class="text-sm text-amber-300 font-bold">1.65 mol</span>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Microscopic Particle Field Canvas -->
+          <div class="bg-white rounded-3xl p-6 border border-emerald-200 shadow-lg space-y-3">
+            <div class="flex items-center justify-between">
+              <h4 class="text-sm font-bold text-slate-900 font-prompt flex items-center gap-1.5">
+                <i class="fa-solid fa-expand text-emerald-600"></i>
+                แบบจำลองกลุ่มอนุภาคในสนามจำลอง
+              </h4>
+              <span class="text-xs font-mono font-semibold text-emerald-700" id="canvas-particle-density">อนุภาคย่อย: ปกติ</span>
+            </div>
+
+            <canvas id="particle-canvas" width="400" height="190" class="w-full h-auto rounded-2xl shadow-inner"></canvas>
+            
+            <p class="text-[11px] text-slate-500 text-center leading-normal">
+              อนุภาคจำลองการเคลื่อนที่ในสนามตัวอย่าง สีและจำนวนจุดสะท้อนอนุภาคย่อยในโมเลกุลที่เลือก
+            </p>
+          </div>
+
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ========================================================================= -->
+    <!-- SECTION 3 : ใบงานแบบฝึกทักษะ 10 ข้อ (Warm Amber Theme & Isolated Print)   -->
+    <!-- ========================================================================= -->
+    <section id="worksheet-section" class="space-y-6">
+      
+      <!-- Control Banner (Completely hidden during printing) -->
+      <div class="no-print bg-gradient-to-r from-amber-600 via-orange-600 to-amber-700 rounded-3xl p-6 sm:p-8 text-white shadow-xl flex flex-col md:flex-row items-center justify-between gap-6">
+        <div class="space-y-1 text-center md:text-left">
+          <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/20 text-white text-xs font-bold uppercase font-prompt">
+            <i class="fa-solid fa-file-pen"></i> เอกสารการเรียนรู้
+          </div>
+          <h2 class="text-2xl sm:text-3xl font-extrabold font-prompt">ใบงานแบบฝึกทักษะ: โมลและจำนวนอนุภาค (10 ข้อ)</h2>
+          <p class="text-amber-100 text-xs sm:text-sm">
+            กดปุ่มสั่งพิมพ์เพื่อพิมพ์เฉพาะตัวใบงาน โดยระบบจะซ่อนส่วนอื่นๆ ของหน้าเว็บทั้งหมดอัตโนมัติ
+          </p>
+        </div>
+
+        <div class="flex flex-wrap items-center justify-center gap-3">
+          <button onclick="toggleWorksheetSolutions()" id="btn-toggle-solutions" class="px-4 py-2.5 rounded-xl bg-amber-900/60 hover:bg-amber-900 text-white font-prompt font-semibold text-xs sm:text-sm transition flex items-center gap-2 border border-amber-400/40">
+            <i class="fa-solid fa-eye" id="toggle-icon"></i> <span id="toggle-text">แสดงเฉลยบนหน้าจอ</span>
+          </button>
+          <button onclick="printStudentWorksheet()" class="px-5 py-2.5 rounded-xl bg-white text-amber-900 hover:bg-amber-50 font-prompt font-bold text-xs sm:text-sm transition shadow-md flex items-center gap-2">
+            <i class="fa-solid fa-user-graduate text-amber-700"></i> พิมพ์ใบงานสำหรับนักเรียน
+          </button>
+          <button onclick="printTeacherKey()" class="px-5 py-2.5 rounded-xl bg-slate-900 text-amber-300 hover:bg-slate-800 font-prompt font-bold text-xs sm:text-sm transition shadow-md flex items-center gap-2">
+            <i class="fa-solid fa-chalkboard-user"></i> พิมพ์เฉลยสำหรับครู
+          </button>
+        </div>
+      </div>
+
+      <!-- Printable Worksheet Content (Strictly isolated during print) -->
+      <div id="printable-worksheet-card" class="bg-white rounded-3xl p-6 sm:p-10 border border-slate-300 shadow-xl space-y-6">
+        
+        <!-- Header shown on Paper and Screen -->
+        <div class="border-b-2 border-slate-900 pb-5">
+          <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
+            <div>
+              <h3 class="text-xl sm:text-2xl font-bold font-prompt text-slate-950">ใบงานแบบฝึกทักษะ: เรื่อง โมลและจำนวนอนุภาค</h3>
+              <p class="text-slate-600 text-xs sm:text-sm font-prompt">กลุ่มสาระการเรียนรู้วิทยาศาสตร์และเทคโนโลยี • รายวิชาเคมีเพิ่มเติม ม.4</p>
+            </div>
+            <div class="text-right">
+              <span id="worksheet-status-badge" class="inline-block px-3 py-1 rounded-lg border-2 border-slate-800 text-xs font-prompt font-bold text-slate-900">
+                ฉบับนักเรียน (Student Worksheet)
+              </span>
+              <p class="text-[11px] text-slate-500 mt-1 font-prompt">คะแนนเต็ม 20 คะแนน (ข้อละ 2 คะแนน)</p>
+            </div>
+          </div>
+
+          <div class="mt-4 pt-3 border-t border-dashed border-slate-400 grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs sm:text-sm font-prompt text-slate-800">
+            <div>ชื่อ-สกุล : .....................................................................</div>
+            <div>ชั้น ม.4 / ........ เลขที่ : ............</div>
+            <div>วันที่ : ........ / ........................ / ............</div>
+          </div>
+
+          <div class="mt-3 p-2.5 bg-amber-50/70 border border-amber-200 rounded-xl text-xs text-amber-950 font-mono">
+            <strong>ค่าคงที่สากล:</strong> เลขอาโวกาโดร ($N_A$) $= 6.022 \times 10^{23} \text{ อนุภาค/mol}$ (หรือใช้ $6.02 \times 10^{23}$ ในการคำนวณ)
+          </div>
+        </div>
+
+        <!-- 10 Questions Cards (Page Break Avoidance Applied) -->
+        <div class="space-y-5">
+          
+          <!-- ข้อ 1 -->
+          <div class="question-card p-5 rounded-2xl bg-slate-50 border border-slate-200 space-y-2">
+            <div class="font-bold font-prompt text-sm sm:text-base text-slate-900">
+              ข้อ 1. จงคำนวณหาจำนวนอะตอมของก๊าซฮีเลียม ($\text{He}$) ปริมาณ $2.50\text{ โมล}$
+            </div>
+            <div class="student-write-area min-h-[85px] border border-dashed border-slate-300 rounded-xl bg-white p-3 font-sans text-xs">
+              <div class="text-slate-400 font-prompt workspace-prompt">
+                วิธีทำ : <br><br>
+                ตอบ : .........................................................................................................................................................
+              </div>
+            </div>
+            <div class="teacher-solution text-slate-800 space-y-1">
+              <span class="font-bold text-emerald-800 font-prompt">แนวทางการเฉลยละเอียด :</span>
+              <div>เนื่องจากก๊าซฮีเลียม ($\text{He}$) เป็นก๊าซเฉื่อยที่มีอนุภาคพื้นฐานเป็น <strong>อะตอมเดี่ยว</strong></div>
+              <div>จากความสัมพันธ์ : $N = n \times N_A$</div>
+              <div>แทนค่า : $N = 2.50\text{ mol} \times (6.022 \times 10^{23}\text{ atoms/mol})$</div>
+              <div>$$N = 15.055 \times 10^{23} = \mathbf{1.506 \times 10^{24}\text{ อะตอม}}$$</div>
+              <div class="font-bold text-amber-800 font-prompt">ตอบ : ก๊าซฮีเลียมมีจำนวนอะตอมเท่ากับ $1.51 \times 10^{24}\text{ อะตอม}$</div>
+            </div>
+          </div>
+
+          <!-- ข้อ 2 -->
+          <div class="question-card p-5 rounded-2xl bg-slate-50 border border-slate-200 space-y-2">
+            <div class="font-bold font-prompt text-sm sm:text-base text-slate-900">
+              ข้อ 2. น้ำบริสุทธิ์ ($\text{H}_2\text{O}$) จำนวน $0.50\text{ โมล}$ มีกี่โมเลกุล และมีจำนวนอะตอมทั้งหมด (ทั้ง $\text{H}$ และ $\text{O}$) รวมกันกี่อะตอม
+            </div>
+            <div class="student-write-area min-h-[85px] border border-dashed border-slate-300 rounded-xl bg-white p-3 font-sans text-xs">
+              <div class="text-slate-400 font-prompt workspace-prompt">
+                วิธีทำ : <br><br>
+                ตอบ : .........................................................................................................................................................
+              </div>
+            </div>
+            <div class="teacher-solution text-slate-800 space-y-1">
+              <span class="font-bold text-emerald-800 font-prompt">แนวทางการเฉลยละเอียด :</span>
+              <div>1) หาจำนวนโมเลกุลของน้ำ :</div>
+              <div>$$N_{\text{molecule}} = n \times N_A = 0.50\text{ mol} \times (6.022 \times 10^{23}\text{ molecules/mol}) = \mathbf{3.011 \times 10^{23}\text{ โมเลกุล}}$$</div>
+              <div>2) หาจำนวนอะตอมรวม (ใน 1 โมเลกุล $\text{H}_2\text{O}$ มี 2H + 1O = 3 อะตอม) :</div>
+              <div>$$N_{\text{total atoms}} = 3 \times (3.011 \times 10^{23}) = \mathbf{9.033 \times 10^{23}\text{ อะตอม}}$$</div>
+              <div class="font-bold text-amber-800 font-prompt">ตอบ : มีน้ำ $3.01 \times 10^{23}\text{ โมเลกุล}$ และมีจำนวนอะตอมรวมทั้งหมด $9.03 \times 10^{23}\text{ อะตอม}$</div>
+            </div>
+          </div>
+
+          <!-- ข้อ 3 -->
+          <div class="question-card p-5 rounded-2xl bg-slate-50 border border-slate-200 space-y-2">
+            <div class="font-bold font-prompt text-sm sm:text-base text-slate-900">
+              ข้อ 3. ก๊าซคาร์บอนไดออกไซด์ ($\text{CO}_2$) จำนวน $1.806 \times 10^{24}\text{ โมเลกุล}$ คิดเป็นปริมาณกี่โมล
+            </div>
+            <div class="student-write-area min-h-[85px] border border-dashed border-slate-300 rounded-xl bg-white p-3 font-sans text-xs">
+              <div class="text-slate-400 font-prompt workspace-prompt">
+                วิธีทำ : <br><br>
+                ตอบ : .........................................................................................................................................................
+              </div>
+            </div>
+            <div class="teacher-solution text-slate-800 space-y-1">
+              <span class="font-bold text-emerald-800 font-prompt">แนวทางการเฉลยละเอียด :</span>
+              <div>จากสมการความสัมพันธ์เพื่อคำนวณหาจำนวนโมล : $n = \frac{N}{N_A}$</div>
+              <div>แทนค่า : $$n = \frac{1.806 \times 10^{24}\text{ molecules}}{6.022 \times 10^{23}\text{ molecules/mol}}$$</div>
+              <div>$$n = \frac{18.06 \times 10^{23}}{6.022 \times 10^{23}} = \mathbf{3.00\text{ โมล}}$$</div>
+              <div class="font-bold text-amber-800 font-prompt">ตอบ : ก๊าซคาร์บอนไดออกไซด์คิดเป็นปริมาณ 3.00 โมล</div>
+            </div>
+          </div>
+
+          <!-- ข้อ 4 -->
+          <div class="question-card p-5 rounded-2xl bg-slate-50 border border-slate-200 space-y-2">
+            <div class="font-bold font-prompt text-sm sm:text-base text-slate-900">
+              ข้อ 4. เกลือแกงโซเดียมคลอไรด์ ($\text{NaCl}$) ปริมาณ $1.20\text{ โมล}$ เมื่อละลายน้ำแตกตัวเป็นไอออนอย่างสมบูรณ์ จะได้ไอออนรวมทั้งหมด ($\text{Na}^+$ และ $\text{Cl}^-$) กี่ไอออน
+            </div>
+            <div class="student-write-area min-h-[85px] border border-dashed border-slate-300 rounded-xl bg-white p-3 font-sans text-xs">
+              <div class="text-slate-400 font-prompt workspace-prompt">
+                วิธีทำ : <br><br>
+                ตอบ : .........................................................................................................................................................
+              </div>
+            </div>
+            <div class="teacher-solution text-slate-800 space-y-1">
+              <span class="font-bold text-emerald-800 font-prompt">แนวทางการเฉลยละเอียด :</span>
+              <div>สมการการแตกตัวของสารไอออนิก : $\text{NaCl(s)} \rightarrow \text{Na}^+\text{(aq)} + \text{Cl}^-\text{(aq)}$</div>
+              <div>แสดงว่า $\text{NaCl}$ 1 หน่วยสูตร แตกตัวให้ไอออนรวม $= 1 + 1 = 2\text{ ไอออน}$</div>
+              <div>1) จำนวนหน่วยสูตร $\text{NaCl} = 1.20 \times 6.022 \times 10^{23} = 7.226 \times 10^{23}\text{ หน่วยสูตร}$</div>
+              <div>2) จำนวนไอออนรวม $= 2 \times (7.226 \times 10^{23}) = \mathbf{1.445 \times 10^{24}\text{ ไอออน}}$</div>
+              <div class="font-bold text-amber-800 font-prompt">ตอบ : จะได้ไอออนรวมทั้งหมด $1.45 \times 10^{24}\text{ ไอออน}$</div>
+            </div>
+          </div>
+
+          <!-- ข้อ 5 -->
+          <div class="question-card p-5 rounded-2xl bg-slate-50 border border-slate-200 space-y-2">
+            <div class="font-bold font-prompt text-sm sm:text-base text-slate-900">
+              ข้อ 5. ก๊าซมีเทน ($\text{CH}_4$) จำนวน $0.40\text{ โมล}$ จะมีจำนวนอะตอมของธาตุไฮโดรเจน ($\text{H}$) ปรากฏอยู่ทั้งหมดกี่อะตอม
+            </div>
+            <div class="student-write-area min-h-[85px] border border-dashed border-slate-300 rounded-xl bg-white p-3 font-sans text-xs">
+              <div class="text-slate-400 font-prompt workspace-prompt">
+                วิธีทำ : <br><br>
+                ตอบ : .........................................................................................................................................................
+              </div>
+            </div>
+            <div class="teacher-solution text-slate-800 space-y-1">
+              <span class="font-bold text-emerald-800 font-prompt">แนวทางการเฉลยละเอียด :</span>
+              <div>ในก๊าซมีเทน 1 โมเลกุลประกอบด้วยอะตอมของไฮโดรเจน 4 อะตอม</div>
+              <div>วิธีที่ 1 : หาโมลของอะตอม $\text{H} = 0.40\text{ mol} \times 4 = 1.60\text{ mol H}$</div>
+              <div>$$N_{\text{H}} = 1.60\text{ mol} \times (6.022 \times 10^{23}\text{ atoms/mol}) = \mathbf{9.635 \times 10^{23}\text{ อะตอม}}$$</div>
+              <div class="font-bold text-amber-800 font-prompt">ตอบ : มีอะตอมของไฮโดรเจนเท่ากับ $9.64 \times 10^{23}\text{ อะตอม}$</div>
+            </div>
+          </div>
+
+          <!-- ข้อ 6 -->
+          <div class="question-card p-5 rounded-2xl bg-slate-50 border border-slate-200 space-y-2">
+            <div class="font-bold font-prompt text-sm sm:text-base text-slate-900">
+              ข้อ 6. โลหะอะลูมิเนียม ($\text{Al}$) ตัวอย่างหนึ่ง มีจำนวนอะตอมเท่ากับ $3.011 \times 10^{22}\text{ อะตอม}$ จงคำนวณหาปริมาณของอะลูมิเนียมนี้ในหน่วยโมล
+            </div>
+            <div class="student-write-area min-h-[85px] border border-dashed border-slate-300 rounded-xl bg-white p-3 font-sans text-xs">
+              <div class="text-slate-400 font-prompt workspace-prompt">
+                วิธีทำ : <br><br>
+                ตอบ : .........................................................................................................................................................
+              </div>
+            </div>
+            <div class="teacher-solution text-slate-800 space-y-1">
+              <span class="font-bold text-emerald-800 font-prompt">แนวทางการเฉลยละเอียด :</span>
+              <div>จากสูตร : $n = \frac{N}{N_A}$</div>
+              <div>แทนค่า : $$n = \frac{3.011 \times 10^{22}}{6.022 \times 10^{23}} = \frac{3.011}{60.22} = \mathbf{0.050\text{ โมล}}$$</div>
+              <div class="font-bold text-amber-800 font-prompt">ตอบ : โลหะอะลูมิเนียมมีปริมาณเท่ากับ 0.05 โมล (หรือ $5.0 \times 10^{-2}\text{ mol}$)</div>
+            </div>
+          </div>
+
+          <!-- ข้อ 7 -->
+          <div class="question-card p-5 rounded-2xl bg-slate-50 border border-slate-200 space-y-2">
+            <div class="font-bold font-prompt text-sm sm:text-base text-slate-900">
+              ข้อ 7. น้ำตาลกลูโคส ($\text{C}_6\text{H}_{12}\text{O}_6$) ปริมาณ $0.20\text{ โมล}$ จะมีจำนวนอะตอมของคาร์บอน ($\text{C}$) กี่อะตอม และมีจำนวนอะตอมของธาตุทั้งหมดรวมกันกี่อะตอม
+            </div>
+            <div class="student-write-area min-h-[85px] border border-dashed border-slate-300 rounded-xl bg-white p-3 font-sans text-xs">
+              <div class="text-slate-400 font-prompt workspace-prompt">
+                วิธีทำ : <br><br>
+                ตอบ : .........................................................................................................................................................
+              </div>
+            </div>
+            <div class="teacher-solution text-slate-800 space-y-1">
+              <span class="font-bold text-emerald-800 font-prompt">แนวทางการเฉลยละเอียด :</span>
+              <div>1) จำนวนโมเลกุลกลูโคส $= 0.20 \times 6.022 \times 10^{23} = 1.204 \times 10^{23}\text{ โมเลกุล}$</div>
+              <div>2) จำนวนอะตอมของ $\text{C}$ (มี 6 อะตอม C / โมเลกุล) :</div>
+              <div>$$N_{\text{C}} = 6 \times (1.204 \times 10^{23}) = \mathbf{7.226 \times 10^{23}\text{ อะตอม}}$$</div>
+              <div>3) จำนวนอะตอมทั้งหมดใน 1 โมเลกุล $= 6\text{C} + 12\text{H} + 6\text{O} = 24\text{ อะตอม}$ :</div>
+              <div>$$N_{\text{total}} = 24 \times (1.204 \times 10^{23}) = \mathbf{2.890 \times 10^{24}\text{ อะตอม}}$$</div>
+              <div class="font-bold text-amber-800 font-prompt">ตอบ : มีอะตอม C เท่ากับ $7.23 \times 10^{23}\text{ อะตอม}$ และมีอะตอมรวมทั้งหมด $2.89 \times 10^{24}\text{ อะตอม}$</div>
+            </div>
+          </div>
+
+          <!-- ข้อ 8 -->
+          <div class="question-card p-5 rounded-2xl bg-slate-50 border border-slate-200 space-y-2">
+            <div class="font-bold font-prompt text-sm sm:text-base text-slate-900">
+              ข้อ 8. แคลเซียมคลอไรด์ ($\text{CaCl}_2$) จำนวน $0.75\text{ โมล}$ เมื่อละลายน้ำแตกตัวสมบูรณ์ จะมีแคลเซียมไอออน ($\text{Ca}^{2+}$) กี่ไอออน และมีคลอไรด์ไอออน ($\text{Cl}^-$) กี่ไอออน
+            </div>
+            <div class="student-write-area min-h-[85px] border border-dashed border-slate-300 rounded-xl bg-white p-3 font-sans text-xs">
+              <div class="text-slate-400 font-prompt workspace-prompt">
+                วิธีทำ : <br><br>
+                ตอบ : .........................................................................................................................................................
+              </div>
+            </div>
+            <div class="teacher-solution text-slate-800 space-y-1">
+              <span class="font-bold text-emerald-800 font-prompt">แนวทางการเฉลยละเอียด :</span>
+              <div>สมการการแตกตัว : $\text{CaCl}_2 \rightarrow \text{Ca}^{2+} + 2\text{Cl}^-$</div>
+              <div>• จำนวนโมลของ $\text{Ca}^{2+} = 0.75\text{ mol}$</div>
+              <div>$$N_{\text{Ca}^{2+}} = 0.75 \times 6.022 \times 10^{23} = \mathbf{4.517 \times 10^{23}\text{ ไอออน}}$$</div>
+              <div>• จำนวนโมลของ $\text{Cl}^- = 0.75 \times 2 = 1.50\text{ mol}$</div>
+              <div>$$N_{\text{Cl}^-} = 1.50 \times 6.022 \times 10^{23} = \mathbf{9.033 \times 10^{23}\text{ ไอออน}}$$</div>
+              <div class="font-bold text-amber-800 font-prompt">ตอบ : มี $\text{Ca}^{2+}$ เท่ากับ $4.52 \times 10^{23}\text{ ไอออน}$ และมี $\text{Cl}^-$ เท่ากับ $9.03 \times 10^{23}\text{ ไอออน}$</div>
+            </div>
+          </div>
+
+          <!-- ข้อ 9 -->
+          <div class="question-card p-5 rounded-2xl bg-slate-50 border border-slate-200 space-y-2">
+            <div class="font-bold font-prompt text-sm sm:text-base text-slate-900">
+              ข้อ 9. ถ้าตรวจพบว่ามีอะตอมของไฮโดรเจน ($\text{H}$) อยู่ $1.204 \times 10^{24}\text{ อะตอม}$ ในภาชนะบรรจุก๊าซแอมโมเนีย ($\text{NH}_3$) จงหาว่าในภาชนะนี้มีก๊าซแอมโมเนียกี่โมเลกุล และคิดเป็นปริมาณกี่โมล
+            </div>
+            <div class="student-write-area min-h-[85px] border border-dashed border-slate-300 rounded-xl bg-white p-3 font-sans text-xs">
+              <div class="text-slate-400 font-prompt workspace-prompt">
+                วิธีทำ : <br><br>
+                ตอบ : .........................................................................................................................................................
+              </div>
+            </div>
+            <div class="teacher-solution text-slate-800 space-y-1">
+              <span class="font-bold text-emerald-800 font-prompt">แนวทางการเฉลยละเอียด :</span>
+              <div>เนื่องจากแอมโมเนีย 1 โมเลกุล ($\text{NH}_3$) มีอะตอม $\text{H} = 3$ อะตอม</div>
+              <div>1) หาจำนวนโมเลกุลของ $\text{NH}_3$ :</div>
+              <div>$$N_{\text{NH}_3} = \frac{N_{\text{H}}}{3} = \frac{1.204 \times 10^{24}}{3} = \mathbf{4.013 \times 10^{23}\text{ โมเลกุล}}$$</div>
+              <div>2) หาปริมาณสารในหน่วยโมล :</div>
+              <div>$$n_{\text{NH}_3} = \frac{4.013 \times 10^{23}}{6.022 \times 10^{23}} = \mathbf{0.667\text{ โมล}}$$ (หรือคิดจาก $n_{\text{H}} = \frac{1.204 \times 10^{24}}{6.022 \times 10^{23}} = 2.0\text{ mol}$, $n_{\text{NH}_3} = \frac{2.0}{3} = 0.67\text{ mol}$)</div>
+              <div class="font-bold text-amber-800 font-prompt">ตอบ : มีก๊าซแอมโมเนีย $4.01 \times 10^{23}\text{ โมเลกุล}$ คิดเป็น $0.67\text{ โมล}$</div>
+            </div>
+          </div>
+
+          <!-- ข้อ 10 -->
+          <div class="question-card p-5 rounded-2xl bg-slate-50 border border-slate-200 space-y-2">
+            <div class="font-bold font-prompt text-sm sm:text-base text-slate-900">
+              ข้อ 10. สารประกอบอะลูมิเนียมซัลเฟต ($\text{Al}_2(\text{SO}_4)_3$) จำนวน $0.10\text{ โมล}$ เมื่อละลายน้ำแตกตัวสมบูรณ์ จะมีจำนวนไอออนบวก ($\text{Al}^{3+}$), ไอออนลบ ($\text{SO}_4^{2-}$), และไอออนรวมทั้งหมดกี่ไอออน
+            </div>
+            <div class="student-write-area min-h-[85px] border border-dashed border-slate-300 rounded-xl bg-white p-3 font-sans text-xs">
+              <div class="text-slate-400 font-prompt workspace-prompt">
+                วิธีทำ : <br><br>
+                ตอบ : .........................................................................................................................................................
+              </div>
+            </div>
+            <div class="teacher-solution text-slate-800 space-y-1">
+              <span class="font-bold text-emerald-800 font-prompt">แนวทางการเฉลยละเอียด :</span>
+              <div>สมการการแตกตัว : $\text{Al}_2(\text{SO}_4)_3 \rightarrow 2\text{Al}^{3+} + 3\text{SO}_4^{2-}$ (รวม 5 ไอออนต่อหน่วยสูตร)</div>
+              <div>1) จำนวนไอออนบวก $\text{Al}^{3+}$ ($0.10 \times 2 = 0.20\text{ mol}$) :</div>
+              <div>$$N_{\text{Al}^{3+}} = 0.20 \times 6.022 \times 10^{23} = \mathbf{1.204 \times 10^{23}\text{ ไอออน}}$$</div>
+              <div>2) จำนวนไอออนลบ $\text{SO}_4^{2-}$ ($0.10 \times 3 = 0.30\text{ mol}$) :</div>
+              <div>$$N_{\text{SO}_4^{2-}} = 0.30 \times 6.022 \times 10^{23} = \mathbf{1.807 \times 10^{23}\text{ ไอออน}}$$</div>
+              <div>3) จำนวนไอออนรวมทั้งหมด ($0.10 \times 5 = 0.50\text{ mol}$) :</div>
+              <div>$$N_{\text{total ions}} = 0.50 \times 6.022 \times 10^{23} = \mathbf{3.011 \times 10^{23}\text{ ไอออน}}$$</div>
+              <div class="font-bold text-amber-800 font-prompt">ตอบ : มี $\text{Al}^{3+} = 1.20 \times 10^{23}\text{ ไอออน}$, $\text{SO}_4^{2-} = 1.81 \times 10^{23}\text{ ไอออน}$, และไอออนรวมทั้งหมด $3.01 \times 10^{23}\text{ ไอออน}$</div>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ========================================================================= -->
+    <!-- SECTION 4 : เกณฑ์การประเมินรูบริก (Purple & Indigo Theme)                  -->
+    <!-- ========================================================================= -->
+    <section id="rubric-section" class="space-y-8">
+      
+      <div class="flex items-center gap-3.5 pb-3 border-b-2 border-purple-500">
+        <div class="w-10 h-10 rounded-xl bg-purple-600 text-white flex items-center justify-center font-bold text-lg shadow-md shadow-purple-200">
+          <i class="fa-solid fa-list-check"></i>
+        </div>
+        <div>
+          <span class="text-xs font-bold text-purple-600 uppercase tracking-widest font-prompt">เกณฑ์การวัดและประเมินผล</span>
+          <h2 class="text-2xl sm:text-3xl font-bold text-slate-900 font-prompt">เกณฑ์การประเมินผล (Rubric) แบบ 3 ระดับ</h2>
+        </div>
+      </div>
+
+      <div class="bg-white rounded-3xl p-6 sm:p-8 border border-purple-200 shadow-xl space-y-6">
+        
+        <div class="pb-3 border-b border-slate-200">
+          <h3 class="text-lg font-bold font-prompt text-slate-900">
+            เกณฑ์การประเมินตามสภาพจริง 3 ระดับ (คะแนนเต็ม 20 คะแนน, ข้อละ 2 คะแนน)
+          </h3>
+          <p class="text-xs text-slate-500 font-prompt mt-0.5">
+            ประเมินครอบคลุมความเข้าใจมโนทัศน์เรื่องอนุภาค ทักษะการตั้งสมการสัญกรณ์วิทยาศาสตร์ และความถูกต้องของคำตอบ
+          </p>
+        </div>
+
+        <!-- Rubric Table -->
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-sm border-collapse">
+            <thead>
+              <tr class="bg-purple-50 border-b-2 border-purple-200 text-purple-950 font-prompt">
+                <th class="p-4 w-1/4 rounded-tl-2xl font-bold text-sm sm:text-base">ประเด็นการประเมิน</th>
+                <th class="p-4 w-1/4 font-semibold text-emerald-900 bg-emerald-100/60 border-r border-slate-200">
+                  <div class="flex items-center gap-2 font-bold text-sm">
+                    <span class="w-6 h-6 rounded-full bg-emerald-600 text-white flex items-center justify-center text-xs">3</span>
+                    <span>ระดับดีมาก (2.0 คะแนน/ข้อ)</span>
+                  </div>
+                </th>
+                <th class="p-4 w-1/4 font-semibold text-amber-900 bg-amber-50/70 border-r border-slate-200">
+                  <div class="flex items-center gap-2 font-bold text-sm">
+                    <span class="w-6 h-6 rounded-full bg-amber-600 text-white flex items-center justify-center text-xs">2</span>
+                    <span>ระดับปานกลาง (1.0 - 1.5 คะแนน)</span>
+                  </div>
+                </th>
+                <th class="p-4 w-1/4 rounded-tr-2xl font-semibold text-rose-900 bg-rose-50/70">
+                  <div class="flex items-center gap-2 font-bold text-sm">
+                    <span class="w-6 h-6 rounded-full bg-rose-600 text-white flex items-center justify-center text-xs">1</span>
+                    <span>ระดับปรับปรุง (0.0 - 0.5 คะแนน)</span>
+                  </div>
+                </th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-200 font-sans">
+              
+              <!-- Criterion 1 -->
+              <tr class="hover:bg-slate-50/70 transition">
+                <td class="p-4 font-bold text-slate-900 align-top">
+                  <div class="font-prompt text-sm sm:text-base text-purple-900">1. มโนทัศน์เรื่องโมลและชนิดอนุภาค</div>
+                  <div class="text-xs text-slate-500 mt-1 font-normal">
+                    ความเข้าใจนิยามเลขอาโวกาโดร และการแยกแยะหน่วยอนุภาค (อะตอม โมเลกุล ไอออน)
+                  </div>
+                </td>
+                <td class="p-4 align-top text-xs text-slate-700 bg-emerald-50/20 leading-relaxed">
+                  ระบุหน่วยอนุภาคของสารได้สอดคล้องกับธรรมชาติทางเคมี 100% เชื่อมโยงสัดส่วนอะตอม/ไอออนในสูตรเคมีได้ถูกต้องสมบูรณ์
+                </td>
+                <td class="p-4 align-top text-xs text-slate-700 bg-amber-50/20 leading-relaxed">
+                  เข้าใจความสัมพันธ์พื้นฐานของโมล แต่มีข้อผิดพลาดในการแยกแยะหน่วยระหว่าง "โมเลกุล" กับ "อะตอมย่อย" 1 จุด
+                </td>
+                <td class="p-4 align-top text-xs text-slate-700 bg-rose-50/20 leading-relaxed">
+                  สับสนความหมายของโมลและชนิดอนุภาค ไม่สามารถระบุได้ว่าสารที่กำหนดมีอนุภาคเป็นอะตอม โมเลกุล หรือไอออน
+                </td>
+              </tr>
+
+              <!-- Criterion 2 -->
+              <tr class="hover:bg-slate-50/70 transition">
+                <td class="p-4 font-bold text-slate-900 align-top">
+                  <div class="font-prompt text-sm sm:text-base text-purple-900">2. การตั้งสมการและการแทนค่า</div>
+                  <div class="text-xs text-slate-500 mt-1 font-normal">
+                    การใช้สูตรความสัมพันธ์ $n = \frac{N}{N_A}$ และการย้ายข้างสมการทางพีชคณิต
+                  </div>
+                </td>
+                <td class="p-4 align-top text-xs text-slate-700 bg-emerald-50/20 leading-relaxed">
+                  เขียนสมการและแทนค่า $N_A = 6.022 \times 10^{23}$ ถูกต้องทุกพจน์ แสดงวิธีคิดการคูณและหารเลขยกกำลังสัญกรณ์วิทยาศาสตร์อย่างเป็นระบบ
+                </td>
+                <td class="p-4 align-top text-xs text-slate-700 bg-amber-50/20 leading-relaxed">
+                  ตั้งสมการถูกต้อง แต่แสดงขั้นตอนการคิดข้ามไป หรือมีข้อผิดพลาดเล็กน้อยในการย้ายข้างสมการเพื่อหาโมลย้อนกลับ
+                </td>
+                <td class="p-4 align-top text-xs text-slate-700 bg-rose-50/20 leading-relaxed">
+                  แทนค่าสับสนระหว่าง $n$ กับ $N$ ไม่แสดงสมการความสัมพันธ์ หรือคำนวณสัญกรณ์วิทยาศาสตร์ผิดรูปแบบ
+                </td>
+              </tr>
+
+              <!-- Criterion 3 -->
+              <tr class="hover:bg-slate-50/70 transition">
+                <td class="p-4 font-bold text-slate-900 align-top">
+                  <div class="font-prompt text-sm sm:text-base text-purple-900">3. ความถูกต้องของผลลัพธ์และหน่วย</div>
+                  <div class="text-xs text-slate-500 mt-1 font-normal">
+                    ความแม่นยำของการคิดเลขยกกำลัง เลขนัยสำคัญ และการระบุหน่วยอนุภาคกำกับ
+                  </div>
+                </td>
+                <td class="p-4 align-top text-xs text-slate-700 bg-emerald-50/20 leading-relaxed">
+                  ผลลัพธ์ตัวเลขและเลขชี้กำลัง $10^x$ ถูกต้องแม่นยำ ปัดเศษทศนิยมเหมาะสม และระบุหน่วยกำกับท้ายคำตอบชัดเจนทุกข้อ
+                </td>
+                <td class="p-4 align-top text-xs text-slate-700 bg-amber-50/20 leading-relaxed">
+                  คำนวณตัวเลขฐานถูกต้อง แต่เขียนเลขชี้กำลังคลาดเคลื่อนเล็กน้อย หรือคำตอบถูกแต่ลืมใส่หน่วยอนุภาค
+                </td>
+                <td class="p-4 align-top text-xs text-slate-700 bg-rose-50/20 leading-relaxed">
+                  คำนวณผลลัพธ์ผิดพลาดหลายข้อ และไม่ระบุหน่วยกำกับท้ายคำตอบ
+                </td>
+              </tr>
+
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Grade Summary -->
+        <div class="bg-purple-50/70 rounded-2xl p-5 border border-purple-200">
+          <h4 class="font-bold text-purple-950 font-prompt text-sm mb-3">เกณฑ์สรุปการแปลผลระดับคุณภาพโดยรวม (คะแนนเต็ม 20 คะแนน) :</h4>
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs font-prompt">
+            <div class="p-3.5 bg-white rounded-xl border border-emerald-200">
+              <span class="font-bold text-emerald-800 text-sm block">16 - 20 คะแนน (ระดับดีมาก)</span>
+              <p class="text-slate-600 font-sans mt-1">เข้าใจมโนทัศน์โมลอย่างแม่นยำ สามารถคำนวณแปลงหน่วยระหว่างโมลและอนุภาคย่อยของสารได้อย่างคล่องแคล่ว</p>
+            </div>
+            <div class="p-3.5 bg-white rounded-xl border border-amber-200">
+              <span class="font-bold text-amber-800 text-sm block">10 - 15 คะแนน (ระดับปานกลาง)</span>
+              <p class="text-slate-600 font-sans mt-1">คำนวณแปลงโมลเป็นอนุภาคของสารตัวเดียวได้ดี ควรฝึกการแจกแจงอนุภาคย่อยในโมเลกุลและไอออนเพิ่มเติม</p>
+            </div>
+            <div class="p-3.5 bg-white rounded-xl border border-rose-200">
+              <span class="font-bold text-rose-800 text-sm block">0 - 9 คะแนน (ระดับปรับปรุง)</span>
+              <p class="text-slate-600 font-sans mt-1">ยังสับสนการคูณหารเลขยกกำลังสัญกรณ์วิทยาศาสตร์ แนะนำให้ฝึกปฏิบัติผ่านโมเดลจำลองในส่วนที่ 2</p>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="no-print py-6 text-center text-xs text-slate-400 font-prompt">
+    รายวิชาเคมีเพิ่มเติม ม.4 • กลุ่มสาระการเรียนรู้วิทยาศาสตร์และเทคโนโลยี
+  </footer>
+
+  <!-- JavaScript Application Logic -->
+  <script>
+    const AVOGADRO = 6.02214076e23;
+    const AVOGADRO_DISPLAY = 6.022;
+
+    const SUBSTANCES = {
+      He: {
+        name: "He (ฮีเลียม)",
+        category: "อะตอมเดี่ยว (Monoatomic gas)",
+        badge: "สาร: He (ฮีเลียม)",
+        primaryName: "อะตอม",
+        primaryUnit: "อะตอม (atoms)",
+        subName: "อะตอมทั้งหมด (Total Atoms)",
+        subUnit: "อะตอมรวม (atoms)",
+        subMultiplier: 1,
+        multiplierText: "1 อะตอม He / อนุภาค",
+        color: "#10b981",
+        radius: 4.5,
+        subParts: [{ label: "He", color: "#10b981", ratio: 1 }]
+      },
+      O2: {
+        name: "O₂ (ออกซิเจน)",
+        category: "โมเลกุลอะตอมคู่ (Diatomic molecule)",
+        badge: "สาร: O₂ (ก๊าซออกซิเจน)",
+        primaryName: "โมเลกุล",
+        primaryUnit: "โมเลกุล (molecules)",
+        subName: "อะตอมออกซิเจนทั้งหมด (Total O Atoms)",
+        subUnit: "อะตอม O (atoms)",
+        subMultiplier: 2,
+        multiplierText: "2 อะตอม O / 1 โมเลกุล",
+        color: "#0284c7",
+        radius: 5.0,
+        subParts: [{ label: "O", color: "#0284c7", ratio: 2 }]
+      },
+      H2O: {
+        name: "H₂O (น้ำ)",
+        category: "โมเลกุล 3 อะตอม (Triatomic molecule)",
+        badge: "สาร: H₂O (น้ำบริสุทธิ์)",
+        primaryName: "โมเลกุล",
+        primaryUnit: "โมเลกุล (molecules)",
+        subName: "อะตอมรวมทั้งหมด (Total Atoms)",
+        subUnit: "อะตอมรวม (2H + 1O)",
+        subMultiplier: 3,
+        multiplierText: "3 อะตอม (2H + 1O) / 1 โมเลกุล",
+        color: "#3b82f6",
+        radius: 5.2,
+        subParts: [{ label: "H", color: "#93c5fd", ratio: 2 }, { label: "O", color: "#ef4444", ratio: 1 }]
+      },
+      CH4: {
+        name: "CH₄ (มีเทน)",
+        category: "โมเลกุล 5 อะตอม (Polyatomic molecule)",
+        badge: "สาร: CH₄ (ก๊าซมีเทน)",
+        primaryName: "โมเลกุล",
+        primaryUnit: "โมเลกุล (molecules)",
+        subName: "อะตอมรวมทั้งหมด (Total Atoms)",
+        subUnit: "อะตอมรวม (1C + 4H)",
+        subMultiplier: 5,
+        multiplierText: "5 อะตอม (1C + 4H) / 1 โมเลกุล",
+        color: "#6366f1",
+        radius: 5.8,
+        subParts: [{ label: "C", color: "#64748b", ratio: 1 }, { label: "H", color: "#a5b4fc", ratio: 4 }]
+      },
+      NaCl: {
+        name: "NaCl (เกลือแกง)",
+        category: "สารประกอบไอออนิก (Ionic compound)",
+        badge: "สาร: NaCl (โซเดียมคลอไรด์)",
+        primaryName: "หน่วยสูตร",
+        primaryUnit: "หน่วยสูตร (formula units)",
+        subName: "ไอออนรวมทั้งหมด (Total Ions)",
+        subUnit: "ไอออนรวม (Na⁺ + Cl⁻)",
+        subMultiplier: 2,
+        multiplierText: "2 ไอออน (1Na⁺ + 1Cl⁻) / หน่วยสูตร",
+        color: "#d97706",
+        radius: 4.8,
+        subParts: [{ label: "Na⁺", color: "#fbbf24", ratio: 1 }, { label: "Cl⁻", color: "#10b981", ratio: 1 }]
+      },
+      CaCl2: {
+        name: "CaCl₂",
+        category: "สารประกอบไอออนิก (Ionic compound)",
+        badge: "สาร: CaCl₂ (แคลเซียมคลอไรด์)",
+        primaryName: "หน่วยสูตร",
+        primaryUnit: "หน่วยสูตร (formula units)",
+        subName: "ไอออนรวมทั้งหมด (Total Ions)",
+        subUnit: "ไอออนรวม (Ca²⁺ + 2Cl⁻)",
+        subMultiplier: 3,
+        multiplierText: "3 ไอออน (1Ca²⁺ + 2Cl⁻) / หน่วยสูตร",
+        color: "#ef4444",
+        radius: 5.2,
+        subParts: [{ label: "Ca²⁺", color: "#f87171", ratio: 1 }, { label: "Cl⁻", color: "#34d399", ratio: 2 }]
+      }
+    };
+
+    let activeSubstanceKey = 'He';
+    let currentMoles = 1.65;
+    let particles = [];
+    let animationId = null;
+    let solutionsVisible = false;
+
+    function triggerMathRender() {
+      if (window.MathJax && MathJax.typesetPromise) {
+        return MathJax.typesetPromise().catch(err => console.log('MathJax error: ', err));
+      }
+      return Promise.resolve();
+    }
+
+    function formatSci(val) {
+      if (val === 0) return "0";
+      const exponent = Math.floor(Math.log10(Math.abs(val)));
+      const mantissa = val / Math.pow(10, exponent);
+      return `${mantissa.toFixed(3)} \\times 10^{${exponent}}`;
+    }
+
+    function formatSciDisplay(val) {
+      if (val === 0) return "0";
+      const exponent = Math.floor(Math.log10(Math.abs(val)));
+      const mantissa = val / Math.pow(10, exponent);
+      return `${mantissa.toFixed(3)} × 10<sup>${exponent}</sup>`;
+    }
+
+    function selectSubstance(key) {
+      activeSubstanceKey = key;
+      Object.keys(SUBSTANCES).forEach(k => {
+        const btn = document.getElementById(`btn-sub-${k}`);
+        if (btn) {
+          if (k === key) {
+            btn.className = "p-3 rounded-2xl border-2 border-emerald-500 bg-emerald-50 text-emerald-950 font-prompt text-left transition hover:shadow-sm";
+          } else {
+            btn.className = "p-3 rounded-2xl border-2 border-slate-200 bg-white text-slate-700 font-prompt text-left transition hover:border-emerald-300";
+          }
+        }
+      });
+
+      const sub = SUBSTANCES[key];
+      const desc = document.getElementById('selected-substance-desc');
+      if (desc) desc.textContent = `${key}: ${sub.subMultiplier} ${sub.subUnit.split(' ')[0]}/อนุภาค`;
+
+      updateConverterOutputs();
+      createCanvasParticles();
+    }
+
+    function onMoleSlider(val) {
+      currentMoles = Math.max(0.01, parseFloat(val) || 0.01);
+      const input = document.getElementById('input-moles');
+      if (input) input.value = currentMoles.toFixed(2);
+      syncParticleKFromMoles();
+      updateConverterOutputs();
+      createCanvasParticles();
+    }
+
+    function onMoleInput(val) {
+      currentMoles = Math.max(0.01, parseFloat(val) || 0.01);
+      const slider = document.getElementById('slider-moles');
+      if (slider) slider.value = Math.min(5.0, currentMoles);
+      syncParticleKFromMoles();
+      updateConverterOutputs();
+      createCanvasParticles();
+    }
+
+    function onParticleKInput(kVal) {
+      const k = Math.max(0.01, parseFloat(kVal) || 0.01);
+      currentMoles = k / AVOGADRO_DISPLAY;
+      const moleInput = document.getElementById('input-moles');
+      const moleSlider = document.getElementById('slider-moles');
+      if (moleInput) moleInput.value = currentMoles.toFixed(2);
+      if (moleSlider) moleSlider.value = Math.min(5.0, currentMoles);
+      updateConverterOutputs(true);
+      createCanvasParticles();
+    }
+
+    function syncParticleKFromMoles() {
+      const kInput = document.getElementById('input-particle-k');
+      if (kInput) {
+        const k = currentMoles * AVOGADRO_DISPLAY;
+        kInput.value = k.toFixed(2);
+      }
+    }
+
+    function updateConverterOutputs(skipKUpdate = false) {
+      if (!skipKUpdate) {
+        syncParticleKFromMoles();
+      }
+
+      const sub = SUBSTANCES[activeSubstanceKey];
+
+      const primaryCount = currentMoles * AVOGADRO;
+      const primaryK = (currentMoles * AVOGADRO_DISPLAY).toFixed(3);
+
+      const subTotalCount = primaryCount * sub.subMultiplier;
+
+      document.getElementById('current-particle-badge').textContent = sub.badge;
+
+      document.getElementById('primary-count-label').textContent = `1. จำนวน${sub.primaryName}หลัก ($N_{\\text{unit}}$)`;
+      document.getElementById('display-primary-count').innerHTML = `${primaryK} × 10<sup>23</sup>`;
+      document.getElementById('display-primary-unit').textContent = sub.primaryUnit;
+
+      document.getElementById('sub-count-label').textContent = `2. จำนวน${sub.subName}`;
+      document.getElementById('display-sub-count').innerHTML = formatSciDisplay(subTotalCount);
+      document.getElementById('display-sub-unit').textContent = sub.subUnit;
+      document.getElementById('display-sub-formula').textContent = 
+        `คำนวณจาก: ${sub.subMultiplier} × (${primaryK} × 10²³) = ${formatSciDisplay(subTotalCount).replace(/<[^>]*>/g, '')}`;
+
+      const mathStep = document.getElementById('math-conversion-step');
+      if (mathStep) {
+        mathStep.innerHTML = `
+          <div class="text-slate-300 pb-1">
+            • <strong>หน่วยหลัก:</strong> $N_{\\text{unit}} = ${currentMoles.toFixed(2)} \\times (6.022 \\times 10^{23}) = ${formatSci(primaryCount)}\\text{ ${sub.primaryName}}$
+          </div>
+          <div class="text-amber-300 pt-1 border-t border-slate-700 font-bold">
+            • <strong>อนุภาคย่อย (${sub.multiplierText}):</strong><br>
+            $N_{\\text{total}} = ${sub.subMultiplier} \\times (${formatSci(primaryCount)}) = ${formatSci(subTotalCount)}\\text{ อนุภาคย่อย}$
+          </div>
+        `;
+        triggerMathRender();
+      }
+
+      document.getElementById('math-mole-final').textContent = `${currentMoles.toFixed(2)} mol`;
+
+      document.getElementById('insight-moles').textContent = currentMoles.toFixed(2);
+      document.getElementById('insight-primary').textContent = `${primaryK} × 10²³`;
+      document.getElementById('insight-total').textContent = `${formatSciDisplay(subTotalCount).replace(/<[^>]*>/g, '')} ${sub.subUnit}`;
+
+      const densityBadge = document.getElementById('canvas-particle-density');
+      if (densityBadge) {
+        densityBadge.textContent = `อนุภาคย่อย (${sub.subMultiplier} เท่า): ${Math.round(currentMoles * sub.subMultiplier * 10)} จุดจำลอง`;
+      }
+    }
+
+    function initParticleCanvas() {
+      createCanvasParticles();
+      if (!animationId) {
+        animateCanvasLoop();
+      }
+    }
+
+    function createCanvasParticles() {
+      const canvas = document.getElementById('particle-canvas');
+      if (!canvas) return;
+
+      const sub = SUBSTANCES[activeSubstanceKey];
+      const baseCount = Math.round(currentMoles * 25);
+      const visualCount = Math.min(180, Math.max(20, baseCount * sub.subMultiplier));
+      particles = [];
+
+      for (let i = 0; i < visualCount; i++) {
+        const subPart = sub.subParts[i % sub.subParts.length];
+        particles.push({
+          x: Math.random() * (canvas.width - 20) + 10,
+          y: Math.random() * (canvas.height - 20) + 10,
+          vx: (Math.random() - 0.5) * 1.3,
+          vy: (Math.random() - 0.5) * 1.3,
+          radius: sub.radius,
+          color: subPart.color,
+          label: subPart.label
+        });
+      }
+    }
+
+    function animateCanvasLoop() {
+      const canvas = document.getElementById('particle-canvas');
+      if (canvas && canvas.getContext) {
+        const ctx = canvas.getContext('2d');
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        particles.forEach(p => {
+          p.x += p.vx;
+          p.y += p.vy;
+
+          if (p.x - p.radius < 0 || p.x + p.radius > canvas.width) p.vx *= -1;
+          if (p.y - p.radius < 0 || p.y + p.radius > canvas.height) p.vy *= -1;
+
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+
+          const grad = ctx.createRadialGradient(p.x, p.y, 1, p.x, p.y, p.radius);
+          grad.addColorStop(0, '#ffffff');
+          grad.addColorStop(0.5, p.color);
+          grad.addColorStop(1, 'rgba(0,0,0,0.3)');
+
+          ctx.fillStyle = grad;
+          ctx.fill();
+
+          if (p.radius >= 5.0) {
+            ctx.fillStyle = '#ffffff';
+            ctx.font = '8px sans-serif';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(p.label, p.x, p.y);
+          }
+        });
+      }
+      animationId = requestAnimationFrame(animateCanvasLoop);
+    }
+
+    // Toggle solutions on screen
+    function toggleWorksheetSolutions() {
+      solutionsVisible = !solutionsVisible;
+      const solutions = document.querySelectorAll('.teacher-solution');
+      const writeAreas = document.querySelectorAll('.student-write-area');
+      const toggleText = document.getElementById('toggle-text');
+      const toggleIcon = document.getElementById('toggle-icon');
+
+      if (solutionsVisible) {
+        solutions.forEach(s => s.classList.add('show'));
+        writeAreas.forEach(w => w.classList.add('hide-on-screen'));
+        if (toggleText) toggleText.textContent = 'ซ่อนเฉลยบนหน้าจอ';
+        if (toggleIcon) toggleIcon.className = 'fa-solid fa-eye-slash';
+      } else {
+        solutions.forEach(s => s.classList.remove('show'));
+        writeAreas.forEach(w => w.classList.remove('hide-on-screen'));
+        if (toggleText) toggleText.textContent = 'แสดงเฉลยบนหน้าจอ';
+        if (toggleIcon) toggleIcon.className = 'fa-solid fa-eye';
+      }
+      triggerMathRender();
+    }
+
+    // Student Print Mode
+    function printStudentWorksheet() {
+      document.body.classList.remove('print-mode-teacher');
+      document.body.classList.add('print-mode-student');
+
+      const badge = document.getElementById('worksheet-status-badge');
+      if (badge) {
+        badge.textContent = 'ฉบับนักเรียน (Student Worksheet)';
+        badge.className = 'inline-block px-3 py-1 rounded-lg border-2 border-slate-800 text-xs font-prompt font-bold text-slate-900 bg-white';
+      }
+
+      triggerMathRender().then(() => {
+        setTimeout(() => {
+          window.print();
+        }, 200);
+      });
+    }
+
+    // Teacher Answer Key Print Mode
+    function printTeacherKey() {
+      document.body.classList.remove('print-mode-student');
+      document.body.classList.add('print-mode-teacher');
+
+      const badge = document.getElementById('worksheet-status-badge');
+      if (badge) {
+        badge.textContent = 'ฉบับเฉลยสำหรับครูผู้สอน (Teacher Answer Key)';
+        badge.className = 'inline-block px-3 py-1 rounded-lg bg-amber-500 text-slate-950 font-prompt font-bold text-xs border border-amber-600';
+      }
+
+      // Ensure all solutions are pre-rendered by MathJax before opening print dialog
+      triggerMathRender().then(() => {
+        setTimeout(() => {
+          window.print();
+        }, 300);
+      });
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      selectSubstance('He');
+      initParticleCanvas();
+      setTimeout(triggerMathRender, 300);
+    });
+  </script>
+</body>
+</html>

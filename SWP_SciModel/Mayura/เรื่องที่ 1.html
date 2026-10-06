@@ -1,0 +1,1223 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>เคมี ม.4 • โมลและสูตรเคมี เรื่องที่ 1: มวลอะตอม</title>
+  
+  <!-- Google Fonts: Sarabun, Kanit, Fira Code -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700&family=Sarabun:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+  
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+  
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- MathJax 3 Engine Setup -->
+  <script>
+    window.MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']],
+        displayMath: [['$$', '$$'], ['\\[', '\\]']],
+        processEscapes: true
+      },
+      options: {
+        skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+      },
+      startup: {
+        pageReady: () => {
+          return MathJax.startup.defaultPageReady();
+        }
+      }
+    };
+  </script>
+  <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            kanit: ['Kanit', 'sans-serif'],
+            sarabun: ['Sarabun', 'sans-serif'],
+            mono: ['Fira Code', 'monospace']
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    body {
+      font-family: 'Sarabun', sans-serif;
+      background-color: #f8fafc;
+      color: #1e293b;
+    }
+    
+    h1, h2, h3, h4, .font-heading {
+      font-family: 'Kanit', sans-serif;
+    }
+
+    #particle-canvas {
+      background: radial-gradient(circle at center, #0f172a 0%, #020617 100%);
+    }
+
+    input[type=range] {
+      accent-color: #059669;
+    }
+
+    /* ==============================================================
+       STRICT PRINT CONFIGURATION (PRINT ONLY THE WORKSHEET)
+       ============================================================== */
+    @media print {
+      /* Hide ALL page elements except the worksheet */
+      body {
+        background: #ffffff !important;
+        color: #000000 !important;
+        margin: 0 !important;
+        padding: 0 !important;
+      }
+
+      /* Hide entire header, non-worksheet sections, action bars, footer */
+      header,
+      #summary-section,
+      #model-section,
+      #rubric-section,
+      footer,
+      .no-print {
+        display: none !important;
+      }
+
+      /* Make worksheet container take full width without shadows or extra borders */
+      #worksheet-section {
+        margin: 0 !important;
+        padding: 0 !important;
+        display: block !important;
+      }
+
+      #printable-worksheet-card {
+        border: none !important;
+        box-shadow: none !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        width: 100% !important;
+      }
+
+      /* PREVENT QUESTION SPLITTING ACROSS PAGES */
+      .question-card {
+        break-inside: avoid !important;
+        page-break-inside: avoid !important;
+        margin-bottom: 1.5rem !important;
+        border: 1px solid #cbd5e1 !important;
+        background: #ffffff !important;
+        padding: 1rem !important;
+      }
+
+      .worksheet-workspace {
+        min-height: 120px !important;
+        border: 1px dashed #94a3b8 !important;
+        background-color: #ffffff !important;
+      }
+
+      .writing-lines {
+        background-image: repeating-linear-gradient(transparent, transparent 27px, #e2e8f0 28px);
+        line-height: 28px;
+      }
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col antialiased selection:bg-teal-500 selection:text-white">
+
+  <!-- ========================================================================= -->
+  <!-- TOP BANNER (Clean, without top buttons and without long descriptions)     -->
+  <!-- ========================================================================= -->
+  <header class="no-print bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 text-white border-b border-indigo-900/60 shadow-lg py-8">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 text-center md:text-left">
+      <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-500/20 border border-indigo-400/30 text-indigo-300 text-xs font-semibold uppercase tracking-wider font-kanit mb-3">
+        <i class="fa-solid fa-atom"></i> รายวิชาเคมี ม.4 • หน่วยการเรียนรู้ที่ 4
+      </div>
+      <h1 class="text-3xl sm:text-4xl lg:text-5xl font-extrabold font-kanit tracking-tight text-white">
+        โมลและสูตรเคมี <span class="text-slate-400 font-normal">|</span> <span class="bg-clip-text text-transparent bg-gradient-to-r from-cyan-400 via-teal-300 to-emerald-400">เรื่องที่ 1: มวลอะตอม</span>
+      </h1>
+    </div>
+  </header>
+
+  <!-- Continuous Single-Page Flow -->
+  <main class="flex-grow max-w-6xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-16">
+
+    <!-- ========================================================================= -->
+    <!-- SECTION 1 : สรุปสาระสำคัญ (Azure & Indigo Theme)                           -->
+    <!-- ========================================================================= -->
+    <section id="summary-section" class="space-y-8">
+      
+      <!-- Section Header -->
+      <div class="flex items-center gap-3.5 pb-3 border-b-2 border-blue-500">
+        <div class="w-10 h-10 rounded-xl bg-blue-600 text-white flex items-center justify-center font-bold text-lg shadow-md shadow-blue-200">
+          <i class="fa-solid fa-book-bookmark"></i>
+        </div>
+        <div>
+          <span class="text-xs font-bold text-blue-600 uppercase tracking-widest font-kanit">ทฤษฎีและหลักการพื้นฐาน</span>
+          <h2 class="text-2xl sm:text-3xl font-bold text-slate-900 font-kanit">สรุปสาระสำคัญ: มวลอะตอมและมวลอะตอมเฉลี่ย</h2>
+        </div>
+      </div>
+
+      <!-- Core Chemistry Cards -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        
+        <!-- Card 1: มวลอะตอมและหน่วย amu -->
+        <div class="bg-white rounded-3xl p-6 border-2 border-blue-100 shadow-sm hover:shadow-md transition-all flex flex-col justify-between">
+          <div>
+            <div class="flex items-center justify-between mb-4">
+              <span class="px-3 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-800 font-kanit">หลักการที่ 1</span>
+              <i class="fa-solid fa-scale-balanced text-blue-500 text-xl"></i>
+            </div>
+            <h3 class="text-lg font-bold text-slate-900 font-kanit mb-2">มวลอะตอมสัมพัทธ์ และหน่วย amu</h3>
+            <p class="text-slate-600 text-sm leading-relaxed mb-4">
+              อะตอมของธาตุแต่ละชนิดมีมวลแตกต่างกัน แต่มวลของอะตอมมีขนาดเล็กมาก จึงนิยมเปรียบเทียบมวลอะตอมกับมาตรฐานที่กำหนด โดยใช้หน่วยมวลอะตอม ($\text{amu}$ หรือ $\text{u}$)
+            </p>
+
+            <div class="bg-blue-50/90 rounded-2xl p-4 border border-blue-200 text-xs text-blue-950 space-y-2">
+              <div class="font-bold font-kanit text-blue-900">นิยามมาตรฐานสากล:</div>
+              <div class="p-2 bg-white rounded-xl border border-blue-100 text-center font-medium">
+                $1\text{ amu} = \frac{1}{12} \text{ ของมวล } ^{12}_{\phantom{1}6}\text{C } 1\text{ อะตอม}$
+              </div>
+              <div class="text-center font-mono text-slate-700">
+                $1\text{ amu} \approx 1.6605 \times 10^{-24}\text{ กรัม (g)}$
+              </div>
+            </div>
+          </div>
+
+          <div class="mt-4 pt-3 border-t border-slate-100 text-xs text-slate-500 font-medium">
+            <i class="fa-solid fa-circle-check text-blue-500 mr-1"></i> ค่ามวลอะตอมสัมพัทธ์เป็นตัวเลขเปรียบเทียบ <strong>ไม่มีหน่วย</strong>
+          </div>
+        </div>
+
+        <!-- Card 2: ปรากฏการณ์ไอโซโทป -->
+        <div class="bg-white rounded-3xl p-6 border-2 border-indigo-100 shadow-sm hover:shadow-md transition-all flex flex-col justify-between">
+          <div>
+            <div class="flex items-center justify-between mb-4">
+              <span class="px-3 py-1 rounded-full text-xs font-semibold bg-indigo-100 text-indigo-800 font-kanit">หลักการที่ 2</span>
+              <i class="fa-solid fa-dna text-indigo-500 text-xl"></i>
+            </div>
+            <h3 class="text-lg font-bold text-slate-900 font-kanit mb-2">ไอโซโทปของธาตุ (Isotopes)</h3>
+            <p class="text-slate-600 text-sm leading-relaxed mb-4">
+              ธาตุเดียวกันอาจมีไอโซโทปที่มีจำนวนโปรตอนเท่ากัน แต่มีจำนวนนิวตรอนต่างกัน ทำให้มีมวลแตกต่างกัน
+            </p>
+
+            <div class="bg-indigo-50/90 rounded-2xl p-4 border border-indigo-200 text-xs text-indigo-950 space-y-2">
+              <div class="font-bold font-kanit text-indigo-900">ตัวอย่างไอโซโทปของคาร์บอน:</div>
+              <div class="grid grid-cols-3 gap-1.5 text-center">
+                <div class="bg-white p-2 rounded-xl border border-indigo-100">
+                  <div class="font-bold text-indigo-700 font-mono">$^{12}_{\phantom{1}6}\text{C}$</div>
+                  <div class="text-[11px] text-slate-500 mt-0.5">6p, 6n</div>
+                </div>
+                <div class="bg-white p-2 rounded-xl border border-indigo-100">
+                  <div class="font-bold text-indigo-700 font-mono">$^{13}_{\phantom{1}6}\text{C}$</div>
+                  <div class="text-[11px] text-slate-500 mt-0.5">6p, 7n</div>
+                </div>
+                <div class="bg-white p-2 rounded-xl border border-indigo-100">
+                  <div class="font-bold text-indigo-700 font-mono">$^{14}_{\phantom{1}6}\text{C}$</div>
+                  <div class="text-[11px] text-slate-500 mt-0.5">6p, 8n</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="mt-4 pt-3 border-t border-slate-100 text-xs text-slate-500 font-medium">
+            <i class="fa-solid fa-circle-check text-indigo-500 mr-1"></i> สมบัติทางเคมีเหมือนกัน แต่มวลต่างกัน
+          </div>
+        </div>
+
+        <!-- Card 3: สูตรมวลอะตอมเฉลี่ย -->
+        <div class="bg-white rounded-3xl p-6 border-2 border-teal-100 shadow-sm hover:shadow-md transition-all flex flex-col justify-between">
+          <div>
+            <div class="flex items-center justify-between mb-4">
+              <span class="px-3 py-1 rounded-full text-xs font-semibold bg-teal-100 text-teal-800 font-kanit">หลักการที่ 3</span>
+              <i class="fa-solid fa-calculator text-teal-600 text-xl"></i>
+            </div>
+            <h3 class="text-lg font-bold text-slate-900 font-kanit mb-2">มวลอะตอมเฉลี่ยถ่วงน้ำหนัก</h3>
+            <p class="text-slate-600 text-sm leading-relaxed mb-4">
+              มวลอะตอมที่ปรากฏในตารางธาตุ จึงเป็นค่าเฉลี่ยถ่วงน้ำหนักของมวลไอโซโทปตามสัดส่วนที่พบในธรรมชาติ
+            </p>
+
+            <div class="bg-teal-50/90 rounded-2xl p-4 border border-teal-200 text-xs text-teal-950 space-y-2">
+              <div class="font-bold font-kanit text-teal-900">สูตรการคำนวณมาตรฐาน :</div>
+              <div class="p-2.5 bg-white rounded-xl border border-teal-100 text-center font-bold text-teal-800 text-[13px]">
+                $$\text{มวลอะตอมเฉลี่ย} = \frac{\sum (\% \times \text{มวล})}{100}$$
+              </div>
+              <div class="text-[11px] text-center text-slate-600">
+                หรือ $= \sum (\text{เศษส่วนในธรรมชาติ} \times \text{มวล})$
+              </div>
+            </div>
+          </div>
+
+          <div class="mt-4 pt-3 border-t border-slate-100 text-xs text-slate-500 font-medium">
+            <i class="fa-solid fa-circle-check text-teal-600 mr-1"></i> มักมีค่าใกล้เคียงกับไอโซโทปที่มีปริมาณมากที่สุด
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Worked Out Calculation Example Card -->
+      <div class="bg-gradient-to-br from-blue-900 via-indigo-900 to-slate-900 rounded-3xl p-6 sm:p-8 text-white shadow-xl">
+        <div class="max-w-4xl space-y-5">
+          <div class="flex items-center gap-2 text-cyan-300 font-kanit text-sm font-semibold tracking-wide uppercase">
+            <i class="fa-solid fa-square-root-variable"></i> ตัวอย่างการคำนวณละเอียดตามหลักคณิตศาสตร์
+          </div>
+          <h3 class="text-xl sm:text-2xl font-bold font-kanit">การหามวลอะตอมเฉลี่ยของธาตุคลอรีน ($\text{Cl}$)</h3>
+          
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6 items-center">
+            <div class="bg-white/10 backdrop-blur-md rounded-2xl p-5 border border-white/15 space-y-3 text-sm">
+              <p class="text-slate-200">ในธรรมชาติ พบไอโซโทปของคลอรีน 2 ชนิด ได้แก่ :</p>
+              <div class="space-y-2 text-xs sm:text-sm">
+                <div class="p-3 bg-white/10 rounded-xl flex justify-between items-center">
+                  <span><strong>1. $^{35}\text{Cl}$</strong> (มวล = $34.969\text{ amu}$)</span>
+                  <span class="px-2.5 py-1 rounded-full bg-cyan-400 text-slate-950 font-bold text-xs">พบ 75.77%</span>
+                </div>
+                <div class="p-3 bg-white/10 rounded-xl flex justify-between items-center">
+                  <span><strong>2. $^{37}\text{Cl}$</strong> (มวล = $36.966\text{ amu}$)</span>
+                  <span class="px-2.5 py-1 rounded-full bg-emerald-400 text-slate-950 font-bold text-xs">พบ 24.23%</span>
+                </div>
+              </div>
+              <p class="text-[11px] text-cyan-200 pt-1">
+                *ผลรวมร้อยละในธรรมชาติ: $75.77\% + 24.23\% = 100.00\%$
+              </p>
+            </div>
+
+            <!-- Mathematical Steps Breakdown -->
+            <div class="space-y-2.5 text-xs sm:text-sm font-mono bg-black/40 p-5 rounded-2xl border border-white/10">
+              <div class="text-cyan-300 text-xs font-kanit">ขั้นตอนการแทนค่าในสูตร :</div>
+              <div class="text-slate-300 overflow-x-auto py-1">
+                $$\text{มวลอะตอมเฉลี่ย} = \frac{(34.969 \times 75.77) + (36.966 \times 24.23)}{100}$$
+              </div>
+              <div class="text-slate-300 overflow-x-auto py-1">
+                $$= \frac{2649.60 + 895.69}{100} = \frac{3545.29}{100}$$
+              </div>
+              <div class="pt-2 border-t border-white/20 text-base sm:text-lg font-bold text-amber-300 font-kanit">
+                ตอบ : มวลอะตอมเฉลี่ยของคลอรีน = <strong>35.45 amu</strong>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================================================= -->
+    <!-- SECTION 2 : แบบจำลองเชิงโต้ตอบ (Emerald & Teal Theme)                     -->
+    <!-- ========================================================================= -->
+    <section id="model-section" class="space-y-8">
+      
+      <!-- Section Header -->
+      <div class="flex items-center gap-3.5 pb-3 border-b-2 border-emerald-500">
+        <div class="w-10 h-10 rounded-xl bg-emerald-600 text-white flex items-center justify-center font-bold text-lg shadow-md shadow-emerald-200">
+          <i class="fa-solid fa-sliders"></i>
+        </div>
+        <div>
+          <span class="text-xs font-bold text-emerald-600 uppercase tracking-widest font-kanit">แบบจำลองเชิงโต้ตอบ</span>
+          <h2 class="text-2xl sm:text-3xl font-bold text-slate-900 font-kanit">โมเดลจำลอง: ปรับไอโซโทปและสังเกตมวลอะตอมเฉลี่ย</h2>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+        
+        <!-- Controls Column (7 Cols) -->
+        <div class="lg:col-span-7 bg-white rounded-3xl p-6 sm:p-8 border border-emerald-200 shadow-lg space-y-6">
+          
+          <div class="flex flex-wrap items-center justify-between gap-4 pb-4 border-b border-slate-100">
+            <div>
+              <label class="block text-xs font-bold text-slate-600 uppercase tracking-wider font-kanit mb-1">เลือกธาตุตัวอย่าง</label>
+              <select id="preset-selector" onchange="loadPreset(this.value)" class="bg-emerald-50 border border-emerald-300 text-emerald-900 text-sm rounded-xl focus:ring-emerald-500 focus:border-emerald-500 p-2.5 font-kanit font-semibold">
+                <option value="cl">คลอรีน (Chlorine: Cl) - 2 ไอโซโทป</option>
+                <option value="b">โบรอน (Boron: B) - 2 ไอโซโทป</option>
+                <option value="c">คาร์บอน (Carbon: C) - 3 ไอโซโทป</option>
+                <option value="mg">แมกนีเซียม (Magnesium: Mg) - 3 ไอโซโทป</option>
+                <option value="custom">กำหนดธาตุและมวลเอง (Custom)</option>
+              </select>
+            </div>
+
+            <div>
+              <label class="block text-xs font-bold text-slate-600 uppercase tracking-wider font-kanit mb-1">จำนวนไอโซโทป</label>
+              <div class="flex items-center gap-1 bg-slate-100 p-1 rounded-xl border border-slate-200">
+                <button type="button" onclick="setIsotopeCount(2)" id="btn-count-2" class="px-3.5 py-1.5 rounded-lg text-xs font-kanit font-bold bg-emerald-600 text-white shadow-sm transition">2 ชนิด</button>
+                <button type="button" onclick="setIsotopeCount(3)" id="btn-count-3" class="px-3.5 py-1.5 rounded-lg text-xs font-kanit font-bold text-slate-600 hover:text-emerald-700 transition">3 ชนิด</button>
+                <button type="button" onclick="setIsotopeCount(4)" id="btn-count-4" class="px-3.5 py-1.5 rounded-lg text-xs font-kanit font-bold text-slate-600 hover:text-emerald-700 transition">4 ชนิด</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Total Percentage Alert Bar -->
+          <div class="space-y-2">
+            <div class="flex justify-between items-center text-xs font-kanit">
+              <span class="text-slate-600">ผลรวมร้อยละในธรรมชาติ :</span>
+              <span id="total-percent-label" class="font-bold text-sm text-emerald-600">100.00%</span>
+            </div>
+            <div class="w-full h-3.5 bg-slate-100 rounded-full overflow-hidden flex border border-slate-200 shadow-inner">
+              <div id="bar-iso-0" class="h-full bg-blue-500 transition-all duration-300" style="width: 75.77%"></div>
+              <div id="bar-iso-1" class="h-full bg-emerald-500 transition-all duration-300" style="width: 24.23%"></div>
+              <div id="bar-iso-2" class="h-full bg-amber-500 transition-all duration-300" style="width: 0%"></div>
+              <div id="bar-iso-3" class="h-full bg-purple-500 transition-all duration-300" style="width: 0%"></div>
+            </div>
+            <div id="percent-warning" class="hidden text-xs text-rose-600 flex items-center gap-1.5 font-medium mt-1">
+              <i class="fa-solid fa-triangle-exclamation"></i>
+              <span>คำเตือน: ผลรวมร้อยละไม่เท่ากับ 100% กรุณากดปุ่มปรับสมดุล</span>
+            </div>
+          </div>
+
+          <!-- Dynamic Isotope Input Cards -->
+          <div id="isotopes-input-list" class="space-y-4"></div>
+
+          <!-- Action Buttons -->
+          <div class="flex flex-wrap items-center gap-3 pt-2">
+            <button onclick="autoNormalizePercentages()" class="px-4 py-2.5 rounded-xl bg-emerald-600 text-white hover:bg-emerald-700 font-kanit text-xs sm:text-sm font-semibold transition flex items-center gap-2 shadow-sm">
+              <i class="fa-solid fa-scale-balanced"></i> ปรับสมดุลร้อยละให้เท่ากับ 100%
+            </button>
+            <button onclick="resetModel()" class="px-4 py-2.5 rounded-xl bg-slate-100 text-slate-700 hover:bg-slate-200 font-kanit text-xs sm:text-sm font-semibold transition flex items-center gap-2">
+              <i class="fa-solid fa-rotate-left"></i> รีเซ็ตค่าเริ่มต้น
+            </button>
+          </div>
+
+        </div>
+
+        <!-- Simulation & Real-time Math Output (5 Cols) -->
+        <div class="lg:col-span-5 space-y-6">
+          
+          <!-- Live Real-Time Result Card -->
+          <div class="bg-gradient-to-br from-slate-900 via-slate-800 to-teal-950 text-white rounded-3xl p-6 sm:p-7 border border-emerald-500/30 shadow-2xl">
+            <div class="flex items-center justify-between pb-3 border-b border-slate-700">
+              <span class="text-xs uppercase tracking-wider font-kanit font-semibold text-emerald-400">
+                มวลอะตอมเฉลี่ยแบบทันที (Real-Time)
+              </span>
+              <span class="px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 text-[11px] font-mono">
+                Live Calculation
+              </span>
+            </div>
+
+            <div class="my-6 text-center">
+              <span class="text-xs text-slate-400 font-kanit block mb-1">มวลอะตอมเฉลี่ย (Average Atomic Mass)</span>
+              <div class="text-5xl sm:text-6xl font-extrabold tracking-tight text-white font-kanit" id="display-average-mass">
+                35.45
+              </div>
+              <span class="text-sm font-mono text-emerald-300 mt-1 inline-block">amu (หน่วยมวลอะตอม)</span>
+            </div>
+
+            <!-- Live Math Expression Container -->
+            <div class="bg-black/50 rounded-2xl p-4 border border-slate-700/80 space-y-2 text-xs">
+              <div class="text-slate-400 text-[11px] font-kanit font-semibold">ขั้นตอนการแทนค่าในสูตร:</div>
+              <div id="math-expression-display" class="font-mono text-emerald-300 overflow-x-auto py-1 leading-relaxed"></div>
+              <div class="pt-2 border-t border-slate-800 flex justify-between items-center text-xs text-emerald-400 font-kanit font-semibold">
+                <span>คำตอบสุดท้าย :</span>
+                <span id="math-step-final" class="text-sm text-amber-300 font-bold">35.45 amu</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- 2D Particle Canvas Simulation -->
+          <div class="bg-white rounded-3xl p-6 border border-emerald-200 shadow-lg space-y-4">
+            <div class="flex items-center justify-between">
+              <h4 class="text-sm font-bold text-slate-900 font-kanit flex items-center gap-1.5">
+                <i class="fa-solid fa-atom text-emerald-600"></i>
+                แบบจำลองสัดส่วนอะตอมในสนามตัวอย่าง (100 อะตอม)
+              </h4>
+              <button onclick="reshuffleParticles()" class="text-xs text-emerald-600 hover:text-emerald-800 font-kanit font-semibold">
+                <i class="fa-solid fa-shuffle mr-1"></i> สุ่มตำแหน่ง
+              </button>
+            </div>
+
+            <canvas id="particle-canvas" width="400" height="220" class="w-full h-auto rounded-2xl shadow-inner"></canvas>
+            
+            <div id="particle-legend" class="grid grid-cols-2 gap-2 text-xs font-kanit pt-1"></div>
+            <p class="text-[11px] text-slate-500 text-center leading-normal">
+              อนุภาคจำลองการกระจายตัวของไอโซโทปตามสัดส่วนร้อยละที่ผู้เรียนกำหนด
+            </p>
+          </div>
+
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ========================================================================= -->
+    <!-- SECTION 3 : ใบงานแบบฝึกทักษะ 10 ข้อ (Print-Isolated & Non-breaking)         -->
+    <!-- ========================================================================= -->
+    <section id="worksheet-section" class="space-y-6">
+      
+      <!-- Control Buttons (Hidden completely during Print) -->
+      <div class="no-print bg-gradient-to-r from-amber-600 via-orange-600 to-amber-700 rounded-3xl p-6 sm:p-8 text-white shadow-xl flex flex-col md:flex-row items-center justify-between gap-6">
+        <div class="space-y-1 text-center md:text-left">
+          <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/20 text-white text-xs font-bold uppercase font-kanit">
+            <i class="fa-solid fa-file-lines"></i> เอกสารการเรียนรู้
+          </div>
+          <h2 class="text-2xl sm:text-3xl font-extrabold font-kanit">ใบงานแบบฝึกทักษะ: มวลอะตอมและไอโซโทป (10 ข้อ)</h2>
+          <p class="text-amber-100 text-xs sm:text-sm">
+            กดปุ่มสั่งพิมพ์เพื่อพิมพ์เฉพาะตัวใบงาน โดยจะตัดส่วนอื่นของหน้าเว็บออกทั้งหมด
+          </p>
+        </div>
+
+        <div class="flex flex-wrap items-center justify-center gap-3">
+          <button onclick="toggleOnScreenSolutions()" id="btn-toggle-solutions" class="px-4 py-2.5 rounded-xl bg-amber-900/60 hover:bg-amber-900 text-white font-kanit font-semibold text-xs sm:text-sm transition flex items-center gap-2 border border-amber-400/40">
+            <i class="fa-solid fa-eye" id="toggle-icon"></i> <span id="toggle-text">เปิดดูเฉลยบนหน้าจอ</span>
+          </button>
+          <button onclick="printStudentWorksheet()" class="px-5 py-2.5 rounded-xl bg-white text-amber-900 hover:bg-amber-50 font-kanit font-bold text-xs sm:text-sm transition shadow-md flex items-center gap-2">
+            <i class="fa-solid fa-user-graduate text-amber-700"></i> พิมพ์ใบงานสำหรับนักเรียน
+          </button>
+          <button onclick="printTeacherKey()" class="px-5 py-2.5 rounded-xl bg-slate-900 text-amber-300 hover:bg-slate-800 font-kanit font-bold text-xs sm:text-sm transition shadow-md flex items-center gap-2">
+            <i class="fa-solid fa-chalkboard-user"></i> พิมพ์เฉลยสำหรับครู
+          </button>
+        </div>
+      </div>
+
+      <!-- Printable Worksheet Content -->
+      <div id="printable-worksheet-card" class="bg-white rounded-3xl p-6 sm:p-10 border border-slate-300 shadow-xl space-y-6">
+        
+        <!-- Header shown on paper / screen -->
+        <div class="border-b-2 border-slate-900 pb-5">
+          <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
+            <div>
+              <h3 class="text-xl sm:text-2xl font-bold font-kanit text-slate-950">ใบงานแบบฝึกทักษะ: เรื่อง มวลอะตอมและมวลอะตอมเฉลี่ย</h3>
+              <p class="text-slate-600 text-xs sm:text-sm font-kanit">กลุ่มสาระการเรียนรู้วิทยาศาสตร์และเทคโนโลยี • รายวิชาเคมีเพิ่มเติม ม.4</p>
+            </div>
+            <div class="text-right">
+              <span id="worksheet-type-indicator" class="inline-block px-3 py-1 rounded-lg border-2 border-slate-800 text-xs font-kanit font-bold text-slate-900">
+                ฉบับนักเรียน (Student Worksheet)
+              </span>
+              <p class="text-[11px] text-slate-500 mt-1 font-kanit">คะแนนเต็ม 20 คะแนน (ข้อละ 2 คะแนน)</p>
+            </div>
+          </div>
+
+          <div class="mt-4 pt-3 border-t border-dashed border-slate-400 grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs sm:text-sm font-kanit text-slate-800">
+            <div>ชื่อ-สกุล : .....................................................................</div>
+            <div>ชั้น ม.4 / ........ เลขที่ : ............</div>
+            <div>วันที่ : ........ / ........................ / ............</div>
+          </div>
+        </div>
+
+        <!-- 10 Questions with strict page-break-inside avoidance -->
+        <div class="space-y-6">
+          
+          <!-- ข้อ 1 -->
+          <div class="question-card p-5 rounded-2xl bg-slate-50 border border-slate-200 space-y-2">
+            <div class="font-bold font-kanit text-sm sm:text-base text-slate-900">
+              ข้อ 1. อะตอมของธาตุโซเดียม ($\text{Na}$) 1 อะตอม มีมวลจริงเท่ากับ $3.82 \times 10^{-23}\text{ กรัม}$ จงคำนวณหามวลอะตอมสัมพัทธ์ของธาตุโซเดียม (กำหนดให้ $1\text{ amu} = 1.66 \times 10^{-24}\text{ กรัม}$)
+            </div>
+            <div class="worksheet-workspace min-h-[105px] border border-dashed border-slate-300 rounded-xl bg-white p-3 font-sans text-xs">
+              <div class="text-slate-400 font-kanit workspace-prompt writing-lines">
+                วิธีทำ : <br><br><br>
+                ตอบ : .........................................................................................................................................................
+              </div>
+              <div class="solution-block hidden text-slate-800 space-y-1">
+                <span class="font-bold text-emerald-800 font-kanit">วิธีทำ :</span>
+                <div>$$\text{มวลอะตอมสัมพัทธ์} = \frac{\text{มวลของธาตุ 1 อะตอม (g)}}{1.66 \times 10^{-24}\text{ g}} = \frac{3.82 \times 10^{-23}\text{ g}}{1.66 \times 10^{-24}\text{ g}} \approx 23.01$$</div>
+                <div class="font-bold text-amber-800 font-kanit">ตอบ : มวลอะตอมสัมพัทธ์ของโซเดียมเท่ากับ 23.01 (ไม่มีหน่วย)</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- ข้อ 2 -->
+          <div class="question-card p-5 rounded-2xl bg-slate-50 border border-slate-200 space-y-2">
+            <div class="font-bold font-kanit text-sm sm:text-base text-slate-900">
+              ข้อ 2. ธาตุแมกนีเซียม ($\text{Mg}$) มีมวลอะตอมสัมพัทธ์เท่ากับ 24.31 จงคำนวณหามวลที่แท้จริงของแมกนีเซียมจำนวน 1 อะตอมในหน่วยกรัม
+            </div>
+            <div class="worksheet-workspace min-h-[105px] border border-dashed border-slate-300 rounded-xl bg-white p-3 font-sans text-xs">
+              <div class="text-slate-400 font-kanit workspace-prompt writing-lines">
+                วิธีทำ : <br><br><br>
+                ตอบ : .........................................................................................................................................................
+              </div>
+              <div class="solution-block hidden text-slate-800 space-y-1">
+                <span class="font-bold text-emerald-800 font-kanit">วิธีทำ :</span>
+                <div>$$\text{มวลจริงของธาตุ 1 อะตอม} = \text{มวลอะตอมสัมพัทธ์} \times 1.66 \times 10^{-24}\text{ g}$$</div>
+                <div>$$= 24.31 \times 1.66 \times 10^{-24}\text{ g} = 4.035 \times 10^{-23}\text{ กรัม}$$</div>
+                <div class="font-bold text-amber-800 font-kanit">ตอบ : แมกนีเซียม 1 อะตอม มีมวลจริงเท่ากับ $4.035 \times 10^{-23}\text{ กรัม}$</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- ข้อ 3 -->
+          <div class="question-card p-5 rounded-2xl bg-slate-50 border border-slate-200 space-y-2">
+            <div class="font-bold font-kanit text-sm sm:text-base text-slate-900">
+              ข้อ 3. ในธรรมชาติ ธาตุคาร์บอนประกอบด้วย 2 ไอโซโทปหลักคือ $^{12}\text{C}$ (มวล $12.000\text{ amu}$, พบ 98.93%) และ $^{13}\text{C}$ (มวล $13.003\text{ amu}$, พบ 1.07%) จงคำนวณหามวลอะตอมเฉลี่ยของคาร์บอน
+            </div>
+            <div class="worksheet-workspace min-h-[105px] border border-dashed border-slate-300 rounded-xl bg-white p-3 font-sans text-xs">
+              <div class="text-slate-400 font-kanit workspace-prompt writing-lines">
+                วิธีทำ : <br><br><br>
+                ตอบ : .........................................................................................................................................................
+              </div>
+              <div class="solution-block hidden text-slate-800 space-y-1">
+                <span class="font-bold text-emerald-800 font-kanit">วิธีทำ :</span>
+                <div>$$\text{มวลอะตอมเฉลี่ย} = \frac{(12.000 \times 98.93) + (13.003 \times 1.07)}{100} = \frac{1187.16 + 13.913}{100} = \frac{1201.073}{100} \approx 12.011$$</div>
+                <div class="font-bold text-amber-800 font-kanit">ตอบ : มวลอะตอมเฉลี่ยของธาตุคาร์บอนเท่ากับ 12.01 amu</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- ข้อ 4 -->
+          <div class="question-card p-5 rounded-2xl bg-slate-50 border border-slate-200 space-y-2">
+            <div class="font-bold font-kanit text-sm sm:text-base text-slate-900">
+              ข้อ 4. ธาตุโบรอน ($\text{B}$) ประกอบด้วย 2 ไอโซโทป คือ $^{10}\text{B}$ (มวล $10.013\text{ amu}$, พบ 19.90%) และ $^{11}\text{B}$ (มวล $11.009\text{ amu}$, พบ 80.10%) จงแสดงวิธีคำนวณหามวลอะตอมเฉลี่ย
+            </div>
+            <div class="worksheet-workspace min-h-[105px] border border-dashed border-slate-300 rounded-xl bg-white p-3 font-sans text-xs">
+              <div class="text-slate-400 font-kanit workspace-prompt writing-lines">
+                วิธีทำ : <br><br><br>
+                ตอบ : .........................................................................................................................................................
+              </div>
+              <div class="solution-block hidden text-slate-800 space-y-1">
+                <span class="font-bold text-emerald-800 font-kanit">วิธีทำ :</span>
+                <div>$$\text{มวลอะตอมเฉลี่ย} = \frac{(10.013 \times 19.90) + (11.009 \times 80.10)}{100} = \frac{199.2587 + 881.8209}{100} = \frac{1081.08}{100} \approx 10.81$$</div>
+                <div class="font-bold text-amber-800 font-kanit">ตอบ : มวลอะตอมเฉลี่ยของโบรอนคือ 10.81 amu</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- ข้อ 5 -->
+          <div class="question-card p-5 rounded-2xl bg-slate-50 border border-slate-200 space-y-2">
+            <div class="font-bold font-kanit text-sm sm:text-base text-slate-900">
+              ข้อ 5. ธาตุทองแดง ($\text{Cu}$) มีมวลอะตอมเฉลี่ยในตารางธาตุเท่ากับ 63.55 amu โดยประกอบด้วยไอโซโทป $^{63}\text{Cu}$ (มวล $62.93\text{ amu}$) และ $^{65}\text{Cu}$ (มวล $64.93\text{ amu}$) จงหาร้อยละของไอโซโทป $^{63}\text{Cu}$ ในธรรมชาติ
+            </div>
+            <div class="worksheet-workspace min-h-[105px] border border-dashed border-slate-300 rounded-xl bg-white p-3 font-sans text-xs">
+              <div class="text-slate-400 font-kanit workspace-prompt writing-lines">
+                วิธีทำ : <br><br><br>
+                ตอบ : .........................................................................................................................................................
+              </div>
+              <div class="solution-block hidden text-slate-800 space-y-1">
+                <span class="font-bold text-emerald-800 font-kanit">วิธีทำ :</span>
+                <div>กำหนดให้ $^{63}\text{Cu}$ มีร้อยละ $x$ ดังนั้น $^{65}\text{Cu}$ จะมีร้อยละ $(100 - x)$</div>
+                <div>$$63.55 = \frac{62.93(x) + 64.93(100 - x)}{100} \implies 6355 = 62.93x + 6493 - 64.93x$$</div>
+                <div>$$2.00x = 138 \implies x = 69.00\%$$</div>
+                <div class="font-bold text-amber-800 font-kanit">ตอบ : ในธรรมชาติมีไอโซโทป $^{63}\text{Cu}$ อยู่ร้อยละ 69.00%</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- ข้อ 6 -->
+          <div class="question-card p-5 rounded-2xl bg-slate-50 border border-slate-200 space-y-2">
+            <div class="font-bold font-kanit text-sm sm:text-base text-slate-900">
+              ข้อ 6. ธาตุไนโตรเจน ($\text{N}$) มี 2 ไอโซโทป คือ $^{14}\text{N}$ (มวล $14.003\text{ amu}$) และ $^{15}\text{N}$ (มวล $15.000\text{ amu}$) ถ้ามวลอะตอมเฉลี่ยของไนโตรเจนคือ $14.007\text{ amu}$ จงหาร้อยละของไอโซโทป $^{15}\text{N}$ ในธรรมชาติ
+            </div>
+            <div class="worksheet-workspace min-h-[105px] border border-dashed border-slate-300 rounded-xl bg-white p-3 font-sans text-xs">
+              <div class="text-slate-400 font-kanit workspace-prompt writing-lines">
+                วิธีทำ : <br><br><br>
+                ตอบ : .........................................................................................................................................................
+              </div>
+              <div class="solution-block hidden text-slate-800 space-y-1">
+                <span class="font-bold text-emerald-800 font-kanit">วิธีทำ :</span>
+                <div>กำหนดให้ $^{15}\text{N}$ มีร้อยละ $y$ ดังนั้น $^{14}\text{N}$ จะมีร้อยละ $(100 - y)$</div>
+                <div>$$14.007 = \frac{15.000(y) + 14.003(100 - y)}{100} \implies 1400.7 = 15y + 1400.3 - 14.003y$$</div>
+                <div>$$0.997y = 0.4 \implies y \approx 0.401\%$$</div>
+                <div class="font-bold text-amber-800 font-kanit">ตอบ : ในธรรมชาติมีไอโซโทป $^{15}\text{N}$ อยู่ร้อยละ 0.40%</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- ข้อ 7 -->
+          <div class="question-card p-5 rounded-2xl bg-slate-50 border border-slate-200 space-y-2">
+            <div class="font-bold font-kanit text-sm sm:text-base text-slate-900">
+              ข้อ 7. ธาตุซิลิคอน ($\text{Si}$) ประกอบด้วย 3 ไอโซโทป ได้แก่ $^{28}\text{Si}$ (มวล $27.98\text{ amu}$, พบ 92.23%), $^{29}\text{Si}$ (มวล $28.98\text{ amu}$, พบ 4.68%) และ $^{30}\text{Si}$ (มวล $29.97\text{ amu}$, พบ 3.09%) จงคำนวณหามวลอะตอมเฉลี่ยของซิลิคอน
+            </div>
+            <div class="worksheet-workspace min-h-[105px] border border-dashed border-slate-300 rounded-xl bg-white p-3 font-sans text-xs">
+              <div class="text-slate-400 font-kanit workspace-prompt writing-lines">
+                วิธีทำ : <br><br><br>
+                ตอบ : .........................................................................................................................................................
+              </div>
+              <div class="solution-block hidden text-slate-800 space-y-1">
+                <span class="font-bold text-emerald-800 font-kanit">วิธีทำ :</span>
+                <div>$$\text{มวลเฉลี่ย} = \frac{(27.98 \times 92.23) + (28.98 \times 4.68) + (29.97 \times 3.09)}{100}$$</div>
+                <div>$$= \frac{2580.595 + 135.626 + 92.607}{100} = \frac{2808.828}{100} \approx 28.09\text{ amu}$$</div>
+                <div class="font-bold text-amber-800 font-kanit">ตอบ : มวลอะตอมเฉลี่ยของซิลิคอนเท่ากับ 28.09 amu</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- ข้อ 8 -->
+          <div class="question-card p-5 rounded-2xl bg-slate-50 border border-slate-200 space-y-2">
+            <div class="font-bold font-kanit text-sm sm:text-base text-slate-900">
+              ข้อ 8. ธาตุลิเทียม ($\text{Li}$) มีมวลอะตอมเฉลี่ย 6.94 amu ประกอบด้วยไอโซโทป $^{6}\text{Li}$ (มวล $6.015\text{ amu}$) และ $^{7}\text{Li}$ (มวล $7.016\text{ amu}$) จงวิเคราะห์ว่าไอโซโทปใดมีปริมาณมากกว่าในธรรมชาติ และคิดเป็นร้อยละเท่าใดสำหรับ $^{7}\text{Li}$
+            </div>
+            <div class="worksheet-workspace min-h-[105px] border border-dashed border-slate-300 rounded-xl bg-white p-3 font-sans text-xs">
+              <div class="text-slate-400 font-kanit workspace-prompt writing-lines">
+                วิธีทำ : <br><br><br>
+                ตอบ : .........................................................................................................................................................
+              </div>
+              <div class="solution-block hidden text-slate-800 space-y-1">
+                <span class="font-bold text-emerald-800 font-kanit">วิธีทำ :</span>
+                <div>เนื่องจากมวลอะตอมเฉลี่ย (6.94) มีค่าใกล้เคียงกับ 7.016 มากกว่า 6.015 แสดงว่า $^{7}\text{Li}$ ต้องมีสัดส่วนมากกว่า</div>
+                <div>$$6.94 = \frac{7.016(x) + 6.015(100 - x)}{100} \implies 694 = 7.016x + 601.5 - 6.015x$$</div>
+                <div>$$1.001x = 92.5 \implies x \approx 92.41\%$$</div>
+                <div class="font-bold text-amber-800 font-kanit">ตอบ : ไอโซโทป $^{7}\text{Li}$ มีปริมาณมากกว่า โดยพบร้อยละ 92.41%</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- ข้อ 9 -->
+          <div class="question-card p-5 rounded-2xl bg-slate-50 border border-slate-200 space-y-2">
+            <div class="font-bold font-kanit text-sm sm:text-base text-slate-900">
+              ข้อ 9. ธาตุสมมุติ $X$ มี 2 ไอโซโทปคือ $^{50}X$ (มวล $49.95\text{ amu}$) และ $^{52}X$ (มวล $51.94\text{ amu}$) ถ้าร้อยละในธรรมชาติของ $^{50}X$ ต่อ $^{52}X$ มีอัตราส่วนเท่ากับ $1 : 3$ จงคำนวณหามวลอะตอมเฉลี่ยของธาตุ $X$
+            </div>
+            <div class="worksheet-workspace min-h-[105px] border border-dashed border-slate-300 rounded-xl bg-white p-3 font-sans text-xs">
+              <div class="text-slate-400 font-kanit workspace-prompt writing-lines">
+                วิธีทำ : <br><br><br>
+                ตอบ : .........................................................................................................................................................
+              </div>
+              <div class="solution-block hidden text-slate-800 space-y-1">
+                <span class="font-bold text-emerald-800 font-kanit">วิธีทำ :</span>
+                <div>อัตราส่วน 1 : 3 คิดเป็นร้อยละ: $\%^{50}X = \frac{1}{4} \times 100 = 25\%$ และ $\%^{52}X = \frac{3}{4} \times 100 = 75\%$</div>
+                <div>$$\text{มวลอะตอมเฉลี่ย} = \frac{(49.95 \times 25) + (51.94 \times 75)}{100} = \frac{1248.75 + 3895.5}{100} = \frac{5144.25}{100} = 51.44$$</div>
+                <div class="font-bold text-amber-800 font-kanit">ตอบ : มวลอะตอมเฉลี่ยของธาตุ $X$ เท่ากับ 51.44 amu</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- ข้อ 10 -->
+          <div class="question-card p-5 rounded-2xl bg-slate-50 border border-slate-200 space-y-2">
+            <div class="font-bold font-kanit text-sm sm:text-base text-slate-900">
+              ข้อ 10. ธาตุ $M$ จำนวน 4 อะตอม มีมวลรวมกันเท่ากับ $1.328 \times 10^{-22}\text{ กรัม}$ จงหามวลจริงของธาตุ $M$ จำนวน 1 อะตอม และคำนวณว่ามวลอะตอมสัมพัทธ์ของธาตุนี้มีค่าเท่าใด
+            </div>
+            <div class="worksheet-workspace min-h-[105px] border border-dashed border-slate-300 rounded-xl bg-white p-3 font-sans text-xs">
+              <div class="text-slate-400 font-kanit workspace-prompt writing-lines">
+                วิธีทำ : <br><br><br>
+                ตอบ : .........................................................................................................................................................
+              </div>
+              <div class="solution-block hidden text-slate-800 space-y-1">
+                <span class="font-bold text-emerald-800 font-kanit">วิธีทำ :</span>
+                <div>1) มวลของธาตุ $M$ 1 อะตอม $= \frac{1.328 \times 10^{-22}\text{ g}}{4} = 3.32 \times 10^{-23}\text{ กรัม}$</div>
+                <div>2) มวลอะตอมสัมพัทธ์ $= \frac{3.32 \times 10^{-23}\text{ g}}{1.66 \times 10^{-24}\text{ g}} = 20.00$</div>
+                <div class="font-bold text-amber-800 font-kanit">ตอบ : ธาตุ $M$ 1 อะตอมหนัก $3.32 \times 10^{-23}\text{ กรัม}$ และมีมวลอะตอมสัมพัทธ์เท่ากับ 20.00</div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ========================================================================= -->
+    <!-- SECTION 4 : เกณฑ์การประเมินรูบริก (Rubric Assessment Theme)                -->
+    <!-- ========================================================================= -->
+    <section id="rubric-section" class="space-y-8">
+      
+      <!-- Section Header -->
+      <div class="flex items-center gap-3.5 pb-3 border-b-2 border-purple-500">
+        <div class="w-10 h-10 rounded-xl bg-purple-600 text-white flex items-center justify-center font-bold text-lg shadow-md shadow-purple-200">
+          <i class="fa-solid fa-list-check"></i>
+        </div>
+        <div>
+          <span class="text-xs font-bold text-purple-600 uppercase tracking-widest font-kanit">เกณฑ์การวัดและประเมินผล</span>
+          <h2 class="text-2xl sm:text-3xl font-bold text-slate-900 font-kanit">เกณฑ์การประเมินผล (Rubric) แบบ 3 ระดับ</h2>
+        </div>
+      </div>
+
+      <div class="bg-white rounded-3xl p-6 sm:p-8 border border-purple-200 shadow-xl space-y-6">
+        
+        <div class="pb-3 border-b border-slate-200">
+          <h3 class="text-lg font-bold font-kanit text-slate-900">
+            เกณฑ์การประเมินตามสภาพจริง 3 ระดับ (คะแนนเต็ม 20 คะแนน, ข้อละ 2 คะแนน)
+          </h3>
+          <p class="text-xs text-slate-500 font-kanit mt-0.5">
+            ประเมินครอบคลุมความถูกต้องของหลักการเคมี ทักษะการคิดคำนวณทางคณิตศาสตร์ และการระบุหน่วย
+          </p>
+        </div>
+
+        <!-- Rubric Table -->
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-sm border-collapse">
+            <thead>
+              <tr class="bg-purple-50 border-b-2 border-purple-200 text-purple-950 font-kanit">
+                <th class="p-4 w-1/4 rounded-tl-2xl font-bold text-sm sm:text-base">ประเด็นการประเมิน</th>
+                <th class="p-4 w-1/4 font-semibold text-emerald-900 bg-emerald-50/70 border-r border-slate-200">
+                  <div class="flex items-center gap-2 font-bold text-sm">
+                    <span class="w-6 h-6 rounded-full bg-emerald-600 text-white flex items-center justify-center text-xs">3</span>
+                    <span>ระดับดีมาก (2.0 คะแนน/ข้อ)</span>
+                  </div>
+                </th>
+                <th class="p-4 w-1/4 font-semibold text-amber-900 bg-amber-50/70 border-r border-slate-200">
+                  <div class="flex items-center gap-2 font-bold text-sm">
+                    <span class="w-6 h-6 rounded-full bg-amber-600 text-white flex items-center justify-center text-xs">2</span>
+                    <span>ระดับปานกลาง (1.0 - 1.5 คะแนน)</span>
+                  </div>
+                </th>
+                <th class="p-4 w-1/4 rounded-tr-2xl font-semibold text-rose-900 bg-rose-50/70">
+                  <div class="flex items-center gap-2 font-bold text-sm">
+                    <span class="w-6 h-6 rounded-full bg-rose-600 text-white flex items-center justify-center text-xs">1</span>
+                    <span>ระดับปรับปรุง (0.0 - 0.5 คะแนน)</span>
+                  </div>
+                </th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-200 font-sans">
+              
+              <!-- Criterion 1 -->
+              <tr class="hover:bg-slate-50/70 transition">
+                <td class="p-4 font-bold text-slate-900 align-top">
+                  <div class="font-kanit text-sm sm:text-base text-purple-900">1. มโนทัศน์และสูตรเคมี</div>
+                  <div class="text-xs text-slate-500 mt-1 font-normal">
+                    ความเข้าใจมวลอะตอมสัมพัทธ์ การเทียบค่ามาตรฐาน $1.66 \times 10^{-24}\text{ g}$ และสูตรมวลเฉลี่ย
+                  </div>
+                </td>
+                <td class="p-4 align-top text-xs text-slate-700 bg-emerald-50/20 leading-relaxed">
+                  ระบุสูตรและหลักการเคมีได้ถูกต้องสมบูรณ์ 100% เช่น สูตร $\frac{\sum (\% \times \text{มวล})}{100}$ หรือตั้งสมการสัดส่วนไอโซโทปตรงตามเงื่อนไข
+                </td>
+                <td class="p-4 align-top text-xs text-slate-700 bg-amber-50/20 leading-relaxed">
+                  เลือกใช้สูตรถูกต้องเป็นส่วนใหญ่ แต่อาจเขียนสัญลักษณ์หรือนิยามไม่ครบถ้วน หรือจับคู่อัตราส่วนไอโซโทปคลาดเคลื่อนเล็กน้อย
+                </td>
+                <td class="p-4 align-top text-xs text-slate-700 bg-rose-50/20 leading-relaxed">
+                  เลือกใช้สูตรไม่ถูกต้องตามหลักการ เช่น สับสนระหว่างผลรวมมวลธรรมดากับค่าเฉลี่ยถ่วงน้ำหนัก หรือไม่แสดงสูตรทางเคมี
+                </td>
+              </tr>
+
+              <!-- Criterion 2 -->
+              <tr class="hover:bg-slate-50/70 transition">
+                <td class="p-4 font-bold text-slate-900 align-top">
+                  <div class="font-kanit text-sm sm:text-base text-purple-900">2. การแทนค่าและการคำนวณ</div>
+                  <div class="text-xs text-slate-500 mt-1 font-normal">
+                    การคูณหารทศนิยม การย้ายข้างสมการ และการคำนวณเลขยกกำลังสัญกรณ์วิทยาศาสตร์
+                  </div>
+                </td>
+                <td class="p-4 align-top text-xs text-slate-700 bg-emerald-50/20 leading-relaxed">
+                  แทนค่าตัวเลขได้ถูกต้องทุกตำแหน่ง แสดงขั้นตอนการคำนวณทางคณิตศาสตร์อย่างเป็นระบบ ไม่มีข้อผิดพลาดทางพีชคณิต
+                </td>
+                <td class="p-4 align-top text-xs text-slate-700 bg-amber-50/20 leading-relaxed">
+                  แทนค่าตัวเลขถูกต้อง แต่มีข้อผิดพลาดในการคิดเลขทศนิยมหรือการย้ายข้างสมการเล็กน้อย ส่งผลให้ตัวเลขคลาดเคลื่อนบางส่วน
+                </td>
+                <td class="p-4 align-top text-xs text-slate-700 bg-rose-50/20 leading-relaxed">
+                  แทนค่าผิดตำแหน่ง ไม่แสดงขั้นตอนการคิดเลข หรือคำนวณสัญกรณ์วิทยาศาสตร์ $10^{-24}$ ผิดพลาดอย่างมีนัยสำคัญ
+                </td>
+              </tr>
+
+              <!-- Criterion 3 -->
+              <tr class="hover:bg-slate-50/70 transition">
+                <td class="p-4 font-bold text-slate-900 align-top">
+                  <div class="font-kanit text-sm sm:text-base text-purple-900">3. สรุปคำตอบและการระบุหน่วย</div>
+                  <div class="text-xs text-slate-500 mt-1 font-normal">
+                    ความถูกต้องของคำตอบ การปัดเศษทศนิยมตามเลขนัยสำคัญ และการเขียนหน่วยกำกับ
+                  </div>
+                </td>
+                <td class="p-4 align-top text-xs text-slate-700 bg-emerald-50/20 leading-relaxed">
+                  ได้คำตอบสุดท้ายถูกต้อง แม่นยำ ระบุหน่วยกำกับครบถ้วน (กรัม, amu หรือไม่มีหน่วยตามนิยามมวลสัมพัทธ์)
+                </td>
+                <td class="p-4 align-top text-xs text-slate-700 bg-amber-50/20 leading-relaxed">
+                  คำตอบสุดท้ายใกล้เคียงแต่ปัดเศษผิด หรือคำตอบถูกแต่ลืมใส่หน่วย หรือใส่หน่วยไม่เหมาะสม
+                </td>
+                <td class="p-4 align-top text-xs text-slate-700 bg-rose-50/20 leading-relaxed">
+                  คำตอบสุดท้ายไม่ถูกต้อง และไม่ระบุหน่วยหรือไม่สรุปคำตอบให้ชัดเจน
+                </td>
+              </tr>
+
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Grade Summary -->
+        <div class="bg-purple-50/70 rounded-2xl p-5 border border-purple-200">
+          <h4 class="font-bold text-purple-950 font-kanit text-sm mb-3">เกณฑ์สรุปการแปลผลระดับคุณภาพโดยรวม (คะแนนเต็ม 20 คะแนน) :</h4>
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs font-kanit">
+            <div class="p-3.5 bg-white rounded-xl border border-emerald-200">
+              <span class="font-bold text-emerald-800 text-sm block">16 - 20 คะแนน (ระดับดีมาก)</span>
+              <p class="text-slate-600 font-sans mt-1">มีความเชี่ยวชาญทั้งมโนทัศน์เคมีและการคิดเลข สามารถคำนวณมวลอะตอมและสัดส่วนไอโซโทปได้อย่างแม่นยำ</p>
+            </div>
+            <div class="p-3.5 bg-white rounded-xl border border-amber-200">
+              <span class="font-bold text-amber-800 text-sm block">10 - 15 คะแนน (ระดับปานกลาง)</span>
+              <p class="text-slate-600 font-sans mt-1">เข้าใจมโนทัศน์หลักและทำโจทย์พื้นฐานได้ ควรฝึกทักษะการแก้สมการย้อนกลับหาร้อยละไอโซโทปเพิ่มเติม</p>
+            </div>
+            <div class="p-3.5 bg-white rounded-xl border border-rose-200">
+              <span class="font-bold text-rose-800 text-sm block">0 - 9 คะแนน (ระดับปรับปรุง)</span>
+              <p class="text-slate-600 font-sans mt-1">ยังสับสนนิยามมวลอะตอมสัมพัทธ์และสูตรถ่วงน้ำหนัก แนะนำให้เรียนซ่อมเสริมด้วยแบบจำลองในส่วนที่ 2</p>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Empty minimal footer (without long prompt text) -->
+  <footer class="no-print py-6 text-center text-xs text-slate-400 font-kanit">
+    รายวิชาเคมีเพิ่มเติม ม.4 • กลุ่มสาระการเรียนรู้วิทยาศาสตร์และเทคโนโลยี
+  </footer>
+
+  <!-- JavaScript Logic -->
+  <script>
+    const PRESETS = {
+      cl: {
+        name: "คลอรีน (Chlorine: Cl)",
+        isotopes: [
+          { name: "Cl-35", mass: 34.969, percent: 75.77, color: "#3b82f6" },
+          { name: "Cl-37", mass: 36.966, percent: 24.23, color: "#10b981" }
+        ]
+      },
+      b: {
+        name: "โบรอน (Boron: B)",
+        isotopes: [
+          { name: "B-10", mass: 10.013, percent: 19.90, color: "#f59e0b" },
+          { name: "B-11", mass: 11.009, percent: 80.10, color: "#06b6d4" }
+        ]
+      },
+      c: {
+        name: "คาร์บอน (Carbon: C)",
+        isotopes: [
+          { name: "C-12", mass: 12.000, percent: 98.93, color: "#6366f1" },
+          { name: "C-13", mass: 13.003, percent: 1.07, color: "#ec4899" },
+          { name: "C-14", mass: 14.003, percent: 0.00, color: "#84cc16" }
+        ]
+      },
+      mg: {
+        name: "แมกนีเซียม (Magnesium: Mg)",
+        isotopes: [
+          { name: "Mg-24", mass: 23.985, percent: 78.99, color: "#3b82f6" },
+          { name: "Mg-25", mass: 24.986, percent: 10.00, color: "#10b981" },
+          { name: "Mg-26", mass: 25.983, percent: 11.01, color: "#f59e0b" }
+        ]
+      }
+    };
+
+    const PALETTE = ["#3b82f6", "#10b981", "#f59e0b", "#8b5cf6", "#ec4899"];
+
+    let currentIsotopes = JSON.parse(JSON.stringify(PRESETS.cl.isotopes));
+    let particles = [];
+    let animationId = null;
+    let solutionsVisibleOnScreen = false;
+
+    function triggerMathRender() {
+      if (window.MathJax && MathJax.typesetPromise) {
+        MathJax.typesetPromise().catch(err => console.log('MathJax error: ', err));
+      }
+    }
+
+    function renderIsotopeInputs() {
+      const container = document.getElementById('isotopes-input-list');
+      if (!container) return;
+      container.innerHTML = '';
+
+      currentIsotopes.forEach((iso, idx) => {
+        const card = document.createElement('div');
+        card.className = "p-4 rounded-2xl border border-slate-200 bg-slate-50/70 space-y-3 transition hover:border-emerald-300";
+        card.innerHTML = `
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <span class="w-3.5 h-3.5 rounded-full" style="background-color: ${iso.color}"></span>
+              <input type="text" value="${iso.name}" onchange="updateIsotopeName(${idx}, this.value)" class="text-sm font-kanit font-bold bg-transparent border-b border-dashed border-slate-300 focus:outline-none focus:border-emerald-500 text-slate-800 w-28">
+            </div>
+            <div class="text-xs font-semibold text-slate-500 font-kanit">
+              สัดส่วน: <span class="text-emerald-700 font-bold text-sm" id="pct-val-${idx}">${iso.percent.toFixed(2)}%</span>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
+            <div>
+              <label class="block text-[11px] font-bold text-slate-500 uppercase font-kanit">มวลไอโซโทป (amu)</label>
+              <input type="number" step="0.001" value="${iso.mass}" oninput="updateIsotopeMass(${idx}, this.value)" class="mt-1 w-full bg-white border border-slate-300 rounded-xl px-3 py-1.5 text-sm font-mono text-slate-800 focus:ring-emerald-500 focus:border-emerald-500">
+            </div>
+            <div>
+              <label class="block text-[11px] font-bold text-slate-500 uppercase font-kanit">ร้อยละในธรรมชาติ (%)</label>
+              <div class="flex items-center gap-2 mt-1">
+                <input type="range" min="0" max="100" step="0.1" value="${iso.percent}" oninput="updateIsotopePercent(${idx}, this.value)" class="w-full h-2 bg-slate-200 rounded-lg cursor-pointer">
+                <input type="number" step="0.1" min="0" max="100" value="${iso.percent}" oninput="updateIsotopePercent(${idx}, this.value)" class="w-20 bg-white border border-slate-300 rounded-xl px-2 py-1 text-xs font-mono text-slate-800 text-right">
+              </div>
+            </div>
+          </div>
+        `;
+        container.appendChild(card);
+      });
+
+      updateCalculations();
+      updateLegend();
+    }
+
+    function updateIsotopeName(index, val) {
+      currentIsotopes[index].name = val.trim() || `Iso-${index+1}`;
+      updateLegend();
+    }
+
+    function updateIsotopeMass(index, val) {
+      const num = parseFloat(val);
+      currentIsotopes[index].mass = isNaN(num) ? 0 : Math.max(0, num);
+      updateCalculations();
+    }
+
+    function updateIsotopePercent(index, val) {
+      const num = parseFloat(val);
+      currentIsotopes[index].percent = isNaN(num) ? 0 : Math.max(0, Math.min(100, num));
+      const lbl = document.getElementById(`pct-val-${index}`);
+      if (lbl) lbl.textContent = currentIsotopes[index].percent.toFixed(2) + '%';
+      updateCalculations();
+      createParticles();
+    }
+
+    function setIsotopeCount(count) {
+      [2, 3, 4].forEach(c => {
+        const btn = document.getElementById(`btn-count-${c}`);
+        if (btn) {
+          if (c === count) {
+            btn.className = "px-3.5 py-1.5 rounded-lg text-xs font-kanit font-bold bg-emerald-600 text-white shadow-sm transition";
+          } else {
+            btn.className = "px-3.5 py-1.5 rounded-lg text-xs font-kanit font-bold text-slate-600 hover:text-emerald-700 transition";
+          }
+        }
+      });
+
+      if (currentIsotopes.length < count) {
+        while (currentIsotopes.length < count) {
+          const i = currentIsotopes.length;
+          currentIsotopes.push({
+            name: `Iso-${i + 1}`,
+            mass: parseFloat((20.0 + (i * 2)).toFixed(3)),
+            percent: 0.0,
+            color: PALETTE[i % PALETTE.length]
+          });
+        }
+      } else if (currentIsotopes.length > count) {
+        currentIsotopes = currentIsotopes.slice(0, count);
+      }
+
+      autoNormalizePercentages();
+      renderIsotopeInputs();
+    }
+
+    function loadPreset(key) {
+      if (key === 'custom') return;
+      const preset = PRESETS[key];
+      if (preset) {
+        currentIsotopes = JSON.parse(JSON.stringify(preset.isotopes));
+        setIsotopeCount(currentIsotopes.length);
+        renderIsotopeInputs();
+      }
+    }
+
+    function autoNormalizePercentages() {
+      const currentSum = currentIsotopes.reduce((acc, curr) => acc + curr.percent, 0);
+      if (currentSum === 0) {
+        const equalShare = 100 / currentIsotopes.length;
+        currentIsotopes.forEach(iso => iso.percent = parseFloat(equalShare.toFixed(2)));
+      } else {
+        const factor = 100 / currentSum;
+        currentIsotopes.forEach(iso => {
+          iso.percent = parseFloat((iso.percent * factor).toFixed(2));
+        });
+      }
+      
+      const newSum = currentIsotopes.reduce((acc, curr) => acc + curr.percent, 0);
+      const diff = 100.00 - newSum;
+      if (Math.abs(diff) > 0.0001 && currentIsotopes.length > 0) {
+        currentIsotopes[0].percent = parseFloat((currentIsotopes[0].percent + diff).toFixed(2));
+      }
+
+      renderIsotopeInputs();
+      createParticles();
+    }
+
+    function resetModel() {
+      const sel = document.getElementById('preset-selector');
+      if (sel) sel.value = 'cl';
+      loadPreset('cl');
+    }
+
+    function updateCalculations() {
+      const totalPercent = currentIsotopes.reduce((acc, curr) => acc + curr.percent, 0);
+      const totalLabel = document.getElementById('total-percent-label');
+      const warning = document.getElementById('percent-warning');
+
+      if (totalLabel) {
+        totalLabel.textContent = totalPercent.toFixed(2) + '%';
+        if (Math.abs(totalPercent - 100.00) > 0.05) {
+          totalLabel.className = "font-bold text-sm text-rose-600";
+          if (warning) warning.classList.remove('hidden');
+        } else {
+          totalLabel.className = "font-bold text-sm text-emerald-600";
+          if (warning) warning.classList.add('hidden');
+        }
+      }
+
+      for (let i = 0; i < 4; i++) {
+        const bar = document.getElementById(`bar-iso-${i}`);
+        if (bar) {
+          if (i < currentIsotopes.length) {
+            bar.style.width = `${Math.min(100, Math.max(0, currentIsotopes[i].percent))}%`;
+            bar.style.backgroundColor = currentIsotopes[i].color;
+          } else {
+            bar.style.width = '0%';
+          }
+        }
+      }
+
+      let weightedSum = 0;
+      let terms = [];
+
+      currentIsotopes.forEach(iso => {
+        const term = iso.mass * iso.percent;
+        weightedSum += term;
+        terms.push(`(${iso.mass.toFixed(2)} \\times ${iso.percent.toFixed(2)}\\%)`);
+      });
+
+      const avgMass = weightedSum / 100.0;
+      const displayElem = document.getElementById('display-average-mass');
+      if (displayElem) {
+        displayElem.textContent = avgMass.toFixed(2);
+      }
+
+      const mathExpr = document.getElementById('math-expression-display');
+      const mathFinal = document.getElementById('math-step-final');
+
+      if (mathExpr) {
+        mathExpr.innerHTML = `
+          <div class="py-1 text-slate-200">
+            $$= \\frac{${terms.join(' + ')}}{100}$$
+          </div>
+          <div class="py-1 text-emerald-300">
+            $$= \\frac{${weightedSum.toFixed(2)}}{100} = ${avgMass.toFixed(2)}\\text{ amu}$$
+          </div>
+        `;
+        triggerMathRender();
+      }
+
+      if (mathFinal) {
+        mathFinal.textContent = `${avgMass.toFixed(2)} amu`;
+      }
+    }
+
+    function updateLegend() {
+      const container = document.getElementById('particle-legend');
+      if (!container) return;
+      container.innerHTML = '';
+      currentIsotopes.forEach(iso => {
+        const item = document.createElement('div');
+        item.className = "flex items-center gap-1.5 p-1.5 rounded-lg bg-slate-50 border border-slate-200";
+        item.innerHTML = `
+          <span class="w-2.5 h-2.5 rounded-full flex-shrink-0" style="background-color: ${iso.color}"></span>
+          <span class="font-bold text-slate-800">${iso.name}</span>
+          <span class="text-slate-500 font-mono text-[11px]">(${iso.mass.toFixed(2)} amu)</span>
+        `;
+        container.appendChild(item);
+      });
+    }
+
+    function initCanvasParticles() {
+      const canvas = document.getElementById('particle-canvas');
+      if (!canvas) return;
+      createParticles();
+      if (!animationId) {
+        animateLoop();
+      }
+    }
+
+    function createParticles() {
+      const canvas = document.getElementById('particle-canvas');
+      if (!canvas) return;
+      const totalParticles = 100;
+      particles = [];
+
+      const totalPercent = currentIsotopes.reduce((acc, curr) => acc + curr.percent, 0) || 100;
+
+      currentIsotopes.forEach(iso => {
+        const count = Math.round((iso.percent / totalPercent) * totalParticles);
+        for (let i = 0; i < count; i++) {
+          particles.push({
+            x: Math.random() * (canvas.width - 24) + 12,
+            y: Math.random() * (canvas.height - 24) + 12,
+            vx: (Math.random() - 0.5) * 0.9,
+            vy: (Math.random() - 0.5) * 0.9,
+            radius: 4.5,
+            color: iso.color
+          });
+        }
+      });
+    }
+
+    function reshuffleParticles() {
+      createParticles();
+    }
+
+    function animateLoop() {
+      const canvas = document.getElementById('particle-canvas');
+      if (canvas && canvas.getContext) {
+        const ctx = canvas.getContext('2d');
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        particles.forEach(p => {
+          p.x += p.vx;
+          p.y += p.vy;
+
+          if (p.x - p.radius < 0 || p.x + p.radius > canvas.width) p.vx *= -1;
+          if (p.y - p.radius < 0 || p.y + p.radius > canvas.height) p.vy *= -1;
+
+          const grad = ctx.createRadialGradient(p.x, p.y, 1, p.x, p.y, p.radius);
+          grad.addColorStop(0, '#ffffff');
+          grad.addColorStop(0.4, p.color);
+          grad.addColorStop(1, 'rgba(0,0,0,0.3)');
+
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+          ctx.fillStyle = grad;
+          ctx.fill();
+        });
+      }
+      animationId = requestAnimationFrame(animateLoop);
+    }
+
+    /* ========================================================
+     * PRINT LOGIC: STRICTURE TO ONLY PRINT THE WORKSHEET
+     * ======================================================== */
+    function toggleOnScreenSolutions() {
+      solutionsVisibleOnScreen = !solutionsVisibleOnScreen;
+      const solutions = document.querySelectorAll('.solution-block');
+      const prompts = document.querySelectorAll('.workspace-prompt');
+      const toggleText = document.getElementById('toggle-text');
+      const toggleIcon = document.getElementById('toggle-icon');
+
+      if (solutionsVisibleOnScreen) {
+        solutions.forEach(s => s.classList.remove('hidden'));
+        prompts.forEach(p => p.classList.add('hidden'));
+        if (toggleText) toggleText.textContent = 'ซ่อนเฉลยบนหน้าจอ';
+        if (toggleIcon) toggleIcon.className = 'fa-solid fa-eye-slash';
+        triggerMathRender();
+      } else {
+        solutions.forEach(s => s.classList.add('hidden'));
+        prompts.forEach(p => p.classList.remove('hidden'));
+        if (toggleText) toggleText.textContent = 'เปิดดูเฉลยบนหน้าจอ';
+        if (toggleIcon) toggleIcon.className = 'fa-solid fa-eye';
+      }
+    }
+
+    function printStudentWorksheet() {
+      const tag = document.getElementById('worksheet-type-indicator');
+      if (tag) {
+        tag.textContent = 'ฉบับนักเรียน (Student Worksheet)';
+        tag.className = 'inline-block px-3 py-1 rounded-lg border-2 border-slate-800 text-xs font-kanit font-bold text-slate-900 bg-white';
+      }
+
+      // Hide solutions for students
+      document.querySelectorAll('.solution-block').forEach(s => s.classList.add('hidden'));
+      document.querySelectorAll('.workspace-prompt').forEach(p => p.classList.remove('hidden'));
+
+      setTimeout(() => {
+        window.print();
+      }, 250);
+    }
+
+    function printTeacherKey() {
+      const tag = document.getElementById('worksheet-type-indicator');
+      if (tag) {
+        tag.textContent = 'ฉบับเฉลยสำหรับครูผู้สอน (Teacher Key)';
+        tag.className = 'inline-block px-3 py-1 rounded-lg bg-amber-500 text-slate-950 font-kanit font-bold text-xs border border-amber-600';
+      }
+
+      // Show solutions for teachers
+      document.querySelectorAll('.solution-block').forEach(s => s.classList.remove('hidden'));
+      document.querySelectorAll('.workspace-prompt').forEach(p => p.classList.add('hidden'));
+
+      triggerMathRender();
+
+      setTimeout(() => {
+        window.print();
+      }, 350);
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      renderIsotopeInputs();
+      initCanvasParticles();
+      setTimeout(triggerMathRender, 400);
+    });
+  </script>
+</body>
+</html>

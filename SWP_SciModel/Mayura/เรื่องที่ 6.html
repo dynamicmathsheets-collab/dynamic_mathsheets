@@ -1,0 +1,1293 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>เคมี ม.4 • โมลและสูตรเคมี เรื่องที่ 6: สูตรเคมี</title>
+
+  <!-- Google Fonts: Prompt & Sarabun -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&family=Prompt:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=Sarabun:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome 6 Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <!-- MathJax 3 Configuration -->
+  <script>
+    window.MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']],
+        displayMath: [['$$', '$$'], ['\\[', '\\]']],
+        processEscapes: true
+      },
+      options: {
+        skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+      }
+    };
+  </script>
+  <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            prompt: ['Prompt', 'sans-serif'],
+            sarabun: ['Sarabun', 'sans-serif'],
+            mono: ['Fira Code', 'monospace']
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    body {
+      font-family: 'Sarabun', sans-serif;
+      background-color: #f8fafc;
+      color: #1e293b;
+    }
+
+    h1, h2, h3, h4, .font-heading {
+      font-family: 'Prompt', sans-serif;
+    }
+
+    /* Subscript styling for chemistry formula cards */
+    .chem-formula sub {
+      font-size: 0.58em !important;
+      line-height: 1 !important;
+      vertical-align: -0.25em !important;
+      font-weight: 700 !important;
+      opacity: 0.95;
+    }
+
+    .math-step-container {
+      word-break: break-word;
+      overflow-x: hidden;
+    }
+
+    /* On-Screen Solution Toggle Display */
+    .teacher-solution {
+      display: none;
+    }
+    .teacher-solution.show {
+      display: block !important;
+    }
+
+    .student-write-area.hide-on-screen {
+      display: none !important;
+    }
+
+    /* ==============================================================
+       STRICT PRINT CONFIGURATION (ISOLATES WORKSHEET ONLY)
+       ============================================================== */
+    @media print {
+      @page {
+        size: A4;
+        margin: 14mm 12mm 14mm 12mm;
+      }
+
+      body {
+        background: #ffffff !important;
+        color: #000000 !important;
+        margin: 0 !important;
+        padding: 0 !important;
+      }
+
+      header,
+      #concept-section,
+      #interactive-section,
+      #rubric-section,
+      footer,
+      .no-print {
+        display: none !important;
+      }
+
+      #worksheet-section {
+        display: block !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        border: none !important;
+        box-shadow: none !important;
+      }
+
+      #printable-worksheet-card {
+        border: none !important;
+        box-shadow: none !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        width: 100% !important;
+      }
+
+      .question-card {
+        break-inside: avoid !important;
+        page-break-inside: avoid !important;
+        margin-bottom: 1.15rem !important;
+        border: 1px solid #94a3b8 !important;
+        background: #ffffff !important;
+        padding: 0.9rem !important;
+      }
+
+      .student-write-area {
+        min-height: 85px !important;
+        border: 1px dashed #94a3b8 !important;
+        background-color: #ffffff !important;
+      }
+
+      /* TEACHER PRINT MODE */
+      body.print-mode-teacher .teacher-solution {
+        display: block !important;
+        visibility: visible !important;
+        background-color: #f1f5f9 !important;
+        border-left: 4px solid #0f172a !important;
+        color: #0f172a !important;
+        padding: 10px 14px !important;
+        margin-top: 8px !important;
+        border-radius: 6px !important;
+      }
+
+      body.print-mode-teacher .student-write-area {
+        display: none !important;
+      }
+
+      /* STUDENT PRINT MODE */
+      body.print-mode-student .teacher-solution {
+        display: none !important;
+      }
+
+      body.print-mode-student .student-write-area {
+        display: block !important;
+      }
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col antialiased selection:bg-teal-500 selection:text-white">
+
+  <!-- ========================================================================= -->
+  <!-- TOP BANNER                                                                -->
+  <!-- ========================================================================= -->
+  <header class="no-print bg-gradient-to-r from-slate-900 via-teal-950 to-slate-900 text-white border-b border-teal-900/60 shadow-lg py-8">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 text-center md:text-left">
+      <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-teal-500/20 border border-teal-400/30 text-teal-300 text-xs font-semibold uppercase tracking-wider font-prompt mb-3">
+        <i class="fa-solid fa-atom"></i> รายวิชาเคมี ม.4 • หน่วยการเรียนรู้ที่ 4
+      </div>
+      <h1 class="text-3xl sm:text-4xl lg:text-5xl font-extrabold font-prompt tracking-tight text-white">
+        โมลและสูตรเคมี <span class="text-slate-400 font-normal">|</span> <span class="bg-clip-text text-transparent bg-gradient-to-r from-teal-400 via-cyan-300 to-emerald-400">เรื่องที่ 6: สูตรเคมี</span>
+      </h1>
+    </div>
+  </header>
+
+  <!-- Continuous Single-Page Flow -->
+  <main class="flex-grow max-w-6xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-16">
+
+    <!-- ========================================================================= -->
+    <!-- SECTION 1 : สรุปสาระสำคัญ                                                 -->
+    <!-- ========================================================================= -->
+    <section id="concept-section" class="space-y-8">
+      
+      <div class="flex items-center gap-3.5 pb-3 border-b-2 border-teal-500">
+        <div class="w-10 h-10 rounded-xl bg-teal-600 text-white flex items-center justify-center font-bold text-lg shadow-md shadow-teal-200">
+          <i class="fa-solid fa-book-open"></i>
+        </div>
+        <div>
+          <span class="text-xs font-bold text-teal-600 uppercase tracking-widest font-prompt">ทฤษฎีและหลักการพื้นฐาน</span>
+          <h2 class="text-2xl sm:text-3xl font-bold text-slate-900 font-prompt">สรุปสาระสำคัญ: สูตรเอมพิริคัลและสูตรโมเลกุล</h2>
+        </div>
+      </div>
+
+      <!-- Core Principle Cards -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        
+        <!-- Card 1: สูตรเอมพิริคัล -->
+        <div class="bg-white rounded-3xl p-6 border-2 border-teal-100 shadow-sm hover:shadow-md transition-all flex flex-col justify-between">
+          <div>
+            <div class="flex items-center justify-between mb-4">
+              <span class="px-3 py-1 rounded-full text-xs font-semibold bg-teal-100 text-teal-800 font-prompt">หลักการที่ 1</span>
+              <i class="fa-solid fa-shapes text-teal-500 text-xl"></i>
+            </div>
+            <h3 class="text-lg font-bold text-slate-900 font-prompt mb-2">สูตรเอมพิริคัล (Empirical Formula)</h3>
+            <p class="text-slate-600 text-sm leading-relaxed mb-4">
+              สูตรอย่างง่ายที่แสดง <strong>อัตราส่วนอย่างต่ำของจำนวนอะตอม</strong> ของธาตุที่เป็นองค์ประกอบ คำนวณได้โดยการเปลี่ยนข้อมูลมวลหรือร้อยละโดยมวลให้เป็นจำนวนโมล แล้วหาอัตราส่วนจำนวนเต็มอย่างต่ำ
+            </p>
+
+            <div class="bg-teal-50/90 rounded-2xl p-4 border border-teal-200 text-xs text-teal-950 space-y-2">
+              <div class="font-bold font-prompt text-teal-900">อัตราส่วนอย่างต่ำของโมล:</div>
+              <div class="p-2 bg-white rounded-xl border border-teal-100 text-center font-mono font-bold text-teal-800 text-xs">
+                $$n = \frac{\text{มวลธาตุ (g)}}{\text{มวลอะตอม}}$$
+              </div>
+              <p class="text-[11px] text-slate-600 leading-normal">
+                นำจำนวนโมลที่น้อยที่สุดไปหารทุกตัว หากได้ทศนิยม เช่น .5 หรือ .33 ต้องคูณด้วย 2 หรือ 3 เพื่อให้เป็นจำนวนเต็ม
+              </p>
+            </div>
+          </div>
+
+          <div class="mt-4 pt-3 border-t border-slate-100 text-xs text-slate-500 font-medium">
+            <i class="fa-solid fa-circle-check text-teal-500 mr-1"></i> ตัวอย่าง: กลูโคสและกรดแอซีติกมีสูตรเอมพิริคัลเป็น $\text{CH}_2\text{O}$ เหมือนกัน
+          </div>
+        </div>
+
+        <!-- Card 2: สูตรโมเลกุล -->
+        <div class="bg-white rounded-3xl p-6 border-2 border-cyan-100 shadow-sm hover:shadow-md transition-all flex flex-col justify-between">
+          <div>
+            <div class="flex items-center justify-between mb-4">
+              <span class="px-3 py-1 rounded-full text-xs font-semibold bg-cyan-100 text-cyan-800 font-prompt">หลักการที่ 2</span>
+              <i class="fa-solid fa-dna text-cyan-500 text-xl"></i>
+            </div>
+            <h3 class="text-lg font-bold text-slate-900 font-prompt mb-2">สูตรโมเลกุล (Molecular Formula)</h3>
+            <p class="text-slate-600 text-sm leading-relaxed mb-4">
+              สูตรที่แสดง <strong>จำนวนอะตอมที่แท้จริง</strong> ของแต่ละธาตุใน 1 โมเลกุลของสารประกอบ สามารถหาได้เมื่อทราบสูตรเอมพิริคัลและมวลโมเลกุลจริงของสาร
+            </p>
+
+            <div class="bg-cyan-50/90 rounded-2xl p-4 border border-cyan-200 text-xs text-cyan-950 space-y-2">
+              <div class="font-bold font-prompt text-cyan-900">ความสัมพันธ์ระหว่างสองสูตร:</div>
+              <div class="p-2 bg-white rounded-xl border border-cyan-100 text-center font-mono font-bold text-cyan-800 text-xs">
+                $$\text{สูตรโมเลกุล} = (\text{สูตรเอมพิริคัล})_n$$
+              </div>
+              <div class="p-2 bg-white rounded-xl border border-cyan-100 text-center font-mono text-slate-700 text-xs">
+                $$n = \frac{\text{มวลโมเลกุล}}{\text{มวลสูตรเอมพิริคัล}}$$
+              </div>
+            </div>
+          </div>
+
+          <div class="mt-4 pt-3 border-t border-slate-100 text-xs text-slate-500 font-medium">
+            <i class="fa-solid fa-circle-check text-cyan-500 mr-1"></i> ค่า $n$ ต้องเป็นจำนวนเต็มบวก ($1, 2, 3, \dots$) เสมอ
+          </div>
+        </div>
+
+        <!-- Card 3: แผนภาพกระบวนการ 5 สเต็ป -->
+        <div class="bg-white rounded-3xl p-6 border-2 border-indigo-100 shadow-sm hover:shadow-md transition-all flex flex-col justify-between">
+          <div>
+            <div class="flex items-center justify-between mb-4">
+              <span class="px-3 py-1 rounded-full text-xs font-semibold bg-indigo-100 text-indigo-800 font-prompt">หลักการที่ 3</span>
+              <i class="fa-solid fa-route text-indigo-500 text-xl"></i>
+            </div>
+            <h3 class="text-lg font-bold text-slate-900 font-prompt mb-2">ผังขั้นตอนการคำนวณหาสูตร</h3>
+            <p class="text-slate-600 text-sm leading-relaxed mb-4">
+              กระบวนการเชื่อมโยงข้อมูลจากห้องปฏิบัติการสู่การระบุโครงสร้างสูตรโมเลกุลที่แท้จริงทีละระดับ
+            </p>
+
+            <div class="bg-indigo-50/90 rounded-2xl p-3 border border-indigo-200 text-xs text-indigo-950 space-y-1.5">
+              <div class="flex items-center gap-1.5 p-1 bg-white rounded-lg">
+                <span class="w-5 h-5 rounded-full bg-indigo-600 text-white flex items-center justify-center font-bold text-[10px]">1</span>
+                <span>มวลธาตุ / ร้อยละโดยมวล ($g$)</span>
+              </div>
+              <div class="flex items-center gap-1.5 p-1 bg-white rounded-lg">
+                <span class="w-5 h-5 rounded-full bg-indigo-600 text-white flex items-center justify-center font-bold text-[10px]">2</span>
+                <span>แปลงเป็นจำนวนโมล ($\div \text{มวลอะตอม}$)</span>
+              </div>
+              <div class="flex items-center gap-1.5 p-1 bg-white rounded-lg">
+                <span class="w-5 h-5 rounded-full bg-indigo-600 text-white flex items-center justify-center font-bold text-[10px]">3</span>
+                <span>หาอัตราส่วนโมลอย่างต่ำ ($\div \text{โมลต่ำสุด}$)</span>
+              </div>
+              <div class="flex items-center gap-1.5 p-1 bg-white rounded-lg">
+                <span class="w-5 h-5 rounded-full bg-indigo-600 text-white flex items-center justify-center font-bold text-[10px]">4</span>
+                <span>ปรับเป็นจำนวนเต็ม $\rightarrow$ <strong>สูตรเอมพิริคัล</strong></span>
+              </div>
+              <div class="flex items-center gap-1.5 p-1 bg-white rounded-lg">
+                <span class="w-5 h-5 rounded-full bg-indigo-600 text-white flex items-center justify-center font-bold text-[10px]">5</span>
+                <span>หาค่าตัวคูณ $n$ $\rightarrow$ <strong>สูตรโมเลกุล</strong></span>
+              </div>
+            </div>
+          </div>
+
+          <div class="mt-4 pt-3 border-t border-slate-100 text-xs text-slate-500 font-medium">
+            <i class="fa-solid fa-circle-check text-indigo-500 mr-1"></i> ลำดับขั้นตอนนี้สามารถใช้แก้โจทย์สูตรเคมีได้ทุกรูปแบบ
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Conceptual Walkthrough Card -->
+      <div class="bg-gradient-to-br from-slate-900 via-teal-950 to-slate-950 rounded-3xl p-6 sm:p-8 text-white shadow-xl">
+        <div class="max-w-4xl space-y-5">
+          <div class="flex items-center gap-2 text-teal-300 font-prompt text-sm font-semibold tracking-wide uppercase">
+            <i class="fa-solid fa-calculator"></i> ตัวอย่างการคำนวณละเอียด: เบนซีน (Benzene)
+          </div>
+          <h3 class="text-xl sm:text-2xl font-bold font-prompt">
+            ตัวอย่าง: เบนซีนประกอบด้วย $\text{C}$ 92.26% และ $\text{H}$ 7.74% โดยมวล มีมวลโมเลกุล 78.11 g/mol
+          </h3>
+          
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6 items-start text-xs sm:text-sm font-sarabun">
+            <div class="bg-white/10 backdrop-blur-md rounded-2xl p-5 border border-white/15 space-y-2">
+              <span class="font-bold text-teal-300 font-prompt block text-sm">การหาสูตรเอมพิริคัล (สเต็ป 1 - 4):</span>
+              <div>1. คิดในสาร 100 g จะมี $\text{C} = 92.26\text{ g}$ และ $\text{H} = 7.74\text{ g}$</div>
+              <div>2. แปลงเป็นโมล:</div>
+              <div class="font-mono text-slate-200 pl-3">
+                $n_{\text{C}} = \frac{92.26}{12.01} = 7.682\text{ mol}$<br>
+                $n_{\text{H}} = \frac{7.74}{1.01} = 7.663\text{ mol}$
+              </div>
+              <div>3. หารด้วยโมลต่ำสุด ($7.663$):</div>
+              <div class="font-mono text-slate-200 pl-3">
+                $\text{C} : \text{H} = \frac{7.682}{7.663} : \frac{7.663}{7.663} = 1.00 : 1.00$
+              </div>
+              <div class="text-amber-300 font-bold pt-1 border-t border-white/10">
+                $\implies$ สูตรเอมพิริคัล คือ $\mathbf{CH}$ (มวลสูตร $= 12.01 + 1.01 = 13.02\text{ g/mol}$)
+              </div>
+            </div>
+
+            <div class="bg-white/10 backdrop-blur-md rounded-2xl p-5 border border-white/15 space-y-2">
+              <span class="font-bold text-cyan-300 font-prompt block text-sm">การหาสูตรโมเลกุล (สเต็ป 5):</span>
+              <div>4. กำหนดมวลโมเลกุลจริง $= 78.11\text{ g/mol}$</div>
+              <div>5. คำนวณหาค่าตัวคูณ $n$:</div>
+              <div class="font-mono text-slate-200 pl-3">
+                $$n = \frac{\text{มวลโมเลกุล}}{\text{มวลสูตรเอมพิริคัล}} = \frac{78.11}{13.02} \approx 6.00 \approx \mathbf{6}$$
+              </div>
+              <div>6. คูณแจกแจงค่า $n$ เข้าไปในสูตรเอมพิริคัล:</div>
+              <div class="font-mono text-slate-200 pl-3">
+                $$\text{สูตรโมเลกุล} = (\text{CH})_6 = \mathbf{C_6H_6}$$
+              </div>
+              <div class="text-amber-300 font-bold pt-1 border-t border-white/10">
+                $\implies$ สูตรโมเลกุลของเบนซีน คือ $\mathbf{C_6H_6}$
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================================================= -->
+    <!-- SECTION 2 : แบบจำลองเชิงโต้ตอบ (ห้องทดลองหาสูตรสาร)                         -->
+    <!-- ========================================================================= -->
+    <section id="interactive-section" class="space-y-8">
+      
+      <div class="flex items-center gap-3.5 pb-3 border-b-2 border-teal-500">
+        <div class="w-10 h-10 rounded-xl bg-teal-600 text-white flex items-center justify-center font-bold text-lg shadow-md shadow-teal-200">
+          <i class="fa-solid fa-flask-vial"></i>
+        </div>
+        <div>
+          <span class="text-xs font-bold text-teal-600 uppercase tracking-widest font-prompt">แบบจำลองเชิงโต้ตอบ</span>
+          <h2 class="text-2xl sm:text-3xl font-bold text-slate-900 font-prompt">ห้องทดลองหาสูตรสาร: คำนวณสูตรเอมพิริคัลและสูตรโมเลกุลแบบสด</h2>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+        
+        <!-- Controls Column (7 Cols) -->
+        <div class="lg:col-span-7 bg-white rounded-3xl p-6 sm:p-8 border border-teal-200 shadow-lg space-y-6">
+          
+          <!-- Compound Preset Selector -->
+          <div class="space-y-3 pb-4 border-b border-slate-100">
+            <label class="block text-xs font-bold text-slate-600 uppercase tracking-wider font-prompt">
+              1. เลือกสารตัวอย่างทดสอบ หรือกำหนดธาตุเอง:
+            </label>
+
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
+              <button type="button" onclick="loadPreset('glucose')" id="btn-pre-glucose" class="p-2.5 rounded-2xl border-2 border-slate-200 bg-white text-slate-700 font-prompt text-left transition hover:border-teal-300">
+                <div class="font-bold text-sm">กลูโคส (Glucose)</div>
+                <div class="text-[11px] text-slate-500">CH₂O $\rightarrow$ C₆H₁₂O₆</div>
+              </button>
+              <button type="button" onclick="loadPreset('acetic')" id="btn-pre-acetic" class="p-2.5 rounded-2xl border-2 border-slate-200 bg-white text-slate-700 font-prompt text-left transition hover:border-teal-300">
+                <div class="font-bold text-sm">กรดแอซีติก (Acetic)</div>
+                <div class="text-[11px] text-slate-500">CH₂O $\rightarrow$ C₂H₄O₂</div>
+              </button>
+              <button type="button" onclick="loadPreset('benzene')" id="btn-pre-benzene" class="p-2.5 rounded-2xl border-2 border-teal-500 bg-teal-50 text-teal-950 font-prompt text-left transition hover:shadow-sm">
+                <div class="font-bold text-sm">เบนซีน (Benzene)</div>
+                <div class="text-[11px] text-slate-500">CH $\rightarrow$ C₆H₆</div>
+              </button>
+              <button type="button" onclick="loadPreset('butane')" id="btn-pre-butane" class="p-2.5 rounded-2xl border-2 border-slate-200 bg-white text-slate-700 font-prompt text-left transition hover:border-teal-300">
+                <div class="font-bold text-sm">บิวเทน (Butane)</div>
+                <div class="text-[11px] text-slate-500">C₂H₅ $\rightarrow$ C₄H₁₀</div>
+              </button>
+            </div>
+          </div>
+
+          <!-- Element Input Rows Container -->
+          <div class="space-y-3">
+            <div class="flex items-center justify-between">
+              <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider font-prompt">
+                2. ข้อมูลองค์ประกอบของธาตุ (มวลหรือร้อยละโดยมวล):
+              </label>
+            </div>
+
+            <div id="element-rows-container" class="space-y-2.5">
+              <!-- Dynamically populated rows -->
+            </div>
+
+            <button type="button" onclick="addElementRow()" class="w-full py-2 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-dashed border-emerald-300 rounded-xl text-xs font-prompt font-semibold transition flex items-center justify-center gap-1.5">
+              <i class="fa-solid fa-plus-circle"></i> เพิ่มธาตุในสารประกอบ
+            </button>
+          </div>
+
+          <!-- Molar Mass Input Box -->
+          <div class="p-4 rounded-2xl bg-teal-50/70 border border-teal-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div>
+              <label class="text-xs font-bold text-teal-950 uppercase font-prompt flex items-center gap-1.5">
+                <i class="fa-solid fa-scale-balanced text-teal-600"></i> มวลโมเลกุลจริง (Molar Mass) :
+              </label>
+              <span class="text-[11px] text-teal-800 font-sarabun">ระบุเพื่อคำนวณหาสูตรโมเลกุลในสเต็ปที่ 5</span>
+            </div>
+            <div class="flex items-center gap-1.5">
+              <input type="number" id="input-molar-mass" step="0.01" min="1" value="78.11" oninput="onLiveInputChange()" class="w-28 text-right font-mono font-bold text-sm bg-white border border-teal-300 rounded-xl px-2.5 py-1 text-teal-900 focus:outline-none focus:ring-2 focus:ring-teal-500">
+              <span class="text-xs font-prompt font-semibold text-teal-800">g/mol</span>
+            </div>
+          </div>
+
+          <!-- Reset / Live Indicator -->
+          <div class="flex flex-wrap items-center justify-between gap-2 pt-1 border-t border-slate-100">
+            <span class="text-xs text-emerald-600 font-prompt flex items-center gap-1.5 font-medium">
+              <i class="fa-solid fa-circle-check text-emerald-500"></i> คำนวณแบบสดอัตโนมัติ (Live Real-Time)
+            </span>
+            <button onclick="resetLabToDefault()" class="px-3.5 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs sm:text-sm font-prompt font-semibold transition flex items-center gap-1.5">
+              <i class="fa-solid fa-rotate-left"></i> คืนค่าเริ่มต้น
+            </button>
+          </div>
+
+        </div>
+
+        <!-- 5-Step Visualizer Output Column (5 Cols) -->
+        <div class="lg:col-span-5 space-y-6">
+          
+          <div class="bg-gradient-to-br from-slate-900 via-teal-950 to-slate-900 text-white rounded-3xl p-6 sm:p-7 border border-teal-500/30 shadow-2xl space-y-5">
+            
+            <div class="flex items-center justify-between pb-3 border-b border-slate-700">
+              <span class="text-xs font-prompt font-bold text-teal-300 uppercase tracking-wider flex items-center gap-1.5">
+                <i class="fa-solid fa-chart-simple"></i> ผลการคำนวณทีละสเต็ป (STEP-BY-STEP)
+              </span>
+              <span class="text-[11px] font-mono text-slate-400 bg-white/10 px-2 py-0.5 rounded">Live Engine</span>
+            </div>
+
+            <!-- Big Formula Reveal Cards (With proper chemical subscripts) -->
+            <div class="grid grid-cols-2 gap-3 text-center">
+              <div class="bg-white/5 p-3.5 rounded-2xl border border-white/10">
+                <span class="text-[11px] text-slate-400 font-prompt block mb-1">สูตรเอมพิริคัล (EMPIRICAL)</span>
+                <span class="text-2xl sm:text-3xl font-extrabold text-cyan-300 font-mono chem-formula" id="disp-emp-formula">CH</span>
+                <span class="text-[11px] text-slate-400 block font-mono mt-1" id="disp-emp-mass">มวลสูตร: 13.02 g/mol</span>
+              </div>
+              <div class="bg-white/5 p-3.5 rounded-2xl border border-white/10">
+                <span class="text-[11px] text-slate-400 font-prompt block mb-1">สูตรโมเลกุล (MOLECULAR)</span>
+                <span class="text-2xl sm:text-3xl font-extrabold text-amber-300 font-mono chem-formula" id="disp-mol-formula">C<sub>6</sub>H<sub>6</sub></span>
+                <span class="text-[11px] text-emerald-300 block font-prompt font-bold mt-1" id="disp-n-factor">ตัวคูณ n = 6 (จาก 78.1 ÷ 13.0)</span>
+              </div>
+            </div>
+
+            <!-- Mathematical Breakdown of 5 Steps (Clear TeX & Formatting) -->
+            <div class="bg-black/50 rounded-2xl p-4 border border-slate-700/80 space-y-3 text-xs math-step-container">
+              
+              <!-- Step 1-2 -->
+              <div class="space-y-1">
+                <div class="text-emerald-400 font-prompt font-bold text-xs flex items-center gap-1.5">
+                  <span>สเต็ป 1-2 (มวล $\rightarrow$ โมล):</span>
+                </div>
+                <div id="step-1-2-output" class="font-mono text-slate-200 pl-2 leading-relaxed">
+                  <!-- Populated dynamically with clean TeX -->
+                </div>
+              </div>
+
+              <!-- Step 3-4 -->
+              <div class="space-y-1 pt-2 border-t border-slate-800">
+                <div class="text-emerald-400 font-prompt font-bold text-xs flex items-center gap-1.5">
+                  <span>สเต็ป 3-4 (อัตราส่วนอย่างต่ำ):</span>
+                </div>
+                <div id="step-3-4-output" class="font-mono text-slate-200 pl-2 leading-relaxed">
+                  <!-- Populated dynamically without raw text leaks -->
+                </div>
+              </div>
+
+              <!-- Step 5 -->
+              <div class="space-y-1 pt-2 border-t border-slate-800">
+                <div class="text-emerald-400 font-prompt font-bold text-xs flex items-center gap-1.5">
+                  <span>สเต็ป 5 (หาสูตรโมเลกุล):</span>
+                </div>
+                <div id="step-5-output" class="font-mono text-amber-300 pl-2 leading-relaxed">
+                  <!-- Populated dynamically with clean TeX -->
+                </div>
+              </div>
+
+            </div>
+
+            <!-- Visual Atoms in 1 Molecule -->
+            <div class="space-y-2">
+              <div class="flex justify-between items-center text-xs font-prompt text-slate-400">
+                <span>สัดส่วนอะตอมใน 1 โมเลกุลจริง:</span>
+                <span id="disp-total-atoms-badge" class="font-mono text-teal-300 font-bold">12 อะตอมใน 1 โมเลกุล</span>
+              </div>
+              <div id="atom-spheres-cluster" class="p-3 bg-white/5 rounded-2xl border border-white/10 flex flex-wrap gap-1.5 items-center justify-center min-h-[50px]">
+                <!-- Injected spheres -->
+              </div>
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ========================================================================= -->
+    <!-- SECTION 3 : ใบงานแบบฝึกทักษะ 10 ข้อ (Warm Amber Theme & Isolated Print)   -->
+    <!-- ========================================================================= -->
+    <section id="worksheet-section" class="space-y-6">
+      
+      <!-- Control Banner (Completely hidden during printing) -->
+      <div class="no-print bg-gradient-to-r from-amber-600 via-orange-600 to-amber-700 rounded-3xl p-6 sm:p-8 text-white shadow-xl flex flex-col md:flex-row items-center justify-between gap-6">
+        <div class="space-y-1 text-center md:text-left">
+          <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/20 text-white text-xs font-bold uppercase font-prompt">
+            <i class="fa-solid fa-file-pen"></i> เอกสารการเรียนรู้
+          </div>
+          <h2 class="text-2xl sm:text-3xl font-extrabold font-prompt">ใบงานแบบฝึกทักษะ: สูตรเคมี (10 ข้อ)</h2>
+          <p class="text-amber-100 text-xs sm:text-sm">
+            กดปุ่มสั่งพิมพ์เพื่อพิมพ์เฉพาะตัวใบงาน โดยระบบจะซ่อนส่วนอื่นๆ ของหน้าเว็บทั้งหมดอัตโนมัติ
+          </p>
+        </div>
+
+        <div class="flex flex-wrap items-center justify-center gap-3">
+          <button onclick="toggleWorksheetSolutions()" id="btn-toggle-solutions" class="px-4 py-2.5 rounded-xl bg-amber-900/60 hover:bg-amber-900 text-white font-prompt font-semibold text-xs sm:text-sm transition flex items-center gap-2 border border-amber-400/40">
+            <i class="fa-solid fa-eye" id="toggle-icon"></i> <span id="toggle-text">แสดงเฉลยบนหน้าจอ</span>
+          </button>
+          <button onclick="printStudentWorksheet()" class="px-5 py-2.5 rounded-xl bg-white text-amber-900 hover:bg-amber-50 font-prompt font-bold text-xs sm:text-sm transition shadow-md flex items-center gap-2">
+            <i class="fa-solid fa-user-graduate text-amber-700"></i> พิมพ์ใบงานสำหรับนักเรียน
+          </button>
+          <button onclick="printTeacherKey()" class="px-5 py-2.5 rounded-xl bg-slate-900 text-amber-300 hover:bg-slate-800 font-prompt font-bold text-xs sm:text-sm transition shadow-md flex items-center gap-2">
+            <i class="fa-solid fa-chalkboard-user"></i> พิมพ์เฉลยสำหรับครู
+          </button>
+        </div>
+      </div>
+
+      <!-- Printable Worksheet Content (Strictly isolated during print) -->
+      <div id="printable-worksheet-card" class="bg-white rounded-3xl p-6 sm:p-10 border border-slate-300 shadow-xl space-y-6">
+        
+        <!-- Document Paper Header -->
+        <div class="border-b-2 border-slate-900 pb-5">
+          <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
+            <div>
+              <h3 class="text-xl sm:text-2xl font-bold font-prompt text-slate-950">ใบงานแบบฝึกทักษะ: เรื่อง สูตรเอมพิริคัลและสูตรโมเลกุล</h3>
+              <p class="text-slate-600 text-xs sm:text-sm font-prompt">กลุ่มสาระการเรียนรู้วิทยาศาสตร์และเทคโนโลยี • รายวิชาเคมีเพิ่มเติม ม.4</p>
+            </div>
+            <div class="text-right">
+              <span id="worksheet-status-badge" class="inline-block px-3 py-1 rounded-lg border-2 border-slate-800 text-xs font-prompt font-bold text-slate-900">
+                ฉบับนักเรียน (Student Worksheet)
+              </span>
+              <p class="text-[11px] text-slate-500 mt-1 font-prompt">คะแนนเต็ม 20 คะแนน (ข้อละ 2 คะแนน)</p>
+            </div>
+          </div>
+
+          <div class="mt-4 pt-3 border-t border-dashed border-slate-400 grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs sm:text-sm font-prompt text-slate-800">
+            <div>ชื่อ-สกุล : .....................................................................</div>
+            <div>ชั้น ม.4 / ........ เลขที่ : ............</div>
+            <div>วันที่ : ........ / ........................ / ............</div>
+          </div>
+
+          <div class="mt-3 p-2.5 bg-amber-50/70 border border-amber-200 rounded-xl text-xs text-amber-950 font-mono">
+            <strong>กำหนดมวลอะตอมสำหรับทำใบงาน:</strong> $\text{H}=1.01,\ \text{C}=12.01,\ \text{N}=14.01,\ \text{O}=16.00,\ \text{Na}=22.99,\ \text{Mg}=24.31,\ \text{P}=30.97,\ \text{S}=32.06,\ \text{Cl}=35.45,\ \text{Fe}=55.85$
+          </div>
+        </div>
+
+        <!-- 10 Questions Cards (Page Break Avoidance Applied) -->
+        <div class="space-y-5">
+          
+          <!-- ข้อ 1 -->
+          <div class="question-card p-5 rounded-2xl bg-slate-50 border border-slate-200 space-y-2">
+            <div class="font-bold font-prompt text-sm sm:text-base text-slate-900">
+              ข้อ 1. สารประกอบชนิดหนึ่งประกอบด้วยกำมะถัน ($\text{S}$) ร้อยละ 50.05 และออกซิเจน ($\text{O}$) ร้อยละ 49.95 โดยมวล จงคำนวณหาสูตรเอมพิริคัลของสารประกอบนี้
+            </div>
+            <div class="student-write-area min-h-[85px] border border-dashed border-slate-300 rounded-xl bg-white p-3 font-sans text-xs">
+              <div class="text-slate-400 font-prompt workspace-prompt">
+                วิธีทำ : <br><br>
+                ตอบ : .........................................................................................................................................................
+              </div>
+            </div>
+            <div class="teacher-solution text-slate-800 space-y-1">
+              <span class="font-bold text-emerald-800 font-prompt">แนวทางการเฉลยละเอียด :</span>
+              <div>1) หาสัดส่วนโมล: $n_{\text{S}} = \frac{50.05}{32.06} = 1.561\text{ mol}$, $n_{\text{O}} = \frac{49.95}{16.00} = 3.122\text{ mol}$</div>
+              <div>2) หารด้วยโมลต่ำสุด ($1.561$): $\text{S} = \frac{1.561}{1.561} = 1.00$, $\text{O} = \frac{3.122}{1.561} = 2.00$</div>
+              <div>3) อัตราส่วนจำนวนเต็ม $\text{S} : \text{O} = 1 : 2$</div>
+              <div class="font-bold text-amber-800 font-prompt">ตอบ : สูตรเอมพิริคัล คือ $\mathbf{SO_2}$ (ซัลเฟอร์ไดออกไซด์)</div>
+            </div>
+          </div>
+
+          <!-- ข้อ 2 -->
+          <div class="question-card p-5 rounded-2xl bg-slate-50 border border-slate-200 space-y-2">
+            <div class="font-bold font-prompt text-sm sm:text-base text-slate-900">
+              ข้อ 2. สารไฮโดรคาร์บอนชนิดหนึ่งประกอบด้วยคาร์บอน ($\text{C}$) ร้อยละ 82.66 และไฮโดรเจน ($\text{H}$) ร้อยละ 17.34 โดยมวล จงหาสูตรเอมพิริคัล และถ้าสารนี้มีมวลโมเลกุลเท่ากับ 58.12 g/mol จงหาสูตรโมเลกุล
+            </div>
+            <div class="student-write-area min-h-[85px] border border-dashed border-slate-300 rounded-xl bg-white p-3 font-sans text-xs">
+              <div class="text-slate-400 font-prompt workspace-prompt">
+                วิธีทำ : <br><br>
+                ตอบ : .........................................................................................................................................................
+              </div>
+            </div>
+            <div class="teacher-solution text-slate-800 space-y-1">
+              <span class="font-bold text-emerald-800 font-prompt">แนวทางการเฉลยละเอียด :</span>
+              <div>1) โมล: $n_{\text{C}} = \frac{82.66}{12.01} = 6.883$, $n_{\text{H}} = \frac{17.34}{1.01} = 17.168$</div>
+              <div>2) หารด้วย $6.883$: $\text{C} = 1.00$, $\text{H} = 2.49 \approx 2.50$ (พบทศนิยม .5 ให้คูณ 2 ตลอด)</div>
+              <div>3) อัตราส่วน: $\text{C} = 1 \times 2 = 2$, $\text{H} = 2.5 \times 2 = 5 \implies$ สูตรเอมพิริคัล คือ $\mathbf{C_2H_5}$</div>
+              <div>4) มวลสูตร $\text{C}_2\text{H}_5 = (2 \times 12.01) + (5 \times 1.01) = 29.07\text{ g/mol}$</div>
+              <div>5) หาค่า $n = \frac{58.12}{29.07} \approx 2 \implies$ สูตรโมเลกุล คือ $(\text{C}_2\text{H}_5)_2 = \mathbf{C_4H_{10}}$</div>
+              <div class="font-bold text-amber-800 font-prompt">ตอบ : สูตรเอมพิริคัล คือ $\mathbf{C_2H_5}$ และสูตรโมเลกุล คือ $\mathbf{C_4H_{10}}$ (บิวเทน)</div>
+            </div>
+          </div>
+
+          <!-- ข้อ 3 -->
+          <div class="question-card p-5 rounded-2xl bg-slate-50 border border-slate-200 space-y-2">
+            <div class="font-bold font-prompt text-sm sm:text-base text-slate-900">
+              ข้อ 3. เมื่อนำผงเหล็ก ($\text{Fe}$) มวล 5.585 กรัม มาทำปฏิกิริยากับแก๊สออกซิเจนจนสมบูรณ์ ได้ออกไซด์ของเหล็กมวล 7.985 กรัม จงคำนวณหาสูตรเอมพิริคัลของสารประกอบออกไซด์นี้
+            </div>
+            <div class="student-write-area min-h-[85px] border border-dashed border-slate-300 rounded-xl bg-white p-3 font-sans text-xs">
+              <div class="text-slate-400 font-prompt workspace-prompt">
+                วิธีทำ : <br><br>
+                ตอบ : .........................................................................................................................................................
+              </div>
+            </div>
+            <div class="teacher-solution text-slate-800 space-y-1">
+              <span class="font-bold text-emerald-800 font-prompt">แนวทางการเฉลยละเอียด :</span>
+              <div>1) มวล $\text{Fe} = 5.585\text{ g}$, มวล $\text{O} = 7.985 - 5.585 = 2.400\text{ g}$</div>
+              <div>2) โมล: $n_{\text{Fe}} = \frac{5.585}{55.85} = 0.100\text{ mol}$, $n_{\text{O}} = \frac{2.400}{16.00} = 0.150\text{ mol}$</div>
+              <div>3) หารด้วย $0.100$: $\text{Fe} = 1.00$, $\text{O} = 1.50$ (คูณ 2 ทั้งหมด $\implies \text{Fe} = 2, \text{O} = 3$)</div>
+              <div class="font-bold text-amber-800 font-prompt">ตอบ : สูตรเอมพิริคัล คือ $\mathbf{Fe_2O_3}$ (ไอรอน(III)ออกไซด์)</div>
+            </div>
+          </div>
+
+          <!-- ข้อ 4 -->
+          <div class="question-card p-5 rounded-2xl bg-slate-50 border border-slate-200 space-y-2">
+            <div class="font-bold font-prompt text-sm sm:text-base text-slate-900">
+              ข้อ 4. สารอินทรีย์ชนิดหนึ่งมีสูตรเอมพิริคัลเป็น $\text{CH}_2\text{O}$ จากการทดลองพบว่าสารนี้ปริมาณ 0.50 โมล มีมวลเท่ากับ 30.03 กรัม จงคำนวณหาสูตรโมเลกุลของสารอินทรีย์นี้
+            </div>
+            <div class="student-write-area min-h-[85px] border border-dashed border-slate-300 rounded-xl bg-white p-3 font-sans text-xs">
+              <div class="text-slate-400 font-prompt workspace-prompt">
+                วิธีทำ : <br><br>
+                ตอบ : .........................................................................................................................................................
+              </div>
+            </div>
+            <div class="teacher-solution text-slate-800 space-y-1">
+              <span class="font-bold text-emerald-800 font-prompt">แนวทางการเฉลยละเอียด :</span>
+              <div>1) มวลโมเลกุลจริง $= \frac{30.03\text{ g}}{0.50\text{ mol}} = 60.06\text{ g/mol}$</div>
+              <div>2) มวลสูตรเอมพิริคัล $\text{CH}_2\text{O} = 12.01 + (2 \times 1.01) + 16.00 = 30.03\text{ g/mol}$</div>
+              <div>3) ค่า $n = \frac{60.06}{30.03} = 2 \implies \text{สูตรโมเลกุล} = (\text{CH}_2\text{O})_2 = \mathbf{C_2H_4O_2}$</div>
+              <div class="font-bold text-amber-800 font-prompt">ตอบ : สูตรโมเลกุล คือ $\mathbf{C_2H_4O_2}$ (กรดแอซีติก)</div>
+            </div>
+          </div>
+
+          <!-- ข้อ 5 -->
+          <div class="question-card p-5 rounded-2xl bg-slate-50 border border-slate-200 space-y-2">
+            <div class="font-bold font-prompt text-sm sm:text-base text-slate-900">
+              ข้อ 5. กรดแอสคอร์บิก (วิตามินซี) ประกอบด้วย $\text{C}$ 40.92%, $\text{H}$ 4.58% และ $\text{O}$ 54.50% โดยมวล มีมวลโมเลกุล 176.12 g/mol จงคำนวณหาสูตรเอมพิริคัลและสูตรโมเลกุล
+            </div>
+            <div class="student-write-area min-h-[85px] border border-dashed border-slate-300 rounded-xl bg-white p-3 font-sans text-xs">
+              <div class="text-slate-400 font-prompt workspace-prompt">
+                วิธีทำ : <br><br>
+                ตอบ : .........................................................................................................................................................
+              </div>
+            </div>
+            <div class="teacher-solution text-slate-800 space-y-1">
+              <span class="font-bold text-emerald-800 font-prompt">แนวทางการเฉลยละเอียด :</span>
+              <div>1) โมล: $n_{\text{C}} = \frac{40.92}{12.01} = 3.407$, $n_{\text{H}} = \frac{4.58}{1.01} = 4.535$, $n_{\text{O}} = \frac{54.50}{16.00} = 3.406$</div>
+              <div>2) หารด้วย $3.406$: $\text{C} = 1.00$, $\text{H} = 1.33$, $\text{O} = 1.00$ (พบเศษ .33 ให้คูณ 3 ทั้งหมด)</div>
+              <div>3) อัตราส่วน: $\text{C} = 3, \text{H} = 4, \text{O} = 3 \implies$ สูตรเอมพิริคัล คือ $\mathbf{C_3H_4O_3}$ (มวลสูตร $= 88.07\text{ g/mol}$)</div>
+              <div>4) ค่า $n = \frac{176.12}{88.07} \approx 2 \implies \text{สูตรโมเลกุล} = (\text{C}_3\text{H}_4\text{O}_3)_2 = \mathbf{C_6H_8O_6}$</div>
+              <div class="font-bold text-amber-800 font-prompt">ตอบ : สูตรเอมพิริคัล คือ $\mathbf{C_3H_4O_3}$ และสูตรโมเลกุล คือ $\mathbf{C_6H_8O_6}$</div>
+            </div>
+          </div>
+
+          <!-- ข้อ 6 -->
+          <div class="question-card p-5 rounded-2xl bg-slate-50 border border-slate-200 space-y-2">
+            <div class="font-bold font-prompt text-sm sm:text-base text-slate-900">
+              ข้อ 6. แก๊สชนิดหนึ่งมีสูตรเอมพิริคัลเป็น $\text{CH}_2$ แก๊สนี้ปริมาตร $5.60\text{ dm}^3$ ที่ STP มีมวลเท่ากับ $10.50\text{ g}$ จงคำนวณหาสูตรโมเลกุลของแก๊สนี้
+            </div>
+            <div class="student-write-area min-h-[85px] border border-dashed border-slate-300 rounded-xl bg-white p-3 font-sans text-xs">
+              <div class="text-slate-400 font-prompt workspace-prompt">
+                วิธีทำ : <br><br>
+                ตอบ : .........................................................................................................................................................
+              </div>
+            </div>
+            <div class="teacher-solution text-slate-800 space-y-1">
+              <span class="font-bold text-emerald-800 font-prompt">แนวทางการเฉลยละเอียด :</span>
+              <div>1) หาโมลแก๊สที่ STP: $n = \frac{5.60}{22.4} = 0.25\text{ mol}$</div>
+              <div>2) มวลโมเลกุล $= \frac{10.50\text{ g}}{0.25\text{ mol}} = 42.00\text{ g/mol}$</div>
+              <div>3) มวลสูตร $\text{CH}_2 = 12.01 + (2 \times 1.01) = 14.03\text{ g/mol}$</div>
+              <div>4) ค่า $n = \frac{42.00}{14.03} \approx 3 \implies \text{สูตรโมเลกุล} = (\text{CH}_2)_3 = \mathbf{C_3H_6}$</div>
+              <div class="font-bold text-amber-800 font-prompt">ตอบ : สูตรโมเลกุล คือ $\mathbf{C_3H_6}$ (โพรพีลีน)</div>
+            </div>
+          </div>
+
+          <!-- ข้อ 7 -->
+          <div class="question-card p-5 rounded-2xl bg-slate-50 border border-slate-200 space-y-2">
+            <div class="font-bold font-prompt text-sm sm:text-base text-slate-900">
+              ข้อ 7. เมื่อเผาไหม้สารไฮโดรคาร์บอนตัวอย่างมวล 4.40 กรัม อย่างสมบูรณ์ เกิดแก๊ส $\text{CO}_2$ 13.20 กรัม และไอน้ำ $\text{H}_2\text{O}$ 7.20 กรัม จงคำนวณหาสูตรเอมพิริคัลของไฮโดรคาร์บอนนี้
+            </div>
+            <div class="student-write-area min-h-[85px] border border-dashed border-slate-300 rounded-xl bg-white p-3 font-sans text-xs">
+              <div class="text-slate-400 font-prompt workspace-prompt">
+                วิธีทำ : <br><br>
+                ตอบ : .........................................................................................................................................................
+              </div>
+            </div>
+            <div class="teacher-solution text-slate-800 space-y-1">
+              <span class="font-bold text-emerald-800 font-prompt">แนวทางการเฉลยละเอียด :</span>
+              <div>1) มวล $\text{C} = 13.20 \times \frac{12.01}{44.01} = 3.60\text{ g}$, มวล $\text{H} = 7.20 \times \frac{2.02}{18.02} = 0.80\text{ g}$</div>
+              <div>2) โมล: $n_{\text{C}} = \frac{3.60}{12.01} = 0.30\text{ mol}$, $n_{\text{H}} = \frac{0.80}{1.01} = 0.792\text{ mol}$</div>
+              <div>3) อัตราส่วนโมล $\text{C} : \text{H} = 0.30 : 0.792 \approx 1 : 2.64 \approx \frac{3}{10} : \frac{8}{10} = 3 : 8$</div>
+              <div class="font-bold text-amber-800 font-prompt">ตอบ : สูตรเอมพิริคัล คือ $\mathbf{C_3H_8}$ (โพรเพน)</div>
+            </div>
+          </div>
+
+          <!-- ข้อ 8 -->
+          <div class="question-card p-5 rounded-2xl bg-slate-50 border border-slate-200 space-y-2">
+            <div class="font-bold font-prompt text-sm sm:text-base text-slate-900">
+              ข้อ 8. สารประกอบออกไซด์ของฟอสฟอรัสประกอบด้วย $\text{P}$ 43.64% และ $\text{O}$ 56.36% โดยมวล มีมวลโมเลกุลเท่ากับ 283.88 g/mol จงคำนวณหาสูตรเอมพิริคัลและสูตรโมเลกุล
+            </div>
+            <div class="student-write-area min-h-[85px] border border-dashed border-slate-300 rounded-xl bg-white p-3 font-sans text-xs">
+              <div class="text-slate-400 font-prompt workspace-prompt">
+                วิธีทำ : <br><br>
+                ตอบ : .........................................................................................................................................................
+              </div>
+            </div>
+            <div class="teacher-solution text-slate-800 space-y-1">
+              <span class="font-bold text-emerald-800 font-prompt">แนวทางการเฉลยละเอียด :</span>
+              <div>1) โมล: $n_{\text{P}} = \frac{43.64}{30.97} = 1.409$, $n_{\text{O}} = \frac{56.36}{16.00} = 3.523$</div>
+              <div>2) หารด้วย $1.409$: $\text{P} = 1.00$, $\text{O} = 2.50 \xrightarrow{\times 2} \text{P} = 2, \text{O} = 5 \implies$ สูตรเอมพิริคัล คือ $\mathbf{P_2O_5}$</div>
+              <div>3) มวลสูตร $\text{P}_2\text{O}_5 = (2 \times 30.97) + (5 \times 16.00) = 141.94\text{ g/mol}$</div>
+              <div>4) ค่า $n = \frac{283.88}{141.94} = 2 \implies \text{สูตรโมเลกุล} = (\text{P}_2\text{O}_5)_2 = \mathbf{P_4O_{10}}$</div>
+              <div class="font-bold text-amber-800 font-prompt">ตอบ : สูตรเอมพิริคัล คือ $\mathbf{P_2O_5}$ และสูตรโมเลกุล คือ $\mathbf{P_4O_{10}}$</div>
+            </div>
+          </div>
+
+          <!-- ข้อ 9 -->
+          <div class="question-card p-5 rounded-2xl bg-slate-50 border border-slate-200 space-y-2">
+            <div class="font-bold font-prompt text-sm sm:text-base text-slate-900">
+              ข้อ 9. สารชนิดหนึ่งมีสูตรเอมพิริคัลเป็น $\text{C}_2\text{H}_4\text{O}$ ถ้าสารนี้จำนวน $1.204 \times 10^{23}$ โมเลกุล มีมวลเท่ากับ $17.62\text{ g}$ จงหาสูตรโมเลกุลของสารนี้
+            </div>
+            <div class="student-write-area min-h-[85px] border border-dashed border-slate-300 rounded-xl bg-white p-3 font-sans text-xs">
+              <div class="text-slate-400 font-prompt workspace-prompt">
+                วิธีทำ : <br><br>
+                ตอบ : .........................................................................................................................................................
+              </div>
+            </div>
+            <div class="teacher-solution text-slate-800 space-y-1">
+              <span class="font-bold text-emerald-800 font-prompt">แนวทางการเฉลยละเอียด :</span>
+              <div>1) หาโมลสาร: $n = \frac{1.204 \times 10^{23}}{6.02 \times 10^{23}} = 0.20\text{ mol}$</div>
+              <div>2) มวลโมเลกุล $= \frac{17.62\text{ g}}{0.20\text{ mol}} = 88.10\text{ g/mol}$</div>
+              <div>3) มวลสูตร $\text{C}_2\text{H}_4\text{O} = (2 \times 12.01) + (4 \times 1.01) + 16.00 = 44.06\text{ g/mol}$</div>
+              <div>4) ค่า $n = \frac{88.10}{44.06} \approx 2 \implies \text{สูตรโมเลกุล} = (\text{C}_2\text{H}_4\text{O})_2 = \mathbf{C_4H_8O_2}$</div>
+              <div class="font-bold text-amber-800 font-prompt">ตอบ : สูตรโมเลกุล คือ $\mathbf{C_4H_8O_2}$ (เอทิลแอซีเตต / ไดออกเซน)</div>
+            </div>
+          </div>
+
+          <!-- ข้อ 10 -->
+          <div class="question-card p-5 rounded-2xl bg-slate-50 border border-slate-200 space-y-2">
+            <div class="font-bold font-prompt text-sm sm:text-base text-slate-900">
+              ข้อ 10. เมื่อนำสารตัวอย่าง $\text{MgSO}_4\cdot x\text{H}_2\text{O}$ มวล 4.93 กรัม มาเผาจนน้ำระเหยออกหมด เหลือเกลือปราศจากน้ำ ($\text{MgSO}_4$) มวล 2.41 กรัม จงคำนวณหาค่าจำนวนเต็ม $x$ และระบุสูตรสมบูรณ์
+            </div>
+            <div class="student-write-area min-h-[85px] border border-dashed border-slate-300 rounded-xl bg-white p-3 font-sans text-xs">
+              <div class="text-slate-400 font-prompt workspace-prompt">
+                วิธีทำ : <br><br>
+                ตอบ : .........................................................................................................................................................
+              </div>
+            </div>
+            <div class="teacher-solution text-slate-800 space-y-1">
+              <span class="font-bold text-emerald-800 font-prompt">แนวทางการเฉลยละเอียด :</span>
+              <div>1) มวล $\text{MgSO}_4 = 2.41\text{ g}$, มวล $\text{H}_2\text{O} = 4.93 - 2.41 = 2.52\text{ g}$</div>
+              <div>2) มวลต่อโมล: $\text{MgSO}_4 = 120.37\text{ g/mol}$, $\text{H}_2\text{O} = 18.02\text{ g/mol}$</div>
+              <div>3) โมล: $n_{\text{MgSO}_4} = \frac{2.41}{120.37} = 0.0200$, $n_{\text{H}_2\text{O}} = \frac{2.52}{18.02} = 0.1398$</div>
+              <div>4) อัตราส่วน $\frac{0.1398}{0.0200} \approx 6.99 \approx 7$</div>
+              <div class="font-bold text-amber-800 font-prompt">ตอบ : ค่า $x = 7$ และสูตรสมบูรณ์ คือ $\mathbf{MgSO_4\cdot 7H_2O}$ (ดีเกลือฝรั่ง)</div>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ========================================================================= -->
+    <!-- SECTION 4 : เกณฑ์การประเมินรูบริก                                         -->
+    <!-- ========================================================================= -->
+    <section id="rubric-section" class="space-y-8">
+      
+      <div class="flex items-center gap-3.5 pb-3 border-b-2 border-purple-500">
+        <div class="w-10 h-10 rounded-xl bg-purple-600 text-white flex items-center justify-center font-bold text-lg shadow-md shadow-purple-200">
+          <i class="fa-solid fa-list-check"></i>
+        </div>
+        <div>
+          <span class="text-xs font-bold text-purple-600 uppercase tracking-widest font-prompt">เกณฑ์การวัดและประเมินผล</span>
+          <h2 class="text-2xl sm:text-3xl font-bold text-slate-900 font-prompt">เกณฑ์การประเมินผล (Rubric) แบบ 3 ระดับ</h2>
+        </div>
+      </div>
+
+      <div class="bg-white rounded-3xl p-6 sm:p-8 border border-purple-200 shadow-xl space-y-6">
+        
+        <div class="pb-3 border-b border-slate-200">
+          <h3 class="text-lg font-bold font-prompt text-slate-900">
+            เกณฑ์การประเมินตามสภาพจริง 3 ระดับ (คะแนนเต็ม 20 คะแนน, ข้อละ 2 คะแนน)
+          </h3>
+          <p class="text-xs text-slate-500 font-prompt mt-0.5">
+            ประเมินความเข้าใจมโนทัศน์สูตรเคมี ทักษะการตั้งสมการแปลงโมล และความถูกต้องในการหาสูตร
+          </p>
+        </div>
+
+        <!-- Rubric Table -->
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-sm border-collapse">
+            <thead>
+              <tr class="bg-purple-50 border-b-2 border-purple-200 text-purple-950 font-prompt">
+                <th class="p-4 w-1/4 rounded-tl-2xl font-bold text-sm sm:text-base">ประเด็นการประเมิน</th>
+                <th class="p-4 w-1/4 font-semibold text-emerald-900 bg-emerald-100/60 border-r border-slate-200">
+                  <div class="flex items-center gap-2 font-bold text-sm">
+                    <span class="w-6 h-6 rounded-full bg-emerald-600 text-white flex items-center justify-center text-xs">3</span>
+                    <span>ระดับดีมาก (2.0 คะแนน/ข้อ)</span>
+                  </div>
+                </th>
+                <th class="p-4 w-1/4 font-semibold text-amber-900 bg-amber-50/70 border-r border-slate-200">
+                  <div class="flex items-center gap-2 font-bold text-sm">
+                    <span class="w-6 h-6 rounded-full bg-amber-600 text-white flex items-center justify-center text-xs">2</span>
+                    <span>ระดับปานกลาง (1.0 - 1.5 คะแนน)</span>
+                  </div>
+                </th>
+                <th class="p-4 w-1/4 rounded-tr-2xl font-semibold text-rose-900 bg-rose-50/70">
+                  <div class="flex items-center gap-2 font-bold text-sm">
+                    <span class="w-6 h-6 rounded-full bg-rose-600 text-white flex items-center justify-center text-xs">1</span>
+                    <span>ระดับปรับปรุง (0.0 - 0.5 คะแนน)</span>
+                  </div>
+                </th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-200 font-sans">
+              
+              <!-- Criterion 1 -->
+              <tr class="hover:bg-slate-50/70 transition">
+                <td class="p-4 font-bold text-slate-900 align-top">
+                  <div class="font-prompt text-sm sm:text-base text-purple-900">1. การแปลงมวลและร้อยละเป็นโมล</div>
+                  <div class="text-xs text-slate-500 mt-1 font-normal">
+                    ความเข้าใจการตั้งสมมุติฐาน 100 g และการหารด้วยมวลอะตอม ($g/M$)
+                  </div>
+                </td>
+                <td class="p-4 align-top text-xs text-slate-700 bg-emerald-50/20 leading-relaxed">
+                  แปลงข้อมูลมวลหรือร้อยละเป็นโมลได้ถูกต้องทุกธาตุ แสดงทศนิยมไม่ต่ำกว่า 3 ตำแหน่งเพื่อรักษาความแม่นยำทางคณิตศาสตร์
+                </td>
+                <td class="p-4 align-top text-xs text-slate-700 bg-amber-50/20 leading-relaxed">
+                  แปลงข้อมูลเป็นโมลได้ถูกต้องเป็นส่วนใหญ่ แต่อาจปัดเศษทศนิยมเร็วเกินไป หรือแทนมวลอะตอมคลาดเคลื่อน 1 จุด
+                </td>
+                <td class="p-4 align-top text-xs text-slate-700 bg-rose-50/20 leading-relaxed">
+                  ไม่สามารถแปลงเป็นโมลได้ นำมวลมาคิดเป็นอัตราส่วนอะตอมโดยตรง หรือสับสนการใช้มวลอะตอม
+                </td>
+              </tr>
+
+              <!-- Criterion 2 -->
+              <tr class="hover:bg-slate-50/70 transition">
+                <td class="p-4 font-bold text-slate-900 align-top">
+                  <div class="font-prompt text-sm sm:text-base text-purple-900">2. การหาอัตราส่วนและสูตรเอมพิริคัล</div>
+                  <div class="text-xs text-slate-500 mt-1 font-normal">
+                    การหารด้วยโมลต่ำสุด และการคูณปรับทศนิยม (.5 หรือ .33) เป็นจำนวนเต็ม
+                  </div>
+                </td>
+                <td class="p-4 align-top text-xs text-slate-700 bg-emerald-50/20 leading-relaxed">
+                  หารด้วยโมลต่ำสุดถูกต้อง จัดการกรณีทศนิยมก้ำกึ่งด้วยตัวคูณที่ถูกต้องจนได้อัตราส่วนจำนวนเต็มอย่างต่ำ และเขียนสูตรห้อยตัวเลขสมบูรณ์
+                </td>
+                <td class="p-4 align-top text-xs text-slate-700 bg-amber-50/20 leading-relaxed">
+                  หารด้วยโมลต่ำสุดได้ แต่มีการปัดเศษทศนิยม .5 หรือ .33 ทิ้ง แทนการคูณด้วยตัวเลขที่เหมาะสม
+                </td>
+                <td class="p-4 align-top text-xs text-slate-700 bg-rose-50/20 leading-relaxed">
+                  หาอัตราส่วนโมลไม่ถูกต้อง หรือเขียนสัญลักษณ์สูตรเคมีผิดพลาด
+                </td>
+              </tr>
+
+              <!-- Criterion 3 -->
+              <tr class="hover:bg-slate-50/70 transition">
+                <td class="p-4 font-bold text-slate-900 align-top">
+                  <div class="font-prompt text-sm sm:text-base text-purple-900">3. การหาตัวคูณ n และสูตรโมเลกุล</div>
+                  <div class="text-xs text-slate-500 mt-1 font-normal">
+                    การเชื่อมโยงมวลโมเลกุลกับมวลสูตร และการแจกแจงสูตรโมเลกุล
+                  </div>
+                </td>
+                <td class="p-4 align-top text-xs text-slate-700 bg-emerald-50/20 leading-relaxed">
+                  คำนวณมวลสูตรเอมพิริคัลถูกต้อง ตั้งสมการหาค่า $n$ ได้ถูกต้อง และคูณแจกแจงเป็นสูตรโมเลกุลที่ถูกต้องสมบูรณ์
+                </td>
+                <td class="p-4 align-top text-xs text-slate-700 bg-amber-50/20 leading-relaxed">
+                  คำนวณค่า $n$ ได้ แต่มีจุดผิดพลาดเล็กน้อยในมวลสูตรเอมพิริคัล หรือเขียนตัวห้อยในสูตรโมเลกุลตกหล่น
+                </td>
+                <td class="p-4 align-top text-xs text-slate-700 bg-rose-50/20 leading-relaxed">
+                  ไม่สามารถหาค่า $n$ ได้ หรือไม่เข้าใจความสัมพันธ์ระหว่างสูตรเอมพิริคัลกับสูตรโมเลกุล
+                </td>
+              </tr>
+
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Grade Summary -->
+        <div class="bg-purple-50/70 rounded-2xl p-5 border border-purple-200">
+          <h4 class="font-bold text-purple-950 font-prompt text-sm mb-3">เกณฑ์สรุปการแปลผลระดับคุณภาพโดยรวม (คะแนนเต็ม 20 คะแนน) :</h4>
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs font-prompt">
+            <div class="p-3.5 bg-white rounded-xl border border-emerald-200">
+              <span class="font-bold text-emerald-800 text-sm block">16 - 20 คะแนน (ระดับดีมาก)</span>
+              <p class="text-slate-600 font-sans mt-1">เข้าใจกระบวนการหาสูตรเคมีอย่างถ่องแท้ สามารถคำนวณโจทย์ประยุกต์และโจทย์การเผาไหม้ได้อย่างแม่นยำ</p>
+            </div>
+            <div class="p-3.5 bg-white rounded-xl border border-amber-200">
+              <span class="font-bold text-amber-800 text-sm block">10 - 15 คะแนน (ระดับปานกลาง)</span>
+              <p class="text-slate-600 font-sans mt-1">หาสูตรเอมพิริคัลทั่วไปได้ดี ควรฝึกทักษะกรณีทศนิยมกึ่งหนึ่งและโจทย์เชื่อมโยงแก๊สที่ STP เพิ่มเติม</p>
+            </div>
+            <div class="p-3.5 bg-white rounded-xl border border-rose-200">
+              <span class="font-bold text-rose-800 text-sm block">0 - 9 คะแนน (ระดับปรับปรุง)</span>
+              <p class="text-slate-600 font-sans mt-1">ยังสับสนการแปลงมวลเป็นโมล แนะนำให้ฝึกปฏิบัติผ่านแบบจำลองในส่วนที่ 2 อย่างสม่ำเสมอ</p>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Clean footer -->
+  <footer class="no-print py-6 text-center text-xs text-slate-400 font-prompt">
+    รายวิชาเคมีเพิ่มเติม ม.4 • กลุ่มสาระการเรียนรู้วิทยาศาสตร์และเทคโนโลยี
+  </footer>
+
+  <script>
+    const PERIODIC_TABLE = [
+      { sym: 'H', mass: 1.01, color: '#38bdf8' },
+      { sym: 'C', mass: 12.01, color: '#64748b' },
+      { sym: 'N', mass: 14.01, color: '#818cf8' },
+      { sym: 'O', mass: 16.00, color: '#f87171' },
+      { sym: 'Na', mass: 22.99, color: '#fbbf24' },
+      { sym: 'Mg', mass: 24.31, color: '#34d399' },
+      { sym: 'P', mass: 30.97, color: '#fb923c' },
+      { sym: 'S', mass: 32.06, color: '#facc15' },
+      { sym: 'Cl', mass: 35.45, color: '#4ade80' },
+      { sym: 'Ca', mass: 40.08, color: '#a78bfa' },
+      { sym: 'Fe', mass: 55.85, color: '#e879f9' }
+    ];
+
+    const PRESETS = {
+      glucose: {
+        name: "กลูโคส (Glucose)",
+        molarMass: 180.16,
+        elements: [
+          { sym: 'C', mass: 40.00 },
+          { sym: 'H', mass: 6.72 },
+          { sym: 'O', mass: 53.28 }
+        ]
+      },
+      acetic: {
+        name: "กรดแอซีติก (Acetic Acid)",
+        molarMass: 60.05,
+        elements: [
+          { sym: 'C', mass: 40.00 },
+          { sym: 'H', mass: 6.72 },
+          { sym: 'O', mass: 53.28 }
+        ]
+      },
+      benzene: {
+        name: "เบนซีน (Benzene)",
+        molarMass: 78.11,
+        elements: [
+          { sym: 'C', mass: 92.26 },
+          { sym: 'H', mass: 7.74 }
+        ]
+      },
+      butane: {
+        name: "บิวเทน (Butane)",
+        molarMass: 58.12,
+        elements: [
+          { sym: 'C', mass: 82.66 },
+          { sym: 'H', mass: 17.34 }
+        ]
+      }
+    };
+
+    let activePreset = 'benzene';
+    let currentElements = [];
+    let solutionsVisible = false;
+
+    function triggerMathRender() {
+      if (window.MathJax && MathJax.typesetPromise) {
+        return MathJax.typesetPromise().catch(err => console.log('MathJax error: ', err));
+      }
+      return Promise.resolve();
+    }
+
+    function loadPreset(key) {
+      activePreset = key;
+      Object.keys(PRESETS).forEach(k => {
+        const btn = document.getElementById(`btn-pre-${k}`);
+        if (btn) {
+          if (k === key) {
+            btn.className = "p-2.5 rounded-2xl border-2 border-teal-500 bg-teal-50 text-teal-950 font-prompt text-left transition hover:shadow-sm";
+          } else {
+            btn.className = "p-2.5 rounded-2xl border-2 border-slate-200 bg-white text-slate-700 font-prompt text-left transition hover:border-teal-300";
+          }
+        }
+      });
+
+      const p = PRESETS[key];
+      document.getElementById('input-molar-mass').value = p.molarMass.toFixed(2);
+      currentElements = JSON.parse(JSON.stringify(p.elements));
+
+      renderElementRows();
+      recalculateFormulas();
+    }
+
+    function resetLabToDefault() {
+      loadPreset(activePreset);
+    }
+
+    function renderElementRows() {
+      const container = document.getElementById('element-rows-container');
+      if (!container) return;
+      container.innerHTML = '';
+
+      currentElements.forEach((el, idx) => {
+        const row = document.createElement('div');
+        row.className = "flex items-center gap-2 p-2.5 rounded-2xl bg-slate-50 border border-slate-200 hover:border-teal-300 transition";
+
+        let selectOptions = '';
+        PERIODIC_TABLE.forEach(pt => {
+          const sel = pt.sym === el.sym ? 'selected' : '';
+          selectOptions += `<option value="${pt.sym}" ${sel}>${pt.sym} (${pt.mass.toFixed(2)})</option>`;
+        });
+
+        row.innerHTML = `
+          <div class="flex-1">
+            <select onchange="updateElementSymbol(${idx}, this.value)" class="w-full bg-white border border-slate-300 rounded-xl px-2.5 py-1 text-xs font-mono font-bold text-slate-800 focus:outline-none focus:ring-2 focus:ring-teal-500">
+              ${selectOptions}
+            </select>
+          </div>
+          <div class="w-28 flex items-center gap-1">
+            <input type="number" step="0.01" min="0.01" value="${el.mass}" oninput="updateElementMass(${idx}, this.value)" class="w-full text-right font-mono font-bold text-xs bg-white border border-slate-300 rounded-xl px-2 py-1 text-slate-800 focus:outline-none focus:ring-2 focus:ring-teal-500">
+            <span class="text-[11px] text-slate-500 font-prompt">g/%</span>
+          </div>
+          ${currentElements.length > 1 ? `
+            <button type="button" onclick="removeElementRow(${idx})" class="p-1 text-slate-400 hover:text-rose-500 transition" title="ลบธาตุนี้">
+              <i class="fa-solid fa-trash-can text-xs"></i>
+            </button>
+          ` : '<div class="w-5"></div>'}
+        `;
+
+        container.appendChild(row);
+      });
+    }
+
+    function updateElementSymbol(idx, sym) {
+      currentElements[idx].sym = sym;
+      recalculateFormulas();
+    }
+
+    function updateElementMass(idx, val) {
+      currentElements[idx].mass = parseFloat(val) || 0.01;
+      recalculateFormulas();
+    }
+
+    function addElementRow() {
+      const unused = PERIODIC_TABLE.find(pt => !currentElements.some(e => e.sym === pt.sym)) || PERIODIC_TABLE[0];
+      currentElements.push({ sym: unused.sym, mass: 10.00 });
+      renderElementRows();
+      recalculateFormulas();
+    }
+
+    function removeElementRow(idx) {
+      if (currentElements.length <= 1) return;
+      currentElements.splice(idx, 1);
+      renderElementRows();
+      recalculateFormulas();
+    }
+
+    function onLiveInputChange() {
+      recalculateFormulas();
+    }
+
+    function recalculateFormulas() {
+      if (currentElements.length === 0) return;
+
+      const molarMassInput = parseFloat(document.getElementById('input-molar-mass').value) || 0;
+
+      // 1) Step 1-2: Calculate Moles
+      const moleData = currentElements.map(e => {
+        const pt = PERIODIC_TABLE.find(p => p.sym === e.sym) || { mass: 12.01, color: '#64748b' };
+        const moles = e.mass > 0 ? (e.mass / pt.mass) : 0;
+        return {
+          sym: e.sym,
+          mass: e.mass,
+          atomicMass: pt.mass,
+          color: pt.color,
+          moles: moles
+        };
+      });
+
+      const validMoles = moleData.map(d => d.moles).filter(m => m > 0);
+      if (validMoles.length === 0) return;
+
+      const minMoles = Math.min(...validMoles);
+
+      // 2) Step 3: Divide by min moles
+      moleData.forEach(d => {
+        d.ratio = minMoles > 0 ? (d.moles / minMoles) : 0;
+      });
+
+      // 3) Step 4: Find integer multiplier (handle .5, .33, .25)
+      let bestMult = 1;
+      let minDiff = 999;
+      for (let m = 1; m <= 6; m++) {
+        let maxDev = 0;
+        moleData.forEach(d => {
+          const val = d.ratio * m;
+          const dev = Math.abs(val - Math.round(val));
+          if (dev > maxDev) maxDev = dev;
+        });
+        if (maxDev < 0.12 && maxDev < minDiff) {
+          minDiff = maxDev;
+          bestMult = m;
+          break;
+        }
+      }
+
+      let empiricalMass = 0;
+      let empiricalFormulaHTML = '';
+      let empiricalFormulaTeX = '';
+
+      moleData.forEach(d => {
+        d.intCount = Math.max(1, Math.round(d.ratio * bestMult));
+        empiricalMass += d.intCount * d.atomicMass;
+
+        empiricalFormulaHTML += `${d.sym}${d.intCount > 1 ? `<sub>${d.intCount}</sub>` : ''}`;
+        empiricalFormulaTeX += `${d.sym}${d.intCount > 1 ? `_{${d.intCount}}` : ''}`;
+      });
+
+      // 4) Step 5: Molecular Multiplier n
+      let nFactor = 1;
+      if (molarMassInput > 0 && empiricalMass > 0) {
+        nFactor = Math.max(1, Math.round(molarMassInput / empiricalMass));
+      }
+
+      let molecularFormulaHTML = '';
+      let molecularFormulaTeX = '';
+      let totalAtomsCount = 0;
+      const sphereCluster = [];
+
+      moleData.forEach(d => {
+        const molCount = d.intCount * nFactor;
+        totalAtomsCount += molCount;
+
+        molecularFormulaHTML += `${d.sym}${molCount > 1 ? `<sub>${molCount}</sub>` : ''}`;
+        molecularFormulaTeX += `${d.sym}${molCount > 1 ? `_{${molCount}}` : ''}`;
+
+        for (let i = 0; i < Math.min(molCount, 16); i++) {
+          sphereCluster.push({ sym: d.sym, color: d.color });
+        }
+      });
+
+      // Update Card Visuals (Ensure subscripts)
+      document.getElementById('disp-emp-formula').innerHTML = empiricalFormulaHTML;
+      document.getElementById('disp-emp-mass').textContent = `มวลสูตร: ${empiricalMass.toFixed(2)} g/mol`;
+
+      document.getElementById('disp-mol-formula').innerHTML = molecularFormulaHTML;
+      document.getElementById('disp-n-factor').textContent = `ตัวคูณ n = ${nFactor} (จาก ${molarMassInput.toFixed(1)} ÷ ${empiricalMass.toFixed(1)})`;
+      document.getElementById('disp-total-atoms-badge').textContent = `${totalAtomsCount} อะตอมใน 1 โมเลกุล`;
+
+      // 5) Update Mathematical Step-by-Step Details (Clean, no leaks)
+      // Step 1-2
+      const step12Elem = document.getElementById('step-1-2-output');
+      if (step12Elem) {
+        step12Elem.innerHTML = moleData.map(d => 
+          `• $n_{\\text{${d.sym}}} = \\frac{${d.mass.toFixed(2)}}{${d.atomicMass.toFixed(2)}} = ${d.moles.toFixed(3)}\\text{ mol}$`
+        ).join('<br>');
+      }
+
+      // Step 3-4 (Fixed: Clean formatting without \text{...} leaks)
+      const step34Elem = document.getElementById('step-3-4-output');
+      if (step34Elem) {
+        const ratioFormulaTeX = moleData.map(d => `\\text{${d.sym}}:${d.intCount}`).join(' : ');
+        step34Elem.innerHTML = `
+          <div>• หารด้วยโมลต่ำสุด (${minMoles.toFixed(3)})${bestMult > 1 ? ` แล้วคูณด้วย ${bestMult}` : ''}</div>
+          <div class="text-teal-300">$$\\rightarrow \\text{อัตราส่วน} = ${ratioFormulaTeX}$$</div>
+          <div class="text-cyan-300">$$\\implies \\text{สูตรเอมพิริคัล: } \\mathbf{${empiricalFormulaTeX}} \\text{ (มวล = ${empiricalMass.toFixed(2)} g/mol)}$$</div>
+        `;
+      }
+
+      // Step 5 (Fixed: Clean formatting without = C_6H_6 leak)
+      const step5Elem = document.getElementById('step-5-output');
+      if (step5Elem) {
+        step5Elem.innerHTML = `
+          <div>$$n = \\frac{\\text{มวลโมเลกุล}}{\\text{มวลสูตรเอมพิริคัล}} = \\frac{${molarMassInput.toFixed(2)}}{${empiricalMass.toFixed(2)}} \\approx \\mathbf{${nFactor}}$$</div>
+          <div class="text-amber-300">$$\\implies \\text{สูตรโมเลกุล: } (${empiricalFormulaTeX})_{${nFactor}} = \\mathbf{${molecularFormulaTeX}}$$</div>
+        `;
+      }
+
+      // Render Atom Spheres Cluster
+      const clusterBox = document.getElementById('atom-spheres-cluster');
+      if (clusterBox) {
+        clusterBox.innerHTML = '';
+        sphereCluster.forEach(item => {
+          const sphere = document.createElement('div');
+          sphere.className = "w-7 h-7 rounded-full flex items-center justify-center text-white text-[10px] font-bold shadow-md transform hover:scale-110 transition cursor-default";
+          sphere.style.backgroundColor = item.color;
+          sphere.textContent = item.sym;
+          clusterBox.appendChild(sphere);
+        });
+
+        if (totalAtomsCount > sphereCluster.length) {
+          const extraBadge = document.createElement('span');
+          extraBadge.className = "text-[11px] text-slate-400 font-prompt px-2";
+          extraBadge.textContent = `+ อีก ${totalAtomsCount - sphereCluster.length} อะตอม`;
+          clusterBox.appendChild(extraBadge);
+        }
+      }
+
+      triggerMathRender();
+    }
+
+    // Toggle solutions on screen
+    function toggleWorksheetSolutions() {
+      solutionsVisible = !solutionsVisible;
+      const solutions = document.querySelectorAll('.teacher-solution');
+      const writeAreas = document.querySelectorAll('.student-write-area');
+      const toggleText = document.getElementById('toggle-text');
+      const toggleIcon = document.getElementById('toggle-icon');
+
+      if (solutionsVisible) {
+        solutions.forEach(s => s.classList.add('show'));
+        writeAreas.forEach(w => w.classList.add('hide-on-screen'));
+        if (toggleText) toggleText.textContent = 'ซ่อนเฉลยบนหน้าจอ';
+        if (toggleIcon) toggleIcon.className = 'fa-solid fa-eye-slash';
+      } else {
+        solutions.forEach(s => s.classList.remove('show'));
+        writeAreas.forEach(w => w.classList.remove('hide-on-screen'));
+        if (toggleText) toggleText.textContent = 'แสดงเฉลยบนหน้าจอ';
+        if (toggleIcon) toggleIcon.className = 'fa-solid fa-eye';
+      }
+      triggerMathRender();
+    }
+
+    // Student Print Mode
+    function printStudentWorksheet() {
+      document.body.classList.remove('print-mode-teacher');
+      document.body.classList.add('print-mode-student');
+
+      const badge = document.getElementById('worksheet-status-badge');
+      if (badge) {
+        badge.textContent = 'ฉบับนักเรียน (Student Worksheet)';
+        badge.className = 'inline-block px-3 py-1 rounded-lg border-2 border-slate-800 text-xs font-prompt font-bold text-slate-900 bg-white';
+      }
+
+      triggerMathRender().then(() => {
+        setTimeout(() => {
+          window.print();
+        }, 200);
+      });
+    }
+
+    // Teacher Answer Key Print Mode
+    function printTeacherKey() {
+      document.body.classList.remove('print-mode-student');
+      document.body.classList.add('print-mode-teacher');
+
+      const badge = document.getElementById('worksheet-status-badge');
+      if (badge) {
+        badge.textContent = 'ฉบับเฉลยสำหรับครูผู้สอน (Teacher Answer Key)';
+        badge.className = 'inline-block px-3 py-1 rounded-lg bg-amber-500 text-slate-950 font-prompt font-bold text-xs border border-amber-600';
+      }
+
+      triggerMathRender().then(() => {
+        setTimeout(() => {
+          window.print();
+        }, 300);
+      });
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      loadPreset('benzene');
+      setTimeout(triggerMathRender, 300);
+    });
+  </script>
+</body>
+</html>

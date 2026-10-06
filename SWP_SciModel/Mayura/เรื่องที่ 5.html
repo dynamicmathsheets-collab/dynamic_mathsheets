@@ -1,0 +1,1236 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>เคมี ม.4 • โมลและสูตรเคมี เรื่องที่ 5: องค์ประกอบของสารประกอบ</title>
+
+  <!-- Google Fonts: Prompt, Sarabun, Fira Code -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&family=Prompt:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=Sarabun:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome 6 Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+
+  <!-- MathJax 3 Configuration -->
+  <script>
+    window.MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']],
+        displayMath: [['$$', '$$'], ['\\[', '\\]']],
+        processEscapes: true
+      },
+      options: {
+        skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+      }
+    };
+  </script>
+  <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            prompt: ['Prompt', 'sans-serif'],
+            sarabun: ['Sarabun', 'sans-serif'],
+            mono: ['Fira Code', 'monospace']
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    body {
+      font-family: 'Sarabun', sans-serif;
+      background-color: #f8fafc;
+      color: #1e293b;
+    }
+
+    h1, h2, h3, h4, .font-heading {
+      font-family: 'Prompt', sans-serif;
+    }
+
+    input[type=range] {
+      accent-color: #0284c7;
+    }
+
+    .math-step-container {
+      word-break: break-word;
+      overflow-x: hidden;
+    }
+
+    /* On-Screen Solution Toggle Display */
+    .teacher-solution {
+      display: none;
+    }
+    .teacher-solution.show {
+      display: block !important;
+    }
+
+    .student-write-area.hide-on-screen {
+      display: none !important;
+    }
+
+    /* ==============================================================
+       STRICT PRINT CONFIGURATION (ISOLATES WORKSHEET ONLY)
+       ============================================================== */
+    @media print {
+      @page {
+        size: A4;
+        margin: 14mm 12mm 14mm 12mm;
+      }
+
+      body {
+        background: #ffffff !important;
+        color: #000000 !important;
+        margin: 0 !important;
+        padding: 0 !important;
+      }
+
+      header,
+      #concept-section,
+      #interactive-section,
+      #rubric-section,
+      footer,
+      .no-print {
+        display: none !important;
+      }
+
+      #worksheet-section {
+        display: block !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        border: none !important;
+        box-shadow: none !important;
+      }
+
+      #printable-worksheet-card {
+        border: none !important;
+        box-shadow: none !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        width: 100% !important;
+      }
+
+      /* Prevent breaking question and solution/write area across pages */
+      .question-card {
+        break-inside: avoid !important;
+        page-break-inside: avoid !important;
+        margin-bottom: 1.15rem !important;
+        border: 1px solid #94a3b8 !important;
+        background: #ffffff !important;
+        padding: 0.9rem !important;
+      }
+
+      .student-write-area {
+        min-height: 85px !important;
+        border: 1px dashed #94a3b8 !important;
+        background-color: #ffffff !important;
+      }
+
+      /* TEACHER PRINT MODE */
+      body.print-mode-teacher .teacher-solution {
+        display: block !important;
+        visibility: visible !important;
+        background-color: #f1f5f9 !important;
+        border-left: 4px solid #0f172a !important;
+        color: #0f172a !important;
+        padding: 10px 14px !important;
+        margin-top: 8px !important;
+        border-radius: 6px !important;
+      }
+
+      body.print-mode-teacher .student-write-area {
+        display: none !important;
+      }
+
+      /* STUDENT PRINT MODE */
+      body.print-mode-student .teacher-solution {
+        display: none !important;
+      }
+
+      body.print-mode-student .student-write-area {
+        display: block !important;
+      }
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col antialiased selection:bg-sky-500 selection:text-white">
+
+  <!-- ========================================================================= -->
+  <!-- TOP BANNER                                                                -->
+  <!-- ========================================================================= -->
+  <header class="no-print bg-gradient-to-r from-slate-900 via-sky-950 to-slate-900 text-white border-b border-sky-900/60 shadow-lg py-8">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 text-center md:text-left">
+      <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-sky-500/20 border border-sky-400/30 text-sky-300 text-xs font-semibold uppercase tracking-wider font-prompt mb-3">
+        <i class="fa-solid fa-atom"></i> รายวิชาเคมี ม.4 • หน่วยการเรียนรู้ที่ 4
+      </div>
+      <h1 class="text-3xl sm:text-4xl lg:text-5xl font-extrabold font-prompt tracking-tight text-white">
+        โมลและสูตรเคมี <span class="text-slate-400 font-normal">|</span> <span class="bg-clip-text text-transparent bg-gradient-to-r from-sky-400 via-blue-300 to-teal-300">เรื่องที่ 5: องค์ประกอบของสารประกอบ</span>
+      </h1>
+    </div>
+  </header>
+
+  <!-- Continuous Single-Page Flow -->
+  <main class="flex-grow max-w-6xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-16">
+
+    <!-- ========================================================================= -->
+    <!-- SECTION 1 : สรุปสาระสำคัญ (Sapphire Blue / Sky Blue Theme)                -->
+    <!-- ========================================================================= -->
+    <section id="concept-section" class="space-y-8">
+      
+      <div class="flex items-center gap-3.5 pb-3 border-b-2 border-sky-500">
+        <div class="w-10 h-10 rounded-xl bg-sky-600 text-white flex items-center justify-center font-bold text-lg shadow-md shadow-sky-200">
+          <i class="fa-solid fa-book-open"></i>
+        </div>
+        <div>
+          <span class="text-xs font-bold text-sky-600 uppercase tracking-widest font-prompt">ทฤษฎีและหลักการพื้นฐาน</span>
+          <h2 class="text-2xl sm:text-3xl font-bold text-slate-900 font-prompt">สรุปสาระสำคัญ: กฎสัดส่วนคงที่และองค์ประกอบของสารประกอบ</h2>
+        </div>
+      </div>
+
+      <!-- Core Principle Cards -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        
+        <!-- Card 1: กฎสัดส่วนคงที่ -->
+        <div class="bg-white rounded-3xl p-6 border-2 border-sky-100 shadow-sm hover:shadow-md transition-all flex flex-col justify-between">
+          <div>
+            <div class="flex items-center justify-between mb-4">
+              <span class="px-3 py-1 rounded-full text-xs font-semibold bg-sky-100 text-sky-800 font-prompt">หลักการที่ 1</span>
+              <i class="fa-solid fa-balance-scale text-sky-500 text-xl"></i>
+            </div>
+            <h3 class="text-lg font-bold text-slate-900 font-prompt mb-2">กฎสัดส่วนคงที่ (Law of Definite Proportions)</h3>
+            <p class="text-slate-600 text-sm leading-relaxed mb-4">
+              เสนอโดย <em>โจเซฟ เพราสต์ (Joseph Proust)</em> ระบุว่า <strong>"เมื่อธาตุตั้งแต่ 2 ชนิดขึ้นไปรวมตัวกันเกิดเป็นสารประกอบชนิดหนึ่ง อัตราส่วนโดยมวลของธาตุที่เป็นองค์ประกอบจะมีค่าคงที่เสมอ"</strong> ไม่ว่าจะเตรียมด้วยวิธีใดหรือมาจากแหล่งใดในธรรมชาติ
+            </p>
+
+            <div class="bg-sky-50/90 rounded-2xl p-4 border border-sky-200 text-xs text-sky-950 space-y-2">
+              <div class="font-bold font-prompt text-sky-900">อัตราส่วนโดยมวลคงที่:</div>
+              <div class="p-2 bg-white rounded-xl border border-sky-100 text-center font-mono font-bold text-sky-800 text-xs">
+                $\text{มวลธาตุ A} : \text{มวลธาตุ B} = \text{ค่าคงที่ (Constant)}$
+              </div>
+              <p class="text-[11px] text-slate-600 leading-normal">
+                หากเติมสารตั้งต้นตัวใดตัวหนึ่งมากเกินพอ สารส่วนเกินจะไม่ทำปฏิกิริยาและจะเหลืออยู่
+              </p>
+            </div>
+          </div>
+
+          <div class="mt-4 pt-3 border-t border-slate-100 text-xs text-slate-500 font-medium">
+            <i class="fa-solid fa-circle-check text-sky-500 mr-1"></i> ตัวอย่าง: น้ำบริสุทธิ์ ($\text{H}_2\text{O}$) มีมวล $\text{H} : \text{O} \approx 1 : 8$ เสมอ
+          </div>
+        </div>
+
+        <!-- Card 2: ร้อยละโดยมวลของธาตุ -->
+        <div class="bg-white rounded-3xl p-6 border-2 border-blue-100 shadow-sm hover:shadow-md transition-all flex flex-col justify-between">
+          <div>
+            <div class="flex items-center justify-between mb-4">
+              <span class="px-3 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-800 font-prompt">หลักการที่ 2</span>
+              <i class="fa-solid fa-percent text-blue-500 text-xl"></i>
+            </div>
+            <h3 class="text-lg font-bold text-slate-900 font-prompt mb-2">ร้อยละโดยมวลของธาตุ (% by mass)</h3>
+            <p class="text-slate-600 text-sm leading-relaxed mb-4">
+              แสดงสัดส่วนมวลของธาตุองค์ประกอบแต่ละชนิดที่มีอยู่ในสารประกอบ 100 ส่วนโดยมวล สามารถคำนวณได้ทั้งจากมวลที่วัดจริงจากการทดลอง หรือจากสูตรเคมีของสาร
+            </p>
+
+            <div class="bg-blue-50/90 rounded-2xl p-4 border border-blue-200 text-xs text-blue-950 space-y-2">
+              <div class="font-bold font-prompt text-blue-900">สูตรคำนวณร้อยละโดยมวล:</div>
+              <div class="p-2 bg-white rounded-xl border border-blue-100 text-center font-mono font-bold text-blue-800 text-xs">
+                $$\% \text{ ธาตุ} = \frac{\text{มวลของธาตุ}}{\text{มวลรวมของสารประกอบ}} \times 100$$
+              </div>
+              <div class="p-1.5 bg-white rounded-xl border border-blue-100 text-center font-mono text-slate-700 text-[11px]">
+                $$\% \text{ ธาตุ} = \frac{n \times \text{มวลอะตอมของธาตุ}}{\text{มวลโมเลกุลหรือมวลสูตร}} \times 100$$
+              </div>
+            </div>
+          </div>
+
+          <div class="mt-4 pt-3 border-t border-slate-100 text-xs text-slate-500 font-medium">
+            <i class="fa-solid fa-circle-check text-blue-500 mr-1"></i> ผลรวมร้อยละโดยมวลของทุกธาตุในสารประกอบต้องรวมกันได้ $100\%$
+          </div>
+        </div>
+
+        <!-- Card 3: การเชื่อมโยงสู่สูตรเคมี -->
+        <div class="bg-white rounded-3xl p-6 border-2 border-indigo-100 shadow-sm hover:shadow-md transition-all flex flex-col justify-between">
+          <div>
+            <div class="flex items-center justify-between mb-4">
+              <span class="px-3 py-1 rounded-full text-xs font-semibold bg-indigo-100 text-indigo-800 font-prompt">หลักการที่ 3</span>
+              <i class="fa-solid fa-microchip text-indigo-500 text-xl"></i>
+            </div>
+            <h3 class="text-lg font-bold text-slate-900 font-prompt mb-2">สะพานเชื่อมสู่การหาสูตรเคมี</h3>
+            <p class="text-slate-600 text-sm leading-relaxed mb-4">
+              ข้อมูลอัตราส่วนโดยมวลและร้อยละโดยมวล คือข้อมูลปฐมภูมิที่นักเคมีใช้ในการวิเคราะห์ธาตุองค์ประกอบ เพื่อแปลงเป็น <strong>อัตราส่วนโดยโมล</strong> สำหรับหาสูตรอย่างง่าย (สูตรเอมพิริคัล)
+            </p>
+
+            <div class="bg-indigo-50/90 rounded-2xl p-4 border border-indigo-200 text-xs text-indigo-950 space-y-2">
+              <div class="font-bold font-prompt text-indigo-900">ขั้นตอนการวิเคราะห์องค์ประกอบ:</div>
+              <div class="p-2 bg-white rounded-xl border border-indigo-100 text-center font-bold text-indigo-800 text-[11px]">
+                มวลธาตุ / % มวล $\rightarrow$ โมล ($\div \text{มวลอะตอม}$) $\rightarrow$ อัตราส่วนอย่างต่ำ $\rightarrow$ สูตรเคมี
+              </div>
+              <p class="text-[11px] text-slate-600 leading-normal">
+                หากอัตราส่วนโดยมวลเปลี่ยน แสดงว่าเป็นคนละสารประกอบ (เช่น $\text{CO}$ กับ $\text{CO}_2$ หรือ $\text{H}_2\text{O}$ กับ $\text{H}_2\text{O}_2$)
+              </p>
+            </div>
+          </div>
+
+          <div class="mt-4 pt-3 border-t border-slate-100 text-xs text-slate-500 font-medium">
+            <i class="fa-solid fa-circle-check text-indigo-500 mr-1"></i> เป็นพื้นฐานสำคัญสำหรับเรื่องที่ 6 (สูตรเอมพิริคัลและสูตรโมเลกุล)
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Conceptual Walkthrough Card -->
+      <div class="bg-gradient-to-br from-slate-900 via-sky-950 to-blue-950 rounded-3xl p-6 sm:p-8 text-white shadow-xl">
+        <div class="max-w-4xl space-y-5">
+          <div class="flex items-center gap-2 text-sky-300 font-prompt text-sm font-semibold tracking-wide uppercase">
+            <i class="fa-solid fa-calculator"></i> ตัวอย่างการคำนวณละเอียด: กฎสัดส่วนคงที่และร้อยละโดยมวล
+          </div>
+          <h3 class="text-xl sm:text-2xl font-bold font-prompt">
+            ตัวอย่าง: การวิเคราะห์องค์ประกอบของคาร์บอนไดออกไซด์ ($\text{CO}_2$) และน้ำบริสุทธิ์ ($\text{H}_2\text{O}$)
+          </h3>
+          
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
+            <div class="bg-white/10 backdrop-blur-md rounded-2xl p-5 border border-white/15 space-y-3 text-xs sm:text-sm">
+              <div class="flex justify-between items-center pb-2 border-b border-white/10">
+                <span class="font-bold text-sky-300 font-prompt">1. คาร์บอนไดออกไซด์ ($\text{CO}_2$, $M = 44.01\text{ g/mol}$)</span>
+                <span class="px-2 py-0.5 rounded bg-sky-500/20 text-sky-200 text-xs font-mono">C = 12.01, O = 32.00</span>
+              </div>
+              <div class="space-y-1 font-mono text-slate-200">
+                <div>• อัตราส่วนโดยมวล $\text{C} : \text{O} = 12.01 : 32.00 \approx \mathbf{3 : 8}$</div>
+                <div>• $\% \text{C} = \frac{12.01}{44.01} \times 100 = \mathbf{27.29\%}$</div>
+                <div>• $\% \text{O} = \frac{32.00}{44.01} \times 100 = \mathbf{72.71\%}$</div>
+                <div class="text-amber-300 pt-1 border-t border-white/10 font-bold">
+                  ไม่ว่าจะเตรียมจากปฏิกิริยาใด $\% \text{C}$ และ $\% \text{O}$ จะคงที่เสมอ
+                </div>
+              </div>
+            </div>
+
+            <div class="bg-white/10 backdrop-blur-md rounded-2xl p-5 border border-white/15 space-y-3 text-xs sm:text-sm">
+              <div class="flex justify-between items-center pb-2 border-b border-white/10">
+                <span class="font-bold text-teal-300 font-prompt">2. น้ำบริสุทธิ์ ($\text{H}_2\text{O}$, $M = 18.02\text{ g/mol}$)</span>
+                <span class="px-2 py-0.5 rounded bg-teal-500/20 text-teal-200 text-xs font-mono">H = 2.02, O = 16.00</span>
+              </div>
+              <div class="space-y-1 font-mono text-slate-200">
+                <div>• อัตราส่วนโดยมวล $\text{H} : \text{O} = 2.02 : 16.00 \approx \mathbf{1 : 7.92} \approx \mathbf{1 : 8}$</div>
+                <div>• $\% \text{H} = \frac{2.02}{18.02} \times 100 = \mathbf{11.21\%}$</div>
+                <div>• $\% \text{O} = \frac{16.00}{18.02} \times 100 = \mathbf{88.79\%}$</div>
+                <div class="text-amber-300 pt-1 border-t border-white/10 font-bold">
+                  หากนำ $\text{H}_2$ $4\text{ g}$ ทำกับ $\text{O}_2$ $16\text{ g}$ จะเกิดน้ำ $18\text{ g}$ และมี $\text{H}_2$ เหลือ $2\text{ g}$
+                </div>
+              </div>
+            </div>
+          </div>
+          <p class="text-xs text-sky-200 bg-white/5 p-3 rounded-xl border border-white/10 font-sarabun">
+            <strong>หัวใจสำคัญ:</strong> อัตราส่วนโดยมวลของสารประกอบหนึ่งๆ จะเป็นค่าเฉพาะตัวเสมอ การเปลี่ยนสัดส่วนมวลของสารตั้งต้นไม่สามารถเปลี่ยนอัตราส่วนการรวมตัวของสารประกอบเดิมได้ แต่จะทำให้เกิดสารเหลือ หรือเกิดเป็นสารประกอบชนิดอื่นที่มีโครงสร้างโมเลกุลต่างกัน
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================================================= -->
+    <!-- SECTION 2 : แบบจำลองเชิงโต้ตอบ (Deep Teal / Emerald Green Theme)          -->
+    <!-- ========================================================================= -->
+    <section id="interactive-section" class="space-y-8">
+      
+      <div class="flex items-center gap-3.5 pb-3 border-b-2 border-teal-500">
+        <div class="w-10 h-10 rounded-xl bg-teal-600 text-white flex items-center justify-center font-bold text-lg shadow-md shadow-teal-200">
+          <i class="fa-solid fa-flask-vial"></i>
+        </div>
+        <div>
+          <span class="text-xs font-bold text-teal-600 uppercase tracking-widest font-prompt">แบบจำลองเชิงโต้ตอบ</span>
+          <h2 class="text-2xl sm:text-3xl font-bold text-slate-900 font-prompt">โมเดลจำลอง: เครื่องผสมสารประกอบและตรวจสอบกฎสัดส่วนคงที่</h2>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+        
+        <!-- Controls Column (7 Cols) -->
+        <div class="lg:col-span-7 bg-white rounded-3xl p-6 sm:p-8 border border-teal-200 shadow-lg space-y-6">
+          
+          <!-- Compound Preset Selector -->
+          <div class="space-y-3 pb-4 border-b border-slate-100">
+            <div class="flex items-center justify-between">
+              <label class="block text-xs font-bold text-slate-600 uppercase tracking-wider font-prompt">
+                1. เลือกสารประกอบเป้าหมายเพื่อทดสอบกฎสัดส่วนคงที่
+              </label>
+              <span id="target-compound-badge" class="text-xs font-mono font-bold text-teal-700 bg-teal-50 px-2.5 py-0.5 rounded-lg border border-teal-200">
+                น้ำ (H₂O) : H : O ≈ 1 : 7.92
+              </span>
+            </div>
+
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
+              <button type="button" onclick="selectCompound('H2O')" id="btn-comp-H2O" class="p-2.5 rounded-2xl border-2 border-teal-500 bg-teal-50 text-teal-950 font-prompt text-left transition hover:shadow-sm">
+                <div class="font-bold text-sm">น้ำ (H₂O)</div>
+                <div class="text-[11px] text-slate-500">H : O ≈ 1 : 8</div>
+              </button>
+              <button type="button" onclick="selectCompound('CO2')" id="btn-comp-CO2" class="p-2.5 rounded-2xl border-2 border-slate-200 bg-white text-slate-700 font-prompt text-left transition hover:border-teal-300">
+                <div class="font-bold text-sm">CO₂</div>
+                <div class="text-[11px] text-slate-500">C : O ≈ 3 : 8</div>
+              </button>
+              <button type="button" onclick="selectCompound('MgO')" id="btn-comp-MgO" class="p-2.5 rounded-2xl border-2 border-slate-200 bg-white text-slate-700 font-prompt text-left transition hover:border-teal-300">
+                <div class="font-bold text-sm">MgO (แมกนีเซียมออกไซด์)</div>
+                <div class="text-[11px] text-slate-500">Mg : O ≈ 3 : 2</div>
+              </button>
+              <button type="button" onclick="selectCompound('H2O2')" id="btn-comp-H2O2" class="p-2.5 rounded-2xl border-2 border-slate-200 bg-white text-slate-700 font-prompt text-left transition hover:border-teal-300">
+                <div class="font-bold text-sm">H₂O₂ (ไฮโดรเจนเปอร์ออกไซด์)</div>
+                <div class="text-[11px] text-slate-500">H : O ≈ 1 : 16</div>
+              </button>
+            </div>
+          </div>
+
+          <!-- Dual Element Mass Inputs -->
+          <div class="space-y-4">
+            <div class="flex items-center justify-between">
+              <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider font-prompt">
+                2. ปรับมวลของสารตั้งต้นแต่ละชนิด (กรัม) เพื่อทดลองผสมสาร
+              </label>
+              <button type="button" onclick="setStoichiometricRatio()" class="px-3 py-1 bg-teal-600 hover:bg-teal-700 text-white rounded-xl text-xs font-prompt font-semibold shadow-sm transition flex items-center gap-1.5">
+                <i class="fa-solid fa-wand-magic-sparkles"></i> ปรับมวลให้พอดีเป๊ะ (สัดส่วนคงที่)
+              </button>
+            </div>
+
+            <!-- Element A Mass Input -->
+            <div class="p-4 rounded-2xl bg-sky-50/70 border border-sky-200 space-y-2">
+              <div class="flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                  <span id="dot-elmA" class="w-3.5 h-3.5 rounded-full bg-sky-500"></span>
+                  <label id="label-elmA" class="text-xs font-bold text-sky-950 uppercase font-prompt">มวลของไฮโดรเจน (H) :</label>
+                </div>
+                <div class="flex items-center gap-1">
+                  <input type="number" id="input-massA" step="0.1" min="0.1" max="100.0" value="2.02" oninput="onMassAChange(this.value)" class="w-24 text-right font-mono font-bold text-sm bg-white border border-sky-300 rounded-xl px-2.5 py-1 text-sky-900 focus:outline-none focus:ring-2 focus:ring-sky-500">
+                  <span class="text-xs font-prompt font-semibold text-sky-800">กรัม</span>
+                </div>
+              </div>
+              <input type="range" id="slider-massA" min="0.1" max="50.0" step="0.1" value="2.02" oninput="onMassAChange(this.value)" class="w-full h-2.5 bg-sky-200 rounded-lg cursor-pointer">
+              <div class="flex justify-between text-[11px] text-slate-500 font-mono">
+                <span>0.1 g</span>
+                <span>25.0 g</span>
+                <span>50.0 g</span>
+              </div>
+            </div>
+
+            <!-- Element B Mass Input -->
+            <div class="p-4 rounded-2xl bg-teal-50/70 border border-teal-200 space-y-2">
+              <div class="flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                  <span id="dot-elmB" class="w-3.5 h-3.5 rounded-full bg-teal-600"></span>
+                  <label id="label-elmB" class="text-xs font-bold text-teal-950 uppercase font-prompt">มวลของออกซิเจน (O) :</label>
+                </div>
+                <div class="flex items-center gap-1">
+                  <input type="number" id="input-massB" step="0.5" min="0.5" max="200.0" value="16.00" oninput="onMassBChange(this.value)" class="w-24 text-right font-mono font-bold text-sm bg-white border border-teal-300 rounded-xl px-2.5 py-1 text-teal-900 focus:outline-none focus:ring-2 focus:ring-teal-500">
+                  <span class="text-xs font-prompt font-semibold text-teal-800">กรัม</span>
+                </div>
+              </div>
+              <input type="range" id="slider-massB" min="0.5" max="100.0" step="0.5" value="16.0" oninput="onMassBChange(this.value)" class="w-full h-2.5 bg-teal-200 rounded-lg cursor-pointer">
+              <div class="flex justify-between text-[11px] text-slate-500 font-mono">
+                <span>0.5 g</span>
+                <span>50.0 g</span>
+                <span>100.0 g</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Quick Scale Buttons -->
+          <div class="flex flex-wrap items-center gap-2 pt-1 border-t border-slate-100">
+            <span class="text-xs text-slate-500 font-prompt">จำลองเพิ่มขนาดการทดลอง:</span>
+            <button onclick="multiplyReaction(2)" class="px-2.5 py-1 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-prompt font-semibold transition">× 2 เท่า</button>
+            <button onclick="multiplyReaction(5)" class="px-2.5 py-1 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-prompt font-semibold transition">× 5 เท่า</button>
+            <button onclick="addExcessA()" class="px-2.5 py-1 rounded-xl bg-amber-50 hover:bg-amber-100 text-amber-800 border border-amber-200 text-xs font-prompt font-semibold transition">+ ธาตุ A เกินพอ</button>
+            <button onclick="addExcessB()" class="px-2.5 py-1 rounded-xl bg-amber-50 hover:bg-amber-100 text-amber-800 border border-amber-200 text-xs font-prompt font-semibold transition">+ ธาตุ B เกินพอ</button>
+          </div>
+
+        </div>
+
+        <!-- Real-time Verifier & Analysis Output (5 Cols) -->
+        <div class="lg:col-span-5 space-y-6">
+          
+          <!-- Definite Proportions Status Box -->
+          <div class="bg-gradient-to-br from-slate-900 via-teal-950 to-slate-900 text-white rounded-3xl p-6 sm:p-7 border border-teal-500/30 shadow-2xl space-y-5">
+            
+            <div class="flex items-center justify-between pb-3 border-b border-slate-700">
+              <span class="text-xs font-prompt font-bold text-teal-300 uppercase tracking-wider">
+                ผลการวิเคราะห์กฎสัดส่วนคงที่
+              </span>
+              <span class="text-[11px] font-mono text-slate-400">Live Reaction Engine</span>
+            </div>
+
+            <!-- Law Compliance Status Badge -->
+            <div id="status-card" class="p-4 rounded-2xl bg-emerald-500/10 border-2 border-emerald-400/40 text-center space-y-1.5 transition-all">
+              <div class="inline-flex items-center gap-2 text-emerald-300 font-prompt font-bold text-sm" id="status-heading">
+                <i class="fa-solid fa-circle-check text-base"></i> สอดคล้องตามกฎสัดส่วนคงที่พอดีเป๊ะ
+              </div>
+              <p class="text-xs text-slate-300 font-sarabun" id="status-detail">
+                สารทั้งสองทำปฏิกิริยากันหมดพอดี ไม่มีสารใดเหลือ เกิดสารประกอบเป้าหมายบริสุทธิ์
+              </p>
+            </div>
+
+            <!-- Yield & Leftover Metric Grid -->
+            <div class="grid grid-cols-2 gap-3 text-center">
+              <div class="bg-white/5 p-3 rounded-2xl border border-white/10">
+                <span class="text-[11px] text-slate-400 font-prompt block">มวลสารประกอบที่เกิด</span>
+                <span class="text-2xl font-extrabold text-teal-300 font-mono" id="yield-mass-display">18.02</span>
+                <span class="text-[11px] text-slate-400 block font-prompt">กรัม</span>
+              </div>
+              <div class="bg-white/5 p-3 rounded-2xl border border-white/10">
+                <span class="text-[11px] text-slate-400 font-prompt block">สารตั้งต้นที่เหลือ</span>
+                <span class="text-xl font-extrabold text-amber-300 font-mono" id="leftover-mass-display">0.00</span>
+                <span class="text-[11px] text-slate-400 block font-prompt" id="leftover-name-display">ไม่มีสารเหลือ</span>
+              </div>
+            </div>
+
+            <!-- Mass Ratio & % Composition -->
+            <div class="bg-black/50 rounded-2xl p-4 border border-slate-700/80 space-y-3 text-xs">
+              <div class="flex justify-between items-center pb-2 border-b border-slate-800">
+                <span class="text-slate-400 font-prompt font-semibold">อัตราส่วนโดยมวลที่ทำปฏิกิริยาจริง:</span>
+                <span class="font-mono font-bold text-amber-300 text-sm" id="ratio-actual-display">1.00 : 7.92</span>
+              </div>
+              
+              <!-- Multi-color Percentage Bar -->
+              <div class="space-y-1.5">
+                <div class="flex justify-between text-[11px] font-mono">
+                  <span class="text-sky-300 font-bold" id="pct-label-A">H: 11.21%</span>
+                  <span class="text-teal-300 font-bold" id="pct-label-B">O: 88.79%</span>
+                </div>
+                <div class="w-full h-3.5 bg-slate-800 rounded-full overflow-hidden flex border border-slate-700 shadow-inner">
+                  <div id="bar-pct-A" class="h-full bg-sky-500 transition-all duration-300" style="width: 11.21%"></div>
+                  <div id="bar-pct-B" class="h-full bg-teal-500 transition-all duration-300" style="width: 88.79%"></div>
+                </div>
+              </div>
+
+              <!-- Mathematical Substitution Breakdown -->
+              <div class="pt-2 border-t border-slate-800 text-[11px] font-mono text-slate-300 space-y-1" id="math-live-breakdown">
+                <div>$\text{อัตราส่วนโดยมวล } = 2.02\text{ g} : 16.00\text{ g} = \mathbf{1 : 7.92}$</div>
+                <div>$\% \text{H} = \frac{2.02}{18.02} \times 100 = \mathbf{11.21\%},\ \% \text{O} = \frac{16.00}{18.02} \times 100 = \mathbf{88.79\%}$</div>
+              </div>
+            </div>
+
+            <!-- Conceptual Insight Note -->
+            <div class="p-3 bg-white/5 rounded-2xl border border-white/10 text-[11px] text-slate-300 font-sarabun leading-relaxed" id="insight-text">
+              <i class="fa-solid fa-lightbulb text-amber-300 mr-1"></i>
+              <strong>ข้อสังเกต:</strong> แม้จะเพิ่มหรือลดมวลรวมของสารตั้งต้น หากอัตราส่วนมวลเท่ากับอัตราส่วนคงที่ของสาร ร้อยละโดยมวลของธาตุองค์ประกอบจะคงเดิมเสมอ
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ========================================================================= -->
+    <!-- SECTION 3 : ใบงานแบบฝึกทักษะ 10 ข้อ (Warm Amber Theme & Isolated Print)   -->
+    <!-- ========================================================================= -->
+    <section id="worksheet-section" class="space-y-6">
+      
+      <!-- Control Banner (Completely hidden during printing) -->
+      <div class="no-print bg-gradient-to-r from-amber-600 via-orange-600 to-amber-700 rounded-3xl p-6 sm:p-8 text-white shadow-xl flex flex-col md:flex-row items-center justify-between gap-6">
+        <div class="space-y-1 text-center md:text-left">
+          <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/20 text-white text-xs font-bold uppercase font-prompt">
+            <i class="fa-solid fa-file-pen"></i> เอกสารการเรียนรู้
+          </div>
+          <h2 class="text-2xl sm:text-3xl font-extrabold font-prompt">ใบงานแบบฝึกทักษะ: องค์ประกอบของสารประกอบ (10 ข้อ)</h2>
+          <p class="text-amber-100 text-xs sm:text-sm">
+            กดปุ่มสั่งพิมพ์เพื่อพิมพ์เฉพาะตัวใบงาน โดยระบบจะซ่อนส่วนอื่นๆ ของหน้าเว็บทั้งหมดอัตโนมัติ
+          </p>
+        </div>
+
+        <div class="flex flex-wrap items-center justify-center gap-3">
+          <button onclick="toggleWorksheetSolutions()" id="btn-toggle-solutions" class="px-4 py-2.5 rounded-xl bg-amber-900/60 hover:bg-amber-900 text-white font-prompt font-semibold text-xs sm:text-sm transition flex items-center gap-2 border border-amber-400/40">
+            <i class="fa-solid fa-eye" id="toggle-icon"></i> <span id="toggle-text">แสดงเฉลยบนหน้าจอ</span>
+          </button>
+          <button onclick="printStudentWorksheet()" class="px-5 py-2.5 rounded-xl bg-white text-amber-900 hover:bg-amber-50 font-prompt font-bold text-xs sm:text-sm transition shadow-md flex items-center gap-2">
+            <i class="fa-solid fa-user-graduate text-amber-700"></i> พิมพ์ใบงานสำหรับนักเรียน
+          </button>
+          <button onclick="printTeacherKey()" class="px-5 py-2.5 rounded-xl bg-slate-900 text-amber-300 hover:bg-slate-800 font-prompt font-bold text-xs sm:text-sm transition shadow-md flex items-center gap-2">
+            <i class="fa-solid fa-chalkboard-user"></i> พิมพ์เฉลยสำหรับครู
+          </button>
+        </div>
+      </div>
+
+      <!-- Printable Worksheet Content (Strictly isolated during print) -->
+      <div id="printable-worksheet-card" class="bg-white rounded-3xl p-6 sm:p-10 border border-slate-300 shadow-xl space-y-6">
+        
+        <!-- Document Paper Header -->
+        <div class="border-b-2 border-slate-900 pb-5">
+          <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
+            <div>
+              <h3 class="text-xl sm:text-2xl font-bold font-prompt text-slate-950">ใบงานแบบฝึกทักษะ: เรื่อง องค์ประกอบของสารประกอบและกฎสัดส่วนคงที่</h3>
+              <p class="text-slate-600 text-xs sm:text-sm font-prompt">กลุ่มสาระการเรียนรู้วิทยาศาสตร์และเทคโนโลยี • รายวิชาเคมีเพิ่มเติม ม.4</p>
+            </div>
+            <div class="text-right">
+              <span id="worksheet-status-badge" class="inline-block px-3 py-1 rounded-lg border-2 border-slate-800 text-xs font-prompt font-bold text-slate-900">
+                ฉบับนักเรียน (Student Worksheet)
+              </span>
+              <p class="text-[11px] text-slate-500 mt-1 font-prompt">คะแนนเต็ม 20 คะแนน (ข้อละ 2 คะแนน)</p>
+            </div>
+          </div>
+
+          <div class="mt-4 pt-3 border-t border-dashed border-slate-400 grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs sm:text-sm font-prompt text-slate-800">
+            <div>ชื่อ-สกุล : .....................................................................</div>
+            <div>ชั้น ม.4 / ........ เลขที่ : ............</div>
+            <div>วันที่ : ........ / ........................ / ............</div>
+          </div>
+
+          <div class="mt-3 p-2.5 bg-amber-50/70 border border-amber-200 rounded-xl text-xs text-amber-950 font-mono">
+            <strong>กำหนดมวลอะตอม:</strong> $\text{H}=1.01,\ \text{C}=12.01,\ \text{N}=14.01,\ \text{O}=16.00,\ \text{Na}=22.99,\ \text{Mg}=24.31,\ \text{S}=32.06,\ \text{Ca}=40.08,\ \text{Fe}=55.85,\ \text{Cu}=63.55$
+          </div>
+        </div>
+
+        <!-- 10 Questions Cards (Page Break Avoidance Applied) -->
+        <div class="space-y-5">
+          
+          <!-- ข้อ 1 -->
+          <div class="question-card p-5 rounded-2xl bg-slate-50 border border-slate-200 space-y-2">
+            <div class="font-bold font-prompt text-sm sm:text-base text-slate-900">
+              ข้อ 1. จงคำนวณหาร้อยละโดยมวลของธาตุไฮโดรเจน ($\text{H}$) และออกซิเจน ($\text{O}$) ในโมเลกุลของน้ำ ($\text{H}_2\text{O}$)
+            </div>
+            <div class="student-write-area min-h-[85px] border border-dashed border-slate-300 rounded-xl bg-white p-3 font-sans text-xs">
+              <div class="text-slate-400 font-prompt workspace-prompt">
+                วิธีทำ : <br><br>
+                ตอบ : .........................................................................................................................................................
+              </div>
+            </div>
+            <div class="teacher-solution text-slate-800 space-y-1">
+              <span class="font-bold text-emerald-800 font-prompt">แนวทางการเฉลยละเอียด :</span>
+              <div>1) หามวลโมเลกุลของ $\text{H}_2\text{O} = (2 \times 1.01) + 16.00 = 18.02\text{ g/mol}$</div>
+              <div>2) ร้อยละโดยมวลของ $\text{H} = \frac{2 \times 1.01}{18.02} \times 100 = \frac{2.02}{18.02} \times 100 = \mathbf{11.21\%}$</div>
+              <div>3) ร้อยละโดยมวลของ $\text{O} = \frac{16.00}{18.02} \times 100 = \mathbf{88.79\%}$ (หรือ $100 - 11.21 = 88.79\%$)</div>
+              <div class="font-bold text-amber-800 font-prompt">ตอบ : น้ำประกอบด้วยธาตุไฮโดรเจน 11.21% และธาตุออกซิเจน 88.79% โดยมวล</div>
+            </div>
+          </div>
+
+          <!-- ข้อ 2 -->
+          <div class="question-card p-5 rounded-2xl bg-slate-50 border border-slate-200 space-y-2">
+            <div class="font-bold font-prompt text-sm sm:text-base text-slate-900">
+              ข้อ 2. เมื่อเผาทองแดง ($\text{Cu}$) $6.355\text{ กรัม}$ กับกำมะถัน ($\text{S}$) อย่างสมบูรณ์ พบว่าเกิดสารประกอบคอปเปอร์(II)ซัลไฟด์ ($\text{CuS}$) หนัก $9.561\text{ กรัม}$ จงหาอัตราส่วนโดยมวลของ $\text{Cu} : \text{S}$ และถ้านำทองแดง $12.71\text{ กรัม}$ มาทำปฏิกิริยาจะต้องใช้กำมะถันกี่กรัมตามกฎสัดส่วนคงที่
+            </div>
+            <div class="student-write-area min-h-[85px] border border-dashed border-slate-300 rounded-xl bg-white p-3 font-sans text-xs">
+              <div class="text-slate-400 font-prompt workspace-prompt">
+                วิธีทำ : <br><br>
+                ตอบ : .........................................................................................................................................................
+              </div>
+            </div>
+            <div class="teacher-solution text-slate-800 space-y-1">
+              <span class="font-bold text-emerald-800 font-prompt">แนวทางการเฉลยละเอียด :</span>
+              <div>1) มวลของกำมะถันที่ทำปฏิกิริยา $= 9.561 - 6.355 = 3.206\text{ กรัม}$</div>
+              <div>อัตราส่วนโดยมวล $\text{Cu} : \text{S} = 6.355 : 3.206 \approx \mathbf{1.98 : 1}$ (หรือคิดตามมวลอะตอม $63.55 : 32.06 \approx 2 : 1$)</div>
+              <div>2) ถ้าใช้ $\text{Cu} = 12.71\text{ กรัม}$ (เป็น 2 เท่าของ 6.355 g) จะต้องใช้ $\text{S}$ :</div>
+              <div>$$\text{มวล S} = 12.71\text{ g} \times \frac{3.206\text{ g S}}{6.355\text{ g Cu}} = \mathbf{6.412\text{ กรัม}}$$</div>
+              <div class="font-bold text-amber-800 font-prompt">ตอบ : อัตราส่วนโดยมวล $\text{Cu} : \text{S} = 1.98 : 1$ และต้องใช้กำมะถัน $6.41\text{ กรัม}$</div>
+            </div>
+          </div>
+
+          <!-- ข้อ 3 -->
+          <div class="question-card p-5 rounded-2xl bg-slate-50 border border-slate-200 space-y-2">
+            <div class="font-bold font-prompt text-sm sm:text-base text-slate-900">
+              ข้อ 3. จงคำนวณหาร้อยละโดยมวลของธาตุแต่ละชนิดในหินปูนแคลเซียมคาร์บอเนต ($\text{CaCO}_3$)
+            </div>
+            <div class="student-write-area min-h-[85px] border border-dashed border-slate-300 rounded-xl bg-white p-3 font-sans text-xs">
+              <div class="text-slate-400 font-prompt workspace-prompt">
+                วิธีทำ : <br><br>
+                ตอบ : .........................................................................................................................................................
+              </div>
+            </div>
+            <div class="teacher-solution text-slate-800 space-y-1">
+              <span class="font-bold text-emerald-800 font-prompt">แนวทางการเฉลยละเอียด :</span>
+              <div>1) มวลสูตร $\text{CaCO}_3 = 40.08 + 12.01 + (3 \times 16.00) = 100.09\text{ g/mol}$</div>
+              <div>• $\% \text{Ca} = \frac{40.08}{100.09} \times 100 = \mathbf{40.04\%}$</div>
+              <div>• $\% \text{C} = \frac{12.01}{100.09} \times 100 = \mathbf{12.00\%}$</div>
+              <div>• $\% \text{O} = \frac{48.00}{100.09} \times 100 = \mathbf{47.96\%}$</div>
+              <div class="font-bold text-amber-800 font-prompt">ตอบ : $\% \text{Ca} = 40.04\%,\ \% \text{C} = 12.00\%,\ \% \text{O} = 47.96\%$ โดยมวล</div>
+            </div>
+          </div>
+
+          <!-- ข้อ 4 -->
+          <div class="question-card p-5 rounded-2xl bg-slate-50 border border-slate-200 space-y-2">
+            <div class="font-bold font-prompt text-sm sm:text-base text-slate-900">
+              ข้อ 4. ในสารตัวอย่างคอปเปอร์(II)ซัลเฟต ($\text{CuSO}_4$) บริสุทธิ์ หนัก $50.00\text{ กรัม}$ จะมีธาตุทองแดง ($\text{Cu}$) อยู่กี่กรัม
+            </div>
+            <div class="student-write-area min-h-[85px] border border-dashed border-slate-300 rounded-xl bg-white p-3 font-sans text-xs">
+              <div class="text-slate-400 font-prompt workspace-prompt">
+                วิธีทำ : <br><br>
+                ตอบ : .........................................................................................................................................................
+              </div>
+            </div>
+            <div class="teacher-solution text-slate-800 space-y-1">
+              <span class="font-bold text-emerald-800 font-prompt">แนวทางการเฉลยละเอียด :</span>
+              <div>1) หามวลสูตรของ $\text{CuSO}_4 = 63.55 + 32.06 + (4 \times 16.00) = 159.61\text{ g/mol}$</div>
+              <div>2) หาสัดส่วนร้อยละโดยมวลของ $\text{Cu} = \frac{63.55}{159.61} \times 100 = 39.82\%$</div>
+              <div>3) คำนวณมวลของ $\text{Cu}$ ในสารตัวอย่าง $50.00\text{ g}$ :</div>
+              <div>$$\text{มวล Cu} = 50.00\text{ g} \times \frac{63.55\text{ g Cu}}{159.61\text{ g CuSO}_4} = \mathbf{19.91\text{ กรัม}}$$</div>
+              <div class="font-bold text-amber-800 font-prompt">ตอบ : มีธาตุทองแดงอยู่ $19.91\text{ กรัม}$</div>
+            </div>
+          </div>
+
+          <!-- ข้อ 5 -->
+          <div class="question-card p-5 rounded-2xl bg-slate-50 border border-slate-200 space-y-2">
+            <div class="font-bold font-prompt text-sm sm:text-base text-slate-900">
+              ข้อ 5. นักเรียนทำการทดลอง 2 ชุด เพื่อเตรียมแมกนีเซียมออกไซด์ ($\text{MgO}$): การทดลองที่ 1 ใช้ $\text{Mg}$ $1.20\text{ g}$ เผากับ $\text{O}_2$ เกิด $\text{MgO}$ $2.00\text{ g}$; การทดลองที่ 2 นำ $\text{MgO}$ $5.00\text{ g}$ มาสลายตัวพบว่าได้ $\text{Mg}$ $3.00\text{ g}$ จงพิสูจน์ว่าผลการทดลองนี้เป็นไปตามกฎสัดส่วนคงที่หรือไม่
+            </div>
+            <div class="student-write-area min-h-[85px] border border-dashed border-slate-300 rounded-xl bg-white p-3 font-sans text-xs">
+              <div class="text-slate-400 font-prompt workspace-prompt">
+                วิธีทำ : <br><br>
+                ตอบ : .........................................................................................................................................................
+              </div>
+            </div>
+            <div class="teacher-solution text-slate-800 space-y-1">
+              <span class="font-bold text-emerald-800 font-prompt">แนวทางการเฉลยละเอียด :</span>
+              <div>• <strong>การทดลองที่ 1:</strong> มวล $\text{Mg} = 1.20\text{ g}$, มวล $\text{O} = 2.00 - 1.20 = 0.80\text{ g}$</div>
+              <div>อัตราส่วนโดยมวล $\text{Mg} : \text{O} = \frac{1.20}{0.80} = \mathbf{1.50 : 1}$ (หรือ $3 : 2$)</div>
+              <div>• <strong>การทดลองที่ 2:</strong> มวล $\text{Mg} = 3.00\text{ g}$, มวล $\text{O} = 5.00 - 3.00 = 2.00\text{ g}$</div>
+              <div>อัตราส่วนโดยมวล $\text{Mg} : \text{O} = \frac{3.00}{2.00} = \mathbf{1.50 : 1}$ (หรือ $3 : 2$)</div>
+              <div class="font-bold text-amber-800 font-prompt">ตอบ : เป็นไปตามกฎสัดส่วนคงที่ เนื่องจากอัตราส่วนโดยมวล $\text{Mg} : \text{O}$ ของทั้งสองชุดการทดลองมีค่าเท่ากันคือ $1.50 : 1$ (หรือ $3 : 2$)</div>
+            </div>
+          </div>
+
+          <!-- ข้อ 6 -->
+          <div class="question-card p-5 rounded-2xl bg-slate-50 border border-slate-200 space-y-2">
+            <div class="font-bold font-prompt text-sm sm:text-base text-slate-900">
+              ข้อ 6. เหล็กสามารถเกิดสารประกอบออกไซด์ได้หลายชนิด ได้แก่ ไอรอน(II)ออกไซด์ ($\text{FeO}$) และ ไอรอน(III)ออกไซด์ ($\text{Fe}_2\text{O}_3$) จงคำนวณหาร้อยละโดยมวลของเหล็ก ($\text{Fe}$) ในสารประกอบทั้งสองชนิดนี้ และอธิบายความแตกต่างตามกฎทางเคมี
+            </div>
+            <div class="student-write-area min-h-[85px] border border-dashed border-slate-300 rounded-xl bg-white p-3 font-sans text-xs">
+              <div class="text-slate-400 font-prompt workspace-prompt">
+                วิธีทำ : <br><br>
+                ตอบ : .........................................................................................................................................................
+              </div>
+            </div>
+            <div class="teacher-solution text-slate-800 space-y-1">
+              <span class="font-bold text-emerald-800 font-prompt">แนวทางการเฉลยละเอียด :</span>
+              <div>1) ใน $\text{FeO}$ : มวลสูตร $= 55.85 + 16.00 = 71.85\text{ g/mol}$</div>
+              <div>$\% \text{Fe} = \frac{55.85}{71.85} \times 100 = \mathbf{77.73\%}$</div>
+              <div>2) ใน $\text{Fe}_2\text{O}_3$ : มวลสูตร $= (2 \times 55.85) + (3 \times 16.00) = 111.70 + 48.00 = 159.70\text{ g/mol}$</div>
+              <div>$\% \text{Fe} = \frac{111.70}{159.70} \times 100 = \mathbf{69.94\%}$</div>
+              <div class="font-bold text-amber-800 font-prompt">ตอบ : ใน $\text{FeO}$ มี $\text{Fe} = 77.73\%$ และใน $\text{Fe}_2\text{O}_3$ มี $\text{Fe} = 69.94\%$ โดยมวล ซึ่งร้อยละที่ต่างกันยืนยันว่าเป็นสารประกอบคนละชนิดกันตามกฎสัดส่วนพหุคูณ</div>
+            </div>
+          </div>
+
+          <!-- ข้อ 7 -->
+          <div class="question-card p-5 rounded-2xl bg-slate-50 border border-slate-200 space-y-2">
+            <div class="font-bold font-prompt text-sm sm:text-base text-slate-900">
+              ข้อ 7. จงคำนวณหาร้อยละโดยมวลของน้ำผลึก ($\text{H}_2\text{O}$) ในสารส้มจุนสีสะตุ ($\text{CuSO}_4\cdot 5\text{H}_2\text{O}$)
+            </div>
+            <div class="student-write-area min-h-[85px] border border-dashed border-slate-300 rounded-xl bg-white p-3 font-sans text-xs">
+              <div class="text-slate-400 font-prompt workspace-prompt">
+                วิธีทำ : <br><br>
+                ตอบ : .........................................................................................................................................................
+              </div>
+            </div>
+            <div class="teacher-solution text-slate-800 space-y-1">
+              <span class="font-bold text-emerald-800 font-prompt">แนวทางการเฉลยละเอียด :</span>
+              <div>1) มวลสูตรของ $\text{CuSO}_4 = 63.55 + 32.06 + 64.00 = 159.61\text{ g/mol}$</div>
+              <div>2) มวลของน้ำผลึก $5\text{H}_2\text{O} = 5 \times 18.02 = 90.10\text{ g/mol}$</div>
+              <div>3) มวลสูตรรวมของ $\text{CuSO}_4\cdot 5\text{H}_2\text{O} = 159.61 + 90.10 = 249.71\text{ g/mol}$</div>
+              <div>$$\% \text{H}_2\text{O} = \frac{90.10}{249.71} \times 100 = \mathbf{36.08\%}$$</div>
+              <div class="font-bold text-amber-800 font-prompt">ตอบ : สารประกอบไฮเดรตนี้มีน้ำผลึกอยู่ $36.08\%$ โดยมวล</div>
+            </div>
+          </div>
+
+          <!-- ข้อ 8 -->
+          <div class="question-card p-5 rounded-2xl bg-slate-50 border border-slate-200 space-y-2">
+            <div class="font-bold font-prompt text-sm sm:text-base text-slate-900">
+              ข้อ 8. ชาวสวนต้องการเลือกซื้อปุ๋ยไนโตรเจนระหว่าง ยูเรีย ($(\text{NH}_2)_2\text{CO}$) กับ แอมโมเนียมไนเตรต ($\text{NH}_4\text{NO}_3$) จงเปรียบเทียบร้อยละโดยมวลของธาตุไนโตรเจน ($\text{N}$) ในปุ๋ยทั้งสองชนิดเพื่อตัดสินใจว่าปุ๋ยชนิดใดให้ธาตุไนโตรเจนสูงกว่า
+            </div>
+            <div class="student-write-area min-h-[85px] border border-dashed border-slate-300 rounded-xl bg-white p-3 font-sans text-xs">
+              <div class="text-slate-400 font-prompt workspace-prompt">
+                วิธีทำ : <br><br>
+                ตอบ : .........................................................................................................................................................
+              </div>
+            </div>
+            <div class="teacher-solution text-slate-800 space-y-1">
+              <span class="font-bold text-emerald-800 font-prompt">แนวทางการเฉลยละเอียด :</span>
+              <div>1) <strong>ยูเรีย ($(\text{NH}_2)_2\text{CO}$):</strong> มวลโมเลกุล $= (2 \times 14.01) + (4 \times 1.01) + 12.01 + 16.00 = 60.07\text{ g/mol}$</div>
+              <div>มี $\text{N} = 2$ อะตอม คิดเป็น $28.02\text{ g}$ $\rightarrow \% \text{N} = \frac{28.02}{60.07} \times 100 = \mathbf{46.65\%}$</div>
+              <div>2) <strong>แอมโมเนียมไนเตรต ($\text{NH}_4\text{NO}_3$):</strong> มวลสูตร $= (2 \times 14.01) + (4 \times 1.01) + (3 \times 16.00) = 80.06\text{ g/mol}$</div>
+              <div>มี $\text{N} = 2$ อะตอม คิดเป็น $28.02\text{ g}$ $\rightarrow \% \text{N} = \frac{28.02}{80.06} \times 100 = \mathbf{35.00\%}$</div>
+              <div class="font-bold text-amber-800 font-prompt">ตอบ : ปุ๋ยยูเรียมีไนโตรเจนสูงกว่า ($46.65\%$ เทียบกับ $35.00\%$) ดังนั้นยูเรียให้ธาตุไนโตรเจนสูงกว่า</div>
+            </div>
+          </div>
+
+          <!-- ข้อ 9 -->
+          <div class="question-card p-5 rounded-2xl bg-slate-50 border border-slate-200 space-y-2">
+            <div class="font-bold font-prompt text-sm sm:text-base text-slate-900">
+              ข้อ 9. การวิเคราะห์สารประกอบอินทรีย์ชนิดหนึ่งพบว่ามีธาตุออกซิเจนเป็นองค์ประกอบร้อยละ $40.00$ โดยมวล ถ้าในสารตัวอย่างนี้มีออกซิเจนหนัก $2.40\text{ กรัม}$ จงคำนวณหามวลรวมของสารตัวอย่างนี้
+            </div>
+            <div class="student-write-area min-h-[85px] border border-dashed border-slate-300 rounded-xl bg-white p-3 font-sans text-xs">
+              <div class="text-slate-400 font-prompt workspace-prompt">
+                วิธีทำ : <br><br>
+                ตอบ : .........................................................................................................................................................
+              </div>
+            </div>
+            <div class="teacher-solution text-slate-800 space-y-1">
+              <span class="font-bold text-emerald-800 font-prompt">แนวทางการเฉลยละเอียด :</span>
+              <div>จากสูตร : $\% \text{O} = \frac{\text{มวลของ O}}{\text{มวลรวมของสาร}} \times 100$</div>
+              <div>แทนค่า : $$40.00 = \frac{2.40\text{ g}}{\text{มวลรวม}} \times 100$$</div>
+              <div>$$\text{มวลรวมของสารตัวอย่าง} = \frac{2.40 \times 100}{40.00} = \mathbf{6.00\text{ กรัม}}$$</div>
+              <div class="font-bold text-amber-800 font-prompt">ตอบ : มวลรวมของสารตัวอย่างเท่ากับ $6.00\text{ กรัม}$</div>
+            </div>
+          </div>
+
+          <!-- ข้อ 10 -->
+          <div class="question-card p-5 rounded-2xl bg-slate-50 border border-slate-200 space-y-2">
+            <div class="font-bold font-prompt text-sm sm:text-base text-slate-900">
+              ข้อ 10. ในโรงงานถลุงเหล็กนำแร่เฮมาไทต์ที่มีไอรอน(III)ออกไซด์ ($\text{Fe}_2\text{O}_3$) บริสุทธิ์จำนวน $1.00\text{ ตัน (1,000 kg)}$ มาถลุง จงคำนวณหามวลของเหล็ก ($\text{Fe}$) สูงสุดตามทฤษฎีที่จะได้รับในหน่วยกิโลกรัม
+            </div>
+            <div class="student-write-area min-h-[85px] border border-dashed border-slate-300 rounded-xl bg-white p-3 font-sans text-xs">
+              <div class="text-slate-400 font-prompt workspace-prompt">
+                วิธีทำ : <br><br>
+                ตอบ : .........................................................................................................................................................
+              </div>
+            </div>
+            <div class="teacher-solution text-slate-800 space-y-1">
+              <span class="font-bold text-emerald-800 font-prompt">แนวทางการเฉลยละเอียด :</span>
+              <div>1) มวลสูตรของ $\text{Fe}_2\text{O}_3 = (2 \times 55.85) + (3 \times 16.00) = 111.70 + 48.00 = 159.70\text{ g/mol}$</div>
+              <div>2) ร้อยละโดยมวลของ $\text{Fe} = \frac{111.70}{159.70} \times 100 = 69.94\%$</div>
+              <div>3) หามวลของเหล็กจากแร่ $1,000\text{ kg}$ :</div>
+              <div>$$\text{มวล Fe} = 1,000\text{ kg} \times \frac{111.70\text{ kg Fe}}{159.70\text{ kg Fe}_2\text{O}_3} = \mathbf{699.44\text{ กิโลกรัม}}$$</div>
+              <div class="font-bold text-amber-800 font-prompt">ตอบ : จะได้รับเนื้อเหล็กสูงสุดตามทฤษฎีเท่ากับ $699.44\text{ กิโลกรัม}$ (หรือประมาณ $699.4\text{ kg}$)</div>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ========================================================================= -->
+    <!-- SECTION 4 : เกณฑ์การประเมินรูบริก (Royal Purple & Violet Theme)            -->
+    <!-- ========================================================================= -->
+    <section id="rubric-section" class="space-y-8">
+      
+      <div class="flex items-center gap-3.5 pb-3 border-b-2 border-purple-500">
+        <div class="w-10 h-10 rounded-xl bg-purple-600 text-white flex items-center justify-center font-bold text-lg shadow-md shadow-purple-200">
+          <i class="fa-solid fa-list-check"></i>
+        </div>
+        <div>
+          <span class="text-xs font-bold text-purple-600 uppercase tracking-widest font-prompt">เกณฑ์การวัดและประเมินผล</span>
+          <h2 class="text-2xl sm:text-3xl font-bold text-slate-900 font-prompt">เกณฑ์การประเมินผล (Rubric) แบบ 3 ระดับ</h2>
+        </div>
+      </div>
+
+      <div class="bg-white rounded-3xl p-6 sm:p-8 border border-purple-200 shadow-xl space-y-6">
+        
+        <div class="pb-3 border-b border-slate-200">
+          <h3 class="text-lg font-bold font-prompt text-slate-900">
+            เกณฑ์การประเมินตามสภาพจริง 3 ระดับ (คะแนนเต็ม 20 คะแนน, ข้อละ 2 คะแนน)
+          </h3>
+          <p class="text-xs text-slate-500 font-prompt mt-0.5">
+            ประเมินความเข้าใจมโนทัศน์กฎสัดส่วนคงที่ ทักษะการคำนวณอัตราส่วนและร้อยละโดยมวล และความถูกต้องทางคณิตศาสตร์
+          </p>
+        </div>
+
+        <!-- Rubric Table -->
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-sm border-collapse">
+            <thead>
+              <tr class="bg-purple-50 border-b-2 border-purple-200 text-purple-950 font-prompt">
+                <th class="p-4 w-1/4 rounded-tl-2xl font-bold text-sm sm:text-base">ประเด็นการประเมิน</th>
+                <th class="p-4 w-1/4 font-semibold text-emerald-900 bg-emerald-100/60 border-r border-slate-200">
+                  <div class="flex items-center gap-2 font-bold text-sm">
+                    <span class="w-6 h-6 rounded-full bg-emerald-600 text-white flex items-center justify-center text-xs">3</span>
+                    <span>ระดับดีมาก (2.0 คะแนน/ข้อ)</span>
+                  </div>
+                </th>
+                <th class="p-4 w-1/4 font-semibold text-amber-900 bg-amber-50/70 border-r border-slate-200">
+                  <div class="flex items-center gap-2 font-bold text-sm">
+                    <span class="w-6 h-6 rounded-full bg-amber-600 text-white flex items-center justify-center text-xs">2</span>
+                    <span>ระดับปานกลาง (1.0 - 1.5 คะแนน)</span>
+                  </div>
+                </th>
+                <th class="p-4 w-1/4 rounded-tr-2xl font-semibold text-rose-900 bg-rose-50/70">
+                  <div class="flex items-center gap-2 font-bold text-sm">
+                    <span class="w-6 h-6 rounded-full bg-rose-600 text-white flex items-center justify-center text-xs">1</span>
+                    <span>ระดับปรับปรุง (0.0 - 0.5 คะแนน)</span>
+                  </div>
+                </th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-200 font-sans">
+              
+              <!-- Criterion 1 -->
+              <tr class="hover:bg-slate-50/70 transition">
+                <td class="p-4 font-bold text-slate-900 align-top">
+                  <div class="font-prompt text-sm sm:text-base text-purple-900">1. มโนทัศน์กฎสัดส่วนคงที่</div>
+                  <div class="text-xs text-slate-500 mt-1 font-normal">
+                    ความเข้าใจอัตราส่วนโดยมวลคงที่ ผลของสารที่มากเกินพอ และการแยกแยะสารประกอบต่างชนิด
+                  </div>
+                </td>
+                <td class="p-4 align-top text-xs text-slate-700 bg-emerald-50/20 leading-relaxed">
+                  อธิบายและประยุกต์กฎสัดส่วนคงที่ได้ถูกต้องสมบูรณ์ 100% สามารถพิสูจน์การทดลองและจำแนกสารที่มีอัตราส่วนมวลต่างกันได้อย่างชัดเจน
+                </td>
+                <td class="p-4 align-top text-xs text-slate-700 bg-amber-50/20 leading-relaxed">
+                  เข้าใจหลักการ แต่มีจุดคลาดเคลื่อนเล็กน้อยในการอธิบายสารที่เหลือ หรือสับสนระหว่างสารประกอบไฮเดรตกับสารประกอบทั่วไป 1 จุด
+                </td>
+                <td class="p-4 align-top text-xs text-slate-700 bg-rose-50/20 leading-relaxed">
+                  สับสนแนวคิดกฎสัดส่วนคงที่ ไม่เข้าใจว่าสารประกอบชนิดเดียวกันต้องมีสัดส่วนมวลคงที่ หรือคิดว่าอัตราส่วนมวลเปลี่ยนได้ตามสารตั้งต้นที่ใส่
+                </td>
+              </tr>
+
+              <!-- Criterion 2 -->
+              <tr class="hover:bg-slate-50/70 transition">
+                <td class="p-4 font-bold text-slate-900 align-top">
+                  <div class="font-prompt text-sm sm:text-base text-purple-900">2. การตั้งสมการและคำนวณร้อยละ</div>
+                  <div class="text-xs text-slate-500 mt-1 font-normal">
+                    การใช้สูตร $\% \text{ธาตุ} = \frac{\text{มวลธาตุ}}{\text{มวลรวม}} \times 100$ และการแก้สมการย้อนกลับ
+                  </div>
+                </td>
+                <td class="p-4 align-top text-xs text-slate-700 bg-emerald-50/20 leading-relaxed">
+                  ตั้งสมการและแทนค่ามวลของธาตุและมวลรวมได้ถูกต้อง แสดงขั้นตอนการคำนวณร้อยละและการแก้สมการย้อนกลับหามวลสารตัวอย่างได้อย่างเป็นระบบ
+                </td>
+                <td class="p-4 align-top text-xs text-slate-700 bg-amber-50/20 leading-relaxed">
+                  ตั้งสมการถูกต้อง แต่แสดงขั้นตอนข้ามไป หรือมีข้อผิดพลาดเล็กน้อยในการย้ายข้างสมการ หรือลืมคูณจำนวนอะตอมในสูตรเคมีบางพจน์
+                </td>
+                <td class="p-4 align-top text-xs text-slate-700 bg-rose-50/20 leading-relaxed">
+                  แทนค่าสับสนระหว่างมวลธาตุกับมวลรวม ไม่แสดงสมการความสัมพันธ์ หรือคำนวณการหาร้อยละผิดรูปแบบอย่างมีนัยสำคัญ
+                </td>
+              </tr>
+
+              <!-- Criterion 3 -->
+              <tr class="hover:bg-slate-50/70 transition">
+                <td class="p-4 font-bold text-slate-900 align-top">
+                  <div class="font-prompt text-sm sm:text-base text-purple-900">3. ความถูกต้องของคำตอบและหน่วย</div>
+                  <div class="text-xs text-slate-500 mt-1 font-normal">
+                    ความแม่นยำของการคิดเลขทศนิยม ผลรวมร้อยละเท่ากับ 100% และการระบุหน่วยวิทยาศาสตร์กำกับ
+                  </div>
+                </td>
+                <td class="p-4 align-top text-xs text-slate-700 bg-emerald-50/20 leading-relaxed">
+                  คำนวณตัวเลขได้แม่นยำถูกต้อง ปัดเศษทศนิยมตามหลักการ ผลรวมร้อยละเท่ากับ $100\%$ และระบุหน่วยกำกับชัดเจนทุกข้อ ($\%, \text{g}, \text{kg}$)
+                </td>
+                <td class="p-4 align-top text-xs text-slate-700 bg-amber-50/20 leading-relaxed">
+                  ตัวเลขคำตอบคลาดเคลื่อนจากการปัดเศษทศนิยมเล็กน้อย หรือได้คำตอบถูกต้องแต่ลืมระบุหน่วยกำกับ
+                </td>
+                <td class="p-4 align-top text-xs text-slate-700 bg-rose-50/20 leading-relaxed">
+                  คำนวณผลลัพธ์ผิดพลาดหลายข้อ และไม่ระบุหน่วยกำกับท้ายคำตอบ
+                </td>
+              </tr>
+
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Grade Summary -->
+        <div class="bg-purple-50/70 rounded-2xl p-5 border border-purple-200">
+          <h4 class="font-bold text-purple-950 font-prompt text-sm mb-3">เกณฑ์สรุปการแปลผลระดับคุณภาพโดยรวม (คะแนนเต็ม 20 คะแนน) :</h4>
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs font-prompt">
+            <div class="p-3.5 bg-white rounded-xl border border-emerald-200">
+              <span class="font-bold text-emerald-800 text-sm block">16 - 20 คะแนน (ระดับดีมาก)</span>
+              <p class="text-slate-600 font-sans mt-1">เข้าใจมโนทัศน์กฎสัดส่วนคงที่และร้อยละโดยมวลอย่างถ่องแท้ สามารถวิเคราะห์โจทย์ประยุกต์และคำนวณย้อนกลับได้อย่างแม่นยำ</p>
+            </div>
+            <div class="p-3.5 bg-white rounded-xl border border-amber-200">
+              <span class="font-bold text-amber-800 text-sm block">10 - 15 คะแนน (ระดับปานกลาง)</span>
+              <p class="text-slate-600 font-sans mt-1">คำนวณร้อยละโดยมวลของสารอย่างง่ายได้ดี ควรฝึกการวิเคราะห์สารประกอบที่มีน้ำผลึกและโจทย์สารเหลือเพิ่มเติม</p>
+            </div>
+            <div class="p-3.5 bg-white rounded-xl border border-rose-200">
+              <span class="font-bold text-rose-800 text-sm block">0 - 9 คะแนน (ระดับปรับปรุง)</span>
+              <p class="text-slate-600 font-sans mt-1">ยังสับสนการหาอัตราส่วนโดยมวล แนะนำให้ฝึกปฏิบัติผ่านแบบจำลองเครื่องผสมสารในส่วนที่ 2 อย่างสม่ำเสมอ</p>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Clean footer -->
+  <footer class="no-print py-6 text-center text-xs text-slate-400 font-prompt">
+    รายวิชาเคมีเพิ่มเติม ม.4 • กลุ่มสาระการเรียนรู้วิทยาศาสตร์และเทคโนโลยี
+  </footer>
+
+  <script>
+    const COMPOUNDS_DB = {
+      H2O: {
+        name: "น้ำ (H₂O)",
+        elmA: { name: "ไฮโดรเจน (H)", symbol: "H", mass: 2.02, unitColor: "#0284c7" },
+        elmB: { name: "ออกซิเจน (O)", symbol: "O", mass: 16.00, unitColor: "#0d9488" },
+        totalMolarMass: 18.02,
+        fixedRatio: 16.00 / 2.02, // O / H = 7.9208
+        fixedRatioText: "1 : 7.92",
+        ratioSimpleText: "≈ 1 : 8",
+        pctA: (2.02 / 18.02) * 100, // 11.21%
+        pctB: (16.00 / 18.02) * 100  // 88.79%
+      },
+      CO2: {
+        name: "คาร์บอนไดออกไซด์ (CO₂)",
+        elmA: { name: "คาร์บอน (C)", symbol: "C", mass: 12.01, unitColor: "#475569" },
+        elmB: { name: "ออกซิเจน (O)", symbol: "O", mass: 32.00, unitColor: "#0d9488" },
+        totalMolarMass: 44.01,
+        fixedRatio: 32.00 / 12.01, // O / C = 2.6644
+        fixedRatioText: "1 : 2.66",
+        ratioSimpleText: "≈ 3 : 8",
+        pctA: (12.01 / 44.01) * 100, // 27.29%
+        pctB: (32.00 / 44.01) * 100  // 72.71%
+      },
+      MgO: {
+        name: "แมกนีเซียมออกไซด์ (MgO)",
+        elmA: { name: "แมกนีเซียม (Mg)", symbol: "Mg", mass: 24.31, unitColor: "#6366f1" },
+        elmB: { name: "ออกซิเจน (O)", symbol: "O", mass: 16.00, unitColor: "#0d9488" },
+        totalMolarMass: 40.31,
+        fixedRatio: 16.00 / 24.31, // O / Mg = 0.6582
+        fixedRatioText: "1 : 0.66",
+        ratioSimpleText: "≈ 3 : 2 (Mg:O)",
+        pctA: (24.31 / 40.31) * 100, // 60.31%
+        pctB: (16.00 / 40.31) * 100  // 39.69%
+      },
+      H2O2: {
+        name: "ไฮโดรเจนเปอร์ออกไซด์ (H₂O₂)",
+        elmA: { name: "ไฮโดรเจน (H)", symbol: "H", mass: 2.02, unitColor: "#0284c7" },
+        elmB: { name: "ออกซิเจน (O)", symbol: "O", mass: 32.00, unitColor: "#0d9488" },
+        totalMolarMass: 34.02,
+        fixedRatio: 32.00 / 2.02, // O / H = 15.84
+        fixedRatioText: "1 : 15.84",
+        ratioSimpleText: "≈ 1 : 16",
+        pctA: (2.02 / 34.02) * 100, // 5.94%
+        pctB: (32.00 / 34.02) * 100  // 94.06%
+      }
+    };
+
+    let activeCompKey = 'H2O';
+    let massA = 2.02;
+    let massB = 16.00;
+    let solutionsVisible = false;
+
+    function triggerMathRender() {
+      if (window.MathJax && MathJax.typesetPromise) {
+        return MathJax.typesetPromise().catch(err => console.log('MathJax error: ', err));
+      }
+      return Promise.resolve();
+    }
+
+    function selectCompound(key) {
+      activeCompKey = key;
+      Object.keys(COMPOUNDS_DB).forEach(k => {
+        const btn = document.getElementById(`btn-comp-${k}`);
+        if (btn) {
+          if (k === key) {
+            btn.className = "p-2.5 rounded-2xl border-2 border-teal-500 bg-teal-50 text-teal-950 font-prompt text-left transition hover:shadow-sm";
+          } else {
+            btn.className = "p-2.5 rounded-2xl border-2 border-slate-200 bg-white text-slate-700 font-prompt text-left transition hover:border-teal-300";
+          }
+        }
+      });
+
+      const comp = COMPOUNDS_DB[key];
+      document.getElementById('target-compound-badge').textContent = `${comp.name} : ${comp.elmA.symbol} : ${comp.elmB.symbol} ${comp.ratioSimpleText}`;
+      
+      // Update element labels and colors
+      document.getElementById('label-elmA').textContent = `มวลของ${comp.elmA.name} :`;
+      document.getElementById('label-elmB').textContent = `มวลของ${comp.elmB.name} :`;
+      document.getElementById('dot-elmA').style.backgroundColor = comp.elmA.unitColor;
+      document.getElementById('dot-elmB').style.backgroundColor = comp.elmB.unitColor;
+
+      // Set base stoichiometric mass
+      massA = comp.elmA.mass;
+      massB = comp.elmB.mass;
+      
+      syncInputs();
+      recalculateReaction();
+    }
+
+    function syncInputs() {
+      document.getElementById('input-massA').value = massA.toFixed(2);
+      document.getElementById('slider-massA').value = Math.min(50, massA);
+      document.getElementById('input-massB').value = massB.toFixed(2);
+      document.getElementById('slider-massB').value = Math.min(100, massB);
+    }
+
+    function onMassAChange(val) {
+      massA = Math.max(0.01, parseFloat(val) || 0.01);
+      document.getElementById('input-massA').value = massA.toFixed(2);
+      document.getElementById('slider-massA').value = Math.min(50, massA);
+      recalculateReaction();
+    }
+
+    function onMassBChange(val) {
+      massB = Math.max(0.01, parseFloat(val) || 0.01);
+      document.getElementById('input-massB').value = massB.toFixed(2);
+      document.getElementById('slider-massB').value = Math.min(100, massB);
+      recalculateReaction();
+    }
+
+    function setStoichiometricRatio() {
+      const comp = COMPOUNDS_DB[activeCompKey];
+      // Keep massA, adjust massB to exact ratio
+      massB = massA * comp.fixedRatio;
+      syncInputs();
+      recalculateReaction();
+    }
+
+    function multiplyReaction(factor) {
+      massA = parseFloat((massA * factor).toFixed(2));
+      massB = parseFloat((massB * factor).toFixed(2));
+      syncInputs();
+      recalculateReaction();
+    }
+
+    function addExcessA() {
+      massA = parseFloat((massA * 1.6).toFixed(2));
+      syncInputs();
+      recalculateReaction();
+    }
+
+    function addExcessB() {
+      massB = parseFloat((massB * 1.6).toFixed(2));
+      syncInputs();
+      recalculateReaction();
+    }
+
+    function recalculateReaction() {
+      const comp = COMPOUNDS_DB[activeCompKey];
+      const idealRatio = comp.fixedRatio; // Mass B required per 1 unit of Mass A
+      const suppliedRatio = massB / massA;
+
+      let reactedA = 0;
+      let reactedB = 0;
+      let leftoverName = "ไม่มีสารเหลือ";
+      let leftoverAmount = 0;
+      let isExact = false;
+
+      // Check stoichiometric compliance with 1% tolerance
+      const tolerance = 0.015;
+      if (Math.abs(suppliedRatio - idealRatio) / idealRatio <= tolerance) {
+        // Exact reaction
+        isExact = true;
+        reactedA = massA;
+        reactedB = massB;
+        leftoverAmount = 0;
+        leftoverName = "หมดพอดี (ไม่มีสารเหลือ)";
+      } else if (suppliedRatio > idealRatio) {
+        // Mass B is in excess, A is limiting
+        reactedA = massA;
+        reactedB = massA * idealRatio;
+        leftoverAmount = massB - reactedB;
+        leftoverName = `${comp.elmB.symbol} เหลือ ${leftoverAmount.toFixed(2)} g`;
+      } else {
+        // Mass A is in excess, B is limiting
+        reactedB = massB;
+        reactedA = massB / idealRatio;
+        leftoverAmount = massA - reactedA;
+        leftoverName = `${comp.elmA.symbol} เหลือ ${leftoverAmount.toFixed(2)} g`;
+      }
+
+      const compoundYield = reactedA + reactedB;
+
+      // Actual reaction ratio and percentages
+      const actualRatioText = `1.00 : ${(reactedB / reactedA).toFixed(2)}`;
+      const pctA = (reactedA / compoundYield) * 100;
+      const pctB = (reactedB / compoundYield) * 100;
+
+      // Update Displays
+      document.getElementById('yield-mass-display').textContent = compoundYield.toFixed(2);
+      document.getElementById('leftover-mass-display').textContent = leftoverAmount.toFixed(2);
+      document.getElementById('leftover-name-display').textContent = leftoverName;
+
+      document.getElementById('ratio-actual-display').textContent = actualRatioText;
+      document.getElementById('pct-label-A').textContent = `${comp.elmA.symbol}: ${pctA.toFixed(2)}%`;
+      document.getElementById('pct-label-B').textContent = `${comp.elmB.symbol}: ${pctB.toFixed(2)}%`;
+      document.getElementById('bar-pct-A').style.width = `${pctA.toFixed(2)}%`;
+      document.getElementById('bar-pct-B').style.width = `${pctB.toFixed(2)}%`;
+      document.getElementById('bar-pct-A').style.backgroundColor = comp.elmA.unitColor;
+      document.getElementById('bar-pct-B').style.backgroundColor = comp.elmB.unitColor;
+
+      // Status Card Styling
+      const statusCard = document.getElementById('status-card');
+      const statusHeading = document.getElementById('status-heading');
+      const statusDetail = document.getElementById('status-detail');
+
+      if (isExact) {
+        statusCard.className = "p-4 rounded-2xl bg-emerald-500/10 border-2 border-emerald-400/40 text-center space-y-1.5 transition-all";
+        statusHeading.innerHTML = `<i class="fa-solid fa-circle-check text-base text-emerald-400"></i> <span class="text-emerald-300">สอดคล้องตามกฎสัดส่วนคงที่พอดีเป๊ะ</span>`;
+        statusDetail.textContent = `มวลของ ${comp.elmA.symbol} (${massA.toFixed(2)} g) และ ${comp.elmB.symbol} (${massB.toFixed(2)} g) ทำปฏิกิริยากันหมดพอดี เกิดเป็น ${comp.name} บริสุทธิ์ ${compoundYield.toFixed(2)} g`;
+      } else {
+        statusCard.className = "p-4 rounded-2xl bg-amber-500/10 border-2 border-amber-400/40 text-center space-y-1.5 transition-all";
+        statusHeading.innerHTML = `<i class="fa-solid fa-triangle-exclamation text-base text-amber-400"></i> <span class="text-amber-300">เกิดสารประกอบตามกฎสัดส่วนคงที่ แต่มีสารตั้งต้นเหลือ!</span>`;
+        statusDetail.textContent = `สารทำปฏิกิริยากันตามสัดส่วนคงที่เดิม แต่มี ${leftoverName} เนื่องจากสัดส่วนที่ใส่ไม่พอดี ไม่สามารถบังคับให้อัตราส่วนในสารประกอบเปลี่ยนได้`;
+      }
+
+      // Live breakdown equation
+      const mathBox = document.getElementById('math-live-breakdown');
+      if (mathBox) {
+        mathBox.innerHTML = `
+          <div>• มวลที่รวมตัวกันจริง: $${comp.elmA.symbol} = ${reactedA.toFixed(2)}\\text{ g},\ ${comp.elmB.symbol} = ${reactedB.toFixed(2)}\\text{ g}$</div>
+          <div>• อัตราส่วนโดยมวล: $\\frac{\\text{มวล } ${comp.elmB.symbol}}{\\text{มวล } ${comp.elmA.symbol}} = \\frac{${reactedB.toFixed(2)}}{${reactedA.toFixed(2)}} = \\mathbf{${(reactedB / reactedA).toFixed(2)}} \\implies \\mathbf{${comp.fixedRatioText}}$</div>
+          <div>• ร้อยละโดยมวล: $\%${comp.elmA.symbol} = \\mathbf{${pctA.toFixed(2)}\\%},\\ \\%${comp.elmB.symbol} = \\mathbf{${pctB.toFixed(2)}\\%}$</div>
+        `;
+        triggerMathRender();
+      }
+
+      // Insight text
+      const insight = document.getElementById('insight-text');
+      if (insight) {
+        if (isExact) {
+          insight.innerHTML = `<i class="fa-solid fa-lightbulb text-amber-300 mr-1"></i> <strong>ข้อค้นพบ:</strong> เมื่ออัตราส่วนสารตั้งต้นพอดี จะไม่มีสารเหลือ และร้อยละของแต่ละธาตุคือ <strong>${pctA.toFixed(1)}% : ${pctB.toFixed(1)}%</strong> คงที่ตามสูตรเคมี`;
+        } else {
+          insight.innerHTML = `<i class="fa-solid fa-lightbulb text-amber-300 mr-1"></i> <strong>ข้อค้นพบ:</strong> แม้จะใส่ ${leftoverName.split(' ')[0]} เกินมา สารประกอบที่เกิดขึ้นก็ยังมีองค์ประกอบ <strong>${pctA.toFixed(1)}% : ${pctB.toFixed(1)}%</strong> เท่าเดิมเสมอ ส่วนที่เกินไม่สามารถเข้าไปรวมได้!`;
+        }
+      }
+    }
+
+    // Toggle solutions on screen
+    function toggleWorksheetSolutions() {
+      solutionsVisible = !solutionsVisible;
+      const solutions = document.querySelectorAll('.teacher-solution');
+      const writeAreas = document.querySelectorAll('.student-write-area');
+      const toggleText = document.getElementById('toggle-text');
+      const toggleIcon = document.getElementById('toggle-icon');
+
+      if (solutionsVisible) {
+        solutions.forEach(s => s.classList.add('show'));
+        writeAreas.forEach(w => w.classList.add('hide-on-screen'));
+        if (toggleText) toggleText.textContent = 'ซ่อนเฉลยบนหน้าจอ';
+        if (toggleIcon) toggleIcon.className = 'fa-solid fa-eye-slash';
+      } else {
+        solutions.forEach(s => s.classList.remove('show'));
+        writeAreas.forEach(w => w.classList.remove('hide-on-screen'));
+        if (toggleText) toggleText.textContent = 'แสดงเฉลยบนหน้าจอ';
+        if (toggleIcon) toggleIcon.className = 'fa-solid fa-eye';
+      }
+      triggerMathRender();
+    }
+
+    // Student Print Mode
+    function printStudentWorksheet() {
+      document.body.classList.remove('print-mode-teacher');
+      document.body.classList.add('print-mode-student');
+
+      const badge = document.getElementById('worksheet-status-badge');
+      if (badge) {
+        badge.textContent = 'ฉบับนักเรียน (Student Worksheet)';
+        badge.className = 'inline-block px-3 py-1 rounded-lg border-2 border-slate-800 text-xs font-prompt font-bold text-slate-900 bg-white';
+      }
+
+      triggerMathRender().then(() => {
+        setTimeout(() => {
+          window.print();
+        }, 200);
+      });
+    }
+
+    // Teacher Answer Key Print Mode
+    function printTeacherKey() {
+      document.body.classList.remove('print-mode-student');
+      document.body.classList.add('print-mode-teacher');
+
+      const badge = document.getElementById('worksheet-status-badge');
+      if (badge) {
+        badge.textContent = 'ฉบับเฉลยสำหรับครูผู้สอน (Teacher Answer Key)';
+        badge.className = 'inline-block px-3 py-1 rounded-lg bg-amber-500 text-slate-950 font-prompt font-bold text-xs border border-amber-600';
+      }
+
+      triggerMathRender().then(() => {
+        setTimeout(() => {
+          window.print();
+        }, 300);
+      });
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      selectCompound('H2O');
+      setTimeout(triggerMathRender, 300);
+    });
+  </script>
+</body>
+</html>
