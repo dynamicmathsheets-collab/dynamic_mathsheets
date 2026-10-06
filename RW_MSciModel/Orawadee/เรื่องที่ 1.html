@@ -1,0 +1,1277 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>เรื่องที่ 1: ตัวแปรสุ่ม (Random Variables)</title>
+  
+  <!-- ฟอนต์ภาษาไทยและคณิตศาสตร์ -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Sarabun:ital,wght@0,300;0,400;0,600;0,700;1,400&family=Fira+Code:wght@400;600&display=swap" rel="stylesheet">
+  
+  <!-- MathJax สำหรับแสดงผลสูตรคณิตศาสตร์และสัญลักษณ์ LaTeX -->
+  <script>
+    window.MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']],
+        displayMath: [['$$', '$$'], ['\\[', '\\]']],
+        processEscapes: true
+      },
+      options: {
+        skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+      }
+    };
+  </script>
+  <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+  <style>
+    :root {
+      --font-th: 'Sarabun', system-ui, -apple-system, sans-serif;
+      --font-code: 'Fira Code', monospace;
+      
+      /* ชุดสีประจำเฟรม */
+      --frame1-border: #2563eb;
+      --frame1-bg: #eff6ff;
+      --frame1-head: #1e40af;
+      
+      --frame2-border: #059669;
+      --frame2-bg: #ecfdf5;
+      --frame2-head: #065f46;
+      
+      --frame3-border: #7c3aed;
+      --frame3-bg: #f5f3ff;
+      --frame3-head: #5b21b6;
+      
+      --frame4-border: #d97706;
+      --frame4-bg: #fffbeb;
+      --frame4-head: #92400e;
+      
+      --frame5-border: #0284c7;
+      --frame5-bg: #f0f9ff;
+      --frame5-head: #075985;
+      
+      --frame6-border: #e11d48;
+      --frame6-bg: #fff1f2;
+      --frame6-head: #9f1239;
+
+      --text-dark: #1e293b;
+      --text-muted: #64748b;
+      --shadow-sm: 0 2px 4px rgba(0,0,0,0.05);
+      --shadow-md: 0 4px 10px rgba(0,0,0,0.08);
+      --radius: 12px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: var(--font-th);
+      background-color: #f8fafc;
+      color: var(--text-dark);
+      line-height: 1.7;
+      padding: 24px 16px 60px 16px;
+    }
+
+    .main-container {
+      max-width: 1100px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 32px;
+    }
+
+    /* หัวข้อหลักของเอกสาร */
+    .document-header {
+      background: white;
+      border: 1px solid #e2e8f0;
+      border-top: 6px solid #1e3a8a;
+      border-radius: var(--radius);
+      padding: 28px;
+      text-align: center;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .document-header h1 {
+      font-size: 1.95rem;
+      color: #0f172a;
+      margin-bottom: 6px;
+      font-weight: 700;
+    }
+
+    .document-header p {
+      font-size: 1.05rem;
+      color: var(--text-muted);
+    }
+
+    /* กรอบเฟรม */
+    .frame-box {
+      background: white;
+      border-radius: var(--radius);
+      border: 2px solid;
+      box-shadow: var(--shadow-sm);
+      overflow: hidden;
+      transition: box-shadow 0.2s ease;
+    }
+
+    .frame-box:hover {
+      box-shadow: var(--shadow-md);
+    }
+
+    .frame-header {
+      padding: 16px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid rgba(0,0,0,0.08);
+    }
+
+    .frame-header h2 {
+      font-size: 1.3rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .frame-tag {
+      font-size: 0.85rem;
+      font-weight: 600;
+      padding: 4px 12px;
+      border-radius: 999px;
+      background: white;
+      border: 1px solid currentColor;
+    }
+
+    .frame-body {
+      padding: 24px;
+    }
+
+    /* สีกำกับเฟรม */
+    .frame-1 { border-color: var(--frame1-border); }
+    .frame-1 .frame-header { background: var(--frame1-bg); color: var(--frame1-head); }
+    .frame-1 .frame-tag { color: var(--frame1-border); }
+
+    .frame-2 { border-color: var(--frame2-border); }
+    .frame-2 .frame-header { background: var(--frame2-bg); color: var(--frame2-head); }
+    .frame-2 .frame-tag { color: var(--frame2-border); }
+
+    .frame-3 { border-color: var(--frame3-border); }
+    .frame-3 .frame-header { background: var(--frame3-bg); color: var(--frame3-head); }
+    .frame-3 .frame-tag { color: var(--frame3-border); }
+
+    .frame-4 { border-color: var(--frame4-border); }
+    .frame-4 .frame-header { background: var(--frame4-bg); color: var(--frame4-head); }
+    .frame-4 .frame-tag { color: var(--frame4-border); }
+
+    .frame-5 { border-color: var(--frame5-border); }
+    .frame-5 .frame-header { background: var(--frame5-bg); color: var(--frame5-head); }
+    .frame-5 .frame-tag { color: var(--frame5-border); }
+
+    .frame-6 { border-color: var(--frame6-border); }
+    .frame-6 .frame-header { background: var(--frame6-bg); color: var(--frame6-head); }
+    .frame-6 .frame-tag { color: var(--frame6-border); }
+
+    /* บล็อกนิยามทางคณิตศาสตร์ */
+    .math-def {
+      background: #f8fafc;
+      border-left: 4px solid #334155;
+      padding: 14px 18px;
+      border-radius: 4px;
+      margin: 16px 0;
+    }
+
+    .math-def-title {
+      font-weight: 700;
+      color: #0f172a;
+      margin-bottom: 4px;
+    }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 18px;
+      margin-top: 14px;
+    }
+
+    @media (max-width: 768px) {
+      .grid-2 { grid-template-columns: 1fr; }
+    }
+
+    .card-sub {
+      background: #fafafa;
+      border: 1px solid #e5e7eb;
+      border-radius: 8px;
+      padding: 16px;
+    }
+
+    .card-sub h3 {
+      font-size: 1.1rem;
+      margin-bottom: 8px;
+    }
+
+    /* Interactive Model Components */
+    .control-panel {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 16px;
+      background: #f9fafb;
+      padding: 18px;
+      border-radius: 8px;
+      border: 1px solid #e5e7eb;
+      margin-bottom: 20px;
+    }
+
+    .control-item {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .control-item label {
+      font-weight: 600;
+      font-size: 0.92rem;
+      color: var(--text-dark);
+    }
+
+    select, input[type="number"] {
+      padding: 8px 12px;
+      border-radius: 6px;
+      border: 1px solid #cbd5e1;
+      font-family: inherit;
+      font-size: 0.95rem;
+      background-color: white;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 9px 18px;
+      border-radius: 6px;
+      font-family: inherit;
+      font-weight: 600;
+      font-size: 0.95rem;
+      cursor: pointer;
+      border: none;
+      transition: all 0.2s ease;
+    }
+
+    .btn-violet { background: #7c3aed; color: white; }
+    .btn-violet:hover { background: #6d28d9; }
+
+    .btn-amber { background: #d97706; color: white; }
+    .btn-amber:hover { background: #b45309; }
+
+    .btn-cyan { background: #0284c7; color: white; }
+    .btn-cyan:hover { background: #0369a1; }
+
+    .btn-outline {
+      background: white;
+      border: 1px solid #cbd5e1;
+      color: var(--text-dark);
+    }
+    .btn-outline:hover {
+      background: #f1f5f9;
+    }
+
+    .sim-display {
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      padding: 18px;
+      margin-top: 14px;
+    }
+
+    .step-line {
+      padding: 10px 14px;
+      background: #f8fafc;
+      border-left: 3px solid #6366f1;
+      margin-bottom: 10px;
+      border-radius: 0 4px 4px 0;
+      animation: fadeIn 0.3s ease;
+    }
+
+    .data-pill-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 8px;
+    }
+
+    .data-pill {
+      background: #e2e8f0;
+      border: 1px solid #cbd5e1;
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-family: var(--font-code);
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: #1e293b;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(4px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Badge สถานะ */
+    .badge {
+      display: inline-block;
+      padding: 2px 10px;
+      border-radius: 4px;
+      font-size: 0.85rem;
+      font-weight: 600;
+    }
+    .badge-discrete { background: #dbeafe; color: #1e40af; }
+    .badge-continuous { background: #fef3c7; color: #92400e; }
+
+    /* ตารางคณิตศาสตร์และรูบริก */
+    .table-math {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 14px 0;
+      font-size: 0.95rem;
+    }
+
+    .table-math th, .table-math td {
+      border: 1px solid #cbd5e1;
+      padding: 10px 14px;
+      text-align: left;
+      vertical-align: top;
+    }
+
+    .table-math th {
+      background: #f1f5f9;
+      color: #0f172a;
+      font-weight: 700;
+    }
+
+    .table-math tr:nth-child(even) td {
+      background: #fcfcfd;
+    }
+
+    /* ส่วนใบงานและปุ่มควบคุม */
+    .worksheet-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-bottom: 20px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid #e2e8f0;
+    }
+
+    .worksheet-container {
+      background: white;
+      border: 1px solid #cbd5e1;
+      border-radius: 6px;
+      padding: 24px;
+    }
+
+    .worksheet-header-print {
+      display: none;
+    }
+
+    .worksheet-q-item {
+      padding: 14px 0;
+      border-bottom: 1px dashed #e2e8f0;
+      page-break-inside: avoid;
+    }
+
+    .worksheet-q-item:last-child {
+      border-bottom: none;
+    }
+
+    .student-write-area {
+      min-height: 48px;
+      margin-top: 8px;
+      border: 1px dashed #cbd5e1;
+      background: #fafafa;
+      border-radius: 4px;
+      padding: 8px 12px;
+      color: #94a3b8;
+      font-size: 0.9rem;
+    }
+
+    .answer-key-box {
+      margin-top: 8px;
+      padding: 10px 14px;
+      background: #ecfdf5;
+      border-left: 3px solid #059669;
+      color: #065f46;
+      border-radius: 0 4px 4px 0;
+      font-size: 0.93rem;
+    }
+
+    /* =========================================================
+       PRINT CSS: ควบคุมการพิมพ์เอกสาร ตัดหน้าว่างทิ้ง 100%
+       ========================================================= */
+    @page {
+      size: A4 portrait;
+      margin: 12mm 15mm;
+    }
+
+    @media print {
+      body, html {
+        background: white !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        height: auto !important;
+        overflow: visible !important;
+      }
+
+      .document-header,
+      .frame-1,
+      .frame-2,
+      .frame-3,
+      .frame-4,
+      .frame-6,
+      .worksheet-actions,
+      .frame-header,
+      .no-print {
+        display: none !important;
+      }
+
+      .main-container {
+        display: block !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        gap: 0 !important;
+      }
+
+      .frame-5 {
+        border: none !important;
+        box-shadow: none !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        background: transparent !important;
+        border-radius: 0 !important;
+      }
+
+      .frame-5 .frame-body {
+        padding: 0 !important;
+      }
+
+      .worksheet-container {
+        border: none !important;
+        padding: 0 !important;
+        box-shadow: none !important;
+        width: 100% !important;
+      }
+
+      .worksheet-header-print {
+        display: block !important;
+        margin-bottom: 14px;
+        padding-bottom: 10px;
+        border-bottom: 2px solid #000;
+        text-align: center;
+      }
+
+      .worksheet-header-print h2 {
+        font-size: 16pt;
+        color: #000 !important;
+        margin-bottom: 4px;
+      }
+
+      .worksheet-header-print p {
+        font-size: 11pt;
+        color: #333 !important;
+      }
+
+      .print-meta-grid {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 10px;
+        font-size: 10.5pt;
+        color: #000 !important;
+      }
+
+      .student-write-area {
+        min-height: 52px !important;
+        background: transparent !important;
+        border: 1px solid #475569 !important;
+        color: #334155 !important;
+        font-size: 10pt !important;
+      }
+
+      .worksheet-q-item {
+        padding: 10px 0 !important;
+        border-bottom: 1px dashed #94a3b8 !important;
+        page-break-inside: avoid !important;
+      }
+
+      .answer-key-box {
+        background: #f0fdf4 !important;
+        border-left: 3px solid #000 !important;
+        color: #000 !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<div class="main-container">
+
+  <!-- ส่วนหัวเอกสารทางการ -->
+  <header class="document-header">
+    <h1>เอกสารการเรียนรู้คณิตศาสตร์: เรื่องที่ 1 ตัวแปรสุ่ม</h1>
+    <p>หน่วยการเรียนรู้: ตัวแปรสุ่มและการแจกแจงความน่าจะเป็น (Random Variables & Probability Distributions)</p>
+  </header>
+
+  <!-- ==========================================
+       เฟรมที่ 1: ปรับปรุงเรื่อง ตัวแปรสุ่ม (แนวคิดพื้นฐาน)
+       ========================================== -->
+  <section class="frame-box frame-1">
+    <div class="frame-header">
+      <h2>1. แนวคิดพื้นฐานสู่ตัวแปรสุ่ม (Foundation of Random Variables)</h2>
+      <span class="frame-tag">การทดลองสุ่มและปริภูมิตัวอย่าง</span>
+    </div>
+    <div class="frame-body">
+      <div class="math-def">
+        <div class="math-def-title">ทบทวนมโนทัศน์เบื้องต้น (Mathematical Review):</div>
+        <strong>การทดลองสุ่ม (Random Experiment)</strong> คือ การทดลองหรือกระบวนการที่ไม่สามารถทำนายผลลัพธ์ล่วงหน้าได้อย่างแน่นอน แต่ทราบว่าผลลัพธ์ที่เป็นไปได้ทั้งหมดมีอะไรบ้าง <br>
+        เซตของผลลัพธ์ที่เป็นไปได้ทั้งหมด เรียกว่า <strong>ปริภูมิตัวอย่าง (Sample Space)</strong> เขียนแทนด้วย $S$ และสมาชิกลำดับผลลัพธ์แทนด้วย $\omega \in S$
+      </div>
+
+      <div class="grid-2">
+        <div class="card-sub">
+          <h3 style="color: var(--frame1-head);">ข้อจำกัดของผลลัพธ์เชิงคุณภาพ</h3>
+          <p>
+            ในทางสถิติและทฤษฎีความน่าจะเป็น ผลลัพธ์ใน $S$ มักเป็นข้อความหรือลักษณะเชิงคุณภาพ เช่น การโยนเหรียญได้ $\{\text{หัว}, \text{ก้อย}\}$ หรือการตรวจสอบสินค้าได้ $\{\text{ดี}, \text{ชำรุด}\}$ 
+            ซึ่งไม่สามารถนำมาดำเนินการบวก ลบ คูณ หรือหาค่าเฉลี่ยทางคณิตศาสตร์ได้โดยตรง
+          </p>
+        </div>
+        <div class="card-sub">
+          <h3 style="color: var(--frame1-head);">บทบาทของตัวแปรสุ่ม</h3>
+          <p>
+            คณิตศาสตร์จึงสร้าง <strong>ตัวแปรสุ่ม</strong> ขึ้นมาทำหน้าที่เป็นสะพานเชื่อม แปลงผลลัพธ์เชิงพรรณนา $\omega \in S$ ให้กลายเป็น <strong>ปริมาณตัวเลขบนเซตของจำนวนจริง $\mathbb{R}$</strong> ทำให้เราสามารถสร้างฟังก์ชันความน่าจะเป็น คำนวณค่าเฉลี่ย (ค่าคาดหมาย) และความแปรปรวนได้อย่างเป็นระบบ
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==========================================
+       เฟรมที่ 2: ความหมายของตัวแปรสุ่มและการจำแนก
+       ========================================== -->
+  <section class="frame-box frame-2">
+    <div class="frame-header">
+      <h2>2. ความหมายของตัวแปรสุ่ม และการจำแนกชนิด</h2>
+      <span class="frame-tag">มโนทัศน์หลัก</span>
+    </div>
+    <div class="frame-body">
+      <div class="math-def">
+        <div class="math-def-title">บทนิยามตัวแปรสุ่ม (Definition of Random Variable):</div>
+        ให้ $S$ แทนปริภูมิตัวอย่างของการทดลองสุ่มหนึ่ง ๆ <br>
+        <strong>ตัวแปรสุ่ม (Random Variable: $X$)</strong> คือ ฟังก์ชันที่ส่งผลลัพธ์จากปริภูมิตัวอย่างไปยังเซตของจำนวนจริง:
+        \[X: S \to \mathbb{R}\]
+        และเรียกเซตของค่าที่เป็นไปได้ทั้งหมดของตัวแปรสุ่มว่า $S_X$ หรือ $R_X = \{X(\omega) \mid \omega \in S\} \subseteq \mathbb{R}$
+      </div>
+
+      <p style="margin-bottom: 14px;">
+        <strong>การจำแนกประเภทของตัวแปรสุ่ม:</strong> จำแนกตามลักษณะของเซตค่าที่เป็นไปได้ $S_X$ ออกเป็น 2 ประเภทหลัก:
+      </p>
+
+      <div class="grid-2">
+        <div class="card-sub" style="border-left: 4px solid var(--frame2-border);">
+          <h3 style="color: var(--frame2-head);">1. ตัวแปรสุ่มไม่ต่อเนื่อง (Discrete Random Variable)</h3>
+          <p>คือ ตัวแปรสุ่มที่เซตของค่าที่เป็นไปได้ทั้งหมดเป็น <strong>เซตจำกัด (Finite Set)</strong> หรือ <strong>เซตอนันต์ที่นับได้ (Countably Infinite Set)</strong></p>
+          <ul style="padding-left: 20px; margin-top: 8px;">
+            <li><strong>ที่มา:</strong> เกิดจากการนับ (Counting Process)</li>
+            <li><strong>ลักษณะค่า:</strong> ค่าแยกขาดจากกันชัดเจน เช่น $x \in \{0, 1, 2, \dots, n\}$</li>
+            <li><strong>ตัวอย่าง:</strong> จำนวนครั้งที่เหรียญขึ้นหัว, จำนวนสินค้าที่ชำรุดในกล่อง</li>
+          </ul>
+        </div>
+
+        <div class="card-sub" style="border-left: 4px solid #047857;">
+          <h3 style="color: var(--frame2-head);">2. ตัวแปรสุ่มต่อเนื่อง (Continuous Random Variable)</h3>
+          <p>คือ ตัวแปรสุ่มที่เซตของค่าที่เป็นไปได้ทั้งหมดเป็น <strong>ช่วงของจำนวนจริง (Interval of Real Numbers)</strong> หรือเซตอนันต์ที่นับไม่ได้</p>
+          <ul style="padding-left: 20px; margin-top: 8px;">
+            <li><strong>ที่มา:</strong> เกิดจากการวัด (Measurement Process)</li>
+            <li><strong>ลักษณะค่า:</strong> ต่อเนื่องเป็นช่วง เช่น $x \in [a, b]$ หรือ $x \in (0, \infty)$</li>
+            <li><strong>ตัวอย่าง:</strong> ปริมาณแรงดันไฟฟ้า, เวลาในการรอคอย, น้ำหนักของผลผลิต</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==========================================
+       เฟรมที่ 3: HTML Interactive Model
+       ========================================== -->
+  <section class="frame-box frame-3">
+    <div class="frame-header">
+      <h2>3. แบบจำลองเชิงโต้ตอบ: การทดลองสุ่มและค่าตัวแปรสุ่ม (Interactive Simulation)</h2>
+      <span class="frame-tag">ห้องทดลองสุ่มและวิเคราะห์</span>
+    </div>
+    <div class="frame-body">
+      <!-- ส่วนควบคุมตัวแปร -->
+      <div class="control-panel">
+        <div class="control-item">
+          <label for="simExpType">1. ประเภทการทดลอง:</label>
+          <select id="simExpType" onchange="onExpTypeChange()">
+            <option value="coin">การโยนเหรียญเที่ยงตรง (Coin Toss)</option>
+            <option value="dice">การทอดลูกเต๋า 6 หน้า (Dice Roll)</option>
+            <option value="battery">การทดสอบแบตเตอรี่/อุปกรณ์ไฟฟ้า (Continuous Model)</option>
+          </select>
+        </div>
+
+        <div class="control-item" id="trialControlWrapper">
+          <label id="trialControlLabel" for="simTrials">2. จำนวนครั้งของการทดลอง ($n$):</label>
+          <input type="number" id="simTrials" min="1" max="20" value="5">
+        </div>
+
+        <div class="control-item">
+          <label for="simCondition">3. เงื่อนไขกำหนดตัวแปรสุ่ม ($X$):</label>
+          <select id="simCondition">
+            <!-- ตัวเลือกสร้างผ่าน JS -->
+          </select>
+        </div>
+
+        <div class="control-item" style="justify-content: flex-end;">
+          <button class="btn btn-violet" onclick="runInteractiveSim()">
+            <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M5 3l14 9-14 9V3z"/></svg>
+            เริ่มทดลองสุ่ม
+          </button>
+        </div>
+      </div>
+
+      <!-- สรุปผลการสังเกตและวิเคราะห์ -->
+      <div class="sim-display" id="simObservationDisplay">
+        <div style="text-align: center; color: var(--text-muted); padding: 12px;">
+          กดปุ่ม <strong>"เริ่มทดลองสุ่ม"</strong> เพื่อสังเกตค่าที่วัดได้จริง การกระจายตัว และการวิเคราะห์ทางคณิตศาสตร์
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==========================================
+       เฟรมที่ 4: คลังโจทย์สุ่มและเฉลยขั้นตอน
+       ========================================== -->
+  <section class="frame-box frame-4">
+    <div class="frame-header">
+      <h2>4. คลังโจทย์สุ่มและเฉลยขั้นตอน (Random Practice)</h2>
+      <span class="frame-tag">ฝึกทักษะ</span>
+    </div>
+    <div class="frame-body">
+      <div style="display: flex; gap: 12px; margin-bottom: 16px;">
+        <button class="btn btn-amber" onclick="generateSinglePracticeQuestion()">
+          <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+          สุ่มโจทย์ใหม่
+        </button>
+        <button class="btn btn-outline" id="btnRevealNext" onclick="revealNextStep()" disabled>
+          แสดงเฉลยทีละบรรทัด
+        </button>
+      </div>
+
+      <!-- กล่องแสดงคำถาม -->
+      <div class="card-sub" id="practiceQuestionBox" style="background:#fffdfa; border-color:#fde68a;">
+        <!-- ข้อความโจทย์แสดงที่นี่ -->
+      </div>
+
+      <!-- กล่องแสดงเฉลยทีละบรรทัด -->
+      <div id="practiceStepsContainer" style="margin-top: 14px;"></div>
+    </div>
+  </section>
+
+  <!-- ==========================================
+       เฟรมที่ 5: ส่วนทำใบงานให้นักเรียน (Worksheet)
+       ========================================== -->
+  <section class="frame-box frame-5">
+    <div class="frame-header">
+      <h2>5. ระบบสร้างใบงานและแบบประเมิน (Worksheet Generator)</h2>
+      <span class="frame-tag">พิมพ์เอกสาร</span>
+    </div>
+    <div class="frame-body">
+      
+      <!-- ปุ่มคำสั่งด้านบน -->
+      <div class="worksheet-actions no-print">
+        <button class="btn btn-cyan" onclick="generateNew5Worksheet()">
+          <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+          สุ่มโจทย์ 5 ข้อใหม่
+        </button>
+        <button class="btn btn-outline" onclick="printWorksheet(false)">
+          <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4H7v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/></svg>
+          พิมพ์ใบงานสำหรับนักเรียน
+        </button>
+        <button class="btn btn-outline" onclick="printWorksheet(true)">
+          <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+          พิมพ์เฉลยสำหรับครู
+        </button>
+      </div>
+
+      <!-- พื้นที่ใบงาน (Print Target) -->
+      <div class="worksheet-container" id="worksheet-print-area">
+        
+        <!-- ส่วนหัวใบงานสำหรับพิมพ์ -->
+        <div class="worksheet-header-print">
+          <h2>ใบงานคณิตศาสตร์: เรื่องที่ 1 การกำหนดและจำแนกตัวแปรสุ่ม</h2>
+          <p>กลุ่มสาระการเรียนรู้คณิตศาสตร์ | เรื่อง ตัวแปรสุ่มและการแจกแจงความน่าจะเป็น</p>
+          <div class="print-meta-grid">
+            <span>ชื่อ-นามสกุล: ............................................................................</span>
+            <span>ชั้น ม.6/......</span>
+            <span>เลขที่: ..........</span>
+            <span>คะแนนเต็ม: 15 คะแนน</span>
+          </div>
+        </div>
+
+        <p class="no-print" style="margin-bottom: 12px; color: var(--text-muted); font-size: 0.95rem;">
+          คำชี้แจง: จงระบุการกำหนดตัวแปรสุ่ม $X$, ค่าที่เป็นไปได้ทั้งหมด ($S_X$) และจำแนกชนิดของตัวแปรสุ่มให้ถูกต้องครบถ้วน
+        </p>
+
+        <!-- รายการโจทย์ 5 ข้อ -->
+        <div id="worksheetQuestionsList">
+          <!-- สร้างข้อความโจทย์ด้วย JS -->
+        </div>
+
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ==========================================
+       เฟรมที่ 6: เกณฑ์การตรวจรูบริก (Rubric 3 ระดับ)
+       ========================================== -->
+  <section class="frame-box frame-6">
+    <div class="frame-header">
+      <h2>6. รูบริกการประเมินใบงาน (Scoring Rubric - 3 ระดับ)</h2>
+      <span class="frame-tag">การวัดและประเมินผล</span>
+    </div>
+    <div class="frame-body">
+      <p style="margin-bottom: 12px;">
+        เกณฑ์การประเมินผลการเรียนรู้รายข้อ (ข้อละ 3 คะแนน รวม 5 ข้อ 15 คะแนน) โดยใช้เกณฑ์แบบวิเคราะห์ (Analytic Rubric) ตามมาตรฐานเอกสารคณิตศาสตร์:
+      </p>
+
+      <table class="table-math">
+        <thead>
+          <tr>
+            <th style="width: 22%;">ประเด็นการประเมิน</th>
+            <th style="width: 26%;">ระดับ 3 (ดีเยี่ยม - 3 คะแนน)</th>
+            <th style="width: 26%;">ระดับ 2 (พอใช้ - 2 คะแนน)</th>
+            <th style="width: 26%;">ระดับ 1 (ต้องปรับปรุง - 1 คะแนน)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>
+              <strong>1. การกำหนดตัวแปรสุ่ม $X$</strong><br>
+              <span style="font-size:0.85rem; color:var(--text-muted);">(ความถูกต้องของฟังก์ชัน)</span>
+            </td>
+            <td>
+              กำหนดสัญลักษณ์ $X$ และนิยามตัวแปรสุ่มสอดคล้องกับผลลัพธ์ในปริภูมิตัวอย่าง $S$ อย่างรัดกุมและถูกต้องทุกประการ
+            </td>
+            <td>
+              กำหนดสัญลักษณ์ $X$ ได้ แต่การเขียนระบุความหมายยังคลาดเคลื่อนบางส่วนหรือไม่สมบูรณ์
+            </td>
+            <td>
+              ไม่สามารถระบุสัญลักษณ์ $X$ หรือกำหนดความหมายไม่สอดคล้องกับสถานการณ์ที่กำหนดให้
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <strong>2. การหาเซตของค่าที่เป็นไปได้ ($S_X$)</strong><br>
+              <span style="font-size:0.85rem; color:var(--text-muted);">(สัญลักษณ์เซต/ช่วง)</span>
+            </td>
+            <td>
+              ระบุค่าที่เป็นไปได้ทั้งหมดครบถ้วน ใช้สัญลักษณ์เซตแจกแจงสมาชิก $\{x_1, x_2, \dots\}$ หรือสัญลักษณ์ช่วง $[a, b]$ ถูกต้องตามหลักคณิตศาสตร์
+            </td>
+            <td>
+              ระบุค่าที่เป็นไปได้ถูกต้อง แต่ไม่ครบทุกกรณี หรือเขียนสัญลักษณ์ทางเซต/ช่วงผิดพลาดเล็กน้อย
+            </td>
+            <td>
+              ระบุค่าที่เป็นไปได้ผิดพลาด ไม่สอดคล้องกับธรรมชาติของผลการทดลองสุ่ม
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <strong>3. การจำแนกชนิดของตัวแปรสุ่ม</strong><br>
+              <span style="font-size:0.85rem; color:var(--text-muted);">(ความเข้าใจมโนทัศน์)</span>
+            </td>
+            <td>
+              จำแนกชนิดตัวแปรสุ่มถูกต้องชัดเจนว่าเป็น <em>ไม่ต่อเนื่อง</em> หรือ <em>ต่อเนื่อง</em> พร้อมให้เหตุผลทางคณิตศาสตร์ประกอบ (เช่น ชี้ว่าได้จากการนับหรือการวัด)
+            </td>
+            <td>
+              จำแนกชนิดตัวแปรสุ่มได้ถูกต้อง แต่ไม่สามารถให้เหตุผลประกอบ หรือเหตุผลยังไม่สมบูรณ์
+            </td>
+            <td>
+              จำแนกชนิดตัวแปรสุ่มผิดพลาด หรือสับสนระหว่างตัวแปรสุ่มไม่ต่อเนื่องกับตัวแปรสุ่มต่อเนื่อง
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div style="background: #fff1f2; border: 1px solid #fecdd3; padding: 12px 16px; border-radius: 6px; font-size: 0.92rem; color: #9f1239;">
+        <strong>เกณฑ์การตัดสินระดับคุณภาพรวม (15 คะแนนเต็ม):</strong><br>
+        13 – 15 คะแนน = ระดับดีมาก | 9 – 12 คะแนน = ระดับดี (ผ่านเกณฑ์) | 5 – 8 คะแนน = ระดับพอใช้ | น้อยกว่า 5 คะแนน = ระดับปรับปรุง
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<!-- ==========================================
+     JavaScript Logic
+     ========================================== -->
+<script>
+  /* ------------------------------------------
+     1. Interactive Simulation Model
+     ------------------------------------------ */
+  const simConditionsMap = {
+    coin: [
+      { id: "heads", label: "จำนวนครั้งที่เหรียญขึ้นหน้าหัว (Head)", type: "discrete" },
+      { id: "tails", label: "จำนวนครั้งที่เหรียญขึ้นหน้าก้อย (Tail)", type: "discrete" }
+    ],
+    dice: [
+      { id: "sum", label: "ผลรวมของแต้มบนหน้าลูกเต๋า", type: "discrete" },
+      { id: "sixCount", label: "จำนวนครั้งที่ขึ้นแต้ม 6", type: "discrete" },
+      { id: "evenCount", label: "จำนวนครั้งที่ขึ้นแต้มคู่ (2, 4, 6)", type: "discrete" }
+    ],
+    battery: [
+      { id: "voltage", label: "แรงดันไฟฟ้ากระแสตรงที่วัดได้จริง (โวลต์: V)", type: "continuous" },
+      { id: "hours", label: "ระยะเวลาใช้งานต่อเนื่องจนแบตเตอรี่หมด (ชั่วโมง: ชม.)", type: "continuous" }
+    ]
+  };
+
+  function onExpTypeChange() {
+    const exp = document.getElementById("simExpType").value;
+    const condSelect = document.getElementById("simCondition");
+    const trialLabel = document.getElementById("trialControlLabel");
+
+    condSelect.innerHTML = "";
+    simConditionsMap[exp].forEach((c, idx) => {
+      const opt = document.createElement("option");
+      opt.value = idx;
+      opt.textContent = c.label;
+      condSelect.appendChild(opt);
+    });
+
+    if (exp === "battery") {
+      trialLabel.innerHTML = '2. จำนวนตัวอย่างที่สุ่มวัด ($n$ ชิ้น):';
+    } else {
+      trialLabel.innerHTML = '2. จำนวนครั้งของการทดลอง ($n$ ครั้ง):';
+    }
+    renderMath(trialLabel);
+  }
+
+  function runInteractiveSim() {
+    const exp = document.getElementById("simExpType").value;
+    const condIdx = parseInt(document.getElementById("simCondition").value) || 0;
+    const n = Math.min(Math.max(parseInt(document.getElementById("simTrials").value) || 1, 1), 20);
+    const cond = simConditionsMap[exp][condIdx];
+    const display = document.getElementById("simObservationDisplay");
+
+    let outcomeHTML = "";
+    let dataList = [];
+    let xValFormula = "";
+    let possibleValues = "";
+    let classification = "";
+    let reasonText = "";
+    let analysisTable = "";
+
+    if (exp === "coin") {
+      let flips = [];
+      let hCount = 0;
+      for (let i = 0; i < n; i++) {
+        let f = Math.random() < 0.5 ? "H" : "T";
+        flips.push(f);
+        if (f === "H") hCount++;
+      }
+      let tCount = n - hCount;
+      let val = (cond.id === "heads") ? hCount : tCount;
+
+      outcomeHTML = `
+        <div>ลำดับผลลัพธ์เหรียญ:</div>
+        <div class="data-pill-container">
+          ${flips.map((f, i) => `<span class="data-pill">ครั้งที่ ${i+1}: ${f === 'H' ? 'หัว (H)' : 'ก้อย (T)'}</span>`).join("")}
+        </div>
+      `;
+      xValFormula = `X = ${val} \\text{ ครั้ง (จากทั้งหมด ${n} ครั้ง)}`;
+      possibleValues = `\\{0, 1, 2, \\dots, ${n}\\}`;
+      classification = `<span class="badge badge-discrete">ตัวแปรสุ่มไม่ต่อเนื่อง (Discrete)</span>`;
+      reasonText = `เกิดจากการนับจำนวนครั้งที่เกิดเหตุการณ์ เซตของค่าที่เป็นไปได้เป็นเซตจำกัด`;
+
+      let ratio = (val / n).toFixed(4);
+      analysisTable = `
+        <div style="overflow-x: auto; margin-top: 10px;">
+          <table class="table-math" style="margin: 0; background: white;">
+            <thead>
+              <tr>
+                <th>จำนวนครั้งทั้งหมด ($n$)</th>
+                <th>จำนวนครั้งที่สอดคล้อง ($X$)</th>
+                <th>อัตราส่วนความถี่สัมพัทธ์ ($\\frac{X}{n}$)</th>
+                <th>ความน่าจะเป็นทางทฤษฎี ($P$)</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>${n}</td>
+                <td><strong style="color:#2563eb;">${val}</strong></td>
+                <td><strong>${ratio}</strong></td>
+                <td>$0.5000$ (เมื่อเหรียญเที่ยงตรง)</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      `;
+    } 
+    else if (exp === "dice") {
+      let rolls = [];
+      let sum = 0, sixes = 0, evens = 0;
+      for (let i = 0; i < n; i++) {
+        let r = Math.floor(Math.random() * 6) + 1;
+        rolls.push(r);
+        sum += r;
+        if (r === 6) sixes++;
+        if (r % 2 === 0) evens++;
+      }
+
+      outcomeHTML = `
+        <div>แต้มที่ทอดได้แต่ละครั้ง:</div>
+        <div class="data-pill-container">
+          ${rolls.map((r, i) => `<span class="data-pill">ครั้งที่ ${i+1}: [ แต้ม ${r} ]</span>`).join("")}
+        </div>
+      `;
+
+      let val = (cond.id === "sum") ? sum : (cond.id === "sixCount" ? sixes : evens);
+      xValFormula = `X = ${val}`;
+      possibleValues = (cond.id === "sum") ? `\\{${n}, ${n+1}, \\dots, ${6*n}\\}` : `\\{0, 1, \\dots, ${n}\\}`;
+      classification = `<span class="badge badge-discrete">ตัวแปรสุ่มไม่ต่อเนื่อง (Discrete)</span>`;
+      reasonText = `เซตของค่าที่เป็นไปได้เป็นจำนวนเต็มที่นับได้และมีขอบเขตจำกัด`;
+
+      let meanRoll = (sum / n).toFixed(2);
+      let minRoll = Math.min(...rolls);
+      let maxRoll = Math.max(...rolls);
+      analysisTable = `
+        <div style="overflow-x: auto; margin-top: 10px;">
+          <table class="table-math" style="margin: 0; background: white;">
+            <thead>
+              <tr>
+                <th>จำนวนครั้ง ($n$)</th>
+                <th>แต้มต่ำสุด</th>
+                <th>แต้มสูงสุด</th>
+                <th>ผลรวมแต้มทั้งหมด</th>
+                <th>ค่าเฉลี่ยแต้มต่อครั้ง</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>${n}</td>
+                <td>${minRoll}</td>
+                <td>${maxRoll}</td>
+                <td><strong style="color:#7c3aed;">${sum}</strong></td>
+                <td>${meanRoll} (ค่าคาดหมายทฤษฎีคือ $3.5$)</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      `;
+    } 
+    else if (exp === "battery") {
+      let sum = 0;
+      let unit = cond.id === "hours" ? "ชม." : "V";
+      for (let i = 0; i < n; i++) {
+        let val = cond.id === "hours" 
+          ? (Math.random() * 8.5 + 4.2).toFixed(3)
+          : (Math.random() * 2.3 + 11.1).toFixed(3);
+        let num = parseFloat(val);
+        dataList.push(num);
+        sum += num;
+      }
+      
+      let mean = (sum / n).toFixed(3);
+      let minVal = Math.min(...dataList).toFixed(3);
+      let maxVal = Math.max(...dataList).toFixed(3);
+      let rangeVal = (maxVal - minVal).toFixed(3);
+
+      outcomeHTML = `
+        <div>ชุดข้อมูลการวัดจริงรายชิ้นตัวอย่าง ($n = ${n}$):</div>
+        <div class="data-pill-container">
+          ${dataList.map((v, i) => `<span class="data-pill">ชิ้นที่ ${i+1}: <strong>${v}</strong> ${unit}</span>`).join("")}
+        </div>
+      `;
+
+      xValFormula = (n === 1) 
+        ? `X = ${dataList[0]} \\text{ ${unit}}` 
+        : `\\bar{X} = ${mean} \\text{ ${unit}} \\quad \\text{(ค่าเฉลี่ยตัวอย่างที่วัดได้)}`;
+      
+      possibleValues = cond.id === "hours" ? `[0, \\infty) \\text{ หรือช่วงจำนวนจริงบวก}` : `(0, 15] \\text{ โวลต์}`;
+      classification = `<span class="badge badge-continuous">ตัวแปรสุ่มต่อเนื่อง (Continuous)</span>`;
+      reasonText = `ได้จากการวัดด้วยเครื่องมือละเอียด ค่าของตัวแปรสุ่มสามารถเป็นทศนิยมใด ๆ ก็ได้ในช่วงของจำนวนจริง`;
+
+      analysisTable = `
+        <div style="overflow-x: auto; margin-top: 10px;">
+          <table class="table-math" style="margin: 0; background: white;">
+            <thead>
+              <tr style="background:#f8fafc;">
+                <th>ขนาดตัวอย่าง ($n$)</th>
+                <th>ค่าต่ำสุด ($x_{\\min}$)</th>
+                <th>ค่าสูงสุด ($x_{\\max}$)</th>
+                <th>พิสัย ($x_{\\max} - x_{\\min}$)</th>
+                <th>ค่าเฉลี่ยตัวอย่าง ($\\bar{x}$)</th>
+                <th>นัยสำคัญทางคณิตศาสตร์</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>${n} ตัวอย่าง</td>
+                <td>${minVal} ${unit}</td>
+                <td>${maxVal} ${unit}</td>
+                <td>${rangeVal} ${unit}</td>
+                <td><strong style="color:#059669;">${mean} ${unit}</strong></td>
+                <td>ค่าละเอียดต่อเนื่องใน $S_X$ ความน่าจะเป็นที่จุดเดี่ยว $P(X = c) = 0$</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      `;
+    }
+
+    display.innerHTML = `
+      <div style="display:flex; flex-direction:column; gap:10px;">
+        <div class="step-line" style="border-color:#2563eb;">
+          <strong>1. ผลลัพธ์จากการสุ่มวัดจริง (Observed Sample Data):</strong>
+          <div style="margin-top: 4px;">${outcomeHTML}</div>
+        </div>
+        
+        <div class="step-line" style="border-color:#059669;">
+          <strong>2. ค่าและสถิติที่ได้จากการวัดเพื่อการวิเคราะห์:</strong> 
+          <div style="font-size:1.1rem; font-weight:700; color:#059669; margin: 4px 0;">$${xValFormula}$</div>
+          ${analysisTable}
+        </div>
+
+        <div class="step-line" style="border-color:#d97706;">
+          <strong>3. เซตของค่าที่เป็นไปได้ทั้งหมดในทางทฤษฎี ($S_X$):</strong> $S_X = ${possibleValues}$
+        </div>
+
+        <div class="step-line" style="border-color:#7c3aed;">
+          <strong>4. ชนิดของตัวแปรสุ่ม:</strong> ${classification} 
+          <span style="display:block; font-size:0.92rem; color:var(--text-muted); margin-top:4px;"><strong>เหตุผล:</strong> ${reasonText}</span>
+        </div>
+      </div>
+    `;
+
+    renderMath(display);
+  }
+
+  /* ------------------------------------------
+     2. คลังโจทย์สุ่มและเฉลยขั้นตอน (Frame 4)
+     ------------------------------------------ */
+  const questionPool = [
+    {
+      q: "ทอดลูกเต๋าที่เที่ยงตรง 2 ลูกพร้อมกัน 1 ครั้ง กำหนดให้ $D$ คือ ค่าสัมบูรณ์ของผลต่างระหว่างแต้มของลูกเต๋าทั้งสองลูก",
+      steps: [
+        "ปริภูมิตัวอย่างประกอบด้วยคู่อันดับ $(a, b)$ ทั้งหมด $6 \\times 6 = 36$ แบบ โดย $a, b \\in \\{1, 2, 3, 4, 5, 6\\}$",
+        "กำหนดให้ตัวแปรสุ่ม $D = \\lvert a - b \\rvert$",
+        "ผลต่างต่ำสุดคือ $\\lvert 1 - 1 \\rvert = 0$ และสูงสุดคือ $\\lvert 6 - 1 \\rvert = 5$ ดังนั้น $S_D = \\{0, 1, 2, 3, 4, 5\\}$",
+        "สรุป: $D$ เป็น <strong>ตัวแปรสุ่มไม่ต่อเนื่อง (Discrete Random Variable)</strong> เพราะเซตของค่าที่เป็นไปได้มีสมาชิกเป็นจำนวนจำกัดเพียง 6 ค่า"
+      ]
+    },
+    {
+      q: "สุ่มหยิบสลาก 2 ใบพร้อมกัน จากกล่องที่มีสลากหมายเลข 1, 2, 3, 4, 5 โดยกำหนดให้ $X$ คือ ผลรวมของหมายเลขบนสลากทั้งสองใบ",
+      steps: [
+        "ปริภูมิตัวอย่างของการหยิบสลาก 2 ใบจาก 5 ใบ คือ $n(S) = \\binom{5}{2} = 10$ รูปแบบ โดยผลลัพธ์เป็นคู่ของสลากที่แตกต่างกัน",
+        "กำหนดให้ตัวแปรสุ่ม $X$ แทนผลรวมของหมายเลขบนสลากทั้งสองใบที่หยิบได้",
+        "ผลรวมที่น้อยที่สุดคือ $1 + 2 = 3$ และผลรวมที่มากที่สุดคือ $4 + 5 = 9$ ดังนั้น $S_X = \\{3, 4, 5, 6, 7, 8, 9\\}$",
+        "สรุป: $X$ เป็น <strong>ตัวแปรสุ่มไม่ต่อเนื่อง (Discrete Random Variable)</strong> เนื่องจากเซตของค่าที่เป็นไปได้เป็นเซตจำกัดของจำนวนเต็ม"
+      ]
+    },
+    {
+      q: "ในการทดสอบคุณภาพน้ำในแม่น้ำแห่งหนึ่ง กำหนดให้ $Y$ คือ ปริมาณออกซิเจนละลายน้ำ (Dissolved Oxygen: DO) มีหน่วยเป็นมิลลิกรัมต่อลิตร (mg/L)",
+      steps: [
+        "การทดลองสุ่มคือการเก็บตัวอย่างน้ำเพื่อนำมาวิเคราะห์ด้วยเครื่องมือทางวิทยาศาสตร์",
+        "กำหนดให้ตัวแปรสุ่ม $Y$ แทนปริมาณออกซิเจนละลายน้ำที่ตรวจวัดได้จริง",
+        "เนื่องจากปริมาณออกซิเจนได้จากการวัด ค่าที่เป็นไปได้จึงเป็นจำนวนจริงที่ไม่ติดลบ ดังนั้น $S_Y = [0, \\infty)$ หรือช่วง $(0, 20]$ ในทางปฏิบัติ",
+        "สรุป: $Y$ เป็น <strong>ตัวแปรสุ่มต่อเนื่อง (Continuous Random Variable)</strong> เพราะเซตของค่าที่เป็นไปได้เป็นช่วงของจำนวนจริง"
+      ]
+    },
+    {
+      q: "โยนเหรียญ 1 เหรียญซ้ำไปเรื่อย ๆ จนกระทั่งเหรียญขึ้นหน้าก้อยเป็นครั้งแรกจึงหยุด ให้ $Z$ คือ จำนวนครั้งที่ต้องโยนเหรียญทั้งหมด",
+      steps: [
+        "ผลลัพธ์ที่เป็นไปได้คือ $(T), (H, T), (H, H, T), (H, H, H, T), \\dots$",
+        "กำหนดให้ตัวแปรสุ่ม $Z$ แทนจำนวนครั้งที่ต้องโยนเหรียญทั้งหมดจนกระทั่งออกก้อย",
+        "จำนวนครั้งที่โยนต้องเป็นจำนวนนับ โดยการทดลองอาจไม่สิ้นสุดในทางทฤษฎี ดังนั้น $S_Z = \\{1, 2, 3, 4, \\dots\\}$",
+        "สรุป: $Z$ เป็น <strong>ตัวแปรสุ่มไม่ต่อเนื่อง (Discrete Random Variable)</strong> เพราะค่าที่เป็นไปได้เป็นเซตอนันต์ที่นับได้ (Countably Infinite Set)"
+      ]
+    },
+    {
+      q: "การชั่งน้ำหนักแตงโม 1 ผลที่สุ่มมาจากสวนเกษตรอินทรีย์ โดยกำหนดให้ $W$ คือ น้ำหนักจริงของแตงโม (กิโลกรัม)",
+      steps: [
+        "การทดลองสุ่มคือการหยิบแตงโมขึ้นมาวางบนเครื่องชั่งที่มีความละเอียดสูง",
+        "กำหนดให้ตัวแปรสุ่ม $W$ แทนนัยสำคัญของน้ำหนักผลแตงโมที่ชั่งได้",
+        "น้ำหนักเป็นปริมาณที่ได้จากการชั่งวัด ค่าที่เป็นไปได้จึงเป็นช่วงจำนวนจริง $S_W = (0, \\infty)$ หรือในช่วงทางชีววิทยา $[0.5, 15]$ กิโลกรัม",
+        "สรุป: $W$ เป็น <strong>ตัวแปรสุ่มต่อเนื่อง (Continuous Random Variable)</strong> เนื่องจากมีค่าต่อเนื่องได้ทุกค่าในช่วงจำนวนจริง"
+      ]
+    }
+  ];
+
+  let currentPracticeIdx = -1;
+  let currentStepIdx = 0;
+
+  function generateSinglePracticeQuestion() {
+    let nextIdx = Math.floor(Math.random() * questionPool.length);
+    if (nextIdx === currentPracticeIdx) {
+      nextIdx = (nextIdx + 1) % questionPool.length;
+    }
+    currentPracticeIdx = nextIdx;
+    currentStepIdx = 0;
+
+    const qItem = questionPool[currentPracticeIdx];
+    const qBox = document.getElementById("practiceQuestionBox");
+    const sBox = document.getElementById("practiceStepsContainer");
+    const btn = document.getElementById("btnRevealNext");
+
+    qBox.innerHTML = `<strong>สถานการณ์โจทย์:</strong> ${qItem.q}`;
+    sBox.innerHTML = "";
+    btn.disabled = false;
+    btn.textContent = `แสดงเฉลยบรรทัดที่ 1 (จาก 4 บรรทัด)`;
+
+    renderMath(qBox);
+  }
+
+  function revealNextStep() {
+    if (currentPracticeIdx === -1) return;
+    const qItem = questionPool[currentPracticeIdx];
+    const sBox = document.getElementById("practiceStepsContainer");
+    const btn = document.getElementById("btnRevealNext");
+
+    if (currentStepIdx < qItem.steps.length) {
+      const stepDiv = document.createElement("div");
+      stepDiv.className = "step-line";
+      stepDiv.innerHTML = `<strong>บรรทัดที่ ${currentStepIdx + 1}:</strong> ${qItem.steps[currentStepIdx]}`;
+      sBox.appendChild(stepDiv);
+      renderMath(stepDiv);
+
+      currentStepIdx++;
+      if (currentStepIdx < qItem.steps.length) {
+        btn.textContent = `แสดงเฉลยบรรทัดที่ ${currentStepIdx + 1} (จาก 4 บรรทัด)`;
+      } else {
+        btn.textContent = "แสดงเฉลยครบทุกขั้นตอนแล้ว";
+        btn.disabled = true;
+      }
+    }
+  }
+
+  /* ------------------------------------------
+     3. ระบบใบงาน 5 ข้อ และพิมพ์เฉพาะใบงาน (Frame 5)
+     ------------------------------------------ */
+  const worksheetMasterBank = [
+    {
+      scenario: "สุ่มหยิบไพ่ 1 ใบจากสำรับมาตรฐาน (52 ใบ) กำหนดให้ $X$ คือ จำนวนหน้าที่เป็นรูปหน้าคน (แจ็ค, แหม่ม, คิง)",
+      ansVar: "ให้ $X$ แทนจำนวนใบที่เป็นไพ่รูปหน้าคนจากการหยิบ 1 ใบ",
+      ansSet: "$S_X = \\{0, 1\\}$",
+      ansType: "ตัวแปรสุ่มไม่ต่อเนื่อง (Discrete) เนื่องจากเกิดจากการนับและมีค่าจำกัดเพียง 2 ค่า"
+    },
+    {
+      scenario: "ชั่งน้ำหนักผลเมลอนบรรจุกล่องที่มีระบุน้ำหนักเฉลี่ย 2.5 กิโลกรัม กำหนดให้ $W$ คือ น้ำหนักจริงของผลเมลอนที่วัดได้ (กิโลกรัม)",
+      ansVar: "ให้ $W$ แทนน้ำหนักจริงของเมลอน (กก.)",
+      ansSet: "$S_W = (0, \\infty)$ หรือระบุเป็นช่วง $[1.5, 4.0]$",
+      ansType: "ตัวแปรสุ่มต่อเนื่อง (Continuous) เนื่องจากได้จากการวัดและเป็นช่วงของจำนวนจริง"
+    },
+    {
+      scenario: "จำนวนอุบัติเหตุทางจราจรที่เกิดขึ้นบนทางด่วนสายหนึ่งในช่วงเทศกาลปีใหม่ตลอดระยะเวลา 7 วัน กำหนดให้ $A$ คือ จำนวนอุบัติเหตุที่ได้รับแจ้ง",
+      ansVar: "ให้ $A$ แทนจำนวนครั้งการเกิดอุบัติเหตุ",
+      ansSet: "$S_A = \\{0, 1, 2, 3, \\dots\\}$",
+      ansType: "ตัวแปรสุ่มไม่ต่อเนื่อง (Discrete) เนื่องจากเกิดจากการนับจำนวนครั้ง"
+    },
+    {
+      scenario: "การบันทึกระยะเวลา (นาที) ที่ลูกค้ารอรับบริการที่เคาน์เตอร์ธนาคาร กำหนดให้ $T$ คือ ระยะเวลาที่ลูกค้ารอคอย",
+      ansVar: "ให้ $T$ แทนเวลาที่ลูกค้ารอคอย (นาที)",
+      ansSet: "$S_T = [0, \\infty)$",
+      ansType: "ตัวแปรสุ่มต่อเนื่อง (Continuous) เนื่องจากเป็นปริมาณการวัดเวลาที่ต่อเนื่อง"
+    },
+    {
+      scenario: "การโยนเหรียญบาท 3 เหรียญพร้อมกัน 1 ครั้ง กำหนดให้ $H$ แทนจำนวนเหรียญที่ออกหน้าหัว",
+      ansVar: "ให้ $H$ แทนจำนวนเหรียญที่ขึ้นหน้าหัว",
+      ansSet: "$S_H = \\{0, 1, 2, 3\\}$",
+      ansType: "ตัวแปรสุ่มไม่ต่อเนื่อง (Discrete) เนื่องจากเซตของค่าที่เป็นไปได้เป็นเซตจำกัด"
+    },
+    {
+      scenario: "การวัดอุณหภูมิสูงสุดของร่างกายผู้ป่วย (องศาเซลเซียส) ในแผนกผู้ป่วยวิกฤต กำหนดให้ $C$ คือ อุณหภูมิที่วัดได้",
+      ansVar: "ให้ $C$ แทนอุณหภูมิร่างกาย (°C)",
+      ansSet: "$S_C = [34.0, 43.0]$ หรือช่วงจำนวนจริงบวก",
+      ansType: "ตัวแปรสุ่มต่อเนื่อง (Continuous) เพราะได้จากการวัดด้วยเทอร์โมมิเตอร์"
+    },
+    {
+      scenario: "สุ่มตรวจหลอดไฟ 100 หลอดจากสายการผลิต เพื่อหาจำนวนหลอดไฟที่มีข้อบกพร่อง กำหนดให้ $D$ คือ จำนวนหลอดไฟที่ชำรุด",
+      ansVar: "ให้ $D$ แทนจำนวนหลอดไฟที่ชำรุด",
+      ansSet: "$S_D = \\{0, 1, 2, \\dots, 100\\}$",
+      ansType: "ตัวแปรสุ่มไม่ต่อเนื่อง (Discrete) เพราะเป็นผลจากการนับจำนวนชิ้นส่วนที่ชำรุด"
+    }
+  ];
+
+  let currentWorksheetQuestions = [];
+
+  function generateNew5Worksheet() {
+    let shuffled = [...worksheetMasterBank].sort(() => 0.5 - Math.random());
+    currentWorksheetQuestions = shuffled.slice(0, 5);
+    renderWorksheetDOM(false);
+  }
+
+  function renderWorksheetDOM(showAnswerKey) {
+    const list = document.getElementById("worksheetQuestionsList");
+    list.innerHTML = "";
+
+    currentWorksheetQuestions.forEach((item, index) => {
+      const qDiv = document.createElement("div");
+      qDiv.className = "worksheet-q-item";
+
+      let inner = `
+        <div style="font-weight:600; margin-bottom:6px;">ข้อที่ ${index + 1}) ${item.scenario}</div>
+      `;
+
+      if (showAnswerKey) {
+        inner += `
+          <div class="answer-key-box">
+            <div><strong>แนวการตอบและการกำหนดตัวแปร:</strong> ${item.ansVar}</div>
+            <div><strong>เซตของค่าที่เป็นไปได้ ($S_X$):</strong> ${item.ansSet}</div>
+            <div><strong>การจำแนกชนิดและเหตุผล:</strong> ${item.ansType}</div>
+          </div>
+        `;
+      } else {
+        inner += `
+          <div class="student-write-area">
+            <div>การกำหนดตัวแปรสุ่ม: ............................................................................................................................................</div>
+            <div style="margin-top:4px;">เซตของค่าที่เป็นไปได้ ($S_X$): ............................................ | ชนิดของตัวแปรสุ่ม: ............................................</div>
+          </div>
+        `;
+      }
+
+      qDiv.innerHTML = inner;
+      list.appendChild(qDiv);
+    });
+
+    renderMath(list);
+  }
+
+  function printWorksheet(isTeacherKey) {
+    renderWorksheetDOM(isTeacherKey);
+    setTimeout(() => {
+      window.print();
+    }, 400);
+  }
+
+  /* Utility ฟังก์ชันเรียก MathJax Typeset */
+  function renderMath(targetElement) {
+    if (window.MathJax && window.MathJax.typesetPromise) {
+      window.MathJax.typesetPromise([targetElement]).catch((err) => console.log('MathJax error:', err));
+    }
+  }
+
+  // เริ่มต้นทำงานอัตโนมัติเมื่อโหลดหน้า
+  window.addEventListener('DOMContentLoaded', () => {
+    onExpTypeChange();
+    generateSinglePracticeQuestion();
+    generateNew5Worksheet();
+  });
+</script>
+
+</body>
+</html>

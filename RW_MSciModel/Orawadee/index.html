@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ระบบการเรียนรู้: ตัวแปรสุ่มและการแจกแจงความน่าจะเป็น ม.6</title>
+  
+  <!-- ฟอนต์ Sarabun -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com">
+  <link href="https://fonts.googleapis.com/css2?family=Sarabun:ital,wght@0,300;0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
+
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Sarabun', system-ui, -apple-system, sans-serif;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden; /* ไม่ให้หน้าหลักเลื่อน ให้ iframe เลื่อนแทน */
+      background-color: #0f172a;
+    }
+
+    /* แถบบาร์นำทางด้านบนสุด (Top Navigation Bar) */
+    .top-navbar {
+      background: #1e293b;
+      border-bottom: 2px solid #334155;
+      color: white;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+      z-index: 1000;
+      flex-shrink: 0;
+    }
+
+    /* แถวบนของบาร์: โลโก้และชื่อวิชา */
+    .nav-header-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 8px 16px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .brand-title {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: #38bdf8;
+    }
+
+    .brand-badge {
+      background: #0284c7;
+      color: white;
+      font-size: 0.75rem;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-weight: 600;
+    }
+
+    .current-view-title {
+      font-size: 0.9rem;
+      color: #cbd5e1;
+      font-weight: 400;
+    }
+
+    /* แถวล่างของบาร์: ปุ่มลัดเมนูทั้ง 9 บทเรียน */
+    .nav-buttons-row {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 12px;
+      overflow-x: auto; /* เลื่อนซ้าย-ขวาได้หากหน้าจอเล็ก */
+      white-space: nowrap;
+      background: #0f172a;
+    }
+
+    /* ปรับแต่ง Scrollbar ของเมนู */
+    .nav-buttons-row::-webkit-scrollbar {
+      height: 4px;
+    }
+    .nav-buttons-row::-webkit-scrollbar-thumb {
+      background: #475569;
+      border-radius: 4px;
+    }
+
+    /* ปุ่มเมนูแต่ละเรื่อง */
+    .nav-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 14px;
+      border-radius: 6px;
+      border: 1px solid #334155;
+      background: #1e293b;
+      color: #94a3b8;
+      font-family: inherit;
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      text-decoration: none;
+      transition: all 0.2s ease;
+      flex-shrink: 0;
+    }
+
+    .nav-btn:hover {
+      background: #334155;
+      color: #ffffff;
+      border-color: #64748b;
+    }
+
+    /* สไตล์เมื่อปุ่มกำลังถูกเลือก (Active State) */
+    .nav-btn.active {
+      background: #0284c7;
+      color: white;
+      border-color: #38bdf8;
+      box-shadow: 0 0 10px rgba(56, 189, 248, 0.4);
+    }
+
+    /* ปุ่มแบบทดสอบพิเศษ (สีส้มเด่นชัด) */
+    .nav-btn.btn-quiz {
+      background: #9a3412;
+      border-color: #ea580c;
+      color: #ffedd5;
+      margin-left: 8px;
+    }
+
+    .nav-btn.btn-quiz:hover {
+      background: #ea580c;
+      color: white;
+    }
+
+    .nav-btn.btn-quiz.active {
+      background: #ea580c;
+      color: white;
+      border-color: #fb923c;
+      box-shadow: 0 0 10px rgba(251, 146, 60, 0.5);
+    }
+
+    /* พื้นที่แสดงผลเนื้อหา (Iframe Container) */
+    .content-viewport {
+      flex: 1;
+      width: 100%;
+      height: 100%;
+      position: relative;
+      background: #f8fafc;
+    }
+
+    iframe#lessonFrame {
+      width: 100%;
+      height: 100%;
+      border: none;
+      display: block;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- แถบบาร์นำทางด้านบนตลอดกาล -->
+  <header class="top-navbar">
+    <div class="nav-header-row">
+      <div class="brand-title">
+        <span>📊 ตัวแปรสุ่มและการแจกแจงความน่าจะเป็น ม.6</span>
+        <span class="brand-badge">หลักสูตรแกนกลางฯ</span>
+      </div>
+      <div class="current-view-title" id="currentViewText">
+        กำลังแสดงผล: <strong>เรื่องที่ 1: ตัวแปรสุ่ม</strong>
+      </div>
+    </div>
+
+    <!-- เมนูปุ่มกดเลือกเรื่อง 1 - 8 และแบบทดสอบ -->
+    <nav class="nav-buttons-row">
+      <button class="nav-btn active" onclick="loadLesson('เรื่องที่ 1.html', 'เรื่องที่ 1: ตัวแปรสุ่ม', this)">
+        <span>1.</span> ตัวแปรสุ่ม
+      </button>
+      <button class="nav-btn" onclick="loadLesson('เรื่องที่ 2.html', 'เรื่องที่ 2: การแจกแจงความน่าจะเป็นของตัวแปรสุ่ม', this)">
+        <span>2.</span> การแจกแจงความน่าจะเป็น
+      </button>
+      <button class="nav-btn" onclick="loadLesson('เรื่องที่ 3.html', 'เรื่องที่ 3: การแจกแจงเอกรูปไม่ต่อเนื่อง', this)">
+        <span>3.</span> แจกแจงเอกรูป
+      </button>
+      <button class="nav-btn" onclick="loadLesson('เรื่องที่ 4.html', 'เรื่องที่ 4: การแจกแจงทวินาม', this)">
+        <span>4.</span> แจกแจงทวินาม
+      </button>
+      <button class="nav-btn" onclick="loadLesson('เรื่องที่ 5.html', 'เรื่องที่ 5: ตัวแปรสุ่มต่อเนื่อง', this)">
+        <span>5.</span> ตัวแปรสุ่มต่อเนื่อง
+      </button>
+      <button class="nav-btn" onclick="loadLesson('เรื่องที่ 6.html', 'เรื่องที่ 6: การแจกแจงปกติ', this)">
+        <span>6.</span> การแจกแจงปกติ
+      </button>
+      <button class="nav-btn" onclick="loadLesson('เรื่องที่ 7.html', 'เรื่องที่ 7: การแจกแจงปกติมาตรฐาน', this)">
+        <span>7.</span> การแจกแจงปกติมาตรฐาน
+      </button>
+      <button class="nav-btn" onclick="loadLesson('เรื่องที่ 8.html', 'เรื่องที่ 8: การหาความน่าจะเป็นและเปรียบเทียบตำแหน่ง', this)">
+        <span>8.</span> ความน่าจะเป็น & ค่า Z
+      </button>
+      <button class="nav-btn btn-quiz" onclick="loadLesson('แบบทดสอบ.html', 'แบบทดสอบวัดผลสัมฤทธิ์ทางการเรียน (15 ข้อ)', this)">
+        <span>🎯</span> แบบทดสอบวัดผลสัมฤทธิ์
+      </button>
+    </nav>
+  </header>
+
+  <!-- พื้นที่แสดงหน้าเว็บของแต่ละเรื่อง -->
+  <main class="content-viewport">
+    <iframe id="lessonFrame" src="เรื่องที่ 1.html" title="หน้าแสดงเนื้อหาบทเรียน"></iframe>
+  </main>
+
+  <script>
+    function loadLesson(fileName, titleText, btnElement) {
+      // 1. โหลดไฟล์เข้าสู่ iframe
+      const iframe = document.getElementById('lessonFrame');
+      iframe.src = fileName;
+
+      // 2. อัปเดตข้อความหัวข้อที่กำลังเปิดอยู่
+      document.getElementById('currentViewText').innerHTML = `กำลังแสดงผล: <strong>${titleText}</strong>`;
+
+      // 3. ปรับสถานะปุ่ม Active
+      const allButtons = document.querySelectorAll('.nav-btn');
+      allButtons.forEach(btn => btn.classList.remove('active'));
+      btnElement.classList.add('active');
+
+      // 4. เลื่อนมุมมองปุ่มที่ถูกเลือกให้อยู่ในสายตา (กรณีหน้าจอแคบ)
+      btnElement.scrollIntoView({ behavior: 'smooth', inline: 'nearest', block: 'nearest' });
+    }
+  </script>
+
+</body>
+</html>

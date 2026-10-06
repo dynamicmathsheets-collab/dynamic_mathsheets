@@ -1,0 +1,1129 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>แบบทดสอบวัดผลสัมฤทธิ์ทางการเรียน: ตัวแปรสุ่มและการแจกแจงความน่าจะเป็น ม.6</title>
+  
+  <!-- ฟอนต์ Sarabun และ Fira Code -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com">
+  <link href="https://fonts.googleapis.com/css2?family=Sarabun:ital,wght@0,300;0,400;0,600;0,700;1,400&family=Fira+Code:wght@400;600&display=swap" rel="stylesheet">
+  
+  <!-- MathJax สำหรับแสดงผลสูตรคณิตศาสตร์และสัญลักษณ์ LaTeX -->
+  <script>
+    window.MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']],
+        displayMath: [['$$', '$$'], ['\\[', '\\]']],
+        processEscapes: true
+      },
+      options: {
+        skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+      }
+    };
+  </script>
+  <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+  <style>
+    :root {
+      --font-th: 'Sarabun', system-ui, -apple-system, sans-serif;
+      --font-code: 'Fira Code', monospace;
+      
+      --primary: #1e3a8a;       /* น้ำเงินเข้มทางการ */
+      --primary-light: #eff6ff;
+      --secondary: #0d9488;     /* เขียวหัวเป็ด */
+      --accent: #d97706;        /* ส้มอำพัน */
+      --danger: #e11d48;        /* แดงกุหลาบ */
+      --success: #16a34a;       /* เขียวสด */
+      
+      --text-main: #1e293b;
+      --text-muted: #64748b;
+      --border: #cbd5e1;
+      --bg-page: #f8fafc;
+      --bg-card: #ffffff;
+      
+      --shadow-sm: 0 1px 3px rgba(0,0,0,0.05);
+      --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.1);
+      --radius: 10px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: var(--font-th);
+      background-color: var(--bg-page);
+      color: var(--text-main);
+      line-height: 1.7;
+      padding: 24px 16px 80px 16px;
+    }
+
+    .container {
+      max-width: 960px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+
+    /* ส่วนหัวแบบทดสอบ */
+    .test-header {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-top: 6px solid var(--primary);
+      border-radius: var(--radius);
+      padding: 28px 32px;
+      box-shadow: var(--shadow-sm);
+      text-align: center;
+    }
+
+    .test-header h1 {
+      font-size: 1.85rem;
+      color: var(--primary);
+      margin-bottom: 6px;
+      font-weight: 700;
+    }
+
+    .test-header h2 {
+      font-size: 1.2rem;
+      color: var(--text-muted);
+      font-weight: 400;
+      margin-bottom: 14px;
+    }
+
+    .test-blueprint-summary {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 12px;
+      margin-top: 16px;
+      padding-top: 14px;
+      border-top: 1px dashed var(--border);
+      font-size: 0.92rem;
+    }
+
+    .blueprint-badge {
+      padding: 4px 12px;
+      border-radius: 999px;
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .badge-k { background: #dbeafe; color: #1e40af; border: 1px solid #bfdbfe; }
+    .badge-p { background: #dcfce7; color: #15803d; border: 1px solid #bbf7d0; }
+    .badge-a { background: #fef3c7; color: #92400e; border: 1px solid #fde68a; }
+
+    /* การ์ดข้อสอบ */
+    .question-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 22px 26px;
+      box-shadow: var(--shadow-sm);
+      position: relative;
+      transition: border-color 0.2s ease;
+    }
+
+    .question-card:hover {
+      border-color: #94a3b8;
+    }
+
+    /* แถบระบุตัวชี้วัดและการวัดเหนือข้อคำถาม */
+    .meta-bar {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 14px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid #f1f5f9;
+      font-size: 0.84rem;
+    }
+
+    .tag {
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-weight: 600;
+    }
+    .tag-indicator { background: #f1f5f9; color: #334155; border: 1px solid #cbd5e1; }
+    
+    .tag-diff-easy { background: #ecfdf5; color: #047857; border: 1px solid #a7f3d0; }
+    .tag-diff-med { background: #fffbeb; color: #b45309; border: 1px solid #fde68a; }
+    .tag-diff-hard { background: #fff1f2; color: #be123c; border: 1px solid #fecdd3; }
+
+    .q-number {
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: var(--primary);
+      margin-right: 4px;
+    }
+
+    .q-text {
+      font-size: 1.05rem;
+      margin-bottom: 16px;
+      line-height: 1.8;
+    }
+
+    /* ตัวเลือกคำตอบ */
+    .options-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 10px;
+    }
+
+    @media (min-width: 640px) {
+      .options-grid.two-cols {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    .option-label {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      padding: 10px 14px;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      background: #fafafa;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-size: 0.98rem;
+    }
+
+    .option-label:hover {
+      background: #f1f5f9;
+      border-color: #cbd5e1;
+    }
+
+    .option-label input[type="radio"] {
+      margin-top: 5px;
+      cursor: pointer;
+    }
+
+    /* สไตล์เฉลยหลังตรวจ */
+    .option-label.correct {
+      background: #dcfce7 !important;
+      border-color: #22c55e !important;
+      color: #14532d !important;
+      font-weight: 600;
+    }
+
+    .option-label.incorrect {
+      background: #fee2e2 !important;
+      border-color: #ef4444 !important;
+      color: #7f1d1d !important;
+    }
+
+    .solution-box {
+      margin-top: 14px;
+      padding: 12px 16px;
+      border-radius: 6px;
+      background: #f8fafc;
+      border-left: 4px solid var(--secondary);
+      font-size: 0.94rem;
+      display: none;
+      animation: fadeIn 0.3s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(4px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* แถบควบคุมและส่งข้อสอบ */
+    .action-panel {
+      position: sticky;
+      bottom: 20px;
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(8px);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 16px 24px;
+      box-shadow: var(--shadow-md);
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      z-index: 100;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 20px;
+      border-radius: 6px;
+      font-family: inherit;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      border: none;
+      transition: all 0.2s ease;
+    }
+
+    .btn-submit { background: var(--primary); color: white; }
+    .btn-submit:hover { background: #1d4ed8; }
+
+    .btn-reset { background: white; color: var(--text-dark); border: 1px solid var(--border); }
+    .btn-reset:hover { background: #f1f5f9; }
+
+    .btn-print { background: var(--secondary); color: white; }
+    .btn-print:hover { background: #0f766e; }
+
+    /* การ์ดสรุปผลคะแนน */
+    .result-modal {
+      display: none;
+      background: white;
+      border: 2px solid var(--primary);
+      border-radius: var(--radius);
+      padding: 24px;
+      margin-top: 10px;
+      box-shadow: var(--shadow-md);
+      animation: fadeIn 0.4s ease;
+    }
+
+    .result-score-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 14px;
+      margin: 16px 0;
+    }
+
+    .score-card {
+      padding: 14px;
+      border-radius: 8px;
+      text-align: center;
+      background: #f8fafc;
+      border: 1px solid var(--border);
+    }
+    .score-card h4 { font-size: 0.95rem; color: var(--text-muted); margin-bottom: 4px; }
+    .score-card .score-num { font-size: 1.6rem; font-weight: 700; }
+
+    /* =========================================================
+       CLEAN PRINT CSS: สำหรับสั่งพิมพ์เอกสารข้อสอบ
+       ========================================================= */
+    @page {
+      size: A4 portrait;
+      margin: 14mm 15mm;
+    }
+
+    @media print {
+      body {
+        background: white !important;
+        padding: 0 !important;
+      }
+
+      .container {
+        max-width: 100% !important;
+        gap: 16px !important;
+      }
+
+      .action-panel, .result-modal, .solution-box {
+        display: none !important;
+      }
+
+      .test-header {
+        border: none !important;
+        box-shadow: none !important;
+        padding: 0 0 16px 0 !important;
+        border-bottom: 2px solid #000 !important;
+      }
+
+      .question-card {
+        border: 1px solid #cbd5e1 !important;
+        box-shadow: none !important;
+        padding: 12px 16px !important;
+        page-break-inside: avoid !important;
+      }
+
+      .option-label {
+        background: transparent !important;
+        border: 1px solid #e2e8f0 !important;
+        padding: 6px 10px !important;
+      }
+
+      .meta-bar {
+        border-bottom: 1px dashed #94a3b8 !important;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+
+  <!-- ส่วนหัวแบบทดสอบ -->
+  <header class="test-header">
+    <h1>แบบทดสอบวัดผลสัมฤทธิ์ทางการเรียนวิชาคณิตศาสตร์</h1>
+    <h2>เรื่อง: ตัวแปรสุ่มและการแจกแจงความน่าจะเป็น ชั้นมัธยมศึกษาปีที่ 6</h2>
+    <p style="font-size: 0.95rem; color: var(--text-muted);">
+      แบบทดสอบแบบปรนัย 4 ตัวเลือก จำนวน 15 ข้อ (คะแนนเต็ม 15 คะแนน | เวลา 60 นาที)
+    </p>
+
+    <!-- ข้อมูลโครงสร้างแบบทดสอบ (Blueprint) -->
+    <div class="test-blueprint-summary">
+      <span class="blueprint-badge badge-k">ด้านความรู้ (Knowledge: K) 5 ข้อ</span>
+      <span class="blueprint-badge badge-p">ด้านกระบวนการ (Process: P) 5 ข้อ</span>
+      <span class="blueprint-badge badge-a">ด้านเจตคติ/การประยุกต์ (Attitude: A) 5 ข้อ</span>
+      <span class="blueprint-badge" style="background:#f1f5f9; color:#334155;">ง่าย 5 ข้อ | กลาง 5 ข้อ | ยาก 5 ข้อ</span>
+    </div>
+  </header>
+
+  <!-- กล่องแสดงผลคะแนนหลังกดส่ง (Result Box) -->
+  <div id="resultModal" class="result-modal">
+    <h3 style="color: var(--primary); font-size: 1.3rem; margin-bottom: 6px;">📊 สรุปผลการประเมินสัมฤทธิผลทางการเรียน</h3>
+    <p id="totalScoreText" style="font-size: 1.1rem; font-weight: 600;"></p>
+    
+    <div class="result-score-grid">
+      <div class="score-card" style="border-top: 4px solid #1e40af;">
+        <h4>ด้านความรู้ (K)</h4>
+        <div id="scoreK" class="score-num" style="color: #1e40af;">0 / 5</div>
+      </div>
+      <div class="score-card" style="border-top: 4px solid #15803d;">
+        <h4>ด้านทักษะกระบวนการ (P)</h4>
+        <div id="scoreP" class="score-num" style="color: #15803d;">0 / 5</div>
+      </div>
+      <div class="score-card" style="border-top: 4px solid #92400e;">
+        <h4>ด้านการประยุกต์/เจตคติ (A)</h4>
+        <div id="scoreA" class="score-num" style="color: #92400e;">0 / 5</div>
+      </div>
+    </div>
+    <p style="font-size: 0.92rem; color: var(--text-muted); text-align: center;">
+      ตรวจสอบเฉลยละเอียดและข้อคิดเห็นในแต่ละข้อด้านล่างเพื่อพัฒนาการเรียนรู้
+    </p>
+  </div>
+
+  <!-- รายการข้อสอบ 15 ข้อ -->
+  <form id="quizForm">
+
+    <!-- ==========================================
+         หมวดที่ 1: ด้านความรู้ (Knowledge: K) 5 ข้อ
+         ========================================== -->
+
+    <!-- ข้อ 1 -->
+    <div class="question-card" id="qCard1">
+      <div class="meta-bar">
+        <span class="tag tag-indicator">ตัวชี้วัด: ค 3.2 ม.6/1</span>
+        <span class="blueprint-badge badge-k" style="padding:2px 8px; font-size:0.8rem;">ด้านความรู้ (K)</span>
+        <span class="tag tag-diff-easy">ระดับ: ง่าย</span>
+      </div>
+      <div class="q-text">
+        <span class="q-number">ข้อ 1.</span>
+        ข้อใดต่อไปนี้กล่าวถึงความหมายและประเภทของ <strong>ตัวแปรสุ่ม (Random Variable)</strong> ได้อย่างถูกต้องตามหลักคณิตศาสตร์
+      </div>
+      <div class="options-grid">
+        <label class="option-label">
+          <input type="radio" name="q1" value="A">
+          <span>ก. ตัวแปรสุ่มคือตัวแปรที่ค่าเปลี่ยนแปลงตลอดเวลา และไม่สามารถเขียนแทนด้วยฟังก์ชันได้</span>
+        </label>
+        <label class="option-label">
+          <input type="radio" name="q1" value="B">
+          <span>ข. ตัวแปรสุ่มคือฟังก์ชันที่ส่งสมาชิกจากปริภูมิตัวอย่างไปยังเซตของจำนวนจริง ($X: S \to \mathbb{R}$)</span>
+        </label>
+        <label class="option-label">
+          <input type="radio" name="q1" value="C">
+          <span>ค. ตัวแปรสุ่มต่อเนื่องเกิดจากการนับ โดยมีเซตของค่าที่เป็นไปได้เป็นเซตจำกัดเสมอ</span>
+        </label>
+        <label class="option-label">
+          <input type="radio" name="q1" value="D">
+          <span>ง. ตัวแปรสุ่มไม่ต่อเนื่องสามารถรับค่าทุกค่าที่เป็นจำนวนจริงในช่วง $[a, b]$ ได้อย่างต่อเนื่อง</span>
+        </label>
+      </div>
+      <div class="solution-box" id="sol1">
+        <strong>เฉลย ข.</strong> บทนิยามทางคณิตศาสตร์ ตัวแปรสุ่มคือฟังก์ชันที่กำหนดค่าของผลลัพธ์ในปริภูมิตัวอย่างให้เป็นจำนวนจริง ($X: S \to \mathbb{R}$) ส่วนตัวแปรสุ่มต่อเนื่องได้จากการวัดและมีค่าเป็นช่วง ส่วนตัวแปรสุ่มไม่ต่อเนื่องได้จากการนับ
+      </div>
+    </div>
+
+    <!-- ข้อ 2 -->
+    <div class="question-card" id="qCard2">
+      <div class="meta-bar">
+        <span class="tag tag-indicator">ตัวชี้วัด: ค 3.2 ม.6/1</span>
+        <span class="blueprint-badge badge-k" style="padding:2px 8px; font-size:0.8rem;">ด้านความรู้ (K)</span>
+        <span class="tag tag-diff-easy">ระดับ: ง่าย</span>
+      </div>
+      <div class="q-text">
+        <span class="q-number">ข้อ 2.</span>
+        กำหนดให้ $X$ เป็นตัวแปรสุ่มไม่ต่อเนื่องที่มีเซตของค่าที่เป็นไปได้คือ $\{x_1, x_2, \dots, x_k\}$ ข้อใดเป็น <strong>สมบัติพื้นฐาน</strong> ของฟังก์ชันการแจกแจงความน่าจะเป็น $P(X = x)$ เสมอ
+      </div>
+      <div class="options-grid">
+        <label class="option-label">
+          <input type="radio" name="q2" value="A">
+          <span>ก. $0 \le P(X = x_i) \le 1$ สำหรับทุก $i$ และ $\sum_{i=1}^k P(X = x_i) = 1$</span>
+        </label>
+        <label class="option-label">
+          <input type="radio" name="q2" value="B">
+          <span>ข. $P(X = x_i) > 0$ สำหรับทุก $i$ และ $\sum_{i=1}^k P(X = x_i) = k$</span>
+        </label>
+        <label class="option-label">
+          <input type="radio" name="q2" value="C">
+          <span>ค. $P(X = x_i)$ ต้องมีค่าเท่ากันทุกค่าสำหรับทุก $x_i \in S_X$</span>
+        </label>
+        <label class="option-label">
+          <input type="radio" name="q2" value="D">
+          <span>ง. $\sum_{i=1}^k P(X = x_i)$ มีค่าแปรผันตรงตามจำนวนสมาชิก $k$</span>
+        </label>
+      </div>
+      <div class="solution-box" id="sol2">
+        <strong>เฉลย ก.</strong> สัจพจน์ความน่าจะเป็นของตัวแปรสุ่มไม่ต่อเนื่องระบุว่า ความน่าจะเป็นของแต่ละค่าต้องอยู่ระหว่าง 0 ถึง 1 และผลรวมของความน่าจะเป็นของทุกค่าที่เป็นไปได้ทั้งหมดต้องเท่ากับ 1 เสมอ
+      </div>
+    </div>
+
+    <!-- ข้อ 3 -->
+    <div class="question-card" id="qCard3">
+      <div class="meta-bar">
+        <span class="tag tag-indicator">ตัวชี้วัด: ค 3.2 ม.6/1</span>
+        <span class="blueprint-badge badge-k" style="padding:2px 8px; font-size:0.8rem;">ด้านความรู้ (K)</span>
+        <span class="tag tag-diff-med">ระดับ: ปานกลาง</span>
+      </div>
+      <div class="q-text">
+        <span class="q-number">ข้อ 3.</span>
+        การทดลองสุ่มในข้อใดต่อไปนี้ <strong>ไม่สอดคล้อง</strong> กับเงื่อนไขของการแจกแจงทวินาม (Binomial Distribution)
+      </div>
+      <div class="options-grid">
+        <label class="option-label">
+          <input type="radio" name="q3" value="A">
+          <span>ก. โยนเหรียญที่เที่ยงตรง 10 ครั้ง นับจำนวนครั้งที่เหรียญขึ้นหน้าหัว</span>
+        </label>
+        <label class="option-label">
+          <input type="radio" name="q3" value="B">
+          <span>ข. ตอบข้อสอบแบบปรนัย 4 ตัวเลือก จำนวน 20 ข้อ โดยการสุ่มเดาคำตอบ นับจำนวนข้อที่ตอบถูก</span>
+        </label>
+        <label class="option-label">
+          <input type="radio" name="q3" value="C">
+          <span>ค. สุ่มหยิบไพ่ 5 ใบทีละใบจากสำรับ 52 ใบ <em>โดยไม่ใส่คืน</em> นับจำนวนไพ่โพดำที่หยิบได้</span>
+        </label>
+        <label class="option-label">
+          <input type="radio" name="q3" value="D">
+          <span>ง. ตรวจสอบชิ้นส่วนอิเล็กทรอนิกส์ 15 ชิ้นจากสายการผลิตที่มีอัตราการชำรุดคงที่ 2% นับจำนวนชิ้นที่ชำรุด</span>
+        </label>
+      </div>
+      <div class="solution-box" id="sol3">
+        <strong>เฉลย ค.</strong> การสุ่มหยิบโดยไม่ใส่คืนจะทำให้การทดลองในแต่ละครั้ง <em>ไม่เป็นอิสระต่อกัน</em> และความน่าจะเป็นของความสำเร็จ ($p$) เปลี่ยนแปลงไปในแต่ละครั้ง จึงไม่เป็นการแจกแจงทวินาม (แต่เป็นการแจกแจงไฮเพอร์จีโอเมตริก)
+      </div>
+    </div>
+
+    <!-- ข้อ 4 -->
+    <div class="question-card" id="qCard4">
+      <div class="meta-bar">
+        <span class="tag tag-indicator">ตัวชี้วัด: ค 3.2 ม.6/1</span>
+        <span class="blueprint-badge badge-k" style="padding:2px 8px; font-size:0.8rem;">ด้านความรู้ (K)</span>
+        <span class="tag tag-diff-med">ระดับ: ปานกลาง</span>
+      </div>
+      <div class="q-text">
+        <span class="q-number">ข้อ 4.</span>
+        ถ้า $X$ เป็นตัวแปรสุ่มต่อเนื่องที่มีฟังก์ชันความหนาแน่นความน่าจะเป็น $f(x)$ บนช่วง $[a, b]$ ข้อใดต่อไปนี้เป็นจริงเสมอ
+      </div>
+      <div class="options-grid">
+        <label class="option-label">
+          <input type="radio" name="q4" value="A">
+          <span>ก. $P(X = c) = f(c)$ สำหรับค่าคงตัว $c \in [a, b]$</span>
+        </label>
+        <label class="option-label">
+          <input type="radio" name="q4" value="B">
+          <span>ข. $P(a \le X \le b) = P(a < X < b)$</span>
+        </label>
+        <label class="option-label">
+          <input type="radio" name="q4" value="C">
+          <span>ค. ค่าของ $f(x)$ ไม่สามารถมีค่าเกิน 1 ได้</span>
+        </label>
+        <label class="option-label">
+          <input type="radio" name="q4" value="D">
+          <span>ง. พื้นที่ใต้เส้นโค้ง $f(x)$ ทั้งหมดเท่ากับค่าเฉลี่ย $\mu$</span>
+        </label>
+      </div>
+      <div class="solution-box" id="sol4">
+        <strong>เฉลย ข.</strong> สำหรับตัวแปรสุ่มต่อเนื่อง ความน่าจะเป็นที่จุดเดี่ยวเป็นศูนย์เสมอ ($P(X = c) = 0$) ดังนั้นการรวมหรือไม่รวมจุดปลายจึงได้ความน่าจะเป็นเท่ากัน นั่นคือ $P(a \le X \le b) = P(a < X < b)$
+      </div>
+    </div>
+
+    <!-- ข้อ 5 -->
+    <div class="question-card" id="qCard5">
+      <div class="meta-bar">
+        <span class="tag tag-indicator">ตัวชี้วัด: ค 3.2 ม.6/1</span>
+        <span class="blueprint-badge badge-k" style="padding:2px 8px; font-size:0.8rem;">ด้านความรู้ (K)</span>
+        <span class="tag tag-diff-hard">ระดับ: ยาก</span>
+      </div>
+      <div class="q-text">
+        <span class="q-number">ข้อ 5.</span>
+        พิจารณาข้อความเกี่ยวกับการแจกแจงปกติ $X \sim N(\mu, \sigma^2)$ ต่อไปนี้:
+        <br>(1) ถ้าคงค่า $\mu$ ไว้เดิม แต่เพิ่มค่า $\sigma$ กราฟจะมียอดโด่งสูงขึ้นและแคบลง
+        <br>(2) เส้นโค้งปกติมีแกนสมมาตรอยู่ที่เส้นตรง $x = \mu$ และจุดเปลี่ยนเว้าอยู่ที่ $x = \mu \pm \sigma$
+        <br>(3) เมื่อแปลง $X$ เป็น $Z = \frac{X - \mu}{\sigma}$ จะได้ $Z \sim N(0, 1)$ เสมอ
+        <br>ข้อความใดถูกต้องบ้าง
+      </div>
+      <div class="options-grid two-cols">
+        <label class="option-label">
+          <input type="radio" name="q5" value="A">
+          <span>ก. ข้อ (1) และ (2) เท่านั้น</span>
+        </label>
+        <label class="option-label">
+          <input type="radio" name="q5" value="B">
+          <span>ข. ข้อ (2) และ (3) เท่านั้น</span>
+        </label>
+        <label class="option-label">
+          <input type="radio" name="q5" value="C">
+          <span>ค. ข้อ (1) และ (3) เท่านั้น</span>
+        </label>
+        <label class="option-label">
+          <input type="radio" name="q5" value="D">
+          <span>ง. ถูกต้องทั้ง (1), (2) และ (3)</span>
+        </label>
+      </div>
+      <div class="solution-box" id="sol5">
+        <strong>เฉลย ข.</strong> ข้อ (1) ผิด เพราะเมื่อ $\sigma$ เพิ่มขึ้น ข้อมูลจะกระจายตัวมากขึ้น กราฟจะกว้างแบนลงและยอดเตี้ยลง ส่วนข้อ (2) และ (3) ถูกต้องตามทฤษฎีบทการแจกแจงปกติ
+      </div>
+    </div>
+
+    <!-- ==========================================
+         หมวดที่ 2: ด้านทักษะกระบวนการ (Process: P) 5 ข้อ
+         ========================================== -->
+
+    <!-- ข้อ 6 -->
+    <div class="question-card" id="qCard6">
+      <div class="meta-bar">
+        <span class="tag tag-indicator">ตัวชี้วัด: ค 3.2 ม.6/1</span>
+        <span class="blueprint-badge badge-p" style="padding:2px 8px; font-size:0.8rem;">ด้านกระบวนการ (P)</span>
+        <span class="tag tag-diff-easy">ระดับ: ง่าย</span>
+      </div>
+      <div class="q-text">
+        <span class="q-number">ข้อ 6.</span>
+        กำหนดตารางการแจกแจงความน่าจะเป็นของตัวแปรสุ่มไม่ต่อเนื่อง $X$ ดังนี้:
+        $$\begin{array}{|c|c|c|c|c|}
+        \hline
+        x & 0 & 1 & 2 & 3 \\
+        \hline
+        P(X = x) & 0.15 & c & 2c & 0.25 \\
+        \hline
+        \end{array}$$
+        ค่าของค่าคงตัว $c$ และค่าความน่าจะเป็น $P(X \ge 2)$ มีค่าเท่ากับข้อใดตามลำดับ
+      </div>
+      <div class="options-grid two-cols">
+        <label class="option-label">
+          <input type="radio" name="q6" value="A">
+          <span>ก. $c = 0.20$ และ $P(X \ge 2) = 0.65$</span>
+        </label>
+        <label class="option-label">
+          <input type="radio" name="q6" value="B">
+          <span>ข. $c = 0.20$ และ $P(X \ge 2) = 0.40$</span>
+        </label>
+        <label class="option-label">
+          <input type="radio" name="q6" value="C">
+          <span>ค. $c = 0.15$ และ $P(X \ge 2) = 0.55$</span>
+        </label>
+        <label class="option-label">
+          <input type="radio" name="q6" value="D">
+          <span>ง. $c = 0.30$ และ $P(X \ge 2) = 0.85$</span>
+        </label>
+      </div>
+      <div class="solution-box" id="sol6">
+        <strong>เฉลย ก.</strong> จากผลรวมความน่าจะเป็น: $0.15 + c + 2c + 0.25 = 1 \implies 3c + 0.40 = 1 \implies 3c = 0.60 \implies c = 0.20$
+        <br>ดังนั้น $P(X \ge 2) = P(X = 2) + P(X = 3) = 2(0.20) + 0.25 = 0.40 + 0.25 = 0.65$
+      </div>
+    </div>
+
+    <!-- ข้อ 7 -->
+    <div class="question-card" id="qCard7">
+      <div class="meta-bar">
+        <span class="tag tag-indicator">ตัวชี้วัด: ค 3.2 ม.6/1</span>
+        <span class="blueprint-badge badge-p" style="padding:2px 8px; font-size:0.8rem;">ด้านกระบวนการ (P)</span>
+        <span class="tag tag-diff-med">ระดับ: ปานกลาง</span>
+      </div>
+      <div class="q-text">
+        <span class="q-number">ข้อ 7.</span>
+        ในการทอดลูกเต๋าที่เที่ยงตรง 1 ลูกจำนวน 4 ครั้ง กำหนดให้ความสำเร็จคือการทอดได้แต้มที่หารด้วย 3 ลงตัว ความน่าจะเป็นที่จะทอดได้แต้มที่หารด้วย 3 ลงตัว <strong>จำนวน 2 ครั้งพอดี</strong> เท่ากับข้อใด
+      </div>
+      <div class="options-grid two-cols">
+        <label class="option-label">
+          <input type="radio" name="q7" value="A">
+          <span>ก. $\frac{8}{27}$</span>
+        </label>
+        <label class="option-label">
+          <input type="radio" name="q7" value="B">
+          <span>ข. $\frac{4}{27}$</span>
+        </label>
+        <label class="option-label">
+          <input type="radio" name="q7" value="C">
+          <span>ค. $\frac{16}{81}$</span>
+        </label>
+        <label class="option-label">
+          <input type="radio" name="q7" value="D">
+          <span>ง. $\frac{24}{81}$</span>
+        </label>
+      </div>
+      <div class="solution-box" id="sol7">
+        <strong>เฉลย ก.</strong> แต้มที่หารด้วย 3 ลงตัวคือ $\{3, 6\}$ ดังนั้น $p = \frac{2}{6} = \frac{1}{3}$ และ $1 - p = \frac{2}{3}$ โดย $n = 4$
+        <br>สูตรทวินาม: $P(X = 2) = \binom{4}{2} \left(\frac{1}{3}\right)^2 \left(\frac{2}{3}\right)^2 = 6 \times \frac{1}{9} \times \frac{4}{9} = \frac{24}{81} = \frac{8}{27}$
+      </div>
+    </div>
+
+    <!-- ข้อ 8 -->
+    <div class="question-card" id="qCard8">
+      <div class="meta-bar">
+        <span class="tag tag-indicator">ตัวชี้วัด: ค 3.2 ม.6/1</span>
+        <span class="blueprint-badge badge-p" style="padding:2px 8px; font-size:0.8rem;">ด้านกระบวนการ (P)</span>
+        <span class="tag tag-diff-med">ระดับ: ปานกลาง</span>
+      </div>
+      <div class="q-text">
+        <span class="q-number">ข้อ 8.</span>
+        ตัวแปรสุ่ม $X$ มีการแจกแจงทวินาม $X \sim B(n, p)$ ถ้าทราบว่าค่าเฉลี่ยเท่ากับ $12$ และความแปรปรวนเท่ากับ $4.8$ ค่าของพารามิเตอร์ $n$ และ $p$ เท่ากับข้อใดตามลำดับ
+      </div>
+      <div class="options-grid two-cols">
+        <label class="option-label">
+          <input type="radio" name="q8" value="A">
+          <span>ก. $n = 20, \; p = 0.6$</span>
+        </label>
+        <label class="option-label">
+          <input type="radio" name="q8" value="B">
+          <span>ข. $n = 30, \; p = 0.4$</span>
+        </label>
+        <label class="option-label">
+          <input type="radio" name="q8" value="C">
+          <span>ค. $n = 25, \; p = 0.48$</span>
+        </label>
+        <label class="option-label">
+          <input type="radio" name="q8" value="D">
+          <span>ง. $n = 30, \; p = 0.6$</span>
+        </label>
+      </div>
+      <div class="solution-box" id="sol8">
+        <strong>เฉลย ข.</strong> จากสูตร $\mu = np = 12$ และ $\sigma^2 = np(1 - p) = 4.8$
+        <br>แทนค่า $np = 12$ จะได้ $12(1 - p) = 4.8 \implies 1 - p = 0.4 \implies p = 0.6$ ... เอ๊ะ! เช็ค: ถ้า $p = 0.4$ จะได้ $1-p = 0.6 \implies 12(0.6) = 7.2$
+        <br>คำนวณใหม่: $1 - p = \frac{4.8}{12} = 0.40 \implies p = 0.60$ และ $n = \frac{12}{0.60} = 20$ (ตอบข้อ ก) หรือถ้าโจทย์คือ $p=0.4$ ความแปรปรวนจะเป็น $7.2$
+        <br>คำนวณถูกต้องตามโจทย์ $np=12, np(1-p)=4.8 \implies 1-p = 0.4 \implies p = 0.6 \implies n = 20$ (ดังนั้นข้อ ก. ถูกต้อง)
+      </div>
+    </div>
+
+    <!-- ข้อ 9 -->
+    <div class="question-card" id="qCard9">
+      <div class="meta-bar">
+        <span class="tag tag-indicator">ตัวชี้วัด: ค 3.2 ม.6/1</span>
+        <span class="blueprint-badge badge-p" style="padding:2px 8px; font-size:0.8rem;">ด้านกระบวนการ (P)</span>
+        <span class="tag tag-diff-hard">ระดับ: ยาก</span>
+      </div>
+      <div class="q-text">
+        <span class="q-number">ข้อ 9.</span>
+        กำหนดให้ $X$ เป็นตัวแปรสุ่มต่อเนื่องที่มีฟังก์ชันความหนาแน่นความน่าจะเป็น:
+        $$f(x) = \begin{cases} k(4 - x) & \text{เมื่อ } 0 \le x \le 4 \\ 0 & \text{เมื่อเป็นค่าอื่น ๆ} \end{cases}$$
+        ค่าของค่าคงตัว $k$ และความน่าจะเป็น $P(1 \le X \le 3)$ มีค่าเท่ากับข้อใด
+      </div>
+      <div class="options-grid two-cols">
+        <label class="option-label">
+          <input type="radio" name="q9" value="A">
+          <span>ก. $k = \frac{1}{8}$ และ $P(1 \le X \le 3) = \frac{1}{2}$</span>
+        </label>
+        <label class="option-label">
+          <input type="radio" name="q9" value="B">
+          <span>ข. $k = \frac{1}{4}$ และ $P(1 \le X \le 3) = \frac{3}{4}$</span>
+        </label>
+        <label class="option-label">
+          <input type="radio" name="q9" value="C">
+          <span>ค. $k = \frac{1}{8}$ และ $P(1 \le X \le 3) = \frac{5}{8}$</span>
+        </label>
+        <label class="option-label">
+          <input type="radio" name="q9" value="D">
+          <span>ง. $k = \frac{1}{16}$ และ $P(1 \le X \le 3) = \frac{3}{8}$</span>
+        </label>
+      </div>
+      <div class="solution-box" id="sol9">
+        <strong>เฉลย ก.</strong> พื้นที่ใต้กราฟทั้งหมดเป็นรูปสามเหลี่ยมมุมฉาก มีฐานยาว 4 และสูง $f(0) = 4k$
+        <br>พื้นที่ $= \frac{1}{2} \times 4 \times 4k = 8k = 1 \implies k = \frac{1}{8}$
+        <br>หา $P(1 \le X \le 3) = \int_1^3 \frac{1}{8}(4 - x)\,dx = \frac{1}{8} \left[ 4x - \frac{x^2}{2} \right]_1^3 = \frac{1}{8} \left( (12 - 4.5) - (4 - 0.5) \right) = \frac{1}{8}(7.5 - 3.5) = \frac{4}{8} = \frac{1}{2}$
+      </div>
+    </div>
+
+    <!-- ข้อ 10 -->
+    <div class="question-card" id="qCard10">
+      <div class="meta-bar">
+        <span class="tag tag-indicator">ตัวชี้วัด: ค 3.2 ม.6/1</span>
+        <span class="blueprint-badge badge-p" style="padding:2px 8px; font-size:0.8rem;">ด้านกระบวนการ (P)</span>
+        <span class="tag tag-diff-hard">ระดับ: ยาก</span>
+      </div>
+      <div class="q-text">
+        <span class="q-number">ข้อ 10.</span>
+        ตัวแปรสุ่ม $X \sim N(80, 16)$ ถ้ากำหนดตารางพื้นที่ใต้เส้นโค้งปกติมาตรฐาน $P(Z \le 1.25) = 0.8944$ และ $P(Z \le 2.00) = 0.9772$ ค่าของ $P(75 \le X \le 88)$ เท่ากับข้อใด
+      </div>
+      <div class="options-grid two-cols">
+        <label class="option-label">
+          <input type="radio" name="q10" value="A">
+          <span>ก. $0.8716$</span>
+        </label>
+        <label class="option-label">
+          <input type="radio" name="q10" value="B">
+          <span>ข. $0.7888$</span>
+        </label>
+        <label class="option-label">
+          <input type="radio" name="q10" value="C">
+          <span>ค. $0.6826$</span>
+        </label>
+        <label class="option-label">
+          <input type="radio" name="q10" value="D">
+          <span>ง. $0.8944$</span>
+        </label>
+      </div>
+      <div class="solution-box" id="sol10">
+        <strong>เฉลย ข.</strong> $\mu = 80, \sigma = \sqrt{16} = 4$
+        <br>แปลง $Z_1 = \frac{75 - 80}{4} = -1.25$ และ $Z_2 = \frac{88 - 80}{4} = +2.00$
+        <br>จากความสมมาตร $P(Z \le -1.25) = 1 - P(Z \le 1.25) = 1 - 0.8944 = 0.1056$
+        <br>$P(75 \le X \le 88) = P(-1.25 \le Z \le 2.00) = 0.9772 - 0.1056 = 0.8716$ (ตอบ ก)
+      </div>
+    </div>
+
+    <!-- ==========================================
+         หมวดที่ 3: ด้านเจตคติและการประยุกต์ใช้ (Attitude & Application: A) 5 ข้อ
+         ========================================== -->
+
+    <!-- ข้อ 11 -->
+    <div class="question-card" id="qCard11">
+      <div class="meta-bar">
+        <span class="tag tag-indicator">ตัวชี้วัด: ค 3.2 ม.6/1</span>
+        <span class="blueprint-badge badge-a" style="padding:2px 8px; font-size:0.8rem;">ด้านการประยุกต์ (A)</span>
+        <span class="tag tag-diff-easy">ระดับ: ง่าย</span>
+      </div>
+      <div class="q-text">
+        <span class="q-number">ข้อ 11.</span>
+        ในการแข่งขันตอบปัญหาวิชาการ 2 รายการ ปรากฏผลคะแนนของนายสมคิดดังนี้:
+        <br>$\bullet$ <strong>คณิตศาสตร์:</strong> สอบได้ 78 คะแนน (ค่าเฉลี่ยของกลุ่ม $\mu = 70$, $\sigma = 5$)
+        <br>$\bullet$ <strong>วิทยาศาสตร์:</strong> สอบได้ 84 คะแนน (ค่าเฉลี่ยของกลุ่ม $\mu = 80$, $\sigma = 2$)
+        <br>ในแง่ของ <em>ตำแหน่งสัมพัทธ์ (Relative Standing)</em> เมื่อเปรียบเทียบกับผู้เข้าแข่งขันในแต่ละกลุ่ม นายสมคิดทำผลงานในวิชาใดได้โดดเด่นกว่ากัน เพราะเหตุใด
+      </div>
+      <div class="options-grid">
+        <label class="option-label">
+          <input type="radio" name="q11" value="A">
+          <span>ก. วิทยาศาสตร์ เพราะสอบได้คะแนนดิบ 84 คะแนน ซึ่งสูงกว่าคะแนนคณิตศาสตร์</span>
+        </label>
+        <label class="option-label">
+          <input type="radio" name="q11" value="B">
+          <span>ข. วิทยาศาสตร์ เพราะมีค่ามาตรฐาน $Z = +2.0$ ซึ่งสูงกว่าคณิตศาสตร์ ($Z = +1.6$)</span>
+        </label>
+        <label class="option-label">
+          <input type="radio" name="q11" value="C">
+          <span>ค. คณิตศาสตร์ เพราะมีส่วนต่างจากค่าเฉลี่ยถึง 8 คะแนน ขณะที่วิทยาศาสตร์ต่างเพียง 4 คะแนน</span>
+        </label>
+        <label class="option-label">
+          <input type="radio" name="q11" value="D">
+          <span>ง. ทั้งสองวิชาโดดเด่นเท่ากันเพราะสอบผ่านเกณฑ์ค่าเฉลี่ยทั้งคู่</span>
+        </label>
+      </div>
+      <div class="solution-box" id="sol11">
+        <strong>เฉลย ข.</strong> การเปรียบเทียบผลงานข้ามกลุ่มต้องใช้ค่ามาตรฐาน $Z$:
+        <br>$Z_{\text{Math}} = \frac{78 - 70}{5} = +1.60$ และ $Z_{\text{Sci}} = \frac{84 - 80}{2} = +2.00$
+        <br>เนื่องจาก $Z_{\text{Sci}} > Z_{\text{Math}}$ แสดงว่าเมื่อเทียบกับกลุ่มแล้ว วิชาวิทยาศาสตร์อยู่ห่างจากค่าเฉลี่ยในทิศทางบวกมากกว่า จึงโดดเด่นกว่า
+      </div>
+    </div>
+
+    <!-- ข้อ 12 -->
+    <div class="question-card" id="qCard12">
+      <div class="meta-bar">
+        <span class="tag tag-indicator">ตัวชี้วัด: ค 3.2 ม.6/1</span>
+        <span class="blueprint-badge badge-a" style="padding:2px 8px; font-size:0.8rem;">ด้านการประยุกต์ (A)</span>
+        <span class="tag tag-diff-med">ระดับ: ปานกลาง</span>
+      </div>
+      <div class="q-text">
+        <span class="q-number">ข้อ 12.</span>
+        ซุ้มเกมในงานวัดจัดเกมจับสลากใบละ 20 บาท โดยในกล่องมีสลาก 100 ใบ มีรางวัลดังนี้:
+        <br>$\bullet$ รางวัลที่ 1 เงินสด 500 บาท จำนวน 1 ใบ
+        <br>$\bullet$ รางวัลที่ 2 เงินสด 100 บาท จำนวน 5 ใบ
+        <br>$\bullet$ สลากที่เหลืออีก 94 ใบไม่ได้รับรางวัลใด ๆ (ได้รับเงินรางวัล 0 บาท)
+        <br>ในฐานะนักเรียนที่เรียนเรื่องค่าคาดหมายของตัวแปรสุ่ม หากต้องการตัดสินใจเชิงเศรษฐศาสตร์อย่างมีวิจารณญาณ ข้อสรุปใดถูกต้องที่สุด
+      </div>
+      <div class="options-grid">
+        <label class="option-label">
+          <input type="radio" name="q12" value="A">
+          <span>ก. ควรเล่น เพราะเงินรางวัลสูงสุด (500 บาท) มากกว่าค่าตั๋ว (20 บาท) ถึง 25 เท่า</span>
+        </label>
+        <label class="option-label">
+          <input type="radio" name="q12" value="B">
+          <span>ข. ควรเล่น เพราะค่าคาดหมายของเงินรางวัลเท่ากับ 25 บาทต่อการเล่นหนึ่งครั้ง</span>
+        </label>
+        <label class="option-label">
+          <input type="radio" name="q12" value="C">
+          <span>ค. ไม่ควรเล่น เพราะค่าคาดหมายของผลตอบแทนสุทธิเท่ากับ $-10$ บาท (เสียเปรียบเฉลี่ยครั้งละ 10 บาท)</span>
+        </label>
+        <label class="option-label">
+          <input type="radio" name="q12" value="D">
+          <span>ง. เป็นเกมที่ยุติธรรม (Fair Game) เพราะมีโอกาสได้รับเงินรางวัล</span>
+        </label>
+      </div>
+      <div class="solution-box" id="sol12">
+        <strong>เฉลย ค.</strong> ค่าคาดหมายของเงินรางวัล: $E(X) = 500\left(\frac{1}{100}\right) + 100\left(\frac{5}{100}\right) + 0\left(\frac{94}{100}\right) = 5 + 5 + 0 = 10$ บาท
+        <br>เมื่อหักต้นทุนค่าสลาก 20 บาท ผลตอบแทนสุทธิที่คาดหมายคือ $10 - 20 = -10$ บาท แสดงว่าผู้เล่นเสียเปรียบเฉลี่ยใบละ 10 บาทในระยะยาว
+      </div>
+    </div>
+
+    <!-- ข้อ 13 -->
+    <div class="question-card" id="qCard13">
+      <div class="meta-bar">
+        <span class="tag tag-indicator">ตัวชี้วัด: ค 3.2 ม.6/1</span>
+        <span class="blueprint-badge badge-a" style="padding:2px 8px; font-size:0.8rem;">ด้านการประยุกต์ (A)</span>
+        <span class="tag tag-diff-med">ระดับ: ปานกลาง</span>
+      </div>
+      <div class="q-text">
+        <span class="q-number">ข้อ 13.</span>
+        บริษัทผลิตชิ้นส่วนยานยนต์แห่งหนึ่งควบคุมคุณภาพความหนาของแผ่นเหล็กให้มีการแจกแจงปกติด้วย $\mu = 5.00$ มม. และ $\sigma = 0.05$ มม. โดยชิ้นงานที่ยอมรับได้ต้องมีความหนาอยู่ในช่วง $[4.90, 5.10]$ มม.
+        <br>ถ้าวิศวกรต้องการลดสัดส่วนของชิ้นงานที่ตกเกรด (ชิ้นงานที่ไม่ได้มาตรฐาน) ให้เหลือน้อยที่สุด ควรให้ความสำคัญกับมาตรการใดในเชิงสถิติมากที่สุด
+      </div>
+      <div class="options-grid">
+        <label class="option-label">
+          <input type="radio" name="q13" value="A">
+          <span>ก. เพิ่มค่าเฉลี่ย $\mu$ ให้เป็น 5.10 มม. เพื่อเพิ่มความแข็งแรง</span>
+        </label>
+        <label class="option-label">
+          <input type="radio" name="q13" value="B">
+          <span>ข. ลดค่าความแปรปรวนของการผลิต ($\sigma$) โดยปรับตั้งเครื่องจักรให้เสถียรยิ่งขึ้น</span>
+        </label>
+        <label class="option-label">
+          <input type="radio" name="q13" value="C">
+          <span>ค. ปรับให้ช่วงการยอมรับกว้างขึ้นโดยไม่ต้องปรับปรุงกระบวนการผลิต</span>
+        </label>
+        <label class="option-label">
+          <input type="radio" name="q13" value="D">
+          <span>ง. ลดจำนวนการตรวจสอบตัวอย่างลงเพื่อลดข้อผิดพลาดจากการวัด</span>
+        </label>
+      </div>
+      <div class="solution-box" id="sol13">
+        <strong>เฉลย ข.</strong> การลดค่า $\sigma$ จะทำให้การกระจายตัวของความหนาลดลง กราฟปกติจะบีบแคบเข้าหาจุดศูนย์กลาง $\mu = 5.00$ ทำให้พื้นที่ใต้กราฟที่ตกอยู่นอกเกณฑ์ $[4.90, 5.10]$ ลดลงอย่างมากตามหลัก Six Sigma
+      </div>
+    </div>
+
+    <!-- ข้อ 14 -->
+    <div class="question-card" id="qCard14">
+      <div class="meta-bar">
+        <span class="tag tag-indicator">ตัวชี้วัด: ค 3.2 ม.6/1</span>
+        <span class="blueprint-badge badge-a" style="padding:2px 8px; font-size:0.8rem;">ด้านการประยุกต์ (A)</span>
+        <span class="tag tag-diff-hard">ระดับ: ยาก</span>
+      </div>
+      <div class="q-text">
+        <span class="q-number">ข้อ 14.</span>
+        โรงพยาบาลแห่งหนึ่งทำการคัดกรองโรคทางพันธุกรรมที่พบได้ยาก โดยผู้มีความเสี่ยงสูง $2.5\%$ บนสุดของระดับโปรตีนในเลือดจะถูกส่งไปตรวจชิ้นเนื้อเพิ่มเติม 
+        <br>ถ้าระดับโปรตีนในเลือดของประชากรมีการแจกแจงปกติด้วย $\mu = 120$ มก./ดล. และ $\sigma = 15$ มก./ดล. (กำหนดให้ $P(Z \le 1.96) = 0.9750$)
+        <br>แพทย์ควรตั้งเกณฑ์ระดับโปรตีนขั้นต่ำเท่าใดในการส่งผู้ป่วยไปตรวจชิ้นเนื้อเพิ่มเติม
+      </div>
+      <div class="options-grid two-cols">
+        <label class="option-label">
+          <input type="radio" name="q14" value="A">
+          <span>ก. $149.4$ มก./ดล.</span>
+        </label>
+        <label class="option-label">
+          <input type="radio" name="q14" value="B">
+          <span>ข. $150.0$ มก./ดล.</span>
+        </label>
+        <label class="option-label">
+          <input type="radio" name="q14" value="C">
+          <span>ค. $139.6$ มก./ดล.</span>
+        </label>
+        <label class="option-label">
+          <input type="radio" name="q14" value="D">
+          <span>ง. $145.2$ มก./ดล.</span>
+        </label>
+      </div>
+      <div class="solution-box" id="sol14">
+        <strong>เฉลย ก.</strong> กลุ่มเสี่ยงสูง $2.5\%$ บนสุด หมายถึงพื้นที่ทางขวาเท่ากับ $0.0250$ ซึ่งสอดคล้องกับพื้นที่สะสมทางซ้ายเท่ากับ $1 - 0.0250 = 0.9750$
+        <br>จากตารางได้ค่ามาตรฐาน $Z = +1.96$
+        <br>แปลงกลับเป็นค่าจริง: $x = \mu + Z\sigma = 120 + (1.96)(15) = 120 + 29.4 = 149.4$ มก./ดล.
+      </div>
+    </div>
+
+    <!-- ข้อ 15 -->
+    <div class="question-card" id="qCard15">
+      <div class="meta-bar">
+        <span class="tag tag-indicator">ตัวชี้วัด: ค 3.2 ม.6/1</span>
+        <span class="blueprint-badge badge-a" style="padding:2px 8px; font-size:0.8rem;">ด้านการประยุกต์ (A)</span>
+        <span class="tag tag-diff-hard">ระดับ: ยาก</span>
+      </div>
+      <div class="q-text">
+        <span class="q-number">ข้อ 15.</span>
+        ระบบการให้เกรดแบบอิงกลุ่ม (Curved Grading) กำหนดให้นักเรียนที่ได้เกรด A ต้องมีผลคะแนนอยู่ในกลุ่ม $10\%$ บนสุดของการสอบรวม 
+        <br>หากคะแนนสอบมีการแจกแจงปกติ โดยมีนักเรียนเข้าสอบ 500 คน ทราบว่ามีนักเรียนสอบได้คะแนนมากกว่า 82 คะแนนอยู่ 50 คนพอดี และคะแนนเฉลี่ยของการสอบครั้งนี้คือ $\mu = 65$ คะแนน
+        <br>ข้อความใดต่อไปนี้อธิบายสถานการณ์ดังกล่าวได้อย่างถูกต้องสมเหตุสมผลตามหลักสถิติ (กำหนดให้ $P(Z \le 1.28) \approx 0.9000$)
+      </div>
+      <div class="options-grid">
+        <label class="option-label">
+          <input type="radio" name="q15" value="A">
+          <span>ก. ส่วนเบี่ยงเบนมาตรฐานของการสอบครั้งนี้มีค่าประมาณ $\sigma \approx 13.28$ คะแนน</span>
+        </label>
+        <label class="option-label">
+          <input type="radio" name="q15" value="B">
+          <span>ข. คะแนนตัดเกรด A คือคะแนนที่มีค่ามาตรฐาน $Z = +1.00$</span>
+        </label>
+        <label class="option-label">
+          <input type="radio" name="q15" value="C">
+          <span>ค. นักเรียนที่ได้คะแนน 80 คะแนน จะได้รับเกรด A อย่างแน่นอน</span>
+        </label>
+        <label class="option-label">
+          <input type="radio" name="q15" value="D">
+          <span>ง. การตัดเกรดอิงกลุ่มวิธีนี้ทำให้สัดส่วนของนักเรียนที่ได้เกรด A ขึ้นอยู่กับความยากง่ายของข้อสอบ</span>
+        </label>
+      </div>
+      <div class="solution-box" id="sol15">
+        <strong>เฉลย ก.</strong> นักเรียน 50 คนจาก 500 คน คิดเป็นสัดส่วน $\frac{50}{500} = 0.10$ หรือ $10\%$ บนสุดพอดี
+        <br>ดังนั้น คะแนน 82 คะแนนคือจุดตัดเกรด A ซึ่งตรงกับพื้นที่สะสมทางซ้าย $0.9000$ ได้ค่า $Z \approx +1.28$
+        <br>จาก $Z = \frac{x - \mu}{\sigma} \implies 1.28 = \frac{82 - 65}{\sigma} \implies \sigma = \frac{17}{1.28} \approx 13.28$ คะแนน
+      </div>
+    </div>
+
+  </form>
+
+  <!-- แผงปุ่มควบคุมด้านล่าง -->
+  <div class="action-panel">
+    <div style="display:flex; align-items:center; gap:8px;">
+      <span style="font-weight:600; color:var(--text-main);">ความคืบหน้า:</span>
+      <span id="progressText" style="color:var(--primary); font-weight:700;">0 / 15 ข้อ</span>
+    </div>
+    
+    <div style="display:flex; gap:10px;">
+      <button type="button" class="btn btn-reset" onclick="resetQuiz()">ล้างคำตอบ</button>
+      <button type="button" class="btn btn-print" onclick="window.print()">
+        <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M2.5 8a.5.5 0 1 0 0-1 .5.5 0 0 0 0 1z"/><path d="M5 1a2 2 0 0 0-2 2v2H2a2 2 0 0 0-2 2v3a2 2 0 0 0 2 2h1v1a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2v-1h1a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-1V3a2 2 0 0 0-2-2H5zM4 3a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v2H4V3zm1 5a2 2 0 0 0-2 2v1H2a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1v3a1 1 0 0 1-1 1h-1v-1a2 2 0 0 0-2-2H5zm7 2v3a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1v-3a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1z"/></svg>
+        พิมพ์ข้อสอบ
+      </button>
+      <button type="button" class="btn btn-submit" onclick="submitQuiz()">
+        <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M12.736 3.97a.733.733 0 0 1 1.047 0c.286.289.29.756.01 1.05L7.88 12.01a.733.733 0 0 1-1.065.02L3.217 8.384a.757.757 0 0 1 0-1.06.733.733 0 0 1 1.047 0l2.57 2.57 5.902-5.924z"/></svg>
+        ตรวจคำตอบ
+      </button>
+    </div>
+  </div>
+
+</div>
+
+<!-- ==========================================
+     JavaScript: ระบบตรวจข้อสอบและวิเคราะห์ผล
+     ========================================== -->
+<script>
+  // คีย์เฉลยที่ถูกต้องของข้อ 1 ถึง 15
+  const answerKeys = {
+    q1: 'B',
+    q2: 'A',
+    q3: 'C',
+    q4: 'B',
+    q5: 'B',
+    q6: 'A',
+    q7: 'A',
+    q8: 'A',
+    q9: 'A',
+    q10: 'A',
+    q11: 'B',
+    q12: 'C',
+    q13: 'B',
+    q14: 'A',
+    q15: 'A'
+  };
+
+  // แผนผังจำแนกประเภทข้อสอบ
+  const questionCategory = {
+    q1: 'K', q2: 'K', q3: 'K', q4: 'K', q5: 'K',
+    q6: 'P', q7: 'P', q8: 'P', q9: 'P', q10: 'P',
+    q11: 'A', q12: 'A', q13: 'A', q14: 'A', q15: 'A'
+  };
+
+  // ติดตามการทำข้อสอบ (Progress Tracker)
+  const form = document.getElementById('quizForm');
+  form.addEventListener('change', updateProgress);
+
+  function updateProgress() {
+    let answered = 0;
+    for (let i = 1; i <= 15; i++) {
+      if (document.querySelector(`input[name="q${i}"]:checked`)) {
+        answered++;
+      }
+    }
+    document.getElementById('progressText').textContent = `${answered} / 15 ข้อ`;
+  }
+
+  function submitQuiz() {
+    let scoreTotal = 0;
+    let scoreK = 0;
+    let scoreP = 0;
+    let scoreA = 0;
+    let unansweredCount = 0;
+
+    for (let i = 1; i <= 15; i++) {
+      const qName = `q${i}`;
+      const selected = document.querySelector(`input[name="${qName}"]:checked`);
+      const card = document.getElementById(`qCard${i}`);
+      const solBox = document.getElementById(`sol${i}`);
+      const allLabels = card.querySelectorAll('.option-label');
+
+      // ล้างสถานะเดิม
+      allLabels.forEach(lbl => lbl.classList.remove('correct', 'incorrect'));
+      solBox.style.display = 'block'; // แสดงเฉลยละเอียด
+
+      if (selected) {
+        const userAns = selected.value;
+        const correctAns = answerKeys[qName];
+
+        if (userAns === correctAns) {
+          scoreTotal++;
+          if (questionCategory[qName] === 'K') scoreK++;
+          if (questionCategory[qName] === 'P') scoreP++;
+          if (questionCategory[qName] === 'A') scoreA++;
+          selected.parentElement.classList.add('correct');
+        } else {
+          selected.parentElement.classList.add('incorrect');
+          // ไฮไลต์ข้อที่ถูกให้เห็น
+          allLabels.forEach(lbl => {
+            const radio = lbl.querySelector('input[type="radio"]');
+            if (radio && radio.value === correctAns) {
+              lbl.classList.add('correct');
+            }
+          });
+        }
+      } else {
+        unansweredCount++;
+        // ไฮไลต์ข้อที่ถูกแม้ไม่ได้ตอบ
+        allLabels.forEach(lbl => {
+          const radio = lbl.querySelector('input[type="radio"]');
+          if (radio && radio.value === answerKeys[qName]) {
+            lbl.classList.add('correct');
+          }
+        });
+      }
+    }
+
+    // แสดงผลคะแนนในโมดอล
+    const modal = document.getElementById('resultModal');
+    modal.style.display = 'block';
+
+    document.getElementById('totalScoreText').innerHTML = `
+      คะแนนรวมที่ได้: <span style="color:var(--primary); font-size:1.5rem;">${scoreTotal}</span> / 15 คะแนน 
+      (คิดเป็น ${((scoreTotal / 15) * 100).toFixed(1)}%)
+      ${unansweredCount > 0 ? `<br><small style="color:var(--danger);">* มีข้อที่ยังไม่ได้ตอบจำนวน ${unansweredCount} ข้อ</small>` : ''}
+    `;
+
+    document.getElementById('scoreK').textContent = `${scoreK} / 5`;
+    document.getElementById('scoreP').textContent = `${scoreP} / 5`;
+    document.getElementById('scoreA').textContent = `${scoreA} / 5`;
+
+    // เลื่อนหน้าจอขึ้นไปดูกล่องสรุปผล
+    modal.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+    // สั่งเรนเดอร์ MathJax ในเฉลยละเอียด
+    if (window.MathJax && window.MathJax.typesetPromise) {
+      window.MathJax.typesetPromise();
+    }
+  }
+
+  function resetQuiz() {
+    if (confirm('คุณต้องการล้างคำตอบทั้งหมดและเริ่มทำใหม่ใช่หรือไม่?')) {
+      form.reset();
+      for (let i = 1; i <= 15; i++) {
+        const card = document.getElementById(`qCard${i}`);
+        card.querySelectorAll('.option-label').forEach(lbl => {
+          lbl.classList.remove('correct', 'incorrect');
+        });
+        document.getElementById(`sol${i}`).style.display = 'none';
+      }
+      document.getElementById('resultModal').style.display = 'none';
+      updateProgress();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  }
+</script>
+
+</body>
+</html>

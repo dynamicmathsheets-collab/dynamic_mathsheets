@@ -1,0 +1,1169 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>เรื่องที่ 5: ตัวแปรสุ่มต่อเนื่อง</title>
+  
+  <!-- ฟอนต์ Sarabun และ Fira Code -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com">
+  <link href="https://fonts.googleapis.com/css2?family=Sarabun:ital,wght@0,300;0,400;0,600;0,700;1,400&family=Fira+Code:wght@400;600&display=swap" rel="stylesheet">
+  
+  <!-- MathJax สำหรับแสดงผลสูตรคณิตศาสตร์และสัญลักษณ์ LaTeX -->
+  <script>
+    window.MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']],
+        displayMath: [['$$', '$$'], ['\\[', '\\]']],
+        processEscapes: true
+      },
+      options: {
+        skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+      }
+    };
+  </script>
+  <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+  <style>
+    :root {
+      --font-th: 'Sarabun', system-ui, -apple-system, sans-serif;
+      --font-code: 'Fira Code', monospace;
+      
+      /* ชุดสีประจำ 6 เฟรม (เรื่องที่ 5: โทน Teal, Blue, Orange, Purple, Green, Rose) */
+      --frame1-border: #0d9488;  /* Teal */
+      --frame1-bg: #f0fdfa;
+      --frame1-head: #0f766e;
+      
+      --frame2-border: #2563eb;  /* Blue */
+      --frame2-bg: #eff6ff;
+      --frame2-head: #1e40af;
+      
+      --frame3-border: #ea580c;  /* Orange/Coral */
+      --frame3-bg: #fff7ed;
+      --frame3-head: #c2410c;
+      
+      --frame4-border: #7c3aed;  /* Violet */
+      --frame4-bg: #f5f3ff;
+      --frame4-head: #5b21b6;
+      
+      --frame5-border: #059669;  /* Emerald */
+      --frame5-bg: #ecfdf5;
+      --frame5-head: #065f46;
+      
+      --frame6-border: #e11d48;  /* Rose */
+      --frame6-bg: #fff1f2;
+      --frame6-head: #9f1239;
+
+      --text-dark: #1e293b;
+      --text-muted: #64748b;
+      --shadow-sm: 0 2px 4px rgba(0,0,0,0.05);
+      --shadow-md: 0 4px 10px rgba(0,0,0,0.08);
+      --radius: 12px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: var(--font-th);
+      background-color: #f8fafc;
+      color: var(--text-dark);
+      line-height: 1.7;
+      padding: 24px 16px 60px 16px;
+    }
+
+    .main-container {
+      max-width: 1120px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 32px;
+    }
+
+    /* หัวข้อเอกสาร */
+    .document-header {
+      background: white;
+      border: 1px solid #e2e8f0;
+      border-top: 6px solid var(--frame1-border);
+      border-radius: var(--radius);
+      padding: 28px;
+      text-align: center;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .document-header h1 {
+      font-size: 1.95rem;
+      color: #0f172a;
+      margin-bottom: 6px;
+      font-weight: 700;
+    }
+
+    .document-header p {
+      font-size: 1.05rem;
+      color: var(--text-muted);
+    }
+
+    /* กล่องเฟรม */
+    .frame-box {
+      background: white;
+      border-radius: var(--radius);
+      border: 2px solid;
+      box-shadow: var(--shadow-sm);
+      overflow: hidden;
+      transition: box-shadow 0.2s ease;
+    }
+
+    .frame-box:hover {
+      box-shadow: var(--shadow-md);
+    }
+
+    .frame-header {
+      padding: 16px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid rgba(0,0,0,0.08);
+    }
+
+    .frame-header h2 {
+      font-size: 1.3rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .frame-tag {
+      font-size: 0.85rem;
+      font-weight: 600;
+      padding: 4px 12px;
+      border-radius: 999px;
+      background: white;
+      border: 1px solid currentColor;
+    }
+
+    .frame-body {
+      padding: 24px;
+    }
+
+    /* สีกำกับเฟรม */
+    .frame-1 { border-color: var(--frame1-border); }
+    .frame-1 .frame-header { background: var(--frame1-bg); color: var(--frame1-head); }
+    .frame-1 .frame-tag { color: var(--frame1-border); }
+
+    .frame-2 { border-color: var(--frame2-border); }
+    .frame-2 .frame-header { background: var(--frame2-bg); color: var(--frame2-head); }
+    .frame-2 .frame-tag { color: var(--frame2-border); }
+
+    .frame-3 { border-color: var(--frame3-border); }
+    .frame-3 .frame-header { background: var(--frame3-bg); color: var(--frame3-head); }
+    .frame-3 .frame-tag { color: var(--frame3-border); }
+
+    .frame-4 { border-color: var(--frame4-border); }
+    .frame-4 .frame-header { background: var(--frame4-bg); color: var(--frame4-head); }
+    .frame-4 .frame-tag { color: var(--frame4-border); }
+
+    .frame-5 { border-color: var(--frame5-border); }
+    .frame-5 .frame-header { background: var(--frame5-bg); color: var(--frame5-head); }
+    .frame-5 .frame-tag { color: var(--frame5-border); }
+
+    .frame-6 { border-color: var(--frame6-border); }
+    .frame-6 .frame-header { background: var(--frame6-bg); color: var(--frame6-head); }
+    .frame-6 .frame-tag { color: var(--frame6-border); }
+
+    /* บล็อกนิยามทางคณิตศาสตร์ */
+    .math-def {
+      background: #f8fafc;
+      border-left: 4px solid #334155;
+      padding: 14px 18px;
+      border-radius: 4px;
+      margin: 16px 0;
+    }
+
+    .math-def-title {
+      font-weight: 700;
+      color: #0f172a;
+      margin-bottom: 4px;
+    }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 18px;
+      margin-top: 14px;
+    }
+
+    @media (max-width: 768px) {
+      .grid-2 { grid-template-columns: 1fr; }
+    }
+
+    .card-sub {
+      background: #fafafa;
+      border: 1px solid #e5e7eb;
+      border-radius: 8px;
+      padding: 16px;
+    }
+
+    .card-sub h3 {
+      font-size: 1.1rem;
+      margin-bottom: 8px;
+    }
+
+    /* แผงควบคุมและปุ่ม */
+    .control-panel {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 16px;
+      background: #f9fafb;
+      padding: 18px;
+      border-radius: 8px;
+      border: 1px solid #e5e7eb;
+      margin-bottom: 20px;
+    }
+
+    .control-item {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .control-item label {
+      font-weight: 600;
+      font-size: 0.92rem;
+      color: var(--text-dark);
+    }
+
+    select, input[type="number"], input[type="range"] {
+      padding: 8px 12px;
+      border-radius: 6px;
+      border: 1px solid #cbd5e1;
+      font-family: inherit;
+      font-size: 0.95rem;
+      background-color: white;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 9px 18px;
+      border-radius: 6px;
+      font-family: inherit;
+      font-weight: 600;
+      font-size: 0.95rem;
+      cursor: pointer;
+      border: none;
+      transition: all 0.2s ease;
+    }
+
+    .btn-violet { background: #7c3aed; color: white; }
+    .btn-violet:hover { background: #6d28d9; }
+
+    .btn-emerald { background: #059669; color: white; }
+    .btn-emerald:hover { background: #047857; }
+
+    .btn-outline {
+      background: white;
+      border: 1px solid #cbd5e1;
+      color: var(--text-dark);
+    }
+    .btn-outline:hover {
+      background: #f1f5f9;
+    }
+
+    .step-line {
+      padding: 10px 14px;
+      background: #f8fafc;
+      border-left: 3px solid #6366f1;
+      margin-bottom: 10px;
+      border-radius: 0 4px 4px 0;
+      animation: fadeIn 0.3s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(4px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ตารางทางคณิตศาสตร์ */
+    .table-math {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 14px 0;
+      font-size: 0.95rem;
+    }
+
+    .table-math th, .table-math td {
+      border: 1px solid #cbd5e1;
+      padding: 10px 14px;
+      text-align: left;
+      vertical-align: top;
+    }
+
+    .table-math th {
+      background: #f1f5f9;
+      color: #0f172a;
+      font-weight: 700;
+    }
+
+    .table-math tr:nth-child(even) td {
+      background: #fcfcfd;
+    }
+
+    /* Interactive Graph / Number Line Container */
+    .interactive-canvas-box {
+      background: white;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      padding: 20px;
+      margin-top: 16px;
+    }
+
+    svg.interactive-plot {
+      width: 100%;
+      height: 250px;
+      display: block;
+      overflow: visible;
+    }
+
+    /* ใบงาน */
+    .worksheet-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-bottom: 20px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid #e2e8f0;
+    }
+
+    .worksheet-container {
+      background: white;
+      border: 1px solid #cbd5e1;
+      border-radius: 6px;
+      padding: 24px;
+    }
+
+    .worksheet-header-print {
+      display: none;
+    }
+
+    .worksheet-q-item {
+      padding: 14px 0;
+      border-bottom: 1px dashed #e2e8f0;
+      page-break-inside: avoid;
+    }
+
+    .worksheet-q-item:last-child {
+      border-bottom: none;
+    }
+
+    .student-write-area {
+      min-height: 52px;
+      margin-top: 8px;
+      border: 1px dashed #cbd5e1;
+      background: #fafafa;
+      border-radius: 4px;
+      padding: 8px 12px;
+      color: #94a3b8;
+      font-size: 0.9rem;
+    }
+
+    .answer-key-box {
+      margin-top: 8px;
+      padding: 10px 14px;
+      background: #ecfdf5;
+      border-left: 3px solid #059669;
+      color: #065f46;
+      border-radius: 0 4px 4px 0;
+      font-size: 0.93rem;
+    }
+
+    /* =========================================================
+       CLEAN PRINT CSS: ป้องกันหน้าว่าง 100%
+       ========================================================= */
+    @page {
+      size: A4 portrait;
+      margin: 12mm 15mm;
+    }
+
+    @media print {
+      body, html {
+        background: white !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        height: auto !important;
+        overflow: visible !important;
+      }
+
+      .document-header,
+      .frame-1,
+      .frame-2,
+      .frame-3,
+      .frame-4,
+      .frame-6,
+      .worksheet-actions,
+      .frame-header,
+      .no-print {
+        display: none !important;
+      }
+
+      .main-container {
+        display: block !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        gap: 0 !important;
+      }
+
+      .frame-5 {
+        border: none !important;
+        box-shadow: none !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        background: transparent !important;
+        border-radius: 0 !important;
+      }
+
+      .frame-5 .frame-body {
+        padding: 0 !important;
+      }
+
+      .worksheet-container {
+        border: none !important;
+        padding: 0 !important;
+        box-shadow: none !important;
+        width: 100% !important;
+      }
+
+      .worksheet-header-print {
+        display: block !important;
+        margin-bottom: 14px;
+        padding-bottom: 10px;
+        border-bottom: 2px solid #000;
+        text-align: center;
+      }
+
+      .worksheet-header-print h2 {
+        font-size: 16pt;
+        color: #000 !important;
+        margin-bottom: 4px;
+      }
+
+      .worksheet-header-print p {
+        font-size: 11pt;
+        color: #333 !important;
+      }
+
+      .print-meta-grid {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 10px;
+        font-size: 10.5pt;
+        color: #000 !important;
+      }
+
+      .student-write-area {
+        min-height: 52px !important;
+        background: transparent !important;
+        border: 1px solid #475569 !important;
+        color: #334155 !important;
+        font-size: 10pt !important;
+      }
+
+      .worksheet-q-item {
+        padding: 10px 0 !important;
+        border-bottom: 1px dashed #94a3b8 !important;
+        page-break-inside: avoid !important;
+      }
+
+      .answer-key-box {
+        background: #ecfdf5 !important;
+        border-left: 3px solid #000 !important;
+        color: #000 !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<div class="main-container">
+
+  <!-- ส่วนหัวเอกสาร -->
+  <header class="document-header">
+    <h1>เอกสารการเรียนรู้คณิตศาสตร์: เรื่องที่ 5 ตัวแปรสุ่มต่อเนื่อง</h1>
+    <p>หน่วยการเรียนรู้: ตัวแปรสุ่มและการแจกแจงความน่าจะเป็น (Continuous Random Variables & Probability Density)</p>
+  </header>
+
+  <!-- ==========================================
+       เฟรมที่ 1: เรื่อง ตัวแปรสุ่มต่อเนื่อง
+       ========================================== -->
+  <section class="frame-box frame-1">
+    <div class="frame-header">
+      <h2>1. ตัวแปรสุ่มต่อเนื่อง (Continuous Random Variables)</h2>
+      <span class="frame-tag">บทนิยามและฟังก์ชันความหนาแน่น</span>
+    </div>
+    <div class="frame-body">
+      <div class="math-def">
+        <div class="math-def-title">บทนิยามทางคณิตศาสตร์ (Definition):</div>
+        <strong>ตัวแปรสุ่มต่อเนื่อง (Continuous Random Variable: $X$)</strong> คือ ตัวแปรสุ่มที่เซตของค่าที่เป็นไปได้ทั้งหมด ($S_X$) เป็นช่วงของจำนวนจริง (Interval of Real Numbers) หรือเซตอนันต์ที่นับไม่ได้ (Uncountably Infinite Set) <br>
+        เรานิยามความน่าจะเป็นผ่าน <strong>ฟังก์ชันความหนาแน่นความน่าจะเป็น (Probability Density Function: PDF: $f(x)$)</strong> โดยที่ความน่าจะเป็นที่ $X$ จะมีค่าตกอยู่ในช่วง $[a, b]$ คือ <em>พื้นที่ใต้เส้นโค้งของ $f(x)$ จาก $x = a$ ถึง $x = b$</em>:
+        \[P(a \le X \le b) = \int_a^b f(x) \, dx\]
+      </div>
+
+      <div class="grid-2">
+        <div class="card-sub">
+          <h3 style="color: var(--frame1-head);">สัจพจน์ของฟังก์ชันความหนาแน่น $f(x)$</h3>
+          <p>ฟังก์ชันความหนาแน่นความน่าจะเป็น $f(x)$ ต้องสอดคล้องกับคุณสมบัติดังนี้:</p>
+          <ol style="padding-left: 22px; margin-top: 6px;">
+            <li>$f(x) \ge 0$ สำหรับทุกจำนวนจริง $x$ (กราฟอยู่เหนือหรือบนแกนนอนเสมอ)</li>
+            <li>พื้นที่ใต้เส้นโค้ง $f(x)$ ทั้งหมดเหนือแกนนอนต้องเท่ากับ $1$ เสมอ:
+              \[\int_{-\infty}^{\infty} f(x) \, dx = 1\]
+            </li>
+          </ol>
+        </div>
+        <div class="card-sub">
+          <h3 style="color: var(--frame1-head);">ความน่าจะเป็นที่จุดเดี่ยวเป็นศูนย์ ($P(X = c) = 0$)</h3>
+          <p>
+            เนื่องจากจุดเดี่ยว $x = c$ เป็นเส้นตรงที่มีความกว้างเท่ากับ $0$ พื้นที่ใต้กราฟ ณ จุดนั้นจึงเป็นศูนย์:
+            \[P(X = c) = \int_c^c f(x) \, dx = 0\]
+            ส่งผลให้ในตัวแปรสุ่มต่อเนื่อง <strong>การรวมหรือไม่รวมจุดปลายมีค่าความน่าจะเป็นเท่ากันทุกประการ:</strong>
+            \[P(a < X < b) = P(a \le X < b) = P(a < X \le b) = P(a \le X \le b)\]
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==========================================
+       เฟรมที่ 2: ลักษณะและความแตกต่างจากตัวแปรสุ่มไม่ต่อเนื่อง
+       ========================================== -->
+  <section class="frame-box frame-2">
+    <div class="frame-header">
+      <h2>2. ลักษณะของตัวแปรสุ่มต่อเนื่องและความแตกต่างจากตัวแปรสุ่มไม่ต่อเนื่อง</h2>
+      <span class="frame-tag">ตารางเปรียบเทียบมโนทัศน์</span>
+    </div>
+    <div class="frame-body">
+      <p style="margin-bottom: 14px;">
+        เพื่อให้นักเรียนเข้าใจความแตกต่างเชิงโครงสร้างทางคณิตศาสตร์อย่างชัดเจน สามารถเปรียบเทียบมโนทัศน์สำคัญได้ดังตารางต่อไปนี้:
+      </p>
+
+      <table class="table-math">
+        <thead>
+          <tr>
+            <th style="width: 25%;">ประเด็นเปรียบเทียบ</th>
+            <th style="width: 37%;">ตัวแปรสุ่มไม่ต่อเนื่อง (Discrete)</th>
+            <th style="width: 38%;">ตัวแปรสุ่มต่อเนื่อง (Continuous)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>1. แหล่งที่มาของข้อมูล</strong></td>
+            <td>เกิดจาก <strong>การนับ (Counting)</strong> เช่น จำนวนชิ้น จำนวนครั้ง</td>
+            <td>เกิดจาก <strong>การวัด (Measurement)</strong> เช่น เวลา น้ำหนัก ความสูง อุณหภูมิ</td>
+          </tr>
+          <tr>
+            <td><strong>2. เซตของค่าที่เป็นไปได้ ($S_X$)</strong></td>
+            <td>เซตจำกัด หรือ เซตอนันต์ที่นับได้ เช่น $\{0, 1, 2, \dots, n\}$ ค่าแยกขาดจากกัน</td>
+            <td>ช่วงของจำนวนจริง เช่น $[A, B]$ หรือ $(0, \infty)$ มีค่าต่อเนื่องนับไม่ถ้วน</td>
+          </tr>
+          <tr>
+            <td><strong>3. เครื่องมือแทนความน่าจะเป็น</strong></td>
+            <td>ฟังก์ชันมวลความน่าจะเป็น $P(X = x)$ หรือ PMF</td>
+            <td>ฟังก์ชันความหนาแน่นความน่าจะเป็น $f(x)$ หรือ PDF</td>
+          </tr>
+          <tr>
+            <td><strong>4. ความน่าจะเป็นที่จุดเดี่ยว</strong></td>
+            <td>อาจมีค่ามากกว่า 0 ได้ เช่น $P(X = 2) = 0.35$</td>
+            <td>มีค่าเท่ากับศูนย์เสมอ $P(X = c) = 0$ สำหรับทุกค่า $c$</td>
+          </tr>
+          <tr>
+            <td><strong>5. การหาความน่าจะเป็น</strong></td>
+            <td>ใช้ <strong>ผลรวม (Summation: $\sum$)</strong> ของจุดที่สนใจ</td>
+            <td>ใช้ <strong>พื้นที่ใต้เส้นโค้ง (Integration: $\int$)</strong> บนช่วงที่สนใจ</td>
+          </tr>
+          <tr>
+            <td><strong>6. ผลรวมความน่าจะเป็นทั้งหมด</strong></td>
+            <td>$\sum_{i} P(X = x_i) = 1$</td>
+            <td>พื้นที่ใต้เส้นโค้งทั้งหมด $= \int_{-\infty}^{\infty} f(x) \, dx = 1$</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ==========================================
+       เฟรมที่ 3: HTML Interactive Model
+       ========================================== -->
+  <section class="frame-box frame-3">
+    <div class="frame-header">
+      <h2>3. แบบจำลองเชิงโต้ตอบ: เส้นจำนวนและพื้นที่ความน่าจะเป็นตัวแปรสุ่มต่อเนื่อง</h2>
+      <span class="frame-tag">Uniform Density Explorer</span>
+    </div>
+    <div class="frame-body">
+      
+      <!-- ส่วนควบคุมตัวแปร -->
+      <div class="control-panel">
+        <div class="control-item">
+          <label for="sliderMinA">1. ค่าต่ำสุดของโดเมน ($A$): <span id="labelMinA" style="color:#c2410c; font-weight:700;">0</span></label>
+          <input type="range" id="sliderMinA" min="0" max="10" value="0" oninput="onDomainChange()">
+        </div>
+
+        <div class="control-item">
+          <label for="sliderMaxB">2. ค่าสูงสุดของโดเมน ($B$): <span id="labelMaxB" style="color:#c2410c; font-weight:700;">10</span></label>
+          <input type="range" id="sliderMaxB" min="2" max="20" value="10" oninput="onDomainChange()">
+        </div>
+
+        <div class="control-item">
+          <label for="sliderRangeLower">3. จุดเริ่มต้นของช่วง ($a$): <span id="labelRangeA" style="color:#0f766e; font-weight:700;">2</span></label>
+          <input type="range" id="sliderRangeLower" min="0" max="10" value="2" oninput="onIntervalChange()">
+        </div>
+
+        <div class="control-item">
+          <label for="sliderRangeUpper">4. จุดสิ้นสุดของช่วง ($b$): <span id="labelRangeB" style="color:#0f766e; font-weight:700;">6</span></label>
+          <input type="range" id="sliderRangeUpper" min="0" max="10" value="6" oninput="onIntervalChange()">
+        </div>
+      </div>
+
+      <!-- ส่วนแสดงผล Interactive SVG และการคำนวณ -->
+      <div class="interactive-canvas-box">
+        <h3 style="color: var(--frame3-head); margin-bottom: 4px; font-size:1.05rem;">
+          กราฟฟังก์ชันความหนาแน่น $f(x)$ บนช่วง $[A, B]$ และพื้นที่แรเงาของช่วง $[a, b]$
+        </h3>
+        
+        <svg class="interactive-plot" id="densityPlotSVG" viewBox="0 0 800 240">
+          <!-- เรนเดอร์เส้นจำนวน แกน และพื้นที่แรเงาด้วย JavaScript -->
+        </svg>
+
+        <div class="grid-2" style="margin-top: 14px;">
+          <div class="card-sub" style="border-left: 4px solid #ea580c;">
+            <strong>การคำนวณพื้นที่และความน่าจะเป็น:</strong>
+            <div id="calcProbDetails" style="margin-top: 6px; font-size: 0.95rem;"></div>
+          </div>
+          <div class="card-sub" style="border-left: 4px solid #0d9488;">
+            <strong>มโนทัศน์ที่สังเกตได้จากโมเดล:</strong>
+            <div id="modelConceptsDetails" style="margin-top: 6px; font-size: 0.93rem; color: #1e293b;"></div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ==========================================
+       เฟรมที่ 4: โจทย์สุ่ม พร้อมเฉลยทีละบรรทัด
+       ========================================== -->
+  <section class="frame-box frame-4">
+    <div class="frame-header">
+      <h2>4. คลังโจทย์สุ่มและเฉลยขั้นตอน (Random Practice)</h2>
+      <span class="frame-tag">ฝึกคิดคำนวณพื้นที่ใต้กราฟ</span>
+    </div>
+    <div class="frame-body">
+      <div style="display: flex; gap: 12px; margin-bottom: 16px;">
+        <button class="btn btn-violet" onclick="generateSinglePracticeQuestion()">
+          <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+          สุ่มโจทย์ใหม่
+        </button>
+        <button class="btn btn-outline" id="btnRevealNext" onclick="revealNextStep()" disabled>
+          แสดงเฉลยทีละบรรทัด
+        </button>
+      </div>
+
+      <!-- กล่องโจทย์ -->
+      <div class="card-sub" id="practiceQuestionBox" style="background:#faf5ff; border-color:#e9d5ff;">
+        <!-- ข้อความโจทย์จะแสดงที่นี่ -->
+      </div>
+
+      <!-- กล่องเฉลยทีละบรรทัด -->
+      <div id="practiceStepsContainer" style="margin-top: 14px;"></div>
+    </div>
+  </section>
+
+  <!-- ==========================================
+       เฟรมที่ 5: ส่วนทำใบงานให้นักเรียน (Worksheet)
+       ========================================== -->
+  <section class="frame-box frame-5">
+    <div class="frame-header">
+      <h2>5. ระบบสร้างใบงานและแบบประเมิน (Worksheet Generator)</h2>
+      <span class="frame-tag">พิมพ์เอกสาร</span>
+    </div>
+    <div class="frame-body">
+      
+      <div class="worksheet-actions no-print">
+        <button class="btn btn-emerald" onclick="generateNew5Worksheet()">
+          <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+          สุ่มโจทย์ 5 ข้อใหม่
+        </button>
+        <button class="btn btn-outline" onclick="printWorksheet(false)">
+          <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4H7v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/></svg>
+          พิมพ์ใบงานสำหรับนักเรียน
+        </button>
+        <button class="btn btn-outline" onclick="printWorksheet(true)">
+          <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+          พิมพ์เฉลยสำหรับครู
+        </button>
+      </div>
+
+      <!-- พื้นที่ใบงาน (Print Area) -->
+      <div class="worksheet-container" id="worksheet-print-area">
+        <div class="worksheet-header-print">
+          <h2>ใบงานคณิตศาสตร์: เรื่องที่ 5 ตัวแปรสุ่มต่อเนื่อง</h2>
+          <p>กลุ่มสาระการเรียนรู้คณิตศาสตร์ | เรื่อง ตัวแปรสุ่มและการแจกแจงความน่าจะเป็น</p>
+          <div class="print-meta-grid">
+            <span>ชื่อ-นามสกุล: ............................................................................</span>
+            <span>ชั้น ม.6/......</span>
+            <span>เลขที่: ..........</span>
+            <span>คะแนนเต็ม: 15 คะแนน</span>
+          </div>
+        </div>
+
+        <p class="no-print" style="margin-bottom: 12px; color: var(--text-muted); font-size: 0.95rem;">
+          คำชี้แจง: จงหาค่าคงตัว ตรวจสอบฟังก์ชันความหนาแน่น และคำนวณความน่าจะเป็นของช่วงตัวแปรสุ่มต่อเนื่องในแต่ละข้อต่อไปนี้
+        </p>
+
+        <div id="worksheetQuestionsList">
+          <!-- รายการโจทย์ 5 ข้อ -->
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ==========================================
+       เฟรมที่ 6: เกณฑ์การตรวจรูบริก (Rubric 3 ระดับ)
+       ========================================== -->
+  <section class="frame-box frame-6">
+    <div class="frame-header">
+      <h2>6. รูบริกการประเมินใบงาน (Scoring Rubric - 3 ระดับ)</h2>
+      <span class="frame-tag">การวัดและประเมินผล</span>
+    </div>
+    <div class="frame-body">
+      <p style="margin-bottom: 12px;">
+        เกณฑ์การประเมินผลการเรียนรู้รายข้อ (ข้อละ 3 คะแนน รวม 5 ข้อ 15 คะแนน) โดยใช้เกณฑ์แบบวิเคราะห์ (Analytic Rubric) ตามมาตรฐานเอกสารคณิตศาสตร์:
+      </p>
+
+      <table class="table-math">
+        <thead>
+          <tr>
+            <th style="width: 22%;">ประเด็นการประเมิน</th>
+            <th style="width: 26%;">ระดับ 3 (ดีเยี่ยม - 3 คะแนน)</th>
+            <th style="width: 26%;">ระดับ 2 (พอใช้ - 2 คะแนน)</th>
+            <th style="width: 26%;">ระดับ 1 (ต้องปรับปรุง - 1 คะแนน)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>
+              <strong>1. การหาค่าคงตัวจากพื้นที่ทั้งหมด</strong><br>
+              <span style="font-size:0.85rem; color:var(--text-muted);">($\int f(x)dx = 1$ หรือพื้นที่รูปทรง $= 1$)</span>
+            </td>
+            <td>
+              ตั้งสมการพื้นที่ทั้งหมดเท่ากับ 1 ได้ถูกต้อง ไม่ว่าจะใช้การอินทิเกรตหรือสูตรพื้นที่เรขาคณิต และแก้สมการหาค่าคงตัว $k$ หรือ $c$ ได้อย่างแม่นยำ
+            </td>
+            <td>
+              เข้าใจว่าพื้นที่ทั้งหมดต้องเท่ากับ 1 แต่ตั้งสมการหรือคำนวณพื้นที่รูปทรงเรขาคณิตผิดพลาดเล็กน้อย
+            </td>
+            <td>
+              ไม่เข้าใจคุณสมบัติพื้นที่ใต้กราฟทั้งหมดเท่ากับ 1 หรือตั้งสมการไม่สอดคล้องกับฟังก์ชันที่กำหนด
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <strong>2. การคำนวณความน่าจะเป็นบนช่วง</strong><br>
+              <span style="font-size:0.85rem; color:var(--text-muted);">($P(a \le X \le b)$)</span>
+            </td>
+            <td>
+              ระบุขอบเขตช่วง $a$ ถึง $b$ บนโดเมนได้ถูกต้อง คำนวณพื้นที่ใต้กราฟบนช่วงนั้นได้ครบถ้วน และได้คำตอบความน่าจะเป็นที่ถูกต้องสมบูรณ์
+            </td>
+            <td>
+              ระบุช่วงได้ถูกต้อง แต่คำนวณพื้นที่ผิดพลาดเล็กน้อย หรือลืมตัดทอนเศษส่วน
+            </td>
+            <td>
+              กำหนดขอบเขตช่วงผิดพลาด หรือไม่สามารถคำนวณพื้นที่ใต้กราฟเพื่อหาความน่าจะเป็นได้
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <strong>3. ความเข้าใจมโนทัศน์ $P(X = c) = 0$</strong><br>
+              <span style="font-size:0.85rem; color:var(--text-muted);">(ความต่อเนื่องและจุดปลาย)</span>
+            </td>
+            <td>
+              อธิบายและให้เหตุผลได้อย่างถูกต้องว่าความน่าจะเป็นที่จุดเดี่ยวมีค่าเท่ากับศูนย์ และตระหนักว่า $P(a < X < b) = P(a \le X \le b)$ เสมอ
+            </td>
+            <td>
+              ตอบได้ว่า $P(X = c) = 0$ แต่ให้เหตุผลประกอบไม่ชัดเจน หรือยังสับสนการรวมจุดปลายในบางกรณี
+            </td>
+            <td>
+              เข้าใจผิดว่าความน่าจะเป็นที่จุดเดี่ยวมีค่าเท่ากับค่าฟังก์ชันความหนาแน่น $f(c)$ หรือสับสนกับตัวแปรสุ่มไม่ต่อเนื่อง
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div style="background: #fff1f2; border: 1px solid #fecdd3; padding: 12px 16px; border-radius: 6px; font-size: 0.92rem; color: #9f1239;">
+        <strong>เกณฑ์การตัดสินระดับคุณภาพรวม (15 คะแนนเต็ม):</strong><br>
+        13 – 15 คะแนน = ระดับดีมาก | 9 – 12 คะแนน = ระดับดี (ผ่านเกณฑ์) | 5 – 8 คะแนน = ระดับพอใช้ | น้อยกว่า 5 คะแนน = ระดับปรับปรุง
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<!-- ==========================================
+     JavaScript Logic: Continuous Variable & SVG Engine
+     ========================================== -->
+<script>
+  /* ------------------------------------------
+     1. Interactive Continuous Model (Frame 3)
+     ------------------------------------------ */
+  function onDomainChange() {
+    let minA = parseFloat(document.getElementById("sliderMinA").value);
+    let maxB = parseFloat(document.getElementById("sliderMaxB").value);
+
+    if (minA >= maxB) {
+      maxB = minA + 2;
+      document.getElementById("sliderMaxB").value = maxB;
+    }
+
+    document.getElementById("labelMinA").textContent = minA;
+    document.getElementById("labelMaxB").textContent = maxB;
+
+    // อัปเดตขอบเขตของช่วง a และ b
+    const sLower = document.getElementById("sliderRangeLower");
+    const sUpper = document.getElementById("sliderRangeUpper");
+
+    sLower.min = minA;
+    sLower.max = maxB;
+    sUpper.min = minA;
+    sUpper.max = maxB;
+
+    let a = parseFloat(sLower.value);
+    let b = parseFloat(sUpper.value);
+
+    if (a < minA) a = minA;
+    if (a > maxB) a = minA;
+    if (b > maxB) b = maxB;
+    if (b < a) b = Math.min(a + (maxB - minA) * 0.5, maxB);
+
+    sLower.value = a;
+    sUpper.value = b;
+
+    document.getElementById("labelRangeA").textContent = a.toFixed(1);
+    document.getElementById("labelRangeB").textContent = b.toFixed(1);
+
+    renderContinuousPlot();
+  }
+
+  function onIntervalChange() {
+    let a = parseFloat(document.getElementById("sliderRangeLower").value);
+    let b = parseFloat(document.getElementById("sliderRangeUpper").value);
+    let minA = parseFloat(document.getElementById("sliderMinA").value);
+    let maxB = parseFloat(document.getElementById("sliderMaxB").value);
+
+    if (a > b) {
+      b = a;
+      document.getElementById("sliderRangeUpper").value = b;
+    }
+
+    document.getElementById("labelRangeA").textContent = a.toFixed(1);
+    document.getElementById("labelRangeB").textContent = b.toFixed(1);
+
+    renderContinuousPlot();
+  }
+
+  function renderContinuousPlot() {
+    const minA = parseFloat(document.getElementById("sliderMinA").value);
+    const maxB = parseFloat(document.getElementById("sliderMaxB").value);
+    const a = parseFloat(document.getElementById("sliderRangeLower").value);
+    const b = parseFloat(document.getElementById("sliderRangeUpper").value);
+
+    const svg = document.getElementById("densityPlotSVG");
+    const width = 800;
+    const height = 240;
+    const paddingX = 80;
+    const axisY = 180;
+    const graphHeight = 110;
+
+    // คำนวณความสูงฟังก์ชันความหนาแน่น f(x) = 1 / (B - A)
+    const domainLength = maxB - minA;
+    const heightPDF = 1.0 / domainLength;
+
+    // สเกลตำแหน่งแกน X
+    function scaleX(val) {
+      let norm = (val - minA) / domainLength;
+      return paddingX + norm * (width - 2 * paddingX);
+    }
+
+    const xA = scaleX(minA);
+    const xB = scaleX(maxB);
+    const xa = scaleX(a);
+    const xb = scaleX(b);
+    const yTop = axisY - graphHeight;
+
+    // คำนวณพื้นที่และความน่าจะเป็น P(a <= X <= b)
+    const intervalLength = Math.max(0, b - a);
+    const prob = intervalLength / domainLength;
+
+    svg.innerHTML = `
+      <!-- แกน X และเส้นจำนวน -->
+      <line x1="40" y1="${axisY}" x2="${width - 40}" y2="${axisY}" stroke="#334155" stroke-width="2.5" />
+      <polygon points="${width - 35},${axisY} ${width - 45},${axisY - 5} ${width - 45},${axisY + 5}" fill="#334155" />
+      <text x="${width - 30}" y="${axisY + 5}" font-size="14" font-weight="bold" fill="#334155">X</text>
+
+      <!-- แกน Y ความหนาแน่น f(x) -->
+      <line x1="${paddingX - 20}" y1="${axisY + 10}" x2="${paddingX - 20}" y2="30" stroke="#64748b" stroke-width="2" />
+      <polygon points="${paddingX - 20},25 ${paddingX - 25},35 ${paddingX - 15},35" fill="#64748b" />
+      <text x="${paddingX - 15}" y="30" font-size="13" font-weight="bold" fill="#0f766e">f(x)</text>
+
+      <!-- เส้นประความสูง f(x) บนแกน Y -->
+      <line x1="${paddingX - 25}" y1="${yTop}" x2="${paddingX - 15}" y2="${yTop}" stroke="#0f766e" stroke-width="2" />
+      <text x="15" y="${yTop + 5}" font-size="12" font-family="var(--font-code)" font-weight="bold" fill="#0f766e">
+        ${heightPDF.toFixed(3)}
+      </text>
+
+      <!-- กล่องพื้นที่ทั้งหมด f(x) -->
+      <rect x="${xA}" y="${yTop}" width="${xB - xA}" height="${graphHeight}" fill="#f1f5f9" stroke="#94a3b8" stroke-width="2" stroke-dasharray="4,4" />
+
+      <!-- พื้นที่แรเงาของช่วง [a, b] -->
+      <rect x="${xa}" y="${yTop}" width="${Math.max(0, xb - xa)}" height="${graphHeight}" fill="rgba(234, 88, 12, 0.45)" stroke="#ea580c" stroke-width="2.5" />
+
+      <!-- เส้นบอกตำแหน่ง A และ B บนแกน X -->
+      <line x1="${xA}" y1="${axisY}" x2="${xA}" y2="${axisY + 8}" stroke="#334155" stroke-width="2" />
+      <text x="${xA}" y="${axisY + 26}" text-anchor="middle" font-size="13" font-weight="bold" fill="#334155">A = ${minA}</text>
+
+      <line x1="${xB}" y1="${axisY}" x2="${xB}" y2="${axisY + 8}" stroke="#334155" stroke-width="2" />
+      <text x="${xB}" y="${axisY + 26}" text-anchor="middle" font-size="13" font-weight="bold" fill="#334155">B = ${maxB}</text>
+
+      <!-- เส้นบอกตำแหน่ง a และ b บนแกน X -->
+      <line x1="${xa}" y1="${axisY}" x2="${xa}" y2="${axisY + 36}" stroke="#ea580c" stroke-width="2" />
+      <text x="${xa}" y="${axisY + 52}" text-anchor="middle" font-size="13" font-weight="bold" fill="#ea580c">a = ${a.toFixed(1)}</text>
+
+      <line x1="${xb}" y1="${axisY}" x2="${xb}" y2="${axisY + 36}" stroke="#ea580c" stroke-width="2" />
+      <text x="${xb}" y="${axisY + 52}" text-anchor="middle" font-size="13" font-weight="bold" fill="#ea580c">b = ${b.toFixed(1)}</text>
+
+      <!-- ป้ายกำกับพื้นที่ความน่าจะเป็น P(a <= X <= b) -->
+      ${prob > 0.05 ? `
+        <text x="${(xa + xb) / 2}" y="${yTop + graphHeight / 2 + 5}" text-anchor="middle" font-size="14" font-weight="bold" fill="#9a3412">
+          พื้นที่ = ${(prob * 100).toFixed(1)}%
+        </text>
+      ` : ''}
+    `;
+
+    // 1. รายละเอียดการคำนวณ (ใช้ \[...\] แทน [ ... ])
+    const calcBox = document.getElementById("calcProbDetails");
+    calcBox.innerHTML = `
+      ฟังก์ชันความหนาแน่น: $f(x) = \\frac{1}{B - A} = \\frac{1}{${maxB} - ${minA}} = \\frac{1}{${domainLength}} \\approx ${heightPDF.toFixed(4)}$ <br>
+      ความกว้างของช่วง: $b - a = ${b.toFixed(1)} - ${a.toFixed(1)} = ${intervalLength.toFixed(1)}$ <br>
+      \\[P(${a.toFixed(1)} \\le X \\le ${b.toFixed(1)}) = \\text{พื้นที่แรเงา} = \\text{กว้าง} \\times \\text{ยาว} = ${intervalLength.toFixed(1)} \\times \\frac{1}{${domainLength}} = \\mathbf{${prob.toFixed(4)}}\\]
+      คิดเป็นความน่าจะเป็น: <strong>${(prob * 100).toFixed(2)}%</strong>
+    `;
+
+    // 2. มโนทัศน์สำคัญ
+    const conceptBox = document.getElementById("modelConceptsDetails");
+    conceptBox.innerHTML = `
+      1. <strong>พื้นที่รวมทั้งหมด:</strong> $(B - A) \\times f(x) = ${domainLength} \\times \\frac{1}{${domainLength}} = \\mathbf{1.00}$ เสมอ<br>
+      2. <strong>จุดเดี่ยวไม่มีพื้นที่:</strong> หากปรับให้ $a = b$ จะได้ความกว้าง $= 0$ ทำให้พื้นที่แรเงาเป็นศูนย์ นั่นคือ $P(X = c) = 0$<br>
+      3. <strong>สัดส่วนความน่าจะเป็น:</strong> ความน่าจะเป็นจะแปรผันตรงกับความยาวของช่วง $[a, b]$ เทียบกับความยาวโดเมนทั้งหมด $[A, B]$
+    `;
+
+    // เรนเดอร์ MathJax พร้อมกันทั้ง 2 กล่อง
+    if (window.MathJax && window.MathJax.typesetPromise) {
+      window.MathJax.typesetPromise([calcBox, conceptBox]).catch((err) => console.log('MathJax error:', err));
+    }
+  }
+
+  /* ------------------------------------------
+     2. คลังโจทย์สุ่มและเฉลยขั้นตอน (Frame 4)
+     ------------------------------------------ */
+  const questionPool = [
+    {
+      q: "กำหนดให้ $X$ เป็นตัวแปรสุ่มต่อเนื่องที่มีฟังก์ชันความหนาแน่นความน่าจะเป็น $f(x) = k$ สำหรับ $0 \\le x \\le 5$ และ $f(x) = 0$ สำหรับค่าอื่น ๆ จงหาค่าคงตัว $k$ และหาค่า $P(1 \\le X \\le 4)$",
+      steps: [
+        "จากสมบัติของตัวแปรสุ่มต่อเนื่อง พื้นที่ใต้เส้นโค้ง $f(x)$ ทั้งหมดต้องเท่ากับ 1: $\\int_{0}^{5} f(x) \\, dx = 1$",
+        "เนื่องจากเป็นรูปสี่เหลี่ยมผืนผ้า พื้นที่ $= \\text{ฐาน} \\times \\text{สูง} = (5 - 0) \\times k = 5k = 1 \\implies k = \\frac{1}{5} = 0.2$",
+        "หาค่า $P(1 \\le X \\le 4)$ คือพื้นที่จาก $x = 1$ ถึง $x = 4$",
+        "ความกว้างช่วงคือ $4 - 1 = 3$ ดังนั้น $P(1 \\le X \\le 4) = 3 \\times k = 3 \\times 0.2 = 0.6$"
+      ]
+    },
+    {
+      q: "ระยะเวลาในการรอคอยรถไฟฟ้า (นาที) เป็นตัวแปรสุ่มต่อเนื่อง $T$ ที่มีการแจกแจงเอกรูปบนช่วง $[0, 10]$ จงหาความน่าจะเป็นที่จะต้องรอรถไฟฟ้านานกว่า 7 นาที และหาค่า $P(T = 5)$",
+      steps: [
+        "โดเมนของเวลาคือ $T \\in [0, 10]$ จะได้ฟังก์ชันความหนาแน่น $f(t) = \\frac{1}{10 - 0} = 0.1$ สำหรับ $0 \\le t \\le 10$",
+        "ต้องการหารอคอยนานกว่า 7 นาที คือ $P(T > 7) = P(7 < T \\le 10)$",
+        "ความกว้างช่วงคือ $10 - 7 = 3$ นาที ดังนั้น $P(T > 7) = 3 \\times 0.1 = 0.3$",
+        "สำหรับจุดเดี่ยว $T = 5$: เนื่องจากเป็นตัวแปรสุ่มต่อเนื่อง จุดเดี่ยวไม่มีพื้นที่ ดังนั้น $P(T = 5) = 0$ เสมอ"
+      ]
+    },
+    {
+      q: "กำหนดให้ $X$ เป็นตัวแปรสุ่มต่อเนื่องที่มีฟังก์ชันความหนาแน่น $f(x) = c x$ สำหรับ $0 \\le x \\le 2$ และ $f(x) = 0$ เมื่อ $x$ เป็นค่าอื่น จงหาค่าคงตัว $c$ และหา $P(X \\le 1)$",
+      steps: [
+        "จากพื้นที่ใต้กราฟทั้งหมดต้องเท่ากับ 1: กราฟเป็นรูปสามเหลี่ยมมุมฉากมีฐานจาก 0 ถึง 2 (ยาว 2) และความสูงที่จุด $x=2$ คือ $f(2) = 2c$",
+        "พื้นที่สามเหลี่ยม $= \\frac{1}{2} \\times \\text{ฐาน} \\times \\text{สูง} = \\frac{1}{2} \\times 2 \\times (2c) = 2c = 1 \\implies c = \\frac{1}{2} = 0.5$",
+        "ดังนั้น $f(x) = 0.5x$ เมื่อ $x \\in [0, 2]$",
+        "หา $P(X \\le 1) = P(0 \\le X \\le 1)$: พื้นที่สามเหลี่ยมจาก 0 ถึง 1 มีฐานยาว 1 และสูง $f(1) = 0.5(1) = 0.5$ จะได้พื้นที่ $= \\frac{1}{2} \\times 1 \\times 0.5 = 0.25$"
+      ]
+    },
+    {
+      q: "ถ้า $Y$ เป็นตัวแปรสุ่มต่อเนื่องที่มีการแจกแจงบนช่วง $[2, 8]$ โดยมีฟังก์ชันความหนาแน่นสม่ำเสมอ จงเปรียบเทียบค่าระหว่าง $P(3 \\le Y \\le 6)$ กับ $P(3 < Y < 6)$",
+      steps: [
+        "ฟังก์ชันความหนาแน่นบนช่วง $[2, 8]$ คือ $f(y) = \\frac{1}{8 - 2} = \\frac{1}{6}$",
+        "สำหรับตัวแปรสุ่มต่อเนื่อง ความน่าจะเป็นที่จุดปลายเดี่ยวมีค่าเป็นศูนย์เสมอ: $P(Y = 3) = 0$ และ $P(Y = 6) = 0$",
+        "ดังนั้น $P(3 \\le Y \\le 6) = P(Y = 3) + P(3 < Y < 6) + P(Y = 6) = 0 + P(3 < Y < 6) + 0 = P(3 < Y < 6)$",
+        "คำนวณค่า: ทั้งสองมีค่าเท่ากันคือ $\\frac{6 - 3}{6} = \\frac{3}{6} = 0.5$"
+      ]
+    }
+  ];
+
+  let currentPracticeIdx = -1;
+  let currentStepIdx = 0;
+
+  function generateSinglePracticeQuestion() {
+    let nextIdx = Math.floor(Math.random() * questionPool.length);
+    if (nextIdx === currentPracticeIdx) {
+      nextIdx = (nextIdx + 1) % questionPool.length;
+    }
+    currentPracticeIdx = nextIdx;
+    currentStepIdx = 0;
+
+    const qItem = questionPool[currentPracticeIdx];
+    const qBox = document.getElementById("practiceQuestionBox");
+    const sBox = document.getElementById("practiceStepsContainer");
+    const btn = document.getElementById("btnRevealNext");
+
+    qBox.innerHTML = `<strong>สถานการณ์โจทย์:</strong> ${qItem.q}`;
+    sBox.innerHTML = "";
+    btn.disabled = false;
+    btn.textContent = `แสดงเฉลยบรรทัดที่ 1 (จาก 4 บรรทัด)`;
+
+    renderMath(qBox);
+  }
+
+  function revealNextStep() {
+    if (currentPracticeIdx === -1) return;
+    const qItem = questionPool[currentPracticeIdx];
+    const sBox = document.getElementById("practiceStepsContainer");
+    const btn = document.getElementById("btnRevealNext");
+
+    if (currentStepIdx < qItem.steps.length) {
+      const stepDiv = document.createElement("div");
+      stepDiv.className = "step-line";
+      stepDiv.innerHTML = `<strong>บรรทัดที่ ${currentStepIdx + 1}:</strong> ${qItem.steps[currentStepIdx]}`;
+      sBox.appendChild(stepDiv);
+      renderMath(stepDiv);
+
+      currentStepIdx++;
+      if (currentStepIdx < qItem.steps.length) {
+        btn.textContent = `แสดงเฉลยบรรทัดที่ ${currentStepIdx + 1} (จาก 4 บรรทัด)`;
+      } else {
+        btn.textContent = "แสดงเฉลยครบทุกขั้นตอนแล้ว";
+        btn.disabled = true;
+      }
+    }
+  }
+
+  /* ------------------------------------------
+     3. ระบบสร้างใบงาน 5 ข้อ (Frame 5)
+     ------------------------------------------ */
+  const worksheetMasterBank = [
+    {
+      q: "กำหนดให้ $X$ เป็นตัวแปรสุ่มต่อเนื่องที่มีการแจกแจงเอกรูปแบบสม่ำเสมอบนช่วง $[0, 8]$ จงหาค่าความน่าจะเป็น $P(2 \\le X \\le 6)$",
+      ans: "$f(x) = \\frac{1}{8-0} = \\frac{1}{8}$ สำหรับ $0 \\le x \\le 8$; ดังนั้น $P(2 \\le X \\le 6) = \\frac{6-2}{8} = \\frac{4}{8} = 0.5$"
+    },
+    {
+      q: "ถ้า $T$ เป็นตัวแปรสุ่มต่อเนื่องแทนเวลาทำงานของเครื่องจักร (ชั่วโมง) จงหาค่าของ $P(T = 10)$ พร้อมให้เหตุผลประกอบ",
+      ans: "$P(T = 10) = 0$ เพราะ $T$ เป็นตัวแปรสุ่มต่อเนื่อง ความน่าจะเป็นที่จุดเดี่ยวใด ๆ มีค่าเป็นศูนย์เสมอเนื่องจากไม่มีพื้นที่ใต้กราฟ"
+    },
+    {
+      q: "กำหนดฟังก์ชันความหนาแน่น $f(x) = k$ เมื่อ $2 \\le x \\le 7$ และ $f(x) = 0$ สำหรับค่าอื่น จงหาค่าคงตัว $k$ และหา $P(X > 5)$",
+      ans: "พื้นที่ทั้งหมด $= (7 - 2)k = 5k = 1 \\implies k = \\frac{1}{5} = 0.2$; และ $P(X > 5) = (7 - 5)(0.2) = 2(0.2) = 0.4$"
+    },
+    {
+      q: "ตัวแปรสุ่มต่อเนื่อง $W$ มีฟังก์ชันความหนาแน่นคงที่บนช่วง $[10, 30]$ จงหาความน่าจะเป็นที่ $W$ จะมีค่าไม่เกิน 15",
+      ans: "ความยาวโดเมน $= 30 - 10 = 20$; ช่วงที่สนใจคือ $[10, 15]$ มีความยาว $15 - 10 = 5$; ดังนั้น $P(W \\le 15) = \\frac{5}{20} = \\frac{1}{4} = 0.25$"
+    },
+    {
+      q: "จงอธิบายความแตกต่างระหว่าง $P(a \\le X \\le b)$ กับ $P(a < X < b)$ เมื่อ $X$ เป็นตัวแปรสุ่มต่อเนื่อง",
+      ans: "มีค่าเท่ากันทุกประการ เพราะสำหรับตัวแปรสุ่มต่อเนื่อง $P(X = a) = 0$ และ $P(X = b) = 0$ การรวมหรือไม่รวมจุดปลายจึงไม่ส่งผลต่อพื้นที่ความน่าจะเป็น"
+    },
+    {
+      q: "กำหนดให้ $X$ เป็นตัวแปรสุ่มต่อเนื่องบนช่วง $[0, 4]$ โดยมี $f(x) = \\frac{1}{4}$ จงหาค่า $P(1 < X \\le 3.5)$",
+      ans: "ความยาวช่วงคือ $3.5 - 1 = 2.5$; ดังนั้น $P(1 < X \\le 3.5) = 2.5 \\times \\frac{1}{4} = \\frac{2.5}{4} = 0.625$"
+    },
+    {
+      q: "ถ้าพื้นที่ใต้กราฟ $f(x)$ บนช่วง $[0, c]$ มีค่าเท่ากับ 1 เมื่อ $f(x) = 0.1$ สำหรับทุก $x \\in [0, c]$ จงหาค่า $c$",
+      ans: "จาก $\\text{พื้นที่} = c \\times 0.1 = 1 \\implies c = \\frac{1}{0.1} = 10$"
+    }
+  ];
+
+  let currentWorksheetQuestions = [];
+
+  function generateNew5Worksheet() {
+    let shuffled = [...worksheetMasterBank].sort(() => 0.5 - Math.random());
+    currentWorksheetQuestions = shuffled.slice(0, 5);
+    renderWorksheetDOM(false);
+  }
+
+  function renderWorksheetDOM(showAnswerKey) {
+    const list = document.getElementById("worksheetQuestionsList");
+    list.innerHTML = "";
+
+    currentWorksheetQuestions.forEach((item, index) => {
+      const qDiv = document.createElement("div");
+      qDiv.className = "worksheet-q-item";
+
+      let inner = `
+        <div style="font-weight:600; margin-bottom:6px;">ข้อที่ ${index + 1}) ${item.q}</div>
+      `;
+
+      if (showAnswerKey) {
+        inner += `
+          <div class="answer-key-box">
+            <div><strong>แนวคิดและคำตอบที่ถูกต้อง:</strong> ${item.ans}</div>
+          </div>
+        `;
+      } else {
+        inner += `
+          <div class="student-write-area">
+            <div>วิธีทำ: ...........................................................................................................................................................................</div>
+            <div style="margin-top:6px;">..........................................................................................................................................................................................</div>
+          </div>
+        `;
+      }
+
+      qDiv.innerHTML = inner;
+      list.appendChild(qDiv);
+    });
+
+    renderMath(list);
+  }
+
+  function printWorksheet(isTeacherKey) {
+    renderWorksheetDOM(isTeacherKey);
+    setTimeout(() => {
+      window.print();
+    }, 400);
+  }
+
+  function renderMath(targetElement) {
+    if (window.MathJax && window.MathJax.typesetPromise) {
+      window.MathJax.typesetPromise([targetElement]).catch((err) => console.log('MathJax error:', err));
+    }
+  }
+
+  // เริ่มต้นทำงานทันทีเมื่อโหลดหน้าเว็บ
+  window.addEventListener('DOMContentLoaded', () => {
+    onDomainChange();
+    generateSinglePracticeQuestion();
+    generateNew5Worksheet();
+  });
+</script>
+
+</body>
+</html>

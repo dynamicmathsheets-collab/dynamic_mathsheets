@@ -1,0 +1,1265 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>เรื่องที่ 8: การหาความน่าจะเป็นและการเปรียบเทียบตำแหน่งของข้อมูล</title>
+  
+  <!-- ฟอนต์ Sarabun และ Fira Code -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com">
+  <link href="https://fonts.googleapis.com/css2?family=Sarabun:ital,wght@0,300;0,400;0,600;0,700;1,400&family=Fira+Code:wght@400;600&display=swap" rel="stylesheet">
+  
+  <!-- MathJax สำหรับแสดงผลสูตรคณิตศาสตร์และสัญลักษณ์ LaTeX -->
+  <script>
+    window.MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']],
+        displayMath: [['$$', '$$'], ['\\[', '\\]']],
+        processEscapes: true
+      },
+      options: {
+        skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+      }
+    };
+  </script>
+  <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+  <style>
+    :root {
+      --font-th: 'Sarabun', system-ui, -apple-system, sans-serif;
+      --font-code: 'Fira Code', monospace;
+      
+      /* ชุดสีประจำ 6 เฟรม (เรื่องที่ 8: โทนหรูหรา ชัดเจน สีตัดกันสมบูรณ์) */
+      --frame1-border: #0369a1;  /* Ocean Blue */
+      --frame1-bg: #f0f9ff;
+      --frame1-head: #075985;
+      
+      --frame2-border: #4f46e5;  /* Indigo */
+      --frame2-bg: #eef2ff;
+      --frame2-head: #3730a3;
+      
+      --frame3-border: #b45309;  /* Amber/Bronze */
+      --frame3-bg: #fffbeb;
+      --frame3-head: #78350f;
+      
+      --frame4-border: #059669;  /* Emerald */
+      --frame4-bg: #ecfdf5;
+      --frame4-head: #064e3b;
+      
+      --frame5-border: #7c3aed;  /* Violet */
+      --frame5-bg: #f5f3ff;
+      --frame5-head: #5b21b6;
+      
+      --frame6-border: #e11d48;  /* Rose */
+      --frame6-bg: #fff1f2;
+      --frame6-head: #9f1239;
+
+      --text-dark: #1e293b;
+      --text-muted: #64748b;
+      --shadow-sm: 0 2px 4px rgba(0,0,0,0.05);
+      --shadow-md: 0 4px 10px rgba(0,0,0,0.08);
+      --radius: 12px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: var(--font-th);
+      background-color: #f8fafc;
+      color: var(--text-dark);
+      line-height: 1.7;
+      padding: 24px 16px 60px 16px;
+    }
+
+    .main-container {
+      max-width: 1120px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 32px;
+    }
+
+    /* หัวข้อเอกสาร */
+    .document-header {
+      background: white;
+      border: 1px solid #e2e8f0;
+      border-top: 6px solid var(--frame1-border);
+      border-radius: var(--radius);
+      padding: 28px;
+      text-align: center;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .document-header h1 {
+      font-size: 1.95rem;
+      color: #0f172a;
+      margin-bottom: 6px;
+      font-weight: 700;
+    }
+
+    .document-header p {
+      font-size: 1.05rem;
+      color: var(--text-muted);
+    }
+
+    /* กล่องเฟรม */
+    .frame-box {
+      background: white;
+      border-radius: var(--radius);
+      border: 2px solid;
+      box-shadow: var(--shadow-sm);
+      overflow: hidden;
+      transition: box-shadow 0.2s ease;
+    }
+
+    .frame-box:hover {
+      box-shadow: var(--shadow-md);
+    }
+
+    .frame-header {
+      padding: 16px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid rgba(0,0,0,0.08);
+    }
+
+    .frame-header h2 {
+      font-size: 1.3rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .frame-tag {
+      font-size: 0.85rem;
+      font-weight: 600;
+      padding: 4px 12px;
+      border-radius: 999px;
+      background: white;
+      border: 1px solid currentColor;
+    }
+
+    .frame-body {
+      padding: 24px;
+    }
+
+    /* สีกำกับเฟรม */
+    .frame-1 { border-color: var(--frame1-border); }
+    .frame-1 .frame-header { background: var(--frame1-bg); color: var(--frame1-head); }
+    .frame-1 .frame-tag { color: var(--frame1-border); }
+
+    .frame-2 { border-color: var(--frame2-border); }
+    .frame-2 .frame-header { background: var(--frame2-bg); color: var(--frame2-head); }
+    .frame-2 .frame-tag { color: var(--frame2-border); }
+
+    .frame-3 { border-color: var(--frame3-border); }
+    .frame-3 .frame-header { background: var(--frame3-bg); color: var(--frame3-head); }
+    .frame-3 .frame-tag { color: var(--frame3-border); }
+
+    .frame-4 { border-color: var(--frame4-border); }
+    .frame-4 .frame-header { background: var(--frame4-bg); color: var(--frame4-head); }
+    .frame-4 .frame-tag { color: var(--frame4-border); }
+
+    .frame-5 { border-color: var(--frame5-border); }
+    .frame-5 .frame-header { background: var(--frame5-bg); color: var(--frame5-head); }
+    .frame-5 .frame-tag { color: var(--frame5-border); }
+
+    .frame-6 { border-color: var(--frame6-border); }
+    .frame-6 .frame-header { background: var(--frame6-bg); color: var(--frame6-head); }
+    .frame-6 .frame-tag { color: var(--frame6-border); }
+
+    /* บล็อกนิยามทางคณิตศาสตร์ */
+    .math-def {
+      background: #f8fafc;
+      border-left: 4px solid #334155;
+      padding: 14px 18px;
+      border-radius: 4px;
+      margin: 16px 0;
+    }
+
+    .math-def-title {
+      font-weight: 700;
+      color: #0f172a;
+      margin-bottom: 4px;
+    }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 18px;
+      margin-top: 14px;
+    }
+
+    @media (max-width: 768px) {
+      .grid-2 { grid-template-columns: 1fr; }
+    }
+
+    .card-sub {
+      background: #fafafa;
+      border: 1px solid #e5e7eb;
+      border-radius: 8px;
+      padding: 16px;
+    }
+
+    .card-sub h3 {
+      font-size: 1.1rem;
+      margin-bottom: 8px;
+    }
+
+    /* แผงควบคุม Interactive */
+    .control-panel {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+      gap: 16px;
+      background: #f9fafb;
+      padding: 18px;
+      border-radius: 8px;
+      border: 1px solid #e5e7eb;
+      margin-bottom: 20px;
+    }
+
+    .control-item {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .control-item label {
+      font-weight: 600;
+      font-size: 0.92rem;
+      color: var(--text-dark);
+    }
+
+    select, input[type="range"] {
+      padding: 8px 10px;
+      border-radius: 6px;
+      border: 1px solid #cbd5e1;
+      font-family: inherit;
+      font-size: 0.95rem;
+      background-color: white;
+    }
+
+    input[type="range"] {
+      width: 100%;
+      cursor: pointer;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 9px 18px;
+      border-radius: 6px;
+      font-family: inherit;
+      font-weight: 600;
+      font-size: 0.95rem;
+      cursor: pointer;
+      border: none;
+      transition: all 0.2s ease;
+      white-space: nowrap;
+    }
+
+    .btn-amber { background: #b45309; color: white; }
+    .btn-amber:hover { background: #92400e; }
+
+    .btn-emerald { background: #059669; color: white; }
+    .btn-emerald:hover { background: #047857; }
+
+    .btn-violet { background: #7c3aed; color: white; }
+    .btn-violet:hover { background: #6d28d9; }
+
+    .btn-outline {
+      background: white;
+      border: 1px solid #cbd5e1;
+      color: var(--text-dark);
+    }
+    .btn-outline:hover {
+      background: #f1f5f9;
+    }
+
+    .step-line {
+      padding: 10px 14px;
+      background: #f8fafc;
+      border-left: 3px solid #b45309;
+      margin-bottom: 10px;
+      border-radius: 0 4px 4px 0;
+      animation: fadeIn 0.3s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(4px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ตารางทางคณิตศาสตร์ */
+    .table-math {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 14px 0;
+      font-size: 0.95rem;
+    }
+
+    .table-math th, .table-math td {
+      border: 1px solid #cbd5e1;
+      padding: 10px 14px;
+      text-align: left;
+      vertical-align: top;
+    }
+
+    .table-math th {
+      background: #f1f5f9;
+      color: #0f172a;
+      font-weight: 700;
+    }
+
+    .table-math tr:nth-child(even) td {
+      background: #fcfcfd;
+    }
+
+    /* กราฟ SVG Interactive Standard Normal Area */
+    .interactive-canvas-box {
+      background: white;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      padding: 20px;
+      margin-top: 16px;
+    }
+
+    svg.interactive-plot {
+      width: 100%;
+      height: 290px;
+      display: block;
+      overflow: visible;
+    }
+
+    /* ใบงาน */
+    .worksheet-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-bottom: 20px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid #e2e8f0;
+    }
+
+    .worksheet-container {
+      background: white;
+      border: 1px solid #cbd5e1;
+      border-radius: 6px;
+      padding: 24px;
+    }
+
+    .worksheet-header-print {
+      display: none;
+    }
+
+    .worksheet-q-item {
+      padding: 14px 0;
+      border-bottom: 1px dashed #e2e8f0;
+      page-break-inside: avoid;
+    }
+
+    .worksheet-q-item:last-child {
+      border-bottom: none;
+    }
+
+    .student-write-area {
+      min-height: 52px;
+      margin-top: 8px;
+      border: 1px dashed #cbd5e1;
+      background: #fafafa;
+      border-radius: 4px;
+      padding: 8px 12px;
+      color: #94a3b8;
+      font-size: 0.9rem;
+    }
+
+    .answer-key-box {
+      margin-top: 8px;
+      padding: 10px 14px;
+      background: #f0fdf4;
+      border-left: 3px solid #059669;
+      color: #065f46;
+      border-radius: 0 4px 4px 0;
+      font-size: 0.93rem;
+    }
+
+    /* =========================================================
+       CLEAN PRINT CSS: ป้องกันหน้าว่าง 100%
+       ========================================================= */
+    @page {
+      size: A4 portrait;
+      margin: 12mm 15mm;
+    }
+
+    @media print {
+      body, html {
+        background: white !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        height: auto !important;
+        overflow: visible !important;
+      }
+
+      .document-header,
+      .frame-1,
+      .frame-2,
+      .frame-3,
+      .frame-4,
+      .frame-6,
+      .worksheet-actions,
+      .frame-header,
+      .no-print {
+        display: none !important;
+      }
+
+      .main-container {
+        display: block !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        gap: 0 !important;
+      }
+
+      .frame-5 {
+        border: none !important;
+        box-shadow: none !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        background: transparent !important;
+        border-radius: 0 !important;
+      }
+
+      .frame-5 .frame-body {
+        padding: 0 !important;
+      }
+
+      .worksheet-container {
+        border: none !important;
+        padding: 0 !important;
+        box-shadow: none !important;
+        width: 100% !important;
+      }
+
+      .worksheet-header-print {
+        display: block !important;
+        margin-bottom: 14px;
+        padding-bottom: 10px;
+        border-bottom: 2px solid #000;
+        text-align: center;
+      }
+
+      .worksheet-header-print h2 {
+        font-size: 16pt;
+        color: #000 !important;
+        margin-bottom: 4px;
+      }
+
+      .worksheet-header-print p {
+        font-size: 11pt;
+        color: #333 !important;
+      }
+
+      .print-meta-grid {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 10px;
+        font-size: 10.5pt;
+        color: #000 !important;
+      }
+
+      .student-write-area {
+        min-height: 52px !important;
+        background: transparent !important;
+        border: 1px solid #475569 !important;
+        color: #334155 !important;
+        font-size: 10pt !important;
+      }
+
+      .worksheet-q-item {
+        padding: 10px 0 !important;
+        border-bottom: 1px dashed #94a3b8 !important;
+        page-break-inside: avoid !important;
+      }
+
+      .answer-key-box {
+        background: #f0fdf4 !important;
+        border-left: 3px solid #000 !important;
+        color: #000 !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<div class="main-container">
+
+  <!-- หัวข้อเอกสาร -->
+  <header class="document-header">
+    <h1>เอกสารการเรียนรู้คณิตศาสตร์: เรื่องที่ 8 การหาความน่าจะเป็นและการเปรียบเทียบตำแหน่งของข้อมูล</h1>
+    <p>หน่วยการเรียนรู้: ตัวแปรสุ่มและการแจกแจงความน่าจะเป็น (Probability Calculation & Relative Standing using Z-Score)</p>
+  </header>
+
+  <!-- ==========================================
+       เฟรมที่ 1: การหาความน่าจะเป็นและการเปรียบเทียบตำแหน่ง
+       ========================================== -->
+  <section class="frame-box frame-1">
+    <div class="frame-header">
+      <h2>1. การหาความน่าจะเป็นและการเปรียบเทียบตำแหน่งของข้อมูล</h2>
+      <span class="frame-tag">มโนทัศน์และหัวใจสำคัญ</span>
+    </div>
+    <div class="frame-body">
+      <div class="math-def">
+        <div class="math-def-title">หลักการสำคัญ (Fundamental Principle):</div>
+        การหาความน่าจะเป็นของตัวแปรสุ่มปกติ $X \sim N(\mu, \sigma^2)$ สามารถทำได้โดยการแปลงค่าของตัวแปรสุ่ม $X$ ให้เป็นตัวแปรสุ่มปกติมาตรฐาน $Z \sim N(0, 1)$ ผ่านฟังก์ชันการแปลง:
+        \[Z = \frac{X - \mu}{\sigma}\]
+        ความน่าจะเป็นที่ $X$ จะมีค่าอยู่ในช่วงใด ๆ จะเท่ากับพื้นที่ใต้เส้นโค้งปกติมาตรฐานของตัวแปรสุ่ม $Z$ บนช่วงที่สอดคล้องกัน:
+        \[P(a \le X \le b) = P\left(\frac{a - \mu}{\sigma} \le Z \le \frac{b - \mu}{\sigma}\right)\]
+      </div>
+
+      <div class="grid-2">
+        <div class="card-sub">
+          <h3 style="color: var(--frame1-head);">ความน่าจะเป็นคือพื้นที่ใต้เส้นโค้ง</h3>
+          <p>
+            เนื่องจากการอินทิเกรตฟังก์ชันความหนาแน่นของการแจกแจงปกติโดยตรงมีความซับซ้อนสูง ในทางคณิตศาสตร์และสถิติศาสตร์จึงใช้วิธีแปลงข้อมูลให้เป็นค่า $Z$ แล้วเปิดหาค่าจาก <strong>ตารางการแจกแจงปกติมาตรฐาน (Standard Normal Table)</strong> ซึ่งให้ค่าพื้นที่สะสมทางซ้าย $P(Z \le z)$
+          </p>
+        </div>
+        <div class="card-sub">
+          <h3 style="color: var(--frame1-head);">การวัดตำแหน่งสัมพัทธ์ (Relative Standing)</h3>
+          <p>
+            ค่า $Z$ นอกจากจะใช้คำนวณพื้นที่ความน่าจะเป็นแล้ว ยังเป็นมาตรวัดสากลที่บอกว่าข้อมูลหนึ่ง ๆ อยู่ในตำแหน่งใดเมื่อเทียบกับข้อมูลทั้งหมดในกลุ่ม (เช่น เหนือกว่าประชากรกี่เปอร์เซ็นต์ หรือเทียบเท่ากับเปอร์เซ็นไทล์ใด) ช่วยให้การประเมินผลเป็นธรรมแม้ข้อมูลจะมาจากต่างกลุ่มกัน
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==========================================
+       เฟรมที่ 2: การใช้การแจกแจงปกติมาตรฐานหาความน่าจะเป็นและการเปรียบเทียบค่า Z
+       ========================================== -->
+  <section class="frame-box frame-2">
+    <div class="frame-header">
+      <h2>2. รูปแบบการหาความน่าจะเป็นและการใช้ค่า Z เปรียบเทียบข้อมูล</h2>
+      <span class="frame-tag">3 รูปแบบพื้นที่ & การตัดสินค่า Z</span>
+    </div>
+    <div class="frame-body">
+      <p style="margin-bottom: 12px;">
+        การหาพื้นที่ใต้เส้นโค้งปกติมาตรฐานสามารถแบ่งออกเป็น 3 รูปแบบหลักตามลักษณะของช่วงที่สนใจ:
+      </p>
+
+      <table class="table-math">
+        <thead>
+          <tr>
+            <th style="width: 28%;">รูปแบบช่วงที่สนใจ</th>
+            <th style="width: 36%;">การแปลงรูปสมการความน่าจะเป็น</th>
+            <th style="width: 36%;">ความหมายเชิงเรขาคณิต</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>1. หางด้านซ้าย (น้อยกว่า/ไม่เกิน)</strong><br>$P(X \le k)$ หรือ $P(Z \le z_0)$</td>
+            <td>\[P(Z \le z_0) = \text{พื้นที่จาก } -\infty \text{ ถึง } z_0\]</td>
+            <td>เปิดค่าจากตาราง $Z$ สะสมได้โดยตรงทันที</td>
+          </tr>
+          <tr>
+            <td><strong>2. หางด้านขวา (มากกว่า/อย่างน้อย)</strong><br>$P(X \ge k)$ หรือ $P(Z \ge z_0)$</td>
+            <td>\[P(Z \ge z_0) = 1 - P(Z \le z_0)\]</td>
+            <td>ใช้กฎส่วนกลับ: พื้นที่ทั้งหมด (1.00) ลบด้วยพื้นที่สะสมทางซ้าย</td>
+          </tr>
+          <tr>
+            <td><strong>3. ช่วงระหว่างสองค่า</strong><br>$P(a \le X \le b)$ หรือ $P(z_1 \le Z \le z_2)$</td>
+            <td>\[P(z_1 \le Z \le z_2) = P(Z \le z_2) - P(Z \le z_1)\]</td>
+            <td>นำพื้นที่สะสมถึงขอบเขตบน ($z_2$) ลบด้วยพื้นที่สะสมถึงขอบเขตล่าง ($z_1$)</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="card-sub" style="margin-top: 14px; border-left: 4px solid var(--frame2-border);">
+        <h3 style="color: var(--frame2-head);">หลักการเปรียบเทียบตำแหน่งด้วยค่า Z</h3>
+        <p>
+          ในการเปรียบเทียบผลงาน เช่น คะแนนสอบ 2 วิชาของนักเรียนคนเดียวกัน หรือคะแนนของนักเรียน 2 คนจากต่างโรงเรียน:
+          <br>$\bullet$ ข้อมูลใดที่มีค่า $Z$ <strong>มากกว่า</strong> แสดงว่าอยู่ใน <strong>ตำแหน่งสัมพัทธ์ที่ดีกว่าเมื่อเทียบกับกลุ่มของตนเอง</strong>
+          <br>$\bullet$ ค่า $Z$ ขจัดผลกระทบจากความยากง่ายของข้อสอบ (ค่าเฉลี่ย $\mu$) และการกระจายของคะแนน ($\sigma$) ออกไปอย่างสิ้นเชิง
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==========================================
+       เฟรมที่ 3: HTML Interactive Model
+       ========================================== -->
+  <section class="frame-box frame-3">
+    <div class="frame-header">
+      <h2>3. แบบจำลองเชิงโต้ตอบ: เครื่องมือสำรวจพื้นที่ใต้กราฟปกติ (Normal Area Explorer)</h2>
+      <span class="frame-tag">ห้องทดลองสำรวจพื้นที่และความน่าจะเป็น</span>
+    </div>
+    <div class="frame-body">
+      
+      <!-- ส่วนควบคุมตัวแปร -->
+      <div class="control-panel">
+        <div class="control-item">
+          <label for="explorerMu">1. ค่าเฉลี่ย ($\mu$): <span id="textMuVal" style="color:#b45309; font-weight:700;">50</span></label>
+          <input type="range" id="explorerMu" min="20" max="80" step="1" value="50" oninput="updateAreaInteractive()">
+        </div>
+
+        <div class="control-item">
+          <label for="explorerSigma">2. ส่วนเบี่ยงเบนมาตรฐาน ($\sigma$): <span id="textSigmaVal" style="color:#b45309; font-weight:700;">10</span></label>
+          <input type="range" id="explorerSigma" min="4" max="25" step="0.5" value="10" oninput="updateAreaInteractive()">
+        </div>
+
+        <div class="control-item">
+          <label for="explorerX">3. ค่าข้อมูล $x_1$ (หรือ $x$): <span id="textXVal" style="color:#0369a1; font-weight:700;">60</span></label>
+          <input type="range" id="explorerX" min="0" max="100" step="0.5" value="60" oninput="updateAreaInteractive()">
+        </div>
+
+        <div class="control-item">
+          <label for="explorerIntervalType">4. ขอบเขตช่วงที่ต้องการหา:</label>
+          <select id="explorerIntervalType" onchange="onIntervalTypeChange()">
+            <option value="left" selected>หางด้านซ้าย: P(X ≤ x)</option>
+            <option value="right">หางด้านขวา: P(X ≥ x)</option>
+            <option value="between">ช่วงระหว่าง: P(x₁ ≤ X ≤ x₂)</option>
+          </select>
+        </div>
+
+        <div class="control-item" id="x2ControlWrapper" style="display:none;">
+          <label for="explorerX2">ค่าขอบเขตบน $x_2$: <span id="textX2Val" style="color:#7c3aed; font-weight:700;">70</span></label>
+          <input type="range" id="explorerX2" min="0" max="100" step="0.5" value="70" oninput="updateAreaInteractive()">
+        </div>
+
+        <div class="control-item" style="justify-content: flex-end;">
+          <button class="btn btn-amber" onclick="resetExplorerParams()">
+            <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+            คืนค่าเริ่มต้น
+          </button>
+        </div>
+      </div>
+
+      <!-- ส่วนแสดงผล Interactive SVG -->
+      <div class="interactive-canvas-box">
+        <h3 style="color: var(--frame3-head); margin-bottom: 4px; font-size:1.05rem;">
+          กราฟแสดงพื้นที่แรเงาของความน่าจะเป็น พร้อมสเกลคู่ขนานของแกน $X$ และแกน $Z$
+        </h3>
+        
+        <svg class="interactive-plot" id="areaCurveSVG" viewBox="0 0 800 290">
+          <!-- เรนเดอร์แกน X, แกน Z, เส้นโค้งปกติ และพื้นที่แรเงาด้วย JavaScript -->
+        </svg>
+
+        <div class="grid-2" style="margin-top: 14px;">
+          <div class="card-sub" style="border-left: 4px solid #b45309;">
+            <strong>การแปลงค่าและการคำนวณความน่าจะเป็น:</strong>
+            <div id="areaCalcDetailsBox" style="margin-top: 6px; font-size: 0.95rem;"></div>
+          </div>
+          <div class="card-sub" style="border-left: 4px solid #4f46e5;">
+            <strong>การเปรียบเทียบตำแหน่งและเปอร์เซ็นต์สะสม:</strong>
+            <div id="relativeStandingBox" style="margin-top: 6px; font-size: 0.93rem; color: #1e293b;"></div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ==========================================
+       เฟรมที่ 4: โจทย์สุ่ม พร้อมเฉลยทีละบรรทัด
+       ========================================== -->
+  <section class="frame-box frame-4">
+    <div class="frame-header">
+      <h2>4. คลังโจทย์สุ่มและเฉลยขั้นตอน (Random Practice)</h2>
+      <span class="frame-tag">ฝึกหาความน่าจะเป็นและเปรียบเทียบตำแหน่ง</span>
+    </div>
+    <div class="frame-body">
+      <div style="display: flex; gap: 12px; margin-bottom: 16px;">
+        <button class="btn btn-emerald" onclick="generateSinglePracticeQuestion()">
+          <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+          สุ่มโจทย์ใหม่
+        </button>
+        <button class="btn btn-outline" id="btnRevealNext" onclick="revealNextStep()" disabled>
+          แสดงเฉลยทีละบรรทัด
+        </button>
+      </div>
+
+      <!-- กล่องโจทย์ -->
+      <div class="card-sub" id="practiceQuestionBox" style="background:#fcfdfd; border-color:#a7f3d0;">
+        <!-- ข้อความโจทย์จะแสดงที่นี่ -->
+      </div>
+
+      <!-- กล่องเฉลยทีละบรรทัด -->
+      <div id="practiceStepsContainer" style="margin-top: 14px;"></div>
+    </div>
+  </section>
+
+  <!-- ==========================================
+       เฟรมที่ 5: ส่วนทำใบงานให้นักเรียน (Worksheet)
+       ========================================== -->
+  <section class="frame-box frame-5">
+    <div class="frame-header">
+      <h2>5. ระบบสร้างใบงานและแบบประเมิน (Worksheet Generator)</h2>
+      <span class="frame-tag">พิมพ์เอกสาร</span>
+    </div>
+    <div class="frame-body">
+      
+      <div class="worksheet-actions no-print">
+        <button class="btn btn-violet" onclick="generateNew5Worksheet()">
+          <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+          สุ่มโจทย์ 5 ข้อใหม่
+        </button>
+        <button class="btn btn-outline" onclick="printWorksheet(false)">
+          <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4H7v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/></svg>
+          พิมพ์ใบงานสำหรับนักเรียน
+        </button>
+        <button class="btn btn-outline" onclick="printWorksheet(true)">
+          <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+          พิมพ์เฉลยสำหรับครู
+        </button>
+      </div>
+
+      <!-- พื้นที่ใบงาน (Print Area) -->
+      <div class="worksheet-container" id="worksheet-print-area">
+        <div class="worksheet-header-print">
+          <h2>ใบงานคณิตศาสตร์: เรื่องที่ 8 การหาความน่าจะเป็นและการเปรียบเทียบตำแหน่งของข้อมูล</h2>
+          <p>กลุ่มสาระการเรียนรู้คณิตศาสตร์ | เรื่อง ตัวแปรสุ่มและการแจกแจงความน่าจะเป็น</p>
+          <div class="print-meta-grid">
+            <span>ชื่อ-นามสกุล: ............................................................................</span>
+            <span>ชั้น ม.6/......</span>
+            <span>เลขที่: ..........</span>
+            <span>คะแนนเต็ม: 15 คะแนน</span>
+          </div>
+        </div>
+
+        <p class="no-print" style="margin-bottom: 12px; color: var(--text-muted); font-size: 0.95rem;">
+          คำชี้แจง: จงแปลงค่าของตัวแปรสุ่ม $X$ เป็นค่ามาตรฐาน $Z$ คำนวณหาความน่าจะเป็น และเปรียบเทียบตำแหน่งของข้อมูลในแต่ละข้อต่อไปนี้ (กำหนดค่าพื้นที่ใต้เส้นโค้งปกติมาตรฐานที่จำเป็นไว้ให้ในแต่ละข้อ)
+        </p>
+
+        <div id="worksheetQuestionsList">
+          <!-- แสดงรายการโจทย์ 5 ข้อผ่าน JS -->
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ==========================================
+       เฟรมที่ 6: เกณฑ์การตรวจรูบริก (Rubric 3 ระดับ)
+       ========================================== -->
+  <section class="frame-box frame-6">
+    <div class="frame-header">
+      <h2>6. รูบริกการประเมินใบงาน (Scoring Rubric - 3 ระดับ)</h2>
+      <span class="frame-tag">การวัดและประเมินผล</span>
+    </div>
+    <div class="frame-body">
+      <p style="margin-bottom: 12px;">
+        เกณฑ์การประเมินผลการเรียนรู้รายข้อ (ข้อละ 3 คะแนน รวม 5 ข้อ 15 คะแนน) โดยใช้เกณฑ์แบบวิเคราะห์ (Analytic Rubric) ตามมาตรฐานเอกสารคณิตศาสตร์:
+      </p>
+
+      <table class="table-math">
+        <thead>
+          <tr>
+            <th style="width: 22%;">ประเด็นการประเมิน</th>
+            <th style="width: 26%;">ระดับ 3 (ดีเยี่ยม - 3 คะแนน)</th>
+            <th style="width: 26%;">ระดับ 2 (พอใช้ - 2 คะแนน)</th>
+            <th style="width: 26%;">ระดับ 1 (ต้องปรับปรุง - 1 คะแนน)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>
+              <strong>1. การแปลงตัวแปรสุ่ม $X$ เป็นค่า $Z$</strong><br>
+              <span style="font-size:0.85rem; color:var(--text-muted);">($Z = \frac{X - \mu}{\sigma}$)</span>
+            </td>
+            <td>
+              ระบุ $\mu, \sigma$ ได้ถูกต้อง และคำนวณค่า $Z$ ได้ถูกต้องแม่นยำทุกขั้นตอน ทั้งกรณีจุดเดี่ยวและจุดปลายของช่วง
+            </td>
+            <td>
+              จำสูตรได้ถูกต้อง แต่คำนวณเลขผิดพลาดเล็กน้อย หรือลืมทศนิยม 2 ตำแหน่งตามมาตรฐานตาราง $Z$
+            </td>
+            <td>
+              ใช้สูตรแปลงค่าผิดพลาด หรือสลับตำแหน่งตัวตั้งและตัวลบ ทำให้ได้ค่า $Z$ ผิด
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <strong>2. การเลือกใช้สูตรคำนวณพื้นที่ความน่าจะเป็น</strong><br>
+              <span style="font-size:0.85rem; color:var(--text-muted);">(ซ้าย, ขวา, หรือระหว่าง)</span>
+            </td>
+            <td>
+              เลือกใช้สมการพื้นที่ถูกต้องตามเงื่อนไขโจทย์ ($P(Z \le z)$, $1 - P(Z \le z)$, หรือ $P(Z \le z_2) - P(Z \le z_1)$) และได้คำตอบความน่าจะเป็นที่ถูกต้อง
+            </td>
+            <td>
+              เลือกสูตรความน่าจะเป็นได้ถูกต้อง แต่ลบเลขหรือเปิดค่าตารางผิดพลาดเล็กน้อย
+            </td>
+            <td>
+              สับสนการหาพื้นที่ เช่น หาพื้นที่หางขวาแต่ลืมนำ 1 ไปลบ หรือนำพื้นที่มาบวกกันแทนการลบ
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <strong>3. การเปรียบเทียบตำแหน่งสัมพัทธ์และการประยุกต์</strong><br>
+              <span style="font-size:0.85rem; color:var(--text-muted);">(การเทียบร้อยละ/ข้ามกลุ่ม)</span>
+            </td>
+            <td>
+              นำค่าความน่าจะเป็นไปแปลผลเป็นเปอร์เซ็นไทล์ หรือเปรียบเทียบตำแหน่งของข้อมูลต่างกลุ่มได้อย่างถูกต้อง สมเหตุสมผล และชัดเจน
+            </td>
+            <td>
+              เปรียบเทียบค่า $Z$ ได้ แต่แปลผลเป็นร้อยละหรือสรุปข้อความตัดสินคลาดเคลื่อนบางส่วน
+            </td>
+            <td>
+              ไม่สามารถสรุปเปรียบเทียบตำแหน่งของข้อมูลได้ หรือตัดสินโดยใช้คะแนนดิบโดยไม่พิจารณาค่า $Z$
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div style="background: #fff1f2; border: 1px solid #fecdd3; padding: 12px 16px; border-radius: 6px; font-size: 0.92rem; color: #9f1239;">
+        <strong>เกณฑ์การตัดสินระดับคุณภาพรวม (15 คะแนนเต็ม):</strong><br>
+        13 – 15 คะแนน = ระดับดีมาก | 9 – 12 คะแนน = ระดับดี (ผ่านเกณฑ์) | 5 – 8 คะแนน = ระดับพอใช้ | น้อยกว่า 5 คะแนน = ระดับปรับปรุง
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<!-- ==========================================
+     JavaScript Logic: Probability & Area Engine
+     ========================================== -->
+<script>
+  /* ------------------------------------------
+     1. ฟังก์ชันทางคณิตศาสตร์สถิติ: PDF & CDF ปรกติมาตรฐาน
+     ------------------------------------------ */
+  function stdNormalPDF(z) {
+    return (1.0 / Math.sqrt(2 * Math.PI)) * Math.exp(-0.5 * z * z);
+  }
+
+  // การประมาณค่า Cumulative Distribution Function: Phi(z) = P(Z <= z)
+  function stdNormalCDF(z) {
+    // ใช้ Hart's / Abramowitz & Stegun approximation ความแม่นยำสูง
+    if (z === 0) return 0.5;
+    let t = 1.0 / (1.0 + 0.2316419 * Math.abs(z));
+    let d = 0.3989422804014327 * Math.exp(-0.5 * z * z);
+    let p = d * t * (0.319381530 + t * (-0.356563782 + t * (1.781477937 + t * (-1.821255978 + t * 1.330274429))));
+    return (z > 0) ? (1.0 - p) : p;
+  }
+
+  function onIntervalTypeChange() {
+    const type = document.getElementById("explorerIntervalType").value;
+    const x2Wrap = document.getElementById("x2ControlWrapper");
+    if (type === "between") {
+      x2Wrap.style.display = "flex";
+    } else {
+      x2Wrap.style.display = "none";
+    }
+    updateAreaInteractive();
+  }
+
+  function resetExplorerParams() {
+    document.getElementById("explorerMu").value = 50;
+    document.getElementById("explorerSigma").value = 10;
+    document.getElementById("explorerX").value = 60;
+    document.getElementById("explorerX2").value = 70;
+    document.getElementById("explorerIntervalType").value = "left";
+    document.getElementById("x2ControlWrapper").style.display = "none";
+    updateAreaInteractive();
+  }
+
+  function updateAreaInteractive() {
+    const mu = parseFloat(document.getElementById("explorerMu").value);
+    const sigma = parseFloat(document.getElementById("explorerSigma").value);
+    let x1 = parseFloat(document.getElementById("explorerX").value);
+    let x2 = parseFloat(document.getElementById("explorerX2").value);
+    const intervalType = document.getElementById("explorerIntervalType").value;
+
+    if (intervalType === "between" && x1 > x2) {
+      let temp = x1;
+      x1 = x2;
+      x2 = temp;
+      document.getElementById("explorerX").value = x1;
+      document.getElementById("explorerX2").value = x2;
+    }
+
+    document.getElementById("textMuVal").textContent = mu;
+    document.getElementById("textSigmaVal").textContent = sigma.toFixed(1);
+    document.getElementById("textXVal").textContent = x1.toFixed(1);
+    document.getElementById("textX2Val").textContent = x2.toFixed(1);
+
+    const z1 = (x1 - mu) / sigma;
+    const z2 = (x2 - mu) / sigma;
+
+    const svg = document.getElementById("areaCurveSVG");
+    const width = 800;
+    const paddingX = 70;
+    const curveBaselineY = 190;
+    const zAxisY = 240;
+
+    const zMin = -3.8;
+    const zMax = 3.8;
+    const zSpan = zMax - zMin;
+
+    function scaleZtoPixel(zVal) {
+      return paddingX + ((zVal - zMin) / zSpan) * (width - 2 * paddingX);
+    }
+
+    const maxPDFHeight = 0.42;
+    function scalePDFtoY(pdfVal) {
+      const graphH = 140;
+      return curveBaselineY - (pdfVal / maxPDFHeight) * graphH;
+    }
+
+    // จุดวาดเส้นโค้งปรกติ
+    const pointsCount = 160;
+    let pathD = "";
+    let shadedAreaD = "";
+
+    // กำหนดขอบเขตแรเงาตาม intervalType
+    let lowerZShade = zMin;
+    let upperZShade = zMax;
+
+    if (intervalType === "left") {
+      lowerZShade = zMin;
+      upperZShade = Math.max(zMin, Math.min(zMax, z1));
+    } else if (intervalType === "right") {
+      lowerZShade = Math.max(zMin, Math.min(zMax, z1));
+      upperZShade = zMax;
+    } else { // between
+      lowerZShade = Math.max(zMin, Math.min(zMax, z1));
+      upperZShade = Math.max(zMin, Math.min(zMax, z2));
+    }
+
+    let shadedPoints = [];
+    for (let i = 0; i <= pointsCount; i++) {
+      let zCur = zMin + (i / pointsCount) * zSpan;
+      let pdfCur = stdNormalPDF(zCur);
+      let px = scaleZtoPixel(zCur);
+      let py = scalePDFtoY(pdfCur);
+
+      if (i === 0) pathD += `M ${px} ${py}`;
+      else pathD += ` L ${px} ${py}`;
+
+      if (zCur >= lowerZShade && zCur <= upperZShade) {
+        shadedPoints.push({ x: px, y: py, z: zCur });
+      }
+    }
+
+    if (shadedPoints.length > 0) {
+      let first = shadedPoints[0];
+      let last = shadedPoints[shadedPoints.length - 1];
+      shadedAreaD = `M ${first.x} ${curveBaselineY}`;
+      shadedPoints.forEach(pt => { shadedAreaD += ` L ${pt.x} ${pt.y}`; });
+      shadedAreaD += ` L ${last.x} ${curveBaselineY} Z`;
+    }
+
+    // คำนวณความน่าจะเป็นจริง
+    let calculatedProb = 0;
+    let calcFormulaLatex = "";
+    let compExplanation = "";
+
+    if (intervalType === "left") {
+      calculatedProb = stdNormalCDF(z1);
+      calcFormulaLatex = `
+        Z_1 = \\frac{${x1.toFixed(1)} - ${mu}}{${sigma.toFixed(1)}} = \\mathbf{${z1.toFixed(2)}} <br>
+        \\[P(X \\le ${x1.toFixed(1)}) = P(Z \\le ${z1.toFixed(2)}) = \\mathbf{${calculatedProb.toFixed(4)}}\\]
+      `;
+      compExplanation = `ข้อมูล $x = ${x1.toFixed(1)}$ คิดเป็น <strong>เปอร์เซ็นไทล์ที่ ${(calculatedProb * 100).toFixed(2)}</strong> (มีข้อมูลที่น้อยกว่าหรือเท่ากับค่านี้อยู่ประมาณ ${(calculatedProb * 100).toFixed(2)}%)`;
+    } else if (intervalType === "right") {
+      let cdfLeft = stdNormalCDF(z1);
+      calculatedProb = 1.0 - cdfLeft;
+      calcFormulaLatex = `
+        Z_1 = \\frac{${x1.toFixed(1)} - ${mu}}{${sigma.toFixed(1)}} = \\mathbf{${z1.toFixed(2)}} <br>
+        \\[P(X \\ge ${x1.toFixed(1)}) = 1 - P(Z \\le ${z1.toFixed(2)}) = 1 - ${cdfLeft.toFixed(4)} = \\mathbf{${calculatedProb.toFixed(4)}}\\]
+      `;
+      compExplanation = `มีข้อมูลที่ <strong>สูงกว่าหรือเท่ากับ $x = ${x1.toFixed(1)}$</strong> อยู่ประมาณ <strong>${(calculatedProb * 100).toFixed(2)}%</strong> ของข้อมูลทั้งหมด`;
+    } else {
+      let cdf2 = stdNormalCDF(z2);
+      let cdf1 = stdNormalCDF(z1);
+      calculatedProb = Math.max(0, cdf2 - cdf1);
+      calcFormulaLatex = `
+        Z_1 = \\frac{${x1.toFixed(1)} - ${mu}}{${sigma.toFixed(1)}} = \\mathbf{${z1.toFixed(2)}}, \\quad Z_2 = \\frac{${x2.toFixed(1)} - ${mu}}{${sigma.toFixed(1)}} = \\mathbf{${z2.toFixed(2)}} <br>
+        \\[P(${x1.toFixed(1)} \\le X \\le ${x2.toFixed(1)}) = P(Z \\le ${z2.toFixed(2)}) - P(Z \\le ${z1.toFixed(2)}) = ${cdf2.toFixed(4)} - ${cdf1.toFixed(4)} = \\mathbf{${calculatedProb.toFixed(4)}}\\]
+      `;
+      compExplanation = `ข้อมูลที่อยู่ระหว่างช่วง $[${x1.toFixed(1)}, ${x2.toFixed(1)}]$ มีสัดส่วนคิดเป็น <strong>${(calculatedProb * 100).toFixed(2)}%</strong> ของประชากรทั้งหมด`;
+    }
+
+    const xPos1 = scaleZtoPixel(Math.max(zMin, Math.min(zMax, z1)));
+    const yTop1 = scalePDFtoY(stdNormalPDF(Math.max(zMin, Math.min(zMax, z1))));
+    const centerPixel = scaleZtoPixel(0);
+    const peakCenterY = scalePDFtoY(stdNormalPDF(0));
+
+    svg.innerHTML = `
+      <!-- พื้นที่แรเงาของความน่าจะเป็น -->
+      ${shadedAreaD ? `<path d="${shadedAreaD}" fill="rgba(180, 83, 9, 0.32)" />` : ''}
+
+      <!-- เส้นโค้งปกติมาตรฐาน N(0, 1) -->
+      <path d="${pathD}" fill="none" stroke="#312e81" stroke-width="2.8" stroke-linecap="round" />
+
+      <!-- แกนสมมาตรกึ่งกลาง Z = 0 -->
+      <line x1="${centerPixel}" y1="${curveBaselineY}" x2="${centerPixel}" y2="${peakCenterY}" stroke="#94a3b8" stroke-width="1.8" stroke-dasharray="3,3" />
+
+      <!-- แกน X (ข้อมูลจริง) -->
+      <line x1="40" y1="${curveBaselineY}" x2="${width - 40}" y2="${curveBaselineY}" stroke="#334155" stroke-width="2" />
+      <text x="${width - 30}" y="${curveBaselineY + 4}" font-size="13" font-weight="bold" fill="#334155">X</text>
+
+      ${[-3, -2, -1, 0, 1, 2, 3].map(zTick => {
+        let xValTick = mu + zTick * sigma;
+        let pTick = scaleZtoPixel(zTick);
+        return `
+          <line x1="${pTick}" y1="${curveBaselineY - 4}" x2="${pTick}" y2="${curveBaselineY + 4}" stroke="#475569" stroke-width="1.5" />
+          <text x="${pTick}" y="${curveBaselineY + 17}" text-anchor="middle" font-size="11" font-family="var(--font-code)" fill="#334155">
+            ${xValTick.toFixed(0)}
+          </text>
+        `;
+      }).join('')}
+
+      <!-- แกน Z (ค่ามาตรฐาน) -->
+      <line x1="40" y1="${zAxisY}" x2="${width - 40}" y2="${zAxisY}" stroke="#4f46e5" stroke-width="2" />
+      <text x="${width - 30}" y="${zAxisY + 4}" font-size="13" font-weight="bold" fill="#4f46e5">Z</text>
+
+      ${[-3, -2, -1, 0, 1, 2, 3].map(zTick => {
+        let pTick = scaleZtoPixel(zTick);
+        return `
+          <line x1="${pTick}" y1="${zAxisY - 4}" x2="${pTick}" y2="${zAxisY + 4}" stroke="#4f46e5" stroke-width="1.5" />
+          <text x="${pTick}" y="${zAxisY + 18}" text-anchor="middle" font-size="12" font-family="var(--font-code)" font-weight="bold" fill="#4f46e5">
+            ${zTick > 0 ? '+' + zTick : zTick}
+          </text>
+        `;
+      }).join('')}
+
+      <!-- เส้นบอกตำแหน่ง x1 / z1 (สีน้ำเงิน) -->
+      <line x1="${xPos1}" y1="${zAxisY + 2}" x2="${xPos1}" y2="${yTop1}" stroke="#0369a1" stroke-width="2.2" />
+      <circle cx="${xPos1}" cy="${yTop1}" r="4.5" fill="#0369a1" />
+      <text x="${xPos1}" y="${Math.max(22, yTop1 - 10)}" text-anchor="middle" font-size="12" font-family="var(--font-code)" font-weight="bold" fill="#0369a1">
+        x₁=${x1.toFixed(1)} (Z₁=${z1.toFixed(2)})
+      </text>
+
+      <!-- เส้นบอกตำแหน่ง x2 / z2 (กรณี between) -->
+      ${intervalType === "between" ? `
+        <line x1="${scaleZtoPixel(Math.max(zMin, Math.min(zMax, z2)))}" y1="${zAxisY + 2}" x2="${scaleZtoPixel(Math.max(zMin, Math.min(zMax, z2)))}" y2="${scalePDFtoY(stdNormalPDF(Math.max(zMin, Math.min(zMax, z2))))}" stroke="#7c3aed" stroke-width="2.2" />
+        <circle cx="${scaleZtoPixel(Math.max(zMin, Math.min(zMax, z2)))}" cy="${scalePDFtoY(stdNormalPDF(Math.max(zMin, Math.min(zMax, z2))))}" r="4.5" fill="#7c3aed" />
+        <text x="${scaleZtoPixel(Math.max(zMin, Math.min(zMax, z2)))}" y="${Math.max(22, scalePDFtoY(stdNormalPDF(Math.max(zMin, Math.min(zMax, z2)))) - 10)}" text-anchor="middle" font-size="12" font-family="var(--font-code)" font-weight="bold" fill="#7c3aed">
+          x₂=${x2.toFixed(1)} (Z₂=${z2.toFixed(2)})
+        </text>
+      ` : ''}
+
+      <!-- ป้ายแสดงขนาดพื้นที่ความน่าจะเป็นตรงกลาง -->
+      <text x="${(scaleZtoPixel(lowerZShade) + scaleZtoPixel(upperZShade)) / 2}" y="${curveBaselineY - 30}" text-anchor="middle" font-size="14" font-weight="bold" fill="#78350f" stroke="white" stroke-width="3" paint-order="stroke">
+        พื้นที่ = ${(calculatedProb * 100).toFixed(2)}%
+      </text>
+    `;
+
+    // กล่องการคำนวณ (ซ้าย)
+    const calcBox = document.getElementById("areaCalcDetailsBox");
+    calcBox.innerHTML = `
+      ${calcFormulaLatex}
+      ความน่าจะเป็นของช่วงที่สนใจ: <strong style="color:#b45309; font-size:1.1rem;">${calculatedProb.toFixed(4)}</strong> (หรือ ${(calculatedProb * 100).toFixed(2)}%)
+    `;
+
+    // กล่องการแปลความหมาย (ขวา)
+    const relBox = document.getElementById("relativeStandingBox");
+    relBox.innerHTML = `
+      1. <strong>ตำแหน่งสัมพัทธ์:</strong> ${compExplanation}<br>
+      2. <strong>ระยะห่างจากค่าเฉลี่ย:</strong> ข้อมูล $x_1$ อยู่ห่างจาก $\\mu$ คิดเป็น $|Z| = ${Math.abs(z1).toFixed(2)}$ เท่าของ $\\sigma$<br>
+      3. <strong>การตัดสินผล:</strong> หากข้อมูลมีค่า $Z > 0$ แสดงว่าอยู่ในเกณฑ์สูงกว่าค่าเฉลี่ยประชากร ยิ่งค่า $Z$ สูงมากเท่าใด สัดส่วนพื้นที่ทางขวาก็จะยิ่งแคบลง
+    `;
+
+    // อัปเดต MathJax ทั้งสองกล่องพร้อมกัน
+    if (window.MathJax && window.MathJax.typesetPromise) {
+      window.MathJax.typesetPromise([calcBox, relBox]).catch(err => console.log('MathJax error:', err));
+    }
+  }
+
+  /* ------------------------------------------
+     2. คลังโจทย์สุ่มและเฉลยขั้นตอน (Frame 4)
+     ------------------------------------------ */
+  const questionPool = [
+    {
+      q: "คะแนนสอบคัดเลือกเข้าทำงานของบริษัทแห่งหนึ่งมีการแจกแจงปกติ โดยมีค่าเฉลี่ย $\\mu = 500$ คะแนน และส่วนเบี่ยงเบนมาตรฐาน $\\sigma = 50$ คะแนน ถ้าบริษัทต้องการรับผู้สมัครที่มีคะแนนสอบตั้งแต่ 575 คะแนนขึ้นไป จงหาความน่าจะเป็นที่ผู้สมัครคนหนึ่งที่สุ่มมาจะสอบผ่านเกณฑ์ (กำหนดให้ $P(Z \\le 1.50) = 0.9332$)",
+      steps: [
+        "แปลงคะแนนสอบเกณฑ์ขั้นต่ำ $x = 575$ เป็นค่ามาตรฐาน $Z$: $Z = \\frac{x - \\mu}{\\sigma} = \\frac{575 - 500}{50} = \\frac{75}{50} = +1.50$",
+        "ต้องการหาความน่าจะเป็นที่มีคะแนนตั้งแต่ 575 ขึ้นไป คือ $P(X \\ge 575) = P(Z \\ge 1.50)$",
+        "ใช้กฎส่วนกลับสำหรับพื้นที่หางขวา: $P(Z \\ge 1.50) = 1 - P(Z \\le 1.50)$",
+        "แทนค่าจากตาราง: $P(Z \\ge 1.50) = 1 - 0.9332 = 0.0668$ (คิดเป็นประมาณ $6.68\\%$ ของผู้สมัครทั้งหมด)"
+      ]
+    },
+    {
+      q: "น้ำหนักของทารกแรกเกิดในโรงพยาบาลแห่งหนึ่งมีการแจกแจงปกติด้วย $\\mu = 3,000$ กรัม และ $\\sigma = 400$ กรัม จงหาความน่าจะเป็นที่ทารกที่สุ่มมาจะมีน้ำหนักน้อยกว่า 2,600 กรัม (กำหนดให้ $P(Z \\le -1.00) = 0.1587$)",
+      steps: [
+        "แปลงค่าน้ำหนัก $x = 2,600$ กรัม เป็นค่ามาตรฐาน $Z$: $Z = \\frac{2,600 - 3,000}{400} = \\frac{-400}{400} = -1.00$",
+        "ต้องการหาความน่าจะเป็นที่น้ำหนักน้อยกว่า 2,600 กรัม คือพื้นที่หางซ้าย $P(X < 2,600) = P(Z < -1.00)$",
+        "เนื่องจากเป็นตัวแปรสุ่มต่อเนื่อง $P(Z < -1.00) = P(Z \\le -1.00)$",
+        "เปิดค่าจากตารางพื้นที่สะสม: $P(Z \\le -1.00) = 0.1587$ (หรือคิดเป็น $15.87\\%$)"
+      ]
+    },
+    {
+      q: "ความสูงของนักเรียนหญิง ม.6 มีการแจกแจงปกติด้วย $\\mu = 160$ ซม. และ $\\sigma = 5$ ซม. จงหาความน่าจะเป็นที่นักเรียนหญิงที่สุ่มมาจะมีความสูงอยู่ระหว่าง 155 ถึง 168 ซม. (กำหนดให้ $P(Z \\le -1.00) = 0.1587$ และ $P(Z \\le 1.60) = 0.9452$)",
+      steps: [
+        "แปลงค่าขอบเขตล่าง $x_1 = 155$: $Z_1 = \\frac{155 - 160}{5} = \\frac{-5}{5} = -1.00$",
+        "แปลงค่าขอบเขตบน $x_2 = 168$: $Z_2 = \\frac{168 - 160}{5} = \\frac{8}{5} = +1.60$",
+        "คำนวณพื้นที่ระหว่างสองค่า: $P(155 \\le X \\le 168) = P(-1.00 \\le Z \\le 1.60) = P(Z \\le 1.60) - P(Z \\le -1.00)$",
+        "แทนค่าผลต่าง: $P = 0.9452 - 0.1587 = 0.7865$ (หรือประมาณ $78.65\\%$)"
+      ]
+    },
+    {
+      q: "นาย ก สอบวิชาภาษาไทยได้ 72 คะแนน (กลุ่มมี $\\mu = 60, \\sigma = 8$) และนาย ข สอบวิชาสังคมได้ 78 คะแนน (กลุ่มมี $\\mu = 70, \\sigma = 5$) จงเปรียบเทียบว่าใครอยู่ในลำดับที่สูงกว่าในกลุ่มของตนเอง (กำหนดให้ $P(Z \\le 1.50) = 0.9332$ และ $P(Z \\le 1.60) = 0.9452$)",
+      steps: [
+        "คำนวณค่ามาตรฐานของ นาย ก: $Z_A = \\frac{72 - 60}{8} = \\frac{12}{8} = +1.50$ (คิดเป็นเปอร์เซ็นไทล์ที่ $93.32$)",
+        "คำนวณค่ามาตรฐานของ นาย ข: $Z_B = \\frac{78 - 70}{5} = \\frac{8}{5} = +1.60$ (คิดเป็นเปอร์เซ็นไทล์ที่ $94.52$)",
+        "เปรียบเทียบค่ามาตรฐาน: พบว่า $Z_B (+1.60) > Z_A (+1.50)$",
+        "สรุป: <strong>นาย ข อยู่ในลำดับตำแหน่งที่สูงกว่าในกลุ่มของตนเอง</strong> เมื่อเทียบกับ นาย ก"
+      ]
+    }
+  ];
+
+  let currentPracticeIdx = -1;
+  let currentStepIdx = 0;
+
+  function generateSinglePracticeQuestion() {
+    let nextIdx = Math.floor(Math.random() * questionPool.length);
+    if (nextIdx === currentPracticeIdx) {
+      nextIdx = (nextIdx + 1) % questionPool.length;
+    }
+    currentPracticeIdx = nextIdx;
+    currentStepIdx = 0;
+
+    const qItem = questionPool[currentPracticeIdx];
+    const qBox = document.getElementById("practiceQuestionBox");
+    const sBox = document.getElementById("practiceStepsContainer");
+    const btn = document.getElementById("btnRevealNext");
+
+    qBox.innerHTML = `<strong>สถานการณ์โจทย์:</strong> ${qItem.q}`;
+    sBox.innerHTML = "";
+    btn.disabled = false;
+    btn.textContent = `แสดงเฉลยบรรทัดที่ 1 (จาก 4 บรรทัด)`;
+
+    renderMath(qBox);
+  }
+
+  function revealNextStep() {
+    if (currentPracticeIdx === -1) return;
+    const qItem = questionPool[currentPracticeIdx];
+    const sBox = document.getElementById("practiceStepsContainer");
+    const btn = document.getElementById("btnRevealNext");
+
+    if (currentStepIdx < qItem.steps.length) {
+      const stepDiv = document.createElement("div");
+      stepDiv.className = "step-line";
+      stepDiv.innerHTML = `<strong>บรรทัดที่ ${currentStepIdx + 1}:</strong> ${qItem.steps[currentStepIdx]}`;
+      sBox.appendChild(stepDiv);
+      renderMath(stepDiv);
+
+      currentStepIdx++;
+      if (currentStepIdx < qItem.steps.length) {
+        btn.textContent = `แสดงเฉลยบรรทัดที่ ${currentStepIdx + 1} (จาก 4 บรรทัด)`;
+      } else {
+        btn.textContent = "แสดงเฉลยครบทุกขั้นตอนแล้ว";
+        btn.disabled = true;
+      }
+    }
+  }
+
+  /* ------------------------------------------
+     3. ระบบสร้างใบงาน 5 ข้อ (Frame 5)
+     ------------------------------------------ */
+  const worksheetMasterBank = [
+    {
+      q: "ตัวแปรสุ่ม $X \\sim N(100, 10^2)$ จงหาค่าความน่าจะเป็น $P(X \\le 115)$ กำหนดให้ $P(Z \\le 1.50) = 0.9332$",
+      ans: "$Z = \\frac{115 - 100}{10} = +1.50 \\implies P(X \\le 115) = P(Z \\le 1.50) = 0.9332$"
+    },
+    {
+      q: "คะแนนสอบมี $\\mu = 75, \\sigma = 8$ จงหาความน่าจะเป็นที่นักเรียนจะสอบได้คะแนนมากกว่า 87 คะแนน กำหนดให้ $P(Z \\le 1.50) = 0.9332$",
+      ans: "$Z = \\frac{87 - 75}{8} = +1.50 \\implies P(X > 87) = 1 - P(Z \\le 1.50) = 1 - 0.9332 = 0.0668$"
+    },
+    {
+      q: "ถ้า $X \\sim N(50, 5^2)$ จงหาค่า $P(45 \\le X \\le 55)$ กำหนดให้ $P(Z \\le -1.00) = 0.1587$ และ $P(Z \\le 1.00) = 0.8413$",
+      ans: "$Z_1 = \\frac{45-50}{5} = -1.00, Z_2 = \\frac{55-50}{5} = +1.00 \\implies P = 0.8413 - 0.1587 = 0.6826$"
+    },
+    {
+      q: "ดวงใจสอบภาษาอังกฤษได้ค่ามาตรฐาน $Z = +1.20$ ส่วนสายใจสอบภาษาฝรั่งเศสได้ค่ามาตรฐาน $Z = +1.45$ ใครมีตำแหน่งที่ดีกว่าในวิชาของตนเอง",
+      ans: "สายใจมีตำแหน่งที่ดีกว่าในวิชาของตนเอง เนื่องจากมีค่ามาตรฐาน $Z = +1.45$ ซึ่งสูงกว่าค่ามาตรฐานของดวงใจ ($+1.20$)"
+    },
+    {
+      q: "จงหาค่าความน่าจะเป็น $P(Z \\ge 0)$ เมื่อ $Z \\sim N(0, 1)$ พร้อมอธิบายความหมายเชิงเรขาคณิต",
+      ans: "$P(Z \\ge 0) = 0.50$ (หรือ 50%) เพราะจุด $Z = 0$ เป็นแกนสมมาตรที่แบ่งครึ่งพื้นที่ใต้เส้นโค้งออกเป็นสองข้างเท่ากัน"
+    },
+    {
+      q: "ถ้า $P(Z \\le z_0) = 0.9750$ จงหาค่าของ $P(Z > z_0)$",
+      ans: "$P(Z > z_0) = 1 - P(Z \\le z_0) = 1 - 0.9750 = 0.0250$"
+    },
+    {
+      q: "นักเรียนคนหนึ่งสอบได้ค่ามาตรฐาน $Z = -0.50$ คะแนนของนักเรียนคนนี้อยู่ในตำแหน่งเปอร์เซ็นไทล์ใด กำหนดให้ $P(Z \\le -0.50) = 0.3085$",
+      ans: "เนื่องจากพื้นที่สะสมทางซ้ายคือ $0.3085$ แสดงว่าคะแนนของนักเรียนคนนี้ตรงกับเปอร์เซ็นไทล์ที่ 30.85"
+    }
+  ];
+
+  let currentWorksheetQuestions = [];
+
+  function generateNew5Worksheet() {
+    let shuffled = [...worksheetMasterBank].sort(() => 0.5 - Math.random());
+    currentWorksheetQuestions = shuffled.slice(0, 5);
+    renderWorksheetDOM(false);
+  }
+
+  function renderWorksheetDOM(showAnswerKey) {
+    const list = document.getElementById("worksheetQuestionsList");
+    list.innerHTML = "";
+
+    currentWorksheetQuestions.forEach((item, index) => {
+      const qDiv = document.createElement("div");
+      qDiv.className = "worksheet-q-item";
+
+      let inner = `
+        <div style="font-weight:600; margin-bottom:6px;">ข้อที่ ${index + 1}) ${item.q}</div>
+      `;
+
+      if (showAnswerKey) {
+        inner += `
+          <div class="answer-key-box">
+            <div><strong>แนวคิดและคำตอบที่ถูกต้อง:</strong> ${item.ans}</div>
+          </div>
+        `;
+      } else {
+        inner += `
+          <div class="student-write-area">
+            <div>วิธีทำ: ...........................................................................................................................................................................</div>
+            <div style="margin-top:6px;">..........................................................................................................................................................................................</div>
+          </div>
+        `;
+      }
+
+      qDiv.innerHTML = inner;
+      list.appendChild(qDiv);
+    });
+
+    renderMath(list);
+  }
+
+  function printWorksheet(isTeacherKey) {
+    renderWorksheetDOM(isTeacherKey);
+    setTimeout(() => {
+      window.print();
+    }, 400);
+  }
+
+  function renderMath(targetElement) {
+    if (window.MathJax && window.MathJax.typesetPromise) {
+      window.MathJax.typesetPromise([targetElement]).catch((err) => console.log('MathJax error:', err));
+    }
+  }
+
+  // เริ่มต้นทำงานทันทีเมื่อโหลดหน้าเว็บ
+  window.addEventListener('DOMContentLoaded', () => {
+    updateAreaInteractive();
+    generateSinglePracticeQuestion();
+    generateNew5Worksheet();
+  });
+</script>
+
+</body>
+</html>

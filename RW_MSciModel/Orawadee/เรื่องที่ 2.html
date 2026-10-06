@@ -1,0 +1,1258 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>เรื่องที่ 2: การแจกแจงความน่าจะเป็นของตัวแปรสุ่ม</title>
+  
+  <!-- Google Fonts: Sarabun & Fira Code -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Sarabun:ital,wght@0,300;0,400;0,600;0,700;1,400&family=Fira+Code:wght@400;600&display=swap" rel="stylesheet">
+  
+  <!-- MathJax สำหรับสมการคณิตศาสตร์และ LaTeX -->
+  <script>
+    window.MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']],
+        displayMath: [['$$', '$$'], ['\\[', '\\]']],
+        processEscapes: true
+      },
+      options: {
+        skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+      }
+    };
+  </script>
+  <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+  <style>
+    :root {
+      --font-th: 'Sarabun', system-ui, -apple-system, sans-serif;
+      --font-code: 'Fira Code', monospace;
+      
+      /* ชุดสีประจำ 6 เฟรม */
+      --frame1-border: #0284c7;
+      --frame1-bg: #f0f9ff;
+      --frame1-head: #0369a1;
+      
+      --frame2-border: #0d9488;
+      --frame2-bg: #f0fdfa;
+      --frame2-head: #0f766e;
+      
+      --frame3-border: #6366f1;
+      --frame3-bg: #eef2ff;
+      --frame3-head: #4338ca;
+      
+      --frame4-border: #ea580c;
+      --frame4-bg: #fff7ed;
+      --frame4-head: #c2410c;
+      
+      --frame5-border: #16a34a;
+      --frame5-bg: #f0fdf4;
+      --frame5-head: #15803d;
+      
+      --frame6-border: #9333ea;
+      --frame6-bg: #faf5ff;
+      --frame6-head: #7e22ce;
+
+      --text-dark: #1e293b;
+      --text-muted: #64748b;
+      --shadow-sm: 0 2px 4px rgba(0,0,0,0.05);
+      --shadow-md: 0 4px 10px rgba(0,0,0,0.08);
+      --radius: 12px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: var(--font-th);
+      background-color: #f8fafc;
+      color: var(--text-dark);
+      line-height: 1.7;
+      padding: 24px 16px 60px 16px;
+    }
+
+    .main-container {
+      max-width: 1120px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 32px;
+    }
+
+    /* หัวข้อหลักเอกสาร */
+    .document-header {
+      background: white;
+      border: 1px solid #e2e8f0;
+      border-top: 6px solid #0284c7;
+      border-radius: var(--radius);
+      padding: 28px;
+      text-align: center;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .document-header h1 {
+      font-size: 1.95rem;
+      color: #0f172a;
+      margin-bottom: 6px;
+      font-weight: 700;
+    }
+
+    .document-header p {
+      font-size: 1.05rem;
+      color: var(--text-muted);
+    }
+
+    /* กล่องเฟรม */
+    .frame-box {
+      background: white;
+      border-radius: var(--radius);
+      border: 2px solid;
+      box-shadow: var(--shadow-sm);
+      overflow: hidden;
+      transition: box-shadow 0.2s ease;
+    }
+
+    .frame-box:hover {
+      box-shadow: var(--shadow-md);
+    }
+
+    .frame-header {
+      padding: 16px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid rgba(0,0,0,0.08);
+    }
+
+    .frame-header h2 {
+      font-size: 1.3rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .frame-tag {
+      font-size: 0.85rem;
+      font-weight: 600;
+      padding: 4px 12px;
+      border-radius: 999px;
+      background: white;
+      border: 1px solid currentColor;
+    }
+
+    .frame-body {
+      padding: 24px;
+    }
+
+    /* คู่สีแต่ละเฟรม */
+    .frame-1 { border-color: var(--frame1-border); }
+    .frame-1 .frame-header { background: var(--frame1-bg); color: var(--frame1-head); }
+    .frame-1 .frame-tag { color: var(--frame1-border); }
+
+    .frame-2 { border-color: var(--frame2-border); }
+    .frame-2 .frame-header { background: var(--frame2-bg); color: var(--frame2-head); }
+    .frame-2 .frame-tag { color: var(--frame2-border); }
+
+    .frame-3 { border-color: var(--frame3-border); }
+    .frame-3 .frame-header { background: var(--frame3-bg); color: var(--frame3-head); }
+    .frame-3 .frame-tag { color: var(--frame3-border); }
+
+    .frame-4 { border-color: var(--frame4-border); }
+    .frame-4 .frame-header { background: var(--frame4-bg); color: var(--frame4-head); }
+    .frame-4 .frame-tag { color: var(--frame4-border); }
+
+    .frame-5 { border-color: var(--frame5-border); }
+    .frame-5 .frame-header { background: var(--frame5-bg); color: var(--frame5-head); }
+    .frame-5 .frame-tag { color: var(--frame5-border); }
+
+    .frame-6 { border-color: var(--frame6-border); }
+    .frame-6 .frame-header { background: var(--frame6-bg); color: var(--frame6-head); }
+    .frame-6 .frame-tag { color: var(--frame6-border); }
+
+    /* บล็อกนิยามทางคณิตศาสตร์ */
+    .math-def {
+      background: #f8fafc;
+      border-left: 4px solid #334155;
+      padding: 14px 18px;
+      border-radius: 4px;
+      margin: 16px 0;
+    }
+
+    .math-def-title {
+      font-weight: 700;
+      color: #0f172a;
+      margin-bottom: 4px;
+    }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 18px;
+      margin-top: 14px;
+    }
+
+    @media (max-width: 768px) {
+      .grid-2 { grid-template-columns: 1fr; }
+    }
+
+    .card-sub {
+      background: #fafafa;
+      border: 1px solid #e5e7eb;
+      border-radius: 8px;
+      padding: 16px;
+    }
+
+    .card-sub h3 {
+      font-size: 1.1rem;
+      margin-bottom: 8px;
+    }
+
+    /* ส่วนควบคุม Interactive */
+    .control-panel {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 16px;
+      background: #f9fafb;
+      padding: 18px;
+      border-radius: 8px;
+      border: 1px solid #e5e7eb;
+      margin-bottom: 20px;
+    }
+
+    .control-item {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .control-item label {
+      font-weight: 600;
+      font-size: 0.92rem;
+      color: var(--text-dark);
+    }
+
+    select, input[type="number"] {
+      padding: 8px 12px;
+      border-radius: 6px;
+      border: 1px solid #cbd5e1;
+      font-family: inherit;
+      font-size: 0.95rem;
+      background-color: white;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 9px 18px;
+      border-radius: 6px;
+      font-family: inherit;
+      font-weight: 600;
+      font-size: 0.95rem;
+      cursor: pointer;
+      border: none;
+      transition: all 0.2s ease;
+    }
+
+    .btn-indigo { background: #6366f1; color: white; }
+    .btn-indigo:hover { background: #4f46e5; }
+
+    .btn-orange { background: #ea580c; color: white; }
+    .btn-orange:hover { background: #c2410c; }
+
+    .btn-emerald { background: #16a34a; color: white; }
+    .btn-emerald:hover { background: #15803d; }
+
+    .btn-outline {
+      background: white;
+      border: 1px solid #cbd5e1;
+      color: var(--text-dark);
+    }
+    .btn-outline:hover {
+      background: #f1f5f9;
+    }
+
+    .step-line {
+      padding: 10px 14px;
+      background: #f8fafc;
+      border-left: 3px solid #6366f1;
+      margin-bottom: 10px;
+      border-radius: 0 4px 4px 0;
+      animation: fadeIn 0.3s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(4px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ตารางคณิตศาสตร์ */
+    .table-math {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 14px 0;
+      font-size: 0.95rem;
+    }
+
+    .table-math th, .table-math td {
+      border: 1px solid #cbd5e1;
+      padding: 10px 14px;
+      text-align: center;
+      vertical-align: middle;
+    }
+
+    .table-math th {
+      background: #f1f5f9;
+      color: #0f172a;
+      font-weight: 700;
+    }
+
+    .table-math tr:nth-child(even) td {
+      background: #fcfcfd;
+    }
+
+    /* กราฟแท่ง Interactive (CSS/SVG) */
+    .chart-container {
+      background: white;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      padding: 20px;
+      margin-top: 16px;
+    }
+
+    .chart-bars-wrap {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-around;
+      gap: 16px;
+      height: 220px;
+      padding: 10px 20px 24px 20px;
+      border-bottom: 2px solid #334155;
+      position: relative;
+    }
+
+    .bar-group {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      flex: 1;
+      height: 100%;
+      justify-content: flex-end;
+      position: relative;
+    }
+
+    .bar-pair {
+      display: flex;
+      align-items: flex-end;
+      gap: 6px;
+      width: 100%;
+      max-width: 64px;
+      height: 100%;
+    }
+
+    .bar-col {
+      flex: 1;
+      border-radius: 4px 4px 0 0;
+      transition: height 0.4s ease;
+      position: relative;
+    }
+
+    .bar-theory {
+      background: #94a3b8;
+    }
+
+    .bar-sim {
+      background: #6366f1;
+    }
+
+    .bar-val-label {
+      position: absolute;
+      top: -24px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 0.75rem;
+      font-family: var(--font-code);
+      font-weight: 600;
+      white-space: nowrap;
+    }
+
+    .bar-x-label {
+      margin-top: 8px;
+      font-weight: 700;
+      font-size: 0.95rem;
+      color: #1e293b;
+    }
+
+    .legend-box {
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      margin-top: 14px;
+      font-size: 0.9rem;
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .legend-color {
+      width: 14px;
+      height: 14px;
+      border-radius: 3px;
+    }
+
+    /* ส่วนใบงาน */
+    .worksheet-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-bottom: 20px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid #e2e8f0;
+    }
+
+    .worksheet-container {
+      background: white;
+      border: 1px solid #cbd5e1;
+      border-radius: 6px;
+      padding: 24px;
+    }
+
+    .worksheet-header-print {
+      display: none;
+    }
+
+    .worksheet-q-item {
+      padding: 14px 0;
+      border-bottom: 1px dashed #e2e8f0;
+      page-break-inside: avoid;
+    }
+
+    .worksheet-q-item:last-child {
+      border-bottom: none;
+    }
+
+    .student-write-area {
+      min-height: 52px;
+      margin-top: 8px;
+      border: 1px dashed #cbd5e1;
+      background: #fafafa;
+      border-radius: 4px;
+      padding: 8px 12px;
+      color: #94a3b8;
+      font-size: 0.9rem;
+    }
+
+    .answer-key-box {
+      margin-top: 8px;
+      padding: 10px 14px;
+      background: #f0fdf4;
+      border-left: 3px solid #16a34a;
+      color: #166534;
+      border-radius: 0 4px 4px 0;
+      font-size: 0.93rem;
+    }
+
+    /* =========================================================
+       CLEAN PRINT CSS: ป้องกันหน้าว่าง 100%
+       ========================================================= */
+    @page {
+      size: A4 portrait;
+      margin: 12mm 15mm;
+    }
+
+    @media print {
+      body, html {
+        background: white !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        height: auto !important;
+        overflow: visible !important;
+      }
+
+      .document-header,
+      .frame-1,
+      .frame-2,
+      .frame-3,
+      .frame-4,
+      .frame-6,
+      .worksheet-actions,
+      .frame-header,
+      .no-print {
+        display: none !important;
+      }
+
+      .main-container {
+        display: block !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        gap: 0 !important;
+      }
+
+      .frame-5 {
+        border: none !important;
+        box-shadow: none !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        background: transparent !important;
+        border-radius: 0 !important;
+      }
+
+      .frame-5 .frame-body {
+        padding: 0 !important;
+      }
+
+      .worksheet-container {
+        border: none !important;
+        padding: 0 !important;
+        box-shadow: none !important;
+        width: 100% !important;
+      }
+
+      .worksheet-header-print {
+        display: block !important;
+        margin-bottom: 14px;
+        padding-bottom: 10px;
+        border-bottom: 2px solid #000;
+        text-align: center;
+      }
+
+      .worksheet-header-print h2 {
+        font-size: 16pt;
+        color: #000 !important;
+        margin-bottom: 4px;
+      }
+
+      .worksheet-header-print p {
+        font-size: 11pt;
+        color: #333 !important;
+      }
+
+      .print-meta-grid {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 10px;
+        font-size: 10.5pt;
+        color: #000 !important;
+      }
+
+      .student-write-area {
+        min-height: 52px !important;
+        background: transparent !important;
+        border: 1px solid #475569 !important;
+        color: #334155 !important;
+        font-size: 10pt !important;
+      }
+
+      .worksheet-q-item {
+        padding: 10px 0 !important;
+        border-bottom: 1px dashed #94a3b8 !important;
+        page-break-inside: avoid !important;
+      }
+
+      .answer-key-box {
+        background: #f0fdf4 !important;
+        border-left: 3px solid #000 !important;
+        color: #000 !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<div class="main-container">
+
+  <!-- ส่วนหัวเอกสาร -->
+  <header class="document-header">
+    <h1>เอกสารการเรียนรู้คณิตศาสตร์: เรื่องที่ 2 การแจกแจงความน่าจะเป็นของตัวแปรสุ่ม</h1>
+    <p>หน่วยการเรียนรู้: ตัวแปรสุ่มและการแจกแจงความน่าจะเป็น (Probability Distributions of Random Variables)</p>
+  </header>
+
+  <!-- ==========================================
+       เฟรมที่ 1: การแจกแจงความน่าจะเป็นของตัวแปรสุ่ม
+       ========================================== -->
+  <section class="frame-box frame-1">
+    <div class="frame-header">
+      <h2>1. การแจกแจงความน่าจะเป็นของตัวแปรสุ่ม (Probability Distribution)</h2>
+      <span class="frame-tag">นิยามและสมบัติพื้นฐาน</span>
+    </div>
+    <div class="frame-body">
+      <div class="math-def">
+        <div class="math-def-title">บทนิยามทางคณิตศาสตร์ (Definition):</div>
+        ให้ $X$ เป็นตัวแปรสุ่มไม่ต่อเนื่องที่มีเซตของค่าที่เป็นไปได้คือ $S_X = \{x_1, x_2, \dots, x_k\}$<br>
+        <strong>ฟังก์ชันมวลความน่าจะเป็น (Probability Mass Function: PMF)</strong> หรือฟังก์ชันการแจกแจงความน่าจะเป็น เขียนแทนด้วย:
+        \[p_X(x) = P(X = x)\]
+        ซึ่งแสดงความน่าจะเป็นที่ตัวแปรสุ่ม $X$ จะเกิดค่าเท่ากับจำนวนจริง $x$ ใด ๆ
+      </div>
+
+      <div class="grid-2">
+        <div class="card-sub">
+          <h3 style="color: var(--frame1-head);">สมบัติที่สำคัญของการแจกแจงความน่าจะเป็น</h3>
+          <p>
+            ฟังก์ชันการแจกแจงความน่าจะเป็นของตัวแปรสุ่มไม่ต่อเนื่อง ต้องสอดคล้องกับสัจพจน์ความน่าจะเป็น 2 ข้อสำคัญเสมอ:
+          </p>
+          <ol style="padding-left: 22px; margin-top: 8px;">
+            <li>$0 \le P(X = x_i) \le 1$ สำหรับทุกค่า $x_i \in S_X$</li>
+            <li>ผลรวมของความน่าจะเป็นของทุกค่าที่เป็นไปได้ต้องเท่ากับ $1$ เสมอ:
+              \[\sum_{i=1}^k P(X = x_i) = 1\]
+            </li>
+          </ol>
+        </div>
+        <div class="card-sub">
+          <h3 style="color: var(--frame1-head);">ความหมายเชิงการประยุกต์</h3>
+          <p>
+            การแจกแจงความน่าจะเป็นทำหน้าที่จัดสรร "ความน่าจะเป็นรวมทั้งหมดที่มีค่าเท่ากับ 1 (หรือ 100%)" ให้แก่ค่าแต่ละค่าของตัวแปรสุ่มอย่างสมดุล ช่วยให้เราสามารถประเมินโอกาสเกิดผลลัพธ์ในอนาคตได้อย่างครบถ้วนทุกกรณี
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==========================================
+       เฟรมที่ 2: ความสัมพันธ์และรูปแบบการนำเสนอ
+       ========================================== -->
+  <section class="frame-box frame-2">
+    <div class="frame-header">
+      <h2>2. ความสัมพันธ์และการนำเสนอด้วยตารางและกราฟ</h2>
+      <span class="frame-tag">รูปแบบการแทนความน่าจะเป็น</span>
+    </div>
+    <div class="frame-body">
+      <p style="margin-bottom: 14px;">
+        ความสัมพันธ์ระหว่างค่าของตัวแปรสุ่ม $x$ กับค่าความน่าจะเป็น $P(X = x)$ สามารถแสดงได้ชัดเจน 2 รูปแบบหลัก:
+      </p>
+
+      <div class="grid-2">
+        <div class="card-sub" style="border-left: 4px solid var(--frame2-border);">
+          <h3 style="color: var(--frame2-head);">1. การนำเสนอด้วยตาราง (Probability Distribution Table)</h3>
+          <p>เป็นการแจกแจงค่า $x$ ในแถวแรก และความน่าจะเป็นที่สอดคล้องกันในแถวถัดไป ทำให้ตรวจสอบผลรวม $\sum P(X=x) = 1$ ได้ทันที:</p>
+          
+          <table class="table-math" style="margin-top: 10px; font-size: 0.9rem;">
+            <thead>
+              <tr>
+                <th style="width: 25%;">$x$</th>
+                <td>$x_1$</td>
+                <td>$x_2$</td>
+                <td>$\dots$</td>
+                <td>$x_k$</td>
+                <th style="background:#e2e8f0;">รวม ($\sum$)</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <th style="width: 25%;">$P(X = x)$</th>
+                <td>$P(X = x_1)$</td>
+                <td>$P(X = x_2)$</td>
+                <td>$\dots$</td>
+                <td>$P(X = x_k)$</td>
+                <td>$\mathbf{1.00}$</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="card-sub" style="border-left: 4px solid #0f766e;">
+          <h3 style="color: var(--frame2-head);">2. การนำเสนอด้วยกราฟแท่ง (Probability Histogram)</h3>
+          <p>ถ่ายทอดสัดส่วนความน่าจะเป็นออกมาเป็นรูปธรรมเชิงเรขาคณิต:</p>
+          <ul style="padding-left: 20px; margin-top: 8px;">
+            <li><strong>แกนนอน (X-axis):</strong> แทนค่าที่เป็นไปได้ของตัวแปรสุ่ม ($x$)</li>
+            <li><strong>แกนตั้ง (Y-axis):</strong> แทนความน่าจะเป็น $P(X = x)$</li>
+            <li><strong>ความสูงของแท่งกราฟ:</strong> เท่ากับขนาดของความน่าจะเป็น ณ ค่านั้น และผลรวมความสูงของทุกแท่งกราฟจะเท่ากับ $1$ เสมอ</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==========================================
+       เฟรมที่ 3: HTML Interactive Model
+       ========================================== -->
+  <section class="frame-box frame-3">
+    <div class="frame-header">
+      <h2>3. แบบจำลองเชิงโต้ตอบ: การจำลองสุ่มและสร้างการแจกแจง (Interactive Distribution Model)</h2>
+      <span class="frame-tag">ห้องทดลองและสร้างกราฟ</span>
+    </div>
+    <div class="frame-body">
+      
+      <!-- ส่วนควบคุมตัวแปร -->
+      <div class="control-panel">
+        <div class="control-item">
+          <label for="simOutcomeCount">1. จำนวนผลลัพธ์ที่เป็นไปได้ ($k$ ค่า):</label>
+          <select id="simOutcomeCount" onchange="renderProbabilitySliders()">
+            <option value="3">3 ค่า (x = 0, 1, 2)</option>
+            <option value="4" selected>4 ค่า (x = 0, 1, 2, 3)</option>
+            <option value="5">5 ค่า (x = 0, 1, 2, 3, 4)</option>
+            <option value="6">6 ค่า (x = 1 ถึง 6: ลูกเต๋า)</option>
+          </select>
+        </div>
+
+        <div class="control-item">
+          <label for="simTrialCount">2. จำนวนครั้งของการทดลองสุ่ม ($N$):</label>
+          <input type="number" id="simTrialCount" min="10" max="5000" step="10" value="200">
+        </div>
+
+        <div class="control-item">
+          <label for="probDistributionPattern">3. กำหนดค่าความน่าจะเป็นเชิงทฤษฎี:</label>
+          <select id="probDistributionPattern" onchange="applyProbPattern()">
+            <option value="uniform">สม่ำเสมอเท่ากันทุกค่า (Uniform)</option>
+            <option value="symmetric" selected>สมมาตรตรงกลาง (Symmetric/Binomial-like)</option>
+            <option value="skewed">เบ้ขวา/ไม่เท่ากัน (Skewed)</option>
+          </select>
+        </div>
+
+        <div class="control-item" style="justify-content: flex-end;">
+          <button class="btn btn-indigo" onclick="runDistributionSimulation()">
+            <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+            ทำการสุ่มและพล็อตกราฟ
+          </button>
+        </div>
+      </div>
+
+      <!-- สรุปผล: ตารางและกราฟการแจกแจง -->
+      <div id="simResultsWrapper">
+        <h3 style="color: var(--frame3-head); margin-bottom: 8px;">ตารางแจกแจงความถี่และความน่าจะเป็น</h3>
+        <div id="tableOutputContainer" style="overflow-x: auto;"></div>
+
+        <div class="chart-container">
+          <h3 style="color: var(--frame3-head); margin-bottom: 4px; font-size:1.05rem;">กราฟแท่งเปรียบเทียบ: ความน่าจะเป็นทฤษฎี vs ความถี่สัมพัทธ์จากการสุ่ม</h3>
+          <div class="legend-box">
+            <div class="legend-item">
+              <span class="legend-color" style="background:#94a3b8;"></span>
+              <span>ความน่าจะเป็นเชิงทฤษฎี $P(X = x)$</span>
+            </div>
+            <div class="legend-item">
+              <span class="legend-color" style="background:#6366f1;"></span>
+              <span>ความถี่สัมพัทธ์ที่สุ่มได้จริง $\frac{f}{N}$</span>
+            </div>
+          </div>
+          <div class="chart-bars-wrap" id="chartBarsArea">
+            <!-- แท่งกราฟจะถูกวาดที่นี่ -->
+          </div>
+        </div>
+
+        <div id="lawOfLargeNumbersNotice" class="step-line" style="margin-top: 14px; border-color:#6366f1;">
+          <!-- ข้อความวิเคราะห์จะแสดงที่นี่ -->
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ==========================================
+       เฟรมที่ 4: โจทย์สุ่ม พร้อมเฉลยทีละบรรทัด
+       ========================================== -->
+  <section class="frame-box frame-4">
+    <div class="frame-header">
+      <h2>4. คลังโจทย์สุ่มและเฉลยขั้นตอน (Random Practice)</h2>
+      <span class="frame-tag">ฝึกทักษะการคำนวณ</span>
+    </div>
+    <div class="frame-body">
+      <div style="display: flex; gap: 12px; margin-bottom: 16px;">
+        <button class="btn btn-orange" onclick="generateSinglePracticeQuestion()">
+          <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+          สุ่มโจทย์ใหม่
+        </button>
+        <button class="btn btn-outline" id="btnRevealNext" onclick="revealNextStep()" disabled>
+          แสดงเฉลยทีละบรรทัด
+        </button>
+      </div>
+
+      <!-- กล่องโจทย์ -->
+      <div class="card-sub" id="practiceQuestionBox" style="background:#fffaf5; border-color:#fed7aa;">
+        <!-- ข้อความโจทย์จะแสดงที่นี่ -->
+      </div>
+
+      <!-- กล่องเฉลยทีละบรรทัด -->
+      <div id="practiceStepsContainer" style="margin-top: 14px;"></div>
+    </div>
+  </section>
+
+  <!-- ==========================================
+       เฟรมที่ 5: ส่วนทำใบงานให้นักเรียน (Worksheet)
+       ========================================== -->
+  <section class="frame-box frame-5">
+    <div class="frame-header">
+      <h2>5. ระบบสร้างใบงานและแบบประเมิน (Worksheet Generator)</h2>
+      <span class="frame-tag">พิมพ์เอกสาร</span>
+    </div>
+    <div class="frame-body">
+      
+      <div class="worksheet-actions no-print">
+        <button class="btn btn-emerald" onclick="generateNew5Worksheet()">
+          <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+          สุ่มโจทย์ 5 ข้อใหม่
+        </button>
+        <button class="btn btn-outline" onclick="printWorksheet(false)">
+          <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4H7v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/></svg>
+          พิมพ์ใบงานสำหรับนักเรียน
+        </button>
+        <button class="btn btn-outline" onclick="printWorksheet(true)">
+          <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+          พิมพ์เฉลยสำหรับครู
+        </button>
+      </div>
+
+      <!-- พื้นที่ใบงาน (Print Area) -->
+      <div class="worksheet-container" id="worksheet-print-area">
+        <div class="worksheet-header-print">
+          <h2>ใบงานคณิตศาสตร์: เรื่องที่ 2 การแจกแจงความน่าจะเป็นของตัวแปรสุ่ม</h2>
+          <p>กลุ่มสาระการเรียนรู้คณิตศาสตร์ | เรื่อง ตัวแปรสุ่มและการแจกแจงความน่าจะเป็น</p>
+          <div class="print-meta-grid">
+            <span>ชื่อ-นามสกุล: ............................................................................</span>
+            <span>ชั้น ม.6/......</span>
+            <span>เลขที่: ..........</span>
+            <span>คะแนนเต็ม: 15 คะแนน</span>
+          </div>
+        </div>
+
+        <p class="no-print" style="margin-bottom: 12px; color: var(--text-muted); font-size: 0.95rem;">
+          คำชี้แจง: จงหาค่าของตัวแปรที่ไม่ทราบค่า หรือสร้างตารางแจกแจงความน่าจะเป็น และตรวจสอบเงื่อนไข $\sum P(X=x) = 1$ ในแต่ละข้อต่อไปนี้
+        </p>
+
+        <div id="worksheetQuestionsList">
+          <!-- แสดงรายการโจทย์ 5 ข้อผ่าน JS -->
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ==========================================
+       เฟรมที่ 6: เกณฑ์การตรวจรูบริก (Rubric 3 ระดับ)
+       ========================================== -->
+  <section class="frame-box frame-6">
+    <div class="frame-header">
+      <h2>6. รูบริกการประเมินใบงาน (Scoring Rubric - 3 ระดับ)</h2>
+      <span class="frame-tag">การวัดและประเมินผล</span>
+    </div>
+    <div class="frame-body">
+      <p style="margin-bottom: 12px;">
+        เกณฑ์การประเมินผลการเรียนรู้รายข้อ (ข้อละ 3 คะแนน รวม 5 ข้อ 15 คะแนน) โดยใช้เกณฑ์แบบวิเคราะห์ (Analytic Rubric) ตามมาตรฐานเอกสารคณิตศาสตร์:
+      </p>
+
+      <table class="table-math">
+        <thead>
+          <tr>
+            <th style="width: 22%;">ประเด็นการประเมิน</th>
+            <th style="width: 26%;">ระดับ 3 (ดีเยี่ยม - 3 คะแนน)</th>
+            <th style="width: 26%;">ระดับ 2 (พอใช้ - 2 คะแนน)</th>
+            <th style="width: 26%;">ระดับ 1 (ต้องปรับปรุง - 1 คะแนน)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>
+              <strong>1. การใช้สมบัติผลรวมความน่าจะเป็น</strong><br>
+              <span style="font-size:0.85rem; color:var(--text-muted);">($\sum P(X=x) = 1$)</span>
+            </td>
+            <td>
+              ตั้งสมการผลรวมความน่าจะเป็นเท่ากับ 1 ได้อย่างถูกต้อง และดำเนินการแก้สมการหาค่าคงตัว $c$ หรือ $k$ ได้อย่างแม่นยำครบถ้วน
+            </td>
+            <td>
+              เข้าใจว่าผลรวมความน่าจะเป็นต้องเท่ากับ 1 แต่มีข้อผิดพลาดเล็กน้อยในขั้นตอนการบวกเศษส่วนหรือการย้ายข้างสมการ
+            </td>
+            <td>
+              ไม่สามารถตั้งสมการผลรวมความน่าจะเป็นได้ หรือเข้าใจเงื่อนไขของผลรวมความน่าจะเป็นผิดพลาด
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <strong>2. การคำนวณและสร้างตารางแจกแจง</strong><br>
+              <span style="font-size:0.85rem; color:var(--text-muted);">(ความแม่นยำของตาราง)</span>
+            </td>
+            <td>
+              คำนวณความน่าจะเป็นของแต่ละค่า $x$ ถูกต้องครบทุกช่อง แสดงตารางการแจกแจงเป็นระเบียบ และสอดคล้องกับ $0 \le P(X=x) \le 1$
+            </td>
+            <td>
+              สร้างตารางแจกแจงได้ แต่คำนวณค่าความน่าจะเป็นผิดพลาดบางค่า หรือไม่ได้ตรวจสอบว่าความน่าจะเป็นแต่ละค่าอยู่ในช่วง $[0, 1]$
+            </td>
+            <td>
+              คำนวณค่าความน่าจะเป็นผิดพลาดส่วนใหญ่ หรือสร้างตารางไม่สอดคล้องกับตัวแปรสุ่มที่กำหนด
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <strong>3. การสรุปผลและหาค่าตามเงื่อนไข</strong><br>
+              <span style="font-size:0.85rem; color:var(--text-muted);">(เช่น $P(X \ge a)$)</span>
+            </td>
+            <td>
+              สามารถนำการแจกแจงไปหาค่าความน่าจะเป็นตามเงื่อนไขช่วง เช่น $P(X > a)$ หรือ $P(a \le X \le b)$ ได้อย่างถูกต้องสมบูรณ์
+            </td>
+            <td>
+              ระบุสมาชิกในเงื่อนไขช่วงได้ แต่บวกค่าความน่าจะเป็นผิดพลาด หรือสับสนเครื่องหมาย $\le$ กับ $<$
+            </td>
+            <td>
+              ไม่สามารถหาค่าความน่าจะเป็นตามเงื่อนไขช่วงที่กำหนดให้ได้
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div style="background: #faf5ff; border: 1px solid #e9d5ff; padding: 12px 16px; border-radius: 6px; font-size: 0.92rem; color: #7e22ce;">
+        <strong>เกณฑ์การตัดสินระดับคุณภาพรวม (15 คะแนนเต็ม):</strong><br>
+        13 – 15 คะแนน = ระดับดีมาก | 9 – 12 คะแนน = ระดับดี (ผ่านเกณฑ์) | 5 – 8 คะแนน = ระดับพอใช้ | น้อยกว่า 5 คะแนน = ระดับปรับปรุง
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<!-- ==========================================
+     JavaScript Logic: Interactive Model & Engine
+     ========================================== -->
+<script>
+  /* ------------------------------------------
+     1. Interactive Simulation Model (Frame 3)
+     ------------------------------------------ */
+  let currentTheoreticalProbs = [];
+  let currentXValues = [];
+
+  function applyProbPattern() {
+    const k = parseInt(document.getElementById("simOutcomeCount").value);
+    const pattern = document.getElementById("probDistributionPattern").value;
+
+    currentXValues = [];
+    currentTheoreticalProbs = [];
+
+    // กำหนดค่า x
+    for (let i = 0; i < k; i++) {
+      currentXValues.push(k === 6 ? i + 1 : i);
+    }
+
+    if (pattern === "uniform") {
+      let p = 1.0 / k;
+      for (let i = 0; i < k; i++) currentTheoreticalProbs.push(p);
+    } else if (pattern === "symmetric") {
+      // ใช้สัดส่วนสัมประสิทธิ์ทวินามเพื่อให้สมมาตรตรงกลาง
+      let weights = [];
+      for (let i = 0; i < k; i++) {
+        weights.push(binomialCoeff(k - 1, i));
+      }
+      let sumW = weights.reduce((a, b) => a + b, 0);
+      currentTheoreticalProbs = weights.map(w => w / sumW);
+    } else if (pattern === "skewed") {
+      // เบ้ไปด้านใดด้านหนึ่ง
+      let weights = [];
+      for (let i = 0; i < k; i++) {
+        weights.push(Math.pow(1.8, i));
+      }
+      let sumW = weights.reduce((a, b) => a + b, 0);
+      currentTheoreticalProbs = weights.map(w => w / sumW);
+    }
+
+    runDistributionSimulation();
+  }
+
+  function binomialCoeff(n, k) {
+    if (k < 0 || k > n) return 0;
+    if (k === 0 || k === n) return 1;
+    let c = 1;
+    for (let i = 1; i <= k; i++) {
+      c = c * (n - (k - i)) / i;
+    }
+    return c;
+  }
+
+  function renderProbabilitySliders() {
+    applyProbPattern();
+  }
+
+  function runDistributionSimulation() {
+    const N = parseInt(document.getElementById("simTrialCount").value) || 200;
+    const k = currentXValues.length;
+
+    // จำลองการสุ่มตัวอย่างขนาด N ตามความน่าจะเป็นสะสม (CDF)
+    let cumulative = [];
+    let acc = 0;
+    for (let i = 0; i < k; i++) {
+      acc += currentTheoreticalProbs[i];
+      cumulative.push(acc);
+    }
+
+    let frequencies = new Array(k).fill(0);
+    for (let t = 0; t < N; t++) {
+      let r = Math.random();
+      for (let i = 0; i < k; i++) {
+        if (r <= cumulative[i] || i === k - 1) {
+          frequencies[i]++;
+          break;
+        }
+      }
+    }
+
+    let relFrequencies = frequencies.map(f => f / N);
+
+    // สร้างตารางแสดงผล
+    let tableHTML = `
+      <table class="table-math">
+        <thead>
+          <tr>
+            <th>ตัวแปรสุ่ม ($x$)</th>
+            ${currentXValues.map(x => `<th>${x}</th>`).join('')}
+            <th style="background:#e2e8f0;">ผลรวม ($\sum$)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>ความน่าจะเป็นทฤษฎี $P(X = x)$</strong></td>
+            ${currentTheoreticalProbs.map(p => `<td>${p.toFixed(4)}</td>`).join('')}
+            <td><strong>1.0000</strong></td>
+          </tr>
+          <tr>
+            <td><strong>ความถี่ที่เกิดจริง ($f$)</strong></td>
+            ${frequencies.map(f => `<td>${f}</td>`).join('')}
+            <td><strong>${N}</strong></td>
+          </tr>
+          <tr>
+            <td><strong>ความถี่สัมพัทธ์ ($\\frac{f}{N}$)</strong></td>
+            ${relFrequencies.map(rf => `<td style="color:#4338ca; font-weight:600;">${rf.toFixed(4)}</td>`).join('')}
+            <td><strong>1.0000</strong></td>
+          </tr>
+        </tbody>
+      </table>
+    `;
+    document.getElementById("tableOutputContainer").innerHTML = tableHTML;
+
+    // สร้างกราฟแท่ง
+    const barsContainer = document.getElementById("chartBarsArea");
+    barsContainer.innerHTML = "";
+
+    const maxVal = Math.max(...currentTheoreticalProbs, ...relFrequencies, 0.45);
+
+    for (let i = 0; i < k; i++) {
+      let x = currentXValues[i];
+      let pTheo = currentTheoreticalProbs[i];
+      let pSim = relFrequencies[i];
+
+      let hTheo = (pTheo / maxVal) * 100;
+      let hSim = (pSim / maxVal) * 100;
+
+      let group = document.createElement("div");
+      group.className = "bar-group";
+      group.innerHTML = `
+        <div class="bar-pair">
+          <div class="bar-col bar-theory" style="height: ${hTheo}%;">
+            <span class="bar-val-label" style="color:#64748b;">${pTheo.toFixed(2)}</span>
+          </div>
+          <div class="bar-col bar-sim" style="height: ${hSim}%;">
+            <span class="bar-val-label" style="color:#4338ca;">${pSim.toFixed(2)}</span>
+          </div>
+        </div>
+        <div class="bar-x-label">$x = ${x}$</div>
+      `;
+      barsContainer.appendChild(group);
+    }
+
+    // ข้อสังเกตเชิงคณิตศาสตร์
+    document.getElementById("lawOfLargeNumbersNotice").innerHTML = `
+      <strong>ข้อสังเกตเชิงคณิตศาสตร์ (Law of Large Numbers):</strong><br>
+      เมื่อจำนวนครั้งในการทดลองสุ่มมีค่ามาก ($N = ${N}$) ค่าความถี่สัมพัทธ์ $\\frac{f}{N}$ (แท่งสีม่วง) จะมีค่าลู่เข้าใกล้เคียงกับความน่าจะเป็นเชิงทฤษฎี $P(X = x)$ (แท่งสีเทา) และสังเกตได้ว่าผลรวมของความสูงแท่งกราฟทั้งหมดรวมกันมีสัดส่วนเท่ากับ $1$ เสมอ
+    `;
+
+    renderMath(document.getElementById("simResultsWrapper"));
+  }
+
+  /* ------------------------------------------
+     2. คลังโจทย์สุ่มและเฉลยทีละบรรทัด (Frame 4)
+     ------------------------------------------ */
+  const questionPool = [
+    {
+      q: "กำหนดให้ $X$ เป็นตัวแปรสุ่มไม่ต่อเนื่องที่มีตารางการแจกแจงความน่าจะเป็นดังนี้: <br><br> \
+          <table class='table-math' style='max-width:400px; margin:0 auto;'> \
+            <tr><th>$x$</th><td>0</td><td>1</td><td>2</td></tr> \
+            <tr><th>$P(X=x)$</th><td>$c$</td><td>$2c$</td><td>$0.4$</td></tr> \
+          </table><br> จงหาค่าของค่าคงตัว $c$ และหาค่า $P(X \\ge 1)$",
+      steps: [
+        "จากสมบัติของการแจกแจงความน่าจะเป็นของตัวแปรสุ่ม ผลรวมของความน่าจะเป็นของทุกค่าที่เป็นไปได้ต้องเท่ากับ 1 เสมอ: $\\sum P(X=x) = 1$",
+        "ตั้งสมการ: $P(X=0) + P(X=1) + P(X=2) = 1 \\implies c + 2c + 0.4 = 1$",
+        "แก้สมการ: $3c = 1 - 0.4 = 0.6 \\implies c = \\frac{0.6}{3} = 0.2$",
+        "หาค่า $P(X \\ge 1) = P(X=1) + P(X=2) = 2(0.2) + 0.4 = 0.4 + 0.4 = 0.8$ (หรือคิดจาก $1 - P(X=0) = 1 - 0.2 = 0.8$)"
+      ]
+    },
+    {
+      q: "กล่องใบหนึ่งมีสลากหมายเลข 1, 2, 3 อย่างละใบ สุ่มหยิบสลาก 2 ใบพร้อมกัน ให้ $X$ แทนผลรวมของหมายเลขบนสลาก จงสร้างตารางการแจกแจงความน่าจะเป็นของ $X$",
+      steps: [
+        "ปริภูมิตัวอย่างของการหยิบสลาก 2 ใบจาก 3 ใบ คือ $n(S) = \\binom{3}{2} = 3$ รูปแบบ ได้แก่ $\{1, 2\}, \\{1, 3\\}, \\{2, 3\\}$",
+        "หาค่าของตัวแปรสุ่ม $X$ (ผลรวม): สำหรับ $\{1, 2\} \\to X = 3$, สำหรับ $\{1, 3\} \\to X = 4$, สำหรับ $\{2, 3\} \\to X = 5$ ดังนั้น $S_X = \\{3, 4, 5\\}$",
+        "หาความน่าจะเป็นของแต่ละค่า: $P(X=3) = \\frac{1}{3}$, $P(X=4) = \\frac{1}{3}$, $P(X=5) = \\frac{1}{3}$",
+        "สรุปตารางการแจกแจง: ค่า $x \\in \\{3, 4, 5\\}$ มีค่าความน่าจะเป็นเท่ากันคือ $\\frac{1}{3}$ และตรวจสอบผลรวม $\\frac{1}{3} + \\frac{1}{3} + \\frac{1}{3} = 1$"
+      ]
+    },
+    {
+      q: "กำหนดฟังก์ชันความน่าจะเป็น $P(X = x) = kx$ สำหรับ $x \\in \\{1, 2, 3, 4\\}$ จงหาค่าคงตัว $k$ และหาความน่าจะเป็น $P(2 \\le X < 4)$",
+      steps: [
+        "จากสมบัติผลรวมความน่าจะเป็น: $\\sum_{x=1}^4 P(X=x) = 1 \\implies P(X=1) + P(X=2) + P(X=3) + P(X=4) = 1$",
+        "แทนค่าฟังก์ชัน: $k(1) + k(2) + k(3) + k(4) = 1 \\implies 10k = 1 \\implies k = \\frac{1}{10} = 0.1$",
+        "ดังนั้นฟังก์ชันคือ $P(X=x) = 0.1x$ จะได้ $P(X=2) = 0.2$ และ $P(X=3) = 0.3$",
+        "หาค่า $P(2 \\le X < 4) = P(X=2) + P(X=3) = 0.2 + 0.3 = 0.5$"
+      ]
+    },
+    {
+      q: "ในการโยนเหรียญที่เที่ยงตรง 2 เหรียญพร้อมกัน 1 ครั้ง ให้ $X$ แทนจำนวนเหรียญที่ขึ้นหน้าหัว จงเขียนตารางการแจกแจงความน่าจะเป็นของ $X$",
+      steps: [
+        "ปริภูมิตัวอย่าง $S = \\{HH, HT, TH, TT\\}$ มีจำนวนสมาชิก $n(S) = 4$",
+        "ค่าที่เป็นไปได้ของตัวแปรสุ่ม $X$ (จำนวนหัว) คือ $S_X = \\{0, 1, 2\\}$",
+        "หาค่าความน่าจะเป็น: $P(X=0) = P(\\{TT\\}) = \\frac{1}{4}$, $P(X=1) = P(\\{HT, TH\\}) = \\frac{2}{4} = \\frac{1}{2}$, $P(X=2) = P(\\{HH\\}) = \\frac{1}{4}$",
+        "สรุปตาราง: $P(X=0) = 0.25, P(X=1) = 0.50, P(X=2) = 0.25$ โดยตรวจสอบผลรวมได้ $0.25 + 0.50 + 0.25 = 1.00$"
+      ]
+    }
+  ];
+
+  let currentPracticeIdx = -1;
+  let currentStepIdx = 0;
+
+  function generateSinglePracticeQuestion() {
+    let nextIdx = Math.floor(Math.random() * questionPool.length);
+    if (nextIdx === currentPracticeIdx) {
+      nextIdx = (nextIdx + 1) % questionPool.length;
+    }
+    currentPracticeIdx = nextIdx;
+    currentStepIdx = 0;
+
+    const qItem = questionPool[currentPracticeIdx];
+    const qBox = document.getElementById("practiceQuestionBox");
+    const sBox = document.getElementById("practiceStepsContainer");
+    const btn = document.getElementById("btnRevealNext");
+
+    qBox.innerHTML = `<strong>สถานการณ์โจทย์:</strong> ${qItem.q}`;
+    sBox.innerHTML = "";
+    btn.disabled = false;
+    btn.textContent = `แสดงเฉลยบรรทัดที่ 1 (จาก 4 บรรทัด)`;
+
+    renderMath(qBox);
+  }
+
+  function revealNextStep() {
+    if (currentPracticeIdx === -1) return;
+    const qItem = questionPool[currentPracticeIdx];
+    const sBox = document.getElementById("practiceStepsContainer");
+    const btn = document.getElementById("btnRevealNext");
+
+    if (currentStepIdx < qItem.steps.length) {
+      const stepDiv = document.createElement("div");
+      stepDiv.className = "step-line";
+      stepDiv.innerHTML = `<strong>บรรทัดที่ ${currentStepIdx + 1}:</strong> ${qItem.steps[currentStepIdx]}`;
+      sBox.appendChild(stepDiv);
+      renderMath(stepDiv);
+
+      currentStepIdx++;
+      if (currentStepIdx < qItem.steps.length) {
+        btn.textContent = `แสดงเฉลยบรรทัดที่ ${currentStepIdx + 1} (จาก 4 บรรทัด)`;
+      } else {
+        btn.textContent = "แสดงเฉลยครบทุกขั้นตอนแล้ว";
+        btn.disabled = true;
+      }
+    }
+  }
+
+  /* ------------------------------------------
+     3. ระบบสร้างใบงาน 5 ข้อ (Frame 5)
+     ------------------------------------------ */
+  const worksheetMasterBank = [
+    {
+      q: "กำหนดให้ $X$ เป็นตัวแปรสุ่มที่มีการแจกแจงความน่าจะเป็นดังนี้: $P(X=1) = 0.15, P(X=2) = c, P(X=3) = 0.35, P(X=4) = 0.20$ จงหาค่า $c$",
+      ans: "$c = 1 - (0.15 + 0.35 + 0.20) = 1 - 0.70 = 0.30$"
+    },
+    {
+      q: "ฟังก์ชันความน่าจะเป็นของ $X$ กำหนดโดย $P(X = x) = \\frac{c}{x}$ สำหรับ $x \\in \\{1, 2, 3\\}$ จงหาค่าคงตัว $c$",
+      ans: "จาก $\\frac{c}{1} + \\frac{c}{2} + \\frac{c}{3} = 1 \\implies c(1 + 0.5 + 0.333...) \\implies c(\\frac{11}{6}) = 1 \\implies c = \\frac{6}{11}$"
+    },
+    {
+      q: "ทอดลูกเต๋า 1 ลูก 1 ครั้ง ให้ $X$ แทนแต้มที่ได้ จงเขียนตารางการแจกแจงความน่าจะเป็น และหา $P(X > 4)$",
+      ans: "ตาราง: แต่ละแต้ม $x \\in \\{1, 2, 3, 4, 5, 6\\}$ มี $P(X=x) = \\frac{1}{6}$ และ $P(X > 4) = P(X=5) + P(X=6) = \\frac{2}{6} = \\frac{1}{3}$"
+    },
+    {
+      q: "กำหนดตารางการแจกแจงความน่าจะเป็น: $P(X=0) = k, P(X=1) = 3k, P(X=2) = 2k$ จงหาค่า $k$ และหา $P(X \\le 1)$",
+      ans: "จาก $k + 3k + 2k = 1 \\implies 6k = 1 \\implies k = \\frac{1}{6}$ และ $P(X \\le 1) = k + 3k = 4k = \\frac{4}{6} = \\frac{2}{3}$"
+    },
+    {
+      q: "สุ่มหยิบลวดเสียบกระดาษ 2 อันจากกล่องที่มีสีแดง 2 อัน และสีน้ำเงิน 1 อัน ให้ $X$ แทนจำนวนลวดสีแดงที่หยิบได้ จงสร้างตารางการแจกแจงความน่าจะเป็น",
+      ans: "$n(S) = \\binom{3}{2} = 3$; ค่าที่เป็นไปได้ $X \\in \\{1, 2\\}$; $P(X=1) = \\frac{\\binom{2}{1}\\binom{1}{1}}{3} = \\frac{2}{3}$, $P(X=2) = \\frac{\\binom{2}{2}}{3} = \\frac{1}{3}$"
+    },
+    {
+      q: "ตรวจสอบว่าฟังก์ชัน $P(X = x) = \\frac{x - 1}{4}$ สำหรับ $x \\in \\{1, 2, 3\\}$ เป็นฟังก์ชันการแจกแจงความน่าจะเป็นหรือไม่ เพราะเหตุใด",
+      ans: "หาค่า: $P(X=1) = 0, P(X=2) = \\frac{1}{4}, P(X=3) = \\frac{2}{4}$; ผลรวม $= 0 + \\frac{1}{4} + \\frac{2}{4} = \\frac{3}{4} \\neq 1$ ดังนั้น 'ไม่เป็น' ฟังก์ชันการแจกแจงความน่าจะเป็น"
+    },
+    {
+      q: "กำหนดตัวแปรสุ่ม $X$ มีค่า $x \\in \\{0, 1, 2\\}$ โดยที่ $P(X=0) = 0.2$ และ $P(X=1) = 2P(X=2)$ จงหาค่า $P(X=1)$ และ $P(X=2)$",
+      ans: "ให้ $P(X=2) = a$ จะได้ $P(X=1) = 2a$; จาก $0.2 + 2a + a = 1 \\implies 3a = 0.8 \\implies a = P(X=2) = \\frac{4}{15}$ และ $P(X=1) = \\frac{8}{15}$"
+    }
+  ];
+
+  let currentWorksheetQuestions = [];
+
+  function generateNew5Worksheet() {
+    let shuffled = [...worksheetMasterBank].sort(() => 0.5 - Math.random());
+    currentWorksheetQuestions = shuffled.slice(0, 5);
+    renderWorksheetDOM(false);
+  }
+
+  function renderWorksheetDOM(showAnswerKey) {
+    const list = document.getElementById("worksheetQuestionsList");
+    list.innerHTML = "";
+
+    currentWorksheetQuestions.forEach((item, index) => {
+      const qDiv = document.createElement("div");
+      qDiv.className = "worksheet-q-item";
+
+      let inner = `
+        <div style="font-weight:600; margin-bottom:6px;">ข้อที่ ${index + 1}) ${item.q}</div>
+      `;
+
+      if (showAnswerKey) {
+        inner += `
+          <div class="answer-key-box">
+            <div><strong>แนวคิดและคำตอบที่ถูกต้อง:</strong> ${item.ans}</div>
+          </div>
+        `;
+      } else {
+        inner += `
+          <div class="student-write-area">
+            <div>วิธีทำ: ...........................................................................................................................................................................</div>
+            <div style="margin-top:6px;">..........................................................................................................................................................................................</div>
+          </div>
+        `;
+      }
+
+      qDiv.innerHTML = inner;
+      list.appendChild(qDiv);
+    });
+
+    renderMath(list);
+  }
+
+  function printWorksheet(isTeacherKey) {
+    renderWorksheetDOM(isTeacherKey);
+    setTimeout(() => {
+      window.print();
+    }, 400);
+  }
+
+  function renderMath(targetElement) {
+    if (window.MathJax && window.MathJax.typesetPromise) {
+      window.MathJax.typesetPromise([targetElement]).catch((err) => console.log('MathJax error:', err));
+    }
+  }
+
+  // เริ่มต้นทำงาน
+  window.addEventListener('DOMContentLoaded', () => {
+    applyProbPattern();
+    generateSinglePracticeQuestion();
+    generateNew5Worksheet();
+  });
+</script>
+
+</body>
+</html>
