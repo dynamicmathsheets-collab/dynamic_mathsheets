@@ -1,0 +1,1112 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ระบบพิกัดสามมิติ</title>
+  
+  <!-- Google Fonts: Sarabun & Prompt -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@400;600;700&family=Sarabun:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+  <!-- MathJax 3 -->
+  <script>
+    window.MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']],
+        displayMath: [['$$', '$$'], ['\\[', '\\]']]
+      },
+      svg: { fontCache: 'global' }
+    };
+  </script>
+  <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+  <style>
+    :root {
+      --font-body: 'Sarabun', sans-serif;
+      --font-heading: 'Prompt', sans-serif;
+      --primary: #4338ca;
+      --secondary: #0d9488;
+      --accent: #f59e0b;
+      --slate-dark: #0f172a;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: var(--font-body);
+      color: #334155;
+      background-color: #f8fafc;
+      line-height: 1.6;
+    }
+
+    .container {
+      max-width: 1040px;
+      margin: 0 auto;
+      padding: 24px 16px;
+    }
+
+    .section-card {
+      background: #ffffff;
+      border-radius: 20px;
+      margin-bottom: 30px;
+      padding: 36px;
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.03);
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* สไตล์เฟรมหัวข้อ */
+    .hero-banner {
+      background: linear-gradient(135deg, #1e1b4b 0%, #312e81 50%, #4338ca 100%);
+      color: #ffffff;
+      text-align: center;
+      padding: 50px 24px;
+    }
+    .hero-banner .badge {
+      display: inline-block;
+      background: rgba(255, 255, 255, 0.18);
+      backdrop-filter: blur(8px);
+      padding: 5px 16px;
+      border-radius: 50px;
+      font-size: 0.9rem;
+      font-weight: 500;
+      margin-bottom: 12px;
+    }
+    .hero-banner h1 {
+      font-family: var(--font-heading);
+      font-size: 2.3rem;
+      font-weight: 700;
+      line-height: 1.3;
+      margin-bottom: 10px;
+    }
+    .hero-banner p {
+      font-size: 1.1rem;
+      opacity: 0.95;
+      max-width: 700px;
+      margin: 0 auto;
+    }
+
+    /* สไตล์เฟรมเนื้อหา */
+    .concept-section {
+      background: linear-gradient(180deg, #ffffff 0%, #eef2ff 100%);
+      border-top: 6px solid #6366f1;
+    }
+    .concept-title {
+      font-family: var(--font-heading);
+      font-size: 1.55rem;
+      color: #3730a3;
+      margin-bottom: 14px;
+    }
+    .highlight-card {
+      background: #ffffff;
+      border-left: 5px solid #f59e0b;
+      padding: 16px 20px;
+      border-radius: 10px;
+      margin: 16px 0;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+    }
+    .concept-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 18px;
+      margin-top: 20px;
+    }
+    .plane-box {
+      background: #ffffff;
+      border-radius: 12px;
+      padding: 18px;
+      border: 1px solid #e2e8f0;
+    }
+    .plane-box h3 {
+      font-family: var(--font-heading);
+      font-size: 1.15rem;
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    /* สไตล์เฟรม Interactive Model */
+    .interactive-section {
+      background: linear-gradient(180deg, #ffffff 0%, #f1f5f9 100%);
+      border-top: 6px solid #0f172a;
+    }
+    .model-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      margin-bottom: 14px;
+      gap: 10px;
+    }
+
+    .canvas-wrapper {
+      position: relative;
+      background: radial-gradient(circle at center, #1e293b 0%, #0f172a 100%);
+      border-radius: 14px;
+      box-shadow: 0 10px 25px rgba(15, 23, 42, 0.25);
+      border: 1px solid #334155;
+      overflow: hidden;
+      margin: 0 auto 16px;
+      width: 720px;
+      max-width: 100%;
+      touch-action: none;
+    }
+    canvas { display: block; cursor: grab; }
+    canvas:active { cursor: grabbing; }
+
+    .canvas-overlay-hint {
+      position: absolute;
+      top: 12px;
+      left: 14px;
+      color: rgba(255, 255, 255, 0.7);
+      font-size: 0.82rem;
+      pointer-events: none;
+      background: rgba(15, 23, 42, 0.6);
+      padding: 4px 10px;
+      border-radius: 20px;
+      backdrop-filter: blur(4px);
+    }
+
+    .dashboard-panel {
+      background: #ffffff;
+      border-radius: 14px;
+      padding: 20px;
+      border: 1px solid #e2e8f0;
+      margin-bottom: 16px;
+    }
+    
+    .sliders-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 16px;
+      margin-bottom: 16px;
+    }
+    .slider-item {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .slider-item label {
+      font-family: var(--font-heading);
+      font-weight: 600;
+      font-size: 0.92rem;
+      display: flex;
+      justify-content: space-between;
+    }
+    .slider-item input[type=range] {
+      cursor: pointer;
+    }
+
+    .toggles-row {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding-top: 14px;
+      border-top: 1px dashed #cbd5e1;
+    }
+    .checkbox-group {
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+    .plane-checkbox {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-family: var(--font-heading);
+      font-size: 0.88rem;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 12px;
+    }
+    .stat-badge {
+      background: #ffffff;
+      border-radius: 10px;
+      padding: 12px 16px;
+      border: 1px solid #e2e8f0;
+    }
+    .stat-badge strong {
+      display: block;
+      color: #64748b;
+      font-size: 0.85rem;
+      margin-bottom: 4px;
+    }
+    .stat-badge .val {
+      font-size: 1.05rem;
+      font-weight: 600;
+      color: #1e293b;
+      min-height: 28px;
+      display: flex;
+      align-items: center;
+    }
+
+    .discovery-box {
+      margin-top: 20px;
+      padding: 16px 20px;
+      background: #ecfeff;
+      border-left: 5px solid #0891b2;
+      border-radius: 10px;
+    }
+    .discovery-box h4 {
+      font-family: var(--font-heading);
+      color: #0e7490;
+      margin-bottom: 4px;
+      font-size: 1.1rem;
+    }
+
+    /* สไตล์เฟรมใบงาน */
+    .worksheet-section {
+      background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+      border-top: 6px solid #4338ca;
+    }
+    .worksheet-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 16px;
+      justify-content: flex-end;
+    }
+    .btn {
+      font-family: var(--font-heading);
+      font-size: 0.9rem;
+      padding: 8px 16px;
+      border-radius: 8px;
+      border: none;
+      cursor: pointer;
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s ease;
+    }
+    .btn-student { background: #4338ca; color: white; }
+    .btn-student:hover { background: #3730a3; }
+    .btn-teacher { background: #0d9488; color: white; }
+    .btn-teacher:hover { background: #0f766e; }
+    .btn-toggle { background: #f1f5f9; color: #475569; border: 1px solid #cbd5e1; }
+    .btn-toggle:hover { background: #e2e8f0; }
+
+    .question-item {
+      padding: 12px 8px;
+      border-bottom: 1px dashed #cbd5e1;
+    }
+    .question-item:last-child { border-bottom: none; }
+    .question-title {
+      font-weight: 600;
+      color: #1e293b;
+      margin-bottom: 4px;
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      font-size: 0.98rem;
+    }
+    .write-area {
+      min-height: 32px;
+      border-bottom: 1px dotted #94a3b8;
+      margin: 6px 0;
+    }
+    .answer-key {
+      background: #ecfdf5;
+      border: 1px solid #a7f3d0;
+      color: #065f46;
+      padding: 10px 14px;
+      border-radius: 6px;
+      margin-top: 6px;
+      font-size: 0.92rem;
+      display: none;
+      line-height: 1.7;
+    }
+    .show-answers .answer-key { display: block; }
+
+    /* สไตล์เฟรมเกณฑ์การประเมิน */
+    .rubric-section {
+      background: linear-gradient(180deg, #ffffff 0%, #fff7ed 100%);
+      border-top: 6px solid #f97316;
+    }
+    .rubric-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 14px;
+      background: white;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+    }
+    .rubric-table th, .rubric-table td {
+      border: 1px solid #fed7aa;
+      padding: 12px 14px;
+      text-align: left;
+      vertical-align: top;
+      font-size: 0.9rem;
+    }
+    .rubric-table th {
+      background: #ffedd5;
+      font-family: var(--font-heading);
+      color: #9a3412;
+    }
+    .score-col { width: 25%; }
+
+    .print-header { display: none; }
+
+    /* ระบบพิมพ์ Compact ไม่คล่อมหน้า และตัดหน้าว่าง 100% */
+    @page {
+      size: A4 portrait;
+      margin: 10mm 12mm;
+    }
+
+    @media print {
+      html, body {
+        background: #ffffff !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        font-size: 13px !important;
+        line-height: 1.4 !important;
+        color: #000000 !important;
+      }
+      .container { padding: 0 !important; margin: 0 !important; max-width: 100% !important; }
+      .hero-banner, .concept-section, .interactive-section, .rubric-section, .worksheet-actions {
+        display: none !important;
+      }
+      #printable-worksheet {
+        display: block !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        box-shadow: none !important;
+        border: none !important;
+        border-radius: 0 !important;
+        background: #ffffff !important;
+      }
+      .print-header {
+        display: block !important;
+        text-align: center;
+        margin-bottom: 10px;
+        border-bottom: 1.5px solid #000;
+        padding-bottom: 4px;
+      }
+      .print-header h2 {
+        font-family: var(--font-heading);
+        font-size: 1.25rem !important;
+        font-weight: 700;
+        margin-bottom: 2px;
+      }
+      .print-info-row {
+        display: flex;
+        justify-content: space-between;
+        font-size: 0.85rem;
+      }
+      .question-item {
+        page-break-inside: avoid !important;
+        break-inside: avoid !important;
+        padding: 6px 0 !important;
+        border-bottom: 1px dashed #cbd5e1 !important;
+      }
+      .question-title { font-size: 0.93rem !important; margin-bottom: 3px !important; }
+      .write-area { min-height: 30px !important; margin: 4px 0 !important; border-bottom: 1px dotted #64748b !important; }
+      .answer-key {
+        padding: 6px 10px !important;
+        font-size: 0.86rem !important;
+        margin-top: 4px !important;
+        border: 1px solid #cbd5e1 !important;
+        background: #f8fafc !important;
+        color: #000000 !important;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .section-card { padding: 20px 14px; }
+      .hero-banner h1 { font-size: 1.8rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+
+    <!-- ==================== ตอนที่ 1 ==================== -->
+    <section class="section-card hero-banner">
+      <span class="badge">สาระการเรียนรู้คณิตศาสตร์เพิ่มเติม</span>
+      <h1>เรื่อง ระบบพิกัดสามมิติ</h1>
+      <p>ทำความเข้าใจปริภูมิสามมิติ แกนอ้างอิง การกำหนดพิกัดจุด และการเชื่อมโยงกับระนาบพิกัดฉาก</p>
+    </section>
+
+    <!-- ==================== ตอนที่ 2 ==================== -->
+    <section class="section-card concept-section">
+      <h2 class="concept-title">แกนพิกัดฉากและระนาบในระบบสามมิติ</h2>
+      <p>
+        นักเรียนทำความเข้าใจระบบพิกัดฉากสามมิติ ซึ่งประกอบด้วยแกนที่ตั้งฉากซึ่งกันและกัน 3 แกน คือ <strong>แกน $X$</strong>, <strong>แกน $Y$</strong> และ <strong>แกน $Z$</strong> 
+        โดยตัดกันที่จุดกำเนิด $O(0, 0, 0)$ และตำแหน่งของจุดใด ๆ ในปริภูมิสามมิติจะระบุด้วยสามสิ่งอันดับ (Ordered Triple) เขียนเป็น:
+      </p>
+
+      <div style="text-align: center; margin: 14px 0; font-size: 1.35rem; font-weight: 700; color: #4338ca;">
+        $$P(x, y, z)$$
+      </div>
+
+      <div class="highlight-card">
+        <strong style="color: #b45309; font-size: 1rem;">📌 ประเด็นสำคัญที่นักเรียนต้องทำความเข้าใจ:</strong><br>
+        ตำแหน่งในระบบ 3 มิติต้องพิจารณา <strong>"ความลึก" (Depth)</strong> ด้วย ไม่ใช่พิจารณาเพียงแค่ ซ้าย–ขวา (แกน $X$) และ ขึ้น–ลง (แกน $Z$) เท่านั้น 
+        การมีแกนทั้งสามทำให้เกิด <strong>ระนาบอ้างอิงหลัก 3 ระนาบ</strong> ที่แบ่งปริภูมิออกเป็น 8 อัฐภาค (Octants) ได้แก่:
+      </div>
+
+      <div class="concept-grid">
+        <div class="plane-box" style="border-top: 4px solid #3b82f6;">
+          <h3 style="color: #1d4ed8;">ระนาบ $XY$ (มีสมการคือ $z = 0$)</h3>
+          <p style="font-size: 0.92rem;">
+            เป็นระนาบแนวนอนที่เกิดจากแกน $X$ และแกน $Y$ ตัดกัน ทุกจุดบนระนาบนี้จะมีพิกัดความสูงเป็นศูนย์ $(x, y, 0)$
+          </p>
+        </div>
+
+        <div class="plane-box" style="border-top: 4px solid #10b981;">
+          <h3 style="color: #047857;">ระนาบ $YZ$ (มีสมการคือ $x = 0$)</h3>
+          <p style="font-size: 0.92rem;">
+            เป็นระนาบแนวดิ่งที่เกิดจากแกน $Y$ และแกน $Z$ ตัดกัน ทุกจุดบนระนาบนี้จะไม่มีระยะขจัดตามแนวแกน $X$ นั่นคือ $(0, y, z)$
+          </p>
+        </div>
+
+        <div class="plane-box" style="border-top: 4px solid #f59e0b;">
+          <h3 style="color: #b45309;">ระนาบ $XZ$ (มีสมการคือ $y = 0$)</h3>
+          <p style="font-size: 0.92rem;">
+            เป็นระนาบแนวดิ่งที่เกิดจากแกน $X$ และแกน $Z$ ตัดกัน ทุกจุดบนระนาบนี้จะไม่มีความลึกตามแนวแกน $Y$ นั่นคือ $(x, 0, z)$
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== ตอนที่ 3 ==================== -->
+    <section class="section-card interactive-section">
+      <div class="model-header">
+        <div>
+          <h2 style="font-family: var(--font-heading); color: #0f172a; font-size: 1.55rem;">
+            Interactive Model: ปริภูมิพิกัด 3 มิติ (3D Spatial Explorer)
+          </h2>
+          <p style="color: #475569; font-size: 0.93rem;">
+            คลิกลากเพื่อ <strong>หมุนมุมมอง 360°</strong> | เลื่อนล้อเมาส์เพื่อ <strong>ซูมเข้า–ออก</strong> | เลื่อน Slider เพื่อเปลี่ยนตำแหน่งจุด $A(x, y, z)$
+          </p>
+        </div>
+        <button class="btn btn-toggle" onclick="reset3DView()" style="font-size: 0.85rem; padding: 6px 12px;">
+          รีเซ็ตมุมมอง
+        </button>
+      </div>
+
+      <div class="canvas-wrapper">
+        <div class="canvas-overlay-hint">🖱️ คลิกค้างเพื่อหมุนพื้นที่ 3 มิติ | Scroll ซูม</div>
+        <canvas id="canvas3d" width="720" height="460"></canvas>
+      </div>
+
+      <!-- แผงแดชบอร์ดควบคุม Slider และระนาบช่วยมอง -->
+      <div class="dashboard-panel">
+        <div class="sliders-grid">
+          <div class="slider-item">
+            <label style="color: #ef4444;">แกน X (ความกว้าง): <span id="val-x">3</span></label>
+            <input type="range" id="sliderX" min="-5" max="5" value="3" step="1" oninput="updateCoords()" style="accent-color: #ef4444;">
+          </div>
+          <div class="slider-item">
+            <label style="color: #10b981;">แกน Y (ความลึก): <span id="val-y">4</span></label>
+            <input type="range" id="sliderY" min="-5" max="5" value="4" step="1" oninput="updateCoords()" style="accent-color: #10b981;">
+          </div>
+          <div class="slider-item">
+            <label style="color: #3b82f6;">แกน Z (ความสูง): <span id="val-z">3</span></label>
+            <input type="range" id="sliderZ" min="-5" max="5" value="3" step="1" oninput="updateCoords()" style="accent-color: #3b82f6;">
+          </div>
+        </div>
+
+        <div class="toggles-row">
+          <div class="checkbox-group">
+            <label class="plane-checkbox" style="color: #2563eb;">
+              <input type="checkbox" id="chk-plane-xy" checked onchange="render3D()"> ระนาบ XY ($z=0$)
+            </label>
+            <label class="plane-checkbox" style="color: #b45309;">
+              <input type="checkbox" id="chk-plane-xz" checked onchange="render3D()"> ระนาบ XZ ($y=0$)
+            </label>
+            <label class="plane-checkbox" style="color: #059669;">
+              <input type="checkbox" id="chk-plane-yz" checked onchange="render3D()"> ระนาบ YZ ($x=0$)
+            </label>
+            <label class="plane-checkbox" style="color: #64748b;">
+              <input type="checkbox" id="chk-box" checked onchange="render3D()"> กล่องพิกัดฉาก
+            </label>
+          </div>
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <span style="font-size: 0.85rem; font-weight: 600; color: #64748b;">ซูม:</span>
+            <input type="range" id="zoomSlider" min="20" max="60" value="38" step="1" oninput="updateZoom(this.value)" style="width: 100px;">
+          </div>
+        </div>
+      </div>
+
+      <!-- สถิติพิกัดและการมองภาพฉาย -->
+      <div class="stats-grid">
+        <div class="stat-badge">
+          <strong>พิกัดของจุดปัจจุบัน ($A$)</strong>
+          <div class="val" id="stat-coord">$A(3, 4, 3)$</div>
+        </div>
+
+        <div class="stat-badge" style="background: #eff6ff; border-color: #bfdbfe;">
+          <strong style="color: #1e40af;">ภาพฉายบนระนาบ $XY$ ($A_{xy}$)</strong>
+          <div class="val" id="stat-proj-xy">$(3, 4, 0)$</div>
+        </div>
+
+        <div class="stat-badge" style="background: #fefce8; border-color: #fef08a;">
+          <strong style="color: #854d0e;">ภาพฉายบนระนาบ $XZ$ ($A_{xz}$)</strong>
+          <div class="val" id="stat-proj-xz">$(3, 0, 3)$</div>
+        </div>
+
+        <div class="stat-badge" style="background: #f0fdf4; border-color: #bbf7d0;">
+          <strong style="color: #15803d;">ภาพฉายบนระนาบ $YZ$ ($A_{yz}$)</strong>
+          <div class="val" id="stat-proj-yz">$(0, 4, 3)$</div>
+        </div>
+
+        <div class="stat-badge" style="grid-column: 1 / -1;">
+          <strong>ระยะห่างจากจุดกำเนิด $O(0, 0, 0)$ ถึงจุด $A(x, y, z)$</strong>
+          <div class="val" id="stat-dist">
+            $d = \sqrt{x^2 + y^2 + z^2} = \sqrt{3^2 + 4^2 + 3^2} = \sqrt{9 + 16 + 9} = \sqrt{34} \approx 5.83\text{ หน่วย}$
+          </div>
+        </div>
+      </div>
+
+      <div class="discovery-box">
+        <h4>💡 กิจกรรมสำคัญ: กำหนดพิกัด $\rightarrow$ คาดการณ์ตำแหน่ง $\rightarrow$ หมุนโมเดลตรวจสอบ</h4>
+        <p>
+          <strong>สร้างความเข้าใจเชิงพื้นที่ (Spatial Understanding):</strong><br>
+          • ให้นักเรียนลองกำหนดพิกัดในใจ แล้วหมุนมุมมองเพื่อดูว่าจุด $A$ ลอยอยู่สูงหรือต่ำ ลึกหรือตื้น<br>
+          • สังเกตว่าเมื่อจุด $A$ มีค่า $z = 0$ จุดจะตกอยู่บน <strong>ระนาบ $XY$</strong> พอดี และเมื่อค่า $y = 0$ จุดจะแนบติดกับ <strong>ระนาบ $XZ$</strong><br>
+          • การเปิดเส้นกล่องพิกัดฉากจะช่วยให้เห็นภาพลูกบาศก์ที่ตีกรอบจากแกน $X, Y, Z$ ไปยังจุดพิกัดจริง
+        </p>
+      </div>
+    </section>
+
+    <!-- ==================== ตอนที่ 4 ==================== -->
+    <section class="section-card worksheet-section" id="printable-worksheet">
+      <div class="print-header">
+        <h2>ใบงานคณิตศาสตร์: เรื่อง ระบบพิกัดสามมิติ</h2>
+        <div class="print-info-row">
+          <span>ชื่อ-นามสกุล: ...................................................................</span>
+          <span>ชั้น: ................ เลขที่: ...........</span>
+          <span>วันที่: ........................</span>
+        </div>
+      </div>
+
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
+        <h2 style="font-family: var(--font-heading); color: #4338ca; font-size: 1.45rem;">
+          ใบงานตรวจสอบความเข้าใจ (5 ข้อ)
+        </h2>
+        <div class="worksheet-actions">
+          <button class="btn btn-toggle" onclick="toggleAnswers()">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+            <span id="toggle-text">แสดง/ซ่อนเฉลย</span>
+          </button>
+          <button class="btn btn-student" onclick="printSheet('student')">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+            พิมพ์ใบงานสำหรับนักเรียน
+          </button>
+          <button class="btn btn-teacher" onclick="printSheet('teacher')">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+            พิมพ์เฉลยสำหรับครู
+          </button>
+        </div>
+      </div>
+
+      <div class="worksheet-list">
+        <!-- ข้อ 1 -->
+        <div class="question-item">
+          <div class="question-title">
+            <span>1.</span>
+            <span>กำหนดจุด $P(4, -3, 5)$ ในระบบพิกัดฉากสามมิติ จงหาภาพฉาย (Projection) ของจุด $P$ บนระนาบ $XY$, ระนาบ $YZ$ และระนาบ $XZ$</span>
+          </div>
+          <div class="write-area"></div>
+          <div class="answer-key">
+            <strong>เฉลยวิธีทำ:</strong><br>
+            • ภาพฉายบนระนาบ $XY$ (ตัดแกน $Z$ เป็นศูนย์): คือจุด $(4, -3, 0)$<br>
+            • ภาพฉายบนระนาบ $YZ$ (ตัดแกน $X$ เป็นศูนย์): คือจุด $(0, -3, 5)$<br>
+            • ภาพฉายบนระนาบ $XZ$ (ตัดแกน $Y$ เป็นศูนย์): คือจุด $(4, 0, 5)$
+          </div>
+        </div>
+
+        <!-- ข้อ 2 -->
+        <div class="question-item">
+          <div class="question-title">
+            <span>2.</span>
+            <span>จงหาภาพฉายของจุด $Q(-2, 6, -4)$ ลงบน <em>แกน $X$</em>, <em>แกน $Y$</em> และ <em>แกน $Z$</em></span>
+          </div>
+          <div class="write-area"></div>
+          <div class="answer-key">
+            <strong>เฉลยวิธีทำ:</strong><br>
+            • ภาพฉายบนแกน $X$ (พิกัด $y, z$ เป็นศูนย์): คือจุด $(-2, 0, 0)$<br>
+            • ภาพฉายบนแกน $Y$ (พิกัด $x, z$ เป็นศูนย์): คือจุด $(0, 6, 0)$<br>
+            • ภาพฉายบนแกน $Z$ (พิกัด $x, y$ เป็นศูนย์): คือจุด $(0, 0, -4)$
+          </div>
+        </div>
+
+        <!-- ข้อ 3 -->
+        <div class="question-item">
+          <div class="question-title">
+            <span>3.</span>
+            <span>จงแสดงวิธีคำนวณหาระยะห่างระหว่างจุดกำเนิด $O(0, 0, 0)$ กับจุด $A(2, -3, 6)$ ในระบบพิกัดฉากสามมิติ</span>
+          </div>
+          <div class="write-area"></div>
+          <div class="answer-key">
+            <strong>เฉลยวิธีทำ:</strong><br>
+            จากสูตรระยะห่างจากจุดกำเนิด: $d = \sqrt{x^2 + y^2 + z^2}$<br>
+            แทนค่า: $d = \sqrt{2^2 + (-3)^2 + 6^2} = \sqrt{4 + 9 + 36} = \sqrt{49} = 7\text{ หน่วย}$
+          </div>
+        </div>
+
+        <!-- ข้อ 4 -->
+        <div class="question-item">
+          <div class="question-title">
+            <span>4.</span>
+            <span>กำหนดจุด $A(1, 2, -1)$ และจุด $B(4, -2, 3)$ จงแสดงวิธีคำนวณหาระยะทางระหว่างจุด $A$ และจุด $B$</span>
+          </div>
+          <div class="write-area"></div>
+          <div class="answer-key">
+            <strong>เฉลยวิธีทำ:</strong><br>
+            จากสูตรระยะทางระหว่างสองจุดใน 3 มิติ: $d = \sqrt{(x_2 - x_1)^2 + (y_2 - y_1)^2 + (z_2 - z_1)^2}$<br>
+            $d = \sqrt{(4 - 1)^2 + (-2 - 2)^2 + (3 - (-1))^2} = \sqrt{3^2 + (-4)^2 + 4^2} = \sqrt{9 + 16 + 16} = \sqrt{41}\text{ หน่วย}$
+          </div>
+        </div>
+
+        <!-- ข้อ 5 -->
+        <div class="question-item">
+          <div class="question-title">
+            <span>5.</span>
+            <span>จุด $M$ มีระยะห่างจากระนาบ $XY$ เท่ากับ $4$ หน่วย (อยู่เหนือระนาบ), ห่างจากระนาบ $XZ$ ไปทางขวา $3$ หน่วย และห่างจากระนาบ $YZ$ ไปทางด้านหน้า $2$ หน่วย จงเขียนพิกัดของจุด $M(x, y, z)$ พร้อมอธิบายความหมายของค่าแต่ละแกน</span>
+          </div>
+          <div class="write-area"></div>
+          <div class="answer-key">
+            <strong>เฉลยวิธีทำ:</strong><br>
+            • ห่างจากระนาบ $YZ$ ไปทางด้านหน้า แปลว่าค่าตามแนวแกน $X$ คือ $x = 2$<br>
+            • ห่างจากระนาบ $XZ$ ไปทางขวา แปลว่าค่าตามแนวแกน $Y$ คือ $y = 3$<br>
+            • ห่างจากระนาบ $XY$ ไปทางด้านบน แปลว่าค่าตามแนวแกน $Z$ คือ $z = 4$<br>
+            <strong>ดังนั้น</strong> พิกัดของจุดคือ $M(2, 3, 4)$
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== ตอนที่ 5 ==================== -->
+    <section class="section-card rubric-section">
+      <h2 style="font-family: var(--font-heading); color: #c2410c; font-size: 1.5rem; margin-bottom: 6px;">
+        เกณฑ์การประเมินใบงาน (Scoring Rubric - 3 ระดับ)
+      </h2>
+      <p style="color: #7c2d12; font-size: 0.95rem;">การวัดและประเมินผลทักษะกระบวนการคิดทางคณิตศาสตร์ เรื่อง ระบบพิกัดสามมิติ</p>
+
+      <table class="rubric-table">
+        <thead>
+          <tr>
+            <th style="width: 25%;">ประเด็นการประเมิน</th>
+            <th class="score-col">ระดับ 3 (ดีเยี่ยม : 3 คะแนน)</th>
+            <th class="score-col">ระดับ 2 (พอใช้ : 2 คะแนน)</th>
+            <th class="score-col">ระดับ 1 (ปรับปรุง : 1 คะแนน)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>1. ความเข้าใจระบบแกนและพิกัด $(x, y, z)$</strong></td>
+            <td>ระบุและอธิบายตำแหน่งของจุดใน 3 มิติ เชื่อมโยงมโนทัศน์ความลึก กว้าง สูง ได้อย่างถูกต้องแม่นยำทุกกรณี</td>
+            <td>ระบุพิกัดใน 3 มิติได้ถูกต้องเป็นส่วนใหญ่ แต่สับสนทิศทางบวกลบของแกนความลึกเล็กน้อย</td>
+            <td>ไม่สามารถระบุพิกัดสามมิติได้ถูกต้อง หรือสับสนลำดับของแกน $x, y, z$</td>
+          </tr>
+          <tr>
+            <td><strong>2. ภาพฉายบนระนาบและบนแกนพิกัด</strong></td>
+            <td>หาจุดภาพฉายบนระนาบ $XY, YZ, XZ$ และบนแกนหลักได้อย่างถูกต้องสมบูรณ์ พร้อมเข้าใจว่าค่าใดต้องเป็นศูนย์</td>
+            <td>หาภาพฉายได้ถูกต้องเป็นส่วนใหญ่ แต่มีข้อผิดพลาดบางจุดเรื่องการกำหนดค่าคงที่ศูนย์</td>
+            <td>ไม่เข้าใจมโนทัศน์เรื่องภาพฉายบนระนาบและแกนพิกัด</td>
+          </tr>
+          <tr>
+            <td><strong>3. การคำนวณระยะทางในระบบสามมิติ</strong></td>
+            <td>แสดงการแทนค่าสูตรระยะทาง $d = \sqrt{\Delta x^2 + \Delta y^2 + \Delta z^2}$ ได้ถูกต้อง ดำเนินการคิดเลขและถอดกรณฑ์ครบถ้วน</td>
+            <td>ใช้สูตรระยะทางได้ถูกต้อง แต่มีข้อผิดพลาดในการคิดคำนวณตัวเลขทางพีชคณิต</td>
+            <td>เขียนสูตรระยะทางไม่ถูกต้อง หรือคำนวณเฉพาะในระบบ 2 มิติ</td>
+          </tr>
+          <tr>
+            <td><strong>4. ทักษะการนึกภาพเชิงมิติสัมพันธ์ (Spatial)</strong></td>
+            <td>สามารถแปลความหมายระยะห่างระหว่างจุดกับระนาบอ้างอิงเพื่อสร้างเป็นพิกัด $(x, y, z)$ ได้อย่างถูกต้องมีเหตุผล</td>
+            <td>บอกพิกัดจากระยะห่างได้ แต่การอธิบายความสัมพันธ์เชิงมิติยังไม่สมบูรณ์</td>
+            <td>ไม่สามารถเชื่อมโยงระยะห่างจากระนาบเข้าสู่พิกัดของจุดได้</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div style="margin-top: 16px; font-size: 0.92rem; color: #7c2d12; background: #fff; padding: 12px 16px; border-radius: 8px; border: 1px dashed #fdba74;">
+        <strong>เกณฑ์การตัดสินระดับคุณภาพ:</strong><br>
+        คะแนนรวม $10 - 12$ คะแนน = <strong>ระดับคุณภาพ ดีมาก</strong> | 
+        คะแนนรวม $7 - 9$ คะแนน = <strong>ระดับคุณภาพ ปานกลาง</strong> | 
+        คะแนนรวม $1 - 6$ คะแนน = <strong>ระดับคุณภาพ ควรปรับปรุง</strong>
+      </div>
+    </section>
+
+  </div>
+
+  <script>
+    // 3D Canvas Engine with Rotation & Projection
+    const canvas = document.getElementById('canvas3d');
+    const ctx = canvas.getContext('2d');
+
+    let ptA = { x: 3, y: 4, z: 3 };
+    let zoomScale = 38;
+
+    // มุมมองกล้อง (มุมหมุน)
+    let rotX = 25 * (Math.PI / 180);
+    let rotY = -35 * (Math.PI / 180);
+
+    let isDragging = false;
+    let prevMouseX = 0;
+    let prevMouseY = 0;
+
+    const originCX = canvas.width / 2;
+    const originCY = canvas.height / 2 + 20;
+
+    // ฟังก์ชันแปลงพิกัด 3D สู่ 2D Screen
+    function project(x, y, z) {
+      // 1. หมุนรอบแกน Z (yaw)
+      const x1 = x * Math.cos(rotY) - y * Math.sin(rotY);
+      const y1 = x * Math.sin(rotY) + y * Math.cos(rotY);
+      const z1 = z;
+
+      // 2. หมุนรอบแกน X (pitch)
+      const x2 = x1;
+      const y2 = y1 * Math.cos(rotX) - z1 * Math.sin(rotX);
+      const z2 = y1 * Math.sin(rotX) + z1 * Math.cos(rotX);
+
+      // แปลงสู่พิกัดบนจอ (Screen Space)
+      const sx = originCX + x2 * zoomScale;
+      const sy = originCY - z2 * zoomScale; // แกน Z พุ่งขึ้นบน
+
+      return { sx, sy, depth: y2 };
+    }
+
+    function render3D() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      const showXY = document.getElementById('chk-plane-xy').checked;
+      const showXZ = document.getElementById('chk-plane-xz').checked;
+      const showYZ = document.getElementById('chk-plane-yz').checked;
+      const showBox = document.getElementById('chk-box').checked;
+
+      const pO = project(0, 0, 0);
+
+      // 1. วาดระนาบพิกัดช่วยมอง (Planes)
+      const limit = 5;
+
+      // ระนาบ XY (z = 0)
+      if (showXY) {
+        ctx.fillStyle = 'rgba(59, 130, 246, 0.12)';
+        ctx.strokeStyle = 'rgba(59, 130, 246, 0.3)';
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        const p1 = project(-limit, -limit, 0);
+        const p2 = project(limit, -limit, 0);
+        const p3 = project(limit, limit, 0);
+        const p4 = project(-limit, limit, 0);
+        ctx.moveTo(p1.sx, p1.sy);
+        ctx.lineTo(p2.sx, p2.sy);
+        ctx.lineTo(p3.sx, p3.sy);
+        ctx.lineTo(p4.sx, p4.sy);
+        ctx.closePath();
+        ctx.fill();
+        ctx.stroke();
+      }
+
+      // ระนาบ XZ (y = 0)
+      if (showXZ) {
+        ctx.fillStyle = 'rgba(245, 158, 11, 0.1)';
+        ctx.strokeStyle = 'rgba(245, 158, 11, 0.3)';
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        const p1 = project(-limit, 0, -limit);
+        const p2 = project(limit, 0, -limit);
+        const p3 = project(limit, 0, limit);
+        const p4 = project(-limit, 0, limit);
+        ctx.moveTo(p1.sx, p1.sy);
+        ctx.lineTo(p2.sx, p2.sy);
+        ctx.lineTo(p3.sx, p3.sy);
+        ctx.lineTo(p4.sx, p4.sy);
+        ctx.closePath();
+        ctx.fill();
+        ctx.stroke();
+      }
+
+      // ระนาบ YZ (x = 0)
+      if (showYZ) {
+        ctx.fillStyle = 'rgba(16, 185, 129, 0.1)';
+        ctx.strokeStyle = 'rgba(16, 185, 129, 0.3)';
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        const p1 = project(0, -limit, -limit);
+        const p2 = project(0, limit, -limit);
+        const p3 = project(0, limit, limit);
+        const p4 = project(0, -limit, limit);
+        ctx.moveTo(p1.sx, p1.sy);
+        ctx.lineTo(p2.sx, p2.sy);
+        ctx.lineTo(p3.sx, p3.sy);
+        ctx.lineTo(p4.sx, p4.sy);
+        ctx.closePath();
+        ctx.fill();
+        ctx.stroke();
+      }
+
+      // 2. แกนหลัก 3 แกน (X = แดง, Y = เขียว, Z = ฟ้า)
+      const axisLen = 6;
+      // แกน X
+      drawAxis(0, 0, 0, axisLen, 0, 0, '#ef4444', '+X');
+      drawAxis(0, 0, 0, -axisLen, 0, 0, 'rgba(239, 68, 68, 0.3)', '-X');
+      // แกน Y
+      drawAxis(0, 0, 0, 0, axisLen, 0, '#10b981', '+Y');
+      drawAxis(0, 0, 0, 0, -axisLen, 0, 'rgba(16, 185, 129, 0.3)', '-Y');
+      // แกน Z
+      drawAxis(0, 0, 0, 0, 0, axisLen, '#38bdf8', '+Z');
+      drawAxis(0, 0, 0, 0, 0, -axisLen, 'rgba(56, 189, 248, 0.3)', '-Z');
+
+      // 3. เส้นประกล่องพิกัดฉาก (Cuboid Wireframe)
+      const pA = project(ptA.x, ptA.y, ptA.z);
+      const pXY = project(ptA.x, ptA.y, 0);
+      const pXZ = project(ptA.x, 0, ptA.z);
+      const pYZ = project(0, ptA.y, ptA.z);
+      const pX = project(ptA.x, 0, 0);
+      const pY = project(0, ptA.y, 0);
+      const pZ = project(0, 0, ptA.z);
+
+      if (showBox) {
+        ctx.setLineDash([4, 4]);
+        ctx.lineWidth = 1.4;
+
+        // เส้นจากแกนไปยังจุดฉายบนระนาบ
+        ctx.strokeStyle = '#ef4444';
+        drawLine(pX, pXY);
+        drawLine(pX, pXZ);
+
+        ctx.strokeStyle = '#10b981';
+        drawLine(pY, pXY);
+        drawLine(pY, pYZ);
+
+        ctx.strokeStyle = '#38bdf8';
+        drawLine(pZ, pXZ);
+        drawLine(pZ, pYZ);
+
+        // เส้นจากภาพฉายไปยังจุด A
+        ctx.strokeStyle = '#94a3b8';
+        drawLine(pXY, pA);
+        drawLine(pXZ, pA);
+        drawLine(pYZ, pA);
+
+        ctx.setLineDash([]);
+      }
+
+      // เส้นเวกเตอร์บอกตำแหน่งจาก (0,0,0) ไป A
+      ctx.strokeStyle = '#f59e0b';
+      ctx.lineWidth = 2.5;
+      ctx.beginPath();
+      ctx.moveTo(pO.sx, pO.sy);
+      ctx.lineTo(pA.sx, pA.sy);
+      ctx.stroke();
+
+      // วาดจุดภาพฉาย
+      drawDot(pXY, '#3b82f6', 4, 'A_xy');
+      drawDot(pXZ, '#f59e0b', 4, 'A_xz');
+      drawDot(pYZ, '#10b981', 4, 'A_yz');
+
+      // วาดจุด A (จุดหลัก)
+      drawDot(pA, '#fbbf24', 8, `A(${ptA.x}, ${ptA.y}, ${ptA.z})`);
+
+      // วาดจุดกำเนิด
+      drawDot(pO, '#ffffff', 5, 'O(0,0,0)');
+
+      updateCalculations();
+    }
+
+    function drawAxis(x1, y1, z1, x2, y2, z2, color, label) {
+      const pStart = project(x1, y1, z1);
+      const pEnd = project(x2, y2, z2);
+
+      ctx.strokeStyle = color;
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(pStart.sx, pStart.sy);
+      ctx.lineTo(pEnd.sx, pEnd.sy);
+      ctx.stroke();
+
+      if (label) {
+        ctx.fillStyle = color;
+        ctx.font = '700 13px Prompt, sans-serif';
+        ctx.fillText(label, pEnd.sx + 6, pEnd.sy + 4);
+      }
+    }
+
+    function drawLine(p1, p2) {
+      ctx.beginPath();
+      ctx.moveTo(p1.sx, p1.sy);
+      ctx.lineTo(p2.sx, p2.sy);
+      ctx.stroke();
+    }
+
+    function drawDot(p, color, radius, label) {
+      ctx.fillStyle = color;
+      ctx.beginPath();
+      ctx.arc(p.sx, p.sy, radius, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.strokeStyle = '#ffffff';
+      ctx.lineWidth = 1.5;
+      ctx.stroke();
+
+      if (label) {
+        ctx.fillStyle = '#ffffff';
+        ctx.font = '600 12px Prompt, sans-serif';
+        ctx.fillText(label, p.sx + radius + 4, p.sy - 2);
+      }
+    }
+
+    function updateCalculations() {
+      const coordEl = document.getElementById('stat-coord');
+      const xyEl = document.getElementById('stat-proj-xy');
+      const xzEl = document.getElementById('stat-proj-xz');
+      const yzEl = document.getElementById('stat-proj-yz');
+      const distEl = document.getElementById('stat-dist');
+
+      coordEl.innerHTML = `$A(${ptA.x}, ${ptA.y}, ${ptA.z})$`;
+      xyEl.innerHTML = `$(${ptA.x}, ${ptA.y}, 0)$`;
+      xzEl.innerHTML = `$(${ptA.x}, 0, ${ptA.z})$`;
+      yzEl.innerHTML = `$(0, ${ptA.y}, ${ptA.z})$`;
+
+      const sqX = ptA.x * ptA.x;
+      const sqY = ptA.y * ptA.y;
+      const sqZ = ptA.z * ptA.z;
+      const sumSq = sqX + sqY + sqZ;
+      const dist = Math.sqrt(sumSq);
+
+      distEl.innerHTML = `$d = \\sqrt{(${ptA.x})^2 + (${ptA.y})^2 + (${ptA.z})^2} = \\sqrt{${sqX} + ${sqY} + ${sqZ}} = \\sqrt{${sumSq}} \\approx ${dist.toFixed(2)}\\text{ หน่วย}$`;
+
+      if (window.MathJax && MathJax.typesetPromise) {
+        MathJax.typesetPromise([coordEl, xyEl, xzEl, yzEl, distEl]);
+      }
+    }
+
+    function updateCoords() {
+      ptA.x = parseInt(document.getElementById('sliderX').value);
+      ptA.y = parseInt(document.getElementById('sliderY').value);
+      ptA.z = parseInt(document.getElementById('sliderZ').value);
+
+      document.getElementById('val-x').innerText = ptA.x;
+      document.getElementById('val-y').innerText = ptA.y;
+      document.getElementById('val-z').innerText = ptA.z;
+
+      render3D();
+    }
+
+    function updateZoom(val) {
+      zoomScale = parseInt(val);
+      render3D();
+    }
+
+    function reset3DView() {
+      rotX = 25 * (Math.PI / 180);
+      rotY = -35 * (Math.PI / 180);
+      zoomScale = 38;
+      document.getElementById('zoomSlider').value = 38;
+      render3D();
+    }
+
+    // ระบบลากหมุน 3 มิติ (Mouse & Touch Drag)
+    canvas.addEventListener('mousedown', (e) => {
+      isDragging = true;
+      prevMouseX = e.clientX;
+      prevMouseY = e.clientY;
+    });
+
+    window.addEventListener('mousemove', (e) => {
+      if (!isDragging) return;
+      const dx = e.clientX - prevMouseX;
+      const dy = e.clientY - prevMouseY;
+
+      rotY += dx * 0.01;
+      rotX -= dy * 0.01;
+
+      // จำกัดมุมก้ม-เงย ไม่ให้พลิกกลับหัว
+      rotX = Math.max(-Math.PI / 2.2, Math.min(Math.PI / 2.2, rotX));
+
+      prevMouseX = e.clientX;
+      prevMouseY = e.clientY;
+
+      render3D();
+    });
+
+    window.addEventListener('mouseup', () => { isDragging = false; });
+
+    // Touch Support
+    canvas.addEventListener('touchstart', (e) => {
+      if (e.touches.length === 1) {
+        isDragging = true;
+        prevMouseX = e.touches[0].clientX;
+        prevMouseY = e.touches[0].clientY;
+      }
+    }, { passive: false });
+
+    window.addEventListener('touchmove', (e) => {
+      if (!isDragging || e.touches.length !== 1) return;
+      const dx = e.touches[0].clientX - prevMouseX;
+      const dy = e.touches[0].clientY - prevMouseY;
+
+      rotY += dx * 0.01;
+      rotX -= dy * 0.01;
+      rotX = Math.max(-Math.PI / 2.2, Math.min(Math.PI / 2.2, rotX));
+
+      prevMouseX = e.touches[0].clientX;
+      prevMouseY = e.touches[0].clientY;
+
+      render3D();
+    }, { passive: false });
+
+    window.addEventListener('touchend', () => { isDragging = false; });
+
+    // ซูมด้วย Mouse Wheel
+    canvas.addEventListener('wheel', (e) => {
+      e.preventDefault();
+      zoomScale += e.deltaY < 0 ? 2 : -2;
+      zoomScale = Math.max(20, Math.min(60, zoomScale));
+      document.getElementById('zoomSlider').value = zoomScale;
+      render3D();
+    }, { passive: false });
+
+    // ระบบพิมพ์ใบงานและเฉลย
+    function toggleAnswers() {
+      const section = document.getElementById('printable-worksheet');
+      section.classList.toggle('show-answers');
+      const isShown = section.classList.contains('show-answers');
+      document.getElementById('toggle-text').innerText = isShown ? 'ซ่อนเฉลย' : 'แสดงเฉลย';
+    }
+
+    function printSheet(role) {
+      const worksheetSection = document.getElementById('printable-worksheet');
+      const originalHasClass = worksheetSection.classList.contains('show-answers');
+
+      if (role === 'teacher') {
+        worksheetSection.classList.add('show-answers');
+      } else {
+        worksheetSection.classList.remove('show-answers');
+      }
+
+      window.print();
+
+      if (originalHasClass) {
+        worksheetSection.classList.add('show-answers');
+      } else {
+        worksheetSection.classList.remove('show-answers');
+      }
+    }
+
+    window.addEventListener('load', () => {
+      render3D();
+    });
+  </script>
+</body>
+</html>

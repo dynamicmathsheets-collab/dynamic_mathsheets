@@ -1,0 +1,898 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ขนาดและเวกเตอร์หนึ่งหน่วย</title>
+  
+  <!-- Google Fonts: Sarabun & Prompt -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@400;600;700&family=Sarabun:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+  <!-- MathJax 3 -->
+  <script>
+    window.MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']],
+        displayMath: [['$$', '$$'], ['\\[', '\\]']]
+      },
+      svg: { fontCache: 'global' }
+    };
+  </script>
+  <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+  <style>
+    :root {
+      --font-body: 'Sarabun', sans-serif;
+      --font-heading: 'Prompt', sans-serif;
+      --primary: #0284c7;
+      --secondary: #0d9488;
+      --accent: #d946ef;
+      --slate-dark: #0f172a;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: var(--font-body);
+      color: #334155;
+      background-color: #f8fafc;
+      line-height: 1.6;
+    }
+
+    .container {
+      max-width: 1040px;
+      margin: 0 auto;
+      padding: 24px 16px;
+    }
+
+    .section-card {
+      background: #ffffff;
+      border-radius: 20px;
+      margin-bottom: 30px;
+      padding: 36px;
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.03);
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* เฟรมหัวข้อ */
+    .hero-banner {
+      background: linear-gradient(135deg, #0369a1 0%, #0284c7 50%, #38bdf8 100%);
+      color: #ffffff;
+      text-align: center;
+      padding: 50px 24px;
+    }
+    .hero-banner .badge {
+      display: inline-block;
+      background: rgba(255, 255, 255, 0.2);
+      backdrop-filter: blur(8px);
+      padding: 5px 16px;
+      border-radius: 50px;
+      font-size: 0.9rem;
+      font-weight: 500;
+      margin-bottom: 12px;
+    }
+    .hero-banner h1 {
+      font-family: var(--font-heading);
+      font-size: 2.3rem;
+      font-weight: 700;
+      line-height: 1.3;
+      margin-bottom: 10px;
+    }
+    .hero-banner p {
+      font-size: 1.1rem;
+      opacity: 0.95;
+      max-width: 680px;
+      margin: 0 auto;
+    }
+
+    /* เฟรมเนื้อหา */
+    .concept-section {
+      background: linear-gradient(180deg, #ffffff 0%, #f0fdf4 100%);
+      border-top: 6px solid #10b981;
+    }
+    .concept-title {
+      font-family: var(--font-heading);
+      font-size: 1.55rem;
+      color: #065f46;
+      margin-bottom: 14px;
+    }
+    .formula-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(290px, 1fr));
+      gap: 18px;
+      margin-top: 18px;
+    }
+    .formula-card {
+      background: #ffffff;
+      border-radius: 12px;
+      padding: 20px;
+      border: 1px solid #e2e8f0;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.03);
+    }
+    .formula-card h3 {
+      font-family: var(--font-heading);
+      font-size: 1.15rem;
+      margin-bottom: 8px;
+    }
+
+    /* เฟรม Interactive Model */
+    .interactive-section {
+      background: linear-gradient(180deg, #ffffff 0%, #faf5ff 100%);
+      border-top: 6px solid #d946ef;
+    }
+    .model-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      margin-bottom: 16px;
+      gap: 12px;
+    }
+    .toggle-mode-btn {
+      font-family: var(--font-heading);
+      background: #c026d3;
+      color: white;
+      padding: 9px 18px;
+      border-radius: 50px;
+      border: none;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      box-shadow: 0 4px 10px rgba(192, 38, 211, 0.25);
+      transition: all 0.2s ease;
+    }
+    .toggle-mode-btn:hover { background: #a21caf; transform: translateY(-1px); }
+
+    .canvas-wrapper {
+      position: relative;
+      background: #ffffff;
+      border-radius: 14px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.06);
+      border: 1px solid #cbd5e1;
+      overflow: hidden;
+      margin: 0 auto 16px;
+      width: 720px;
+      max-width: 100%;
+      touch-action: none;
+    }
+    canvas { display: block; cursor: crosshair; }
+
+    .controls-bar {
+      background: #ffffff;
+      border-radius: 12px;
+      padding: 14px 20px;
+      border: 1px solid #e2e8f0;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+    .controls-bar label {
+      font-family: var(--font-heading);
+      font-weight: 600;
+      color: #334155;
+      font-size: 0.95rem;
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 12px;
+    }
+    .stat-badge {
+      background: #ffffff;
+      border-radius: 10px;
+      padding: 12px 16px;
+      border: 1px solid #e2e8f0;
+    }
+    .stat-badge strong {
+      display: block;
+      color: #64748b;
+      font-size: 0.85rem;
+      margin-bottom: 4px;
+    }
+    .stat-badge .val {
+      font-size: 1.05rem;
+      font-weight: 600;
+      color: #1e293b;
+      min-height: 28px;
+      display: flex;
+      align-items: center;
+    }
+
+    .discovery-box {
+      margin-top: 20px;
+      padding: 16px 20px;
+      background: #eff6ff;
+      border-left: 5px solid #0284c7;
+      border-radius: 10px;
+    }
+    .discovery-box h4 {
+      font-family: var(--font-heading);
+      color: #0369a1;
+      margin-bottom: 4px;
+      font-size: 1.1rem;
+    }
+
+    /* เฟรมใบงาน */
+    .worksheet-section {
+      background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+      border-top: 6px solid #0284c7;
+    }
+    .worksheet-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 16px;
+      justify-content: flex-end;
+    }
+    .btn {
+      font-family: var(--font-heading);
+      font-size: 0.9rem;
+      padding: 8px 16px;
+      border-radius: 8px;
+      border: none;
+      cursor: pointer;
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s ease;
+    }
+    .btn-student { background: #0284c7; color: white; }
+    .btn-student:hover { background: #0369a1; }
+    .btn-teacher { background: #0d9488; color: white; }
+    .btn-teacher:hover { background: #0f766e; }
+    .btn-toggle { background: #f1f5f9; color: #475569; border: 1px solid #cbd5e1; }
+    .btn-toggle:hover { background: #e2e8f0; }
+
+    .question-item {
+      padding: 12px 8px;
+      border-bottom: 1px dashed #cbd5e1;
+    }
+    .question-item:last-child { border-bottom: none; }
+    .question-title {
+      font-weight: 600;
+      color: #1e293b;
+      margin-bottom: 4px;
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      font-size: 0.98rem;
+    }
+    .write-area {
+      min-height: 32px;
+      border-bottom: 1px dotted #94a3b8;
+      margin: 6px 0;
+    }
+    .answer-key {
+      background: #ecfdf5;
+      border: 1px solid #a7f3d0;
+      color: #065f46;
+      padding: 10px 14px;
+      border-radius: 6px;
+      margin-top: 6px;
+      font-size: 0.92rem;
+      display: none;
+      line-height: 1.7;
+    }
+    .show-answers .answer-key { display: block; }
+
+    /* เฟรมเกณฑ์การประเมิน */
+    .rubric-section {
+      background: linear-gradient(180deg, #ffffff 0%, #fff7ed 100%);
+      border-top: 6px solid #f97316;
+    }
+    .rubric-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 14px;
+      background: white;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+    }
+    .rubric-table th, .rubric-table td {
+      border: 1px solid #fed7aa;
+      padding: 12px 14px;
+      text-align: left;
+      vertical-align: top;
+      font-size: 0.9rem;
+    }
+    .rubric-table th {
+      background: #ffedd5;
+      font-family: var(--font-heading);
+      color: #9a3412;
+    }
+    .score-col { width: 25%; }
+
+    .print-header { display: none; }
+
+    /* ระบบพิมพ์ Compact ไม่คล่อมหน้า และตัดหน้าว่าง 100% */
+    @page {
+      size: A4 portrait;
+      margin: 10mm 12mm;
+    }
+
+    @media print {
+      html, body {
+        background: #ffffff !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        font-size: 13px !important;
+        line-height: 1.4 !important;
+        color: #000000 !important;
+      }
+      .container { padding: 0 !important; margin: 0 !important; max-width: 100% !important; }
+      .hero-banner, .concept-section, .interactive-section, .rubric-section, .worksheet-actions {
+        display: none !important;
+      }
+      #printable-worksheet {
+        display: block !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        box-shadow: none !important;
+        border: none !important;
+        border-radius: 0 !important;
+        background: #ffffff !important;
+      }
+      .print-header {
+        display: block !important;
+        text-align: center;
+        margin-bottom: 10px;
+        border-bottom: 1.5px solid #000;
+        padding-bottom: 4px;
+      }
+      .print-header h2 {
+        font-family: var(--font-heading);
+        font-size: 1.25rem !important;
+        font-weight: 700;
+        margin-bottom: 2px;
+      }
+      .print-info-row {
+        display: flex;
+        justify-content: space-between;
+        font-size: 0.85rem;
+      }
+      .question-item {
+        page-break-inside: avoid !important;
+        break-inside: avoid !important;
+        padding: 6px 0 !important;
+        border-bottom: 1px dashed #cbd5e1 !important;
+      }
+      .question-title { font-size: 0.93rem !important; margin-bottom: 3px !important; }
+      .write-area { min-height: 30px !important; margin: 4px 0 !important; border-bottom: 1px dotted #64748b !important; }
+      .answer-key {
+        padding: 6px 10px !important;
+        font-size: 0.86rem !important;
+        margin-top: 4px !important;
+        border: 1px solid #cbd5e1 !important;
+        background: #f8fafc !important;
+        color: #000000 !important;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .section-card { padding: 20px 14px; }
+      .hero-banner h1 { font-size: 1.8rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+
+    <!-- ==================== ตอนที่ 1 ==================== -->
+    <section class="section-card hero-banner">
+      <span class="badge">สาระการเรียนรู้คณิตศาสตร์เพิ่มเติม</span>
+      <h1>เรื่อง ขนาดและเวกเตอร์หนึ่งหน่วย</h1>
+      <p>ศึกษาการวัดขนาดความยาวของเวกเตอร์ และการสร้างเวกเตอร์มาตรฐานที่มีขนาดเท่ากับ 1 หน่วย พร้อมชี้ในทิศทางเดิม</p>
+    </section>
+
+    <!-- ==================== ตอนที่ 2 ==================== -->
+    <section class="section-card concept-section">
+      <h2 class="concept-title">มโนทัศน์ขนาดและเวกเตอร์หนึ่งหน่วย</h2>
+      <p>
+        ศึกษาขนาดของเวกเตอร์ และการสร้าง <strong>เวกเตอร์หนึ่งหน่วย (Unit Vector)</strong> ซึ่งเป็นเวกเตอร์ที่มีขนาดความยาวเท่ากับ $1$ หน่วยบริบูรณ์ 
+        และมีทิศทางชี้ไปในแนวเดียวกับเวกเตอร์เดิม
+      </p>
+
+      <div class="formula-grid">
+        <div class="formula-card">
+          <h3 style="color: #0284c7;">1. ในระบบ 2 มิติ</h3>
+          <p style="font-size: 0.93rem;">สำหรับเวกเตอร์ $\vec{v} = ai + bj$ ใด ๆ ที่ไม่เป็นเวกเตอร์ศูนย์:</p>
+          <ul style="margin-left: 20px; margin-top: 6px; font-size: 0.92rem;">
+            <li><strong>ขนาด:</strong> $|\vec{v}| = \sqrt{a^2 + b^2}$</li>
+            <li>
+              <strong>เวกเตอร์หนึ่งหน่วยในทิศทางเดียวกับ $\vec{v}$:</strong>
+              $$\hat{v} = \frac{\vec{v}}{|\vec{v}|} = \frac{a}{|\vec{v}|}i + \frac{b}{|\vec{v}|}j$$
+            </li>
+          </ul>
+        </div>
+
+        <div class="formula-card">
+          <h3 style="color: #c026d3;">2. ขยายสู่ระบบ 3 มิติ</h3>
+          <p style="font-size: 0.93rem;">สำหรับเวกเตอร์ $\vec{v} = ai + bj + ck$ ในปริภูมิ 3 มิติ:</p>
+          <ul style="margin-left: 20px; margin-top: 6px; font-size: 0.92rem;">
+            <li><strong>ขนาด:</strong> $|\vec{v}| = \sqrt{a^2 + b^2 + c^2}$</li>
+            <li>
+              <strong>เวกเตอร์หนึ่งหน่วยในทิศทางเดียวกับ $\vec{v}$:</strong>
+              $$\hat{v} = \frac{\vec{v}}{|\vec{v}|} = \frac{a}{|\vec{v}|}i + \frac{b}{|\vec{v}|}j + \frac{c}{|\vec{v}|}k$$
+            </li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== ตอนที่ 3 ==================== -->
+    <section class="section-card interactive-section">
+      <div class="model-header">
+        <div>
+          <h2 id="model-title" style="font-family: var(--font-heading); color: #86198f; font-size: 1.55rem;">
+            Interactive Model: เวกเตอร์เดิม $\rightarrow$ ขนาด $\rightarrow$ เวกเตอร์หนึ่งหน่วย
+          </h2>
+          <p id="model-subtitle" style="color: #a21caf; font-size: 0.93rem;">
+            ลากปลายเวกเตอร์ $\vec{v}$ (สีน้ำเงิน) เพื่อสังเกตเวกเตอร์หนึ่งหน่วย $\hat{v}$ (สีชมพู ขนาด 1 หน่วย) ที่รักษาทิศทางเดิมเสมอ
+          </p>
+        </div>
+        <button id="toggle-3d-btn" class="toggle-mode-btn" onclick="toggle3D()">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m21.12 6.4-6.05-4.06a2 2 0 0 0-2.17-.05L2.95 8.41a2 2 0 0 0-.95 1.7v5.82a2 2 0 0 0 .95 1.7l9.95 6.12a2 2 0 0 0 2.17-.05l6.05-4.06a2 2 0 0 0 .88-1.66V8.06a2 2 0 0 0-.88-1.66z"/><line x1="12" y1="22" x2="12" y2="12"/><line x1="12" y1="12" x2="2.05" y2="7.05"/><line x1="12" y1="12" x2="21.95" y2="7.05"/></svg>
+          <span id="btn-3d-text">เปิดมุมมอง 3 มิติ</span>
+        </button>
+      </div>
+
+      <!-- แถบทดลองยืด-หดความยาวโดยไม่เปลี่ยนทิศ -->
+      <div class="controls-bar">
+        <label>ปรับขยาย/ย่อความยาวโดยคงทิศเดิม ($k\vec{v}$):</label>
+        <input type="range" id="scaleSlider" min="0.5" max="2.5" step="0.1" value="1.0" oninput="onScaleChange(this.value)" style="flex: 1; accent-color: #c026d3;">
+        <span id="scale-val-text" style="font-family: var(--font-heading); font-weight: 700; color: #a21caf; min-width: 45px;">x 1.0</span>
+        <button class="btn btn-toggle" style="padding: 4px 10px; font-size: 0.85rem;" onclick="resetVector()">รีเซ็ตพิกัด</button>
+      </div>
+
+      <div class="canvas-wrapper">
+        <canvas id="vectorCanvas" width="720" height="440"></canvas>
+      </div>
+
+      <!-- สถิติและการคำนวณแบบ Step-by-Step -->
+      <div class="stats-grid">
+        <div class="stat-badge">
+          <strong>1. เวกเตอร์เดิม ($\vec{v}$)</strong>
+          <div class="val" id="stat-orig-vec">$\vec{v} = 4i + 3j$</div>
+        </div>
+
+        <div class="stat-badge" style="background: #f0fdf4; border-color: #bbf7d0;">
+          <strong style="color: #15803d;">2. ขนาดของเวกเตอร์ ($\vert{}\vec{v}\vert{}$)</strong>
+          <div class="val" id="stat-magnitude">$|\vec{v}| = \sqrt{4^2 + 3^2} = 5.00\text{ หน่วย}$</div>
+        </div>
+
+        <div class="stat-badge" style="grid-column: 1 / -1; background: #fdf4ff; border-color: #f5d0fe;">
+          <strong style="color: #a21caf;">3. เวกเตอร์หนึ่งหน่วย ($\hat{v} = \dfrac{\vec{v}}{\vert{}\vec{v}\vert{}}$)</strong>
+          <div class="val" id="stat-unit-vec">
+            $\hat{v} = \frac{4}{5}i + \frac{3}{5}j = 0.80i + 0.60j$
+          </div>
+        </div>
+
+        <div class="stat-badge" style="grid-column: 1 / -1;">
+          <strong>พิสูจน์ขนาดของเวกเตอร์หนึ่งหน่วย ($\vert{}\hat{v}\vert{}$)</strong>
+          <div class="val" id="stat-verify">
+            $|\hat{v}| = \sqrt{(0.80)^2 + (0.60)^2} = \sqrt{0.64 + 0.36} = \sqrt{1.00} = 1\text{ หน่วยเสมอ}$
+          </div>
+        </div>
+      </div>
+
+      <div class="discovery-box">
+        <h4>💡 ตัวอย่างเชิงภาพและสิ่งที่นักเรียนค้นพบ</h4>
+        <p>
+          <strong>เวกเตอร์ยาว $\rightarrow$ ลดขนาดลง $\rightarrow$ เหลือความยาว 1 แต่ยังชี้ทิศเดิม:</strong><br>
+          เมื่อนักเรียนทดลองเลื่อนสไลเดอร์เพื่อยืดความยาวหรือหดขนาดของเวกเตอร์ $\vec{v}$ โดยที่มุมเอียงยังคงเดิม 
+          จะพบว่า <strong>เวกเตอร์หนึ่งหน่วย $\hat{v}$ (ลูกศรสีชมพู) จะยังคงชี้ไปในทิศทางเดิมและมีความยาวเท่ากับ 1 หน่วยอยู่เสมอ</strong> 
+          และเมื่อเปิดดูในระบบ 3 มิติ จะเห็นว่ามโนทัศน์นี้ยังคงเป็นจริงบนปริภูมิสามมิติด้วยเช่นกัน
+        </p>
+      </div>
+    </section>
+
+    <!-- ==================== ตอนที่ 4 ==================== -->
+    <section class="section-card worksheet-section" id="printable-worksheet">
+      <div class="print-header">
+        <h2>ใบงานคณิตศาสตร์: เรื่อง ขนาดและเวกเตอร์หนึ่งหน่วย</h2>
+        <div class="print-info-row">
+          <span>ชื่อ-นามสกุล: ...................................................................</span>
+          <span>ชั้น: ................ เลขที่: ...........</span>
+          <span>วันที่: ........................</span>
+        </div>
+      </div>
+
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
+        <h2 style="font-family: var(--font-heading); color: #0369a1; font-size: 1.45rem;">
+          ใบงานตรวจสอบความเข้าใจ (5 ข้อ)
+        </h2>
+        <div class="worksheet-actions">
+          <button class="btn btn-toggle" onclick="toggleAnswers()">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+            <span id="toggle-text">แสดง/ซ่อนเฉลย</span>
+          </button>
+          <button class="btn btn-student" onclick="printSheet('student')">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+            พิมพ์ใบงานสำหรับนักเรียน
+          </button>
+          <button class="btn btn-teacher" onclick="printSheet('teacher')">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+            พิมพ์เฉลยสำหรับครู
+          </button>
+        </div>
+      </div>
+
+      <div class="worksheet-list">
+        <!-- ข้อ 1 -->
+        <div class="question-item">
+          <div class="question-title">
+            <span>1.</span>
+            <span>กำหนดเวกเตอร์ $\vec{u} = -6i + 8j$ จงแสดงวิธีหาขนาด $|\vec{u}|$ และหาเวกเตอร์หนึ่งหน่วยที่มีทิศทางเดียวกับ $\vec{u}$</span>
+          </div>
+          <div class="write-area"></div>
+          <div class="answer-key">
+            <strong>เฉลยวิธีทำ:</strong><br>
+            • ขนาด: $|\vec{u}| = \sqrt{(-6)^2 + 8^2} = \sqrt{36 + 64} = \sqrt{100} = 10\text{ หน่วย}$<br>
+            • เวกเตอร์หนึ่งหน่วยในทิศเดียวกับ $\vec{u}$: $\hat{u} = \dfrac{\vec{u}}{|\vec{u}|} = \dfrac{-6i + 8j}{10} = -\dfrac{3}{5}i + \dfrac{4}{5}j$
+          </div>
+        </div>
+
+        <!-- ข้อ 2 -->
+        <div class="question-item">
+          <div class="question-title">
+            <span>2.</span>
+            <span>กำหนดเวกเตอร์ $\vec{v} = 5i - 12j$ จงแสดงวิธีทำหาเวกเตอร์ที่มีขนาด $1$ หน่วย แต่มี <em>ทิศทางตรงกันข้าม</em> กับ $\vec{v}$</span>
+          </div>
+          <div class="write-area"></div>
+          <div class="answer-key">
+            <strong>เฉลยวิธีทำ:</strong><br>
+            • ขนาด: $|\vec{v}| = \sqrt{5^2 + (-12)^2} = \sqrt{25 + 144} = \sqrt{169} = 13\text{ หน่วย}$<br>
+            • เวกเตอร์หนึ่งหน่วยที่มีทิศทางตรงกันข้าม คือ $-\dfrac{\vec{v}}{|\vec{v}|} = -\left(\dfrac{5i - 12j}{13}\right) = -\dfrac{5}{13}i + \dfrac{12}{13}j$
+          </div>
+        </div>
+
+        <!-- ข้อ 3 -->
+        <div class="question-item">
+          <div class="question-title">
+            <span>3.</span>
+            <span>จงหาเวกเตอร์ที่มีขนาดเท่ากับ $7$ หน่วย และมีทิศทางเดียวกับเวกเตอร์ $\vec{w} = 3i - 4j$</span>
+          </div>
+          <div class="write-area"></div>
+          <div class="answer-key">
+            <strong>เฉลยวิธีทำ:</strong><br>
+            • ขนาดของ $\vec{w}$: $|\vec{w}| = \sqrt{3^2 + (-4)^2} = \sqrt{9 + 16} = 5\text{ หน่วย}$<br>
+            • เวกเตอร์หนึ่งหน่วยในทิศ $\vec{w}$: $\hat{w} = \dfrac{3}{5}i - \dfrac{4}{5}j$<br>
+            • เวกเตอร์ขนาด $7$ หน่วยในทิศเดียวกัน คือ $7\hat{w} = 7\left(\dfrac{3}{5}i - \dfrac{4}{5}j\right) = \dfrac{21}{5}i - \dfrac{28}{5}j$
+          </div>
+        </div>
+
+        <!-- ข้อ 4 -->
+        <div class="question-item">
+          <div class="question-title">
+            <span>4.</span>
+            <span>กำหนดจุดเริ่มต้น $A(1, -2)$ และจุดปลาย $B(4, 2)$ จงแสดงวิธีเขียนเวกเตอร์ $\vec{AB}$ ในรูป $ai + bj$ แล้วหาเวกเตอร์หนึ่งหน่วยของ $\vec{AB}$</span>
+          </div>
+          <div class="write-area"></div>
+          <div class="answer-key">
+            <strong>เฉลยวิธีทำ:</strong><br>
+            • $\vec{AB} = (4 - 1)i + (2 - (-2))j = 3i + 4j$<br>
+            • ขนาด $|\vec{AB}| = \sqrt{3^2 + 4^2} = \sqrt{25} = 5\text{ หน่วย}$<br>
+            • เวกเตอร์หนึ่งหน่วย คือ $\dfrac{\vec{AB}}{|\vec{AB}|} = \dfrac{3}{5}i + \dfrac{4}{5}j$
+          </div>
+        </div>
+
+        <!-- ข้อ 5 -->
+        <div class="question-item">
+          <div class="question-title">
+            <span>5.</span>
+            <span>(ระบบ 3 มิติ) กำหนดเวกเตอร์ใน 3 มิติ $\vec{r} = 2i - 3j + 6k$ จงแสดงวิธีหาขนาด $|\vec{r}|$ และเวกเตอร์หนึ่งหน่วย $\hat{r}$</span>
+          </div>
+          <div class="write-area"></div>
+          <div class="answer-key">
+            <strong>เฉลยวิธีทำ:</strong><br>
+            • ขนาด: $|\vec{r}| = \sqrt{a^2 + b^2 + c^2} = \sqrt{2^2 + (-3)^2 + 6^2} = \sqrt{4 + 9 + 36} = \sqrt{49} = 7\text{ หน่วย}$<br>
+            • เวกเตอร์หนึ่งหน่วย: $\hat{r} = \dfrac{\vec{r}}{|\vec{r}|} = \dfrac{2i - 3j + 6k}{7} = \dfrac{2}{7}i - \dfrac{3}{7}j + \dfrac{6}{7}k$
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== ตอนที่ 5 ==================== -->
+    <section class="section-card rubric-section">
+      <h2 style="font-family: var(--font-heading); color: #c2410c; font-size: 1.5rem; margin-bottom: 6px;">
+        เกณฑ์การประเมินใบงาน (Scoring Rubric - 3 ระดับ)
+      </h2>
+      <p style="color: #7c2d12; font-size: 0.95rem;">การวัดและประเมินผลทักษะกระบวนการคิดทางคณิตศาสตร์ เรื่อง ขนาดและเวกเตอร์หนึ่งหน่วย</p>
+
+      <table class="rubric-table">
+        <thead>
+          <tr>
+            <th style="width: 25%;">ประเด็นการประเมิน</th>
+            <th class="score-col">ระดับ 3 (ดีเยี่ยม : 3 คะแนน)</th>
+            <th class="score-col">ระดับ 2 (พอใช้ : 2 คะแนน)</th>
+            <th class="score-col">ระดับ 1 (ปรับปรุง : 1 คะแนน)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>1. การคำนวณขนาดของเวกเตอร์</strong></td>
+            <td>แทนค่าในสูตร $|\vec{v}| = \sqrt{a^2 + b^2}$ (และ 3 มิติ) คำนวณตัวเลข ถอดกรณฑ์ที่สอง และระบุหน่วยได้ถูกต้องสมบูรณ์ 100%</td>
+            <td>ใช้สูตรถูกต้อง แต่มีข้อผิดพลาดเล็กน้อยในขั้นตอนยกกำลังสอง หรือคิดเลขผิดพลาดบางจุด</td>
+            <td>เขียนสูตรไม่ถูกต้อง หรือไม่เข้าใจความเชื่อมโยงกับทฤษฎีบทพีทาโกรัส</td>
+          </tr>
+          <tr>
+            <td><strong>2. การสร้างเวกเตอร์หนึ่งหน่วย ($\hat{v}$)</strong></td>
+            <td>นำเวกเตอร์มาหารด้วยขนาดของตนเอง $\frac{\vec{v}}{|\vec{v}|}$ ได้ถูกต้อง แยกสัมประสิทธิ์หน้า $i, j, k$ ชัดเจน เครื่องหมายถูกต้องทั้งหมด</td>
+            <td>เข้าใจสูตรเวกเตอร์หนึ่งหน่วย แต่มีข้อผิดพลาดในการทอนเศษส่วน หรือเครื่องหมายบวกลบสับสน</td>
+            <td>ไม่สามารถสร้างเวกเตอร์หนึ่งหน่วยได้ หรือนำเวกเตอร์ไปคูณกับขนาดแทนการหาร</td>
+          </tr>
+          <tr>
+            <td><strong>3. การประยุกต์ทิศทางและขนาดที่กำหนด</strong></td>
+            <td>หาเวกเตอร์ทิศตรงข้าม ($-\hat{v}$) และเวกเตอร์ที่มีขนาดตามที่กำหนด ($c\hat{v}$) ได้อย่างถูกต้องเป็นขั้นตอนชัดเจน</td>
+            <td>คำนวณเวกเตอร์หนึ่งหน่วยได้ แต่นำไปคูณขยายขนาดหรือกลับทิศทางยังคลาดเคลื่อนเล็กน้อย</td>
+            <td>ไม่เข้าใจมโนทัศน์การขยายขนาดจากเวกเตอร์หนึ่งหน่วย</td>
+          </tr>
+          <tr>
+            <td><strong>4. การต่อยอดสู่ระบบพิกัด 3 มิติ</strong></td>
+            <td>ขยายแนวคิดการหาขนาดและเวกเตอร์หนึ่งหน่วยจาก 2 มิติ เข้าสู่รูป $ai + bj + ck$ ได้อย่างถูกต้องสมบูรณ์</td>
+            <td>เขียนสูตรใน 3 มิติได้ แต่มีข้อผิดพลาดในการคิดคำนวณตัวเลขของแกน $Z$</td>
+            <td>ไม่สามารถเชื่อมโยงและขยายมโนทัศน์เข้าสู่ปริภูมิ 3 มิติได้</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div style="margin-top: 16px; font-size: 0.92rem; color: #7c2d12; background: #fff; padding: 12px 16px; border-radius: 8px; border: 1px dashed #fdba74;">
+        <strong>เกณฑ์การตัดสินระดับคุณภาพ:</strong><br>
+        คะแนนรวม $10 - 12$ คะแนน = <strong>ระดับคุณภาพ ดีมาก</strong> | 
+        คะแนนรวม $7 - 9$ คะแนน = <strong>ระดับคุณภาพ ปานกลาง</strong> | 
+        คะแนนรวม $1 - 6$ คะแนน = <strong>ระดับคุณภาพ ควรปรับปรุง</strong>
+      </div>
+    </section>
+
+  </div>
+
+  <script>
+    const canvas = document.getElementById('vectorCanvas');
+    const ctx = canvas.getContext('2d');
+
+    const originX = canvas.width / 2;
+    const originY = canvas.height / 2;
+    const baseScale = 25; // 25px ต่อ 1 หน่วย
+
+    let baseV = { x: 4, y: 3, z: 2 };
+    let currentScaleK = 1.0;
+    let is3D = false;
+    let isDragging = false;
+
+    function getScaledV() {
+      return {
+        x: baseV.x * currentScaleK,
+        y: baseV.y * currentScaleK,
+        z: baseV.z * currentScaleK
+      };
+    }
+
+    function mathToCanvas2D(mx, my) {
+      return { cx: originX + mx * baseScale, cy: originY - my * baseScale };
+    }
+
+    function canvasToMath2D(cx, cy) {
+      return {
+        mx: Math.round((cx - originX) / baseScale),
+        my: Math.round((originY - cy) / baseScale)
+      };
+    }
+
+    function project3D(x, y, z) {
+      const angX = (150 * Math.PI) / 180;
+      const angY = (30 * Math.PI) / 180;
+      const px = originX + (y * Math.cos(angY) - x * Math.cos(Math.PI - angX)) * baseScale;
+      const py = originY + (y * Math.sin(angY) + x * Math.sin(Math.PI - angX) - z) * baseScale;
+      return { px, py };
+    }
+
+    function drawGrid() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      if (!is3D) {
+        ctx.strokeStyle = '#f1f5f9';
+        ctx.lineWidth = 1;
+        for (let x = originX % baseScale; x < canvas.width; x += baseScale) {
+          ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, canvas.height); ctx.stroke();
+        }
+        for (let y = originY % baseScale; y < canvas.height; y += baseScale) {
+          ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(canvas.width, y); ctx.stroke();
+        }
+
+        ctx.strokeStyle = '#94a3b8';
+        ctx.lineWidth = 1.5;
+        ctx.beginPath(); ctx.moveTo(0, originY); ctx.lineTo(canvas.width, originY); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(originX, 0); ctx.lineTo(originX, canvas.height); ctx.stroke();
+
+        ctx.fillStyle = '#64748b';
+        ctx.font = '12px Prompt, sans-serif';
+        ctx.fillText('+X (i)', canvas.width - 45, originY - 8);
+        ctx.fillText('+Y (j)', originX + 8, 16);
+      } else {
+        // แกน 3 มิติ
+        ctx.lineWidth = 2;
+        const topZ = project3D(0, 0, 7);
+        const endX = project3D(7, 0, 0);
+        const endY = project3D(0, 7, 0);
+
+        ctx.strokeStyle = '#c026d3'; ctx.beginPath(); ctx.moveTo(originX, originY); ctx.lineTo(topZ.px, topZ.py); ctx.stroke();
+        ctx.strokeStyle = '#ef4444'; ctx.beginPath(); ctx.moveTo(originX, originY); ctx.lineTo(endX.px, endX.py); ctx.stroke();
+        ctx.strokeStyle = '#10b981'; ctx.beginPath(); ctx.moveTo(originX, originY); ctx.lineTo(endY.px, endY.py); ctx.stroke();
+
+        ctx.fillStyle = '#64748b';
+        ctx.font = '12px Prompt, sans-serif';
+        ctx.fillText('+Z (k)', topZ.px + 8, topZ.py + 10);
+        ctx.fillText('+X (i)', endX.px - 35, endX.py + 15);
+        ctx.fillText('+Y (j)', endY.px + 10, endY.py + 15);
+      }
+    }
+
+    function drawArrow(fromX, fromY, toX, toY, color = '#0284c7', lineWidth = 3.5) {
+      const headLength = 12;
+      const angle = Math.atan2(toY - fromY, toX - fromX);
+
+      ctx.save();
+      ctx.strokeStyle = color;
+      ctx.fillStyle = color;
+      ctx.lineWidth = lineWidth;
+
+      ctx.beginPath(); ctx.moveTo(fromX, fromY); ctx.lineTo(toX, toY); ctx.stroke();
+
+      ctx.beginPath();
+      ctx.moveTo(toX, toY);
+      ctx.lineTo(toX - headLength * Math.cos(angle - Math.PI / 7), toY - headLength * Math.sin(angle - Math.PI / 7));
+      ctx.lineTo(toX - headLength * Math.cos(angle + Math.PI / 7), toY - headLength * Math.sin(angle + Math.PI / 7));
+      ctx.closePath();
+      ctx.fill();
+      ctx.restore();
+    }
+
+    function formatVector(vx, vy, vz = null) {
+      let strX = vx === 1 ? "i" : vx === -1 ? "-i" : vx !== 0 ? `${vx}i` : "";
+      let strY = "";
+      if (vy === 1) strY = strX ? "+ j" : "j";
+      else if (vy === -1) strY = "- j";
+      else if (vy > 0) strY = strX ? `+ ${vy}j` : `${vy}j`;
+      else if (vy < 0) strY = `- ${Math.abs(vy)}j`;
+
+      if (vz === null) {
+        if (!strX && !strY) return "0";
+        return `${strX}${strY}`.trim();
+      }
+
+      let res = strX || strY ? `${strX}${strY}`.trim() : "";
+      let strZ = "";
+      if (vz === 1) strZ = res ? "+ k" : "k";
+      else if (vz === -1) strZ = "- k";
+      else if (vz > 0) strZ = res ? `+ ${vz}k` : `${vz}k`;
+      else if (vz < 0) strZ = `- ${Math.abs(vz)}k`;
+
+      if (!res && !strZ) return "0";
+      return `${res}${strZ}`.trim();
+    }
+
+    function render() {
+      drawGrid();
+      const v = getScaledV();
+
+      if (!is3D) {
+        const pO = mathToCanvas2D(0, 0);
+        const pV = mathToCanvas2D(v.x, v.y);
+        const mag = Math.hypot(v.x, v.y);
+
+        // 1. เวกเตอร์เดิม v (สีน้ำเงิน)
+        drawArrow(pO.cx, pO.cy, pV.cx, pV.cy, '#0284c7', 4);
+
+        // 2. เวกเตอร์หนึ่งหน่วย u_hat (สีชมพูเข้ม ขนาด 1 หน่วย)
+        if (mag > 0.001) {
+          const uX = v.x / mag;
+          const uY = v.y / mag;
+          const pUnit = mathToCanvas2D(uX, uY);
+          drawArrow(pO.cx, pO.cy, pUnit.cx, pUnit.cy, '#d946ef', 5);
+
+          ctx.fillStyle = '#c026d3';
+          ctx.font = '700 13px Prompt, sans-serif';
+          ctx.fillText('v̂ (ขนาด 1)', pUnit.cx + 8, pUnit.cy - 6);
+        }
+
+        // วาดจุดปลายที่ลากได้
+        ctx.fillStyle = '#0284c7';
+        ctx.beginPath(); ctx.arc(pV.cx, pV.cy, 7, 0, Math.PI * 2); ctx.fill();
+        ctx.strokeStyle = '#ffffff'; ctx.lineWidth = 2; ctx.stroke();
+        ctx.fillStyle = '#1e293b';
+        ctx.font = '600 13px Prompt, sans-serif';
+        ctx.fillText(`v (${v.x.toFixed(1)},${v.y.toFixed(1)})`, pV.cx + 10, pV.cy - 6);
+
+      } else {
+        // 3D Rendering
+        const mag = Math.hypot(v.x, v.y, v.z);
+        const pV = project3D(v.x, v.y, v.z);
+
+        drawArrow(originX, originY, pV.px, pV.py, '#0284c7', 4);
+
+        if (mag > 0.001) {
+          const uX = v.x / mag;
+          const uY = v.y / mag;
+          const uZ = v.z / mag;
+          const pUnit = project3D(uX, uY, uZ);
+          drawArrow(originX, originY, pUnit.px, pUnit.py, '#d946ef', 5);
+
+          ctx.fillStyle = '#c026d3';
+          ctx.font = '700 13px Prompt, sans-serif';
+          ctx.fillText('v̂ (ขนาด 1)', pUnit.px + 8, pUnit.py - 6);
+        }
+
+        ctx.fillStyle = '#0284c7';
+        ctx.beginPath(); ctx.arc(pV.px, pV.py, 7, 0, Math.PI * 2); ctx.fill();
+        ctx.strokeStyle = '#ffffff'; ctx.lineWidth = 2; ctx.stroke();
+        ctx.fillStyle = '#1e293b';
+        ctx.font = '600 13px Prompt, sans-serif';
+        ctx.fillText(`v (${v.x.toFixed(1)}, ${v.y.toFixed(1)},${v.z.toFixed(1)})`, pV.px + 10, pV.py - 6);
+      }
+
+      updateCalculations();
+    }
+
+    function updateCalculations() {
+      const v = getScaledV();
+      const origEl = document.getElementById('stat-orig-vec');
+      const magEl = document.getElementById('stat-magnitude');
+      const unitEl = document.getElementById('stat-unit-vec');
+      const verEl = document.getElementById('stat-verify');
+
+      if (!is3D) {
+        const vx = Number(v.x.toFixed(1));
+        const vy = Number(v.y.toFixed(1));
+        const mag = Math.hypot(vx, vy);
+
+        origEl.innerHTML = `$\\vec{v} = ${formatVector(vx, vy)}$`;
+
+        if (mag === 0) {
+          magEl.innerHTML = `$\vert{}\\vec{v}\vert{} = 0\\text{ หน่วย}$`;
+          unitEl.innerHTML = `ไม่มีเวกเตอร์หนึ่งหน่วย (เวกเตอร์ศูนย์)`;
+          verEl.innerHTML = `-`;
+        } else {
+          const sqSum = (vx * vx + vy * vy).toFixed(1);
+          magEl.innerHTML = `$\vert{}\\vec{v}\vert{} = \\sqrt{(${vx})^2 + (${vy})^2} = \\sqrt{${sqSum}} \\approx ${mag.toFixed(2)}\\text{ หน่วย}$`;
+
+          const ux = (vx / mag).toFixed(2);
+          const uy = (vy / mag).toFixed(2);
+          unitEl.innerHTML = `$\\hat{v} = \\frac{\\vec{v}}{|\\vec{v}|} = \\frac{${vx}}{${mag.toFixed(2)}}i + \\frac{${vy}}{${mag.toFixed(2)}}j = ${formatVector(Number(ux), Number(uy))}$`;
+          verEl.innerHTML = `$|\\hat{v}| = \\sqrt{(${ux})^2 + (${uy})^2} = \\sqrt{${(ux*ux + uy*uy).toFixed(2)}} = 1.00\\text{ หน่วยเสมอ}$`;
+        }
+      } else {
+        const vx = Number(v.x.toFixed(1));
+        const vy = Number(v.y.toFixed(1));
+        const vz = Number(v.z.toFixed(1));
+        const mag = Math.hypot(vx, vy, vz);
+
+        origEl.innerHTML = `$\\vec{v} = ${formatVector(vx, vy, vz)}$`;
+
+        if (mag === 0) {
+          magEl.innerHTML = `$\vert{}\\vec{v}\vert{} = 0\\text{ หน่วย}$`;
+          unitEl.innerHTML = `ไม่มีเวกเตอร์หนึ่งหน่วย (เวกเตอร์ศูนย์)`;
+          verEl.innerHTML = `-`;
+        } else {
+          const sqSum = (vx * vx + vy * vy + vz * vz).toFixed(1);
+          magEl.innerHTML = `$|\\vec{v}| = \\sqrt{(${vx})^2 + (${vy})^2 + (${vz})^2} = \\sqrt{${sqSum}} \\approx ${mag.toFixed(2)}\\text{ หน่วย}$`;
+
+          const ux = (vx / mag).toFixed(2);
+          const uy = (vy / mag).toFixed(2);
+          const uz = (vz / mag).toFixed(2);
+          unitEl.innerHTML = `$\\hat{v} = \\frac{\\vec{v}}{|\\vec{v}|} = \\frac{${vx}}{${mag.toFixed(2)}}i + \\frac{${vy}}{${mag.toFixed(2)}}j + \\frac{${vz}}{${mag.toFixed(2)}}k = ${formatVector(Number(ux), Number(uy), Number(uz))}$`;
+          verEl.innerHTML = `$|\\hat{v}| = \\sqrt{(${ux})^2 + (${uy})^2 + (${uz})^2} = \\sqrt{${(ux

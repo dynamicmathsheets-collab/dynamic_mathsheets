@@ -1,0 +1,1036 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>การบวก ลบ และคูณเวกเตอร์ด้วยสเกลาร์</title>
+  
+  <!-- Google Fonts: Sarabun & Prompt -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@400;600;700&family=Sarabun:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+  <!-- MathJax 3 -->
+  <script>
+    window.MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']],
+        displayMath: [['$$', '$$'], ['\\[', '\\]']]
+      },
+      svg: { fontCache: 'global' }
+    };
+  </script>
+  <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+  <style>
+    :root {
+      --font-body: 'Sarabun', sans-serif;
+      --font-heading: 'Prompt', sans-serif;
+      --primary: #4f46e5;
+      --secondary: #0d9488;
+      --accent: #e11d48;
+      --slate-dark: #0f172a;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: var(--font-body);
+      color: #334155;
+      background-color: #f8fafc;
+      line-height: 1.6;
+    }
+
+    .container {
+      max-width: 1040px;
+      margin: 0 auto;
+      padding: 24px 16px;
+    }
+
+    .section-card {
+      background: #ffffff;
+      border-radius: 20px;
+      margin-bottom: 30px;
+      padding: 36px;
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.03);
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* สไตล์เฟรมหัวข้อ */
+    .hero-banner {
+      background: linear-gradient(135deg, #1e1b4b 0%, #4338ca 100%);
+      color: #ffffff;
+      text-align: center;
+      padding: 50px 24px;
+    }
+    .hero-banner .badge {
+      display: inline-block;
+      background: rgba(255, 255, 255, 0.18);
+      backdrop-filter: blur(8px);
+      padding: 5px 16px;
+      border-radius: 50px;
+      font-size: 0.9rem;
+      font-weight: 500;
+      margin-bottom: 12px;
+    }
+    .hero-banner h1 {
+      font-family: var(--font-heading);
+      font-size: 2.3rem;
+      font-weight: 700;
+      line-height: 1.3;
+      margin-bottom: 10px;
+    }
+    .hero-banner p {
+      font-size: 1.1rem;
+      opacity: 0.9;
+      max-width: 700px;
+      margin: 0 auto;
+    }
+
+    /* สไตล์เฟรมเนื้อหา */
+    .concept-section {
+      background: linear-gradient(180deg, #ffffff 0%, #fdf2f8 100%);
+      border-top: 6px solid #ec4899;
+    }
+    .concept-title {
+      font-family: var(--font-heading);
+      font-size: 1.55rem;
+      color: #9d174d;
+      margin-bottom: 14px;
+    }
+    .operation-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(290px, 1fr));
+      gap: 18px;
+      margin-top: 18px;
+    }
+    .op-card {
+      background: #ffffff;
+      border-radius: 12px;
+      padding: 20px;
+      border: 1px solid #e2e8f0;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.03);
+    }
+    .op-card h3 {
+      font-family: var(--font-heading);
+      font-size: 1.15rem;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .op-add h3 { color: #2563eb; }
+    .op-sub h3 { color: #dc2626; }
+    .op-scale h3 { color: #7c3aed; }
+
+    /* สไตล์เฟรม Interactive Model */
+    .interactive-section {
+      background: linear-gradient(180deg, #ffffff 0%, #f5f3ff 100%);
+      border-top: 6px solid #6366f1;
+    }
+    .model-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      margin-bottom: 16px;
+      gap: 12px;
+    }
+    .mode-btn-group {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .mode-btn {
+      font-family: var(--font-heading);
+      padding: 8px 18px;
+      border-radius: 50px;
+      border: 1px solid #c7d2fe;
+      background: #ffffff;
+      color: #4338ca;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-size: 0.9rem;
+    }
+    .mode-btn.active {
+      background: #4f46e5;
+      color: #ffffff;
+      border-color: #4f46e5;
+      box-shadow: 0 4px 10px rgba(79, 70, 229, 0.25);
+    }
+
+    .canvas-wrapper {
+      position: relative;
+      background: #ffffff;
+      border-radius: 14px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.06);
+      border: 1px solid #cbd5e1;
+      overflow: hidden;
+      margin: 0 auto 16px;
+      width: 720px;
+      max-width: 100%;
+      touch-action: none;
+    }
+    canvas { display: block; cursor: crosshair; }
+
+    .scalar-controls {
+      display: none;
+      background: #ffffff;
+      border-radius: 12px;
+      padding: 14px 20px;
+      border: 1px solid #e2e8f0;
+      margin-bottom: 14px;
+      align-items: center;
+      gap: 14px;
+      flex-wrap: wrap;
+    }
+    .scalar-btn-group {
+      display: flex;
+      gap: 6px;
+    }
+    .scalar-chip {
+      padding: 4px 12px;
+      border-radius: 6px;
+      background: #f1f5f9;
+      border: 1px solid #cbd5e1;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 0.85rem;
+    }
+    .scalar-chip.active {
+      background: #7c3aed;
+      color: white;
+      border-color: #7c3aed;
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(290px, 1fr));
+      gap: 12px;
+    }
+    .stat-badge {
+      background: #ffffff;
+      border-radius: 10px;
+      padding: 12px 16px;
+      border: 1px solid #e2e8f0;
+    }
+    .stat-badge strong {
+      display: block;
+      color: #64748b;
+      font-size: 0.85rem;
+      margin-bottom: 4px;
+    }
+    .stat-badge .val {
+      font-size: 1.05rem;
+      font-weight: 600;
+      color: #1e293b;
+      min-height: 28px;
+      display: flex;
+      align-items: center;
+    }
+
+    .discovery-box {
+      margin-top: 20px;
+      padding: 16px 20px;
+      background: #eff6ff;
+      border-left: 5px solid #3b82f6;
+      border-radius: 10px;
+    }
+    .discovery-box h4 {
+      font-family: var(--font-heading);
+      color: #1e40af;
+      margin-bottom: 4px;
+      font-size: 1.1rem;
+    }
+
+    /* สไตล์เฟรมใบงาน */
+    .worksheet-section {
+      background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+      border-top: 6px solid #4f46e5;
+    }
+    .worksheet-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 16px;
+      justify-content: flex-end;
+    }
+    .btn {
+      font-family: var(--font-heading);
+      font-size: 0.9rem;
+      padding: 8px 16px;
+      border-radius: 8px;
+      border: none;
+      cursor: pointer;
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s ease;
+    }
+    .btn-student { background: #4f46e5; color: white; }
+    .btn-student:hover { background: #4338ca; }
+    .btn-teacher { background: #0d9488; color: white; }
+    .btn-teacher:hover { background: #0f766e; }
+    .btn-toggle { background: #f1f5f9; color: #475569; border: 1px solid #cbd5e1; }
+    .btn-toggle:hover { background: #e2e8f0; }
+
+    .question-item {
+      padding: 12px 8px;
+      border-bottom: 1px dashed #cbd5e1;
+    }
+    .question-item:last-child { border-bottom: none; }
+    .question-title {
+      font-weight: 600;
+      color: #1e293b;
+      margin-bottom: 4px;
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      font-size: 0.98rem;
+    }
+    .write-area {
+      min-height: 32px;
+      border-bottom: 1px dotted #94a3b8;
+      margin: 6px 0;
+    }
+    .answer-key {
+      background: #ecfdf5;
+      border: 1px solid #a7f3d0;
+      color: #065f46;
+      padding: 10px 14px;
+      border-radius: 6px;
+      margin-top: 6px;
+      font-size: 0.92rem;
+      display: none;
+      line-height: 1.7;
+    }
+    .show-answers .answer-key { display: block; }
+
+    /* สไตล์เฟรมเกณฑ์การประเมิน */
+    .rubric-section {
+      background: linear-gradient(180deg, #ffffff 0%, #fff7ed 100%);
+      border-top: 6px solid #f97316;
+    }
+    .rubric-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 14px;
+      background: white;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+    }
+    .rubric-table th, .rubric-table td {
+      border: 1px solid #fed7aa;
+      padding: 12px 14px;
+      text-align: left;
+      vertical-align: top;
+      font-size: 0.9rem;
+    }
+    .rubric-table th {
+      background: #ffedd5;
+      font-family: var(--font-heading);
+      color: #9a3412;
+    }
+    .score-col { width: 25%; }
+
+    .print-header { display: none; }
+
+    /* ระบบพิมพ์แบบ Compact ตัดหน้าว่างทิ้ง 100% ไม่คล่อมหน้า */
+    @page {
+      size: A4 portrait;
+      margin: 10mm 12mm;
+    }
+
+    @media print {
+      html, body {
+        background: #ffffff !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        font-size: 13px !important;
+        line-height: 1.4 !important;
+        color: #000000 !important;
+      }
+      .container { padding: 0 !important; margin: 0 !important; max-width: 100% !important; }
+      .hero-banner, .concept-section, .interactive-section, .rubric-section, .worksheet-actions {
+        display: none !important;
+      }
+      #printable-worksheet {
+        display: block !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        box-shadow: none !important;
+        border: none !important;
+        border-radius: 0 !important;
+        background: #ffffff !important;
+      }
+      .print-header {
+        display: block !important;
+        text-align: center;
+        margin-bottom: 10px;
+        border-bottom: 1.5px solid #000;
+        padding-bottom: 4px;
+      }
+      .print-header h2 {
+        font-family: var(--font-heading);
+        font-size: 1.25rem !important;
+        font-weight: 700;
+        margin-bottom: 2px;
+      }
+      .print-info-row {
+        display: flex;
+        justify-content: space-between;
+        font-size: 0.85rem;
+      }
+      .question-item {
+        page-break-inside: avoid !important;
+        break-inside: avoid !important;
+        padding: 6px 0 !important;
+        border-bottom: 1px dashed #cbd5e1 !important;
+      }
+      .question-title { font-size: 0.93rem !important; margin-bottom: 3px !important; }
+      .write-area { min-height: 30px !important; margin: 4px 0 !important; border-bottom: 1px dotted #64748b !important; }
+      .answer-key {
+        padding: 6px 10px !important;
+        font-size: 0.86rem !important;
+        margin-top: 4px !important;
+        border: 1px solid #cbd5e1 !important;
+        background: #f8fafc !important;
+        color: #000000 !important;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .section-card { padding: 20px 14px; }
+      .hero-banner h1 { font-size: 1.8rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+
+    <!-- ==================== ตอนที่ 1 ==================== -->
+    <section class="section-card hero-banner">
+      <span class="badge">สาระการเรียนรู้คณิตศาสตร์เพิ่มเติม</span>
+      <h1>เรื่อง การบวก ลบ และคูณเวกเตอร์ด้วยสเกลาร์</h1>
+      <p>เรียนรู้การดำเนินการพีชคณิตกับเวกเตอร์ พร้อมเชื่อมโยงสู่การเปลี่ยนแปลงขนาด ทิศทาง และรูปเรขาคณิต</p>
+    </section>
+
+    <!-- ==================== ตอนที่ 2 ==================== -->
+    <section class="section-card concept-section">
+      <h2 class="concept-title">การดำเนินการกับเวกเตอร์ทางเรขาคณิตและพีชคณิต</h2>
+      <p>
+        นักเรียนศึกษาการดำเนินการกับเวกเตอร์ ได้แก่ การบวก การลบ และการคูณเวกเตอร์ด้วยจำนวนจริง (สเกลาร์) 
+        โดยเชื่อมโยงการคำนวณเชิงตัวเลขกับการเปลี่ยนแปลงของขนาด ทิศทาง และตำแหน่งทางเรขาคณิต
+      </p>
+
+      <div class="operation-grid">
+        <!-- การบวก -->
+        <div class="op-card op-add">
+          <h3>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+            การบวกเวกเตอร์ ($\vec{u} + \vec{v}$)
+          </h3>
+          <p style="font-size: 0.93rem;">
+            <strong>ทางเรขาคณิต:</strong> ใช้วิธี <em>"หางต่อหัว" (Head-to-Tail)</em> โดยนำจุดเริ่มต้นของ $\vec{v}$ มาต่อที่จุดปลายของ $\vec{u}$ เวกเตอร์ผลลัพธ์จะลากจากจุดเริ่มต้นของ $\vec{u}$ ไปยังจุดปลายของ $\vec{v}$<br>
+            <strong>ทางพีชคณิต:</strong> ถ้านำ $\vec{u} = a_1 i + b_1 j$ และ $\vec{v} = a_2 i + b_2 j$
+          </p>
+          <p style="text-align: center; margin: 8px 0; font-weight: 600; color: #1e40af;">
+            $$\vec{u} + \vec{v} = (a_1 + a_2)i + (b_1 + b_2)j$$
+          </p>
+        </div>
+
+        <!-- การลบ -->
+        <div class="op-card op-sub">
+          <h3>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+            การลบเวกเตอร์ ($\vec{u} - \vec{v}$)
+          </h3>
+          <p style="font-size: 0.93rem;">
+            <strong>นิยาม:</strong> คือการบวกด้วยนิเสธของเวกเตอร์ นั่นคือ $\vec{u} - \vec{v} = \vec{u} + (-\vec{v})$<br>
+            โดย $-\vec{v}$ คือเวกเตอร์ที่มีขนาดเท่าเดิมแต่ <strong>ทิศทางตรงกันข้าม</strong> ($180^\circ$)<br>
+            <strong>ทางพีชคณิต:</strong> 
+          </p>
+          <p style="text-align: center; margin: 8px 0; font-weight: 600; color: #b91c1c;">
+            $$\vec{u} - \vec{v} = (a_1 - a_2)i + (b_1 - b_2)j$$
+          </p>
+        </div>
+
+        <!-- การคูณด้วยสเกลาร์ -->
+        <div class="op-card op-scale">
+          <h3>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+            การคูณด้วยสเกลาร์ ($k\vec{u}$)
+          </h3>
+          <p style="font-size: 0.93rem;">
+            เมื่อ $k$ เป็นจำนวนจริงใด ๆ:<br>
+            • ถ้า $k > 0$: ขนาดเปลี่ยนเป็น $|k||\vec{u}|$ ทิศทาง <strong>เดิม</strong><br>
+            • ถ้า $k < 0$: ขนาดเปลี่ยนเป็น $|k||\vec{u}|$ ทิศทาง <strong>ตรงข้าม</strong><br>
+            <strong>ทางพีชคณิต:</strong>
+          </p>
+          <p style="text-align: center; margin: 8px 0; font-weight: 600; color: #6d28d9;">
+            $$k\vec{u} = (ka_1)i + (kb_1)j$$
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== ตอนที่ 3 ==================== -->
+    <section class="section-card interactive-section">
+      <div class="model-header">
+        <div>
+          <h2 style="font-family: var(--font-heading); color: #4338ca; font-size: 1.55rem;">
+            Interactive Model: การดำเนินการกับเวกเตอร์
+          </h2>
+          <p style="color: #6366f1; font-size: 0.93rem;">
+            ลากปลายลูกศร $\vec{u}$ (สีน้ำเงิน) และ $\vec{v}$ (สีส้ม) แล้วเลือกโหมดเพื่อดูเรขาคณิตของการคำนวณ
+          </p>
+        </div>
+        <div class="mode-btn-group">
+          <button class="mode-btn active" id="btn-mode-add" onclick="setMode('add')">บวก $\vec{u} + \vec{v}$</button>
+          <button class="mode-btn" id="btn-mode-sub" onclick="setMode('sub')">ลบ $\vec{u} - \vec{v}$</button>
+          <button class="mode-btn" id="btn-mode-scale" onclick="setMode('scale')">คูณสเกลาร์ $k\vec{u}$</button>
+        </div>
+      </div>
+
+      <!-- แถบควบคุมค่าสเกลาร์ k (แสดงเมื่อเลือกโหมดคูณ) -->
+      <div class="scalar-controls" id="scalar-panel">
+        <span style="font-family: var(--font-heading); font-weight: 600; color: #6d28d9;">เลือกค่า $k$:</span>
+        <div class="scalar-btn-group">
+          <button class="scalar-chip active" onclick="setK(2)">k = 2</button>
+          <button class="scalar-chip" onclick="setK(1)">k = 1</button>
+          <button class="scalar-chip" onclick="setK(0.5)">k = 0.5</button>
+          <button class="scalar-chip" onclick="setK(-1)">k = -1</button>
+          <button class="scalar-chip" onclick="setK(-2)">k = -2</button>
+        </div>
+        <div style="display: flex; align-items: center; gap: 8px; flex: 1; min-width: 200px;">
+          <input type="range" id="sliderK" min="-3" max="3" step="0.5" value="2" oninput="setK(parseFloat(this.value))" style="flex: 1; accent-color: #7c3aed;">
+          <span id="k-value-text" style="font-weight: 700; width: 40px; text-align: right; color: #6d28d9;">2.0</span>
+        </div>
+      </div>
+
+      <div class="canvas-wrapper">
+        <canvas id="vectorCanvas" width="720" height="440"></canvas>
+      </div>
+
+      <!-- แผงแสดงสถิติและวิธีทำละเอียด -->
+      <div class="stats-grid">
+        <div class="stat-badge">
+          <strong>เวกเตอร์ต้นทาง $\vec{u}$ และ $\vec{v}$</strong>
+          <div class="val" id="label-orig-vectors">$\vec{u} = 3i + 2j, \; \vec{v} = 1i + 3j$</div>
+        </div>
+
+        <div class="stat-badge">
+          <strong>เวกเตอร์ผลลัพธ์เชิงพีชคณิต</strong>
+          <div class="val" id="label-result-vector">$\vec{u} + \vec{v} = 4i + 5j$</div>
+        </div>
+
+        <div class="stat-badge" style="grid-column: 1 / -1; background: #faf5ff; border-color: #e9d5ff;">
+          <strong style="color: #6d28d9;">วิธีคำนวณทีละขั้นตอน (Step-by-Step)</strong>
+          <div class="val" id="label-step-by-step">
+            $\vec{u} + \vec{v} = (3 + 1)i + (2 + 3)j = 4i + 5j$
+          </div>
+        </div>
+
+        <div class="stat-badge" style="grid-column: 1 / -1; background: #f0fdf4; border-color: #bbf7d0;">
+          <strong style="color: #15803d;">ขนาดของผลลัพธ์</strong>
+          <div class="val" id="label-result-magnitude">
+            $|\vec{u} + \vec{v}| = \sqrt{4^2 + 5^2} = \sqrt{16 + 25} = \sqrt{41} \approx 6.40\text{ หน่วย}$
+          </div>
+        </div>
+      </div>
+
+      <div class="discovery-box">
+        <h4>💡 จุดเด่นของโมเดล: สิ่งที่นักเรียนค้นพบ</h4>
+        <p id="discovery-text">
+          <strong>"การคำนวณเปลี่ยนรูปเรขาคณิตอย่างไร"</strong><br>
+          • <strong>การบวก:</strong> การนำสัมประสิทธิ์มาบวกกัน $(a_1+a_2)i + (b_1+b_2)j$ มีความหมายเทียบเท่ากับการยกเวกเตอร์ตัวที่สองไปต่อที่ปลายของตัวแรก (หางต่อหัว)<br>
+          • <strong>การลบ:</strong> เวกเตอร์ $\vec{u} - \vec{v}$ คือการบวกด้วย $-\vec{v}$ ซึ่งชี้กลับทิศ $180^\circ$<br>
+          • <strong>การคูณสเกลาร์:</strong> เมื่อ $k$ เป็นลบ เวกเตอร์จะกลับทิศตรงข้ามทันที และขนาดยืด-หดตามค่าสัมบูรณ์ของ $k$
+        </p>
+      </div>
+    </section>
+
+    <!-- ==================== ตอนที่ 4 ==================== -->
+    <section class="section-card worksheet-section" id="printable-worksheet">
+      <div class="print-header">
+        <h2>ใบงานคณิตศาสตร์: เรื่อง การบวก ลบ และคูณเวกเตอร์ด้วยสเกลาร์</h2>
+        <div class="print-info-row">
+          <span>ชื่อ-นามสกุล: ...................................................................</span>
+          <span>ชั้น: ................ เลขที่: ...........</span>
+          <span>วันที่: ........................</span>
+        </div>
+      </div>
+
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
+        <h2 style="font-family: var(--font-heading); color: #4338ca; font-size: 1.45rem;">
+          ใบงานตรวจสอบความเข้าใจ (5 ข้อ)
+        </h2>
+        <div class="worksheet-actions">
+          <button class="btn btn-toggle" onclick="toggleAnswers()">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+            <span id="toggle-text">แสดง/ซ่อนเฉลย</span>
+          </button>
+          <button class="btn btn-student" onclick="printSheet('student')">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+            พิมพ์ใบงานสำหรับนักเรียน
+          </button>
+          <button class="btn btn-teacher" onclick="printSheet('teacher')">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+            พิมพ์เฉลยสำหรับครู
+          </button>
+        </div>
+      </div>
+
+      <div class="worksheet-list">
+        <!-- ข้อ 1 -->
+        <div class="question-item">
+          <div class="question-title">
+            <span>1.</span>
+            <span>กำหนดเวกเตอร์ $\vec{u} = 3i - 2j$ และ $\vec{v} = -5i + 6j$ จงแสดงวิธีทำหาเวกเตอร์ผลลัพธ์ $\vec{u} + \vec{v}$ และคำนวณขนาด $|\vec{u} + \vec{v}|$</span>
+          </div>
+          <div class="write-area"></div>
+          <div class="answer-key">
+            <strong>เฉลยวิธีทำ:</strong><br>
+            • $\vec{u} + \vec{v} = (3 + (-5))i + (-2 + 6)j = -2i + 4j$<br>
+            • หาขนาด: $|\vec{u} + \vec{v}| = \sqrt{(-2)^2 + 4^2} = \sqrt{4 + 16} = \sqrt{20} = 2\sqrt{5}\text{ หน่วย}$
+          </div>
+        </div>
+
+        <!-- ข้อ 2 -->
+        <div class="question-item">
+          <div class="question-title">
+            <span>2.</span>
+            <span>จากเวกเตอร์ $\vec{u} = 3i - 2j$ และ $\vec{v} = -5i + 6j$ ในข้อ 1 จงแสดงวิธีทำหาเวกเตอร์ $\vec{u} - \vec{v}$ พร้อมทั้งอธิบายความหมายเชิงเรขาคณิตของการลบ</span>
+          </div>
+          <div class="write-area"></div>
+          <div class="answer-key">
+            <strong>เฉลยวิธีทำ:</strong><br>
+            • $\vec{u} - \vec{v} = \vec{u} + (-\vec{v}) = (3 - (-5))i + (-2 - 6)j = 8i - 8j$<br>
+            • <strong>ความหมายเชิงเรขาคณิต:</strong> คือการนำเวกเตอร์ $\vec{u}$ มาบวกกับเวกเตอร์นิเสธ $-\vec{v}$ (ซึ่งกลับทิศทาง $180^\circ$ เป็น $5i - 6j$) โดยนำหางของ $-\vec{v}$ มาต่อที่หัวของ $\vec{u}$
+          </div>
+        </div>
+
+        <!-- ข้อ 3 -->
+        <div class="question-item">
+          <div class="question-title">
+            <span>3.</span>
+            <span>กำหนดเวกเตอร์ $\vec{w} = -4i + 3j$ จงหาเวกเตอร์ $-2\vec{w}$ พร้อมเปรียบเทียบขนาดและทิศทางของ $-2\vec{w}$ กับ $\vec{w}$</span>
+          </div>
+          <div class="write-area"></div>
+          <div class="answer-key">
+            <strong>เฉลยวิธีทำ:</strong><br>
+            • $-2\vec{w} = -2(-4i + 3j) = 8i - 6j$<br>
+            • <strong>เปรียบเทียบขนาด:</strong> $|\vec{w}| = \sqrt{(-4)^2 + 3^2} = 5$ หน่วย และ $|-2\vec{w}| = \sqrt{8^2 + (-6)^2} = 10$ หน่วย (มีขนาดเป็น $2$ เท่า)<br>
+            • <strong>เปรียบเทียบทิศทาง:</strong> มีทิศทางตรงกันข้ามกับ $\vec{w}$ เนื่องจากสเกลาร์เป็นจำนวนลบ ($k = -2$)
+          </div>
+        </div>
+
+        <!-- ข้อ 4 -->
+        <div class="question-item">
+          <div class="question-title">
+            <span>4.</span>
+            <span>กำหนด $\vec{a} = 2i + j$ และ $\vec{b} = -i + 4j$ จงแสดงวิธีหาเวกเตอร์ $3\vec{a} - 2\vec{b}$</span>
+          </div>
+          <div class="write-area"></div>
+          <div class="answer-key">
+            <strong>เฉลยวิธีทำ:</strong><br>
+            • คำนวณ $3\vec{a} = 3(2i + j) = 6i + 3j$<br>
+            • คำนวณ $2\vec{b} = 2(-i + 4j) = -2i + 8j$<br>
+            • หาผลต่าง: $3\vec{a} - 2\vec{b} = (6 - (-2))i + (3 - 8)j = 8i - 5j$
+          </div>
+        </div>
+
+        <!-- ข้อ 5 -->
+        <div class="question-item">
+          <div class="question-title">
+            <span>5.</span>
+            <span>ถ้า $\vec{u} + \vec{v} = 6i - j$ และ $\vec{u} - \vec{v} = 2i + 5j$ จงแสดงวิธีทำแก้ระบบสมการเพื่อหาเวกเตอร์ $\vec{u}$ และเวกเตอร์ $\vec{v}$</span>
+          </div>
+          <div class="write-area"></div>
+          <div class="answer-key">
+            <strong>เฉลยวิธีทำ:</strong><br>
+            กำหนดเป็นสมการ (1) $\vec{u} + \vec{v} = 6i - j$ และ (2) $\vec{u} - \vec{v} = 2i + 5j$<br>
+            • นำ (1) + (2): $2\vec{u} = (6 + 2)i + (-1 + 5)j = 8i + 4j \implies \vec{u} = 4i + 2j$<br>
+            • แทนค่า $\vec{u}$ ใน (1): $(4i + 2j) + \vec{v} = 6i - j \implies \vec{v} = (6 - 4)i + (-1 - 2)j = 2i - 3j$<br>
+            <strong>ตอบ:</strong> $\vec{u} = 4i + 2j$ และ $\vec{v} = 2i - 3j$
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== ตอนที่ 5 ==================== -->
+    <section class="section-card rubric-section">
+      <h2 style="font-family: var(--font-heading); color: #c2410c; font-size: 1.5rem; margin-bottom: 6px;">
+        เกณฑ์การประเมินใบงาน (Scoring Rubric - 3 ระดับ)
+      </h2>
+      <p style="color: #7c2d12; font-size: 0.95rem;">การวัดและประเมินผลทักษะกระบวนการคิดทางคณิตศาสตร์ เรื่อง การบวก ลบ และคูณเวกเตอร์ด้วยสเกลาร์</p>
+
+      <table class="rubric-table">
+        <thead>
+          <tr>
+            <th style="width: 25%;">ประเด็นการประเมิน</th>
+            <th class="score-col">ระดับ 3 (ดีเยี่ยม : 3 คะแนน)</th>
+            <th class="score-col">ระดับ 2 (พอใช้ : 2 คะแนน)</th>
+            <th class="score-col">ระดับ 1 (ปรับปรุง : 1 คะแนน)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>1. ทักษะการบวกและลบเวกเตอร์เชิงพีชคณิต</strong></td>
+            <td>คำนวณการบวกและลบเวกเตอร์ในรูป $ai + bj$ ได้ถูกต้องแม่นยำ 100% จัดการเครื่องหมายลบของพิกัดได้อย่างถูกต้องสมบูรณ์</td>
+            <td>ใช้สูตรบวกและลบสัมประสิทธิ์หน้า $i$ และ $j$ ได้ถูกต้อง แต่มีข้อผิดพลาดเล็กน้อยเรื่องการคิดคำนวณเครื่องหมาย</td>
+            <td>ไม่เข้าใจหลักการบวกและลบเวกเตอร์ สลับสัมประสิทธิ์หรือคำนวณผลลัพธ์ไม่ถูกต้อง</td>
+          </tr>
+          <tr>
+            <td><strong>2. ความเข้าใจการคูณเวกเตอร์ด้วยสเกลาร์</strong></td>
+            <td>กระจายสเกลาร์ $k$ เข้าคูณทุกองค์ประกอบถูกต้อง และอธิบายผลของ $k$ ต่อขนาดและทิศทาง (ตรงข้ามเมื่อ $k < 0$) ได้ชัดเจน</td>
+            <td>คูณกระจายตัวเลขสเกลาร์ได้ถูกต้อง แต่อธิบายความสัมพันธ์ของทิศทางเมื่อสเกลาร์ติดลบยังไม่สมบูรณ์</td>
+            <td>ไม่สามารถคูณสเกลาร์เข้ากับเวกเตอร์ได้ หรือคูณเฉพาะองค์ประกอบใดองค์ประกอบหนึ่ง</td>
+          </tr>
+          <tr>
+            <td><strong>3. การเชื่อมโยงพีชคณิตกับเรขาคณิต</strong></td>
+            <td>อธิบายมโนทัศน์หางต่อหัว การกลับทิศของเวกเตอร์นิเสธ $-\vec{v}$ และการยืด-หดของขนาดได้อย่างเป็นเหตุเป็นผล</td>
+            <td>ระบุวิธีการต่อเวกเตอร์ได้ แต่ยังไม่สามารถเชื่อมโยงกับการกลับทิศทางของเวกเตอร์นิเสธได้อย่างชัดเจน</td>
+            <td>ไม่เข้าใจความหมายเชิงเรขาคณิตของการบวก ลบ และการคูณด้วยสเกลาร์</td>
+          </tr>
+          <tr>
+            <td><strong>4. การแก้ปัญหาและระบบสมการเวกเตอร์</strong></td>
+            <td>แสดงขั้นตอนการรวมสมการเวกเตอร์เพื่อหาเวกเตอร์ที่ไม่ทราบค่าได้อย่างเป็นระบบ ถูกต้องแม่นยำ และครบถ้วน</td>
+            <td>วางแผนแก้ระบบสมการได้ถูกต้อง แต่มีข้อผิดพลาดในขั้นตอนคิดคำนวณตัวเลขทางพีชคณิต</td>
+            <td>ไม่สามารถตั้งสมการหรือดำเนินการกับระบบสมการเวกเตอร์ได้</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div style="margin-top: 16px; font-size: 0.92rem; color: #7c2d12; background: #fff; padding: 12px 16px; border-radius: 8px; border: 1px dashed #fdba74;">
+        <strong>เกณฑ์การตัดสินระดับคุณภาพ:</strong><br>
+        คะแนนรวม $10 - 12$ คะแนน = <strong>ระดับคุณภาพ ดีมาก</strong> | 
+        คะแนนรวม $7 - 9$ คะแนน = <strong>ระดับคุณภาพ ปานกลาง</strong> | 
+        คะแนนรวม $1 - 6$ คะแนน = <strong>ระดับคุณภาพ ควรปรับปรุง</strong>
+      </div>
+    </section>
+
+  </div>
+
+  <script>
+    const canvas = document.getElementById('vectorCanvas');
+    const ctx = canvas.getContext('2d');
+
+    const originX = canvas.width / 2;
+    const originY = canvas.height / 2;
+    const scale = 25; // 25px ต่อ 1 หน่วยพิกัด
+
+    // พิกัดเวกเตอร์ต้นทาง (เริ่มต้นที่จุดกำเนิด)
+    let u = { x: 3, y: 2 };
+    let v = { x: 1, y: 3 };
+    let currentMode = 'add'; // 'add', 'sub', 'scale'
+    let currentK = 2.0;
+
+    let isDraggingU = false;
+    let isDraggingV = false;
+
+    function mathToCanvas(mx, my) {
+      return { cx: originX + mx * scale, cy: originY - my * scale };
+    }
+
+    function canvasToMath(cx, cy) {
+      return {
+        mx: Math.round((cx - originX) / scale),
+        my: Math.round((originY - cy) / scale)
+      };
+    }
+
+    function drawGrid() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      ctx.strokeStyle = '#f1f5f9';
+      ctx.lineWidth = 1;
+      for (let x = originX % scale; x < canvas.width; x += scale) {
+        ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, canvas.height); ctx.stroke();
+      }
+      for (let y = originY % scale; y < canvas.height; y += scale) {
+        ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(canvas.width, y); ctx.stroke();
+      }
+
+      ctx.strokeStyle = '#94a3b8';
+      ctx.lineWidth = 1.5;
+      ctx.beginPath(); ctx.moveTo(0, originY); ctx.lineTo(canvas.width, originY); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(originX, 0); ctx.lineTo(originX, canvas.height); ctx.stroke();
+
+      ctx.fillStyle = '#64748b';
+      ctx.font = '12px Prompt, sans-serif';
+      ctx.fillText('+X (i)', canvas.width - 45, originY - 8);
+      ctx.fillText('+Y (j)', originX + 8, 16);
+      ctx.fillText('(0,0)', originX - 30, originY + 16);
+    }
+
+    function drawArrow(fromX, fromY, toX, toY, color = '#2563eb', lineWidth = 3.5, isDashed = false) {
+      const headLength = 12;
+      const angle = Math.atan2(toY - fromY, toX - fromX);
+
+      ctx.save();
+      ctx.strokeStyle = color;
+      ctx.fillStyle = color;
+      ctx.lineWidth = lineWidth;
+      if (isDashed) ctx.setLineDash([5, 5]);
+
+      ctx.beginPath();
+      ctx.moveTo(fromX, fromY);
+      ctx.lineTo(toX, toY);
+      ctx.stroke();
+
+      ctx.setLineDash([]);
+      ctx.beginPath();
+      ctx.moveTo(toX, toY);
+      ctx.lineTo(toX - headLength * Math.cos(angle - Math.PI / 7), toY - headLength * Math.sin(angle - Math.PI / 7));
+      ctx.lineTo(toX - headLength * Math.cos(angle + Math.PI / 7), toY - headLength * Math.sin(angle + Math.PI / 7));
+      ctx.closePath();
+      ctx.fill();
+      ctx.restore();
+    }
+
+    function formatIJ(x, y) {
+      let strX = x === 1 ? "i" : x === -1 ? "-i" : x !== 0 ? `${x}i` : "";
+      let strY = "";
+      if (y === 1) strY = strX ? "+ j" : "j";
+      else if (y === -1) strY = "- j";
+      else if (y > 0) strY = strX ? `+ ${y}j` : `${y}j`;
+      else if (y < 0) strY = `- ${Math.abs(y)}j`;
+
+      if (!strX && !strY) return "0";
+      return `${strX} ${strY}`.trim();
+    }
+
+    function render() {
+      drawGrid();
+
+      const pO = mathToCanvas(0, 0);
+      const pU = mathToCanvas(u.x, u.y);
+      const pV = mathToCanvas(v.x, v.y);
+
+      if (currentMode === 'add') {
+        // 1. เวกเตอร์ u
+        drawArrow(pO.cx, pO.cy, pU.cx, pU.cy, '#2563eb', 3.5);
+        // 2. เวกเตอร์ v เดิมจากจุดกำเนิด
+        drawArrow(pO.cx, pO.cy, pV.cx, pV.cy, '#ea580c', 3);
+        // 3. หางต่อหัว: เลื่อน v ไปต่อที่หัว u
+        const pUV = mathToCanvas(u.x + v.x, u.y + v.y);
+        drawArrow(pU.cx, pU.cy, pUV.cx, pUV.cy, '#f97316', 2.8, true);
+        // 4. ผลลัพธ์ u + v
+        drawArrow(pO.cx, pO.cy, pUV.cx, pUV.cy, '#10b981', 4);
+
+        // จุดลาก
+        drawDragHandle(pU.cx, pU.cy, '#2563eb', `u (${u.x}, ${u.y})`);
+        drawDragHandle(pV.cx, pV.cy, '#ea580c', `v (${v.x}, ${v.y})`);
+        drawPointLabel(pUV.cx, pUV.cy, '#059669', `u + v`);
+
+      } else if (currentMode === 'sub') {
+        // 1. เวกเตอร์ u
+        drawArrow(pO.cx, pO.cy, pU.cx, pU.cy, '#2563eb', 3.5);
+        // 2. เวกเตอร์ v เดิม
+        drawArrow(pO.cx, pO.cy, pV.cx, pV.cy, '#94a3b8', 2.5, true);
+        // 3. เวกเตอร์ -v จากจุดกำเนิด
+        const pNegV = mathToCanvas(-v.x, -v.y);
+        drawArrow(pO.cx, pO.cy, pNegV.cx, pNegV.cy, '#dc2626', 3);
+        // 4. นำ -v ไปต่อที่หัว u: u + (-v)
+        const pUsubV = mathToCanvas(u.x - v.x, u.y - v.y);
+        drawArrow(pU.cx, pU.cy, pUsubV.cx, pUsubV.cy, '#f87171', 2.8, true);
+        // 5. ผลลัพธ์ u - v
+        drawArrow(pO.cx, pO.cy, pUsubV.cx, pUsubV.cy, '#dc2626', 4);
+
+        // จุดลาก
+        drawDragHandle(pU.cx, pU.cy, '#2563eb', `u (${u.x}, ${u.y})`);
+        drawDragHandle(pV.cx, pV.cy, '#94a3b8', `v (${v.x}, ${v.y})`);
+        drawPointLabel(pNegV.cx, pNegV.cy, '#b91c1c', `-v`);
+        drawPointLabel(pUsubV.cx, pUsubV.cy, '#991b1b', `u - v`);
+
+      } else if (currentMode === 'scale') {
+        // 1. เวกเตอร์ u ต้นทาง (เส้นประสีจาง)
+        drawArrow(pO.cx, pO.cy, pU.cx, pU.cy, '#94a3b8', 2.5, true);
+        // 2. เวกเตอร์ ku ผลลัพธ์
+        const scaledX = u.x * currentK;
+        const scaledY = u.y * currentK;
+        const pScaled = mathToCanvas(scaledX, scaledY);
+        drawArrow(pO.cx, pO.cy, pScaled.cx, pScaled.cy, '#7c3aed', 4);
+
+        drawDragHandle(pU.cx, pU.cy, '#2563eb', `u (${u.x}, ${u.y})`);
+        drawPointLabel(pScaled.cx, pScaled.cy, '#6d28d9', `${currentK}u`);
+      }
+
+      updateCalculations();
+    }
+
+    function drawDragHandle(cx, cy, color, text) {
+      ctx.fillStyle = color;
+      ctx.beginPath(); ctx.arc(cx, cy, 7, 0, Math.PI * 2); ctx.fill();
+      ctx.strokeStyle = '#ffffff'; ctx.lineWidth = 2; ctx.stroke();
+      ctx.fillStyle = '#1e293b';
+      ctx.font = '600 13px Prompt, sans-serif';
+      ctx.fillText(text, cx + 10, cy - 8);
+    }
+
+    function drawPointLabel(cx, cy, color, text) {
+      ctx.fillStyle = color;
+      ctx.font = '700 13px Prompt, sans-serif';
+      ctx.fillText(text, cx + 10, cy + 16);
+    }
+
+    function updateCalculations() {
+      const origEl = document.getElementById('label-orig-vectors');
+      const resEl = document.getElementById('label-result-vector');
+      const stepEl = document.getElementById('label-step-by-step');
+      const magEl = document.getElementById('label-result-magnitude');
+
+      origEl.innerHTML = `$\\vec{u} = ${formatIJ(u.x, u.y)}, \\; \\vec{v} = ${formatIJ(v.x, v.y)}$`;
+
+      if (currentMode === 'add') {
+        const rx = u.x + v.x;
+        const ry = u.y + v.y;
+        const mag = Math.hypot(rx, ry);
+
+        resEl.innerHTML = `$\\vec{u} + \\vec{v} = ${formatIJ(rx, ry)}$`;
+        stepEl.innerHTML = `$\\vec{u} + \\vec{v} = (${u.x} + (${v.x}))i + (${u.y} + (${v.y}))j = ${formatIJ(rx, ry)}$`;
+        magEl.innerHTML = `$|\\vec{u} + \\vec{v}| = \\sqrt{(${rx})^2 + (${ry})^2} = \\sqrt{${rx*rx + ry*ry}} \\approx ${mag.toFixed(2)}\\text{ หน่วย}$`;
+
+      } else if (currentMode === 'sub') {
+        const rx = u.x - v.x;
+        const ry = u.y - v.y;
+        const mag = Math.hypot(rx, ry);
+
+        resEl.innerHTML = `$\\vec{u} - \\vec{v} = ${formatIJ(rx, ry)}$`;
+        stepEl.innerHTML = `$\\vec{u} - \\vec{v} = \\vec{u} + (-\\vec{v}) = (${u.x} - (${v.x}))i + (${u.y} - (${v.y}))j = ${formatIJ(rx, ry)}$`;
+        magEl.innerHTML = `$|\\vec{u} - \\vec{v}| = \\sqrt{(${rx})^2 + (${ry})^2} = \\sqrt{${rx*rx + ry*ry}} \\approx ${mag.toFixed(2)}\\text{ หน่วย}$`;
+
+      } else if (currentMode === 'scale') {
+        const rx = Number((u.x * currentK).toFixed(2));
+        const ry = Number((u.y * currentK).toFixed(2));
+        const mag = Math.hypot(rx, ry);
+        const origMag = Math.hypot(u.x, u.y);
+
+        resEl.innerHTML = `$k\\vec{u} = ${formatIJ(rx, ry)}$`;
+        stepEl.innerHTML = `$${currentK}\\vec{u} = (${currentK} \\times (${u.x}))i + (${currentK} \\times (${u.y}))j = ${formatIJ(rx, ry)}$`;
+        
+        let dirText = currentK > 0 ? "ทิศทางเดิม" : currentK < 0 ? "ทิศทางตรงกันข้าม ($180^\\circ$)" : "เวกเตอร์ศูนย์";
+        magEl.innerHTML = `$|${currentK}\\vec{u}| = |${currentK}| \\times |\\vec{u}| = ${Math.abs(currentK)} \\times ${origMag.toFixed(2)} = ${mag.toFixed(2)}\\text{ หน่วย (${dirText})}$`;
+      }
+
+      if (window.MathJax && MathJax.typesetPromise) {
+        MathJax.typesetPromise([origEl, resEl, stepEl, magEl]);
+      }
+    }
+
+    function setMode(mode) {
+      currentMode = mode;
+      document.getElementById('btn-mode-add').classList.toggle('active', mode === 'add');
+      document.getElementById('btn-mode-sub').classList.toggle('active', mode === 'sub');
+      document.getElementById('btn-mode-scale').classList.toggle('active', mode === 'scale');
+
+      const scalarPanel = document.getElementById('scalar-panel');
+      scalarPanel.style.display = mode === 'scale' ? 'flex' : 'none';
+
+      render();
+    }
+
+    function setK(val) {
+      currentK = val;
+      document.getElementById('sliderK').value = val;
+      document.getElementById('k-value-text').innerText = val.toFixed(1);
+
+      document.querySelectorAll('.scalar-chip').forEach(chip => {
+        chip.classList.toggle('active', chip.innerText === `k = ${val}`);
+      });
+
+      render();
+    }
+
+    // ระบบลากจุดบน Canvas
+    function getCanvasCoordinates(e) {
+      const rect = canvas.getBoundingClientRect();
+      const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+      const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+      return { x: clientX - rect.left, y: clientY - rect.top };
+    }
+
+    function handleStart(e) {
+      const { x, y } = getCanvasCoordinates(e);
+      const pU = mathToCanvas(u.x, u.y);
+      const pV = mathToCanvas(v.x, v.y);
+
+      if (Math.hypot(x - pU.cx, y - pU.cy) < 16) {
+        isDraggingU = true;
+      } else if (currentMode !== 'scale' && Math.hypot(x - pV.cx, y - pV.cy) < 16) {
+        isDraggingV = true;
+      }
+    }
+
+    function handleMove(e) {
+      if (!isDraggingU && !isDraggingV) return;
+      e.preventDefault();
+      const { x, y } = getCanvasCoordinates(e);
+      const math = canvasToMath(x, y);
+
+      if (isDraggingU) {
+        u.x = math.mx;
+        u.y = math.my;
+      } else if (isDraggingV) {
+        v.x = math.mx;
+        v.y = math.my;
+      }
+      render();
+    }
+
+    function handleEnd() {
+      isDraggingU = false;
+      isDraggingV = false;
+    }
+
+    canvas.addEventListener('mousedown', handleStart);
+    window.addEventListener('mousemove', handleMove);
+    window.addEventListener('mouseup', handleEnd);
+
+    canvas.addEventListener('touchstart', handleStart, { passive: false });
+    window.addEventListener('touchmove', handleMove, { passive: false });
+    window.addEventListener('touchend', handleEnd);
+
+    // ระบบพิมพ์ใบงานและเฉลย
+    function toggleAnswers() {
+      const section = document.getElementById('printable-worksheet');
+      section.classList.toggle('show-answers');
+      const isShown = section.classList.contains('show-answers');
+      document.getElementById('toggle-text').innerText = isShown ? 'ซ่อนเฉลย' : 'แสดงเฉลย';
+    }
+
+    function printSheet(role) {
+      const worksheetSection = document.getElementById('printable-worksheet');
+      const originalHasClass = worksheetSection.classList.contains('show-answers');
+
+      if (role === 'teacher') {
+        worksheetSection.classList.add('show-answers');
+      } else {
+        worksheetSection.classList.remove('show-answers');
+      }
+
+      window.print();
+
+      if (originalHasClass) {
+        worksheetSection.classList.add('show-answers');
+      } else {
+        worksheetSection.classList.remove('show-answers');
+      }
+    }
+
+    window.addEventListener('load', () => {
+      render();
+    });
+  </script>
+</body>
+</html>

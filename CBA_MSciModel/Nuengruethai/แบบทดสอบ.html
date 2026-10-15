@@ -1,0 +1,626 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>แบบทดสอบวัดผลสัมฤทธิ์ทางการเรียน เรื่อง เวกเตอร์ ม.5</title>
+  
+  <!-- Google Fonts: Sarabun & Prompt -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@400;600;700&family=Sarabun:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+  <!-- MathJax 3 -->
+  <script>
+    window.MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']],
+        displayMath: [['$$', '$$'], ['\\[', '\\]']]
+      },
+      svg: { fontCache: 'global' }
+    };
+  </script>
+  <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+  <style>
+    :root {
+      --font-body: 'Sarabun', sans-serif;
+      --font-heading: 'Prompt', sans-serif;
+      --primary: #1e3a8a;
+      --secondary: #0d9488;
+      --accent: #b45309;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: var(--font-body);
+      color: #334155;
+      background-color: #f1f5f9;
+      line-height: 1.6;
+    }
+    .container { max-width: 1040px; margin: 0 auto; padding: 24px 16px; }
+
+    .card {
+      background: #ffffff;
+      border-radius: 18px;
+      margin-bottom: 24px;
+      padding: 32px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.04);
+    }
+
+    /* ส่วนหัวแบบทดสอบ */
+    .test-header {
+      background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%);
+      color: #ffffff;
+      text-align: center;
+      padding: 40px 20px;
+    }
+    .test-header .badge {
+      display: inline-block;
+      background: rgba(255, 255, 255, 0.18);
+      padding: 4px 14px;
+      border-radius: 50px;
+      font-size: 0.85rem;
+      margin-bottom: 10px;
+    }
+    .test-header h1 {
+      font-family: var(--font-heading);
+      font-size: 2.1rem;
+      margin-bottom: 8px;
+    }
+
+    /* แถบปุ่มจัดการ */
+    .action-bar {
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+    .btn {
+      font-family: var(--font-heading);
+      font-size: 0.9rem;
+      padding: 8px 16px;
+      border-radius: 8px;
+      border: none;
+      cursor: pointer;
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s ease;
+    }
+    .btn-student { background: #2563eb; color: white; }
+    .btn-student:hover { background: #1d4ed8; }
+    .btn-teacher { background: #059669; color: white; }
+    .btn-teacher:hover { background: #047857; }
+    .btn-toggle { background: #e2e8f0; color: #334155; }
+    .btn-toggle:hover { background: #cbd5e1; }
+
+    /* การ์ดข้อสอบ */
+    .question-block {
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 18px;
+      background: #ffffff;
+      position: relative;
+    }
+    .q-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 12px;
+      align-items: center;
+    }
+    .tag {
+      font-size: 0.78rem;
+      font-weight: 600;
+      padding: 3px 10px;
+      border-radius: 4px;
+      font-family: var(--font-heading);
+    }
+    .tag-indicator { background: #e0e7ff; color: #3730a3; }
+    .tag-k { background: #fef3c7; color: #92400e; }
+    .tag-p { background: #dbeafe; color: #1e40af; }
+    .tag-a { background: #dcfce7; color: #166534; }
+    .tag-easy { background: #f1f5f9; color: #475569; border: 1px solid #cbd5e1; }
+    .tag-med { background: #ffedd5; color: #c2410c; }
+    .tag-hard { background: #fee2e2; color: #991b1b; }
+
+    .q-text {
+      font-size: 1rem;
+      font-weight: 600;
+      color: #1e293b;
+      margin-bottom: 12px;
+      line-height: 1.7;
+    }
+    .choices-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 12px;
+      font-size: 0.95rem;
+    }
+    .choice-item {
+      padding: 8px 12px;
+      background: #f8fafc;
+      border-radius: 6px;
+      border: 1px solid #f1f5f9;
+    }
+
+    /* เฉลยและวิธีทำ */
+    .solution-box {
+      background: #ecfdf5;
+      border: 1px solid #a7f3d0;
+      border-radius: 8px;
+      padding: 14px;
+      font-size: 0.92rem;
+      color: #065f46;
+      display: none;
+      line-height: 1.7;
+    }
+    .show-answers .solution-box { display: block; }
+
+    .print-header { display: none; }
+
+    /* CSS สำหรับการพิมพ์ A4 แบบ Compact ไม่คล่อมหน้า */
+    @page {
+      size: A4 portrait;
+      margin: 10mm 12mm;
+    }
+    @media print {
+      html, body {
+        background: #ffffff !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        font-size: 12.5px !important;
+        line-height: 1.45 !important;
+        color: #000000 !important;
+      }
+      .container { padding: 0 !important; margin: 0 !important; max-width: 100% !important; }
+      .test-header, .action-bar { display: none !important; }
+
+      #test-content-area {
+        display: block !important;
+        margin: 0 !important;
+        padding: 0 !important;
+      }
+
+      .print-header {
+        display: block !important;
+        text-align: center;
+        border-bottom: 1.5px solid #000;
+        padding-bottom: 6px;
+        margin-bottom: 12px;
+      }
+      .print-header h2 { font-size: 1.25rem; font-family: var(--font-heading); }
+      .print-meta-row {
+        display: flex;
+        justify-content: space-between;
+        font-size: 0.85rem;
+        margin-top: 4px;
+      }
+
+      .question-block {
+        border: none !important;
+        border-bottom: 1px dashed #cbd5e1 !important;
+        border-radius: 0 !important;
+        padding: 8px 0 !important;
+        margin-bottom: 6px !important;
+        page-break-inside: avoid !important;
+        break-inside: avoid !important;
+      }
+      .q-meta { margin-bottom: 4px !important; }
+      .tag {
+        border: 1px solid #000 !important;
+        background: none !important;
+        color: #000 !important;
+        font-size: 0.72rem !important;
+        padding: 1px 6px !important;
+      }
+      .q-text { font-size: 0.93rem !important; margin-bottom: 6px !important; }
+      .choices-grid { margin-bottom: 6px !important; gap: 6px !important; }
+      .choice-item {
+        background: none !important;
+        border: none !important;
+        padding: 2px 0 !important;
+      }
+      .solution-box {
+        background: #f8fafc !important;
+        border: 1px solid #cbd5e1 !important;
+        color: #000 !important;
+        padding: 8px !important;
+        font-size: 0.85rem !important;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+
+    <!-- ส่วนหัวแบบทดสอบ -->
+    <section class="card test-header">
+      <span class="badge">กลุ่มสาระการเรียนรู้คณิตศาสตร์ (เพิ่มเติม)</span>
+      <h1>แบบทดสอบวัดผลสัมฤทธิ์ทางการเรียน เรื่อง เวกเตอร์</h1>
+      <p>ชั้นมัธยมศึกษาปีที่ 5 จำนวน 15 ข้อ ตามมาตรฐานหลักสูตรแกนกลางการศึกษาขั้นพื้นฐาน</p>
+    </section>
+
+    <!-- แถบปุ่มพิมพ์ -->
+    <div class="action-bar">
+      <button class="btn btn-toggle" onclick="toggleAnswers()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+        <span id="btn-toggle-text">แสดง/ซ่อนเฉลย</span>
+      </button>
+      <button class="btn btn-student" onclick="printTest('student')">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+        พิมพ์แบบทดสอบสำหรับนักเรียน
+      </button>
+      <button class="btn btn-teacher" onclick="printTest('teacher')">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+        พิมพ์เฉลยวิธีทำละเอียดสำหรับครู
+      </button>
+    </div>
+
+    <!-- ส่วนเนื้อหาข้อสอบ 15 ข้อ -->
+    <main id="test-content-area">
+      <!-- หัวกระดาษพิมพ์ข้อสอบ -->
+      <div class="print-header">
+        <h2>แบบทดสอบวัดผลสัมฤทธิ์ทางการเรียน เรื่อง เวกเตอร์ ชั้นมัธยมศึกษาปีที่ 5</h2>
+        <div class="print-meta-row">
+          <span>ชื่อ-นามสกุล: ...................................................................</span>
+          <span>ชั้น: ม.5/....... เลขที่: .........</span>
+          <span>คะแนนที่ได้: ......... / 15</span>
+        </div>
+      </div>
+
+      <!-- ==================== ข้อ 1 - 5: ด้านความรู้ (K) ==================== -->
+      
+      <!-- ข้อ 1 -->
+      <article class="question-block">
+        <div class="q-meta">
+          <span class="tag tag-indicator">ตัวชี้วัด: ค 1.2 ม.5/1</span>
+          <span class="tag tag-k">การวัด: ด้านความรู้ (K)</span>
+          <span class="tag tag-easy">ระดับ: ง่าย</span>
+        </div>
+        <p class="q-text">1. ข้อความใดต่อไปนี้ระบุปริมาณที่เป็น <em>ปริมาณเวกเตอร์</em> ได้ถูกต้องสมบูรณ์ที่สุด</p>
+        <div class="choices-grid">
+          <div class="choice-item">ก. กล่องใบหนึ่งมีมวล $15\text{ kg}$ วางอยู่บนพื้น</div>
+          <div class="choice-item">ข. รถยนต์วิ่งด้วยอัตราเร็ว $90\text{ km/h}$ บนทางด่วน</div>
+          <div class="choice-item">ค. ชายคนหนึ่งออกแรงผลักรถ $80\text{ N}$ ไปทางทิศตะวันออก</div>
+          <div class="choice-item">ง. น้ำในอ่างมีอุณหภูมิ $25^\circ\text{C}$ และปริมาตร $20\text{ L}$</div>
+        </div>
+        <div class="solution-box">
+          <strong>เฉลย: ค.</strong> ชายคนหนึ่งออกแรงผลักรถ $80\text{ N}$ ไปทางทิศตะวันออก<br>
+          <em>เหตุผล:</em> ปริมาณเวกเตอร์ต้องประกอบด้วยทั้ง "ขนาด" ($80\text{ N}$) และ "ทิศทาง" (ทิศตะวันออก) ส่วนข้ออื่นมีเฉพาะขนาด จึงเป็นปริมาณสเกลาร์
+        </div>
+      </article>
+
+      <!-- ข้อ 2 -->
+      <article class="question-block">
+        <div class="q-meta">
+          <span class="tag tag-indicator">ตัวชี้วัด: ค 1.2 ม.5/1</span>
+          <span class="tag tag-k">การวัด: ด้านความรู้ (K)</span>
+          <span class="tag tag-easy">ระดับ: ง่าย</span>
+        </div>
+        <p class="q-text">2. กำหนดจุด $A(2, -1)$ และจุด $B(5, 3)$ เวกเตอร์ $\vec{AB}$ มีค่าตรงกับข้อใด</p>
+        <div class="choices-grid">
+          <div class="choice-item">ก. $3i + 4j$</div>
+          <div class="choice-item">ข. $3i + 2j$</div>
+          <div class="choice-item">ค. $-3i - 4j$</div>
+          <div class="choice-item">ง. $7i + 2j$</div>
+        </div>
+        <div class="solution-box">
+          <strong>เฉลย: ก.</strong> $3i + 4j$<br>
+          <em>วิธีคิด:</em> $\vec{AB} = (x_2 - x_1)i + (y_2 - y_1)j = (5 - 2)i + (3 - (-1))j = 3i + 4j$
+        </div>
+      </article>
+
+      <!-- ข้อ 3 -->
+      <article class="question-block">
+        <div class="q-meta">
+          <span class="tag tag-indicator">ตัวชี้วัด: ค 1.2 ม.5/2</span>
+          <span class="tag tag-k">การวัด: ด้านความรู้ (K)</span>
+          <span class="tag tag-easy">ระดับ: ง่าย</span>
+        </div>
+        <p class="q-text">3. ภาพฉาย (Projection) ของจุด $P(3, -5, 7)$ บน <em>ระนาบ $XY$</em> คือจุดในข้อใด</p>
+        <div class="choices-grid">
+          <div class="choice-item">ก. $(0, -5, 7)$</div>
+          <div class="choice-item">ข. $(3, 0, 7)$</div>
+          <div class="choice-item">ค. $(3, -5, 0)$</div>
+          <div class="choice-item">ง. $(0, 0, 7)$</div>
+        </div>
+        <div class="solution-box">
+          <strong>เฉลย: ค.</strong> $(3, -5, 0)$<br>
+          <em>เหตุผล:</em> จุดใด ๆ ที่อยู่บนระนาบ $XY$ จะมีพิกัดตามแนวแกน $Z$ เท่ากับศูนย์ ($z = 0$) เสมอ
+        </div>
+      </article>
+
+      <!-- ข้อ 4 -->
+      <article class="question-block">
+        <div class="q-meta">
+          <span class="tag tag-indicator">ตัวชี้วัด: ค 1.2 ม.5/1</span>
+          <span class="tag tag-k">การวัด: ด้านความรู้ (K)</span>
+          <span class="tag tag-med">ระดับ: ปานกลาง</span>
+        </div>
+        <p class="q-text">4. ถ้า $\vec{u}$ และ $\vec{v}$ เป็นเวกเตอร์ที่ไม่ใช่เวกเตอร์ศูนย์ ข้อความใดต่อไปนี้ถูกต้องเกี่ยวกับผลคูณเชิงสเกลาร์ ($\vec{u} \cdot \vec{v}$)</p>
+        <div class="choices-grid">
+          <div class="choice-item">ก. ถ้า $\vec{u} \cdot \vec{v} > 0$ แล้วมุมระหว่างเวกเตอร์เป็นมุมป้าน</div>
+          <div class="choice-item">ข. ถ้า $\vec{u}$ ตั้งฉากกับ $\vec{v}$ แล้ว $\vec{u} \cdot \vec{v} = 0$</div>
+          <div class="choice-item">ค. ผลคูณ $\vec{u} \cdot \vec{v}$ ได้ผลลัพธ์เป็นเวกเตอร์เสมอ</div>
+          <div class="choice-item">ง. $\vec{u} \cdot \vec{v} = -\vec{v} \cdot \vec{u}$</div>
+        </div>
+        <div class="solution-box">
+          <strong>เฉลย: ข.</strong> ถ้า $\vec{u}$ ตั้งฉากกับ $\vec{v}$ แล้ว $\vec{u} \cdot \vec{v} = 0$<br>
+          <em>เหตุผล:</em> เมื่อเวกเตอร์ตั้งฉากกัน $\theta = 90^\circ$ จะได้ $\cos 90^\circ = 0$ ส่งผลให้ $\vec{u} \cdot \vec{v} = |\vec{u}||\vec{v}|(0) = 0$
+        </div>
+      </article>
+
+      <!-- ข้อ 5 -->
+      <article class="question-block">
+        <div class="q-meta">
+          <span class="tag tag-indicator">ตัวชี้วัด: ค 1.2 ม.5/2</span>
+          <span class="tag tag-k">การวัด: ด้านความรู้ (K)</span>
+          <span class="tag tag-med">ระดับ: ปานกลาง</span>
+        </div>
+        <p class="q-text">5. ทิศทางของผลคูณเชิงเวกเตอร์ $\vec{u} \times \vec{v}$ มีลักษณะตามข้อใด</p>
+        <div class="choices-grid">
+          <div class="choice-item">ก. มีทิศทางเดียวกับเวกเตอร์ $\vec{u}$</div>
+          <div class="choice-item">ข. มีทิศทางขนานกับระนาบที่เกิดจาก $\vec{u}$ และ $\vec{v}$</div>
+          <div class="choice-item">ค. ตั้งฉากกับทั้งเวกเตอร์ $\vec{u}$ และเวกเตอร์ $\vec{v}$</div>
+          <div class="choice-item">ง. มีทิศทางเดียวกับ $\vec{v} \times \vec{u}$</div>
+        </div>
+        <div class="solution-box">
+          <strong>เฉลย: ค.</strong> ตั้งฉากกับทั้งเวกเตอร์ $\vec{u}$ และเวกเตอร์ $\vec{v}$<br>
+          <em>เหตุผล:</em> ตามนิยามเชิงเรขาคณิต ผลคูณ Cross Product จะได้เวกเตอร์ใหม่ที่ตั้งฉากกับระนาบที่บรรจุทั้งสองเวกเตอร์ตามกฎมือขวา
+        </div>
+      </article>
+
+      <!-- ==================== ข้อ 6 - 10: ด้านทักษะและกระบวนการ (P) ==================== -->
+
+      <!-- ข้อ 6 -->
+      <article class="question-block">
+        <div class="q-meta">
+          <span class="tag tag-indicator">ตัวชี้วัด: ค 1.2 ม.5/1</span>
+          <span class="tag tag-p">การวัด: ด้านกระบวนการ (P)</span>
+          <span class="tag tag-med">ระดับ: ปานกลาง</span>
+        </div>
+        <p class="q-text">6. เวกเตอร์หนึ่งหน่วยที่มีทิศทางเดียวกับเวกเตอร์ $\vec{v} = 3i - 4j$ มีค่าตรงกับข้อใด</p>
+        <div class="choices-grid">
+          <div class="choice-item">ก. $\dfrac{3}{5}i - \dfrac{4}{5}j$</div>
+          <div class="choice-item">ข. $-\dfrac{3}{5}i + \dfrac{4}{5}j$</div>
+          <div class="choice-item">ค. $\dfrac{3}{7}i - \dfrac{4}{7}j$</div>
+          <div class="choice-item">ง. $\dfrac{3}{25}i - \dfrac{4}{25}j$</div>
+        </div>
+        <div class="solution-box">
+          <strong>เฉลย: ก.</strong> $\dfrac{3}{5}i - \dfrac{4}{5}j$<br>
+          <em>วิธีคิด:</em> ขนาด $|\vec{v}| = \sqrt{3^2 + (-4)^2} = \sqrt{25} = 5$<br>
+          เวกเตอร์หนึ่งหน่วยคือ $\hat{v} = \dfrac{\vec{v}}{|\vec{v}|} = \dfrac{3i - 4j}{5} = \dfrac{3}{5}i - \dfrac{4}{5}j$
+        </div>
+      </article>
+
+      <!-- ข้อ 7 -->
+      <article class="question-block">
+        <div class="q-meta">
+          <span class="tag tag-indicator">ตัวชี้วัด: ค 1.2 ม.5/1</span>
+          <span class="tag tag-p">การวัด: ด้านกระบวนการ (P)</span>
+          <span class="tag tag-med">ระดับ: ปานกลาง</span>
+        </div>
+        <p class="q-text">7. กำหนด $\vec{u} = 2i - j + 3k$ และ $\vec{v} = -i + 4j + 2k$ ค่าของ $2\vec{u} - 3\vec{v}$ มีค่าตรงกับข้อใด</p>
+        <div class="choices-grid">
+          <div class="choice-item">ก. $i + 3j + 5k$</div>
+          <div class="choice-item">ข. $7i - 14j + 0k$</div>
+          <div class="choice-item">ค. $7i - 10j + 12k$</div>
+          <div class="choice-item">ง. $i - 14j + 12k$</div>
+        </div>
+        <div class="solution-box">
+          <strong>เฉลย: ข.</strong> $7i - 14j + 0k$<br>
+          <em>วิธีคิด:</em> $2\vec{u} = 4i - 2j + 6k$ และ $3\vec{v} = -3i + 12j + 6k$<br>
+          $2\vec{u} - 3\vec{v} = (4 - (-3))i + (-2 - 12)j + (6 - 6)k = 7i - 14j + 0k$
+        </div>
+      </article>
+
+      <!-- ข้อ 8 -->
+      <article class="question-block">
+        <div class="q-meta">
+          <span class="tag tag-indicator">ตัวชี้วัด: ค 1.2 ม.5/1</span>
+          <span class="tag tag-p">การวัด: ด้านกระบวนการ (P)</span>
+          <span class="tag tag-med">ระดับ: ปานกลาง</span>
+        </div>
+        <p class="q-text">8. กำหนด $\vec{u} = 4i + 2j$ และ $\vec{v} = ki - 6j$ ถ้าเวกเตอร์ $\vec{u}$ ตั้งฉากกับเวกเตอร์ $\vec{v}$ แล้ว ค่าของ $k$ มีค่าเท่าใด</p>
+        <div class="choices-grid">
+          <div class="choice-item">ก. $2$</div>
+          <div class="choice-item">ข. $3$</div>
+          <div class="choice-item">ค. $-3$</div>
+          <div class="choice-item">ง. $12$</div>
+        </div>
+        <div class="solution-box">
+          <strong>เฉลย: ข.</strong> $3$<br>
+          <em>วิธีคิด:</em> เวกเตอร์ตั้งฉากกันเมื่อ $\vec{u} \cdot \vec{v} = 0 \implies (4)(k) + (2)(-6) = 0 \implies 4k - 12 = 0 \implies 4k = 12 \implies k = 3$
+        </div>
+      </article>
+
+      <!-- ข้อ 9 -->
+      <article class="question-block">
+        <div class="q-meta">
+          <span class="tag tag-indicator">ตัวชี้วัด: ค 1.2 ม.5/2</span>
+          <span class="tag tag-p">การวัด: ด้านกระบวนการ (P)</span>
+          <span class="tag tag-med">ระดับ: ปานกลาง</span>
+        </div>
+        <p class="q-text">9. ระยะห่างระหว่างจุด $A(1, -2, 4)$ และจุด $B(3, 2, 0)$ ในปริภูมิสามมิติมีค่าเท่ากับกี่หน่วย</p>
+        <div class="choices-grid">
+          <div class="choice-item">ก. $6$ หน่วย</div>
+          <div class="choice-item">ข. $\sqrt{20}$ หน่วย</div>
+          <div class="choice-item">ค. $2\sqrt{5}$ หน่วย</div>
+          <div class="choice-item">ง. $36$ หน่วย</div>
+        </div>
+        <div class="solution-box">
+          <strong>เฉลย: ก.</strong> $6$ หน่วย<br>
+          <em>วิธีคิด:</em> $d = \sqrt{(3 - 1)^2 + (2 - (-2))^2 + (0 - 4)^2} = \sqrt{2^2 + 4^2 + (-4)^2} = \sqrt{4 + 16 + 16} = \sqrt{36} = 6\text{ หน่วย}$
+        </div>
+      </article>
+
+      <!-- ข้อ 10 -->
+      <article class="question-block">
+        <div class="q-meta">
+          <span class="tag tag-indicator">ตัวชี้วัด: ค 1.2 ม.5/1</span>
+          <span class="tag tag-p">การวัด: ด้านกระบวนการ (P)</span>
+          <span class="tag tag-hard">ระดับ: ยาก</span>
+        </div>
+        <p class="q-text">10. ผลคูณเชิงเวกเตอร์ของ $\vec{u} = 2i - j + k$ และ $\vec{v} = i + 2j - 3k$ มีค่าตรงกับข้อใด</p>
+        <div class="choices-grid">
+          <div class="choice-item">ก. $i + 7j + 5k$</div>
+          <div class="choice-item">ข. $i - 7j + 5k$</div>
+          <div class="choice-item">ค. $5i + 7j + 5k$</div>
+          <div class="choice-item">ง. $-i + 5j + 5k$</div>
+        </div>
+        <div class="solution-box">
+          <strong>เฉลย: ก.</strong> $i + 7j + 5k$<br>
+          <em>วิธีคิด:</em><br>
+          $\vec{u} \times \vec{v} = [(-1)(-3) - (1)(2)]i - [(2)(-3) - (1)(1)]j + [(2)(2) - (-1)(1)]k$<br>
+          $= (3 - 2)i - (-6 - 1)j + (4 + 1)k = i + 7j + 5k$
+        </div>
+      </article>
+
+      <!-- ==================== ข้อ 11 - 15: ด้านเจตคติและการประยุกต์ใช้ (A) ==================== -->
+
+      <!-- ข้อ 11 -->
+      <article class="question-block">
+        <div class="q-meta">
+          <span class="tag tag-indicator">ตัวชี้วัด: ค 1.2 ม.5/2</span>
+          <span class="tag tag-a">การวัด: ด้านเจตคติ/ประยุกต์ (A)</span>
+          <span class="tag tag-easy">ระดับ: ง่าย</span>
+        </div>
+        <p class="q-text">11. ในการลากวัตถุไปบนระนาบ แรงสองแรงจะเกิดประสิทธิผลในการเคลื่อนย้ายวัตถุไปข้างหน้าได้สูงสุดเมื่อแรงทั้งสองทำมุมกันอย่างไร และสะท้อนแนวคิดเวกเตอร์อย่างไร</p>
+        <div class="choices-grid">
+          <div class="choice-item">ก. ทำมุม $90^\circ$ เพราะเวกเตอร์ตั้งฉากกันทำให้เกิดพื้นที่มากที่สุด</div>
+          <div class="choice-item">ข. ทำมุม $0^\circ$ เพราะเวกเตอร์ชี้ทิศทางเดียวกันทำให้ขนาดของผลบวกเวกเตอร์มีค่ามากที่สุด</div>
+          <div class="choice-item">ค. ทำมุม $180^\circ$ เพราะแรงจะต้านกันทำให้เกิดสมดุล</div>
+          <div class="choice-item">ง. ทำมุม $45^\circ$ เพราะเป็นมุมเฉลี่ยที่กระจายแรงได้สมมาตร</div>
+        </div>
+        <div class="solution-box">
+          <strong>เฉลย: ข.</strong> ทำมุม $0^\circ$ เพราะเวกเตอร์ชี้ทิศทางเดียวกันทำให้ขนาดของผลบวกเวกเตอร์มีค่ามากที่สุด<br>
+          <em>เหตุผล:</em> $|\vec{F}_1 + \vec{F}_2| = \sqrt{F_1^2 + F_2^2 + 2F_1 F_2 \cos\theta}$ จะมีค่าสูงสุดเมื่อ $\cos\theta = 1$ ($\theta = 0^\circ$) แสดงถึงความตระหนักในมโนทัศน์ทิศทางของเวกเตอร์ในชีวิตจริง
+        </div>
+      </article>
+
+      <!-- ข้อ 12 -->
+      <article class="question-block">
+        <div class="q-meta">
+          <span class="tag tag-indicator">ตัวชี้วัด: ค 1.2 ม.5/2</span>
+          <span class="tag tag-a">การวัด: ด้านเจตคติ/ประยุกต์ (A)</span>
+          <span class="tag tag-med">ระดับ: ปานกลาง</span>
+        </div>
+        <p class="q-text">12. วิศวกรออกแบบแผงโซลาร์เซลล์รูปสี่เหลี่ยมด้านขนานในระบบพิกัด 3 มิติ โดยมีขอบสองด้านประชิดแทนด้วยเวกเตอร์ $\vec{u} = 2i + 3j + 0k$ และ $\vec{v} = 0i + 2j + 4k$ (หน่วยเป็นเมตร) แผงโซลาร์เซลล์นี้มีพื้นที่รับแสงกี่ตารางเมตร</p>
+        <div class="choices-grid">
+          <div class="choice-item">ก. $14\text{ m}^2$</div>
+          <div class="choice-item">ข. $12\text{ m}^2$</div>
+          <div class="choice-item">ค. $\sqrt{224}\text{ m}^2$ (ประมาณ $14.97\text{ m}^2$)</div>
+          <div class="choice-item">ง. $8\text{ m}^2$</div>
+        </div>
+        <div class="solution-box">
+          <strong>เฉลย: ค.</strong> $\sqrt{224}\text{ m}^2$ (หรือ $4\sqrt{14}\text{ m}^2 \approx 14.97\text{ m}^2$)<br>
+          <em>วิธีคิด:</em> พื้นที่สี่เหลี่ยมด้านขนาน $= |\vec{u} \times \vec{v}|$<br>
+          $\vec{u} \times \vec{v} = [(3)(4) - (0)(2)]i - [(2)(4) - (0)(0)]j + [(2)(2) - (3)(0)]k = 12i - 8j + 4k$<br>
+          ขนาด $|\vec{u} \times \vec{v}| = \sqrt{12^2 + (-8)^2 + 4^2} = \sqrt{144 + 64 + 16} = \sqrt{224}\text{ m}^2$
+        </div>
+      </article>
+
+      <!-- ข้อ 13 -->
+      <article class="question-block">
+        <div class="q-meta">
+          <span class="tag tag-indicator">ตัวชี้วัด: ค 1.2 ม.5/1</span>
+          <span class="tag tag-a">การวัด: ด้านเจตคติ/ประยุกต์ (A)</span>
+          <span class="tag tag-med">ระดับ: ปานกลาง</span>
+        </div>
+        <p class="q-text">13. ในทางฟิสิกส์ งาน ($W$) เกิดจากผลคูณจุดระหว่างแรงกับการกระจัด ($W = \vec{F} \cdot \vec{s}$) หากคนหนึ่งออกแรงแบกกล่อง $\vec{F} = 0i + 50j$ (แรงชี้ขึ้นในแนวดิ่ง) แต่เดินไปข้างหน้าในแนวราบเป็นระยะกระจัด $\vec{s} = 10i + 0j$ งานที่เกิดขึ้นมีค่าเท่าใด และอธิบายทางคณิตศาสตร์อย่างไร</p>
+        <div class="choices-grid">
+          <div class="choice-item">ก. $500\text{ J}$ เพราะขนาดแรงคูณระยะทางโดยตรง</div>
+          <div class="choice-item">ข. $0\text{ J}$ เพราะแรงกับการกระจัดตั้งฉากกันทำให้ผลคูณจุดเป็นศูนย์</div>
+          <div class="choice-item">ค. $250\text{ J}$ เพราะแรงแบ่งครึ่งตามมุมฉาก</div>
+          <div class="choice-item">ง. ไม่สามารถหาค่าได้เนื่องจากมิติไม่เท่ากัน</div>
+        </div>
+        <div class="solution-box">
+          <strong>เฉลย: ข.</strong> $0\text{ J}$ เพราะแรงกับการกระจัดตั้งฉากกันทำให้ผลคูณจุดเป็นศูนย์<br>
+          <em>วิธีคิด:</em> $W = \vec{F} \cdot \vec{s} = (0)(10) + (50)(0) = 0\text{ J}$ เนื่องจากเวกเตอร์แรงในแนวดิ่งตั้งฉากกับระยะกระจัดในแนวราบ ($\cos 90^\circ = 0$)
+        </div>
+      </article>
+
+      <!-- ข้อ 14 -->
+      <article class="question-block">
+        <div class="q-meta">
+          <span class="tag tag-indicator">ตัวชี้วัด: ค 1.2 ม.5/2</span>
+          <span class="tag tag-a">การวัด: ด้านเจตคติ/ประยุกต์ (A)</span>
+          <span class="tag tag-hard">ระดับ: ยาก</span>
+        </div>
+        <p class="q-text">14. โดรนสำรวจบินจากสถานีควบคุมที่จุดกำเนิด $O(0, 0, 0)$ ไปยังเป้าหมายที่จุด $P(4, 2, 4)$ (หน่วยเป็นกิโลเมตร) หากต้องการส่งสัญญาณเลเซอร์นำทางที่มีขนาดความเข้ม $1$ หน่วย ชี้ตรงจากสถานีไปยังโดรน เวกเตอร์สัญญาณนำทางต้องเขียนในรูปใด</p>
+        <div class="choices-grid">
+          <div class="choice-item">ก. $\dfrac{2}{3}i + \dfrac{1}{3}j + \dfrac{2}{3}k$</div>
+          <div class="choice-item">ข. $\dfrac{4}{6}i + \dfrac{2}{6}j + \dfrac{4}{6}k$</div>
+          <div class="choice-item">ค. $4i + 2j + 4k$</div>
+          <div class="choice-item">ง. ทั้งข้อ ก. และข้อ ข. ถูกต้อง</div>
+        </div>
+        <div class="solution-box">
+          <strong>เฉลย: ง.</strong> ทั้งข้อ ก. และข้อ ข. ถูกต้อง<br>
+          <em>วิธีคิด:</em> เวกเตอร์ตำแหน่งคือ $\vec{OP} = 4i + 2j + 4k$<br>
+          ขนาด $|\vec{OP}| = \sqrt{4^2 + 2^2 + 4^2} = \sqrt{16 + 4 + 16} = \sqrt{36} = 6\text{ km}$<br>
+          เวกเตอร์หนึ่งหน่วยคือ $\hat{u} = \dfrac{4}{6}i + \dfrac{2}{6}j + \dfrac{4}{6}k = \dfrac{2}{3}i + \dfrac{1}{3}j + \dfrac{2}{3}k$
+        </div>
+      </article>
+
+      <!-- ข้อ 15 -->
+      <article class="question-block">
+        <div class="q-meta">
+          <span class="tag tag-indicator">ตัวชี้วัด: ค 1.2 ม.5/1</span>
+          <span class="tag tag-a">การวัด: ด้านเจตคติ/ประยุกต์ (A)</span>
+          <span class="tag tag-hard">ระดับ: ยาก</span>
+        </div>
+        <p class="q-text">15. นักเรียนสองคนกำลังถกเถียงกันเรื่องเวกเตอร์ในระบบคอมพิวเตอร์กราฟิกสามมิติ:<br>
+        <strong>สมชาย:</strong> <em>"ถ้าต้องการสร้างเวกเตอร์แนวตั้งฉาก (Normal Vector) เพื่อคำนวณแสงตกกระทบระนาบสามเหลี่ยม เราสามารถใช้ผลคูณ Cross Product ของเวกเตอร์ขอบสองด้านได้เสมอ"</em><br>
+        <strong>สมหญิง:</strong> <em>"แต่ต้องระวังลำดับการคูณด้วย เพราะถ้าสลับลำดับ เวกเตอร์แนวฉากจะชี้กลับด้าน $180^\circ$ ทำให้การเรนเดอร์เงาผิดพลาด"</em><br>
+        นักเรียนเห็นด้วยกับข้อความของใคร และสอดคล้องกับหลักคณิตศาสตร์อย่างไร</p>
+        <div class="choices-grid">
+          <div class="choice-item">ก. เห็นด้วยกับสมชายคนเดียว เพราะลำดับการคูณเวกเตอร์ไม่มีผลต่อทิศทาง</div>
+          <div class="choice-item">ข. เห็นด้วยกับสมหญิงคนเดียว เพราะ Cross Product ไม่สามารถหาเวกเตอร์ตั้งฉากได้จริง</div>
+          <div class="choice-item">ค. เห็นด้วยกับทั้งสองคน เพราะ $\vec{u} \times \vec{v}$ ตั้งฉากกับระนาบจริง และ $\vec{u} \times \vec{v} = -(\vec{v} \times \vec{u})$</div>
+          <div class="choice-item">ง. ไม่เห็นด้วยกับทั้งสองคน เพราะการสร้างแสงเงาต้องใช้ Dot Product เท่านั้น</div>
+        </div>
+        <div class="solution-box">
+          <strong>เฉลย: ค.</strong> เห็นด้วยกับทั้งสองคน เพราะ $\vec{u} \times \vec{v}$ ตั้งฉากกับระนาบจริง และ $\vec{u} \times \vec{v} = -(\vec{v} \times \vec{u})$<br>
+          <em>เหตุผล:</em> การใช้ Cross Product หา Normal Vector เป็นหัวใจของ 3D Computer Graphics และการสลับลำดับทำให้ทิศทางกลับด้านตามสมบัติไม่สลับที่ $\vec{u} \times \vec{v} = -(\vec{v} \times \vec{u})$
+        </div>
+      </article>
+
+    </main>
+  </div>
+
+  <script>
+    function toggleAnswers() {
+      const area = document.getElementById('test-content-area');
+      area.classList.toggle('show-answers');
+      const isShown = area.classList.contains('show-answers');
+      document.getElementById('btn-toggle-text').innerText = isShown ? 'ซ่อนเฉลย' : 'แสดงเฉลย';
+    }
+
+    function printTest(role) {
+      const area = document.getElementById('test-content-area');
+      const wasShown = area.classList.contains('show-answers');
+
+      if (role === 'teacher') {
+        area.classList.add('show-answers');
+      } else {
+        area.classList.remove('show-answers');
+      }
+
+      window.print();
+
+      if (wasShown) {
+        area.classList.add('show-answers');
+      } else {
+        area.classList.remove('show-answers');
+      }
+    }
+  </script>
+</body>
+</html>

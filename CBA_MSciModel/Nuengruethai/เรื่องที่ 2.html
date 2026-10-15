@@ -1,0 +1,958 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>เวกเตอร์ใน 2 มิติ</title>
+  
+  <!-- Google Fonts: Sarabun & Prompt -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@400;600;700&family=Sarabun:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+  <!-- MathJax 3 -->
+  <script>
+    window.MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']],
+        displayMath: [['$$', '$$'], ['\\[', '\\]']]
+      },
+      svg: { fontCache: 'global' }
+    };
+  </script>
+  <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+  <style>
+    :root {
+      --font-body: 'Sarabun', sans-serif;
+      --font-heading: 'Prompt', sans-serif;
+      --primary: #0284c7;
+      --secondary: #0d9488;
+      --accent: #7c3aed;
+      --slate-dark: #0f172a;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: var(--font-body);
+      color: #334155;
+      background-color: #f8fafc;
+      line-height: 1.6;
+    }
+
+    .container {
+      max-width: 1040px;
+      margin: 0 auto;
+      padding: 24px 16px;
+    }
+
+    .section-card {
+      background: #ffffff;
+      border-radius: 20px;
+      margin-bottom: 30px;
+      padding: 36px;
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.03);
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* สไตล์เฟรมหัวข้อ */
+    .hero-banner {
+      background: linear-gradient(135deg, #0f172a 0%, #0284c7 100%);
+      color: #ffffff;
+      text-align: center;
+      padding: 50px 24px;
+    }
+    .hero-banner .badge {
+      display: inline-block;
+      background: rgba(255, 255, 255, 0.18);
+      backdrop-filter: blur(8px);
+      padding: 5px 16px;
+      border-radius: 50px;
+      font-size: 0.9rem;
+      font-weight: 500;
+      margin-bottom: 12px;
+    }
+    .hero-banner h1 {
+      font-family: var(--font-heading);
+      font-size: 2.3rem;
+      font-weight: 700;
+      line-height: 1.3;
+      margin-bottom: 10px;
+    }
+    .hero-banner p {
+      font-size: 1.1rem;
+      opacity: 0.9;
+      max-width: 680px;
+      margin: 0 auto;
+    }
+
+    /* สไตล์เฟรมเนื้อหา */
+    .concept-section {
+      background: linear-gradient(180deg, #ffffff 0%, #f0fdfa 100%);
+      border-top: 6px solid #0d9488;
+    }
+    .concept-title {
+      font-family: var(--font-heading);
+      font-size: 1.55rem;
+      color: #0f766e;
+      margin-bottom: 14px;
+    }
+    .formula-display {
+      background: #ffffff;
+      border: 1px solid #ccfbf1;
+      border-radius: 12px;
+      padding: 20px;
+      margin: 16px 0;
+      text-align: center;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.03);
+    }
+    .concept-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 18px;
+      margin-top: 18px;
+    }
+    .info-box {
+      background: #ffffff;
+      border-radius: 12px;
+      padding: 18px;
+      border: 1px solid #e2e8f0;
+    }
+    .info-box h3 {
+      font-family: var(--font-heading);
+      font-size: 1.15rem;
+      margin-bottom: 8px;
+    }
+
+    /* สไตล์เฟรม Interactive Model */
+    .interactive-section {
+      background: linear-gradient(180deg, #ffffff 0%, #f5f3ff 100%);
+      border-top: 6px solid #8b5cf6;
+    }
+    .model-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      margin-bottom: 16px;
+      gap: 12px;
+    }
+    .toggle-mode-btn {
+      font-family: var(--font-heading);
+      background: #7c3aed;
+      color: white;
+      padding: 9px 18px;
+      border-radius: 50px;
+      border: none;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      box-shadow: 0 4px 10px rgba(124, 58, 237, 0.25);
+      transition: all 0.2s ease;
+    }
+    .toggle-mode-btn:hover { background: #6d28d9; transform: translateY(-1px); }
+
+    .canvas-wrapper {
+      position: relative;
+      background: #ffffff;
+      border-radius: 14px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.06);
+      border: 1px solid #cbd5e1;
+      overflow: hidden;
+      margin: 0 auto 16px;
+      width: 700px;
+      max-width: 100%;
+    }
+    canvas { display: block; }
+
+    .sliders-panel {
+      background: #ffffff;
+      border-radius: 12px;
+      padding: 16px 20px;
+      border: 1px solid #e2e8f0;
+      margin-bottom: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .slider-row {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+    .slider-row label {
+      font-family: var(--font-heading);
+      font-weight: 600;
+      width: 160px;
+      font-size: 0.95rem;
+    }
+    .slider-row input[type=range] {
+      flex: 1;
+      accent-color: #7c3aed;
+      cursor: pointer;
+    }
+    .slider-val {
+      font-family: var(--font-heading);
+      font-weight: 700;
+      min-width: 32px;
+      text-align: right;
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 14px;
+    }
+    .stat-badge {
+      background: #ffffff;
+      border-radius: 10px;
+      padding: 12px 16px;
+      border: 1px solid #e2e8f0;
+    }
+    .stat-badge strong {
+      display: block;
+      color: #64748b;
+      font-size: 0.85rem;
+      margin-bottom: 4px;
+    }
+    .stat-badge .val {
+      font-size: 1.05rem;
+      font-weight: 600;
+      color: #1e293b;
+      min-height: 28px;
+      display: flex;
+      align-items: center;
+    }
+
+    /* สไตล์เฟรมใบงาน */
+    .worksheet-section {
+      background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+      border-top: 6px solid #0284c7;
+    }
+    .worksheet-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 16px;
+      justify-content: flex-end;
+    }
+    .btn {
+      font-family: var(--font-heading);
+      font-size: 0.9rem;
+      padding: 8px 16px;
+      border-radius: 8px;
+      border: none;
+      cursor: pointer;
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s ease;
+    }
+    .btn-student { background: #0284c7; color: white; }
+    .btn-student:hover { background: #0369a1; }
+    .btn-teacher { background: #0d9488; color: white; }
+    .btn-teacher:hover { background: #0f766e; }
+    .btn-toggle { background: #f1f5f9; color: #475569; border: 1px solid #cbd5e1; }
+    .btn-toggle:hover { background: #e2e8f0; }
+
+    .question-item {
+      padding: 12px 8px;
+      border-bottom: 1px dashed #cbd5e1;
+    }
+    .question-item:last-child { border-bottom: none; }
+    .question-title {
+      font-weight: 600;
+      color: #1e293b;
+      margin-bottom: 4px;
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      font-size: 0.98rem;
+    }
+    .write-area {
+      min-height: 32px;
+      border-bottom: 1px dotted #94a3b8;
+      margin: 6px 0;
+    }
+    .answer-key {
+      background: #ecfdf5;
+      border: 1px solid #a7f3d0;
+      color: #065f46;
+      padding: 10px 14px;
+      border-radius: 6px;
+      margin-top: 6px;
+      font-size: 0.92rem;
+      display: none;
+      line-height: 1.7;
+    }
+    .show-answers .answer-key { display: block; }
+
+    /* สไตล์เฟรมเกณฑ์การประเมิน */
+    .rubric-section {
+      background: linear-gradient(180deg, #ffffff 0%, #fff7ed 100%);
+      border-top: 6px solid #f97316;
+    }
+    .rubric-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 14px;
+      background: white;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+    }
+    .rubric-table th, .rubric-table td {
+      border: 1px solid #fed7aa;
+      padding: 12px 14px;
+      text-align: left;
+      vertical-align: top;
+      font-size: 0.9rem;
+    }
+    .rubric-table th {
+      background: #ffedd5;
+      font-family: var(--font-heading);
+      color: #9a3412;
+    }
+    .score-col { width: 25%; }
+
+    .print-header { display: none; }
+
+    /* ระบบพิมพ์แบบ Compact พอดีหน้า A4 ตัดหน้าว่าง 100% */
+    @page {
+      size: A4 portrait;
+      margin: 10mm 12mm;
+    }
+
+    @media print {
+      html, body {
+        background: #ffffff !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        font-size: 13px !important;
+        line-height: 1.4 !important;
+        color: #000000 !important;
+      }
+
+      .container { padding: 0 !important; margin: 0 !important; max-width: 100% !important; }
+
+      .hero-banner, .concept-section, .interactive-section, .rubric-section, .worksheet-actions {
+        display: none !important;
+      }
+
+      #printable-worksheet {
+        display: block !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        box-shadow: none !important;
+        border: none !important;
+        border-radius: 0 !important;
+        background: #ffffff !important;
+      }
+
+      .print-header {
+        display: block !important;
+        text-align: center;
+        margin-bottom: 10px;
+        border-bottom: 1.5px solid #000;
+        padding-bottom: 4px;
+      }
+      .print-header h2 {
+        font-family: var(--font-heading);
+        font-size: 1.25rem !important;
+        font-weight: 700;
+        margin-bottom: 2px;
+      }
+      .print-info-row {
+        display: flex;
+        justify-content: space-between;
+        font-size: 0.85rem;
+      }
+
+      .question-item {
+        page-break-inside: avoid !important;
+        break-inside: avoid !important;
+        padding: 6px 0 !important;
+        border-bottom: 1px dashed #cbd5e1 !important;
+      }
+
+      .question-title { font-size: 0.93rem !important; margin-bottom: 3px !important; }
+      .write-area { min-height: 30px !important; margin: 4px 0 !important; border-bottom: 1px dotted #64748b !important; }
+      .answer-key {
+        padding: 6px 10px !important;
+        font-size: 0.86rem !important;
+        margin-top: 4px !important;
+        border: 1px solid #cbd5e1 !important;
+        background: #f8fafc !important;
+        color: #000000 !important;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .concept-grid { grid-template-columns: 1fr; }
+      .section-card { padding: 20px 14px; }
+      .hero-banner h1 { font-size: 1.8rem; }
+      .slider-row { flex-direction: column; align-items: flex-start; gap: 4px; }
+      .slider-row input[type=range] { width: 100%; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+
+    <!-- ==================== ตอนที่ 1 ==================== -->
+    <section class="section-card hero-banner">
+      <span class="badge">สาระการเรียนรู้คณิตศาสตร์เพิ่มเติม</span>
+      <h1>เรื่อง เวกเตอร์ใน 2 มิติ</h1>
+      <p>ศึกษาระบบพิกัดฉากสองมิติ การควบคุมองค์ประกอบเวกเตอร์ การคำนวณขนาด ทิศทาง และเตรียมความพร้อมสู่ระบบสามมิติ</p>
+    </section>
+
+    <!-- ==================== ตอนที่ 2 ==================== -->
+    <section class="section-card concept-section">
+      <h2 class="concept-title">เวกเตอร์ในระบบพิกัดฉากสองมิติ</h2>
+      <p>
+        เวกเตอร์ในระบบพิกัดฉากสองมิติสามารถเขียนในรูปผลบวกเชิงเส้นของเวกเตอร์หนึ่งหน่วยมาตรฐานได้เป็น:
+      </p>
+
+      <div class="formula-display">
+        <p style="font-size: 1.45rem; font-weight: 600; color: #0f766e; margin-bottom: 6px;">
+          $$\vec{u} = ai + bj$$
+        </p>
+        <p style="font-size: 0.95rem; color: #475569;">
+          โดยที่ $a$ เป็น <strong>องค์ประกอบในทิศทาง $x$</strong> (ตามเวกเตอร์หนึ่งหน่วย $i$) 
+          และ $b$ เป็น <strong>องค์ประกอบในทิศทาง $y$</strong> (ตามเวกเตอร์หนึ่งหน่วย $j$)
+        </p>
+      </div>
+
+      <div class="concept-grid">
+        <div class="info-box">
+          <h3 style="color: #0369a1;">การเปลี่ยนค่าองค์ประกอบ</h3>
+          <p style="font-size: 0.95rem;">
+            การเปลี่ยนค่าขององค์ประกอบ $a$ และ $b$ จะทำให้ <strong>ขนาด</strong> และ <strong>ทิศทาง</strong> ของเวกเตอร์เปลี่ยนไปทันที:
+          </p>
+          <ul style="margin-left: 20px; margin-top: 6px; font-size: 0.92rem;">
+            <li>เมื่อ $a$ เปลี่ยน: ความกว้างในแนวแกน $X$ และความลาดเอียงเทียบแนวราบจะเปลี่ยนไป</li>
+            <li>เมื่อ $b$ เปลี่ยน: ความสูงในแนวแกน $Y$ และความชันแนวดิ่งจะเปลี่ยนไป</li>
+          </ul>
+        </div>
+
+        <div class="info-box">
+          <h3 style="color: #0d9488;">สูตรการคำนวณพื้นฐาน</h3>
+          <p style="font-size: 0.95rem;">
+            สำหรับเวกเตอร์ $\vec{u} = ai + bj$ ใด ๆ บนระนาบ:
+          </p>
+          <ul style="margin-left: 20px; margin-top: 6px; font-size: 0.92rem;">
+            <li><strong>ขนาด:</strong> $|\vec{u}| = \sqrt{a^2 + b^2}$</li>
+            <li><strong>ทิศทาง:</strong> $\tan\theta = \dfrac{b}{a} \implies \theta = \arctan\left(\dfrac{b}{a}\right)$</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== ตอนที่ 3 ==================== -->
+    <section class="section-card interactive-section">
+      <div class="model-header">
+        <div>
+          <h2 id="model-main-title" style="font-family: var(--font-heading); color: #5b21b6; font-size: 1.55rem;">
+            Interactive Model: เวกเตอร์ใน 2 มิติ
+          </h2>
+          <p id="model-sub-title" style="color: #6d28d9; font-size: 0.93rem;">
+            เลื่อน Slider เพื่อปรับค่าองค์ประกอบ $a$ และ $b$ แล้วสังเกตลูกศร ขนาด และวิธีคำนวณทิศทางทันที
+          </p>
+        </div>
+        <button id="toggle-dimension-btn" class="toggle-mode-btn" onclick="toggleDimension()">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m21.12 6.4-6.05-4.06a2 2 0 0 0-2.17-.05L2.95 8.41a2 2 0 0 0-.95 1.7v5.82a2 2 0 0 0 .95 1.7l9.95 6.12a2 2 0 0 0 2.17-.05l6.05-4.06a2 2 0 0 0 .88-1.66V8.06a2 2 0 0 0-.88-1.66z"/><line x1="12" y1="22" x2="12" y2="12"/><line x1="12" y1="12" x2="2.05" y2="7.05"/><line x1="12" y1="12" x2="21.95" y2="7.05"/></svg>
+          <span id="dimension-btn-text">เปลี่ยนเป็น 3 มิติ</span>
+        </button>
+      </div>
+
+      <div class="canvas-wrapper">
+        <canvas id="vectorCanvas" width="700" height="420"></canvas>
+      </div>
+
+      <!-- แผงควบคุม Slider -->
+      <div class="sliders-panel">
+        <div class="slider-row">
+          <label>แกน $X$ (สัมประสิทธิ์ $a$):</label>
+          <input type="range" id="sliderA" min="-8" max="8" value="4" step="1" oninput="onSliderChange()">
+          <span class="slider-val" id="valA">4</span>
+        </div>
+        <div class="slider-row">
+          <label>แกน $Y$ (สัมประสิทธิ์ $b$):</label>
+          <input type="range" id="sliderB" min="-8" max="8" value="3" step="1" oninput="onSliderChange()">
+          <span class="slider-val" id="valB">3</span>
+        </div>
+        <div class="slider-row" id="sliderC-row" style="display: none;">
+          <label style="color: #c026d3;">แกน $Z$ (สัมประสิทธิ์ $c$):</label>
+          <input type="range" id="sliderC" min="-8" max="8" value="4" step="1" oninput="onSliderChange()">
+          <span class="slider-val" id="valC" style="color: #c026d3;">4</span>
+        </div>
+      </div>
+
+      <!-- สถิติและการแสดงวิธีทำอย่างละเอียด -->
+      <div class="stats-grid">
+        <div class="stat-badge" style="grid-column: 1 / -1;">
+          <strong>เวกเตอร์ที่ได้</strong>
+          <div class="val" id="label-vector-display">$\vec{u} = 4i + 3j$</div>
+        </div>
+
+        <div class="stat-badge" style="grid-column: 1 / -1; background: #faf5ff; border-color: #e9d5ff;">
+          <strong style="color: #7c3aed;">วิธีคำนวณขนาดเวกเตอร์ ($\vert{}\vec{u}\vert{}$)</strong>
+          <div class="val" id="label-mag-calc">
+            $|\vec{u}| = \sqrt{4^2 + 3^2} = \sqrt{16 + 9} = \sqrt{25} = 5.00\text{ หน่วย}$
+          </div>
+        </div>
+
+        <div class="stat-badge" id="direction-badge" style="grid-column: 1 / -1; background: #f0fdf4; border-color: #bbf7d0;">
+          <strong style="color: #15803d;">วิธีคำนวณทิศทาง</strong>
+          <div class="val" id="label-dir-calc">
+            $\tan\theta = \frac{3}{4} = 0.750 \implies \theta = \arctan(0.750) \approx 36.9^\circ$
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== ตอนที่ 4 ==================== -->
+    <section class="section-card worksheet-section" id="printable-worksheet">
+      <div class="print-header">
+        <h2>ใบงานคณิตศาสตร์: เรื่อง เวกเตอร์ใน 2 มิติ</h2>
+        <div class="print-info-row">
+          <span>ชื่อ-นามสกุล: ...................................................................</span>
+          <span>ชั้น: ................ เลขที่: ...........</span>
+          <span>วันที่: ........................</span>
+        </div>
+      </div>
+
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
+        <h2 style="font-family: var(--font-heading); color: #0284c7; font-size: 1.45rem;">
+          ใบงานตรวจสอบความเข้าใจ (5 ข้อ)
+        </h2>
+        <div class="worksheet-actions">
+          <button class="btn btn-toggle" onclick="toggleAnswers()">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+            <span id="toggle-text">แสดง/ซ่อนเฉลย</span>
+          </button>
+          <button class="btn btn-student" onclick="printSheet('student')">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+            พิมพ์ใบงานสำหรับนักเรียน
+          </button>
+          <button class="btn btn-teacher" onclick="printSheet('teacher')">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+            พิมพ์เฉลยสำหรับครู
+          </button>
+        </div>
+      </div>
+
+      <div class="worksheet-list">
+        <!-- ข้อ 1 -->
+        <div class="question-item">
+          <div class="question-title">
+            <span>1.</span>
+            <span>กำหนดเวกเตอร์ $\vec{u} = -5i + 12j$ จงระบุองค์ประกอบในแนวแกน $X$ และแกน $Y$ พร้อมแสดงวิธีคำนวณหาขนาด $|\vec{u}|$</span>
+          </div>
+          <div class="write-area"></div>
+          <div class="answer-key">
+            <strong>เฉลยวิธีทำ:</strong><br>
+            • องค์ประกอบในแนวแกน $X$ คือ $a = -5$ และองค์ประกอบในแนวแกน $Y$ คือ $b = 12$<br>
+            • วิธีหาขนาด: $|\vec{u}| = \sqrt{a^2 + b^2} = \sqrt{(-5)^2 + 12^2} = \sqrt{25 + 144} = \sqrt{169} = 13\text{ หน่วย}$
+          </div>
+        </div>
+
+        <!-- ข้อ 2 -->
+        <div class="question-item">
+          <div class="question-title">
+            <span>2.</span>
+            <span>กำหนดเวกเตอร์ $\vec{v} = 3i - 3j$ จงแสดงวิธีคำนวณหามุมทิศทาง $\theta$ ($0^\circ \le \theta < 360^\circ$) ที่เวกเตอร์ทำกับแกน $+X$</span>
+          </div>
+          <div class="write-area"></div>
+          <div class="answer-key">
+            <strong>เฉลยวิธีทำ:</strong><br>
+            เนื่องจาก $a = 3 > 0$ และ $b = -3 < 0$ เวกเตอร์ชี้ตกอยู่ใน Quadrant ที่ 4<br>
+            หามุมอ้างอิง $\alpha$: $\tan\alpha = \left|\dfrac{-3}{3}\right| = 1 \implies \alpha = 45^\circ$<br>
+            ดังนั้น ทิศทางทำมุมกับแกน $+X$ คือ $\theta = 360^\circ - 45^\circ = 315^\circ$
+          </div>
+        </div>
+
+        <!-- ข้อ 3 -->
+        <div class="question-item">
+          <div class="question-title">
+            <span>3.</span>
+            <span>ถ้าเวกเตอร์ $\vec{w}$ มีขนาด $8$ หน่วย และทำมุม $60^\circ$ กับแกน $+X$ ในทิศทวนเข็มนาฬิกา จงแสดงวิธีทำเขียน $\vec{w}$ ในรูป $ai + bj$</span>
+          </div>
+          <div class="write-area"></div>
+          <div class="answer-key">
+            <strong>เฉลยวิธีทำ:</strong><br>
+            จากสูตร $a = |\vec{w}|\cos\theta$ และ $b = |\vec{w}|\sin\theta$<br>
+            $a = 8\cos 60^\circ = 8\left(\dfrac{1}{2}\right) = 4$<br>
+            $b = 8\sin 60^\circ = 8\left(\dfrac{\sqrt{3}}{2}\right) = 4\sqrt{3}$<br>
+            ดังนั้น $\vec{w} = 4i + 4\sqrt{3}j$
+          </div>
+        </div>
+
+        <!-- ข้อ 4 -->
+        <div class="question-item">
+          <div class="question-title">
+            <span>4.</span>
+            <span>หากเปลี่ยนองค์ประกอบของเวกเตอร์ $\vec{u} = 2i + 5j$ เป็น $\vec{u}' = 2i - 5j$ จงอธิบายว่าขนาดและทิศทางของเวกเตอร์เปลี่ยนแปลงอย่างไร</span>
+          </div>
+          <div class="write-area"></div>
+          <div class="answer-key">
+            <strong>เฉลยวิธีทำ:</strong><br>
+            • <strong>ขนาด:</strong> เท่าเดิม เพราะ $|\vec{u}| = \sqrt{2^2 + 5^2} = \sqrt{29}$ และ $|\vec{u}'| = \sqrt{2^2 + (-5)^2} = \sqrt{29}$ หน่วย<br>
+            • <strong>ทิศทาง:</strong> เปลี่ยนไป โดยเวกเตอร์จะสะท้อนข้ามแกน $X$ จากเดิมที่ชี้ขึ้นใน Quadrant 1 เปลี่ยนเป็นชี้ลงใน Quadrant 4
+          </div>
+        </div>
+
+        <!-- ข้อ 5 -->
+        <div class="question-item">
+          <div class="question-title">
+            <span>5.</span>
+            <span>(เชื่อมโยงสู่ 3 มิติ) หากต่อยอดเวกเตอร์ใน 2 มิติ $\vec{u} = 2i + 3j$ เข้าสู่ระบบพิกัดฉาก 3 มิติ โดยมีองค์ประกอบตามแกน $Z$ เท่ากับ $6$ หน่วย (ทิศ $k$) จงเขียนเวกเตอร์ในรูป $ai + bj + ck$ พร้อมแสดงวิธีคำนวณหาขนาด</span>
+          </div>
+          <div class="write-area"></div>
+          <div class="answer-key">
+            <strong>เฉลยวิธีทำ:</strong><br>
+            เขียนเวกเตอร์ใน 3 มิติได้เป็น: $\vec{u} = 2i + 3j + 6k$<br>
+            วิธีคำนวณขนาด: $|\vec{u}| = \sqrt{a^2 + b^2 + c^2} = \sqrt{2^2 + 3^2 + 6^2} = \sqrt{4 + 9 + 36} = \sqrt{49} = 7\text{ หน่วย}$
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== ตอนที่ 5 ==================== -->
+    <section class="section-card rubric-section">
+      <h2 style="font-family: var(--font-heading); color: #c2410c; font-size: 1.5rem; margin-bottom: 6px;">
+        เกณฑ์การประเมินใบงาน (Scoring Rubric - 3 ระดับ)
+      </h2>
+      <p style="color: #7c2d12; font-size: 0.95rem;">การวัดและประเมินผลทักษะกระบวนการคิดทางคณิตศาสตร์ เรื่อง เวกเตอร์ใน 2 มิติ</p>
+
+      <table class="rubric-table">
+        <thead>
+          <tr>
+            <th style="width: 25%;">ประเด็นการประเมิน</th>
+            <th class="score-col">ระดับ 3 (ดีเยี่ยม : 3 คะแนน)</th>
+            <th class="score-col">ระดับ 2 (พอใช้ : 2 คะแนน)</th>
+            <th class="score-col">ระดับ 1 (ปรับปรุง : 1 คะแนน)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>1. ความเข้าใจองค์ประกอบในรูป $ai + bj$</strong></td>
+            <td>ระบุองค์ประกอบในแนวแกน $X$ และ $Y$ ได้ถูกต้องครบถ้วน แปลงระหว่างองค์ประกอบและรูป $ai + bj$ ได้แม่นยำ 100%</td>
+            <td>ระบุองค์ประกอบได้ถูกต้องเป็นส่วนใหญ่ แต่มีข้อผิดพลาดเรื่องเครื่องหมายบวกลบเล็กน้อย</td>
+            <td>ไม่สามารถระบุองค์ประกอบตามแนวแกน หรือสับสนระหว่างสัมประสิทธิ์หน้า $i$ และ $j$</td>
+          </tr>
+          <tr>
+            <td><strong>2. การแสดงวิธีคำนวณขนาดเวกเตอร์</strong></td>
+            <td>แสดงการแทนค่าสูตร $|\vec{u}| = \sqrt{a^2 + b^2}$ ชัดเจน คิดเลขถูกต้อง ถอดกรณฑ์และระบุหน่วยครบถ้วน</td>
+            <td>ใช้สูตรถูกต้อง แต่มีข้อผิดพลาดในการคิดคำนวณตัวเลข หรือลืมถอดกรณฑ์ในขั้นตอนสุดท้าย</td>
+            <td>เขียนสูตรไม่ถูกต้อง หรือไม่สามารถคำนวณหาขนาดของเวกเตอร์ได้</td>
+          </tr>
+          <tr>
+            <td><strong>3. การหามุมทิศทางและตรีโกณมิติ</strong></td>
+            <td>คำนวณ $\tan\theta = \frac{b}{a}$ และพิจารณาจตุภาค (Quadrant) เพื่อระบุมุมทิศทางเทียบแกน $+X$ ได้อย่างถูกต้อง</td>
+            <td>คำนวณอัตราส่วนตรีโกณมิติได้ แต่ระบุจตุภาคผิดพลาด ทำให้มุมทิศทางคลาดเคลื่อน</td>
+            <td>ไม่เข้าใจความสัมพันธ์ระหว่างองค์ประกอบเวกเตอร์กับฟังก์ชันแทนเจนต์</td>
+          </tr>
+          <tr>
+            <td><strong>4. การเชื่อมโยงมโนทัศน์สู่ 3 มิติ</strong></td>
+            <td>เขียนเวกเตอร์ในรูป $ai + bj + ck$ และขยายสูตรหาขนาดเป็น $\sqrt{a^2 + b^2 + c^2}$ ได้อย่างถูกต้องสมบูรณ์</td>
+            <td>เขียนรูป $ai + bj + ck$ ได้ แต่มีข้อผิดพลาดในการแทนค่าหรือคำนวณขนาดใน 3 มิติ</td>
+            <td>ไม่สามารถต่อยอดมโนทัศน์จาก 2 มิติเข้าสู่แกน $Z$ ในระบบพิกัดฉาก 3 มิติได้</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div style="margin-top: 16px; font-size: 0.92rem; color: #7c2d12; background: #fff; padding: 12px 16px; border-radius: 8px; border: 1px dashed #fdba74;">
+        <strong>เกณฑ์การตัดสินระดับคุณภาพ:</strong><br>
+        คะแนนรวม $10 - 12$ คะแนน = <strong>ระดับคุณภาพ ดีมาก</strong> | 
+        คะแนนรวม $7 - 9$ คะแนน = <strong>ระดับคุณภาพ ปานกลาง</strong> | 
+        คะแนนรวม $1 - 6$ คะแนน = <strong>ระดับคุณภาพ ควรปรับปรุง</strong>
+      </div>
+    </section>
+
+  </div>
+
+  <script>
+    const canvas = document.getElementById('vectorCanvas');
+    const ctx = canvas.getContext('2d');
+
+    let is3D = false;
+    let valA = 4;
+    let valB = 3;
+    let valC = 4;
+
+    const originX = canvas.width / 2;
+    const originY = canvas.height / 2;
+    const scale = 25;
+
+    function render() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      if (!is3D) {
+        render2D();
+      } else {
+        render3D();
+      }
+      updateCalculations();
+    }
+
+    function render2D() {
+      // Grid
+      ctx.strokeStyle = '#f1f5f9';
+      ctx.lineWidth = 1;
+      for (let x = originX % scale; x < canvas.width; x += scale) {
+        ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, canvas.height); ctx.stroke();
+      }
+      for (let y = originY % scale; y < canvas.height; y += scale) {
+        ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(canvas.width, y); ctx.stroke();
+      }
+
+      // Axis
+      ctx.strokeStyle = '#94a3b8';
+      ctx.lineWidth = 2;
+      ctx.beginPath(); ctx.moveTo(0, originY); ctx.lineTo(canvas.width, originY); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(originX, 0); ctx.lineTo(originX, canvas.height); ctx.stroke();
+
+      ctx.fillStyle = '#64748b';
+      ctx.font = '12px Prompt, sans-serif';
+      ctx.fillText('+X (i)', canvas.width - 45, originY - 8);
+      ctx.fillText('+Y (j)', originX + 8, 16);
+
+      // Components
+      const targetX = originX + valA * scale;
+      const targetY = originY - valB * scale;
+
+      ctx.setLineDash([4, 4]);
+      ctx.strokeStyle = '#ef4444';
+      ctx.beginPath(); ctx.moveTo(originX, originY); ctx.lineTo(targetX, originY); ctx.stroke();
+      ctx.strokeStyle = '#10b981';
+      ctx.beginPath(); ctx.moveTo(targetX, originY); ctx.lineTo(targetX, targetY); ctx.stroke();
+      ctx.setLineDash([]);
+
+      drawArrow(originX, originY, targetX, targetY, '#7c3aed', 3.5);
+    }
+
+    function render3D() {
+      const angX = (150 * Math.PI) / 180;
+      const angY = (30 * Math.PI) / 180;
+
+      function project3D(x, y, z) {
+        const px = originX + (y * Math.cos(angY) - x * Math.cos(Math.PI - angX)) * scale;
+        const py = originY + (y * Math.sin(angY) + x * Math.sin(Math.PI - angX) - z) * scale;
+        return { px, py };
+      }
+
+      ctx.lineWidth = 2;
+
+      // Axis Z
+      ctx.strokeStyle = '#c026d3';
+      ctx.beginPath(); ctx.moveTo(originX, originY);
+      const topZ = project3D(0, 0, 8);
+      ctx.lineTo(topZ.px, topZ.py); ctx.stroke();
+
+      // Axis X
+      ctx.strokeStyle = '#ef4444';
+      ctx.beginPath(); ctx.moveTo(originX, originY);
+      const endX = project3D(8, 0, 0);
+      ctx.lineTo(endX.px, endX.py); ctx.stroke();
+
+      // Axis Y
+      ctx.strokeStyle = '#10b981';
+      ctx.beginPath(); ctx.moveTo(originX, originY);
+      const endY = project3D(0, 8, 0);
+      ctx.lineTo(endY.px, endY.py); ctx.stroke();
+
+      ctx.fillStyle = '#64748b';
+      ctx.font = '12px Prompt, sans-serif';
+      ctx.fillText('+Z (k)', topZ.px + 8, topZ.py + 10);
+      ctx.fillText('+X (i)', endX.px - 35, endX.py + 15);
+      ctx.fillText('+Y (j)', endY.px + 10, endY.py + 15);
+
+      const pXY = project3D(valA, valB, 0);
+      const pXYZ = project3D(valA, valB, valC);
+
+      ctx.setLineDash([3, 3]);
+      ctx.strokeStyle = '#cbd5e1';
+      ctx.beginPath(); ctx.moveTo(originX, originY); ctx.lineTo(pXY.px, pXY.py); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(pXY.px, pXY.py); ctx.lineTo(pXYZ.px, pXYZ.py); ctx.stroke();
+      ctx.setLineDash([]);
+
+      drawArrow(originX, originY, pXYZ.px, pXYZ.py, '#7c3aed', 3.8);
+    }
+
+    function drawArrow(fromX, fromY, toX, toY, color = '#7c3aed', lineWidth = 3.5) {
+      const headLength = 14;
+      const angle = Math.atan2(toY - fromY, toX - fromX);
+
+      ctx.strokeStyle = color;
+      ctx.fillStyle = color;
+      ctx.lineWidth = lineWidth;
+
+      ctx.beginPath(); ctx.moveTo(fromX, fromY); ctx.lineTo(toX, toY); ctx.stroke();
+
+      ctx.beginPath();
+      ctx.moveTo(toX, toY);
+      ctx.lineTo(toX - headLength * Math.cos(angle - Math.PI / 7), toY - headLength * Math.sin(angle - Math.PI / 7));
+      ctx.lineTo(toX - headLength * Math.cos(angle + Math.PI / 7), toY - headLength * Math.sin(angle + Math.PI / 7));
+      ctx.closePath();
+      ctx.fill();
+    }
+
+    function formatVector(a, b, c = null) {
+      let strA = a === 1 ? "i" : a === -1 ? "-i" : a !== 0 ? `${a}i` : "";
+      let strB = "";
+      if (b === 1) strB = strA ? "+ j" : "j";
+      else if (b === -1) strB = "- j";
+      else if (b > 0) strB = strA ? `+ ${b}j` : `${b}j`;
+      else if (b < 0) strB = `- ${Math.abs(b)}j`;
+
+      if (c === null) {
+        if (!strA && !strB) return "0";
+        return `${strA} ${strB}`.trim();
+      }
+
+      let res = strA || strB ? `${strA} ${strB}`.trim() : "";
+      let strC = "";
+      if (c === 1) strC = res ? "+ k" : "k";
+      else if (c === -1) strC = "- k";
+      else if (c > 0) strC = res ? `+ ${c}k` : `${c}k`;
+      else if (c < 0) strC = `- ${Math.abs(c)}k`;
+
+      if (!res && !strC) return "0";
+      return `${res} ${strC}`.trim();
+    }
+
+    function updateCalculations() {
+      const vecDisp = document.getElementById('label-vector-display');
+      const magCalc = document.getElementById('label-mag-calc');
+      const dirCalc = document.getElementById('label-dir-calc');
+      const dirBadge = document.getElementById('direction-badge');
+
+      if (!is3D) {
+        const sqA = valA * valA;
+        const sqB = valB * valB;
+        const sumSq = sqA + sqB;
+        const mag = Math.sqrt(sumSq);
+
+        vecDisp.innerHTML = `$\\vec{u} = ${formatVector(valA, valB)}$`;
+        
+        const aStr = valA < 0 ? `(${valA})^2` : `${valA}^2`;
+        const bStr = valB < 0 ? `(${valB})^2` : `${valB}^2`;
+        magCalc.innerHTML = `$|\\vec{u}| = \\sqrt{${aStr} + ${bStr}} = \\sqrt{${sqA} + ${sqB}} = \\sqrt{${sumSq}} \\approx ${mag.toFixed(2)}\\text{ หน่วย}$`;
+
+        dirBadge.style.display = "block";
+        if (valA === 0 && valB === 0) {
+          dirCalc.innerHTML = `เวกเตอร์ศูนย์ ไม่สามารถระบุทิศทางได้`;
+        } else if (valA === 0) {
+          const deg = valB > 0 ? 90 : 270;
+          dirCalc.innerHTML = `$a = 0 \\implies$ เวกเตอร์ทับแกน $Y$ ทำมุม $\\theta = ${deg}^\\circ$ กับแกน $+X$`;
+        } else {
+          let deg = Math.atan2(valB, valA) * (180 / Math.PI);
+          if (deg < 0) deg += 360;
+          const ratio = (valB / valA).toFixed(3);
+          dirCalc.innerHTML = `$\\tan\\theta = \\frac{${valB}}{${valA}} = ${ratio} \\implies \\theta \\approx ${deg.toFixed(1)}^\\circ$ (เทียบแกน $+X$)`;
+        }
+      } else {
+        const sqA = valA * valA;
+        const sqB = valB * valB;
+        const sqC = valC * valC;
+        const sumSq = sqA + sqB + sqC;
+        const mag = Math.sqrt(sumSq);
+
+        vecDisp.innerHTML = `$\\vec{u} = ${formatVector(valA, valB, valC)}$`;
+
+        const aStr = valA < 0 ? `(${valA})^2` : `${valA}^2`;
+        const bStr = valB < 0 ? `(${valB})^2` : `${valB}^2`;
+        const cStr = valC < 0 ? `(${valC})^2` : `${valC}^2`;
+        magCalc.innerHTML = `$|\\vec{u}| = \\sqrt{${aStr} + ${bStr} + ${cStr}} = \\sqrt{${sqA} + ${sqB} + ${sqC}} = \\sqrt{${sumSq}} \\approx ${mag.toFixed(2)}\\text{ หน่วย}$`;
+
+        dirBadge.style.display = "block";
+        if (mag === 0) {
+          dirCalc.innerHTML = `เวกเตอร์ศูนย์ ไม่สามารถระบุทิศทางได้`;
+        } else {
+          const cosA = (valA / mag).toFixed(2);
+          const cosB = (valB / mag).toFixed(2);
+          const cosC = (valC / mag).toFixed(2);
+          dirCalc.innerHTML = `ทิศทางใน 3 มิติ (Direction Cosines): $\\cos\\alpha = ${cosA}, \\; \\cos\\beta = ${cosB}, \\; \\cos\\gamma = ${cosC}$`;
+        }
+      }
+
+      if (window.MathJax && MathJax.typesetPromise) {
+        MathJax.typesetPromise([vecDisp, magCalc, dirCalc]);
+      }
+    }
+
+    function onSliderChange() {
+      valA = parseInt(document.getElementById('sliderA').value);
+      valB = parseInt(document.getElementById('sliderB').value);
+      valC = parseInt(document.getElementById('sliderC').value);
+
+      document.getElementById('valA').innerText = valA;
+      document.getElementById('valB').innerText = valB;
+      document.getElementById('valC').innerText = valC;
+
+      render();
+    }
+
+    function toggleDimension() {
+      is3D = !is3D;
+      const btnText = document.getElementById('dimension-btn-text');
+      const sliderCRow = document.getElementById('sliderC-row');
+      const title = document.getElementById('model-main-title');
+      const subtitle = document.getElementById('model-sub-title');
+
+      if (is3D) {
+        btnText.innerText = "กลับสู่ระบบ 2 มิติ";
+        sliderCRow.style.display = "flex";
+        title.innerText = "Interactive Model: เวกเตอร์ใน 3 มิติ";
+        subtitle.innerText = "เพิ่มแกน Z (เวกเตอร์หนึ่งหน่วย k) เพื่อสังเกตทิศทางในปริภูมิสามมิติ";
+      } else {
+        btnText.innerText = "เปลี่ยนเป็น 3 มิติ";
+        sliderCRow.style.display = "none";
+        title.innerText = "Interactive Model: เวกเตอร์ใน 2 มิติ";
+        subtitle.innerText = "เลื่อน Slider เพื่อปรับค่าองค์ประกอบ แล้วสังเกตการเปลี่ยนแปลงของลูกศร ขนาด และทิศทาง";
+      }
+      render();
+    }
+
+    function toggleAnswers() {
+      const section = document.getElementById('printable-worksheet');
+      section.classList.toggle('show-answers');
+      const isShown = section.classList.contains('show-answers');
+      document.getElementById('toggle-text').innerText = isShown ? 'ซ่อนเฉลย' : 'แสดงเฉลย';
+    }
+
+    function printSheet(role) {
+      const worksheetSection = document.getElementById('printable-worksheet');
+      const originalHasClass = worksheetSection.classList.contains('show-answers');
+
+      if (role === 'teacher') {
+        worksheetSection.classList.add('show-answers');
+      } else {
+        worksheetSection.classList.remove('show-answers');
+      }
+
+      window.print();
+
+      if (originalHasClass) {
+        worksheetSection.classList.add('show-answers');
+      } else {
+        worksheetSection.classList.remove('show-answers');
+      }
+    }
+
+    window.addEventListener('load', () => {
+      render();
+    });
+  </script>
+</body>
+</html>
