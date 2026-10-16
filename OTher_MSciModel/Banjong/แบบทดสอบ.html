@@ -1,0 +1,902 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>แบบทดสอบวัดผลสัมฤทธิ์ทางการเรียน เรื่อง จำนวนเชิงซ้อน ม.5</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@400;500;600;700&family=Sarabun:wght@300;400;500;600;700&family=Fira+Code:wght@400;600&display=swap" rel="stylesheet">
+    
+    <!-- MathJax 3 -->
+    <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']],
+                displayMath: [['$$', '$$'], ['\\[', '\\]']]
+            },
+            startup: {
+                ready: () => {
+                    MathJax.startup.defaultReady();
+                    window.mathJaxReady = true;
+                }
+            }
+        };
+    </script>
+    <script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+    <style>
+        :root {
+            --primary: #1e3a8a;
+            --primary-light: #3b82f6;
+            --bg-page: #f1f5f9;
+            --card-bg: #ffffff;
+            --text-dark: #0f172a;
+            --text-muted: #64748b;
+            --k-color: #0284c7;
+            --p-color: #16a34a;
+            --a-color: #9333ea;
+            --easy-color: #10b981;
+            --med-color: #f59e0b;
+            --hard-color: #ef4444;
+            --border: #e2e8f0;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Sarabun', sans-serif;
+            background-color: var(--bg-page);
+            color: var(--text-dark);
+            line-height: 1.6;
+            padding: 24px 0 60px 0;
+            display: flex;
+            justify-content: center;
+        }
+
+        .container {
+            width: 1200px;
+            max-width: 95%;
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        h1, h2, h3, h4 {
+            font-family: 'Kanit', sans-serif;
+        }
+
+        /* Test Header */
+        .header-card {
+            background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%);
+            color: #ffffff;
+            border-radius: 16px;
+            padding: 30px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+        }
+        .header-card h1 {
+            font-size: 2.2rem;
+            margin-bottom: 8px;
+        }
+        .header-card p.subtitle {
+            font-size: 1.1rem;
+            color: #93c5fd;
+            margin-bottom: 20px;
+        }
+
+        .meta-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 14px;
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 12px;
+            padding: 16px 20px;
+            font-size: 0.95rem;
+        }
+
+        /* Action Buttons */
+        .actions-bar {
+            display: flex;
+            gap: 14px;
+            flex-wrap: wrap;
+            background: #ffffff;
+            padding: 18px 24px;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        }
+        .btn {
+            font-family: 'Kanit', sans-serif;
+            font-size: 1rem;
+            font-weight: 500;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            border: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s ease;
+        }
+        .btn-student { background: #2563eb; color: #fff; }
+        .btn-teacher { background: #059669; color: #fff; }
+        .btn-toggle  { background: #64748b; color: #fff; }
+        .btn:hover { transform: translateY(-2px); opacity: 0.95; }
+
+        /* Blueprint Summary Table */
+        .blueprint-card {
+            background: #ffffff;
+            border-radius: 14px;
+            padding: 20px 24px;
+            border: 1px solid var(--border);
+        }
+        .blueprint-card summary {
+            font-family: 'Kanit', sans-serif;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            color: var(--primary);
+        }
+        .table-bp {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 14px;
+            font-size: 0.9rem;
+        }
+        .table-bp th, .table-bp td {
+            border: 1px solid var(--border);
+            padding: 8px 12px;
+            text-align: center;
+        }
+        .table-bp th {
+            background: #f8fafc;
+            color: #334155;
+            font-weight: 600;
+        }
+
+        /* Questions Container */
+        .questions-container {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .question-card {
+            background: #ffffff;
+            border-radius: 14px;
+            padding: 24px;
+            border: 1px solid var(--border);
+            box-shadow: 0 4px 14px rgba(0,0,0,0.04);
+            page-break-inside: avoid;
+            break-inside: avoid;
+            position: relative;
+        }
+
+        /* Metadata Header above each question */
+        .q-meta-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 8px;
+            background: #f8fafc;
+            border-left: 4px solid #cbd5e1;
+            padding: 8px 14px;
+            border-radius: 0 8px 8px 0;
+            margin-bottom: 14px;
+            font-size: 0.88rem;
+        }
+        .q-meta-badges {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+        .badge {
+            display: inline-block;
+            padding: 2px 10px;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: #ffffff;
+            font-family: 'Kanit', sans-serif;
+        }
+        .badge-k { background-color: var(--k-color); }
+        .badge-p { background-color: var(--p-color); }
+        .badge-a { background-color: var(--a-color); }
+        .badge-easy { background-color: var(--easy-color); }
+        .badge-med  { background-color: var(--med-color); }
+        .badge-hard { background-color: var(--hard-color); }
+
+        .lo-text {
+            color: #475569;
+            font-size: 0.88rem;
+            font-weight: 500;
+        }
+
+        .q-text {
+            font-size: 1.08rem;
+            font-weight: 600;
+            color: #0f172a;
+            margin-bottom: 14px;
+            line-height: 1.7;
+        }
+
+        .options-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px 16px;
+            margin-bottom: 14px;
+        }
+        @media (max-width: 768px) {
+            .options-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        .option-item {
+            background: #fbfcfe;
+            border: 1px solid #e2e8f0;
+            padding: 10px 14px;
+            border-radius: 8px;
+            font-size: 1rem;
+            display: flex;
+            align-items: baseline;
+            gap: 10px;
+        }
+        .option-item .choice-key {
+            font-weight: 700;
+            color: #1e3a8a;
+            min-width: 20px;
+        }
+
+        /* Answer & Explanation Box */
+        .solution-box {
+            background: #f0fdf4;
+            border-left: 4px solid #16a34a;
+            border-radius: 0 8px 8px 0;
+            padding: 14px 18px;
+            margin-top: 14px;
+            font-size: 0.95rem;
+            color: #14532d;
+        }
+        .solution-box strong {
+            color: #166534;
+            font-family: 'Kanit', sans-serif;
+        }
+        .solution-box.hidden {
+            display: none !important;
+        }
+
+        /* Student Workspace Box for print */
+        .student-work-area {
+            display: none;
+            border: 1px dashed #cbd5e1;
+            border-radius: 6px;
+            min-height: 80px;
+            margin-top: 10px;
+            background: #fafafa;
+            position: relative;
+        }
+        .student-work-area::before {
+            content: "พื้นที่คิดคำนวณ / แสดงเหตุผล:";
+            position: absolute;
+            top: 4px;
+            left: 8px;
+            font-size: 0.75rem;
+            color: #94a3b8;
+        }
+
+        /* Student Info Form Header (For Print) */
+        .student-print-header {
+            display: none;
+            border-bottom: 2px solid #000;
+            padding-bottom: 10px;
+            margin-bottom: 16px;
+        }
+        .student-print-meta {
+            display: flex;
+            gap: 20px;
+            margin-top: 8px;
+            font-size: 0.95rem;
+        }
+        .dot-fill {
+            flex-grow: 1;
+            border-bottom: 1px dotted #475569;
+        }
+
+        /* --- PRINT STYLES --- */
+        @media print {
+            body {
+                background: #ffffff !important;
+                color: #000000 !important;
+                padding: 0 !important;
+            }
+            .container {
+                width: 100% !important;
+                max-width: 100% !important;
+                gap: 0 !important;
+            }
+            .header-card, .actions-bar, .blueprint-card {
+                display: none !important;
+            }
+            .student-print-header {
+                display: block !important;
+            }
+            .question-card {
+                box-shadow: none !important;
+                border: none !important;
+                border-bottom: 1px dashed #94a3b8 !important;
+                border-radius: 0 !important;
+                padding: 10px 0 !important;
+                page-break-inside: avoid !important;
+                break-inside: avoid !important;
+            }
+            .q-meta-bar {
+                background: #f1f5f9 !important;
+                border-left: 3px solid #000 !important;
+                padding: 4px 8px !important;
+                font-size: 0.8rem !important;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+            .badge {
+                border: 1px solid #475569 !important;
+                color: #000 !important;
+                background: transparent !important;
+                font-size: 0.75rem !important;
+            }
+            .options-grid {
+                gap: 6px 12px !important;
+            }
+            .option-item {
+                background: #ffffff !important;
+                border: 1px solid #cbd5e1 !important;
+                padding: 6px 10px !important;
+            }
+            .student-work-area {
+                display: block !important;
+                min-height: 70px !important;
+                background: #fff !important;
+            }
+            @page {
+                size: A4 portrait;
+                margin: 12mm 15mm;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+
+    <!-- Header & Information -->
+    <header class="header-card">
+        <h1>แบบทดสอบวัดผลสัมฤทธิ์ทางการเรียน เรื่อง จำนวนเชิงซ้อน</h1>
+        <p class="subtitle">กลุ่มสาระการเรียนรู้คณิตศาสตร์ ชั้นมัธยมศึกษาปีที่ 5 (ตามหลักสูตรแกนกลางการศึกษาขั้นพื้นฐาน)</p>
+        
+        <div class="meta-grid">
+            <div><strong>จำนวนข้อสอบ:</strong> 15 ข้อ (ปรนัย 4 ตัวเลือก)</div>
+            <div><strong>เวลาที่ใช้:</strong> 60 นาที</div>
+            <div><strong>สัดส่วนการวัด:</strong> K (5) | P (5) | A (5)</div>
+            <div><strong>ระดับความยาก:</strong> ง่าย (5) | ปานกลาง (5) | ยาก (5)</div>
+        </div>
+    </header>
+
+    <!-- Toolbar for Teachers & Students -->
+    <div class="actions-bar">
+        <button class="btn btn-student" onclick="preparePrint(false)">
+            🖨️ พิมพ์แบบทดสอบสำหรับนักเรียน (ซ่อนเฉลย / หน้า A4)
+        </button>
+        <button class="btn btn-teacher" onclick="preparePrint(true)">
+            📋 พิมพ์พร้อมเฉลยละเอียดและเหตุผลสำหรับครู
+        </button>
+        <button class="btn btn-toggle" onclick="toggleSolutions()">
+            👁️ สลับแสดง/ซ่อนเฉลยบนหน้าจอ
+        </button>
+    </div>
+
+    <!-- Test Blueprint Summary (Collapsible) -->
+    <details class="blueprint-card">
+        <summary>📊 ตารางวิเคราะห์ผังการสร้างแบบทดสอบ (Test Blueprint)</summary>
+        <table class="table-bp">
+            <thead>
+                <tr>
+                    <th>ข้อที่</th>
+                    <th>สาระเนื้อหา / ผลลัพธ์การเรียนรู้ (LO)</th>
+                    <th>ด้านที่วัด</th>
+                    <th>ระดับความยาก</th>
+                    <th>คะแนน</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr><td>1</td><td>สมบัติและกำลังของหน่วยจินตภาพ ($i^n$)</td><td>K (ความรู้)</td><td>ง่าย</td><td>1</td></tr>
+                <tr><td>2</td><td>สังยุคและค่าสัมบูรณ์ของจำนวนเชิงซ้อน</td><td>K (ความรู้)</td><td>ง่าย</td><td>1</td></tr>
+                <tr><td>3</td><td>รูปแบบและเงื่อนไขของรูปเชิงขั้ว (Polar Form)</td><td>K (ความรู้)</td><td>ปานกลาง</td><td>1</td></tr>
+                <tr><td>4</td><td>ทฤษฎีบทรากคู่สังยุคของสมการพหุนาม</td><td>K (ความรู้)</td><td>ปานกลาง</td><td>1</td></tr>
+                <tr><td>5</td><td>ทฤษฎีบทการหารากที่ $n$ และระยะห่างเชิงมุม</td><td>K (ความรู้)</td><td>ยาก</td><td>1</td></tr>
+                <tr><td>6</td><td>การคำนวณและจัดรูปผลหารของจำนวนเชิงซ้อน</td><td>P (ทักษะกระบวนการ)</td><td>ง่าย</td><td>1</td></tr>
+                <tr><td>7</td><td>การแปลงรูปมาตรฐาน $a+bi$ สู่รูปเชิงขั้วตามควอดแรนต์</td><td>P (ทักษะกระบวนการ)</td><td>ปานกลาง</td><td>1</td></tr>
+                <tr><td>8</td><td>การคำนวณเลขยกกำลังด้วยทฤษฎีบทเดอมัวฟร์</td><td>P (ทักษะกระบวนการ)</td><td>ปานกลาง</td><td>1</td></tr>
+                <tr><td>9</td><td>การแก้สมการพหุนามดีกรี 3 ด้วยการหารสังเคราะห์</td><td>P (ทักษะกระบวนการ)</td><td>ยาก</td><td>1</td></tr>
+                <tr><td>10</td><td>การหารากที่ $n$ ทั้งหมดบนระนาบเชิงซ้อน</td><td>P (ทักษะกระบวนการ)</td><td>ยาก</td><td>1</td></tr>
+                <tr><td>11</td><td>การตรวจสอบความสมเหตุสมผลของการดำเนินการเชิงพีชคณิต</td><td>A (เจตคติ/การให้เหตุผล)</td><td>ง่าย</td><td>1</td></tr>
+                <tr><td>12</td><td>การวิเคราะห์ข้อผิดพลาดในการระบุค่ามุมอาร์กิวเมนต์</td><td>A (เจตคติ/การให้เหตุผล)</td><td>ง่าย</td><td>1</td></tr>
+                <tr><td>13</td><td>การเปรียบเทียบประสิทธิภาพระหว่างการกระจายทวินามกับเดอมัวฟร์</td><td>A (เจตคติ/การให้เหตุผล)</td><td>ปานกลาง</td><td>1</td></tr>
+                <tr><td>14</td><td>การให้เหตุผลเชิงเรขาคณิตของการกระจายตัวของรากที่ $n$</td><td>A (เจตคติ/การให้เหตุผล)</td><td>ยาก</td><td>1</td></tr>
+                <tr><td>15</td><td>การสร้างข้อสรุปและการเชื่อมโยงสู่สมการพหุนามสัมประสิทธิ์จริง</td><td>A (เจตคติ/การให้เหตุผล)</td><td>ยาก</td><td>1</td></tr>
+            </tbody>
+        </table>
+    </details>
+
+    <!-- Student Header for Print Only -->
+    <div class="student-print-header">
+        <div style="display: flex; justify-content: space-between; align-items: baseline;">
+            <h2>แบบทดสอบวัดผลสัมฤทธิ์ทางการเรียน เรื่อง จำนวนเชิงซ้อน ชั้น ม.5</h2>
+            <span>คะแนนเต็ม 15 คะแนน</span>
+        </div>
+        <div class="student-print-meta">
+            <div style="flex: 2;">ชื่อ-นามสกุล: <span class="dot-fill"></span></div>
+            <div style="flex: 1;">เลขที่: <span class="dot-fill"></span></div>
+            <div style="flex: 1;">ห้อง ม.5/ <span class="dot-fill"></span></div>
+        </div>
+    </div>
+
+    <!-- Questions Container -->
+    <main class="questions-container">
+
+        <!-- ==================== PART 1: KNOWLEDGE (K) 5 ข้อ ==================== -->
+
+        <!-- ข้อ 1: K - ง่าย -->
+        <article class="question-card">
+            <div class="q-meta-bar">
+                <div class="q-meta-badges">
+                    <span class="badge badge-k">ด้านความรู้ (K)</span>
+                    <span class="badge badge-easy">ระดับ: ง่าย</span>
+                </div>
+                <div class="lo-text"><strong>ผลลัพธ์การเรียนรู้ (LO):</strong> เข้าใจและระบุค่าของหน่วยจินตภาพและสมบัติการยกกำลังของ $i$ ได้</div>
+            </div>
+            <div class="q-text">
+                ข้อที่ 1. ค่าของ $i^{2567} + i^{2568}$ มีค่าตรงกับข้อใดต่อไปนี้
+            </div>
+            <div class="options-grid">
+                <div class="option-item"><span class="choice-key">ก.</span> $0$</div>
+                <div class="option-item"><span class="choice-key">ข.</span> $1 - i$</div>
+                <div class="option-item"><span class="choice-key">ค.</span> $-1 + i$</div>
+                <div class="option-item"><span class="choice-key">ง.</span> $1 + i$</div>
+            </div>
+            <div class="student-work-area"></div>
+            <div class="solution-box hidden">
+                <strong>เฉลยละเอียด: ข้อ ค. ($1 - i$) — แก้ไขเป็น ข.</strong><br>
+                พิจารณาเศษจากการหารด้วย 4:<br>
+                - $2567 \div 4 = 641$ เศษ $3 \implies i^{2567} = i^3 = -i$<br>
+                - $2568 \div 4 = 642$ เศษ $0 \implies i^{2568} = i^0 = 1$<br>
+                ดังนั้น $i^{2567} + i^{2568} = -i + 1 = 1 - i$<br>
+                <strong>คำตอบที่ถูกต้องคือ ข้อ ข.</strong>
+            </div>
+        </article>
+
+        <!-- ข้อ 2: K - ง่าย -->
+        <article class="question-card">
+            <div class="q-meta-bar">
+                <div class="q-meta-badges">
+                    <span class="badge badge-k">ด้านความรู้ (K)</span>
+                    <span class="badge badge-easy">ระดับ: ง่าย</span>
+                </div>
+                <div class="lo-text"><strong>ผลลัพธ์การเรียนรู้ (LO):</strong> บอกความหมาย สมบัติของสังยุคและค่าสัมบูรณ์ของจำนวนเชิงซ้อนได้</div>
+            </div>
+            <div class="q-text">
+                ข้อที่ 2. กำหนดจำนวนเชิงซ้อน $z = 3 - 4i$ ข้อความใดต่อไปนี้<strong>ไม่ถูกต้อง</strong>
+            </div>
+            <div class="options-grid">
+                <div class="option-item"><span class="choice-key">ก.</span> สังยุคของ $z$ คือ $\bar{z} = 3 + 4i$</div>
+                <div class="option-item"><span class="choice-key">ข.</span> ค่าสัมบูรณ์ $|z| = 5$</div>
+                <div class="option-item"><span class="choice-key">ค.</span> ผลคูณ $z \cdot \bar{z} = 25$</div>
+                <div class="option-item"><span class="choice-key">ง.</span> ส่วนจินตภาพของ $z$ คือ $\operatorname{Im}(z) = -4i$</div>
+            </div>
+            <div class="student-work-area"></div>
+            <div class="solution-box hidden">
+                <strong>เฉลยละเอียด: ข้อ ง.</strong><br>
+                นิยามส่วนจินตภาพของ $z = a + bi$ คือสัมประสิทธิ์หน้า $i$ ซึ่งเป็นจำนวนจริง นั่นคือ $\operatorname{Im}(z) = b = -4$ ไม่ใช่ $-4i$ จึงเป็นข้อความที่ไม่ถูกต้อง
+            </div>
+        </article>
+
+        <!-- ข้อ 3: K - ปานกลาง -->
+        <article class="question-card">
+            <div class="q-meta-bar">
+                <div class="q-meta-badges">
+                    <span class="badge badge-k">ด้านความรู้ (K)</span>
+                    <span class="badge badge-med">ระดับ: ปานกลาง</span>
+                </div>
+                <div class="lo-text"><strong>ผลลัพธ์การเรียนรู้ (LO):</strong> อธิบายโครงสร้างและความสัมพันธ์ของรูปเชิงขั้วของจำนวนเชิงซ้อนได้</div>
+            </div>
+            <div class="q-text">
+                ข้อที่ 3. ถ้า $z = r(\cos\theta + i\sin\theta)$ เป็นรูปเชิงขั้วของจำนวนเชิงซ้อน $z \neq 0$ ข้อใดสรุปเงื่อนไขและสมบัติได้<strong>ถูกต้องสมบูรณ์</strong>
+            </div>
+            <div class="options-grid">
+                <div class="option-item"><span class="choice-key">ก.</span> $r$ สามารถเป็นจำนวนจริงใด ๆ และ $\tan\theta = \frac{a}{b}$</div>
+                <div class="option-item"><span class="choice-key">ข.</span> $r = |z| > 0$ เสมอ และอาร์กิวเมนต์หลัก $\theta \in (-\pi, \pi]$ หรือ $[0, 2\pi)$</div>
+                <div class="option-item"><span class="choice-key">ค.</span> $\bar{z} = r(\cos\theta - i\sin\theta)$ ซึ่งไม่ใช่รูปเชิงขั้วมาตรฐาน</div>
+                <div class="option-item"><span class="choice-key">ง.</span> $z^{-1} = r(\cos(-\theta) + i\sin(-\theta))$</div>
+            </div>
+            <div class="student-work-area"></div>
+            <div class="solution-box hidden">
+                <strong>เฉลยละเอียด: ข้อ ข.</strong><br>
+                ตามนิยามรูปเชิงขั้ว $r = |z| = \sqrt{a^2+b^2}$ เป็นระยะทางจึงต้องมีค่าเป็นบวกเสมอ ($r > 0$) และอาร์กิวเมนต์หลัก (Principal Argument) ถูกกำหนดอยู่ในช่วง $(-\pi, \pi]$ หรือ $[0, 2\pi)$ ส่วนตัวเลือกอื่นผิด: ตัวเลือก ก. $r$ ต้องไม่เป็นลบ, ตัวเลือก ง. ขนาดต้องเป็น $\frac{1}{r}$
+            </div>
+        </article>
+
+        <!-- ข้อ 4: K - ปานกลาง -->
+        <article class="question-card">
+            <div class="q-meta-bar">
+                <div class="q-meta-badges">
+                    <span class="badge badge-k">ด้านความรู้ (K)</span>
+                    <span class="badge badge-med">ระดับ: ปานกลาง</span>
+                </div>
+                <div class="lo-text"><strong>ผลลัพธ์การเรียนรู้ (LO):</strong> ระบุเงื่อนไขของทฤษฎีบทรากคู่สังยุคสำหรับสมการพหุนามได้</div>
+            </div>
+            <div class="q-text">
+                ข้อที่ 4. สมการพหุนาม $P(x) = 0$ จะมีสมบัติว่า "ถ้า $a + bi$ (เมื่อ $b \neq 0$) เป็นรากของสมการ แล้ว $a - bi$ จะต้องเป็นรากของสมการด้วยเสมอ" ภายใต้เงื่อนไขใดต่อไปนี้
+            </div>
+            <div class="options-grid">
+                <div class="option-item"><span class="choice-key">ก.</span> สัมประสิทธิ์ทุกตัวของ $P(x)$ ต้องเป็นจำนวนเต็มเท่านั้น</div>
+                <div class="option-item"><span class="choice-key">ข.</span> สัมประสิทธิ์ทุกตัวของ $P(x)$ ต้องเป็นจำนวนจริง</div>
+                <div class="option-item"><span class="choice-key">ค.</span> ดีกรีของ $P(x)$ ต้องเป็นจำนวนคู่เท่านั้น</div>
+                <div class="option-item"><span class="choice-key">ง.</span> เป็นจริงสำหรับสมการพหุนามทุกสมการโดยไม่มีเงื่อนไขของสัมประสิทธิ์</div>
+            </div>
+            <div class="student-work-area"></div>
+            <div class="solution-box hidden">
+                <strong>เฉลยละเอียด: ข้อ ข.</strong><br>
+                ทฤษฎีบทรากคู่สังยุค (Complex Conjugate Root Theorem) บังคับเงื่อนไขสำคัญคือ **สัมประสิทธิ์ทุกตัวของพหุนามต้องเป็นจำนวนจริง** (Real Coefficients) หากสัมประสิทธิ์บางตัวเป็นจำนวนเชิงซ้อน เช่น $x - i = 0$ จะมีรากคือ $i$ แต่ $-i$ ไม่ได้เป็นราก
+            </div>
+        </article>
+
+        <!-- ข้อ 5: K - ยาก -->
+        <article class="question-card">
+            <div class="q-meta-bar">
+                <div class="q-meta-badges">
+                    <span class="badge badge-k">ด้านความรู้ (K)</span>
+                    <span class="badge badge-hard">ระดับ: ยาก</span>
+                </div>
+                <div class="lo-text"><strong>ผลลัพธ์การเรียนรู้ (LO):</strong> อธิบายทฤษฎีบทรากที่ $n$ และสมบัติการกระจายตัวของรากบนระนาบเชิงซ้อนได้</div>
+            </div>
+            <div class="q-text">
+                ข้อที่ 5. ให้ $z \neq 0$ เป็นจำนวนเชิงซ้อนใด ๆ และ $n$ เป็นจำนวนเต็มบวกที่มากกว่า 2 ข้อความใดเกี่ยวกับรากที่ $n$ ทั้งหมดของ $z$ เป็น<strong>จริงเสมอ</strong>
+            </div>
+            <div class="options-grid">
+                <div class="option-item"><span class="choice-key">ก.</span> มีรากอย่างน้อย 1 รากที่เป็นจำนวนจริงเสมอ</div>
+                <div class="option-item"><span class="choice-key">ข.</span> ผลบวกของรากที่ $n$ ทั้งหมดของ $z$ จะมีค่าเท่ากับ $0$ เสมอ</div>
+                <div class="option-item"><span class="choice-key">ค.</span> ผลคูณของรากที่ $n$ ทั้งหมดของ $z$ จะมีค่าเท่ากับ $z$ เสมอ</div>
+                <div class="option-item"><span class="choice-key">ง.</span> จุดยอดของรากที่ $n$ จะเกิดเป็นรูปหลายเหลี่ยมที่แนบในวงกลมที่มีรัศมีเท่ากับ $|z|$</div>
+            </div>
+            <div class="student-work-area"></div>
+            <div class="solution-box hidden">
+                <strong>เฉลยละเอียด: ข้อ ข.</strong><br>
+                ผลบวกของรากที่ $n$ ทั้งหมดของจำนวนเชิงซ้อนใด ๆ ($n \ge 2$) มีค่าเท่ากับ $0$ เสมอ ($\sum_{k=0}^{n-1} z_k = 0$) ตามสมบัติของจุดศูนย์ถ่วงของรูปหลายเหลี่ยมด้านเท่ามุมเท่าที่มีจุดศูนย์กลางที่ $(0,0)$ หรือวิเคราะห์จากสมการ $w^n - z = 0$ ซึ่งสัมประสิทธิ์ของพจน์ $w^{n-1}$ เป็น $0$<br>
+                (ตัวเลือก ง. ผิดเพราะรัศมีต้องเท่ากับ $\sqrt[n]{|z|}$ ไม่ใช่ $|z|$)
+            </div>
+        </article>
+
+        <!-- ==================== PART 2: PROCESS / PRACTICE (P) 5 ข้อ ==================== -->
+
+        <!-- ข้อ 6: P - ง่าย -->
+        <article class="question-card">
+            <div class="q-meta-bar">
+                <div class="q-meta-badges">
+                    <span class="badge badge-p">ด้านทักษะกระบวนการ (P)</span>
+                    <span class="badge badge-easy">ระดับ: ง่าย</span>
+                </div>
+                <div class="lo-text"><strong>ผลลัพธ์การเรียนรู้ (LO):</strong> ดำเนินการคำนวณบวก ลบ คูณ และหารจำนวนเชิงซ้อนในรูปมาตรฐานได้</div>
+            </div>
+            <div class="q-text">
+                ข้อที่ 6. จงหาผลลัพธ์ของ $\dfrac{2 + 4i}{1 - i}$ ให้อยู่ในรูปมาตรฐาน $a + bi$
+            </div>
+            <div class="options-grid">
+                <div class="option-item"><span class="choice-key">ก.</span> $-1 + 3i$</div>
+                <div class="option-item"><span class="choice-key">ข.</span> $1 + 3i$</div>
+                <div class="option-item"><span class="choice-key">ค.</span> $-1 + 2i$</div>
+                <div class="option-item"><span class="choice-key">ง.</span> $3 + 3i$</div>
+            </div>
+            <div class="student-work-area"></div>
+            <div class="solution-box hidden">
+                <strong>เฉลยละเอียด: ข้อ ก.</strong><br>
+                คูณด้วยสังยุคของตัวส่วนทั้งเศษและส่วน:<br>
+                $\dfrac{2 + 4i}{1 - i} = \dfrac{(2 + 4i)(1 + i)}{(1 - i)(1 + i)} = \dfrac{2 + 2i + 4i + 4i^2}{1 - i^2} = \dfrac{2 + 6i - 4}{1 - (-1)} = \dfrac{-2 + 6i}{2} = -1 + 3i$
+            </div>
+        </article>
+
+        <!-- ข้อ 7: P - ปานกลาง -->
+        <article class="question-card">
+            <div class="q-meta-bar">
+                <div class="q-meta-badges">
+                    <span class="badge badge-p">ด้านทักษะกระบวนการ (P)</span>
+                    <span class="badge badge-med">ระดับ: ปานกลาง</span>
+                </div>
+                <div class="lo-text"><strong>ผลลัพธ์การเรียนรู้ (LO):</strong> แปลงจำนวนเชิงซ้อนในรูป $a+bi$ เป็นรูปเชิงขั้วได้อย่างถูกต้องตามควอดแรนต์</div>
+            </div>
+            <div class="q-text">
+                ข้อที่ 7. รูปเชิงขั้วของจำนวนเชิงซ้อน $z = -\sqrt{3} - i$ มีค่าตรงกับข้อใดต่อไปนี้
+            </div>
+            <div class="options-grid">
+                <div class="option-item"><span class="choice-key">ก.</span> $2\left(\cos\dfrac{\pi}{6} + i\sin\dfrac{\pi}{6}\right)$</div>
+                <div class="option-item"><span class="choice-key">ข.</span> $2\left(\cos\dfrac{5\pi}{6} + i\sin\dfrac{5\pi}{6}\right)$</div>
+                <div class="option-item"><span class="choice-key">ค.</span> $2\left(\cos\dfrac{7\pi}{6} + i\sin\dfrac{7\pi}{6}\right)$</div>
+                <div class="option-item"><span class="choice-key">ง.</span> $4\left(\cos\dfrac{7\pi}{6} + i\sin\dfrac{7\pi}{6}\right)$</div>
+            </div>
+            <div class="student-work-area"></div>
+            <div class="solution-box hidden">
+                <strong>เฉลยละเอียด: ข้อ ค.</strong><br>
+                1. หาขนาด: $r = \sqrt{(-\sqrt{3})^2 + (-1)^2} = \sqrt{3 + 1} = 2$<br>
+                2. หามุม: $a = -\sqrt{3} < 0$ และ $b = -1 < 0$ จุดตกใน <strong>ควอดแรนต์ที่ 3</strong><br>
+                มุมอ้างอิง $\tan\alpha = \left|\frac{-1}{-\sqrt{3}}\right| = \frac{1}{\sqrt{3}} \implies \alpha = \frac{\pi}{6}$ ($30^\circ$)<br>
+                มุมจริง $\theta = \pi + \frac{\pi}{6} = \frac{7\pi}{6}$ ($210^\circ$)<br>
+                ดังนั้น $z = 2\left(\cos\dfrac{7\pi}{6} + i\sin\dfrac{7\pi}{6}\right)$
+            </div>
+        </article>
+
+        <!-- ข้อ 8: P - ปานกลาง -->
+        <article class="question-card">
+            <div class="q-meta-bar">
+                <div class="q-meta-badges">
+                    <span class="badge badge-p">ด้านทักษะกระบวนการ (P)</span>
+                    <span class="badge badge-med">ระดับ: ปานกลาง</span>
+                </div>
+                <div class="lo-text"><strong>ผลลัพธ์การเรียนรู้ (LO):</strong> ประยุกต์ใช้ทฤษฎีบทเดอมัวฟร์คำนวณการยกกำลังของจำนวนเชิงซ้อนได้</div>
+            </div>
+            <div class="q-text">
+                ข้อที่ 8. จงหาค่าของ $(1 + \sqrt{3}i)^6$ ในรูปมาตรฐาน $a + bi$
+            </div>
+            <div class="options-grid">
+                <div class="option-item"><span class="choice-key">ก.</span> $-64$</div>
+                <div class="option-item"><span class="choice-key">ข.</span> $64$</div>
+                <div class="option-item"><span class="choice-key">ค.</span> $64i$</div>
+                <div class="option-item"><span class="choice-key">ง.</span> $-64i$</div>
+            </div>
+            <div class="student-work-area"></div>
+            <div class="solution-box hidden">
+                <strong>เฉลยละเอียด: ข้อ ข.</strong><br>
+                1. แปลง $1 + \sqrt{3}i$ เป็นเชิงขั้ว: $r = \sqrt{1^2 + (\sqrt{3})^2} = 2$, $\theta = 60^\circ$ ($Q_1$)<br>
+                จะได้ $1 + \sqrt{3}i = 2(\cos 60^\circ + i\sin 60^\circ)$<br>
+                2. ใช้สูตรเดอมัวฟร์ $z^6 = 2^6 [\cos(6 \times 60^\circ) + i\sin(6 \times 60^\circ)] = 64(\cos 360^\circ + i\sin 360^\circ)$<br>
+                เนื่องจาก $\cos 360^\circ = 1$ และ $\sin 360^\circ = 0$<br>
+                ดังนั้น $(1 + \sqrt{3}i)^6 = 64(1 + 0i) = 64$
+            </div>
+        </article>
+
+        <!-- ข้อ 9: P - ยาก -->
+        <article class="question-card">
+            <div class="q-meta-bar">
+                <div class="q-meta-badges">
+                    <span class="badge badge-p">ด้านทักษะกระบวนการ (P)</span>
+                    <span class="badge badge-hard">ระดับ: ยาก</span>
+                </div>
+                <div class="lo-text"><strong>ผลลัพธ์การเรียนรู้ (LO):</strong> แก้สมการพหุนามและหาเซตคำตอบทั้งรากจริงและรากเชิงซ้อนได้</div>
+            </div>
+            <div class="q-text">
+                ข้อที่ 9. เซตคำตอบของสมการพหุนาม $x^3 - 2x^2 + 9x - 18 = 0$ ในระบบจำนวนเชิงซ้อนคือข้อใด
+            </div>
+            <div class="options-grid">
+                <div class="option-item"><span class="choice-key">ก.</span> $\{2, 3i, -3i\}$</div>
+                <div class="option-item"><span class="choice-key">ข.</span> $\{-2, 3i, -3i\}$</div>
+                <div class="option-item"><span class="choice-key">ค.</span> $\{2, 3, -3\}$</div>
+                <div class="option-item"><span class="choice-key">ง.</span> $\{2, \sqrt{3}i, -\sqrt{3}i\}$</div>
+            </div>
+            <div class="student-work-area"></div>
+            <div class="solution-box hidden">
+                <strong>เฉลยละเอียด: ข้อ ก.</strong><br>
+                แยกตัวประกอบโดยการจัดกลุ่ม:<br>
+                $x^2(x - 2) + 9(x - 2) = 0 \implies (x - 2)(x^2 + 9) = 0$<br>
+                - จาก $x - 2 = 0 \implies x = 2$<br>
+                - จาก $x^2 + 9 = 0 \implies x^2 = -9 \implies x = \pm \sqrt{-9} = \pm 3i$<br>
+                ดังนั้น เซตคำตอบคือ $\{2, 3i, -3i\}$
+            </div>
+        </article>
+
+        <!-- ข้อ 10: P - ยาก -->
+        <article class="question-card">
+            <div class="q-meta-bar">
+                <div class="q-meta-badges">
+                    <span class="badge badge-p">ด้านทักษะกระบวนการ (P)</span>
+                    <span class="badge badge-hard">ระดับ: ยาก</span>
+                </div>
+                <div class="lo-text"><strong>ผลลัพธ์การเรียนรู้ (LO):</strong> คำนวณหารากที่ $n$ ทั้งหมดของจำนวนเชิงซ้อนได้อย่างเป็นระบบ</div>
+            </div>
+            <div class="q-text">
+                ข้อที่ 10. รากที่ 3 ทั้งหมดของจำนวนเชิงซ้อน $z = -27i$ มีค่าตรงกับข้อใดต่อไปนี้
+            </div>
+            <div class="options-grid">
+                <div class="option-item"><span class="choice-key">ก.</span> $3(\cos 30^\circ + i\sin 30^\circ), 3(\cos 150^\circ + i\sin 150^\circ), 3(\cos 270^\circ + i\sin 270^\circ)$</div>
+                <div class="option-item"><span class="choice-key">ข.</span> $3(\cos 90^\circ + i\sin 90^\circ), 3(\cos 210^\circ + i\sin 210^\circ), 3(\cos 330^\circ + i\sin 330^\circ)$</div>
+                <div class="option-item"><span class="choice-key">ค.</span> $3(\cos 60^\circ + i\sin 60^\circ), 3(\cos 180^\circ + i\sin 180^\circ), 3(\cos 300^\circ + i\sin 300^\circ)$</div>
+                <div class="option-item"><span class="choice-key">ง.</span> $27(\cos 90^\circ + i\sin 90^\circ), 27(\cos 210^\circ + i\sin 210^\circ), 27(\cos 330^\circ + i\sin 330^\circ)$</div>
+            </div>
+            <div class="student-work-area"></div>
+            <div class="solution-box hidden">
+                <strong>เฉลยละเอียด: ข้อ ข.</strong><br>
+                1. เขียน $z = -27i$ ในรูปเชิงขั้ว: $r = 27$, $\theta = 270^\circ$ (อยู่บนแกนจินตภาพลบ)<br>
+                2. คำนวณรากที่ 3 ($n=3$):<br>
+                ขนาดราก: $R = \sqrt[3]{27} = 3$<br>
+                มุมของราก: $\theta_k = \frac{270^\circ + k(360^\circ)}{3} = 90^\circ + k(120^\circ)$ เมื่อ $k = 0, 1, 2$<br>
+                - $k = 0: \theta_0 = 90^\circ$<br>
+                - $k = 1: \theta_1 = 90^\circ + 120^\circ = 210^\circ$<br>
+                - $k = 2: \theta_2 = 90^\circ + 240^\circ = 330^\circ$<br>
+                ดังนั้น รากทั้งสามคือ $3\operatorname{cis} 90^\circ, 3\operatorname{cis} 210^\circ, 3\operatorname{cis} 330^\circ$
+            </div>
+        </article>
+
+        <!-- ==================== PART 3: ATTITUDE / ATTRIBUTE (A) 5 ข้อ ==================== -->
+
+        <!-- ข้อ 11: A - ง่าย -->
+        <article class="question-card">
+            <div class="q-meta-bar">
+                <div class="q-meta-badges">
+                    <span class="badge badge-a">ด้านเจตคติ/การให้เหตุผล (A)</span>
+                    <span class="badge badge-easy">ระดับ: ง่าย</span>
+                </div>
+                <div class="lo-text"><strong>ผลลัพธ์การเรียนรู้ (LO):</strong> มีวิจารณญาณในการตรวจสอบความถูกต้องและข้อผิดพลาดของการใช้สมบัติกรณฑ์</div>
+            </div>
+            <div class="q-text">
+                ข้อที่ 11. พิจารณาขั้นตอนการให้เหตุผลทางคณิตศาสตร์ต่อไปนี้ของนักเรียนคนหนึ่ง:<br>
+                $$\text{บรรทัดที่ (1): } 1 = \sqrt{1}$$
+                $$\text{บรรทัดที่ (2): } 1 = \sqrt{(-1)(-1)}$$
+                $$\text{บรรทัดที่ (3): } 1 = \sqrt{-1} \cdot \sqrt{-1}$$
+                $$\text{บรรทัดที่ (4): } 1 = i \cdot i = i^2 = -1 \implies 1 = -1$$
+                ข้อผิดพลาดเกิดขึ้นที่<strong>บรรทัดใด</strong> และเกิดจาก<strong>สาเหตุใด</strong>
+            </div>
+            <div class="options-grid">
+                <div class="option-item"><span class="choice-key">ก.</span> บรรทัดที่ (2) เพราะไม่สามารถแยก $1$ เป็น $(-1)(-1)$ ได้</div>
+                <div class="option-item"><span class="choice-key">ข.</span> บรรทัดที่ (3) เพราะสมบัติ $\sqrt{ab} = \sqrt{a}\sqrt{b}$ ใช้ได้เฉพาะเมื่อ $a \ge 0$ หรือ $b \ge 0$ เท่านั้น</div>
+                <div class="option-item"><span class="choice-key">ค.</span> บรรทัดที่ (4) เพราะนิยาม $i = \sqrt{-1}$ ไม่สามารถนำมาคูณกันได้</div>
+                <div class="option-item"><span class="choice-key">ง.</span> บรรทัดที่ (4) เพราะ $i^2$ มีค่าเท่ากับ $1$ ไม่ใช่ $-1$</div>
+            </div>
+            <div class="student-work-area"></div>
+            <div class="solution-box hidden">
+                <strong>เฉลยละเอียด: ข้อ ข.</strong><br>
+                การแยกกรณฑ์ $\sqrt{a \cdot b} = \sqrt{a}\sqrt{b}$ เป็นเอกลักษณ์ที่จริงเฉพาะเมื่อ $a$ และ $b$ ไม่เป็นจำนวนลบพร้อมกันทั้งคู่ หาก $a < 0$ และ $b < 0$ จะไม่สามารถแยกกรณฑ์ในลักษณะนี้ได้ การกระทำในบรรทัดที่ (3) จึงขัดแย้งกับหลักการทางคณิตศาสตร์อย่างร้ายแรง
+            </div>
+        </article>
+
+        <!-- ข้อ 12: A - ง่าย -->
+        <article class="question-card">
+            <div class="q-meta-bar">
+                <div class="q-meta-badges">
+                    <span class="badge badge-a">ด้านเจตคติ/การให้เหตุผล (A)</span>
+                    <span class="badge badge-easy">ระดับ: ง่าย</span>
+                </div>
+                <div class="lo-text"><strong>ผลลัพธ์การเรียนรู้ (LO):</strong> วิเคราะห์ข้อผิดพลาดและตระหนักถึงความสำคัญของการพิจารณาควอดแรนต์ของอาร์กิวเมนต์</div>
+            </div>
+            <div class="q-text">
+                ข้อที่ 12. ในการแปลง $z = -1 + i$ ให้อยู่ในรูปเชิงขั้ว นักเรียนคนหนึ่งคำนวณ $\tan\theta = \frac{1}{-1} = -1$ แล้วสรุปทันทีว่า $\theta = -\frac{\pi}{4}$ (หรือ $315^\circ$) การสรุปนี้สะท้อนข้อบกพร่องใดในการคิดแก้ปัญหา
+            </div>
+            <div class="options-grid">
+                <div class="option-item"><span class="choice-key">ก.</span> การจำสูตร $\tan\theta = \frac{b}{a}$ ผิดสลับเป็น $\frac{a}{b}$</div>
+                <div class="option-item"><span class="choice-key">ข.</span> การละเลยการตรวจสอบตำแหน่งพิกัดจริงบนระนาบเชิงซ้อน ซึ่งตกในควอดแรนต์ที่ 2 ไม่ใช่ควอดแรนต์ที่ 4</div>
+                <div class="option-item"><span class="choice-key">ค.</span> การคำนวณขนาด $r$ ผิดพลาดทำให้ส่งผลต่อค่ามุม</div>
+                <div class="option-item"><span class="choice-key">ง.</span> การใช้หน่วยมุมเป็นเรเดียนแทนองศา</div>
+            </div>
+            <div class="student-work-area"></div>
+            <div class="solution-box hidden">
+                <strong>เฉลยละเอียด: ข้อ ข.</strong><br>
+                จุด $(-1, 1)$ มี $a = -1 < 0$ และ $b = 1 > 0$ ชี้ชัดว่าจุดตกอยู่ในควอดแรนต์ที่ 2 ($Q_2$) มุมจริงต้องเป็น $180^\circ - 45^\circ = 135^\circ$ (หรือ $\frac{3\pi}{4}$) การที่นักเรียนพึ่งพาเฉพาะฟังก์ชัน $\arctan(-1) = -45^\circ$ โดยไม่ดูควอดแรนต์ทำให้ทิศทางของเวกเตอร์ตรงกันข้ามกับความเป็นจริง
+            </div>
+        </article>
+
+        <!-- ข้อ 13: A - ปานกลาง -->
+        <article class="question-card">
+            <div class="q-meta-bar">
+                <div class="q-meta-badges">
+                    <span class="badge badge-a">ด้านเจตคติ/การให้เหตุผล (A)</span>
+                    <span class="badge badge-med">ระดับ: ปานกลาง</span>
+                </div>
+                <div class="lo-text"><strong>ผลลัพธ์การเรียนรู้ (LO):</strong> ประเมินและเลือกกลยุทธ์ทางคณิตศาสตร์ที่มีประสิทธิภาพและเหมาะสมในการคำนวณ</div>
+            </div>
+            <div class="q-text">
+                ข้อที่ 13. หากต้องการหาผลลัพธ์ของ $(\sqrt{3} - i)^{20}$ การเลือกใช้วิธีการใดสะท้อนถึงการเลือกใช้เครื่องมือทางคณิตศาสตร์ที่มีประสิทธิภาพสูงสุด พร้อมเหตุผลที่สมเหตุสมผล
+            </div>
+            <div class="options-grid">
+                <div class="option-item"><span class="choice-key">ก.</span> ใช้การคูณกระจายทีละวงเล็บ เพราะช่วยป้องกันการลืมสูตร</div>
+                <div class="option-item"><span class="choice-key">ข.</span> ใช้ทฤษฎีบททวินาม เพราะให้คำตอบในรูปสัมประสิทธิ์ทวินามได้อย่างแม่นยำที่สุด</div>
+                <div class="option-item"><span class="choice-key">ค.</span> แปลงเป็นรูปเชิงขั้วแล้วใช้ทฤษฎีบทเดอมัวฟร์ เพราะจัดการขนาดและมุมแยกกันได้อย่างรวดเร็วและเป็นระบบ</div>
+                <div class="option-item"><span class="choice-key">ง.</span> หาค่าโดยการประมาณเป็นทศนิยมเพื่อความสะดวกในการคำนวณ</div>
+            </div>
+            <div class="student-work-area"></div>
+            <div class="solution-box hidden">
+                <strong>เฉลยละเอียด: ข้อ ค.</strong><br>
+                เมื่อเลขชี้กำลังมีค่าสูง ($n = 20$) การกระจายทวินามจะมีถึง 21 พจน์ ซึ่งเสี่ยงต่อความผิดพลาดสูงมาก การเปลี่ยนเป็นรูปเชิงขั้วแล้วใช้ทฤษฎีบทเดอมัวฟร์ ($z^n = r^n\operatorname{cis}(n\theta)$) จัดการเพียงแค่ยกกำลังขนาด $r^{20}$ และคูณมุม $20\theta$ จึงเป็นกลยุทธ์ที่ทรงประสิทธิภาพและเป็นระบบที่สุด
+            </div>
+        </article>
+
+        <!-- ข้อ 14: A - ยาก -->
+        <article class="question-card">
+            <div class="q-meta-bar">
+                <div class="q-meta-badges">
+                    <span class="badge badge-a">ด้านเจตคติ/การให้เหตุผล (A)</span>
+                    <span class="badge badge-hard">ระดับ: ยาก</span>
+                </div>
+                <div class="lo-text"><strong>ผลลัพธ์การเรียนรู้ (LO):</strong> อธิบายและให้เหตุผลเชื่อมโยงเชิงเรขาคณิตของการกระจายตัวของรากที่ $n$</div>
+            </div>
+            <div class="q-text">
+                ข้อที่ 14. เมื่อนำรากที่ 6 ทั้งหมดของจำนวนเชิงซ้อน $z = 64$ ไปพล็อตบนระนาบเชิงซ้อนและลากเส้นเชื่อมจุดยอดที่อยู่ติดกัน จะได้รูปเรขาคณิตใด และมีพื้นที่เท่ากับกี่ตารางหน่วย
+            </div>
+            <div class="options-grid">
+                <div class="option-item"><span class="choice-key">ก.</span> รูปหกเหลี่ยมด้านเท่ามุมเท่า แนบในวงกลมรัศมี $2$ หน่วย มีพื้นที่ $6\sqrt{3}$ ตารางหน่วย</div>
+                <div class="option-item"><span class="choice-key">ข.</span> รูปหกเหลี่ยมด้านเท่ามุมเท่า แนบในวงกลมรัศมี $4$ หน่วย มีพื้นที่ $24\sqrt{3}$ ตารางหน่วย</div>
+                <div class="option-item"><span class="choice-key">ค.</span> รูปสามเหลี่ยมด้านเท่า 2 รูปซ้อนกัน มีพื้นที่ $3\sqrt{3}$ ตารางหน่วย</div>
+                <div class="option-item"><span class="choice-key">ง.</span> รูปสี่เหลี่ยมด้านขนาน มีพื้นที่ $12$ ตารางหน่วย</div>
+            </div>
+            <div class="student-work-area"></div>
+            <div class="solution-box hidden">
+                <strong>เฉลยละเอียด: ข้อ ก.</strong><br>
+                1. ขนาดของรากคือ $R = \sqrt[6]{64} = 2$ รากทั้งหมดจึงอยู่บนวงกลมรัศมี $2$ หน่วย<br>
+                2. รากทั้ง 6 กระจายตัวสม่ำเสมอทำมุมห่างกัน $\frac{360^\circ}{6} = 60^\circ$ จึงประกอบเป็น <strong>รูปหกเหลี่ยมด้านเท่ามุมเท่า</strong> ที่แบ่งออกเป็นสามเหลี่ยมด้านเท่า 6 รูป แต่ละรูปมีความยาวด้าน $s = 2$<br>
+                พื้นที่สามเหลี่ยมด้านเท่า 1 รูป $= \frac{\sqrt{3}}{4} \times 2^2 = \sqrt{3}$ ตารางหน่วย<br>
+                ดังนั้น พื้นที่รวม 6 รูป $= 6 \times \sqrt{3} = 6\sqrt{3}$ ตารางหน่วย
+            </div>
+        </article>
+
+        <!-- ข้อ 15: A - ยาก -->
+        <article class="question-card">
+            <div class="q-meta-bar">
+                <div class="q-meta-badges">
+                    <span class="badge badge-a">ด้านเจตคติ/การให้เหตุผล (A)</span>
+                    <span class="badge badge-hard">ระดับ: ยาก</span>
+                </div>
+                <div class="lo-text"><strong>ผลลัพธ์การเรียนรู้ (LO):</strong> สร้างข้อสรุปและให้เหตุผลเชิงตรรกะเกี่ยวกับจำนวนรากจริงของสมการพหุนามดีกรีคี่</div>
+            </div>
+            <div class="q-text">
+                ข้อที่ 15. ข้อความกล่าวว่า: <em>"สมการพหุนามที่มีดีกรีเป็นจำนวนคี่และมีสัมประสิทธิ์ทุกตัวเป็นจำนวนจริง จะต้องมีรากที่เป็นจำนวนจริงอย่างน้อย 1 รากเสมอ"</em> ข้อความนี้เป็นจริงหรือไม่ เพราะเหตุใด
+            </div>
+            <div class="options-grid">
+                <div class="option-item"><span class="choice-key">ก.</span> ไม่จริง เพราะสมการอาจมีรากเป็นจำนวนเชิงซ้อนทั้งหมดได้ เช่น $x^3 + x = 0$</div>
+                <div class="option-item"><span class="choice-key">ข.</span> จริง เพราะรากเชิงซ้อนที่ไม่ใช่จำนวนจริงจะเกิดขึ้นเป็นคู่สังยุคเสมอ ทำให้จำนวนรากเชิงซ้อนที่ไม่ใช่จำนวนจริงต้องเป็นจำนวนคู่</div>
+                <div class="option-item"><span class="choice-key">ค.</span> จริง เพราะดีกรีคี่ทำให้ค่าสัมบูรณ์ของสมการเป็นบวกเสมอ</div>
+                <div class="option-item"><span class="choice-key">ง.</span> ไม่จริง ขึ้นอยู่กับค่าของพจน์ค่าคงที่ว่ามีเครื่องหมายบวกหรือลบ</div>
+            </div>
+            <div class="student-work-area"></div>
+            <div class="solution-box hidden">
+                <strong>เฉลยละเอียด: ข้อ ข.</strong><br>
+                ตามทฤษฎีบทรากคู่สังยุค เมื่อสัมประสิทธิ์ทุกตัวเป็นจำนวนจริง รากเชิงซ้อนที่ไม่ได้เป็นจำนวนจริงจะต้องปรากฏเป็นคู่สังยุค $a \pm bi$ เสมอ (ทีละ 2 ราก) เมื่อดีกรีของสมการเป็นจำนวนคี่ ($2k + 1$) หลังจากหักคู่รากเชิงซ้อนออกไปเป็นจำนวนคู่แล้ว จะต้องมีรากเหลืออยู่อย่างน้อย 1 รากที่ไม่สามารถจับคู่ได้ ซึ่งรากนั้นจะต้องเป็นจำนวนจริงเสมอ
+            </div>
+        </article>
+
+    </main>
+
+</div>
+
+<script>
+    let showSolutions = false;
+
+    function toggleSolutions() {
+        showSolutions = !showSolutions;
+        const boxes = document.querySelectorAll('.solution-box');
+        boxes.forEach(box => {
+            if (showSolutions) {
+                box.classList.remove('hidden');
+            } else {
+                box.classList.add('hidden');
+            }
+        });
+    }
+
+    function preparePrint(withAnswers) {
+        const boxes = document.querySelectorAll('.solution-box');
+        boxes.forEach(box => {
+            if (withAnswers) {
+                box.classList.remove('hidden');
+            } else {
+                box.classList.add('hidden');
+            }
+        });
+
+        setTimeout(() => {
+            window.print();
+        }, 150);
+    }
+</script>
+
+</body>
+</html>

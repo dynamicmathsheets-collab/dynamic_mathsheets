@@ -1,0 +1,914 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>รูปเชิงขั้วของจำนวนเชิงซ้อน</title>
+    <!-- Google Fonts: Sarabun & Kanit -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@400;500;600;700&family=Sarabun:wght@300;400;500;600;700&family=Fira+Code:wght@400;600&display=swap" rel="stylesheet">
+    
+    <!-- MathJax 3 -->
+    <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']],
+                displayMath: [['$$', '$$'], ['\\[', '\\]']]
+            },
+            startup: {
+                ready: () => {
+                    MathJax.startup.defaultReady();
+                    window.mathJaxReady = true;
+                }
+            }
+        };
+    </script>
+    <script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+    <style>
+        :root {
+            --primary: #4f46e5;
+            --primary-light: #818cf8;
+            --secondary: #06b6d4;
+            --accent: #f59e0b;
+            --bg-dark: #0b1120;
+            --bg-card: #131d33;
+            --border: rgba(255, 255, 255, 0.1);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Sarabun', sans-serif;
+            background-color: var(--bg-dark);
+            color: #f8fafc;
+            line-height: 1.6;
+            padding: 30px 0 60px 0;
+            display: flex;
+            justify-content: center;
+        }
+
+        .main-wrapper {
+            width: 1200px;
+            max-width: 95%;
+            display: flex;
+            flex-direction: column;
+            gap: 36px;
+        }
+
+        h1, h2, h3, h4 {
+            font-family: 'Kanit', sans-serif;
+            font-weight: 600;
+        }
+
+        .section-card {
+            border-radius: 18px;
+            padding: 36px;
+            border: 1px solid var(--border);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
+        }
+
+        /* 1. Header Banner */
+        .sec-intro {
+            background: linear-gradient(135deg, #1e1b4b 0%, #0f172a 100%);
+            border-bottom: 3px solid var(--primary-light);
+            text-align: center;
+        }
+        .sec-intro h1 {
+            font-size: 2.6rem;
+            color: #ffffff;
+            margin-bottom: 8px;
+        }
+        .sec-intro p.sub {
+            color: #38bdf8;
+            font-size: 1.2rem;
+        }
+
+        /* 2. Theory */
+        .sec-theory {
+            background: #111c35;
+        }
+        .theory-head {
+            border-bottom: 2px solid rgba(255, 255, 255, 0.08);
+            padding-bottom: 14px;
+            margin-bottom: 24px;
+            font-size: 1.8rem;
+            color: #38bdf8;
+        }
+        .theory-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 20px;
+        }
+        .theory-box {
+            background: rgba(15, 23, 42, 0.7);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 14px;
+            padding: 20px;
+        }
+        .theory-box h3 {
+            color: #38bdf8;
+            font-size: 1.2rem;
+            margin-bottom: 10px;
+        }
+        .theory-box ul {
+            padding-left: 20px;
+            color: #cbd5e1;
+            font-size: 0.98rem;
+        }
+        .theory-box li {
+            margin-bottom: 6px;
+        }
+        .math-badge {
+            background: rgba(6, 182, 212, 0.12);
+            border-left: 4px solid var(--secondary);
+            padding: 8px 12px;
+            margin: 10px 0;
+            border-radius: 0 6px 6px 0;
+            font-size: 1.05rem;
+        }
+
+        /* 3. Interactive Visualizer */
+        .sec-interactive {
+            background: #091224;
+            border: 1px solid rgba(56, 189, 248, 0.25);
+        }
+        .model-container {
+            display: grid;
+            grid-template-columns: 500px 1fr;
+            gap: 30px;
+            align-items: start;
+        }
+        @media (max-width: 950px) {
+            .model-container {
+                grid-template-columns: 1fr;
+            }
+        }
+        .canvas-box {
+            background: #040814;
+            border-radius: 14px;
+            border: 2px solid rgba(56, 189, 248, 0.3);
+            padding: 12px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        #argandCanvas {
+            background-color: #040814;
+            border-radius: 10px;
+            cursor: crosshair;
+            display: block;
+            width: 100%;
+            max-width: 476px;
+            height: auto;
+            aspect-ratio: 1 / 1;
+        }
+        .control-box {
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+        }
+        .slider-card {
+            background: #111d38;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 12px;
+            padding: 16px 20px;
+        }
+        .slider-title {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 1.05rem;
+            margin-bottom: 8px;
+        }
+        .slider-title span.val {
+            font-family: 'Fira Code', monospace;
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: #38bdf8;
+        }
+        input[type=range] {
+            width: 100%;
+            height: 8px;
+            border-radius: 4px;
+            background: #1e293b;
+            outline: none;
+            cursor: pointer;
+        }
+        .coord-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px;
+        }
+        .coord-card {
+            background: #0b1329;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 10px;
+            padding: 14px;
+        }
+        .coord-card .title {
+            font-size: 0.9rem;
+            color: #94a3b8;
+            margin-bottom: 4px;
+        }
+        .coord-card .num {
+            font-family: 'Fira Code', monospace;
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: #38bdf8;
+        }
+        .formula-summary {
+            background: #060b17;
+            border: 1px solid rgba(99, 102, 241, 0.35);
+            border-radius: 12px;
+            padding: 16px 20px;
+        }
+        .discovery {
+            background: rgba(245, 158, 11, 0.1);
+            border-left: 4px solid var(--accent);
+            padding: 16px 20px;
+            border-radius: 0 10px 10px 0;
+        }
+
+        /* 4. Worksheet */
+        .sec-worksheet {
+            background: #ffffff;
+            color: #0f172a;
+        }
+        .worksheet-actions {
+            display: flex;
+            gap: 14px;
+            margin-bottom: 24px;
+            flex-wrap: wrap;
+        }
+        .btn-print {
+            padding: 12px 24px;
+            font-family: 'Kanit', sans-serif;
+            font-size: 1rem;
+            font-weight: 600;
+            border-radius: 8px;
+            cursor: pointer;
+            border: none;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .btn-stu { background: #2563eb; color: #fff; }
+        .btn-tch { background: #059669; color: #fff; }
+        .btn-tgl { background: #64748b; color: #fff; }
+
+        .sheet-box {
+            border-bottom: 2px solid #0f172a;
+            padding-bottom: 12px;
+            margin-bottom: 20px;
+        }
+        .student-inputs {
+            display: flex;
+            gap: 20px;
+            margin-top: 10px;
+            font-size: 1rem;
+        }
+        .dotted-line {
+            flex-grow: 1;
+            border-bottom: 1px dotted #64748b;
+            display: inline-block;
+        }
+        .q-item {
+            margin-bottom: 22px;
+            padding-bottom: 16px;
+            border-bottom: 1px dashed #cbd5e1;
+            page-break-inside: avoid;
+            break-inside: avoid;
+        }
+        .q-title {
+            font-weight: 700;
+            font-size: 1.15rem;
+            color: #0f172a;
+            margin-bottom: 6px;
+        }
+        .work-area {
+            border: 1px dashed #94a3b8;
+            border-radius: 6px;
+            min-height: 120px;
+            background: #f8fafc;
+            margin-top: 10px;
+            padding: 8px 12px;
+            position: relative;
+        }
+        .work-area::before {
+            content: "แสดงวิธีทำ:";
+            color: #94a3b8;
+            font-size: 0.85rem;
+        }
+        .ans-block {
+            margin-top: 10px;
+            background: #ecfdf5;
+            border-left: 4px solid #10b981;
+            padding: 12px 16px;
+            border-radius: 0 6px 6px 0;
+            color: #064e3b;
+        }
+        .ans-block.hide {
+            display: none !important;
+        }
+
+        /* 5. Rubric */
+        .sec-rubric {
+            background: #111a30;
+        }
+        table.rubric-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 16px;
+            background: #091224;
+            border-radius: 12px;
+            overflow: hidden;
+        }
+        table.rubric-table th, table.rubric-table td {
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            padding: 14px 18px;
+            vertical-align: top;
+        }
+        table.rubric-table th {
+            background: #1e1b4b;
+            color: #e0e7ff;
+            font-size: 1.05rem;
+        }
+        .badge-score {
+            background: rgba(255,255,255,0.12);
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 0.85rem;
+            color: #fcd34d;
+        }
+
+        /* PRINT SETTINGS (เฉพาะส่วนใบงาน A4) */
+        @media print {
+            body {
+                background: #ffffff !important;
+                color: #000000 !important;
+                padding: 0 !important;
+                margin: 0 !important;
+            }
+            .main-wrapper {
+                width: 100% !important;
+                max-width: 100% !important;
+                gap: 0 !important;
+                padding: 0 !important;
+            }
+            .sec-intro, .sec-theory, .sec-interactive, .sec-rubric, .worksheet-actions {
+                display: none !important;
+            }
+            .sec-worksheet {
+                box-shadow: none !important;
+                border: none !important;
+                padding: 0 !important;
+            }
+            .q-item {
+                page-break-inside: avoid !important;
+                break-inside: avoid !important;
+                margin-bottom: 14px !important;
+                padding-bottom: 10px !important;
+            }
+            .work-area {
+                min-height: 95px !important;
+                background: #ffffff !important;
+            }
+            @page {
+                size: A4 portrait;
+                margin: 12mm 15mm;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="main-wrapper">
+
+    <!-- 1. ส่วนนำ -->
+    <header class="section-card sec-intro">
+        <h1>รูปเชิงขั้วของจำนวนเชิงซ้อน</h1>
+        <p class="sub">Polar Form of Complex Numbers: การเชื่อมโยงเวกเตอร์และตรีโกณมิติบนระนาบเชิงซ้อน</p>
+    </header>
+
+    <!-- 2. สรุปเนื้อหา -->
+    <section class="section-card sec-theory">
+        <h2 class="theory-head">สรุปสาระสำคัญ</h2>
+        <div class="theory-grid">
+            <div class="theory-box">
+                <h3>1. ขนาดของจำนวนเชิงซ้อน (Modulus)</h3>
+                <p>ระยะทางจากจุดกำเนิด $(0, 0)$ ไปยังจุด $(a, b)$ แทนด้วย $|z|$ หรือ $r$ มีค่าเป็นบวกหรือศูนย์เสมอ:</p>
+                <div class="math-badge">$$r = |z| = \sqrt{a^2 + b^2}$$</div>
+                <ul>
+                    <li>สมบัติสำคัญ: $|z_1 z_2| = |z_1||z_2|$</li>
+                    <li>$|z^n| = |z|^n$ และ $|z| = |\bar{z}| = |-z|$</li>
+                </ul>
+            </div>
+
+            <div class="theory-box">
+                <h3>2. อาร์กิวเมนต์ของจำนวนเชิงซ้อน (Argument)</h3>
+                <p>มุม $\theta$ ที่เวกเตอร์ทำมุมกับแกนจริงบวกในทิศทวนเข็มนาฬิกา แทนด้วย $\arg(z)$:</p>
+                <div class="math-badge">$$\tan\theta = \frac{b}{a} \quad (a \neq 0)$$</div>
+                <ul>
+                    <li><strong>อาร์กิวเมนต์หลัก (Principal Argument):</strong> นิยมระบุในช่วง $-\pi < \theta \le \pi$ หรือ $0^\circ \le \theta < 360^\circ$</li>
+                </ul>
+            </div>
+
+            <div class="theory-box">
+                <h3>3. การหามุมโดยพิจารณาควอดแรนต์</h3>
+                <p>กำหนดมุมอ้างอิงแหลมบวก $\alpha = \arctan\left|\frac{b}{a}\right|$:</p>
+                <ul>
+                    <li><strong>$Q_1$ ($a>0, b>0$):</strong> $\theta = \alpha$</li>
+                    <li><strong>$Q_2$ ($a<0, b>0$):</strong> $\theta = 180^\circ - \alpha$</li>
+                    <li><strong>$Q_3$ ($a<0, b<0$):</strong> $\theta = 180^\circ + \alpha$</li>
+                    <li><strong>$Q_4$ ($a>0, b<0$):</strong> $\theta = 360^\circ - \alpha$</li>
+                </ul>
+            </div>
+
+            <div class="theory-box">
+                <h3>4. การแปลงรูปมาตรฐานและรูปเชิงขั้ว</h3>
+                <p><strong>แปลงรูปมาตรฐานเป็นเชิงขั้ว:</strong></p>
+                <div class="math-badge">$$z = r(\cos\theta + i\sin\theta)$$</div>
+                <p><strong>แปลงเชิงขั้วเป็นรูปมาตรฐาน:</strong> คำนวณค่าจริง $a = r\cos\theta$ และส่วนจินตภาพ $b = r\sin\theta$</p>
+            </div>
+
+            <div class="theory-box" style="grid-column: 1 / -1;">
+                <h3>5. การใช้รูปเชิงขั้วแก้ปัญหา (ทฤษฎีบทเดอมัวฟวร์)</h3>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 14px;">
+                    <div class="math-badge">
+                        <strong>การคูณ:</strong><br>
+                        $$z_1 z_2 = r_1 r_2 [\cos(\theta_1+\theta_2) + i\sin(\theta_1+\theta_2)]$$
+                    </div>
+                    <div class="math-badge">
+                        <strong>การหาร:</strong><br>
+                        $$\frac{z_1}{z_2} = \frac{r_1}{r_2} [\cos(\theta_1-\theta_2) + i\sin(\theta_1-\theta_2)]$$
+                    </div>
+                    <div class="math-badge">
+                        <strong>ทฤษฎีบทเดอมัวฟวร์:</strong><br>
+                        $$z^n = r^n [\cos(n\theta) + i\sin(n\theta)]$$
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 3. โมเดลการศึกษา -->
+    <section class="section-card sec-interactive">
+        <h2 style="font-size: 1.8rem; color: #38bdf8; margin-bottom: 20px;">โมเดลการศึกษา: สำรวจระนาบเชิงซ้อนและการเปลี่ยนรูปพิกัด</h2>
+        
+        <div class="model-container">
+            <div class="canvas-box">
+                <!-- กำหนด Width/Height ตายตัว 500x500 ป้องกัน Canvas ว่างเปล่า -->
+                <canvas id="argandCanvas" width="500" height="500"></canvas>
+                <div style="font-size: 0.85rem; color: #94a3b8; margin-top: 8px;">💡 คลิกหรือลากเมาส์บนระนาบเพื่อเปลี่ยนตำแหน่งพิกัด $z$</div>
+            </div>
+
+            <div class="control-box">
+                <!-- Slider r -->
+                <div class="slider-card">
+                    <div class="slider-title">
+                        <span>ขนาด $r$ (Modulus 1 - 9):</span>
+                        <span class="val" id="rLabel">5</span>
+                    </div>
+                    <input type="range" id="rRange" min="1" max="9" step="1" value="5">
+                </div>
+
+                <!-- Slider theta -->
+                <div class="slider-card">
+                    <div class="slider-title">
+                        <span>มุม $\theta$ (ห่างกันทีละ $15^\circ$):</span>
+                        <span class="val" id="thetaLabel">45°</span>
+                    </div>
+                    <input type="range" id="thetaRange" min="0" max="360" step="15" value="45">
+                </div>
+
+                <!-- Stat Real and Imaginary -->
+                <div class="coord-grid">
+                    <div class="coord-card">
+                        <div class="title">ส่วนจริง ($a = r\cos\theta$)</div>
+                        <div class="num" id="aText">3.54</div>
+                    </div>
+                    <div class="coord-card">
+                        <div class="title">ส่วนจินตภาพ ($b = r\sin\theta$)</div>
+                        <div class="num" id="bText">3.54</div>
+                    </div>
+                </div>
+
+                <!-- Live Equation Display -->
+                <div class="formula-summary">
+                    <div style="font-size: 0.9rem; color: #94a3b8; margin-bottom: 6px;">สมการเปรียบเทียบรูปมาตรฐานและรูปเชิงขั้ว:</div>
+                    <div style="font-family: 'Fira Code', monospace; font-size: 1.15rem; color: #67e8f9;" id="equationText">
+                        z = 5(cos 45° + i sin 45°) ≈ 3.54 + 3.54i
+                    </div>
+                    <div style="margin-top: 6px; font-size: 0.95rem; color: #f8fafc;" id="quadrantText">
+                        ตำแหน่ง: <strong>ควอดแรนต์ที่ 1</strong> ($a > 0, b > 0$)
+                    </div>
+                </div>
+
+                <!-- Discovery Box -->
+                <div class="discovery">
+                    <h4 style="color: #fbbf24; font-size: 1.1rem; margin-bottom: 4px;">สิ่งที่นักเรียนควรค้นพบ:</h4>
+                    <p style="color: #fde68a; font-size: 0.95rem;">
+                        จำนวนเชิงซ้อนเดียวกันสามารถแทนได้ทั้งรูปมาตรฐาน $a + bi$ และรูปเชิงขั้ว $r(\cos\theta + i\sin\theta)$ อย่างสมบูรณ์ 
+                        โดยที่ขนาด $r$ จะเป็นความยาวของเวกเตอร์เสมอ และมุม $\theta$ ต้องพิจารณาเครื่องหมายของทั้ง $a$ และ $b$ เพื่อระบุควอดแรนต์ให้ถูกต้อง
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 4. ใบงาน 5 ข้อ -->
+    <section class="section-card sec-worksheet">
+        <div class="worksheet-actions">
+            <button class="btn-print btn-stu" onclick="printDoc(false)">🖨️ พิมพ์ใบงานสำหรับนักเรียน (หน้า A4)</button>
+            <button class="btn-print btn-tch" onclick="printDoc(true)">📋 พิมพ์เฉลยสำหรับครู</button>
+            <button class="btn-print btn-tgl" onclick="toggleAns()">👁️ แสดง/ซ่อนเฉลยบนหน้าจอ</button>
+        </div>
+
+        <div class="sheet-box">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                    <h2 style="font-size: 1.4rem;">ใบงานคณิตศาสตร์: เรื่อง รูปเชิงขั้วของจำนวนเชิงซ้อน</h2>
+                    <div style="color: #475569; font-size: 0.95rem;">สาระการเรียนรู้คณิตศาสตร์เพิ่มเติม ชั้นมัธยมศึกษาปีที่ 5</div>
+                </div>
+                <div style="border: 2px solid #000; padding: 4px 12px; font-weight: bold; border-radius: 4px;">
+                    คะแนนเต็ม 15 คะแนน
+                </div>
+            </div>
+            <div class="student-inputs">
+                <div style="flex: 2;">ชื่อ-นามสกุล: <span class="dotted-line"></span></div>
+                <div style="flex: 1;">เลขที่: <span class="dotted-line"></span></div>
+                <div style="flex: 1;">ชั้น ม.5/ <span class="dotted-line"></span></div>
+            </div>
+        </div>
+
+        <!-- 5 Questions -->
+        <div class="q-item">
+            <div class="q-title">ข้อที่ 1. (3 คะแนน)</div>
+            <div>จงหาขนาด $|z|$ และอาร์กิวเมนต์ $\theta$ ของจำนวนเชิงซ้อน $z = -2\sqrt{3} + 2i$ และเขียนในรูปเชิงขั้ว ($0^\circ \le \theta < 360^\circ$)</div>
+            <div class="work-area"></div>
+            <div class="ans-block hide">
+                <strong>เฉลย:</strong> $r = \sqrt{(-2\sqrt{3})^2 + 2^2} = \sqrt{12+4} = 4$<br>
+                พิจารณาจุดอยู่ใน $Q_2$ ($a<0, b>0$), มุมอ้างอิง $\alpha = 30^\circ \implies \theta = 180^\circ - 30^\circ = 150^\circ$<br>
+                <strong>คำตอบ:</strong> $z = 4(\cos 150^\circ + i\sin 150^\circ)$
+            </div>
+        </div>
+
+        <div class="q-item">
+            <div class="q-title">ข้อที่ 2. (3 คะแนน)</div>
+            <div>จงแปลงจำนวนเชิงซ้อน $z = -3 - 3i$ ให้อยู่ในรูปเชิงขั้ว $r(\cos\theta + i\sin\theta)$</div>
+            <div class="work-area"></div>
+            <div class="ans-block hide">
+                <strong>เฉลย:</strong> $r = \sqrt{(-3)^2 + (-3)^2} = \sqrt{18} = 3\sqrt{2}$<br>
+                พิจารณาจุดอยู่ใน $Q_3$ ($a<0, b<0$), มุมอ้างอิง $\alpha = 45^\circ \implies \theta = 180^\circ + 45^\circ = 225^\circ$<br>
+                <strong>คำตอบ:</strong> $z = 3\sqrt{2}(\cos 225^\circ + i\sin 225^\circ)$
+            </div>
+        </div>
+
+        <div class="q-item">
+            <div class="q-title">ข้อที่ 3. (3 คะแนน)</div>
+            <div>จงแปลง $z = 6\left(\cos\frac{4\pi}{3} + i\sin\frac{4\pi}{3}\right)$ ให้อยู่ในรูปมาตรฐาน $a + bi$</div>
+            <div class="work-area"></div>
+            <div class="ans-block hide">
+                <strong>เฉลย:</strong> $\cos\frac{4\pi}{3} = -\frac{1}{2}$ และ $\sin\frac{4\pi}{3} = -\frac{\sqrt{3}}{2}$<br>
+                $z = 6\left(-\frac{1}{2} - i\frac{\sqrt{3}}{2}\right) = -3 - 3\sqrt{3}i$<br>
+                <strong>คำตอบ:</strong> $-3 - 3\sqrt{3}i$
+            </div>
+        </div>
+
+        <div class="q-item">
+            <div class="q-title">ข้อที่ 4. (3 คะแนน)</div>
+            <div>กำหนด $z_1 = 2(\cos 40^\circ + i\sin 40^\circ)$ และ $z_2 = 4(\cos 80^\circ + i\sin 80^\circ)$ จงหาผลคูณ $z_1 \cdot z_2$ ในรูป $a + bi$</div>
+            <div class="work-area"></div>
+            <div class="ans-block hide">
+                <strong>เฉลย:</strong> $z_1 z_2 = (2)(4)[\cos(40^\circ+80^\circ) + i\sin(40^\circ+80^\circ)] = 8(\cos 120^\circ + i\sin 120^\circ)$<br>
+                แปลงกลับ: $8\left(-\frac{1}{2} + i\frac{\sqrt{3}}{2}\right) = -4 + 4\sqrt{3}i$<br>
+                <strong>คำตอบ:</strong> $-4 + 4\sqrt{3}i$
+            </div>
+        </div>
+
+        <div class="q-item">
+            <div class="q-title">ข้อที่ 5. (3 คะแนน)</div>
+            <div>จงใช้ทฤษฎีบทเดอมัวฟวร์ (De Moivre's Theorem) คำนวณหาค่าของ $(1 + i)^{10}$ ในรูป $a + bi$</div>
+            <div class="work-area"></div>
+            <div class="ans-block hide">
+                <strong>เฉลย:</strong> $1+i = \sqrt{2}(\cos 45^\circ + i\sin 45^\circ)$<br>
+                $(1+i)^{10} = (\sqrt{2})^{10}[\cos(10 \times 45^\circ) + i\sin(10 \times 45^\circ)] = 32(\cos 450^\circ + i\sin 450^\circ)$<br>
+                เนื่องจาก $450^\circ \equiv 90^\circ$ จะได้ $32(\cos 90^\circ + i\sin 90^\circ) = 32(0 + i) = 32i$<br>
+                <strong>คำตอบ:</strong> $32i$
+            </div>
+        </div>
+    </section>
+
+    <!-- 5. รูบริกการประเมิน -->
+    <section class="section-card sec-rubric">
+        <h2 style="font-size: 1.8rem; color: #a78bfa; margin-bottom: 6px;">เกณฑ์การประเมินผลแบบรูบริก (Rubric Assessment)</h2>
+        <p style="color: #94a3b8; font-size: 0.95rem;">เกณฑ์การให้คะแนนแบ่งเป็น 3 ระดับคุณภาพ เพื่อประเมินความเข้าใจและทักษะทางคณิตศาสตร์</p>
+
+        <table class="rubric-table">
+            <thead>
+                <tr>
+                    <th style="width: 25%;">ประเด็นการประเมิน</th>
+                    <th style="width: 25%;">ระดับ 3: ดีมาก <span class="badge-score">3 คะแนน</span></th>
+                    <th style="width: 25%;">ระดับ 2: พอใช้ <span class="badge-score">2 คะแนน</span></th>
+                    <th style="width: 25%;">ระดับ 1: ปรับปรุง <span class="badge-score">1 คะแนน</span></th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td style="font-weight: 600; color: #38bdf8;">1. การหาขนาดและระบุมุม ($r$ และ $\theta$)</td>
+                    <td>คำนวณขนาด $r = \sqrt{a^2+b^2}$ ถูกต้อง และหามุมอ้างอิง $\alpha$ ได้ถูกต้องแม่นยำ</td>
+                    <td>คำนวณขนาดถูกต้อง แต่หาค่ามุมอ้างอิงผิดพลาดเล็กน้อย</td>
+                    <td>คำนวณขนาดผิด หรือไม่สามารถหามุมได้</td>
+                </tr>
+                <tr>
+                    <td style="font-weight: 600; color: #38bdf8;">2. การวิเคราะห์ควอดแรนต์</td>
+                    <td>พิจารณาเครื่องหมาย $a, b$ ระบุควอดแรนต์และปรับค่ามุมจริง $\theta$ ได้ถูกต้องสมบูรณ์</td>
+                    <td>ระบุควอดแรนต์ถูกต้อง แต่นำมุมอ้างอิงมาแปลงเป็นมุมจริงผิดเล็กน้อย</td>
+                    <td>ไม่พิจารณาควอดแรนต์ ทำให้ทิศทางมุมผิดพลาด</td>
+                </tr>
+                <tr>
+                    <td style="font-weight: 600; color: #38bdf8;">3. การแปลงรูปทางคณิตศาสตร์</td>
+                    <td>แปลงสลับระหว่าง $a+bi$ และ $r(\cos\theta + i\sin\theta)$ ได้ถูกต้องสมบูรณ์</td>
+                    <td>แปลงรูปได้ถูกต้องเป็นส่วนใหญ่ แต่ตกหล่นเครื่องหมาย $i$ หรือเครื่องหมายบวกลบ</td>
+                    <td>เขียนสัญลักษณ์รูปเชิงขั้วไม่ถูกต้องตามหลักการ</td>
+                </tr>
+                <tr>
+                    <td style="font-weight: 600; color: #38bdf8;">4. การประยุกต์ทฤษฎีบทเดอมัวฟวร์</td>
+                    <td>ประยุกต์ใช้สูตร $z^n = r^n(\cos n\theta + i\sin n\theta)$ และลดทอนมุมเกิน $360^\circ$ ได้ถูกต้อง</td>
+                    <td>ใช้สูตรเดอมัวฟวร์ได้ แต่คำนวณเลขยกกำลัง $r^n$ หรือมุมผิดพลาดบางส่วน</td>
+                    <td>ไม่สามารถนำทฤษฎีบทเดอมัวฟวร์มาใช้แก้ปัญหาได้</td>
+                </tr>
+            </tbody>
+        </table>
+    </section>
+
+</div>
+
+<script>
+    // --- Canvas & Live Interactive Engine ---
+    const canvas = document.getElementById('argandCanvas');
+    const ctx = canvas.getContext('2d');
+    const rRange = document.getElementById('rRange');
+    const thetaRange = document.getElementById('thetaRange');
+    const rLabel = document.getElementById('rLabel');
+    const thetaLabel = document.getElementById('thetaLabel');
+    const aText = document.getElementById('aText');
+    const bText = document.getElementById('bText');
+    const equationText = document.getElementById('equationText');
+    const quadrantText = document.getElementById('quadrantText');
+
+    let r = parseInt(rRange.value);
+    let thetaDeg = parseInt(thetaRange.value);
+    let isDragging = false;
+
+    function renderCanvas() {
+        const w = 500;
+        const h = 500;
+        const originX = 250;
+        const originY = 250;
+        const scale = 23; // 23px per 1 unit
+
+        // 1. เคลียร์พื้นหลัง
+        ctx.fillStyle = '#040814';
+        ctx.fillRect(0, 0, w, h);
+
+        // 2. เส้น Grid
+        ctx.strokeStyle = "rgba(255, 255, 255, 0.06)";
+        ctx.lineWidth = 1;
+        for (let i = -10; i <= 10; i++) {
+            if (i === 0) continue;
+            ctx.beginPath();
+            ctx.moveTo(originX + i * scale, 0);
+            ctx.lineTo(originX + i * scale, h);
+            ctx.stroke();
+
+            ctx.beginPath();
+            ctx.moveTo(0, originY - i * scale);
+            ctx.lineTo(w, originY - i * scale);
+            ctx.stroke();
+        }
+
+        // วงกลมอ้างอิงรัศมี 2, 4, 6, 8
+        ctx.strokeStyle = "rgba(56, 189, 248, 0.12)";
+        for (let rad = 2; rad <= 8; rad += 2) {
+            ctx.beginPath();
+            ctx.arc(originX, originY, rad * scale, 0, Math.PI * 2);
+            ctx.stroke();
+        }
+
+        // 3. แกน Re และ Im
+        ctx.strokeStyle = "rgba(255, 255, 255, 0.6)";
+        ctx.lineWidth = 2;
+        // แกนแนวนอน Re
+        ctx.beginPath();
+        ctx.moveTo(10, originY);
+        ctx.lineTo(w - 10, originY);
+        ctx.stroke();
+        // แกนแนวตั้ง Im
+        ctx.beginPath();
+        ctx.moveTo(originX, h - 10);
+        ctx.lineTo(originX, 10);
+        ctx.stroke();
+
+        // ตัวอักษรกำกับแกน
+        ctx.fillStyle = "#94a3b8";
+        ctx.font = "13px Kanit, sans-serif";
+        ctx.fillText("Re (แกนจริง)", w - 75, originY - 10);
+        ctx.fillText("Im (แกนจินตภาพ)", originX + 10, 20);
+        ctx.fillText("0", originX - 15, originY + 16);
+
+        // 4. คำนวณพิกัดปัจจุบัน
+        const thetaRad = (thetaDeg * Math.PI) / 180;
+        const a = r * Math.cos(thetaRad);
+        const b = r * Math.sin(thetaRad);
+        const ptX = originX + a * scale;
+        const ptY = originY - b * scale; // กลับแกน Y
+
+        // วงกลมรัศมี r ประ
+        ctx.strokeStyle = "rgba(245, 158, 11, 0.3)";
+        ctx.lineWidth = 1.5;
+        ctx.setLineDash([4, 4]);
+        ctx.beginPath();
+        ctx.arc(originX, originY, r * scale, 0, Math.PI * 2);
+        ctx.stroke();
+        ctx.setLineDash([]);
+
+        // เส้นส่วนประกอบประไปยังแกน
+        ctx.strokeStyle = "rgba(148, 163, 184, 0.4)";
+        ctx.setLineDash([3, 3]);
+        ctx.beginPath();
+        ctx.moveTo(ptX, ptY);
+        ctx.lineTo(ptX, originY);
+        ctx.stroke();
+
+        ctx.beginPath();
+        ctx.moveTo(ptX, ptY);
+        ctx.lineTo(originX, ptY);
+        ctx.stroke();
+        ctx.setLineDash([]);
+
+        // ส่วนโค้งมุมกวาด theta
+        ctx.strokeStyle = "#f59e0b";
+        ctx.lineWidth = 2.5;
+        ctx.beginPath();
+        ctx.arc(originX, originY, Math.min(35, r * scale * 0.4), 0, -thetaRad, true);
+        ctx.stroke();
+
+        // เวกเตอร์ลูกศรจากจุดกำเนิด
+        ctx.strokeStyle = "#06b6d4";
+        ctx.lineWidth = 3;
+        ctx.beginPath();
+        ctx.moveTo(originX, originY);
+        ctx.lineTo(ptX, ptY);
+        ctx.stroke();
+
+        // จุดพิกัด (Point Dot)
+        ctx.fillStyle = "#38bdf8";
+        ctx.beginPath();
+        ctx.arc(ptX, ptY, 7, 0, Math.PI * 2);
+        ctx.fill();
+
+        // แสดงข้อความพิกัด
+        ctx.fillStyle = "#ffffff";
+        ctx.font = "bold 13px 'Fira Code', monospace";
+        ctx.fillText(`z (${a.toFixed(2)}, ${b.toFixed(2)})`, ptX + 10, ptY - 10);
+    }
+
+    function updateAll() {
+        const thetaRad = (thetaDeg * Math.PI) / 180;
+        const a = r * Math.cos(thetaRad);
+        const b = r * Math.sin(thetaRad);
+
+        // อัปเดตตัวเลขทันที ไม่ติดขัด
+        rLabel.textContent = r;
+        thetaLabel.textContent = `${thetaDeg}°`;
+        aText.textContent = a.toFixed(2);
+        bText.textContent = b.toFixed(2);
+
+        // ควอดแรนต์
+        const norm = ((thetaDeg % 360) + 360) % 360;
+        let qStr = "";
+        if (norm === 0) qStr = "บนแกนจริงบวก (+Re)";
+        else if (norm === 90) qStr = "บนแกนจินตภาพบวก (+Im)";
+        else if (norm === 180) qStr = "บนแกนจริงลบ (-Re)";
+        else if (norm === 270) qStr = "บนแกนจินตภาพลบ (-Im)";
+        else if (norm > 0 && norm < 90) qStr = "ควอดแรนต์ที่ 1 (a > 0, b > 0)";
+        else if (norm > 90 && norm < 180) qStr = "ควอดแรนต์ที่ 2 (a < 0, b > 0)";
+        else if (norm > 180 && norm < 270) qStr = "ควอดแรนต์ที่ 3 (a < 0, b < 0)";
+        else qStr = "ควอดแรนต์ที่ 4 (a > 0, b < 0)";
+
+        quadrantText.innerHTML = `ตำแหน่ง: <strong>${qStr}</strong>`;
+
+        const bSign = b >= 0 ? "+" : "-";
+        const bAbs = Math.abs(b).toFixed(2);
+        equationText.textContent = `z = ${r}(cos ${thetaDeg}° + i sin ${thetaDeg}°) ≈ ${a.toFixed(2)} ${bSign} ${bAbs}i`;
+
+        renderCanvas();
+    }
+
+    // Sliders Event
+    rRange.addEventListener('input', (e) => {
+        r = parseInt(e.target.value);
+        updateAll();
+    });
+
+    thetaRange.addEventListener('input', (e) => {
+        thetaDeg = parseInt(e.target.value);
+        updateAll();
+    });
+
+    // Canvas Click / Drag Support
+    function handleMouse(e) {
+        const rect = canvas.getBoundingClientRect();
+        const clientX = e.clientX || (e.touches && e.touches[0].clientX);
+        const clientY = e.clientY || (e.touches && e.touches[0].clientY);
+
+        const mouseX = (clientX - rect.left) * (500 / rect.width);
+        const mouseY = (clientY - rect.top) * (500 / rect.height);
+        const scale = 23;
+
+        const a = (mouseX - 250) / scale;
+        const b = -(mouseY - 250) / scale;
+
+        let newR = Math.round(Math.sqrt(a * a + b * b));
+        newR = Math.max(1, Math.min(newR, 9));
+
+        let rad = Math.atan2(b, a);
+        if (rad < 0) rad += 2 * Math.PI;
+        let deg = Math.round((rad * 180) / Math.PI);
+        // snap to 15 degrees
+        deg = Math.round(deg / 15) * 15;
+        if (deg === 360) deg = 0;
+
+        r = newR;
+        thetaDeg = deg;
+        rRange.value = r;
+        thetaRange.value = thetaDeg;
+
+        updateAll();
+    }
+
+    canvas.addEventListener('mousedown', (e) => {
+        isDragging = true;
+        handleMouse(e);
+    });
+
+    window.addEventListener('mousemove', (e) => {
+        if (isDragging) handleMouse(e);
+    });
+
+    window.addEventListener('mouseup', () => {
+        isDragging = false;
+    });
+
+    // Touch Support
+    canvas.addEventListener('touchstart', (e) => {
+        isDragging = true;
+        handleMouse(e);
+        e.preventDefault();
+    });
+    window.addEventListener('touchmove', (e) => {
+        if (isDragging) {
+            handleMouse(e);
+            e.preventDefault();
+        }
+    }, { passive: false });
+    window.addEventListener('touchend', () => {
+        isDragging = false;
+    });
+
+    // --- Print & Worksheet Logic ---
+    let isAnsShow = false;
+    function toggleAns() {
+        isAnsShow = !isAnsShow;
+        document.querySelectorAll('.ans-block').forEach(el => {
+            if (isAnsShow) el.classList.remove('hide');
+            else el.classList.add('hide');
+        });
+    }
+
+    function printDoc(showKey) {
+        document.querySelectorAll('.ans-block').forEach(el => {
+            if (showKey) el.classList.remove('hide');
+            else el.classList.add('hide');
+        });
+        setTimeout(() => {
+            window.print();
+        }, 100);
+    }
+
+    // เริ่มทำงานทันทีหลัง DOM โหลดเสร็จ
+    window.addEventListener('DOMContentLoaded', () => {
+        updateAll();
+    });
+</script>
+
+</body>
+</html>

@@ -1,0 +1,1011 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>การดำเนินการด้วยรูปเชิงขั้ว (Operations on Complex Numbers in Polar Form)</title>
+    <!-- Google Fonts: Sarabun, Kanit, Fira Code -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@400;500;600;700&family=Sarabun:wght@300;400;500;600;700&family=Fira+Code:wght@400;600&display=swap" rel="stylesheet">
+    
+    <!-- MathJax 3 -->
+    <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']],
+                displayMath: [['$$', '$$'], ['\\[', '\\]']]
+            },
+            startup: {
+                ready: () => {
+                    MathJax.startup.defaultReady();
+                    window.mathJaxReady = true;
+                }
+            }
+        };
+    </script>
+    <script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+    <style>
+        :root {
+            --primary: #6366f1;
+            --primary-light: #a5b4fc;
+            --secondary: #06b6d4;
+            --accent: #f59e0b;
+            --success: #10b981;
+            --danger: #f43f5e;
+            --bg-dark: #0a0f1d;
+            --bg-card: #131c31;
+            --border: rgba(255, 255, 255, 0.08);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Sarabun', sans-serif;
+            background-color: var(--bg-dark);
+            color: #f8fafc;
+            line-height: 1.6;
+            padding: 30px 0 60px 0;
+            display: flex;
+            justify-content: center;
+        }
+
+        .main-wrapper {
+            width: 1200px;
+            max-width: 95%;
+            display: flex;
+            flex-direction: column;
+            gap: 36px;
+        }
+
+        h1, h2, h3, h4 {
+            font-family: 'Kanit', sans-serif;
+            font-weight: 600;
+        }
+
+        .section-card {
+            border-radius: 20px;
+            padding: 36px;
+            border: 1px solid var(--border);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+        }
+
+        /* 1. ส่วนนำ (Hero Header) */
+        .sec-intro {
+            background: linear-gradient(135deg, #1e1b4b 0%, #0f172a 60%, #042f2e 100%);
+            border-bottom: 3px solid #14b8a6;
+            text-align: center;
+        }
+        .sec-intro h1 {
+            font-size: 2.7rem;
+            color: #ffffff;
+            margin-bottom: 8px;
+            letter-spacing: -0.5px;
+        }
+        .sec-intro p.sub {
+            color: #5eead4;
+            font-size: 1.25rem;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        /* 2. สรุปเนื้อหา */
+        .sec-theory {
+            background: #111a2e;
+            border: 1px solid rgba(14, 165, 233, 0.2);
+        }
+        .theory-head {
+            border-bottom: 2px solid rgba(255, 255, 255, 0.08);
+            padding-bottom: 12px;
+            margin-bottom: 24px;
+            font-size: 1.8rem;
+            color: #38bdf8;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .theory-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(330px, 1fr));
+            gap: 20px;
+        }
+        .theory-box {
+            background: rgba(15, 23, 42, 0.75);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 14px;
+            padding: 22px;
+            transition: transform 0.2s ease, border-color 0.2s ease;
+        }
+        .theory-box:hover {
+            transform: translateY(-3px);
+            border-color: #38bdf8;
+        }
+        .theory-box h3 {
+            color: #38bdf8;
+            font-size: 1.2rem;
+            margin-bottom: 10px;
+        }
+        .theory-box ul {
+            padding-left: 20px;
+            color: #cbd5e1;
+            font-size: 0.98rem;
+        }
+        .theory-box li {
+            margin-bottom: 6px;
+        }
+        .math-badge {
+            background: rgba(6, 182, 212, 0.12);
+            border-left: 4px solid var(--secondary);
+            padding: 10px 14px;
+            margin: 10px 0;
+            border-radius: 0 8px 8px 0;
+            font-size: 1.05rem;
+        }
+
+        /* 3. โมเดลการศึกษา (Interactive Visualizer) */
+        .sec-interactive {
+            background: #091224;
+            border: 1px solid rgba(99, 102, 241, 0.3);
+        }
+        .model-container {
+            display: grid;
+            grid-template-columns: 500px 1fr;
+            gap: 30px;
+            align-items: start;
+        }
+        @media (max-width: 980px) {
+            .model-container {
+                grid-template-columns: 1fr;
+            }
+        }
+        .canvas-box {
+            background: #040814;
+            border-radius: 16px;
+            border: 2px solid rgba(56, 189, 248, 0.3);
+            padding: 12px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        #operCanvas {
+            background-color: #040814;
+            border-radius: 10px;
+            display: block;
+            width: 100%;
+            max-width: 476px;
+            height: auto;
+            aspect-ratio: 1 / 1;
+        }
+        .legend-box {
+            display: flex;
+            gap: 16px;
+            margin-top: 10px;
+            font-size: 0.85rem;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .legend-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+
+        .control-box {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        /* Tab เลือกประเภทการดำเนินการ */
+        .operation-tabs {
+            display: flex;
+            gap: 10px;
+            background: #111a33;
+            padding: 6px;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .op-btn {
+            flex: 1;
+            padding: 10px 12px;
+            font-family: 'Kanit', sans-serif;
+            font-size: 1rem;
+            font-weight: 500;
+            border: none;
+            background: transparent;
+            color: #94a3b8;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .op-btn.active {
+            background: #4f46e5;
+            color: #ffffff;
+            box-shadow: 0 4px 12px rgba(79, 70, 229, 0.4);
+        }
+
+        .slider-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+        .slider-card {
+            background: #111d38;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 12px;
+            padding: 12px 16px;
+        }
+        .slider-title {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.95rem;
+            margin-bottom: 6px;
+        }
+        .slider-title span.val {
+            font-family: 'Fira Code', monospace;
+            font-size: 1.15rem;
+            font-weight: 600;
+            color: #38bdf8;
+        }
+        input[type=range] {
+            width: 100%;
+            height: 6px;
+            border-radius: 4px;
+            background: #1e293b;
+            outline: none;
+            cursor: pointer;
+        }
+
+        .comparison-panel {
+            background: #050a16;
+            border: 1px solid rgba(14, 165, 233, 0.3);
+            border-radius: 14px;
+            padding: 16px 20px;
+        }
+        .comp-title {
+            font-size: 0.95rem;
+            color: #94a3b8;
+            margin-bottom: 8px;
+            border-bottom: 1px dashed rgba(255,255,255,0.1);
+            padding-bottom: 4px;
+        }
+        .step-row {
+            font-family: 'Fira Code', monospace;
+            font-size: 1.05rem;
+            color: #7dd3fc;
+            margin-bottom: 6px;
+        }
+        .step-rect {
+            font-family: 'Fira Code', monospace;
+            font-size: 1rem;
+            color: #a7f3d0;
+        }
+
+        .discovery {
+            background: rgba(245, 158, 11, 0.1);
+            border-left: 4px solid var(--accent);
+            padding: 14px 18px;
+            border-radius: 0 10px 10px 0;
+        }
+
+        /* 4. ส่วนใบงาน 5 ข้อ */
+        .sec-worksheet {
+            background: #ffffff;
+            color: #0f172a;
+        }
+        .worksheet-actions {
+            display: flex;
+            gap: 14px;
+            margin-bottom: 24px;
+            flex-wrap: wrap;
+        }
+        .btn-print {
+            padding: 12px 24px;
+            font-family: 'Kanit', sans-serif;
+            font-size: 1rem;
+            font-weight: 600;
+            border-radius: 8px;
+            cursor: pointer;
+            border: none;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s ease;
+        }
+        .btn-stu { background: #2563eb; color: #fff; }
+        .btn-tch { background: #059669; color: #fff; }
+        .btn-tgl { background: #64748b; color: #fff; }
+        .btn-print:hover { transform: translateY(-2px); }
+
+        .sheet-box {
+            border-bottom: 2px solid #0f172a;
+            padding-bottom: 12px;
+            margin-bottom: 20px;
+        }
+        .student-inputs {
+            display: flex;
+            gap: 20px;
+            margin-top: 10px;
+            font-size: 1rem;
+        }
+        .dotted-line {
+            flex-grow: 1;
+            border-bottom: 1px dotted #64748b;
+            display: inline-block;
+        }
+        .q-item {
+            margin-bottom: 20px;
+            padding-bottom: 16px;
+            border-bottom: 1px dashed #cbd5e1;
+            page-break-inside: avoid;
+            break-inside: avoid;
+        }
+        .q-title {
+            font-weight: 700;
+            font-size: 1.12rem;
+            color: #0f172a;
+            margin-bottom: 6px;
+        }
+        .work-area {
+            border: 1px dashed #94a3b8;
+            border-radius: 6px;
+            min-height: 115px;
+            background: #f8fafc;
+            margin-top: 8px;
+            padding: 8px 12px;
+            position: relative;
+        }
+        .work-area::before {
+            content: "แสดงวิธีทำ / คำตอบ:";
+            color: #94a3b8;
+            font-size: 0.85rem;
+        }
+        .ans-block {
+            margin-top: 10px;
+            background: #ecfdf5;
+            border-left: 4px solid #10b981;
+            padding: 12px 16px;
+            border-radius: 0 6px 6px 0;
+            color: #064e3b;
+        }
+        .ans-block.hide {
+            display: none !important;
+        }
+
+        /* 5. รูบริกการประเมิน */
+        .sec-rubric {
+            background: #10192e;
+            border: 1px solid rgba(167, 139, 250, 0.25);
+        }
+        table.rubric-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 16px;
+            background: #080e1c;
+            border-radius: 12px;
+            overflow: hidden;
+        }
+        table.rubric-table th, table.rubric-table td {
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            padding: 14px 18px;
+            vertical-align: top;
+        }
+        table.rubric-table th {
+            background: #2e1065;
+            color: #e9d5ff;
+            font-size: 1.05rem;
+        }
+        .badge-score {
+            background: rgba(255,255,255,0.12);
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 0.85rem;
+            color: #fcd34d;
+        }
+
+        /* PRINT CONFIGURATION: หน้า A4 พอดีและไร้หน้าว่าง */
+        @media print {
+            body {
+                background: #ffffff !important;
+                color: #000000 !important;
+                padding: 0 !important;
+                margin: 0 !important;
+            }
+            .main-wrapper {
+                width: 100% !important;
+                max-width: 100% !important;
+                gap: 0 !important;
+                padding: 0 !important;
+            }
+            .sec-intro, .sec-theory, .sec-interactive, .sec-rubric, .worksheet-actions {
+                display: none !important;
+            }
+            .sec-worksheet {
+                box-shadow: none !important;
+                border: none !important;
+                padding: 0 !important;
+            }
+            .q-item {
+                page-break-inside: avoid !important;
+                break-inside: avoid !important;
+                margin-bottom: 12px !important;
+                padding-bottom: 8px !important;
+            }
+            .work-area {
+                min-height: 90px !important;
+                background: #ffffff !important;
+            }
+            @page {
+                size: A4 portrait;
+                margin: 10mm 15mm;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="main-wrapper">
+
+    <!-- 1. ส่วนนำ -->
+    <header class="section-card sec-intro">
+        <h1>การดำเนินการด้วยรูปเชิงขั้ว</h1>
+        <p class="sub">Operations on Complex Numbers in Polar Form: การคูณ การหาร การยกกำลัง และทฤษฎีบทเดอมัวฟร์</p>
+    </header>
+
+    <!-- 2. สรุปเนื้อหา -->
+    <section class="section-card sec-theory">
+        <h2 class="theory-head">สรุปสาระสำคัญ</h2>
+        <div class="theory-grid">
+            <!-- 1. คูณ -->
+            <div class="topic-box theory-box">
+                <h3>1. การคูณจำนวนเชิงซ้อนในรูปเชิงขั้ว</h3>
+                <p>เมื่อกำหนดให้ $z_1 = r_1(\cos\theta_1 + i\sin\theta_1)$ และ $z_2 = r_2(\cos\theta_2 + i\sin\theta_2)$:</p>
+                <div class="math-badge">
+                    $$z_1 z_2 = r_1 r_2 [\cos(\theta_1 + \theta_2) + i\sin(\theta_1 + \theta_2)]$$
+                </div>
+                <ul>
+                    <li><strong>ขนาด:</strong> นำขนาดมาคูณกัน ($\vert{}z_1 z_2\vert{} = r_1 r_2$)</li>
+                    <li><strong>มุม:</strong> นำอาร์กิวเมนต์มาบวกกัน ($\arg(z_1 z_2) = \theta_1 + \theta_2$)</li>
+                </ul>
+            </div>
+
+            <!-- 2. หาร -->
+            <div class="topic-box theory-box">
+                <h3>2. การหารจำนวนเชิงซ้อนในรูปเชิงขั้ว</h3>
+                <p>สำหรับการหารเมื่อ $z_2 \neq 0$:</p>
+                <div class="math-badge">
+                    $$\frac{z_1}{z_2} = \frac{r_1}{r_2} [\cos(\theta_1 - \theta_2) + i\sin(\theta_1 - \theta_2)]$$
+                </div>
+                <ul>
+                    <li><strong>ขนาด:</strong> นำขนาดมาหารกัน $\left|\frac{z_1}{z_2}\right| = \frac{r_1}{r_2}$</li>
+                    <li><strong>มุม:</strong> นำอาร์กิวเมนต์มาลบกัน ($\arg(z_1/z_2) = \theta_1 - \theta_2$)</li>
+                </ul>
+            </div>
+
+            <!-- 3. ยกกำลัง -->
+            <div class="topic-box theory-box">
+                <h3>3. การยกกำลังจำนวนเชิงซ้อนในรูปเชิงขั้ว</h3>
+                <p>การคูณตัวเองซ้ำกัน $n$ ครั้ง ทำให้ขนาดถูกยกกำลังและมุมถูกทวีคูณ:</p>
+                <div class="math-badge">
+                    $$z^n = [r(\cos\theta + i\sin\theta)]^n$$
+                </div>
+                <ul>
+                    <li>ลดรูปการคูณพหุนามที่ยุ่งยากในรูป $a+bi$ ลงได้อย่างมาก</li>
+                    <li>ช่วยในการคำนวณรากที่ $n$ ของจำนวนเชิงซ้อนในขั้นตอนต่อไป</li>
+                </ul>
+            </div>
+
+            <!-- 4. เดอมัวฟร์ -->
+            <div class="topic-box theory-box">
+                <h3>4. การใช้สูตรของเดอมัวฟร์ (De Moivre's Formula)</h3>
+                <p>สำหรับจำนวนเต็ม $n$ ใด ๆ จะได้ความสัมพันธ์โดยตรง:</p>
+                <div class="math-badge">
+                    $$z^n = r^n [\cos(n\theta) + i\sin(n\theta)]$$
+                </div>
+                <ul>
+                    <li>ถ้า $n$ เป็นจำนวนเต็มลบ: $z^{-n} = r^{-n}[\cos(-n\theta) + i\sin(-n\theta)]$</li>
+                    <li>หาก $n\theta \ge 360^\circ$ ให้ลบด้วยพหุคูณของ $360^\circ$ (หรือ $2k\pi$) เพื่อหาอาร์กิวเมนต์หลัก</li>
+                </ul>
+            </div>
+
+            <!-- 5. แปลงกลับ -->
+            <div class="topic-box theory-box" style="grid-column: 1 / -1;">
+                <h3>5. การแปลงกลับเป็นรูปมาตรฐานเพื่อตรวจสอบคำตอบ</h3>
+                <p>เมื่อได้ผลลัพธ์ในรูป $R(\cos\Phi + i\sin\Phi)$ แล้ว สามารถกระจายค่าตรีโกณมิติกลับสู่รูปมาตรฐาน $a + bi$ เพื่อตรวจทาน:</p>
+                <div class="math-badge" style="display: flex; gap: 30px; align-items: center; justify-content: center; flex-wrap: wrap;">
+                    <span>$$a = R\cos\Phi$$</span>
+                    <span>$$b = R\sin\Phi$$</span>
+                    <span>$$z = a + bi$$</span>
+                </div>
+                <p style="color: #94a3b8; font-size: 0.95rem; text-align: center;">
+                    💡 การคำนวณผลลัพธ์ทั้งสองวิธี (พีชคณิตปกติ vs รูปเชิงขั้ว) จะต้องได้ค่า $a+bi$ ที่เท่ากันเสมอ
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- 3. โมเดลการศึกษา -->
+    <section class="section-card sec-interactive">
+        <h2 style="font-size: 1.8rem; color: #38bdf8; margin-bottom: 20px;">โมเดลการศึกษา: สำรวจการคูณ การหาร และการยกกำลัง</h2>
+        
+        <div class="model-container">
+            <!-- Canvas Plotter 500x500 -->
+            <div class="canvas-box">
+                <canvas id="operCanvas" width="500" height="500"></canvas>
+                <div class="legend-box">
+                    <div class="legend-item"><span class="legend-dot" style="background:#38bdf8;"></span> $z_1$</div>
+                    <div class="legend-item"><span class="legend-dot" style="background:#f59e0b;"></span> $z_2$ (หรือตัวคูณ)</div>
+                    <div class="legend-item"><span class="legend-dot" style="background:#10b981;"></span> ผลลัพธ์ ($z_{ans}$)</div>
+                </div>
+            </div>
+
+            <!-- Controller & Live Feedback -->
+            <div class="control-box">
+                <!-- Operation Switch -->
+                <div class="operation-tabs">
+                    <button class="op-btn active" onclick="setMode('mul')">✖️ การคูณ ($z_1 \cdot z_2$)</button>
+                    <button class="op-btn" onclick="setMode('div')">➗ การหาร ($z_1 / z_2$)</button>
+                    <button class="op-btn" onclick="setMode('pow')">⚡ การยกกำลัง ($z_1^n$)</button>
+                </div>
+
+                <!-- Sliders -->
+                <div class="slider-grid">
+                    <div class="slider-card">
+                        <div class="slider-title">
+                            <span>ขนาด $r_1$:</span>
+                            <span class="val" id="r1Val">2</span>
+                        </div>
+                        <input type="range" id="r1Range" min="1" max="5" step="1" value="2">
+                    </div>
+                    <div class="slider-card">
+                        <div class="slider-title">
+                            <span>มุม $\theta_1$:</span>
+                            <span class="val" id="th1Val">30°</span>
+                        </div>
+                        <input type="range" id="th1Range" min="0" max="360" step="15" value="30">
+                    </div>
+                </div>
+
+                <div class="slider-grid" id="secondaryControlGroup">
+                    <div class="slider-card" id="cardR2">
+                        <div class="slider-title">
+                            <span id="labelR2">ขนาด $r_2$:</span>
+                            <span class="val" id="r2Val">2</span>
+                        </div>
+                        <input type="range" id="r2Range" min="1" max="4" step="1" value="2">
+                    </div>
+                    <div class="slider-card" id="cardTh2">
+                        <div class="slider-title">
+                            <span id="labelTh2">มุม $\theta_2$:</span>
+                            <span class="val" id="th2Val">45°</span>
+                        </div>
+                        <input type="range" id="th2Range" min="0" max="360" step="15" value="45">
+                    </div>
+                </div>
+
+                <!-- Live Comparison Display -->
+                <div class="comparison-panel">
+                    <div class="comp-title">การเปลี่ยนแปลงของขนาดและมุม (Polar Breakdown):</div>
+                    <div class="step-row" id="breakdownText">
+                        R = 2 × 2 = 4, &nbsp; Φ = 30° + 45° = 75°
+                    </div>
+                    <div class="step-row" id="polarResultText" style="color: #6ee7b7;">
+                        z_ans = 4(cos 75° + i sin 75°)
+                    </div>
+                    <div class="comp-title" style="margin-top:10px;">เปรียบเทียบในรูปมาตรฐาน (a + bi):</div>
+                    <div class="step-rect" id="rectResultText">
+                        z_ans ≈ 1.04 + 3.86i
+                    </div>
+                </div>
+
+                <!-- Discovery Box -->
+                <div class="discovery">
+                    <h4 style="color: #fbbf24; font-size: 1.05rem; margin-bottom: 4px;">สิ่งที่นักเรียนควรค้นพบ:</h4>
+                    <p style="color: #fde68a; font-size: 0.95rem;">
+                        <strong>การคูณและหารในรูปเชิงขั้วสามารถจัดการขนาดและมุมแยกกันได้อย่างอิสระ</strong> (ขนาดคูณ/หารกัน มุมบวก/ลบกัน) โดยไม่ต้องกระจายพหุนาม ส่วน<strong>การยกกำลังด้วยสูตรเดอมัวฟร์ช่วยให้คำนวณได้อย่างเป็นระบบ</strong> โดยเฉพาะเมื่อเลขชี้กำลังมีค่ามาก
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 4. ส่วนใบงาน 5 ข้อ -->
+    <section class="section-card sec-worksheet">
+        <div class="worksheet-actions">
+            <button class="btn-print btn-stu" onclick="printSheet(false)">🖨️ พิมพ์ใบงานสำหรับนักเรียน (หน้า A4)</button>
+            <button class="btn-print btn-tch" onclick="printSheet(true)">📋 พิมพ์เฉลยสำหรับครู</button>
+            <button class="btn-print btn-tgl" onclick="toggleAnswers()">👁️ สลับแสดง/ซ่อนเฉลยบนหน้าจอ</button>
+        </div>
+
+        <div class="sheet-box">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                    <h2 style="font-size: 1.35rem;">ใบงานคณิตศาสตร์: เรื่อง การดำเนินการด้วยรูปเชิงขั้ว</h2>
+                    <div style="color: #475569; font-size: 0.95rem;">สาระการเรียนรู้คณิตศาสตร์เพิ่มเติม ชั้นมัธยมศึกษาปีที่ 5</div>
+                </div>
+                <div style="border: 2px solid #0f172a; padding: 4px 12px; font-weight: bold; border-radius: 4px;">
+                    คะแนนเต็ม 15 คะแนน
+                </div>
+            </div>
+            <div class="student-inputs">
+                <div style="flex: 2;">ชื่อ-นามสกุล: <span class="dotted-line"></span></div>
+                <div style="flex: 1;">เลขที่: <span class="dotted-line"></span></div>
+                <div style="flex: 1;">ชั้น ม.5/ <span class="dotted-line"></span></div>
+            </div>
+        </div>
+
+        <!-- 5 Questions -->
+        <div class="q-item">
+            <div class="q-title">ข้อที่ 1. การคูณจำนวนเชิงซ้อนในรูปเชิงขั้ว (3 คะแนน)</div>
+            <div>
+                กำหนดให้ $z_1 = 3(\cos 40^\circ + i\sin 40^\circ)$ และ $z_2 = 2(\cos 80^\circ + i\sin 80^\circ)$ จงหาผลคูณ $z_1 z_2$ ในรูปมาตรฐาน $a + bi$
+            </div>
+            <div class="work-area"></div>
+            <div class="ans-block hide">
+                <strong>เฉลยและวิธีทำ:</strong><br>
+                1. ใช้สูตรคูณ: $z_1 z_2 = r_1 r_2 [\cos(\theta_1 + \theta_2) + i\sin(\theta_1 + \theta_2)]$<br>
+                2. แทนค่า: $z_1 z_2 = (3 \times 2)[\cos(40^\circ + 80^\circ) + i\sin(40^\circ + 80^\circ)] = 6(\cos 120^\circ + i\sin 120^\circ)$<br>
+                3. แปลงเป็นรูปมาตรฐาน: $\cos 120^\circ = -\frac{1}{2}$ และ $\sin 120^\circ = \frac{\sqrt{3}}{2}$<br>
+                $z_1 z_2 = 6\left(-\frac{1}{2} + i\frac{\sqrt{3}}{2}\right) = -3 + 3\sqrt{3}i$<br>
+                <strong>คำตอบ:</strong> $-3 + 3\sqrt{3}i$
+            </div>
+        </div>
+
+        <div class="q-item">
+            <div class="q-title">ข้อที่ 2. การหารจำนวนเชิงซ้อนในรูปเชิงขั้ว (3 คะแนน)</div>
+            <div>
+                กำหนดให้ $z_1 = 8(\cos 105^\circ + i\sin 105^\circ)$ และ $z_2 = 4(\cos 45^\circ + i\sin 45^\circ)$ จงหาค่าของ $\frac{z_1}{z_2}$ ในรูปมาตรฐาน $a + bi$
+            </div>
+            <div class="work-area"></div>
+            <div class="ans-block hide">
+                <strong>เฉลยและวิธีทำ:</strong><br>
+                1. ใช้สูตรการหาร: $\frac{z_1}{z_2} = \frac{r_1}{r_2} [\cos(\theta_1 - \theta_2) + i\sin(\theta_1 - \theta_2)]$<br>
+                2. แทนค่า: $\frac{z_1}{z_2} = \frac{8}{4}[\cos(105^\circ - 45^\circ) + i\sin(105^\circ - 45^\circ)] = 2(\cos 60^\circ + i\sin 60^\circ)$<br>
+                3. แปลงเป็นรูปมาตรฐาน: $\cos 60^\circ = \frac{1}{2}$ และ $\sin 60^\circ = \frac{\sqrt{3}}{2}$<br>
+                $\frac{z_1}{z_2} = 2\left(\frac{1}{2} + i\frac{\sqrt{3}}{2}\right) = 1 + \sqrt{3}i$<br>
+                <strong>คำตอบ:</strong> $1 + \sqrt{3}i$
+            </div>
+        </div>
+
+        <div class="q-item">
+            <div class="q-title">ข้อที่ 3. การประยุกต์ทฤษฎีบทเดอมัวฟร์ (3 คะแนน)</div>
+            <div>
+                จงใช้สูตรของเดอมัวฟร์ คำนวณหาค่าของ $\left[\sqrt{2}(\cos 15^\circ + i\sin 15^\circ)\right]^6$ ในรูปมาตรฐาน $a + bi$
+            </div>
+            <div class="work-area"></div>
+            <div class="ans-block hide">
+                <strong>เฉลยและวิธีทำ:</strong><br>
+                1. ใช้สูตรเดอมัวฟร์: $z^n = r^n [\cos(n\theta) + i\sin(n\theta)]$<br>
+                2. คำนวณขนาด: $R = (\sqrt{2})^6 = (2^{1/2})^6 = 2^3 = 8$<br>
+                3. คำนวณมุม: $\Phi = 6 \times 15^\circ = 90^\circ$<br>
+                4. จะได้ $z^6 = 8(\cos 90^\circ + i\sin 90^\circ) = 8(0 + 1i) = 8i$<br>
+                <strong>คำตอบ:</strong> $8i$ (หรือ $0 + 8i$)
+            </div>
+        </div>
+
+        <div class="q-item">
+            <div class="q-title">ข้อที่ 4. การแปลงรูปมาตรฐานเพื่อยกกำลังและตรวจสอบ (3 คะแนน)</div>
+            <div>
+                จงคำนวณหาค่าของ $(-\sqrt{3} + i)^5$ โดยการแปลงเป็นรูปเชิงขั้วก่อน แล้วเขียนคำตอบสุดท้ายในรูป $a + bi$
+            </div>
+            <div class="work-area"></div>
+            <div class="ans-block hide">
+                <strong>เฉลยและวิธีทำ:</strong><br>
+                1. แปลง $w = -\sqrt{3} + i$ เป็นรูปเชิงขั้ว:<br>
+                - ขนาด $r = \sqrt{(-\sqrt{3})^2 + 1^2} = \sqrt{3 + 1} = 2$<br>
+                - ควอดแรนต์: $a < 0, b > 0$ อยู่ใน $Q_2$ โดยมุมอ้างอิง $\tan\alpha = \frac{1}{\sqrt{3}} \implies \alpha = 30^\circ$<br>
+                - มุมจริง $\theta = 180^\circ - 30^\circ = 150^\circ$<br>
+                ดังนั้น $w = 2(\cos 150^\circ + i\sin 150^\circ)$<br>
+                2. ยกกำลังด้วยสูตรเดอมัวฟร์: $w^5 = 2^5[\cos(5 \times 150^\circ) + i\sin(5 \times 150^\circ)] = 32(\cos 750^\circ + i\sin 750^\circ)$<br>
+                3. ลดทอนมุม: $750^\circ = 2(360^\circ) + 30^\circ \equiv 30^\circ$<br>
+                $w^5 = 32(\cos 30^\circ + i\sin 30^\circ) = 32\left(\frac{\sqrt{3}}{2} + \frac{1}{2}i\right) = 16\sqrt{3} + 16i$<br>
+                <strong>คำตอบ:</strong> $16\sqrt{3} + 16i$
+            </div>
+        </div>
+
+        <div class="q-item">
+            <div class="q-title">ข้อที่ 5. การดำเนินการผสมและแปลงกลับ (3 คะแนน)</div>
+            <div>
+                กำหนดให้ $z_1 = 4(\cos 70^\circ + i\sin 70^\circ)$, $z_2 = 2(\cos 25^\circ + i\sin 25^\circ)$ และ $z_3 = \cos 15^\circ + i\sin 15^\circ$<br>
+                จงหาค่าของ $\frac{z_1 \cdot z_2}{z_3}$ ในรูปมาตรฐาน $a + bi$
+            </div>
+            <div class="work-area"></div>
+            <div class="ans-block hide">
+                <strong>เฉลยและวิธีทำ:</strong><br>
+                1. จัดการขนาด: $R = \frac{r_1 \cdot r_2}{r_3} = \frac{4 \times 2}{1} = 8$<br>
+                2. จัดการมุม: $\Phi = \theta_1 + \theta_2 - \theta_3 = 70^\circ + 25^\circ - 15^\circ = 80^\circ$<br>
+                (หรือหากมุมเป็น $60^\circ$ จะแปลงลงตัว: ในที่นี้ $\Phi = 80^\circ$)<br>
+                $z = 8(\cos 80^\circ + i\sin 80^\circ)$<br>
+                แปลงเป็นทศนิยมเพื่อตรวจสอบ: $\cos 80^\circ \approx 0.1736$, $\sin 80^\circ \approx 0.9848$<br>
+                $z \approx 8(0.1736 + 0.9848i) \approx 1.39 + 7.88i$<br>
+                <strong>คำตอบ:</strong> $8(\cos 80^\circ + i\sin 80^\circ)$ หรือประมาณ $1.39 + 7.88i$
+            </div>
+        </div>
+    </section>
+
+    <!-- 5. รูบริกการประเมิน -->
+    <section class="section-card sec-rubric">
+        <h2 style="font-size: 1.8rem; color: #c4b5fd; margin-bottom: 6px;">เกณฑ์การประเมินผลแบบรูบริก (Rubric Assessment)</h2>
+        <p style="color: #94a3b8; font-size: 0.95rem;">เกณฑ์การให้คะแนน 3 ระดับคุณภาพสำหรับการดำเนินการด้วยรูปเชิงขั้ว</p>
+
+        <table class="rubric-table">
+            <thead>
+                <tr>
+                    <th style="width: 25%;">ประเด็นการประเมิน</th>
+                    <th style="width: 25%;">ระดับ 3: ดีมาก <span class="badge-score">3 คะแนน</span></th>
+                    <th style="width: 25%;">ระดับ 2: พอใช้ <span class="badge-score">2 คะแนน</span></th>
+                    <th style="width: 25%;">ระดับ 1: ปรับปรุง <span class="badge-score">1 คะแนน</span></th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td style="font-weight: 600; color: #38bdf8;">1. การคูณและการหารในรูปเชิงขั้ว</td>
+                    <td>คำนวณขนาดและมุมของการคูณ (บวกมุม) และการหาร (ลบมุม) ได้อย่างถูกต้องแม่นยำทุกขั้นตอน</td>
+                    <td>เข้าใจหลักการนำมุมมาบวกหรือลบกัน แต่คำนวณตัวเลขขนาดหรือมุมผิดพลาดเล็กน้อย</td>
+                    <td>สับสนกฎการคูณ/หาร เช่น นำมุมมาคูณกัน หรือไม่สามารถใช้สูตรได้ถูกต้อง</td>
+                </tr>
+                <tr>
+                    <td style="font-weight: 600; color: #38bdf8;">2. การใช้สูตรของเดอมัวฟร์</td>
+                    <td>ประยุกต์ $z^n = r^n(\cos n\theta + i\sin n\theta)$ ได้ถูกต้อง และลดทอนมุมเกิน $360^\circ$ ได้ถูกต้องสมบูรณ์</td>
+                    <td>นำสูตรเดอมัวฟร์มาใช้ได้ แต่คำนวณเลขยกกำลัง $r^n$ ผิด หรือคำนวณผลคูณ $n\theta$ ผิดพลาด</td>
+                    <td>ไม่สามารถระบุหรือประยุกต์ใช้สูตรเดอมัวฟร์ในการยกกำลังจำนวนเชิงซ้อนได้</td>
+                </tr>
+                <tr>
+                    <td style="font-weight: 600; color: #38bdf8;">3. การแปลงกลับเป็นรูปมาตรฐานและการตรวจคำตอบ</td>
+                    <td>แปลงกลับเป็นรูป $a+bi$ ได้ถูกต้องแม่นยำทุกข้อ รวมถึงการแทนค่าฟังก์ชันตรีโกณมิติมุมสำคัญได้ถูกต้อง</td>
+                    <td>เข้าใจการแปลงกลับ แต่แทนค่า $\cos\theta$ หรือ $\sin\theta$ คลาดเคลื่อน หรือตกหล่นเครื่องหมาย $i$</td>
+                    <td>ไม่สามารถแปลงค่าผลลัพธ์จากรูปเชิงขั้วกลับสู่รูปมาตรฐาน $a+bi$ ได้</td>
+                </tr>
+                <tr>
+                    <td style="font-weight: 600; color: #38bdf8;">4. กระบวนการแก้ปัญหาอย่างเป็นระบบ</td>
+                    <td>แสดงขั้นตอนการแปลงรูป การคำนวณขนาด-มุม และการสรุปคำตอบเป็นระเบียบชัดเจนและสมบูรณ์</td>
+                    <td>แสดงวิธีทำเป็นขั้นตอนพอใช้ได้ มีการข้ามขั้นตอนสำคัญ หรือตกหล่นการสรุปผลบางส่วน</td>
+                    <td>เขียนคำตอบโดยไม่แสดงวิธีทำ หรือขั้นตอนไม่ต่อเนื่องและขาดความสมเหตุสมผล</td>
+                </tr>
+            </tbody>
+        </table>
+    </section>
+
+</div>
+
+<script>
+    // --- State & Canvas Logic ---
+    let currentMode = 'mul'; // 'mul', 'div', 'pow'
+    let r1 = 2;
+    let th1 = 30;
+    let r2 = 2;
+    let th2 = 45;
+    let powN = 3;
+
+    const canvas = document.getElementById('operCanvas');
+    const ctx = canvas.getContext('2d');
+
+    const r1Range = document.getElementById('r1Range');
+    const th1Range = document.getElementById('th1Range');
+    const r2Range = document.getElementById('r2Range');
+    const th2Range = document.getElementById('th2Range');
+
+    const r1Val = document.getElementById('r1Val');
+    const th1Val = document.getElementById('th1Val');
+    const r2Val = document.getElementById('r2Val');
+    const th2Val = document.getElementById('th2Val');
+
+    const labelR2 = document.getElementById('labelR2');
+    const labelTh2 = document.getElementById('labelTh2');
+    const cardTh2 = document.getElementById('cardTh2');
+    const breakdownText = document.getElementById('breakdownText');
+    const polarResultText = document.getElementById('polarResultText');
+    const rectResultText = document.getElementById('rectResultText');
+
+    function setMode(mode) {
+        currentMode = mode;
+        document.querySelectorAll('.op-btn').forEach(b => b.classList.remove('active'));
+        if (mode === 'mul') event.target.classList.add('active');
+        if (mode === 'div') event.target.classList.add('active');
+        if (mode === 'pow') event.target.classList.add('active');
+
+        if (mode === 'pow') {
+            labelR2.textContent = "เลขชี้กำลัง n:";
+            r2Range.min = 2;
+            r2Range.max = 6;
+            r2Range.step = 1;
+            r2Range.value = powN;
+            r2Val.textContent = powN;
+            cardTh2.style.display = 'none';
+        } else {
+            labelR2.textContent = "ขนาด r₂:";
+            cardTh2.style.display = 'block';
+            r2Range.min = 1;
+            r2Range.max = 4;
+            r2Range.step = 1;
+            r2Range.value = r2;
+            r2Val.textContent = r2;
+        }
+
+        updateAll();
+    }
+
+    function renderCanvas() {
+        const w = 500;
+        const h = 500;
+        const cx = 250;
+        const cy = 250;
+
+        // คำนวณค่าผลลัพธ์
+        let resR = 1, resTh = 0;
+        if (currentMode === 'mul') {
+            resR = r1 * r2;
+            resTh = (th1 + th2) % 360;
+        } else if (currentMode === 'div') {
+            resR = r1 / r2;
+            resTh = ((th1 - th2) % 360 + 360) % 360;
+        } else if (currentMode === 'pow') {
+            resR = Math.pow(r1, powN);
+            resTh = (powN * th1) % 360;
+        }
+
+        // Auto Scale เพื่อให้เวกเตอร์ทั้งหมดอยู่ในหน้าจอ 500x500
+        const maxRadius = Math.max(r1, currentMode === 'pow' ? 1 : r2, resR, 4);
+        const scale = 200 / maxRadius;
+
+        // 1. Clear background
+        ctx.fillStyle = '#040814';
+        ctx.fillRect(0, 0, w, h);
+
+        // 2. Grids
+        ctx.strokeStyle = "rgba(255, 255, 255, 0.06)";
+        ctx.lineWidth = 1;
+        for (let rad = 2; rad <= maxRadius; rad += Math.max(1, Math.round(maxRadius/5))) {
+            ctx.beginPath();
+            ctx.arc(cx, cy, rad * scale, 0, Math.PI * 2);
+            ctx.stroke();
+        }
+
+        // 3. Axes
+        ctx.strokeStyle = "rgba(255, 255, 255, 0.5)";
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(10, cy); ctx.lineTo(w - 10, cy); ctx.stroke();
+        ctx.beginPath();
+        ctx.moveTo(cx, h - 10); ctx.lineTo(cx, 10); ctx.stroke();
+
+        ctx.fillStyle = "#94a3b8";
+        ctx.font = "12px Kanit, sans-serif";
+        ctx.fillText("Re", w - 30, cy - 8);
+        ctx.fillText("Im", cx + 8, 20);
+
+        function drawVector(len, angDeg, color, label) {
+            const rad = (angDeg * Math.PI) / 180;
+            const px = cx + len * scale * Math.cos(rad);
+            const py = cy - len * scale * Math.sin(rad);
+
+            // เวกเตอร์
+            ctx.strokeStyle = color;
+            ctx.lineWidth = 2.5;
+            ctx.beginPath();
+            ctx.moveTo(cx, cy);
+            ctx.lineTo(px, py);
+            ctx.stroke();
+
+            // จุด
+            ctx.fillStyle = color;
+            ctx.beginPath();
+            ctx.arc(px, py, 6, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Label
+            ctx.fillStyle = "#ffffff";
+            ctx.font = "bold 12px 'Fira Code', monospace";
+            ctx.fillText(label, px + 8, py - 6);
+        }
+
+        // วาด z1
+        drawVector(r1, th1, "#38bdf8", `z1 (${r1}, ${th1}°)`);
+
+        // วาด z2 (ถ้าไม่ใช่โหมดยกกำลัง)
+        if (currentMode !== 'pow') {
+            drawVector(r2, th2, "#f59e0b", `z2 (${r2}, ${th2}°)`);
+        }
+
+        // วาดเวกเตอร์ผลลัพธ์
+        const ansLabel = currentMode === 'pow' ? `z1^${powN} (${resR.toFixed(1)}, ${resTh}°)` : `z_ans (${resR.toFixed(1)}, ${resTh}°)`;
+        drawVector(resR, resTh, "#10b981", ansLabel);
+    }
+
+    function updateAll() {
+        r1 = parseInt(r1Range.value);
+        th1 = parseInt(th1Range.value);
+
+        if (currentMode === 'pow') {
+            powN = parseInt(r2Range.value);
+            r2Val.textContent = powN;
+        } else {
+            r2 = parseInt(r2Range.value);
+            th2 = parseInt(th2Range.value);
+            r2Val.textContent = r2;
+            th2Val.textContent = `${th2}°`;
+        }
+
+        r1Val.textContent = r1;
+        th1Val.textContent = `${th1}°`;
+
+        let resR = 1, resTh = 0;
+        let breakdownStr = "";
+        let polarStr = "";
+
+        if (currentMode === 'mul') {
+            resR = r1 * r2;
+            resTh = (th1 + th2) % 360;
+            breakdownStr = `ขนาด: R = ${r1} × ${r2} = ${resR}  |  มุม: Φ = ${th1}° + ${th2}° = ${th1 + th2}° ${th1 + th2 >= 360 ? '≡ ' + resTh + '°' : ''}`;
+            polarStr = `z_ans = ${resR}(cos ${resTh}° + i sin ${resTh}°)`;
+        } else if (currentMode === 'div') {
+            resR = r1 / r2;
+            resTh = ((th1 - th2) % 360 + 360) % 360;
+            breakdownStr = `ขนาด: R = ${r1} / ${r2} = ${resR.toFixed(2)}  |  มุม: Φ = ${th1}° - ${th2}° = ${th1 - th2}° ${th1 - th2 < 0 ? '≡ ' + resTh + '°' : ''}`;
+            polarStr = `z_ans = ${resR.toFixed(2)}(cos ${resTh}° + i sin ${resTh}°)`;
+        } else if (currentMode === 'pow') {
+            resR = Math.pow(r1, powN);
+            const totalTh = powN * th1;
+            resTh = totalTh % 360;
+            breakdownStr = `ขนาด: R = ${r1}^${powN} = ${resR}  |  มุม: Φ = ${powN} × ${th1}° = ${totalTh}° ${totalTh >= 360 ? '≡ ' + resTh + '°' : ''}`;
+            polarStr = `z_ans = ${resR}(cos ${resTh}° + i sin ${resTh}°)`;
+        }
+
+        const rad = (resTh * Math.PI) / 180;
+        const a = resR * Math.cos(rad);
+        const b = resR * Math.sin(rad);
+        const bSign = b >= 0 ? "+" : "-";
+
+        breakdownText.textContent = breakdownStr;
+        polarResultText.textContent = polarStr;
+        rectResultText.textContent = `z_ans = ${a.toFixed(2)} ${bSign} ${Math.abs(b).toFixed(2)}i`;
+
+        renderCanvas();
+    }
+
+    // Sliders Event Listeners
+    r1Range.addEventListener('input', updateAll);
+    th1Range.addEventListener('input', updateAll);
+    r2Range.addEventListener('input', updateAll);
+    th2Range.addEventListener('input', updateAll);
+
+    // --- Print & Worksheet Logic ---
+    let answersShown = false;
+    function toggleAnswers() {
+        answersShown = !answersShown;
+        document.querySelectorAll('.ans-block').forEach(el => {
+            if (answersShown) el.classList.remove('hide');
+            else el.classList.add('hide');
+        });
+    }
+
+    function printSheet(isTeacherKey) {
+        document.querySelectorAll('.ans-block').forEach(el => {
+            if (isTeacherKey) el.classList.remove('hide');
+            else el.classList.add('hide');
+        });
+        setTimeout(() => {
+            window.print();
+        }, 120);
+    }
+
+    // Init on load
+    window.addEventListener('DOMContentLoaded', () => {
+        updateAll();
+    });
+</script>
+
+</body>
+</html>

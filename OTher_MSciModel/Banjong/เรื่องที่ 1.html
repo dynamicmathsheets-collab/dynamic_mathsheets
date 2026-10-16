@@ -1,0 +1,817 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>จำนวนเชิงซ้อน ม.5: การสร้างจำนวนเชิงซ้อนและสมบัติพื้นฐาน</title>
+  
+  <!-- Google Fonts: Sarabun & Prompt -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@400;500;600;700&family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- MathJax v3 for High Quality LaTeX -->
+  <script>
+    window.MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']],
+        displayMath: [['$$', '$$'], ['\\[', '\\]']],
+        processEscapes: true
+      },
+      options: {
+        skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre']
+      }
+    };
+  </script>
+  <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+  <style>
+    body {
+      font-family: 'Sarabun', sans-serif;
+      background-color: #f1f5f9;
+      color: #1e293b;
+    }
+    h1, h2, h3, h4, .font-heading {
+      font-family: 'Prompt', sans-serif;
+    }
+    
+    /* Interactive Card Transitions */
+    .card-hover {
+      transition: all 0.25s ease-in-out;
+    }
+    .card-hover:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 12px 24px -10px rgba(0, 0, 0, 0.12);
+    }
+
+    /* Print Specific Styles */
+    @media print {
+      @page {
+        size: A4 portrait;
+        margin: 1.2cm 1.4cm 1.2cm 1.4cm;
+      }
+      body {
+        background-color: #ffffff !important;
+        color: #000000 !important;
+      }
+      /* Hide all UI elements except the worksheet */
+      .no-print, header, footer, #content-summary, #interactive-model, #rubric-section, .print-btn-bar {
+        display: none !important;
+      }
+      #worksheet-section {
+        display: block !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        border: none !important;
+        box-shadow: none !important;
+        background: transparent !important;
+      }
+      .worksheet-box {
+        border-color: #475569 !important;
+      }
+      /* Prevent unnecessary page breaks */
+      .worksheet-page {
+        page-break-after: avoid !important;
+        page-break-inside: avoid !important;
+      }
+      .ws-item {
+        page-break-inside: avoid !important;
+      }
+    }
+  </style>
+</head>
+<body class="py-8 px-4 sm:px-6">
+
+  <!-- Main Container 1200px -->
+  <div class="max-w-[1200px] mx-auto space-y-10">
+
+    <!-- ==================== ส่วนที่ 1: HERO BANNER (Indigo/Violet Gradient) ==================== -->
+    <section class="rounded-3xl p-8 sm:p-12 text-white shadow-xl relative overflow-hidden bg-gradient-to-br from-indigo-700 via-indigo-800 to-purple-900">
+      <div class="absolute -right-12 -bottom-16 w-80 h-80 bg-white/10 rounded-full blur-3xl pointer-events-none"></div>
+      <div class="absolute -left-10 -top-10 w-64 h-64 bg-pink-500/15 rounded-full blur-2xl pointer-events-none"></div>
+      
+      <div class="relative z-10 flex flex-col md:flex-row items-center justify-between gap-6">
+        <div class="space-y-3 text-center md:text-left">
+          <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/15 backdrop-blur-md text-xs sm:text-sm font-medium tracking-wide">
+            <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+            คณิตศาสตร์เพิ่มเติม ชั้นมัธยมศึกษาปีที่ 5
+          </div>
+          <h1 class="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight leading-snug">
+            การสร้างจำนวนเชิงซ้อนและสมบัติพื้นฐาน
+          </h1>
+          <p class="text-indigo-100 text-base sm:text-lg max-w-2xl font-light">
+            ขยายขอบเขตจากระบบจำนวนจริงสู่ระบบจำนวนเชิงซ้อน ทำความเข้าใจหน่วยจินตภาพ $i$ การเท่ากัน และการดำเนินการพีชคณิตอย่างเป็นระบบ
+          </p>
+        </div>
+        <div class="hidden md:flex flex-col items-center justify-center p-6 bg-white/10 backdrop-blur-md rounded-2xl border border-white/20 min-w-[210px] text-center shadow-inner">
+          <span class="text-xs uppercase tracking-wider text-indigo-200 font-semibold">นิยามแก่นสำคัญ</span>
+          <span class="text-3xl font-extrabold mt-1 text-amber-300 font-serif">$i^2 = -1$</span>
+          <span class="text-xs text-indigo-100 mt-2 font-mono">$\mathbb{C} = \{a+bi \mid a,b \in \mathbb{R}\}$</span>
+        </div>
+      </div>
+    </section>
+
+
+    <!-- ==================== ส่วนที่ 2: สรุปเนื้อหาบทเรียน (Emerald & Teal Tone) ==================== -->
+    <section id="content-summary" class="bg-gradient-to-br from-slate-900 to-teal-950 rounded-3xl p-8 sm:p-10 shadow-lg text-slate-100 border border-teal-800/40">
+      <div class="flex items-center gap-3 pb-6 border-b border-teal-800/60 mb-8">
+        <div class="w-12 h-12 rounded-2xl bg-teal-500/20 text-teal-300 flex items-center justify-center text-2xl">
+          <i class="fa-solid fa-book-bookmark"></i>
+        </div>
+        <div>
+          <h2 class="text-2xl sm:text-3xl font-bold text-white tracking-wide">สรุปองค์ความรู้และมโนทัศน์สำคัญ</h2>
+          <p class="text-sm text-teal-300">สาระการเรียนรู้แกนกลางตามหลักสูตรคณิตศาสตร์ ม.ปลาย</p>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        
+        <!-- บัตร 1: การแทนจำนวนเชิงซ้อน -->
+        <div class="bg-slate-800/80 rounded-2xl p-6 border border-teal-700/50 card-hover flex flex-col justify-between">
+          <div>
+            <div class="flex items-center justify-between mb-3">
+              <span class="text-xs font-semibold px-2.5 py-1 rounded bg-teal-500/20 text-teal-300">มโนทัศน์ที่ 1</span>
+              <i class="fa-solid fa-shapes text-teal-400"></i>
+            </div>
+            <h3 class="text-lg font-bold text-white mb-2">จำนวนเชิงซ้อนในรูปคู่อันดับ & $a+bi$</h3>
+            <p class="text-sm text-slate-300 mb-3">
+              กำหนดจำนวนเชิงซ้อน $z$ สามารถเขียนได้ 2 รูปแบบที่สมมูลกัน:
+            </p>
+            <div class="bg-slate-900/90 rounded-xl p-3 border border-slate-700 space-y-2 text-center">
+              <div class="text-teal-300 font-semibold">รูปคู่อันดับ: $(a, b)$</div>
+              <div class="text-amber-300 font-semibold">รูปมาตรฐาน: $a + bi$</div>
+            </div>
+          </div>
+          <p class="text-xs text-slate-400 mt-4 italic">โดยที่ $a, b \in \mathbb{R}$ และ $i$ เป็นหน่วยจินตภาพ</p>
+        </div>
+
+        <!-- บัตร 2: หน่วยจินตภาพ i -->
+        <div class="bg-slate-800/80 rounded-2xl p-6 border border-teal-700/50 card-hover flex flex-col justify-between">
+          <div>
+            <div class="flex items-center justify-between mb-3">
+              <span class="text-xs font-semibold px-2.5 py-1 rounded bg-emerald-500/20 text-emerald-300">มโนทัศน์ที่ 2</span>
+              <i class="fa-solid fa-atom text-emerald-400"></i>
+            </div>
+            <h3 class="text-lg font-bold text-white mb-2">หน่วยจินตภาพ (Imaginary Unit)</h3>
+            <p class="text-sm text-slate-300 mb-3">
+              จำนวนที่ไม่สามารถหาค่าได้ในระบบจำนวนจริง ถูกกำหนดขึ้นเพื่อแก้สมการ $x^2 + 1 = 0$
+            </p>
+            <div class="bg-slate-900/90 rounded-xl p-3 border border-slate-700 text-center space-y-1">
+              <div class="text-emerald-300 font-bold text-lg">$i = \sqrt{-1} \iff (0, 1)$</div>
+              <div class="text-rose-400 font-bold text-base bg-rose-950/40 py-1 rounded border border-rose-800/40">
+                $i^2 = -1$
+              </div>
+            </div>
+          </div>
+          <p class="text-xs text-slate-400 mt-4">สมบัตินี้เป็นหัวใจหลักในการคูณจำนวนเชิงซ้อน</p>
+        </div>
+
+        <!-- บัตร 3: ส่วนจริงและส่วนจินตภาพ -->
+        <div class="bg-slate-800/80 rounded-2xl p-6 border border-teal-700/50 card-hover flex flex-col justify-between">
+          <div>
+            <div class="flex items-center justify-between mb-3">
+              <span class="text-xs font-semibold px-2.5 py-1 rounded bg-teal-500/20 text-teal-300">มโนทัศน์ที่ 3</span>
+              <i class="fa-solid fa-split text-teal-400"></i>
+            </div>
+            <h3 class="text-lg font-bold text-white mb-2">ส่วนจริง และ ส่วนจินตภาพ</h3>
+            <p class="text-sm text-slate-300 mb-3">
+              สำหรับจำนวนเชิงซ้อน $z = a + bi = (a, b)$
+            </p>
+            <div class="bg-slate-900/90 rounded-xl p-3 border border-slate-700 space-y-2 text-sm">
+              <div class="flex justify-between items-center text-sky-300 border-b border-slate-800 pb-1.5">
+                <span>ส่วนจริง (Real part):</span>
+                <span class="font-bold">$\text{Re}(z) = a$</span>
+              </div>
+              <div class="flex justify-between items-center text-amber-300">
+                <span>ส่วนจินตภาพ (Imaginary part):</span>
+                <span class="font-bold">$\text{Im}(z) = b$</span>
+              </div>
+            </div>
+          </div>
+          <p class="text-xs text-slate-400 mt-4 font-mono text-center">**ข้อควรระวัง: $\text{Im}(z)$ มีค่าเป็น $b$ (ไม่รวม $i$)</p>
+        </div>
+
+        <!-- บัตร 4: ความเท่ากัน -->
+        <div class="bg-slate-800/80 rounded-2xl p-6 border border-teal-700/50 card-hover flex flex-col justify-between">
+          <div>
+            <div class="flex items-center justify-between mb-3">
+              <span class="text-xs font-semibold px-2.5 py-1 rounded bg-cyan-500/20 text-cyan-300">มโนทัศน์ที่ 4</span>
+              <i class="fa-solid fa-equals text-cyan-400"></i>
+            </div>
+            <h3 class="text-lg font-bold text-white mb-2">การเท่ากันของจำนวนเชิงซ้อน</h3>
+            <p class="text-sm text-slate-300 mb-2">
+              จำนวนเชิงซ้อนสองจำนวนจะเท่ากัน ก็ต่อเมื่อส่วนจริงเท่ากัน และส่วนจินตภาพเท่ากันพร้อมกัน
+            </p>
+            <div class="bg-slate-900/90 rounded-xl p-3 border border-slate-700 text-center space-y-1">
+              <div class="text-cyan-300 font-semibold text-sm">$(a, b) = (c, d) \iff a = c \text{ และ } b = d$</div>
+              <div class="text-teal-200 font-semibold text-sm">$a+bi = c+di \iff a = c \land b = d$</div>
+            </div>
+          </div>
+          <p class="text-xs text-slate-400 mt-4">นำไปใช้ในการแก้สมการเทียบสัมประสิทธิ์</p>
+        </div>
+
+        <!-- บัตร 5: ความสัมพันธ์ R กับ C -->
+        <div class="bg-slate-800/80 rounded-2xl p-6 border border-teal-700/50 card-hover flex flex-col justify-between">
+          <div>
+            <div class="flex items-center justify-between mb-3">
+              <span class="text-xs font-semibold px-2.5 py-1 rounded bg-teal-500/20 text-teal-300">มโนทัศน์ที่ 5</span>
+              <i class="fa-solid fa-diagram-project text-teal-400"></i>
+            </div>
+            <h3 class="text-lg font-bold text-white mb-2">ความสัมพันธ์ระหว่าง $\mathbb{R}$ กับ $\mathbb{C}$</h3>
+            <p class="text-sm text-slate-300 mb-2">
+              เมื่อกำหนด $b = 0$ จะได้ $a + 0i = a \in \mathbb{R}$ นั่นคือจำนวนจริงทุกจำนวนเป็นจำนวนเชิงซ้อน
+            </p>
+            <div class="bg-slate-900/90 rounded-xl p-3 border border-slate-700 text-center font-bold text-emerald-400 text-base">
+              $\mathbb{R} \subset \mathbb{C}$
+            </div>
+          </div>
+          <p class="text-xs text-slate-400 mt-4">ถ้า $a=0, b \neq 0$ เรียกว่า <em>จำนวนจินตภาพแท้ (Pure Imaginary)</em></p>
+        </div>
+
+        <!-- บัตร 6: กำลังของ i -->
+        <div class="bg-slate-800/80 rounded-2xl p-6 border border-teal-700/50 card-hover flex flex-col justify-between">
+          <div>
+            <div class="flex items-center justify-between mb-3">
+              <span class="text-xs font-semibold px-2.5 py-1 rounded bg-amber-500/20 text-amber-300">มโนทัศน์ที่ 6</span>
+              <i class="fa-solid fa-arrows-spin text-amber-400"></i>
+            </div>
+            <h3 class="text-lg font-bold text-white mb-2">กำลังของหน่วยจินตภาพ ($i^n$)</h3>
+            <p class="text-sm text-slate-300 mb-2">
+              ค่าของ $i^n$ มีการวนซ้ำตามวัฏจักร 4 ค่า โดยนำเลขชี้กำลัง $n$ หารด้วย 4:
+            </p>
+            <div class="grid grid-cols-2 gap-2 text-xs font-mono">
+              <div class="bg-slate-900 p-2 rounded text-center border border-slate-700">เศษ 1 $\rightarrow i$</div>
+              <div class="bg-slate-900 p-2 rounded text-center border border-slate-700">เศษ 2 $\rightarrow -1$</div>
+              <div class="bg-slate-900 p-2 rounded text-center border border-slate-700">เศษ 3 $\rightarrow -i$</div>
+              <div class="bg-slate-900 p-2 rounded text-center border border-slate-700">เศษ 0 (ลงตัว) $\rightarrow 1$</div>
+            </div>
+          </div>
+          <p class="text-xs text-amber-300/80 mt-4">ตัวอย่าง: $i^{102} = i^2 = -1$ (เพราะ $102 \div 4$ เหลือเศษ 2)</p>
+        </div>
+
+      </div>
+
+      <!-- แผงสูตรการดำเนินการพีชคณิต -->
+      <div class="mt-8 bg-slate-900/90 rounded-2xl p-6 border border-teal-600/60">
+        <h4 class="text-lg font-bold text-white mb-4 flex items-center gap-2">
+          <i class="fa-solid fa-calculator text-teal-400"></i>
+          สูตรการบวกและการคูณจำนวนเชิงซ้อน
+        </h4>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 text-sm">
+          <div class="bg-slate-800/90 p-4 rounded-xl border border-slate-700">
+            <div class="font-semibold text-sky-400 mb-2 flex items-center gap-2">
+              <i class="fa-solid fa-plus-circle"></i> การบวก (Addition)
+            </div>
+            <p class="text-slate-300 mb-2">ในรูปคู่อันดับ: $(a, b) + (c, d) = (a + c, b + d)$</p>
+            <p class="text-amber-200">ในรูป $a+bi$: $(a + bi) + (c + di) = (a + c) + (b + d)i$</p>
+          </div>
+          <div class="bg-slate-800/90 p-4 rounded-xl border border-slate-700">
+            <div class="font-semibold text-emerald-400 mb-2 flex items-center gap-2">
+              <i class="fa-solid fa-times-circle"></i> การคูณ (Multiplication)
+            </div>
+            <p class="text-slate-300 mb-2">ในรูปคู่อันดับ: $(a, b) \cdot (c, d) = (ac - bd, ad + bc)$</p>
+            <p class="text-amber-200">ในรูป $a+bi$: $(a + bi)(c + di) = (ac - bd) + (ad + bc)i$</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+
+    <!-- ==================== ส่วนที่ 3: โมเดลการศึกษา INTERACTIVE (Blue & Sky Tone) ==================== -->
+    <section id="interactive-model" class="bg-gradient-to-br from-blue-900 via-indigo-950 to-slate-900 rounded-3xl p-8 sm:p-10 shadow-lg text-white border border-blue-700/50">
+      <div class="flex items-center gap-3 pb-6 border-b border-blue-800/60 mb-8">
+        <div class="w-12 h-12 rounded-2xl bg-blue-500/20 text-blue-300 flex items-center justify-center text-2xl">
+          <i class="fa-solid fa-flask-vial"></i>
+        </div>
+        <div>
+          <h2 class="text-2xl sm:text-3xl font-bold text-white tracking-wide">โมเดลการศึกษาและจำลองการคำนวณ</h2>
+          <p class="text-sm text-blue-300">ทดลองป้อนค่าจำนวนจริง $a, b, c, d$ เพื่อสำรวจผลลัพธ์แบบขั้นตอนต่อขั้นตอน</p>
+        </div>
+      </div>
+
+      <!-- Input Fields -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+        
+        <!-- ตัวแปร z1 -->
+        <div class="bg-slate-800/90 p-6 rounded-2xl border border-blue-500/40 space-y-4">
+          <div class="flex items-center justify-between">
+            <span class="font-bold text-lg text-sky-400">จำนวนเชิงซ้อนที่ 1: $z_1 = a + bi$</span>
+            <span id="label-z1-preview" class="text-sm px-3 py-1 bg-sky-950/80 border border-sky-600 rounded-lg text-sky-200 font-mono">
+              $(3, 4) \iff 3 + 4i$
+            </span>
+          </div>
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <label class="block text-xs text-slate-300 mb-1 font-semibold">ส่วนจริง $a$ :</label>
+              <input type="number" id="input-a" value="3" step="any"
+                class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-2.5 text-white focus:outline-none focus:border-sky-400 transition"
+                oninput="updateSimulation()">
+            </div>
+            <div>
+              <label class="block text-xs text-slate-300 mb-1 font-semibold">ส่วนจินตภาพ $b$ :</label>
+              <input type="number" id="input-b" value="4" step="any"
+                class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-2.5 text-white focus:outline-none focus:border-sky-400 transition"
+                oninput="updateSimulation()">
+            </div>
+          </div>
+        </div>
+
+        <!-- ตัวแปร z2 -->
+        <div class="bg-slate-800/90 p-6 rounded-2xl border border-indigo-500/40 space-y-4">
+          <div class="flex items-center justify-between">
+            <span class="font-bold text-lg text-indigo-300">จำนวนเชิงซ้อนที่ 2: $z_2 = c + di$</span>
+            <span id="label-z2-preview" class="text-sm px-3 py-1 bg-indigo-950/80 border border-indigo-600 rounded-lg text-indigo-200 font-mono">
+              $(1, -2) \iff 1 - 2i$
+            </span>
+          </div>
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <label class="block text-xs text-slate-300 mb-1 font-semibold">ส่วนจริง $c$ :</label>
+              <input type="number" id="input-c" value="1" step="any"
+                class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-2.5 text-white focus:outline-none focus:border-indigo-400 transition"
+                oninput="updateSimulation()">
+            </div>
+            <div>
+              <label class="block text-xs text-slate-300 mb-1 font-semibold">ส่วนจินตภาพ $d$ :</label>
+              <input type="number" id="input-d" value="-2" step="any"
+                class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-2.5 text-white focus:outline-none focus:border-indigo-400 transition"
+                oninput="updateSimulation()">
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Action Presets -->
+      <div class="flex flex-wrap items-center gap-3 mb-8">
+        <span class="text-xs text-slate-400 font-semibold uppercase tracking-wider">ชุดข้อมูลตัวอย่าง:</span>
+        <button onclick="setPresets(3, 4, 1, -2)" class="px-3 py-1.5 rounded-lg bg-slate-800 text-xs hover:bg-slate-700 text-sky-300 border border-slate-700 transition">
+          ตัวอย่างทั่วไป: $(3,4)$ และ $(1,-2)$
+        </button>
+        <button onclick="setPresets(5, 0, 5, 0)" class="px-3 py-1.5 rounded-lg bg-slate-800 text-xs hover:bg-slate-700 text-emerald-300 border border-slate-700 transition">
+          จำนวนจริงแท้ (เท่ากัน): $(5,0)$ และ $(5,0)$
+        </button>
+        <button onclick="setPresets(0, 3, 0, -3)" class="px-3 py-1.5 rounded-lg bg-slate-800 text-xs hover:bg-slate-700 text-amber-300 border border-slate-700 transition">
+          จินตภาพแท้: $(0,3)$ และ $(0,-3)$
+        </button>
+      </div>
+
+      <!-- Calculation Results Container -->
+      <div class="space-y-6">
+        
+        <!-- 1. การตรวจสอบความเท่ากัน -->
+        <div class="bg-slate-800/90 rounded-2xl p-6 border border-slate-700">
+          <h3 class="text-base font-bold text-white mb-3 flex items-center gap-2">
+            <span class="w-6 h-6 rounded-full bg-sky-500/20 text-sky-400 flex items-center justify-center text-xs">1</span>
+            การตรวจสอบความเท่ากัน ($z_1 = z_2$)
+          </h3>
+          <div id="equality-result-box" class="p-4 rounded-xl text-sm leading-relaxed">
+            <!-- Dynamic Content -->
+          </div>
+        </div>
+
+        <!-- 2. การบวก -->
+        <div class="bg-slate-800/90 rounded-2xl p-6 border border-slate-700">
+          <h3 class="text-base font-bold text-white mb-3 flex items-center gap-2">
+            <span class="w-6 h-6 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center text-xs">2</span>
+            การบวกจำนวนเชิงซ้อน ($z_1 + z_2$)
+          </h3>
+          <div id="addition-result-box" class="p-4 rounded-xl text-sm leading-relaxed bg-slate-900/80 border border-slate-700/80 space-y-3">
+            <!-- Dynamic Content -->
+          </div>
+        </div>
+
+        <!-- 3. การคูณ -->
+        <div class="bg-slate-800/90 rounded-2xl p-6 border border-slate-700">
+          <h3 class="text-base font-bold text-white mb-3 flex items-center gap-2">
+            <span class="w-6 h-6 rounded-full bg-amber-500/20 text-amber-400 flex items-center justify-center text-xs">3</span>
+            การคูณจำนวนเชิงซ้อน ($z_1 \cdot z_2$)
+          </h3>
+          <div id="multiplication-result-box" class="p-4 rounded-xl text-sm leading-relaxed bg-slate-900/80 border border-slate-700/80 space-y-3">
+            <!-- Dynamic Content -->
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Discovery Box (สิ่งที่นักเรียนควรค้นพบ) -->
+      <div class="mt-8 bg-gradient-to-r from-amber-500/15 via-orange-500/15 to-yellow-500/15 border-2 border-amber-500/40 rounded-2xl p-6">
+        <div class="flex items-start gap-4">
+          <div class="w-12 h-12 rounded-xl bg-amber-400/20 text-amber-300 flex-shrink-0 flex items-center justify-center text-2xl">
+            <i class="fa-solid fa-lightbulb"></i>
+          </div>
+          <div>
+            <h4 class="text-lg font-bold text-amber-200">สิ่งที่นักเรียนควรค้นพบจากการสังเกต (Mathematical Insight):</h4>
+            <p class="text-slate-200 mt-1 leading-relaxed text-base">
+              <strong>“จำนวนจริงเป็นส่วนหนึ่งของจำนวนเชิงซ้อน $(\mathbb{R} \subset \mathbb{C})$</strong> เมื่อส่วนจินตภาพเป็นศูนย์ $(a, 0) = a$ และจำนวนเชิงซ้อนสามารถดำเนินการทางพีชคณิต (บวกและคูณ) ได้ตามกฎที่กำหนด โดยมีสมบัติปิด การสลับที่ การเปลี่ยนหมู่ และเอกลักษณ์ สอดคล้องกับระบบจำนวนที่สมบูรณ์”
+            </p>
+          </div>
+        </div>
+      </div>
+
+    </section>
+
+
+    <!-- ==================== ส่วนที่ 4: ใบงานและการพิมพ์ A4 (Amber/Slate & Printable) ==================== -->
+    <section class="bg-white rounded-3xl p-8 sm:p-10 shadow-xl border border-slate-200">
+      
+      <!-- Print Control Action Bar -->
+      <div class="print-btn-bar flex flex-col sm:flex-row items-center justify-between gap-4 pb-6 border-b border-slate-200 mb-6">
+        <div>
+          <h2 class="text-2xl sm:text-3xl font-bold text-slate-800 flex items-center gap-2">
+            <i class="fa-solid fa-file-pen text-amber-600"></i>
+            ใบงานฝึกทักษะ เรื่อง จำนวนเชิงซ้อน (5 ข้อ)
+          </h2>
+          <p class="text-sm text-slate-500">พิมพ์เอกสารขนาด A4 หน้าเดียวพอดี เพื่อแจกนักเรียนหรือตรวจสอบเฉลย</p>
+        </div>
+        <div class="flex items-center gap-3 w-full sm:w-auto">
+          <button onclick="printWorksheet(false)"
+            class="flex-1 sm:flex-none inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-600 text-white font-medium shadow-md shadow-amber-200 transition">
+            <i class="fa-solid fa-print"></i> พิมพ์ใบงานสำหรับนักเรียน
+          </button>
+          <button onclick="printWorksheet(true)"
+            class="flex-1 sm:flex-none inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-900 text-white font-medium shadow-md shadow-slate-300 transition">
+            <i class="fa-solid fa-key"></i> พิมพ์เฉลยสำหรับครู
+          </button>
+        </div>
+      </div>
+
+      <!-- Printable Area Wrapper -->
+      <div id="worksheet-section" class="worksheet-page text-slate-900 bg-white">
+        
+        <!-- Header ของกระดาษใบงาน -->
+        <div class="border-b-2 border-slate-800 pb-3 mb-4">
+          <div class="flex justify-between items-start">
+            <div>
+              <h3 class="text-xl font-bold font-heading text-slate-900">ใบงานคณิตศาสตร์: การสร้างจำนวนเชิงซ้อนและสมบัติพื้นฐาน</h3>
+              <p class="text-xs text-slate-600">วิชาคณิตศาสตร์เพิ่มเติม ระดับชั้นมัธยมศึกษาปีที่ 5 | คะแนนเต็ม 15 คะแนน</p>
+            </div>
+            <div id="teacher-badge" class="hidden text-xs font-bold px-3 py-1 bg-red-100 text-red-700 border border-red-300 rounded-md">
+              [ สำหรับครูผู้สอน: เฉลยและแนวคิด ]
+            </div>
+          </div>
+          
+          <div class="grid grid-cols-12 gap-2 mt-3 pt-2 border-t border-slate-200 text-xs">
+            <div class="col-span-6">ชื่อ-นามสกุล: ..........................................................................................</div>
+            <div class="col-span-3">ชั้น ม.5/........</div>
+            <div class="col-span-3">เลขที่: ............</div>
+          </div>
+        </div>
+
+        <!-- รายการข้อสอบ 5 ข้อ จัดเรียงกะทัดรัด ไม่ล้น A4 -->
+        <div class="space-y-3.5 text-xs sm:text-sm">
+          
+          <!-- ข้อ 1 -->
+          <div class="ws-item border border-slate-300 rounded-lg p-2.5 bg-slate-50/50">
+            <div class="font-bold text-slate-800 mb-1">
+              ข้อ 1. จงระบุส่วนจริง $\text{Re}(z)$ และส่วนจินตภาพ $\text{Im}(z)$ ของจำนวนต่อไปนี้ (2 คะแนน)
+            </div>
+            <div class="grid grid-cols-2 gap-4 my-1 pl-2">
+              <div>1.1) $z_1 = 5 - 7i$</div>
+              <div>1.2) $z_2 = (0, -9)$</div>
+            </div>
+            <!-- ส่วนเขียนตอบของนักเรียน -->
+            <div class="student-space h-10 border border-dashed border-slate-300 rounded bg-white p-1 text-slate-400 italic text-[11px] flex items-center pl-3">
+              พื้นที่ตอบ: 1.1) $\text{Re}(z_1) = \dots\dots,\; \text{Im}(z_1) = \dots\dots$ &nbsp;&nbsp;&nbsp;&nbsp; 1.2) $\text{Re}(z_2) = \dots\dots,\; \text{Im}(z_2) = \dots\dots$
+            </div>
+            <!-- เฉลยครู -->
+            <div class="teacher-solution hidden bg-amber-50 border border-amber-300 rounded p-1.5 text-xs text-amber-900 mt-1">
+              <strong>เฉลย:</strong> 1.1) $\text{Re}(z_1) = 5$, $\text{Im}(z_1) = -7$ &nbsp;|&nbsp; 1.2) $\text{Re}(z_2) = 0$, $\text{Im}(z_2) = -9$
+            </div>
+          </div>
+
+          <!-- ข้อ 2 -->
+          <div class="ws-item border border-slate-300 rounded-lg p-2.5 bg-slate-50/50">
+            <div class="font-bold text-slate-800 mb-1">
+              ข้อ 2. กำหนดให้ $(2x + 1, 3y - 4) = (7, 5)$ จงหาค่าของจำนวนจริง $x$ และ $y$ (3 คะแนน)
+            </div>
+            <div class="student-space h-14 border border-dashed border-slate-300 rounded bg-white p-1.5 text-slate-400 italic text-[11px]">
+              แสดงวิธีทำ: เทียบส่วนจริง: .............................................................. เทียบส่วนจินตภาพ: ..............................................................
+            </div>
+            <div class="teacher-solution hidden bg-amber-50 border border-amber-300 rounded p-1.5 text-xs text-amber-900 mt-1">
+              <strong>เฉลย:</strong> จากสมบัติความเท่ากัน:<br>
+              ส่วนจริง: $2x + 1 = 7 \implies 2x = 6 \implies x = 3$<br>
+              ส่วนจินตภาพ: $3y - 4 = 5 \implies 3y = 9 \implies y = 3$ &nbsp;<strong>ตอบ $x = 3, y = 3$</strong>
+            </div>
+          </div>
+
+          <!-- ข้อ 3 -->
+          <div class="ws-item border border-slate-300 rounded-lg p-2.5 bg-slate-50/50">
+            <div class="font-bold text-slate-800 mb-1">
+              ข้อ 3. จงหาผลบวกและผลคูณของจำนวนเชิงซ้อน $z_1 = 3 + 2i$ และ $z_2 = 1 - 4i$ (3 คะแนน)
+            </div>
+            <div class="student-space h-16 border border-dashed border-slate-300 rounded bg-white p-1.5 text-slate-400 italic text-[11px]">
+              แสดงวิธีทำ:<br>
+              $z_1 + z_2 = $ .........................................................................................................................................<br>
+              $z_1 \cdot z_2 = $ .........................................................................................................................................
+            </div>
+            <div class="teacher-solution hidden bg-amber-50 border border-amber-300 rounded p-1.5 text-xs text-amber-900 mt-1">
+              <strong>เฉลย:</strong><br>
+              $z_1 + z_2 = (3+1) + (2 + (-4))i = 4 - 2i$<br>
+              $z_1 \cdot z_2 = (3 \cdot 1 - 2(-4)) + (3(-4) + 2(1))i = (3 + 8) + (-12 + 2)i = 11 - 10i$
+            </div>
+          </div>
+
+          <!-- ข้อ 4 -->
+          <div class="ws-item border border-slate-300 rounded-lg p-2.5 bg-slate-50/50">
+            <div class="font-bold text-slate-800 mb-1">
+              ข้อ 4. การดำเนินการในรูปคู่อันดับ จงหาผลลัพธ์ของ $(2, -3) \cdot (-1, 5)$ (3 คะแนน)
+            </div>
+            <div class="student-space h-14 border border-dashed border-slate-300 rounded bg-white p-1.5 text-slate-400 italic text-[11px]">
+              แสดงวิธีทำตามนิยาม $(ac - bd, ad + bc)$:<br>
+              ...........................................................................................................................................................
+            </div>
+            <div class="teacher-solution hidden bg-amber-50 border border-amber-300 rounded p-1.5 text-xs text-amber-900 mt-1">
+              <strong>เฉลย:</strong> ให้ $(a, b) = (2, -3)$ และ $(c, d) = (-1, 5)$<br>
+              $(ac - bd, ad + bc) = (2(-1) - (-3)(5), \; 2(5) + (-3)(-1)) = (-2 - (-15), \; 10 + 3) = (13, 13)$
+            </div>
+          </div>
+
+          <!-- ข้อ 5 -->
+          <div class="ws-item border border-slate-300 rounded-lg p-2.5 bg-slate-50/50">
+            <div class="font-bold text-slate-800 mb-1">
+              ข้อ 5. จงหาค่าของ $i^{25} + i^{50} + i^{75} + i^{100}$ โดยใช้สมบัติกำลังของ $i$ (4 คะแนน)
+            </div>
+            <div class="student-space h-14 border border-dashed border-slate-300 rounded bg-white p-1.5 text-slate-400 italic text-[11px]">
+              แสดงวิธีทำ: นำเลขชี้กำลังหารด้วย 4 เพื่อหาเศษ:<br>
+              ...........................................................................................................................................................
+            </div>
+            <div class="teacher-solution hidden bg-amber-50 border border-amber-300 rounded p-1.5 text-xs text-amber-900 mt-1">
+              <strong>เฉลย:</strong><br>
+              $25 \div 4$ เหลือเศษ 1 $\implies i^{25} = i^1 = i$<br>
+              $50 \div 4$ เหลือเศษ 2 $\implies i^{50} = i^2 = -1$<br>
+              $75 \div 4$ เหลือเศษ 3 $\implies i^{75} = i^3 = -i$<br>
+              $100 \div 4$ เหลือเศษ 0 $\implies i^{100} = 1$<br>
+              $\therefore i^{25} + i^{50} + i^{75} + i^{100} = i + (-1) + (-i) + 1 = 0$
+            </div>
+          </div>
+
+        </div>
+
+        <div class="mt-4 pt-2 border-t border-slate-300 flex justify-between items-center text-[11px] text-slate-500">
+          <span>เกณฑ์ผ่าน: ได้คะแนนรวมตั้งแต่ 9 คะแนนขึ้นไป (60%)</span>
+          <span>ลงชื่อผู้ตรวจ ..................................................... วันที่ ......../......../........</span>
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- ==================== ส่วนที่ 5: เกณฑ์การประเมินรูบริก (Purple & Rose Tone) ==================== -->
+    <section id="rubric-section" class="bg-gradient-to-br from-purple-950 via-slate-900 to-rose-950 rounded-3xl p-8 sm:p-10 shadow-lg text-white border border-purple-700/40">
+      <div class="flex items-center gap-3 pb-6 border-b border-purple-800/60 mb-8">
+        <div class="w-12 h-12 rounded-2xl bg-purple-500/20 text-purple-300 flex items-center justify-center text-2xl">
+          <i class="fa-solid fa-list-check"></i>
+        </div>
+        <div>
+          <h2 class="text-2xl sm:text-3xl font-bold text-white tracking-wide">เกณฑ์การประเมินตามสภาพจริง (Rubric Assessment)</h2>
+          <p class="text-sm text-purple-200">เกณฑ์การให้คะแนนแบบแยกองค์ประกอบ 3 ระดับคุณภาพ สำหรับชุดกิจกรรมการเรียนรู้นี้</p>
+        </div>
+      </div>
+
+      <!-- Rubric Table -->
+      <div class="overflow-x-auto">
+        <table class="w-full text-left border-collapse rounded-xl overflow-hidden text-sm">
+          <thead>
+            <tr class="bg-purple-900/60 text-purple-200 border-b border-purple-700">
+              <th class="p-4 w-1/4 font-semibold">ประเด็นการประเมิน</th>
+              <th class="p-4 w-1/4 font-semibold text-emerald-300">ระดับ 3 (ดีเยี่ยม : 5 คะแนน)</th>
+              <th class="p-4 w-1/4 font-semibold text-amber-300">ระดับ 2 (พอใช้ : 3 คะแนน)</th>
+              <th class="p-4 w-1/4 font-semibold text-rose-300">ระดับ 1 (ปรับปรุง : 1 คะแนน)</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-purple-800/40 bg-slate-900/60">
+            <tr>
+              <td class="p-4 font-medium text-white">
+                <strong>1. ความเข้าใจมโนทัศน์</strong><br>
+                <span class="text-xs text-slate-300">ความหมาย, $a+bi$, $(a,b)$, $\text{Re}(z)$, $\text{Im}(z)$ และสมบัติ $i^2 = -1$</span>
+              </td>
+              <td class="p-4 text-slate-200">
+                จำแนกส่วนจริงและส่วนจินตภาพได้ถูกต้องแม่นยำทุกข้อ อธิบายความสัมพันธ์ของ $i^n$ และแปลงระหว่างคู่อันดับกับ $a+bi$ ได้อย่างสมบูรณ์
+              </td>
+              <td class="p-4 text-slate-300">
+                จำแนกส่วนจริงและส่วนจินตภาพได้ถูกต้องส่วนใหญ่ มีข้อผิดพลาดเล็กน้อยในการหาค่า $i^n$ หรือสับสนเครื่องหมายลบ
+              </td>
+              <td class="p-4 text-slate-400">
+                สับสนระหว่างส่วนจริงและส่วนจินตภาพ (เช่น เขียน $bi$ แทน $b$) ไม่สามารถคำนวณกำลังของ $i$ ได้อย่างถูกต้อง
+              </td>
+            </tr>
+            <tr>
+              <td class="p-4 font-medium text-white">
+                <strong>2. ทักษะการคำนวณพีชคณิต</strong><br>
+                <span class="text-xs text-slate-300">การบวก, การคูณ และการแก้สมการความเท่ากัน</span>
+              </td>
+              <td class="p-4 text-slate-200">
+                คำนวณการบวกและคูณตามสูตร $(ac-bd, ad+bc)$ ได้ถูกต้องทุกขั้นตอน คำนวณเศษส่วนและเครื่องหมายทางคณิตศาสตร์ได้อย่างแม่นยำ
+              </td>
+              <td class="p-4 text-slate-300">
+                เข้าใจขั้นตอนสูตรการบวกและคูณ แต่มีจุดผิดพลาดจากการคิดเลขหรือการกระจายพจน์ลบ เช่น ลืมเปลี่ยน $i^2$ เป็น $-1$ ใน 1-2 จุด
+              </td>
+              <td class="p-4 text-slate-400">
+                ไม่สามารถประยุกต์สูตรการคูณจำนวนเชิงซ้อนได้ นำจำนวนคูณกันแบบสมาชิกตรงกัน $(ac, bd)$ ซึ่งไม่เป็นไปตามนิยาม
+              </td>
+            </tr>
+            <tr>
+              <td class="p-4 font-medium text-white">
+                <strong>3. การสื่อสารและการให้เหตุผล</strong><br>
+                <span class="text-xs text-slate-300">การแสดงวิธีทำเป็นขั้นตอนและการสรุปข้อค้นพบ</span>
+              </td>
+              <td class="p-4 text-slate-200">
+                แสดงขั้นตอนวิธีทำเป็นระเบียบชัดเจน อ้างอิงสมบัติทางคณิตศาสตร์ถูกต้อง เขียนสัญลักษณ์ LaTeX / สัญลักษณ์ทางคณิตศาสตร์ครบถ้วน
+              </td>
+              <td class="p-4 text-slate-300">
+                แสดงวิธีทำข้ามขั้นตอนบางส่วน แต่ยังสามารถเข้าใจกระบวนการคิดและได้คำตอบปลายทางที่ถูกต้อง
+              </td>
+              <td class="p-4 text-slate-400">
+                เขียนเพียงคำตอบโดยไม่แสดงวิธีทำ หรือขั้นตอนไม่สมเหตุสมผล ไม่เป็นไปตามตรรกะทางคณิตศาสตร์
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- ระดับคุณภาพ -->
+      <div class="mt-6 grid grid-cols-1 sm:grid-cols-3 gap-4 text-center">
+        <div class="p-3 rounded-xl bg-emerald-950/40 border border-emerald-600/50">
+          <div class="text-emerald-400 font-bold text-base">คะแนน 13 - 15 : ระดับ ดีเยี่ยม</div>
+          <div class="text-xs text-slate-300">ผ่านเกณฑ์ในระดับยอดเยี่ยม</div>
+        </div>
+        <div class="p-3 rounded-xl bg-amber-950/40 border border-amber-600/50">
+          <div class="text-amber-400 font-bold text-base">คะแนน 9 - 12 : ระดับ พอใช้</div>
+          <div class="text-xs text-slate-300">ผ่านเกณฑ์ขั้นต่ำตามหลักสูตร</div>
+        </div>
+        <div class="p-3 rounded-xl bg-rose-950/40 border border-rose-600/50">
+          <div class="text-rose-400 font-bold text-base">คะแนน 0 - 8 : ระดับ ปรับปรุง</div>
+          <div class="text-xs text-slate-300">ควรได้รับการสอนเสริมหรือฝึกปฏิบัติเพิ่ม</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="text-center text-xs text-slate-500 py-4 no-print">
+      เอกสารและสื่อบทเรียนอิเล็กทรอนิกส์ วิชาคณิตศาสตร์ เรื่อง จำนวนเชิงซ้อน &copy; สาระการเรียนรู้คณิตศาสตร์ มัธยมศึกษาปีที่ 5
+    </footer>
+
+  </div>
+
+
+  <!-- ==================== Interactive Scripting ==================== -->
+  <script>
+    // Format complex number string
+    function formatComplex(real, imag) {
+      real = Number(real);
+      imag = Number(imag);
+
+      let pair = `(${real}, ${imag})`;
+      let standard = "";
+
+      if (real === 0 && imag === 0) {
+        standard = "0";
+      } else if (real === 0) {
+        standard = (imag === 1) ? "i" : (imag === -1) ? "-i" : `${imag}i`;
+      } else if (imag === 0) {
+        standard = `${real}`;
+      } else {
+        let sign = imag > 0 ? "+" : "-";
+        let absImag = Math.abs(imag);
+        let imagPart = absImag === 1 ? "i" : `${absImag}i`;
+        standard = `${real} ${sign} ${imagPart}`;
+      }
+
+      return { pair, standard };
+    }
+
+    // Set presets helper
+    function setPresets(a, b, c, d) {
+      document.getElementById('input-a').value = a;
+      document.getElementById('input-b').value = b;
+      document.getElementById('input-c').value = c;
+      document.getElementById('input-d').value = d;
+      updateSimulation();
+    }
+
+    // Main Simulation Engine
+    function updateSimulation() {
+      const a = parseFloat(document.getElementById('input-a').value) || 0;
+      const b = parseFloat(document.getElementById('input-b').value) || 0;
+      const c = parseFloat(document.getElementById('input-c').value) || 0;
+      const d = parseFloat(document.getElementById('input-d').value) || 0;
+
+      const z1Fmt = formatComplex(a, b);
+      const z2Fmt = formatComplex(c, d);
+
+      // Update previews
+      document.getElementById('label-z1-preview').innerHTML = `\\(${z1Fmt.pair} \\iff ${z1Fmt.standard}\\)`;
+      document.getElementById('label-z2-preview').innerHTML = `\\(${z2Fmt.pair} \\iff ${z2Fmt.standard}\\)`;
+
+      // 1. Check Equality
+      const isEqual = (a === c && b === d);
+      const eqBox = document.getElementById('equality-result-box');
+      if (isEqual) {
+        eqBox.className = "p-4 rounded-xl text-sm leading-relaxed bg-emerald-950/60 border border-emerald-500/60 text-emerald-200";
+        eqBox.innerHTML = `
+          <div class="font-bold flex items-center gap-2 text-emerald-300">
+            <i class="fa-solid fa-circle-check"></i> จำนวนทั้งสองเท่ากัน ($z_1 = z_2$)
+          </div>
+          <div class="mt-1">
+            เนื่องจากส่วนจริงเท่ากันคือ $a = c = ${a}$ และส่วนจินตภาพเท่ากันคือ $b = d = ${b}$<br>
+            ดังนั้น $(${a}, ${b}) = (${c}, ${d})$ หรือ $(${z1Fmt.standard}) = (${z2Fmt.standard})$
+          </div>
+        `;
+      } else {
+        eqBox.className = "p-4 rounded-xl text-sm leading-relaxed bg-rose-950/40 border border-rose-500/40 text-rose-200";
+        let reason = [];
+        if (a !== c) reason.push(`ส่วนจริงไม่เท่ากัน ($a = ${a} \\neq c = ${c}$)`);
+        if (b !== d) reason.push(`ส่วนจินตภาพไม่เท่ากัน ($b = ${b} \\neq d = ${d}$)`);
+        eqBox.innerHTML = `
+          <div class="font-bold flex items-center gap-2 text-rose-300">
+            <i class="fa-solid fa-circle-xmark"></i> จำนวนทั้งสองไม่เท่ากัน ($z_1 \\neq z_2$)
+          </div>
+          <div class="mt-1">
+            เพราะ ${reason.join(" และ ")}
+          </div>
+        `;
+      }
+
+      // 2. Addition
+      const addReal = a + c;
+      const addImag = b + d;
+      const addFmt = formatComplex(addReal, addImag);
+      const addBox = document.getElementById('addition-result-box');
+      addBox.innerHTML = `
+        <div class="text-sky-300 font-semibold mb-1">
+          <strong>รูปคู่อันดับ:</strong> $(${a}, ${b}) + (${c}, ${d}) = (${a} + (${c}),\\; ${b} + (${d})) = (${addReal},\\; ${addImag})$
+        </div>
+        <div class="text-emerald-300 font-semibold">
+          <strong>รูป $a+bi$:</strong> $(${z1Fmt.standard}) + (${z2Fmt.standard}) = (${a} + (${c})) + (${b} + (${d}))i = ${addFmt.standard}$
+        </div>
+      `;
+
+      // 3. Multiplication
+      const mulReal = (a * c) - (b * d);
+      const mulImag = (a * d) + (b * c);
+      const mulFmt = formatComplex(mulReal, mulImag);
+      const mulBox = document.getElementById('multiplication-result-box');
+      mulBox.innerHTML = `
+        <div class="text-amber-200 font-semibold mb-2">
+          <strong>รูปคู่อันดับ:</strong> $(ac - bd,\\; ad + bc) = (${a}(${c}) - (${b})(${d}),\\; ${a}(${d}) + (${b})(${c})) = (${mulReal},\\; ${mulImag})$
+        </div>
+        <div class="text-indigo-200 font-semibold">
+          <strong>รูป $a+bi$:</strong> $(${z1Fmt.standard})(${z2Fmt.standard})$
+          <div class="text-xs text-slate-300 font-normal pl-4 my-1">
+            $= ${a}(${c}) + ${a}(${d})i + ${b}(${c})i + (${b})(${d})i^2$<br>
+            $= (${a * c}) + (${a * d})i + (${b * c})i + (${b * d})(-1)$ &nbsp; <span class="text-amber-400 font-bold">[ แทนค่า $i^2 = -1$ ]</span><br>
+            $= (${a * c} - (${b * d})) + (${a * d} + ${b * c})i$
+          </div>
+          <strong>ผลลัพธ์:</strong> <span class="text-amber-300 text-base font-bold">$${mulFmt.standard}$</span>
+        </div>
+      `;
+
+      // Request MathJax to re-render dynamic formulas
+      if (window.MathJax && MathJax.typesetPromise) {
+        MathJax.typesetPromise();
+      }
+    }
+
+    // Print Handler for Student / Teacher
+    function printWorksheet(isTeacher) {
+      const teacherBadge = document.getElementById('teacher-badge');
+      const teacherSolutions = document.querySelectorAll('.teacher-solution');
+      const studentSpaces = document.querySelectorAll('.student-space');
+
+      if (isTeacher) {
+        teacherBadge.classList.remove('hidden');
+        teacherSolutions.forEach(el => el.classList.remove('hidden'));
+        studentSpaces.forEach(el => el.classList.add('hidden'));
+      } else {
+        teacherBadge.classList.add('hidden');
+        teacherSolutions.forEach(el => el.classList.add('hidden'));
+        studentSpaces.forEach(el => el.classList.remove('hidden'));
+      }
+
+      // Re-render math before printing
+      if (window.MathJax && MathJax.typesetPromise) {
+        MathJax.typesetPromise().then(() => {
+          window.print();
+        });
+      } else {
+        window.print();
+      }
+    }
+
+    // Initial Execution
+    window.addEventListener('load', () => {
+      updateSimulation();
+    });
+  </script>
+</body>
+</html>

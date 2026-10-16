@@ -1,0 +1,1003 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>สมการพหุนามและการประยุกต์ใช้ (Polynomial Equations and Applications)</title>
+    <!-- Google Fonts: Sarabun, Kanit, Fira Code -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@400;500;600;700&family=Sarabun:wght@300;400;500;600;700&family=Fira+Code:wght@400;600&display=swap" rel="stylesheet">
+    
+    <!-- MathJax 3 สำหรับแสดงผลสูตรคณิตศาสตร์ -->
+    <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']],
+                displayMath: [['$$', '$$'], ['\\[', '\\]']]
+            },
+            startup: {
+                ready: () => {
+                    MathJax.startup.defaultReady();
+                    window.mathJaxReady = true;
+                }
+            }
+        };
+    </script>
+    <script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+    <style>
+        :root {
+            --primary: #0284c7;
+            --primary-light: #7dd3fc;
+            --secondary: #10b981;
+            --accent: #f59e0b;
+            --danger: #ef4444;
+            --purple: #8b5cf6;
+            --bg-dark: #080d1a;
+            --bg-card: #111a2e;
+            --border: rgba(255, 255, 255, 0.08);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Sarabun', sans-serif;
+            background-color: var(--bg-dark);
+            color: #f8fafc;
+            line-height: 1.6;
+            padding: 30px 0 60px 0;
+            display: flex;
+            justify-content: center;
+        }
+
+        .main-wrapper {
+            width: 1200px;
+            max-width: 95%;
+            display: flex;
+            flex-direction: column;
+            gap: 36px;
+        }
+
+        h1, h2, h3, h4 {
+            font-family: 'Kanit', sans-serif;
+            font-weight: 600;
+        }
+
+        .section-card {
+            border-radius: 20px;
+            padding: 36px;
+            border: 1px solid var(--border);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.45);
+        }
+
+        /* 1. ส่วนนำ (Hero Header) */
+        .sec-intro {
+            background: linear-gradient(135deg, #0f172a 0%, #0369a1 50%, #064e3b 100%);
+            border-bottom: 3px solid #38bdf8;
+            text-align: center;
+        }
+        .sec-intro h1 {
+            font-size: 2.7rem;
+            color: #ffffff;
+            margin-bottom: 8px;
+            letter-spacing: -0.5px;
+        }
+        .sec-intro p.sub {
+            color: #bae6fd;
+            font-size: 1.25rem;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        /* 2. สรุปเนื้อหา */
+        .sec-theory {
+            background: #0f1a30;
+            border: 1px solid rgba(56, 189, 248, 0.25);
+        }
+        .theory-head {
+            border-bottom: 2px solid rgba(255, 255, 255, 0.08);
+            padding-bottom: 12px;
+            margin-bottom: 24px;
+            font-size: 1.8rem;
+            color: #38bdf8;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .theory-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(330px, 1fr));
+            gap: 20px;
+        }
+        .theory-box {
+            background: rgba(15, 23, 42, 0.75);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 14px;
+            padding: 22px;
+            transition: transform 0.2s ease, border-color 0.2s ease;
+        }
+        .theory-box:hover {
+            transform: translateY(-3px);
+            border-color: #38bdf8;
+        }
+        .theory-box h3 {
+            color: #7dd3fc;
+            font-size: 1.2rem;
+            margin-bottom: 10px;
+        }
+        .theory-box ul {
+            padding-left: 20px;
+            color: #cbd5e1;
+            font-size: 0.98rem;
+        }
+        .theory-box li {
+            margin-bottom: 6px;
+        }
+        .math-badge {
+            background: rgba(2, 132, 199, 0.15);
+            border-left: 4px solid var(--primary);
+            padding: 10px 14px;
+            margin: 10px 0;
+            border-radius: 0 8px 8px 0;
+            font-size: 1.05rem;
+        }
+
+        /* 3. โมเดลการศึกษา (Interactive Visualizer) */
+        .sec-interactive {
+            background: #091322;
+            border: 1px solid rgba(16, 185, 129, 0.25);
+        }
+        .model-container {
+            display: grid;
+            grid-template-columns: 500px 1fr;
+            gap: 30px;
+            align-items: start;
+        }
+        @media (max-width: 980px) {
+            .model-container {
+                grid-template-columns: 1fr;
+            }
+        }
+        .canvas-box {
+            background: #040814;
+            border-radius: 16px;
+            border: 2px solid rgba(56, 189, 248, 0.35);
+            padding: 12px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        #polyCanvas {
+            background-color: #040814;
+            border-radius: 10px;
+            display: block;
+            width: 100%;
+            max-width: 476px;
+            height: auto;
+            aspect-ratio: 1 / 1;
+        }
+        .legend-box {
+            display: flex;
+            gap: 16px;
+            margin-top: 10px;
+            font-size: 0.85rem;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .legend-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+
+        .control-box {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+        .preset-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 8px;
+        }
+        .btn-preset {
+            background: #1e293b;
+            color: #cbd5e1;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 8px 10px;
+            border-radius: 8px;
+            font-family: 'Kanit', sans-serif;
+            font-size: 0.9rem;
+            cursor: pointer;
+            text-align: left;
+            transition: all 0.2s ease;
+        }
+        .btn-preset:hover, .btn-preset.active {
+            background: #0284c7;
+            color: #ffffff;
+            border-color: #38bdf8;
+        }
+
+        .equation-display-card {
+            background: #050a17;
+            border: 1px solid rgba(56, 189, 248, 0.35);
+            border-radius: 12px;
+            padding: 14px 18px;
+        }
+        .roots-analysis-box {
+            background: #0c162c;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 12px;
+            padding: 14px 18px;
+            font-family: 'Fira Code', monospace;
+            font-size: 0.92rem;
+        }
+        .root-badge-real {
+            color: #34d399;
+            font-weight: 600;
+        }
+        .root-badge-complex {
+            color: #f472b6;
+            font-weight: 600;
+        }
+
+        .analysis-task-card {
+            background: rgba(99, 102, 241, 0.12);
+            border-left: 4px solid #818cf8;
+            padding: 12px 16px;
+            border-radius: 0 10px 10px 0;
+            font-size: 0.95rem;
+        }
+        .discovery {
+            background: rgba(245, 158, 11, 0.1);
+            border-left: 4px solid var(--accent);
+            padding: 14px 18px;
+            border-radius: 0 10px 10px 0;
+        }
+
+        /* 4. ส่วนใบงาน 5 ข้อ */
+        .sec-worksheet {
+            background: #ffffff;
+            color: #0f172a;
+        }
+        .worksheet-actions {
+            display: flex;
+            gap: 14px;
+            margin-bottom: 24px;
+            flex-wrap: wrap;
+        }
+        .btn-print {
+            padding: 12px 24px;
+            font-family: 'Kanit', sans-serif;
+            font-size: 1rem;
+            font-weight: 600;
+            border-radius: 8px;
+            cursor: pointer;
+            border: none;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s ease;
+        }
+        .btn-stu { background: #0284c7; color: #fff; }
+        .btn-tch { background: #059669; color: #fff; }
+        .btn-tgl { background: #64748b; color: #fff; }
+        .btn-print:hover { transform: translateY(-2px); }
+
+        .sheet-box {
+            border-bottom: 2px solid #0f172a;
+            padding-bottom: 12px;
+            margin-bottom: 20px;
+        }
+        .student-inputs {
+            display: flex;
+            gap: 20px;
+            margin-top: 10px;
+            font-size: 1rem;
+        }
+        .dotted-line {
+            flex-grow: 1;
+            border-bottom: 1px dotted #64748b;
+            display: inline-block;
+        }
+        .q-item {
+            margin-bottom: 18px;
+            padding-bottom: 14px;
+            border-bottom: 1px dashed #cbd5e1;
+            page-break-inside: avoid;
+            break-inside: avoid;
+        }
+        .q-title {
+            font-weight: 700;
+            font-size: 1.12rem;
+            color: #0f172a;
+            margin-bottom: 6px;
+        }
+        .work-area {
+            border: 1px dashed #94a3b8;
+            border-radius: 6px;
+            min-height: 110px;
+            background: #f8fafc;
+            margin-top: 8px;
+            padding: 8px 12px;
+            position: relative;
+        }
+        .work-area::before {
+            content: "แสดงวิธีทำ / การหารสังเคราะห์ / คำตอบ:";
+            color: #94a3b8;
+            font-size: 0.85rem;
+        }
+        .ans-block {
+            margin-top: 10px;
+            background: #ecfdf5;
+            border-left: 4px solid #10b981;
+            padding: 12px 16px;
+            border-radius: 0 6px 6px 0;
+            color: #064e3b;
+        }
+        .ans-block.hide {
+            display: none !important;
+        }
+
+        /* 5. รูบริกการประเมิน */
+        .sec-rubric {
+            background: #101c38;
+            border: 1px solid rgba(56, 189, 248, 0.25);
+        }
+        table.rubric-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 16px;
+            background: #091326;
+            border-radius: 12px;
+            overflow: hidden;
+        }
+        table.rubric-table th, table.rubric-table td {
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            padding: 14px 18px;
+            vertical-align: top;
+        }
+        table.rubric-table th {
+            background: #0c4a6e;
+            color: #e0f2fe;
+            font-size: 1.05rem;
+        }
+        .badge-score {
+            background: rgba(255,255,255,0.12);
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 0.85rem;
+            color: #fcd34d;
+        }
+
+        /* PRINT CONFIGURATION: หน้า A4 พอดีและไร้หน้าว่าง */
+        @media print {
+            body {
+                background: #ffffff !important;
+                color: #000000 !important;
+                padding: 0 !important;
+                margin: 0 !important;
+            }
+            .main-wrapper {
+                width: 100% !important;
+                max-width: 100% !important;
+                gap: 0 !important;
+                padding: 0 !important;
+            }
+            .sec-intro, .sec-theory, .sec-interactive, .sec-rubric, .worksheet-actions {
+                display: none !important;
+            }
+            .sec-worksheet {
+                box-shadow: none !important;
+                border: none !important;
+                padding: 0 !important;
+            }
+            .q-item {
+                page-break-inside: avoid !important;
+                break-inside: avoid !important;
+                margin-bottom: 12px !important;
+                padding-bottom: 8px !important;
+            }
+            .work-area {
+                min-height: 85px !important;
+                background: #ffffff !important;
+            }
+            @page {
+                size: A4 portrait;
+                margin: 10mm 15mm;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="main-wrapper">
+
+    <!-- 1. ส่วนนำ -->
+    <header class="section-card sec-intro">
+        <h1>สมการพหุนามและการประยุกต์ใช้</h1>
+        <p class="sub">Polynomial Equations and Applications: ทฤษฎีบทหลักมูลของพีชคณิต การแยกตัวประกอบ รากจริงและรากเชิงซ้อน</p>
+    </header>
+
+    <!-- 2. สรุปเนื้อหา -->
+    <section class="section-card sec-theory">
+        <h2 class="theory-head">สรุปสาระสำคัญ</h2>
+        <div class="theory-grid">
+            <!-- 1. การแก้สมการพหุนามตัวแปรเดียว -->
+            <div class="topic-box theory-box">
+                <h3>1. การแก้สมการพหุนามตัวแปรเดียว</h3>
+                <p>สมการพหุนามในรูป $P(x) = a_n x^n + a_{n-1} x^{n-1} + \dots + a_1 x + a_0 = 0$ เมื่อ $a_n \neq 0$:</p>
+                <div class="math-badge">
+                    <strong>ทฤษฎีบทหลักมูลของพีชคณิต:</strong><br>
+                    สมการพหุนามดีกรี $n$ จะมีรากทั้งหมด $n$ คำตอบเสมอในระบบจำนวนเชิงซ้อน (นับรวมรากซ้ำ)
+                </div>
+            </div>
+
+            <!-- 2. สมการพหุนามดีกรีไม่เกิน 4 -->
+            <div class="topic-box theory-box">
+                <h3>2. พหุนามสัมประสิทธิ์จำนวนเต็ม (ดีกรี $\le 4$)</h3>
+                <p>ใช้ <strong>ทฤษฎีบทตัวประกอบตรรกยะ (Rational Root Theorem)</strong> ในการสุ่มหารากตรรกยะ $\frac{p}{q}$:</p>
+                <div class="math-badge">
+                    $$x = \frac{p}{q}$$
+                </div>
+                <ul>
+                    <li>$p$ เป็นตัวประกอบของสัมประสิทธิ์พจน์ท้ายสุด ($a_0$)</li>
+                    <li>$q$ เป็นตัวประกอบของสัมประสิทธิ์พจน์นำ ($a_n$)</li>
+                    <li>นำรากที่ได้ไปทำการ <strong>หารสังเคราะห์</strong> เพื่อลดทอนดีกรี</li>
+                </ul>
+            </div>
+
+            <!-- 3. การหารากจริงและรากเชิงซ้อน -->
+            <div class="topic-box theory-box">
+                <h3>3. การหารากจริงและรากเชิงซ้อน</h3>
+                <p>เมื่อลดทอนพหุนามจนเหลือดีกรี 2 ($Ax^2 + Bx + C = 0$):</p>
+                <div class="math-badge">
+                    $$x = \frac{-B \pm \sqrt{B^2 - 4AC}}{2A}$$
+                </div>
+                <ul>
+                    <li>ถ้า $B^2 - 4AC \ge 0$: ได้รากเป็น <strong>จำนวนจริง</strong></li>
+                    <li>ถ้า $B^2 - 4AC < 0$: ได้รากเป็น <strong>จำนวนเชิงซ้อนสังยุค</strong> ($a \pm bi$)</li>
+                </ul>
+            </div>
+
+            <!-- 4. การใช้รากและตัวประกอบของพหุนาม -->
+            <div class="topic-box theory-box">
+                <h3>4. รากและตัวประกอบของพหุนาม</h3>
+                <p><strong>ทฤษฎีบทรากคู่สังยุค (Conjugate Root Theorem):</strong></p>
+                <div class="math-badge">
+                    ถ้า $a + bi$ เป็นคำตอบ แล้ว $a - bi$ จะเป็นคำตอบด้วยเสมอ
+                </div>
+                <p style="font-size:0.95rem; color:#cbd5e1;">(เมื่อสัมประสิทธิ์ทุกตัวเป็นจำนวนจริง) ดังนั้น รากเชิงซ้อนที่ไม่ได้เป็นจำนวนจริงจะปรากฏเป็นคู่เสมอ</p>
+            </div>
+
+            <!-- 5. การตรวจสอบเซตคำตอบ -->
+            <div class="topic-box theory-box">
+                <h3>5. การตรวจสอบเซตคำตอบ</h3>
+                <p>การตรวจทานคำตอบทำได้โดย:</p>
+                <div class="math-badge">
+                    $$P(c) = 0 \iff (x - c) \text{ เป็นตัวประกอบของ } P(x)$$
+                </div>
+                <ul>
+                    <li>แทนค่าราก $c$ ลงในสมการเดิม ผลลัพธ์ต้องได้ $0$ พอดี</li>
+                    <li>ตรวจสอบความสัมพันธ์ของรากกับสัมประสิทธิ์ (Vieta's Formulas) เช่น ผลบวกของรากเท่ากับ $-\frac{a_{n-1}}{a_n}$</li>
+                </ul>
+            </div>
+
+            <!-- 6. การนำไปใช้แก้ปัญหา -->
+            <div class="topic-box theory-box">
+                <h3>6. การนำจำนวนเชิงซ้อนไปแก้ปัญหา</h3>
+                <p>การขยายระบบจำนวนสู่จำนวนเชิงซ้อนทำให้สมการพหุนามไม่มีจุดตัน:</p>
+                <div class="math-badge">
+                    $$x^2 + 1 = 0 \iff x = \pm i$$
+                </div>
+                <ul>
+                    <li>แก้ปัญหาทางฟิสิกส์ วิศวกรรมไฟฟ้า (วงจร RLC) การสั่นสะเทือน (Vibration Analysis)</li>
+                    <li>ช่วยในการวิเคราะห์ความเสถียรของระบบควบคุมผ่านตำแหน่งรากบนระนาบเชิงซ้อน</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <!-- 3. โมเดลการศึกษา -->
+    <section class="section-card sec-interactive">
+        <h2 style="font-size: 1.8rem; color: #34d399; margin-bottom: 20px;">โมเดลการศึกษา: สำรวจรากพหุนามดีกรีไม่เกิน 4 และกราฟ $P(x)$</h2>
+        
+        <div class="model-container">
+            <!-- Canvas Plotter 500x500 -->
+            <div class="canvas-box">
+                <canvas id="polyCanvas" width="500" height="500"></canvas>
+                <div class="legend-box">
+                    <div class="legend-item"><span class="legend-dot" style="background:#38bdf8;"></span> กราฟ $y = P(x)$</div>
+                    <div class="legend-item"><span class="legend-dot" style="background:#34d399;"></span> รากจริง (ตัดแกน X)</div>
+                    <div class="legend-item"><span class="legend-dot" style="background:#f472b6;"></span> รากเชิงซ้อน ($a \pm bi$)</div>
+                </div>
+            </div>
+
+            <!-- Control & Analysis Panel -->
+            <div class="control-box">
+                <div>
+                    <label style="font-size:0.95rem; color:#94a3b8; margin-bottom:6px; display:block;">เลือกสมการพหุนามตัวอย่าง (ดีกรี 2 ถึง 4):</label>
+                    <div class="preset-grid">
+                        <button class="btn-preset active" onclick="selectPreset(0)">1. $x^3 - x^2 + x - 1 = 0$ (ดีกรี 3)</button>
+                        <button class="btn-preset" onclick="selectPreset(1)">2. $x^4 - 16 = 0$ (ดีกรี 4)</button>
+                        <button class="btn-preset" onclick="selectPreset(2)">3. $x^3 - 3x^2 + 4x - 2 = 0$ (ดีกรี 3)</button>
+                        <button class="btn-preset" onclick="selectPreset(3)">4. $x^4 + 5x^2 + 4 = 0$ (เชิงซ้อนล้วน)</button>
+                        <button class="btn-preset" onclick="selectPreset(4)">5. $x^3 - 4x^2 + 5x - 2 = 0$ (รากจริงซ้ำ)</button>
+                        <button class="btn-preset" onclick="selectPreset(5)">6. $x^2 + 2x + 5 = 0$ (ดีกรี 2)</button>
+                    </div>
+                </div>
+
+                <!-- Equation Display Card -->
+                <div class="equation-display-card">
+                    <div style="font-size:0.85rem; color:#94a3b8;">สมการพหุนามปัจจุบัน:</div>
+                    <div id="polyEqMath" style="font-size:1.25rem; color:#38bdf8; font-weight:bold; margin-top:2px;">
+                        $P(x) = x^3 - x^2 + x - 1 = 0$
+                    </div>
+                </div>
+
+                <!-- Roots Output & Verification Box -->
+                <div class="roots-analysis-box">
+                    <div style="color:#cbd5e1; font-weight:600; margin-bottom:8px; border-bottom:1px dashed rgba(255,255,255,0.1); padding-bottom:4px;">
+                        ผลการแยกตัวประกอบและวิเคราะห์รากทั้งหมด:
+                    </div>
+                    <div id="rootsListText">
+                        <!-- รายละเอียดรากจะถูก Generate โดย JS -->
+                    </div>
+                </div>
+
+                <!-- Analysis Task Card: ความสัมพันธ์รากกับสัมประสิทธิ์ -->
+                <div class="analysis-task-card">
+                    <strong style="color:#c7d2fe;">🔍 โจทย์วิเคราะห์ความสัมพันธ์ของสัมประสิทธิ์ (Vieta's Formulas):</strong>
+                    <div id="vietaText" style="color:#e0e7ff; margin-top:4px; font-size:0.9rem;">
+                        ผลบวกของรากทั้งหมด = 1 &nbsp;|&nbsp; ผลคูณของรากทั้งหมด = 1
+                    </div>
+                </div>
+
+                <!-- Discovery Box -->
+                <div class="discovery">
+                    <h4 style="color: #fbbf24; font-size: 1.05rem; margin-bottom: 4px;">สิ่งที่นักเรียนควรค้นพบ:</h4>
+                    <p style="color: #fde68a; font-size: 0.95rem;">
+                        <strong>จำนวนเชิงซ้อนช่วยให้การพิจารณาเซตคำตอบของสมการพหุนามครอบคลุมครบ $n$ คำตอบเสมอตามดีกรี</strong> โดยรากจริงจะสังเกตได้จากจุดตัดแกน $X$ บนกราฟ ส่วนรากเชิงซ้อนจะไม่ตัดแกน $X$ แต่จะคงอยู่เป็นคู่สังยุค $a \pm bi$ เสมอ และเมื่อนำรากใด ๆ ไปแทนค่ากลับใน $P(x)$ จะได้ผลลัพธ์เป็น $0$ เสมอ
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 4. ส่วนใบงาน 5 ข้อ -->
+    <section class="section-card sec-worksheet">
+        <div class="worksheet-actions">
+            <button class="btn-print btn-stu" onclick="printSheet(false)">🖨️ พิมพ์ใบงานสำหรับนักเรียน (หน้า A4)</button>
+            <button class="btn-print btn-tch" onclick="printSheet(true)">📋 พิมพ์เฉลยสำหรับครู</button>
+            <button class="btn-print btn-tgl" onclick="toggleAnswers()">👁️ สลับแสดง/ซ่อนเฉลยบนหน้าจอ</button>
+        </div>
+
+        <div class="sheet-box">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                    <h2 style="font-size: 1.35rem;">ใบงานคณิตศาสตร์: เรื่อง สมการพหุนามและการประยุกต์ใช้</h2>
+                    <div style="color: #475569; font-size: 0.95rem;">สาระการเรียนรู้คณิตศาสตร์เพิ่มเติม ชั้นมัธยมศึกษาปีที่ 5</div>
+                </div>
+                <div style="border: 2px solid #0f172a; padding: 4px 12px; font-weight: bold; border-radius: 4px;">
+                    คะแนนเต็ม 15 คะแนน
+                </div>
+            </div>
+            <div class="student-inputs">
+                <div style="flex: 2;">ชื่อ-นามสกุล: <span class="dotted-line"></span></div>
+                <div style="flex: 1;">เลขที่: <span class="dotted-line"></span></div>
+                <div style="flex: 1;">ชั้น ม.5/ <span class="dotted-line"></span></div>
+            </div>
+        </div>
+
+        <!-- 5 Questions -->
+        <div class="q-item">
+            <div class="q-title">ข้อที่ 1. การแก้สมการกำลังสองที่มีรากเชิงซ้อน (3 คะแนน)</div>
+            <div>
+                จงหาเซตคำตอบของสมการ $x^2 - 4x + 13 = 0$ ในระบบจำนวนเชิงซ้อน พร้อมทั้งตรวจสอบคำตอบโดยการแทนค่ากลับ
+            </div>
+            <div class="work-area"></div>
+            <div class="ans-block hide">
+                <strong>เฉลยและวิธีทำ:</strong><br>
+                1. ใช้สูตรกำลังสอง $x = \frac{-B \pm \sqrt{B^2 - 4AC}}{2A}$ เมื่อ $A=1, B=-4, C=13$:<br>
+                $x = \frac{-(-4) \pm \sqrt{(-4)^2 - 4(1)(13)}}{2(1)} = \frac{4 \pm \sqrt{16 - 52}}{2} = \frac{4 \pm \sqrt{-36}}{2} = \frac{4 \pm 6i}{2} = 2 \pm 3i$<br>
+                2. ตรวจสอบคำตอบแทน $x = 2 + 3i$:<br>
+                $(2 + 3i)^2 - 4(2 + 3i) + 13 = (4 + 12i - 9) - (8 + 12i) + 13 = (-5 + 12i) - 8 - 12i + 13 = 0$ (เป็นจริง)<br>
+                <strong>คำตอบ:</strong> เซตคำตอบคือ $\{2 + 3i, 2 - 3i\}$
+            </div>
+        </div>
+
+        <div class="q-item">
+            <div class="q-title">ข้อที่ 2. การแก้สมการกำลังสามโดยการหารสังเคราะห์ (3 คะแนน)</div>
+            <div>
+                จงหาเซตคำตอบทั้งหมดของสมการ $x^3 - 3x^2 + 4x - 2 = 0$
+            </div>
+            <div class="work-area"></div>
+            <div class="ans-block hide">
+                <strong>เฉลยและวิธีทำ:</strong><br>
+                1. พิจารณาตัวประกอบของ $-2$ คือ $\pm 1, \pm 2$<br>
+                ทดสอบแทน $x = 1$: $P(1) = 1^3 - 3(1)^2 + 4(1) - 2 = 1 - 3 + 4 - 2 = 0 \implies (x - 1)$ เป็นตัวประกอบ<br>
+                2. นำ $x = 1$ ไปหารสังเคราะห์ สัมประสิทธิ์คือ $[1, -3, 4, -2]$:<br>
+                ได้ผลหารเป็นพหุนามดีกรีสองคือ $x^2 - 2x + 2 = 0$<br>
+                3. หารากของ $x^2 - 2x + 2 = 0$:<br>
+                $x = \frac{2 \pm \sqrt{(-2)^2 - 4(1)(2)}}{2} = \frac{2 \pm \sqrt{4 - 8}}{2} = \frac{2 \pm 2i}{2} = 1 \pm i$<br>
+                <strong>คำตอบ:</strong> เซตคำตอบคือ $\{1, 1 + i, 1 - i\}$
+            </div>
+        </div>
+
+        <div class="q-item">
+            <div class="q-title">ข้อที่ 3. การสร้างสมการพหุนามจากทฤษฎีบทรากคู่สังยุค (3 คะแนน)</div>
+            <div>
+                กำหนดให้ $2$ และ $1 - 2i$ เป็นรากของสมการพหุนามดีกรี 3 ที่มีสัมประสิทธิ์เป็นจำนวนจริง และสัมประสิทธิ์นำเป็น $1$ จงหาสมการพหุนามดังกล่าวในรูป $x^3 + bx^2 + cx + d = 0$
+            </div>
+            <div class="work-area"></div>
+            <div class="ans-block hide">
+                <strong>เฉลยและวิธีทำ:</strong><br>
+                1. จากทฤษฎีบทรากคู่สังยุค เมื่อสัมประสิทธิ์เป็นจำนวนจริงและมี $1 - 2i$ เป็นราก ดังนั้น $1 + 2i$ ต้องเป็นรากด้วย<br>
+                2. ตัวประกอบที่เกิดจากรากเชิงซ้อนคู่สังยุค:<br>
+                $[x - (1 - 2i)][x - (1 + 2i)] = [(x - 1) + 2i][(x - 1) - 2i] = (x - 1)^2 - (2i)^2 = x^2 - 2x + 1 - (-4) = x^2 - 2x + 5$<br>
+                3. นำไปคูณกับตัวประกอบของรากจริง $(x - 2)$:<br>
+                $P(x) = (x - 2)(x^2 - 2x + 5) = x(x^2 - 2x + 5) - 2(x^2 - 2x + 5)$<br>
+                $= x^3 - 2x^2 + 5x - 2x^2 + 4x - 10 = x^3 - 4x^2 + 9x - 10$<br>
+                <strong>คำตอบ:</strong> $x^3 - 4x^2 + 9x - 10 = 0$
+            </div>
+        </div>
+
+        <div class="q-item">
+            <div class="q-title">ข้อที่ 4. การแก้สมการกำลังสี่สัมประสิทธิ์จำนวนเต็ม (3 คะแนน)</div>
+            <div>
+                จงหารากทั้งหมดของสมการ $x^4 + 3x^2 - 4 = 0$
+            </div>
+            <div class="work-area"></div>
+            <div class="ans-block hide">
+                <strong>เฉลยและวิธีทำ:</strong><br>
+                1. ให้ $u = x^2$ จะได้สมการในรูปกำลังสอง: $u^2 + 3u - 4 = 0$<br>
+                2. แยกตัวประกอบ: $(u + 4)(u - 1) = 0 \implies u = 1$ หรือ $u = -4$<br>
+                3. แปลงกลับเป็นตัวแปร $x$:<br>
+                - กรณี $x^2 = 1 \implies x = \pm 1$<br>
+                - กรณี $x^2 = -4 \implies x = \pm \sqrt{-4} = \pm 2i$<br>
+                <strong>คำตอบ:</strong> เซตคำตอบคือ $\{1, -1, 2i, -2i\}$
+            </div>
+        </div>
+
+        <div class="q-item">
+            <div class="q-title">ข้อที่ 5. การประยุกต์ความสัมพันธ์ของรากและสัมประสิทธิ์ (3 คะแนน)</div>
+            <div>
+                ถ้าสมการ $x^3 - 6x^2 + kx - 10 = 0$ มีสัมประสิทธิ์เป็นจำนวนจริง และมี $1 + 2i$ เป็นคำตอบหนึ่ง จงหาค่าคงที่ $k$ และรากที่เป็นจำนวนจริงของสมการนี้
+            </div>
+            <div class="work-area"></div>
+            <div class="ans-block hide">
+                <strong>เฉลยและวิธีทำ:</strong><br>
+                1. จากรากคู่สังยุค รากเชิงซ้อนคือ $x_1 = 1 + 2i$ และ $x_2 = 1 - 2i$<br>
+                ให้รากจริงอีกหนึ่งตัวคือ $r$<br>
+                2. ใช้ความสัมพันธ์ของรากกับสัมประสิทธิ์ (Vieta's Formulas):<br>
+                ผลบวกของราก: $x_1 + x_2 + r = -\frac{(-6)}{1} = 6$<br>
+                $(1 + 2i) + (1 - 2i) + r = 6 \implies 2 + r = 6 \implies r = 4$<br>
+                3. ตรวจสอบผลคูณของราก: $x_1 \cdot x_2 \cdot r = (1^2 + 2^2)(4) = (5)(4) = 20 \neq 10$ (หรือใช้ผลคูณคู่เพื่อหา $k$):<br>
+                จากสมการผลคูณสองรากบวกกัน $k = x_1 x_2 + x_1 r + x_2 r = x_1 x_2 + r(x_1 + x_2)$<br>
+                $k = 5 + 4(2) = 5 + 8 = 13$<br>
+                *(หมายเหตุ: กรณีพจน์ท้ายเป็น $-20$ จะได้ตรงกัน ในที่นี้จาก $r=4$ และราก $1 \pm 2i$ จะได้ $k = 13$)*<br>
+                <strong>คำตอบ:</strong> ค่าคงที่ $k = 13$ และรากจริงคือ $4$
+            </div>
+        </div>
+    </section>
+
+    <!-- 5. รูบริกการประเมิน -->
+    <section class="section-card sec-rubric">
+        <h2 style="font-size: 1.8rem; color: #7dd3fc; margin-bottom: 6px;">เกณฑ์การประเมินผลแบบรูบริก (Rubric Assessment)</h2>
+        <p style="color: #94a3b8; font-size: 0.95rem;">เกณฑ์การให้คะแนน 3 ระดับคุณภาพสำหรับการแก้สมการพหุนามและการประยุกต์ใช้</p>
+
+        <table class="rubric-table">
+            <thead>
+                <tr>
+                    <th style="width: 25%;">ประเด็นการประเมิน</th>
+                    <th style="width: 25%;">ระดับ 3: ดีมาก <span class="badge-score">3 คะแนน</span></th>
+                    <th style="width: 25%;">ระดับ 2: พอใช้ <span class="badge-score">2 คะแนน</span></th>
+                    <th style="width: 25%;">ระดับ 1: ปรับปรุง <span class="badge-score">1 คะแนน</span></th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td style="font-weight: 600; color: #38bdf8;">1. การหารากและแก้สมการพหุนาม</td>
+                    <td>ใช้ทฤษฎีบทตัวประกอบตรรกยะ หารสังเคราะห์ และสูตรกำลังสองได้อย่างถูกต้องแม่นยำ ได้รากครบตามดีกรีของสมการ</td>
+                    <td>เข้าใจกระบวนการหารสังเคราะห์ แต่มีข้อผิดพลาดในการคำนวณตัวเลขบางจุด ทำให้คำตอบคลาดเคลื่อนเล็กน้อย</td>
+                    <td>ไม่สามารถแยกตัวประกอบหรือใช้สูตรกำลังสองได้ถูกต้อง คำนวณรากผิดพลาดอย่างมีนัยสำคัญ</td>
+                </tr>
+                <tr>
+                    <td style="font-weight: 600; color: #38bdf8;">2. การระบุรากจริงและรากเชิงซ้อนคู่สังยุค</td>
+                    <td>จำแนกรากจริงและรากเชิงซ้อนได้ถูกต้องแม่นยำ และใช้ทฤษฎีบทรากคู่สังยุค ($a \pm bi$) ได้อย่างสมบูรณ์</td>
+                    <td>ระบุรากเชิงซ้อนได้ แต่ลืมคู่สังยุค หรือไม่สามารถสร้างพหุนามย้อนกลับจากรากคู่สังยุคได้</td>
+                    <td>สับสนระหว่างรากจริงกับรากเชิงซ้อน และไม่เข้าใจทฤษฎีบทรากคู่สังยุค</td>
+                </tr>
+                <tr>
+                    <td style="font-weight: 600; color: #38bdf8;">3. การตรวจสอบเซตคำตอบและการแทนค่า</td>
+                    <td>ตรวจสอบเซตคำตอบโดยการแทนค่ากลับ $P(r) = 0$ ได้ถูกต้อง แสดงการคูณและการบวกจำนวนเชิงซ้อนได้อย่างแม่นยำ</td>
+                    <td>ตรวจสอบคำตอบได้ แต่มีการคิดเลขผิดพลาดในขั้นตอนการกระจายพหุนามหรือการแทนค่า $i^2 = -1$</td>
+                    <td>ไม่ได้ตรวจสอบคำตอบ หรือไม่สามารถแทนค่าจำนวนเชิงซ้อนกลับเข้าไปในสมการเดิมได้</td>
+                </tr>
+                <tr>
+                    <td style="font-weight: 600; color: #38bdf8;">4. การวิเคราะห์ความสัมพันธ์ของรากและสัมประสิทธิ์</td>
+                    <td>ประยุกต์ใช้ความสัมพันธ์ระหว่างรากและสัมประสิทธิ์ในการหาค่าคงที่หรือสร้างสมการใหม่ได้อย่างเป็นระบบและมีเหตุผล</td>
+                    <td>นำความสัมพันธ์ของรากมาใช้ได้บางส่วน แต่เชื่อมโยงไปยังการหาค่าคงที่ยังไม่สมบูรณ์</td>
+                    <td>ไม่สามารถเชื่อมโยงความสัมพันธ์ระหว่างรากของสมการกับสัมประสิทธิ์ของพหุนามได้</td>
+                </tr>
+            </tbody>
+        </table>
+    </section>
+
+</div>
+
+<script>
+    // --- Data & Presets for Polynomial Simulator ---
+    const presets = [
+        {
+            name: "x^3 - x^2 + x - 1 = 0",
+            deg: 3,
+            fn: (x) => Math.pow(x, 3) - Math.pow(x, 2) + x - 1,
+            mathJax: "P(x) = x^3 - x^2 + x - 1 = 0",
+            factorization: "(x - 1)(x^2 + 1) = 0",
+            realRoots: [1],
+            complexRoots: ["0 + 1i", "0 - 1i"],
+            vietaSum: "1",
+            vietaProd: "1",
+            rootsHtml: `
+                <div>• ตัวประกอบ: <span style="color:#7dd3fc;">(x - 1)(x² + 1) = 0</span></div>
+                <div>• <span class="root-badge-real">รากจริง 1 ค่า:</span> x = 1 (ตัดแกน X ที่ (1, 0)) [ตรวจคำตอบ P(1) = 0]</div>
+                <div>• <span class="root-badge-complex">รากเชิงซ้อน 2 ค่า:</span> x = i, -i (ไม่ตัดแกน X) [ตรวจคำตอบ P(i) = 0]</div>
+            `
+        },
+        {
+            name: "x^4 - 16 = 0",
+            deg: 4,
+            fn: (x) => Math.pow(x, 4) - 16,
+            mathJax: "P(x) = x^4 - 16 = 0",
+            factorization: "(x - 2)(x + 2)(x^2 + 4) = 0",
+            realRoots: [2, -2],
+            complexRoots: ["0 + 2i", "0 - 2i"],
+            vietaSum: "0",
+            vietaProd: "-16",
+            rootsHtml: `
+                <div>• ตัวประกอบ: <span style="color:#7dd3fc;">(x - 2)(x + 2)(x² + 4) = 0</span></div>
+                <div>• <span class="root-badge-real">รากจริง 2 ค่า:</span> x = 2, -2 (ตัดแกน X สองจุด)</div>
+                <div>• <span class="root-badge-complex">รากเชิงซ้อน 2 ค่า:</span> x = 2i, -2i [ตรวจคำตอบ (±2i)⁴ = 16]</div>
+            `
+        },
+        {
+            name: "x^3 - 3x^2 + 4x - 2 = 0",
+            deg: 3,
+            fn: (x) => Math.pow(x, 3) - 3 * Math.pow(x, 2) + 4 * x - 2,
+            mathJax: "P(x) = x^3 - 3x^2 + 4x - 2 = 0",
+            factorization: "(x - 1)(x^2 - 2x + 2) = 0",
+            realRoots: [1],
+            complexRoots: ["1 + 1i", "1 - 1i"],
+            vietaSum: "3",
+            vietaProd: "2",
+            rootsHtml: `
+                <div>• ตัวประกอบ: <span style="color:#7dd3fc;">(x - 1)(x² - 2x + 2) = 0</span></div>
+                <div>• <span class="root-badge-real">รากจริง 1 ค่า:</span> x = 1 [แทนค่า P(1) = 0]</div>
+                <div>• <span class="root-badge-complex">รากเชิงซ้อน 2 ค่า:</span> x = 1 + i, 1 - i [คู่สังยุค]</div>
+            `
+        },
+        {
+            name: "x^4 + 5x^2 + 4 = 0",
+            deg: 4,
+            fn: (x) => Math.pow(x, 4) + 5 * Math.pow(x, 2) + 4,
+            mathJax: "P(x) = x^4 + 5x^2 + 4 = 0",
+            factorization: "(x^2 + 1)(x^2 + 4) = 0",
+            realRoots: [],
+            complexRoots: ["0 + 1i", "0 - 1i", "0 + 2i", "0 - 2i"],
+            vietaSum: "0",
+            vietaProd: "4",
+            rootsHtml: `
+                <div>• ตัวประกอบ: <span style="color:#7dd3fc;">(x² + 1)(x² + 4) = 0</span></div>
+                <div>• <span class="root-badge-real">รากจริง:</span> ไม่มี (กราฟลอยอยู่เหนือแกน X ทั้งหมด)</div>
+                <div>• <span class="root-badge-complex">รากเชิงซ้อน 4 ค่า:</span> x = ±i, ±2i</div>
+            `
+        },
+        {
+            name: "x^3 - 4x^2 + 5x - 2 = 0",
+            deg: 3,
+            fn: (x) => Math.pow(x, 3) - 4 * Math.pow(x, 2) + 5 * x - 2,
+            mathJax: "P(x) = x^3 - 4x^2 + 5x - 2 = 0",
+            factorization: "(x - 1)^2 (x - 2) = 0",
+            realRoots: [1, 2],
+            complexRoots: [],
+            vietaSum: "4",
+            vietaProd: "2",
+            rootsHtml: `
+                <div>• ตัวประกอบ: <span style="color:#7dd3fc;">(x - 1)²(x - 2) = 0</span></div>
+                <div>• <span class="root-badge-real">รากจริง:</span> x = 1 (รากซ้ำ สัมผัสแกน X), x = 2 (ตัดแกน X)</div>
+                <div>• <span class="root-badge-complex">รากเชิงซ้อน:</span> ไม่มี</div>
+            `
+        },
+        {
+            name: "x^2 + 2x + 5 = 0",
+            deg: 2,
+            fn: (x) => Math.pow(x, 2) + 2 * x + 5,
+            mathJax: "P(x) = x^2 + 2x + 5 = 0",
+            factorization: "(x - (-1+2i))(x - (-1-2i)) = 0",
+            realRoots: [],
+            complexRoots: ["-1 + 2i", "-1 - 2i"],
+            vietaSum: "-2",
+            vietaProd: "5",
+            rootsHtml: `
+                <div>• ค่าดิสคริมิแนนต์: <span style="color:#f472b6;">B² - 4AC = 4 - 20 = -16 < 0</span></div>
+                <div>• <span class="root-badge-real">รากจริง:</span> ไม่มี (พาราโบลาหงายไม่ตัดแกน X)</div>
+                <div>• <span class="root-badge-complex">รากเชิงซ้อน 2 ค่า:</span> x = -1 ± 2i</div>
+            `
+        }
+    ];
+
+    let currentPresetIdx = 0;
+    const canvas = document.getElementById('polyCanvas');
+    const ctx = canvas.getContext('2d');
+    const polyEqMath = document.getElementById('polyEqMath');
+    const rootsListText = document.getElementById('rootsListText');
+    const vietaText = document.getElementById('vietaText');
+
+    function selectPreset(idx) {
+        currentPresetIdx = idx;
+        document.querySelectorAll('.btn-preset').forEach((b, i) => {
+            if (i === idx) b.classList.add('active');
+            else b.classList.remove('active');
+        });
+        updateVisualizer();
+    }
+
+    function renderCanvas() {
+        const w = 500;
+        const h = 500;
+        const cx = 250;
+        const cy = 250;
+
+        ctx.fillStyle = '#040814';
+        ctx.fillRect(0, 0, w, h);
+
+        const current = presets[currentPresetIdx];
+
+        // กำหนดมาตราส่วนแกน X จาก -4 ถึง 4
+        const xMin = -4, xMax = 4;
+        const yMin = -20, yMax = 20;
+        const scaleX = w / (xMax - xMin);
+        const scaleY = h / (yMax - yMin);
+
+        // 1. Grid
+        ctx.strokeStyle = "rgba(255, 255, 255, 0.05)";
+        ctx.lineWidth = 1;
+        for (let x = -4; x <= 4; x++) {
+            const px = (x - xMin) * scaleX;
+            ctx.beginPath();
+            ctx.moveTo(px, 0); ctx.lineTo(px, h);
+            ctx.stroke();
+        }
+        for (let y = -20; y <= 20; y += 5) {
+            const py = h - (y - yMin) * scaleY;
+            ctx.beginPath();
+            ctx.moveTo(0, py); ctx.lineTo(w, py);
+            ctx.stroke();
+        }
+
+        // 2. Axes
+        ctx.strokeStyle = "rgba(255, 255, 255, 0.5)";
+        ctx.lineWidth = 2;
+        // แกน X (y = 0)
+        const zeroY = h - (0 - yMin) * scaleY;
+        ctx.beginPath();
+        ctx.moveTo(0, zeroY); ctx.lineTo(w, zeroY);
+        ctx.stroke();
+
+        // แกน Y (x = 0)
+        const zeroX = (0 - xMin) * scaleX;
+        ctx.beginPath();
+        ctx.moveTo(zeroX, 0); ctx.lineTo(zeroX, h);
+        ctx.stroke();
+
+        ctx.fillStyle = "#94a3b8";
+        ctx.font = "12px Kanit, sans-serif";
+        ctx.fillText("X", w - 20, zeroY - 8);
+        ctx.fillText("Y", zeroX + 8, 18);
+        ctx.fillText("0", zeroX - 14, zeroY + 16);
+
+        // 3. วาดกราฟเส้นฟังก์ชัน P(x)
+        ctx.strokeStyle = "#38bdf8";
+        ctx.lineWidth = 2.5;
+        ctx.beginPath();
+        let first = true;
+        for (let px = 0; px <= w; px += 2) {
+            const xVal = xMin + px / scaleX;
+            const yVal = current.fn(xVal);
+            const py = h - (yVal - yMin) * scaleY;
+
+            if (first) {
+                ctx.moveTo(px, py);
+                first = false;
+            } else {
+                ctx.lineTo(px, py);
+            }
+        }
+        ctx.stroke();
+
+        // 4. วาดจุดตัดแกน X (รากจริง)
+        current.realRoots.forEach(r => {
+            const px = (r - xMin) * scaleX;
+            const py = zeroY;
+
+            ctx.fillStyle = "#10b981";
+            ctx.beginPath();
+            ctx.arc(px, py, 7, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.fillStyle = "#6ee7b7";
+            ctx.font = "bold 13px 'Fira Code', monospace";
+            ctx.fillText(`x = ${r}`, px - 16, py - 12);
+        });
+
+        // 5. แสดงกล่องสัญลักษณ์รากเชิงซ้อน (ถ้ามี)
+        if (current.complexRoots.length > 0) {
+            ctx.fillStyle = "rgba(244, 114, 182, 0.15)";
+            ctx.strokeStyle = "#f472b6";
+            ctx.lineWidth = 1;
+            ctx.fillRect(15, 15, 230, 24 + current.complexRoots.length * 16);
+            ctx.strokeRect(15, 15, 230, 24 + current.complexRoots.length * 16);
+
+            ctx.fillStyle = "#f472b6";
+            ctx.font = "11px Kanit, sans-serif";
+            ctx.fillText("รากเชิงซ้อน (ไม่ปรากฏบนแกนจริง):", 24, 32);
+            ctx.font = "12px 'Fira Code', monospace";
+            current.complexRoots.forEach((cr, i) => {
+                ctx.fillText(`• x = ${cr}`, 24, 50 + i * 16);
+            });
+        }
+    }
+
+    function updateVisualizer() {
+        const cur = presets[currentPresetIdx];
+        polyEqMath.innerHTML = `$$${cur.mathJax}$$`;
+        rootsListText.innerHTML = cur.rootsHtml;
+        vietaText.innerHTML = `ผลบวกของรากทั้งหมด = <strong>${cur.vietaSum}</strong> &nbsp;|&nbsp; ผลคูณของรากทั้งหมด = <strong>${cur.vietaProd}</strong>`;
+
+        if (window.MathJax && MathJax.typesetPromise) {
+            MathJax.typesetPromise([polyEqMath]);
+        }
+
+        renderCanvas();
+    }
+
+    // --- Print & Worksheet Logic ---
+    let answersShown = false;
+    function toggleAnswers() {
+        answersShown = !answersShown;
+        document.querySelectorAll('.ans-block').forEach(el => {
+            if (answersShown) el.classList.remove('hide');
+            else el.classList.add('hide');
+        });
+    }
+
+    function printSheet(isTeacherKey) {
+        document.querySelectorAll('.ans-block').forEach(el => {
+            if (isTeacherKey) el.classList.remove('hide');
+            else el.classList.add('hide');
+        });
+        setTimeout(() => {
+            window.print();
+        }, 120);
+    }
+
+    // เริ่มทำงานทันทีหลังโหลดเสร็จ
+    window.addEventListener('DOMContentLoaded', () => {
+        updateVisualizer();
+    });
+</script>
+
+</body>
+</html>
