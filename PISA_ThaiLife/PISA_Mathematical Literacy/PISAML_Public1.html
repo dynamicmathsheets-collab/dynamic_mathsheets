@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PISA Math - ชุดที่ 1: การจัดการระบบรถเมล์พลังงานสะอาดของชุมชนเมือง</title>
+<script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+<style>
+  :root {
+    --primary: #0f766e;
+    --primary-light: #f0fdfa;
+    --border: #cbd5e1;
+    --bg-card: #ffffff;
+    --text: #1e293b;
+    --accent: #0d9488;
+  }
+  * { box-sizing: border-box; font-family: 'Sarabun', 'Segoe UI', Tahoma, sans-serif; }
+  body { margin: 0; padding: 20px; background-color: #f8fafc; color: var(--text); line-height: 1.6; }
+  .container { max-width: 1200px; margin: 0 auto; display: flex; flex-direction: column; gap: 20px; }
+
+  /* Layout 3 Frames without showing frame labels */
+  .top-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+  }
+  @media (max-width: 850px) {
+    .top-grid { grid-template-columns: 1fr; }
+  }
+
+  .panel {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 22px;
+    box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+  }
+
+  /* Interactive Simulator in Frame 1 */
+  .interactive-box {
+    background: #f0fdfa;
+    border: 1px solid #99f6e4;
+    border-radius: 8px;
+    padding: 15px;
+    margin-top: 15px;
+  }
+  .control-group { margin-bottom: 12px; }
+  .control-group label { display: block; font-weight: 600; margin-bottom: 5px; font-size: 0.95rem; }
+  .control-group input[type="range"] { width: 100%; cursor: pointer; accent-color: #0f766e; }
+  .val-badge { display: inline-block; background: #0f766e; color: white; padding: 2px 8px; border-radius: 12px; font-size: 0.85rem; }
+
+  .bus-visual {
+    background: #e2e8f0;
+    border-radius: 8px;
+    padding: 12px;
+    margin-top: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border: 1px dashed #0d9488;
+  }
+
+  /* Frame 2 Table and Hint Box */
+  table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 0.92rem; }
+  th, td { border: 1px solid var(--border); padding: 8px 10px; text-align: left; }
+  th { background: #f1f5f9; font-weight: 600; }
+  .hint-card {
+    background: #ecfdf5;
+    border-left: 4px solid #10b981;
+    padding: 10px 14px;
+    margin-top: 12px;
+    font-size: 0.9rem;
+    color: #065f46;
+    border-radius: 0 8px 8px 0;
+  }
+  .hint-alert {
+    background: #fffbeb;
+    border-left: 4px solid #f59e0b;
+    padding: 10px 14px;
+    margin-top: 10px;
+    font-size: 0.9rem;
+    color: #92400e;
+    border-radius: 0 8px 8px 0;
+  }
+
+  /* Frame 3 Questions */
+  .question-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 20px;
+    margin-bottom: 24px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.03);
+  }
+  .q-header-line1 {
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: #0f766e;
+    border-bottom: 1px dashed #cbd5e1;
+    padding-bottom: 4px;
+    margin-bottom: 4px;
+  }
+  .q-header-line2 {
+    font-size: 0.9rem;
+    color: #475569;
+    font-weight: 600;
+    margin-bottom: 12px;
+  }
+  .q-text { font-size: 1.05rem; margin-bottom: 12px; line-height: 1.6; }
+  .options-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 15px;
+  }
+  @media (max-width: 650px) {
+    .options-grid { grid-template-columns: 1fr; }
+  }
+  .option-label {
+    background: #f8fafc;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    padding: 10px 14px;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .option-label:hover { background: #ccfbf1; border-color: #5eead4; }
+  .option-label input { accent-color: #0f766e; }
+
+  .solution-box {
+    background: #f1f5f9;
+    border-left: 4px solid #0d9488;
+    border-radius: 0 6px 6px 0;
+    padding: 12px 16px;
+    margin-top: 12px;
+    font-size: 0.92rem;
+  }
+  .solution-title { font-weight: bold; color: #115e59; margin-bottom: 4px; }
+</style>
+</head>
+<body>
+
+<div class="container">
+
+  <!-- แถวบน: ด้านซ้าย (ส่วนให้ข้อมูล/แบบจำลอง) และ ด้านขวา (ผลการทดลอง/คำแนะนำทางอ้อม) -->
+  <div class="top-grid">
+    <!-- ข้อมูลและการทดลองปรับตัวแปร -->
+    <div class="panel">
+      <h2 style="margin-top:0; color:#0f766e; font-size:1.3rem;">สถานการณ์: แผนการเดินรถเมล์ไฟฟ้าเพื่อสิ่งแวดล้อมของเทศบาล</h2>
+      <p style="font-size:0.95rem; color:#475569;">
+        เทศบาลเมืองวางแผนปรับปรุงระบบขนส่งสาธารณะ โดยให้บริการ <strong>"รถเมล์ไฟฟ้าสายรอบเมือง"</strong> เพื่อลดมลพิษทางอากาศและอำนวยความสะดวกแก่ประชาชน 
+        เส้นทางเดินรถมีความยาวรวม \(24\text{ กิโลเมตร (km)}\) ต่อ 1 รอบ
+      </p>
+
+      <div class="interactive-box">
+        <h4 style="margin:0 0 10px 0; color:#0f766e;">🚌 ห้องทดลองวางแผนรอบความถี่การเดินรถ (ช่วงชั่วโมงเร่งด่วน)</h4>
+        
+        <div class="control-group">
+          <label>จำนวนรถเมล์ไฟฟ้าที่ออกวิ่ง: <span id="busCountBadge" class="val-badge">6 คัน</span></label>
+          <input type="range" id="busRange" min="2" max="12" step="1" value="6" oninput="updateBusSim()">
+        </div>
+
+        <div class="control-group">
+          <label>ความเร็วเฉลี่ยในการเดินรถ: <span id="speedBadge" class="val-badge">24 กม./ชม.</span></label>
+          <input type="range" id="speedRange" min="12" max="36" step="4" value="24" oninput="updateBusSim()">
+          <small style="color:#64748b;">(ขึ้นอยู่กับสภาพการจราจรในเขตเมือง)</small>
+        </div>
+
+        <div class="bus-visual">
+          <div>
+            <div>เวลาที่ใช้ต่อ 1 รอบ: <strong id="tripTimeText">60 นาที</strong></div>
+            <div>ระยะห่างระหว่างคัน (Headway): <strong id="intervalText" style="color:#0f766e;">10 นาที</strong></div>
+          </div>
+          <div style="text-align:right;">
+            <div>ความจุผู้โดยสารรวม/เที่ยว: <strong id="capTotalText">300 คน</strong></div>
+            <small>(เฉลี่ยคันละ 50 ที่นั่ง)</small>
+          </div>
+        </div>
+        
+        <div style="font-size:0.85rem; color:#475569; margin-top:8px;">
+          * การปรับจำนวนรถและความเร็วจะส่งผลต่อเวลารอคอยของประชาชน ณ ป้ายรถเมล์โดยตรง
+        </div>
+      </div>
+    </div>
+
+    <!-- ผลลัพธ์และข้อมูลแนะนำทางอ้อม -->
+    <div class="panel">
+      <h2 style="margin-top:0; color:#0f766e; font-size:1.3rem;">ตารางข้อมูลสถิติและการลดการปล่อยคาร์บอน (เปรียบเทียบยานพาหนะ)</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>ประเภทการเดินทาง</th>
+            <th>การปล่อยก๊าซเรือนกระจก<br>(กรัม \(\text{CO}_2\) ต่อคน-กม.)</th>
+            <th>ค่าโดยสารเฉลี่ย<br>(บาทต่อคน-เที่ยว)</th>
+            <th>พื้นที่ผิวจราจรที่ใช้<br>(ตร.ม. ต่อคน)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>รถยนต์ส่วนบุคคล (1 คน)</td>
+            <td>180</td>
+            <td>60 (ค่าน้ำมัน)</td>
+            <td>10</td>
+          </tr>
+          <tr>
+            <td>รถจักรยานยนต์ส่วนตัว</td>
+            <td>90</td>
+            <td>25 (ค่าน้ำมัน)</td>
+            <td>3</td>
+          </tr>
+          <tr>
+            <td>รถเมล์ไฟฟ้าชุมชน</td>
+            <td>15</td>
+            <td>12 (ค่าตั๋ว)</td>
+            <td>0.6</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="hint-card">
+        <strong>💡 ผลการทดลองจากการตั้งค่าปัจจุบัน:</strong><br>
+        - เมื่อใช้รถ <span id="dynBuses">6</span> คัน ประชาชนจะรอรถเฉลี่ยทุก ๆ <strong id="dynWait">10</strong> นาที<br>
+        - หากมีผู้โดยสารใช้บริการรถเมล์ไฟฟ้าเต็มคัน (\(50\text{ คน}\)) ตลอดระยะทาง \(24\text{ กม.}\) จะช่วยลดการปล่อยก๊าซ \(\text{CO}_2\) เมื่อเทียบกับขับรถยนต์ส่วนบุคคลได้ถึง 
+        \((180 - 15) \times 50 \times 24 = 198,000\text{ กรัม}\) หรือ \(198\text{ กิโลกรัม}\) ต่อรอบ
+      </div>
+
+      <div class="hint-alert">
+        <strong>📌 ดัชนีบริการสาธารณะที่เหมาะสม:</strong><br>
+        • มาตรฐานเทศบาลกำหนดว่า ในชั่วโมงเร่งด่วน ประชาชนไม่ควรรอรถเมล์นานเกิน <strong>15 นาที</strong><br>
+        • ค่าใช้จ่ายในการเดินทางด้วยขนส่งสาธารณะควรช่วยประหยัดเงินประชาชนได้ไม่น้อยกว่า \(50\%\) เมื่อเทียบกับรถส่วนตัว
+      </div>
+    </div>
+  </div>
+
+  <!-- แถวล่าง: ข้อสอบ 8 ข้อ เรียงลำดับ 1c ถึง 6 -->
+  <div class="panel">
+    <h2 style="margin-top:0; color:#0f766e; font-size:1.4rem; border-bottom:2px solid #e2e8f0; padding-bottom:8px;">
+      แบบทดสอบวัดการรู้เรื่องคณิตศาสตร์ (8 ระดับความสามารถ)
+    </h2>
+
+    <!-- ข้อ 1 (ระดับ 1c) -->
+    <div class="question-card">
+      <div class="q-header-line1">ข้อความ คณิตศาสตร์ (Mathematical Literacy)&nbsp;&nbsp;&nbsp;&nbsp;บริบทสาธารณะ (Public)</div>
+      <div class="q-header-line2">เนื้อหา: จำนวนและการดำเนินการ (การอ่านข้อมูลตรงตัวจากตารางสถิติสาธารณะ) | ระดับชั้น:   -  | ระดับความสามารถ: 1c</div>
+      <div class="q-text">
+        <strong>คำถามข้อที่ 1:</strong> จากตารางเปรียบเทียบยานพาหนะ ยานพาหนะประเภทใดปล่อยก๊าซเรือนกระจกต่อคน-กิโลเมตรน้อยที่สุด?
+      </div>
+      <div class="options-grid">
+        <label class="option-label"><input type="radio" name="b1"> ก. รถยนต์ส่วนบุคคล</label>
+        <label class="option-label"><input type="radio" name="b1"> ข. รถจักรยานยนต์ส่วนตัว</label>
+        <label class="option-label"><input type="radio" name="b1"> ค. รถเมล์ไฟฟ้าชุมชน</label>
+        <label class="option-label"><input type="radio" name="b1"> ง. ปล่อยก๊าซเรือนกระจกเท่ากันทุกประเภท</label>
+      </div>
+      <div class="solution-box">
+        <div class="solution-title">เฉลย: ค. รถเมล์ไฟฟ้าชุมชน</div>
+        <strong>เหตุผล:</strong> ระดับ 1c เป็นการทำตามคำสั่งง่าย ๆ ขั้นตอนเดียว โดยอ่านข้อมูลชัดเจนจากตาราง พบว่ารถเมล์ไฟฟ้าปล่อยก๊าซเพียง \(15\text{ กรัม }\text{CO}_2\) ต่อคน-กม. ซึ่งน้อยที่สุด
+      </div>
+    </div>
+
+    <!-- ข้อ 2 (ระดับ 1b) -->
+    <div class="question-card">
+      <div class="q-header-line1">ข้อความ คณิตศาสตร์ (Mathematical Literacy)&nbsp;&nbsp;&nbsp;&nbsp;บริบทสาธารณะ (Public)</div>
+      <div class="q-header-line2">เนื้อหา: จำนวนและการดำเนินการ (การบวกคูณจำนวนเต็มอย่างง่าย) | ระดับชั้น:   -  | ระดับความสามารถ: 1b</div>
+      <div class="q-text">
+        <strong>คำถามข้อที่ 2:</strong> ประชาชนคนหนึ่งเปลี่ยนมานั่งรถเมล์ไฟฟ้าชุมชนไปทำงานและกลับบ้าน รวมวันละ 2 เที่ยว ในเวลา 5 วันทำการ เขาต้องจ่ายค่าตั๋วโดยสารรวมทั้งหมดกี่บาท?
+      </div>
+      <div class="options-grid">
+        <label class="option-label"><input type="radio" name="b2"> ก. 60 บาท</label>
+        <label class="option-label"><input type="radio" name="b2"> ข. 100 บาท</label>
+        <label class="option-label"><input type="radio" name="b2"> ค. 120 บาท</label>
+        <label class="option-label"><input type="radio" name="b2"> ง. 150 บาท</label>
+      </div>
+      <div class="solution-box">
+        <div class="solution-title">เฉลย: ค. 120 บาท</div>
+        <strong>เหตุผล:</strong> ระดับ 1b คำนวณจำนวนเต็มอย่างง่ายจากข้อมูลที่ระบุชัด ค่าตั๋วเที่ยวละ 12 บาท วันละ 2 เที่ยว \(= 24\) บาท เป็นเวลา 5 วัน คิดเป็น \(24 \times 5 = 120\) บาท
+      </div>
+    </div>
+
+    <!-- ข้อ 3 (ระดับ 1a) -->
+    <div class="question-card">
+      <div class="q-header-line1">ข้อความ คณิตศาสตร์ (Mathematical Literacy)&nbsp;&nbsp;&nbsp;&nbsp;บริบทสาธารณะ (Public)</div>
+      <div class="q-header-line2">เนื้อหา: การวัด เวลา และความเร็วพื้นฐาน | ระดับชั้น:   -  | ระดับความสามารถ: 1a</div>
+      <div class="q-text">
+        <strong>คำถามข้อที่ 3:</strong> เส้นทางเดินรถเมล์รอบเมืองมีระยะทางรวม \(24\text{ กิโลเมตร}\) ถ้ารถเมล์วิ่งด้วยความเร็วคงที่ \(24\text{ กิโลเมตรต่อชั่วโมง}\) รถเมล์คันนี้จะใช้เวลาวิ่งครบ 1 รอบกี่นาที?
+      </div>
+      <div class="options-grid">
+        <label class="option-label"><input type="radio" name="b3"> ก. 30 นาที</label>
+        <label class="option-label"><input type="radio" name="b3"> ข. 45 นาที</label>
+        <label class="option-label"><input type="radio" name="b3"> ค. 60 นาที</label>
+        <label class="option-label"><input type="radio" name="b3"> ง. 90 นาที</label>
+      </div>
+      <div class="solution-box">
+        <div class="solution-title">เฉลย: ค. 60 นาที</div>
+        <strong>เหตุผล:</strong> ระดับ 1a แก้ปัญหาคุ้นเคยด้วยขั้นตอนพื้นฐาน \(\text{เวลา} = \frac{24\text{ กม.}}{24\text{ กม./ชม.}} = 1\text{ ชั่วโมง}\) ซึ่งแปลงหน่วยเป็นนาทีได้เท่ากับ \(60\text{ นาที}\)
+      </div>
+    </div>
+
+    <!-- ข้อ 4 (ระดับ 2) -->
+    <div class="question-card">
+      <div class="q-header-line1">ข้อความ คณิตศาสตร์ (Mathematical Literacy)&nbsp;&nbsp;&nbsp;&nbsp;บริบทสาธารณะ (Public)</div>
+      <div class="q-header-line2">เนื้อหา: บัญญัติไตรยางศ์และการเปรียบเทียบเชิงผลรวม | ระดับชั้น:   -  | ระดับความสามารถ: 2</div>
+      <div class="q-text">
+        <strong>คำถามข้อที่ 4:</strong> ในการเดินทางระยะทาง \(10\text{ กิโลเมตร}\) รถยนต์ส่วนบุคคลจะปล่อยก๊าซ \(\text{CO}_2\) มากกว่าการนั่งรถเมล์ไฟฟ้าชุมชนอยู่กี่กรัม?
+      </div>
+      <div class="options-grid">
+        <label class="option-label"><input type="radio" name="b4"> ก. 165 กรัม</label>
+        <label class="option-label"><input type="radio" name="b4"> ข. 900 กรัม</label>
+        <label class="option-label"><input type="radio" name="b4"> ค. 1,650 กรัม</label>
+        <label class="option-label"><input type="radio" name="b4"> ง. 1,800 กรัม</label>
+      </div>
+      <div class="solution-box">
+        <div class="solution-title">เฉลย: ค. 1,650 กรัม</div>
+        <strong>เหตุผล:</strong> ระดับ 2 ตีความข้อมูลและแก้ปัญหาในบริบทชัดเจน:<br>
+        - ต่อ 1 กม. ต่างกัน \(180 - 15 = 165\text{ กรัม}\)<br>
+        - ระยะทาง \(10\text{ กม.}\) ต่างกัน \(165 \times 10 = 1,650\text{ กรัม}\)
+      </div>
+    </div>
+
+    <!-- ข้อ 5 (ระดับ 3) -->
+    <div class="question-card">
+      <div class="q-header-line1">ข้อความ คณิตศาสตร์ (Mathematical Literacy)&nbsp;&nbsp;&nbsp;&nbsp;บริบทสาธารณะ (Public)</div>
+      <div class="q-header-line2">เนื้อหา: ร้อยละและการคำนวณความถี่การให้บริการสาธารณะ | ระดับชั้น:   -  | ระดับความสามารถ: 3</div>
+      <div class="q-text">
+        <strong>คำถามข้อที่ 5:</strong> ถ้ารถเมล์ 1 คัน ใช้เวลาวิ่งรอบเมืองรอบละ \(60\text{ นาที}\) หากเทศบาลต้องการให้มีรถเมล์แวะเข้าจอดรับผู้โดยสารที่ป้ายทุก ๆ \(12\text{ นาที}\) อย่างสม่ำเสมอ เทศบาลจะต้องจัดรถเมล์ไฟฟ้ามาวิ่งในเส้นทางนี้ทั้งหมดกี่คัน?
+      </div>
+      <div class="options-grid">
+        <label class="option-label"><input type="radio" name="b5"> ก. 4 คัน</label>
+        <label class="option-label"><input type="radio" name="b5"> ข. 5 คัน</label>
+        <label class="option-label"><input type="radio" name="b5"> ค. 6 คัน</label>
+        <label class="option-label"><input type="radio" name="b5"> ง. 8 คัน</label>
+      </div>
+      <div class="solution-box">
+        <div class="solution-title">เฉลย: ข. 5 คัน</div>
+        <strong>เหตุผล:</strong> ระดับ 3 เลือกกระบวนการเชื่อมโยงเวลาและจำนวนรอบ:<br>
+        ระยะห่างระหว่างคัน (Headway) \(= \frac{\text{เวลารอบทั้งหมด}}{\text{จำนวนรถ}}\)<br>
+        ดังนั้น \(\text{จำนวนรถ} = \frac{60\text{ นาที}}{12\text{ นาทีต่อคัน}} = 5\text{ คัน}\)
+      </div>
+    </div>
+
+    <!-- ข้อ 6 (ระดับ 4) -->
+    <div class="question-card">
+      <div class="q-header-line1">ข้อความ คณิตศาสตร์ (Mathematical Literacy)&nbsp;&nbsp;&nbsp;&nbsp;บริบทสาธารณะ (Public)</div>
+      <div class="q-header-line2">เนื้อหา: แบบจำลองการจัดการพื้นที่จราจรและการให้เหตุผลเชิงสัดส่วน | ระดับชั้น:   -  | ระดับความสามารถ: 4</div>
+      <div class="q-text">
+        <strong>คำถามข้อที่ 6:</strong> รถเมล์ไฟฟ้า 1 คัน บรรทุกผู้โดยสารได้ \(50\text{ คน}\) หากผู้โดยสารทั้ง 50 คนนี้เปลี่ยนไปขับรถยนต์ส่วนบุคคลคนละคัน จะต้องใช้พื้นที่ผิวจราจรรวมเพิ่มขึ้นจากเดิมกี่ตารางเมตร (\(\text{ตร.ม.}\)) และคิดเป็นกี่เท่าของพื้นที่ที่ใช้บนรถเมล์?
+      </div>
+      <div class="options-grid">
+        <label class="option-label"><input type="radio" name="b6"> ก. เพิ่มขึ้น 470 ตารางเมตร คิดเป็นประมาณ 16.7 เท่าของพื้นที่เดิม</label>
+        <label class="option-label"><input type="radio" name="b6"> ข. เพิ่มขึ้น 500 ตารางเมตร คิดเป็นประมาณ 20 เท่าของพื้นที่เดิม</label>
+        <label class="option-label"><input type="radio" name="b6"> ค. เพิ่มขึ้น 350 ตารางเมตร คิดเป็นประมาณ 10 เท่าของพื้นที่เดิม</label>
+        <label class="option-label"><input type="radio" name="b6"> ง. เพิ่มขึ้น 450 ตารางเมตร คิดเป็นประมาณ 15 เท่าของพื้นที่เดิม</label>
+      </div>
+      <div class="solution-box">
+        <div class="solution-title">เฉลย: ก. เพิ่มขึ้น 470 ตารางเมตร คิดเป็นประมาณ 16.7 เท่าของพื้นที่เดิม</div>
+        <strong>เหตุผล:</strong> ระดับ 4 ทำงานกับแบบจำลองและเชื่อมโยงข้อมูลหลายมิติ:<br>
+        1. พื้นที่ที่รถเมล์ใช้สำหรับ 50 คน \(= 50 \times 0.6 = 30\text{ ตร.ม.}\)<br>
+        2. พื้นที่ที่รถยนต์ส่วนบุคคล 50 คันใช้ \(= 50 \times 10 = 500\text{ ตร.ม.}\)<br>
+        3. พื้นที่เพิ่มขึ้น \(= 500 - 30 = 470\text{ ตร.ม.}\)<br>
+        4. คิดเป็นสัดส่วน \(\frac{500}{30} \approx 16.67\) เท่าของพื้นที่เดิม
+      </div>
+    </div>
+
+    <!-- ข้อ 7 (ระดับ 5) -->
+    <div class="question-card">
+      <div class="q-header-line1">ข้อความ คณิตศาสตร์ (Mathematical Literacy)&nbsp;&nbsp;&nbsp;&nbsp;บริบทสาธารณะ (Public)</div>
+      <div class="q-header-line2">เนื้อหา: การพัฒนาแบบจำลองแก้ปัญหาภายใต้ข้อจำกัดและเงื่อนไขจราจร | ระดับชั้น:   -  | ระดับความสามารถ: 5</div>
+      <div class="q-text">
+        <strong>คำถามข้อที่ 7:</strong> ในช่วงฝนตก น้ำท่วมขังทำให้ความเร็วเฉลี่ยของรถเมล์ลดลงจาก \(24\text{ กม./ชม.}\) เหลือเพียง \(16\text{ กม./ชม.}\) ในขณะที่เส้นทางยังยาว \(24\text{ กม.}\) เท่าเดิม เทศบาลต้องการรักษามาตรฐานบริการสาธารณะ <em>"ให้ประชาชนรอรถไม่เกิน 15 นาทีต่อคัน"</em> เทศบาลจะต้องนำรถเมล์ไฟฟ้ามาวิ่งเพิ่มจากเดิมที่เคยใช้ 4 คัน อีกอย่างน้อยที่สุดกี่คัน?
+      </div>
+      <div class="options-grid">
+        <label class="option-label"><input type="radio" name="b7"> ก. ต้องเพิ่มอีก 1 คัน</label>
+        <label class="option-label"><input type="radio" name="b7"> ข. ต้องเพิ่มอีก 2 คัน</label>
+        <label class="option-label"><input type="radio" name="b7"> ค. ต้องเพิ่มอีก 3 คัน</label>
+        <label class="option-label"><input type="radio" name="b7"> ง. ต้องเพิ่มอีก 4 คัน</label>
+      </div>
+      <div class="solution-box">
+        <div class="solution-title">เฉลย: ข. ต้องเพิ่มอีก 2 คัน</div>
+        <strong>เหตุผล:</strong> ระดับ 5 พัฒนาแบบจำลองเพื่อแก้ปัญหาและพิจารณาข้อจำกัดของสถานการณ์จริง:<br>
+        1. คำนวณเวลารอบใหม่ที่ความเร็ว \(16\text{ กม./ชม.}\):<br>
+        \(\text{เวลา} = \frac{24}{16} = 1.5\text{ ชั่วโมง} = 90\text{ นาที}\)<br>
+        2. ต้องการระยะเวลารอไม่เกิน 15 นาที: \(\text{จำนวนรถที่ต้องใช้} = \frac{90}{15} = 6\text{ คัน}\)<br>
+        3. เดิมมีอยู่แล้ว 4 คัน ดังนั้นต้องนำรถมาวิ่งเพิ่มอีก \(6 - 4 = 2\text{ คัน}\)
+      </div>
+    </div>
+
+    <!-- ข้อ 8 (ระดับ 6) -->
+    <div class="question-card">
+      <div class="q-header-line1">ข้อความ คณิตศาสตร์ (Mathematical Literacy)&nbsp;&nbsp;&nbsp;&nbsp;บริบทสาธารณะ (Public)</div>
+      <div class="q-header-line2">เนื้อหา: การให้เหตุผลเชิงนามธรรม การสร้างตัวแบบนโยบายสาธารณะ และการวิเคราะห์จุดคุ้มทุนทางสังคม | ระดับชั้น:   -  | ระดับความสามารถ: 6</div>
+      <div class="q-text">
+        <strong>คำถามข้อที่ 8:</strong> ฝ่ายนโยบายสาธารณะของเมืองเสนอสูตร <em>"ดัชนีผลประโยชน์สุทธิต่อสังคมรายวัน (\(S\))"</em> โดยกำหนดว่า<br>
+        \[S = (\text{เงินที่ประชาชนประหยัดได้รวม}) + (C \times 0.5)\]
+        เมื่อ \(C\) คือปริมาณก๊าซ \(\text{CO}_2\) ที่ลดลงได้รวม (กิโลกรัม) และเงินที่ประชาชนประหยัดได้คิดจากการลดลงของค่าใช้จ่ายเมื่อเปลี่ยนจากรถยนต์ส่วนบุคคล (\(60\text{ บาท}\)) มาเป็นตั๋วรถเมล์ (\(12\text{ บาท}\))<br>
+        หากใน 1 วัน มีประชาชนเปลี่ยนมานั่งรถเมล์ไฟฟ้าจำนวน \(1,000\text{ คน-เที่ยว}\) โดยมีระยะทางเฉลี่ยเที่ยวละ \(10\text{ กม.}\) ข้อใดสรุปค่าดัชนีผลประโยชน์สุทธิต่อสังคม (\(S\)) และเหตุผลเชิงนโยบายได้ถูกต้องที่สุด?
+      </div>
+      <div class="options-grid">
+        <label class="option-label"><input type="radio" name="b8"> ก. \(S = 48,000\) โดยประโยชน์เกิดจากการประหยัดเงินค่าเดินทางของประชาชนเท่านั้น</label>
+        <label class="option-label"><input type="radio" name="b8"> ข. \(S = 48,825\) โดยสะท้อนทั้งการประหยัดเงินในกระเป๋าของประชาชน 48,000 บาท และมูลค่าสิ่งแวดล้อมจากการลดก๊าซพิษอีก 825 หน่วย</label>
+        <label class="option-label"><input type="radio" name="b8"> ค. \(S = 60,000\) เพราะควรรวมมูลค่าพื้นที่ผิวจราจรที่ประหยัดได้เข้าไปด้วยโดยตรง</label>
+        <label class="option-label"><input type="radio" name="b8"> ง. \(S = 12,000\) เพราะคำนวณจากรายได้ค่าตั๋วโดยสารที่เทศบาลจัดเก็บได้</label>
+      </div>
+      <div class="solution-box">
+        <div class="solution-title">เฉลย: ข. \(S = 48,825\) โดยสะท้อนทั้งการประหยัดเงินในกระเป๋าของประชาชน 48,000 บาท และมูลค่าสิ่งแวดล้อมจากการลดก๊าซพิษอีก 825 หน่วย</div>
+        <strong>เหตุผล:</strong> ระดับ 6 ใช้เหตุผลเชิงนามธรรม แปลงข้อมูลซับซ้อนในมิตินโยบายสาธารณะ:<br>
+        1. เงินที่ประชาชนประหยัดได้รวม \(= 1,000 \times (60 - 12) = 1,000 \times 48 = 48,000\text{ บาท}\)<br>
+        2. ลดก๊าซ \(\text{CO}_2\) ต่อคน-เที่ยว (\(10\text{ กม.}\)) \(= 10 \times (180 - 15) = 1,650\text{ กรัม} = 1.65\text{ กิโลกรัม}\)<br>
+        3. ลดก๊าซรวม \(C = 1,000 \times 1.65 = 1,650\text{ กิโลกรัม}\)<br>
+        4. มูลค่าสิ่งแวดล้อม \(= C \times 0.5 = 1,650 \times 0.5 = 825\)<br>
+        5. รวมดัชนี \(S = 48,000 + 825 = 48,825\)
+      </div>
+    </div>
+
+  </div>
+
+</div>
+
+<script>
+function updateBusSim() {
+  const buses = parseInt(document.getElementById('busRange').value);
+  const speed = parseInt(document.getElementById('speedRange').value);
+
+  document.getElementById('busCountBadge').innerText = buses + ' คัน';
+  document.getElementById('speedBadge').innerText = speed + ' กม./ชม.';
+
+  const tripTimeMinutes = (24 / speed) * 60;
+  document.getElementById('tripTimeText').innerText = Math.round(tripTimeMinutes) + ' นาที';
+
+  const headway = tripTimeMinutes / buses;
+  document.getElementById('intervalText').innerText = headway.toFixed(1) + ' นาที';
+
+  document.getElementById('capTotalText').innerText = (buses * 50) + ' คน';
+
+  document.getElementById('dynBuses').innerText = buses;
+  document.getElementById('dynWait').innerText = headway.toFixed(1);
+}
+</script>
+
+</body>
+</html>

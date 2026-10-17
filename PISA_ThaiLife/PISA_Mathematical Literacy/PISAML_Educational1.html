@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PISA Math - ชุดที่ 1: การทดลองการงอกและการเจริญเติบโตของเมล็ดพืชในห้องปฏิบัติการวิทย์</title>
+<script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+<style>
+  :root {
+    --primary: #2563eb;
+    --primary-light: #eff6ff;
+    --border: #bfdbfe;
+    --bg-card: #ffffff;
+    --text: #1e293b;
+    --accent: #1d4ed8;
+  }
+  * { box-sizing: border-box; font-family: 'Sarabun', 'Segoe UI', Tahoma, sans-serif; }
+  body { margin: 0; padding: 20px; background-color: #f8fafc; color: var(--text); line-height: 1.6; }
+  .container { max-width: 1200px; margin: 0 auto; display: flex; flex-direction: column; gap: 20px; }
+
+  /* Layout 3 Frames without showing frame labels */
+  .top-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+  }
+  @media (max-width: 850px) {
+    .top-grid { grid-template-columns: 1fr; }
+  }
+
+  .panel {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 22px;
+    box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+  }
+
+  /* Interactive Simulator in Frame 1 */
+  .interactive-box {
+    background: #f0fdf4;
+    border: 1px solid #bbf7d0;
+    border-radius: 8px;
+    padding: 15px;
+    margin-top: 15px;
+  }
+  .control-group { margin-bottom: 12px; }
+  .control-group label { display: block; font-weight: 600; margin-bottom: 5px; font-size: 0.95rem; }
+  .control-group input[type="range"] { width: 100%; cursor: pointer; accent-color: #16a34a; }
+  .val-badge { display: inline-block; background: #16a34a; color: white; padding: 2px 8px; border-radius: 12px; font-size: 0.85rem; }
+
+  .growth-visual {
+    background: #f8fafc;
+    border: 1px dashed #cbd5e1;
+    border-radius: 8px;
+    padding: 12px;
+    margin-top: 10px;
+    display: flex;
+    justify-content: space-around;
+    align-items: flex-end;
+    height: 140px;
+  }
+  .plant-stem {
+    width: 28px;
+    background: #22c55e;
+    border-radius: 4px 4px 0 0;
+    transition: height 0.3s;
+    text-align: center;
+    color: white;
+    font-size: 0.75rem;
+    font-weight: bold;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    padding-top: 4px;
+  }
+
+  /* Frame 2 Table and Hint Box */
+  table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 0.92rem; }
+  th, td { border: 1px solid var(--border); padding: 8px 10px; text-align: left; }
+  th { background: #f1f5f9; font-weight: 600; }
+  .hint-card {
+    background: #eff6ff;
+    border-left: 4px solid #3b82f6;
+    padding: 10px 14px;
+    margin-top: 12px;
+    font-size: 0.9rem;
+    color: #1e40af;
+    border-radius: 0 8px 8px 0;
+  }
+  .hint-note {
+    background: #fefce8;
+    border-left: 4px solid #eab308;
+    padding: 10px 14px;
+    margin-top: 10px;
+    font-size: 0.9rem;
+    color: #854d0e;
+    border-radius: 0 8px 8px 0;
+  }
+
+  /* Frame 3 Questions */
+  .question-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 20px;
+    margin-bottom: 24px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.03);
+  }
+  .q-header-line1 {
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: #1d4ed8;
+    border-bottom: 1px dashed #cbd5e1;
+    padding-bottom: 4px;
+    margin-bottom: 4px;
+  }
+  .q-header-line2 {
+    font-size: 0.9rem;
+    color: #475569;
+    font-weight: 600;
+    margin-bottom: 12px;
+  }
+  .q-text { font-size: 1.05rem; margin-bottom: 12px; line-height: 1.6; }
+  .options-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 15px;
+  }
+  @media (max-width: 650px) {
+    .options-grid { grid-template-columns: 1fr; }
+  }
+  .option-label {
+    background: #f8fafc;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    padding: 10px 14px;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .option-label:hover { background: #eff6ff; border-color: #60a5fa; }
+  .option-label input { accent-color: #2563eb; }
+
+  .solution-box {
+    background: #f8fafc;
+    border-left: 4px solid #2563eb;
+    border-radius: 0 6px 6px 0;
+    padding: 12px 16px;
+    margin-top: 12px;
+    font-size: 0.92rem;
+  }
+  .solution-title { font-weight: bold; color: #1e40af; margin-bottom: 4px; }
+</style>
+</head>
+<body>
+
+<div class="container">
+
+  <!-- แถวบน: ด้านซ้าย (ส่วนให้ข้อมูล/การทดลอง) และ ด้านขวา (ผลการทดลอง/คำแนะนำทางอ้อม) -->
+  <div class="top-grid">
+    <!-- ส่วนข้อมูล/แบบจำลองการทดลอง -->
+    <div class="panel">
+      <h2 style="margin-top:0; color:#1d4ed8; font-size:1.3rem;">สถานการณ์: การทดลองโครงงานวิทยาศาสตร์ เรื่อง "ปัจจัยแสงต่อการเจริญเติบโตของถั่วเขียว"</h2>
+      <p style="font-size:0.95rem; color:#475569;">
+        ในชั่วโมงวิชาวิทยาศาสตร์ นักเรียนชั้น ป.6 ทำการทดลองเพาะเมล็ดถั่วเขียวจำนวนถาดละ \(50\text{ เมล็ด}\) 
+        โดยควบคุมชนิดดินและปริมาณน้ำให้เท่ากันทุกถาด แต่วางถาดทดลองในสภาพแวดล้อมที่ได้รับชั่วโมงแสงแดดต่อวันแตกต่างกัน เพื่อบันทึกอัตราการงอกและความสูงของต้นกล้าในเวลา \(10\text{ วัน}\)
+      </p>
+
+      <div class="interactive-box">
+        <h4 style="margin:0 0 10px 0; color:#15803d;">🌱 แบบจำลองทดลองปรับชั่วโมงแสงแดด (สำรวจผลต่อความสูงต้นกล้า)</h4>
+        
+        <div class="control-group">
+          <label>ชั่วโมงที่ได้รับแสงต่อวัน: <span id="lightBadge" class="val-badge">6 ชั่วโมง/วัน</span></label>
+          <input type="range" id="lightRange" min="0" max="10" step="2" value="6" oninput="updateGrowthSim()">
+        </div>
+
+        <div class="control-group">
+          <label>ระยะเวลาบันทึกผล: <span id="dayBadge" class="val-badge">10 วัน</span></label>
+          <input type="range" id="dayRange" min="2" max="10" step="2" value="10" oninput="updateGrowthSim()">
+        </div>
+
+        <div><strong>การจำลองความสูงเฉลี่ยของต้นกล้า:</strong></div>
+        <div class="growth-visual">
+          <div style="text-align:center;">
+            <div id="plantStem" class="plant-stem" style="height: 90px;">9 ซม.</div>
+            <small style="color:#64748b;">ต้นกล้าทดลอง</small>
+          </div>
+        </div>
+        
+        <div style="font-size:0.85rem; color:#475569; margin-top:8px;">
+          * สรุปผลปัจจุบัน: อัตราการเติบโตเฉลี่ย <strong id="growthRateText">0.9</strong> ซม./วัน | ความสูงวันที่เลือก: <strong id="currentHeightText">9.0</strong> ซม.
+        </div>
+      </div>
+    </div>
+
+    <!-- ส่วนผลการทดลอง/ข้อมูลแนะนำทางอ้อม -->
+    <div class="panel">
+      <h2 style="margin-top:0; color:#1d4ed8; font-size:1.3rem;">ตารางบันทึกผลการทดลองของกลุ่มนักเรียน (เมื่อครบ 10 วัน)</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>ถาดทดลอง</th>
+            <th>แสงแดดเฉลี่ย (ชม./วัน)</th>
+            <th>จำนวนเมล็ดที่งอก (จาก 50 เมล็ด)</th>
+            <th>ร้อยละการงอก (%)</th>
+            <th>ความสูงเฉลี่ยวันที่ 10 (ซม.)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>ถาด A (ในที่มืด)</td>
+            <td>0</td>
+            <td>40</td>
+            <td>80%</td>
+            <td>14.0 (ลำต้นซีดเรียว)</td>
+          </tr>
+          <tr>
+            <td>ถาด B (แสงรำไร)</td>
+            <td>4</td>
+            <td>45</td>
+            <td>90%</td>
+            <td>11.0</td>
+          </tr>
+          <tr>
+            <td>ถาด C (แสงปกติ)</td>
+            <td>8</td>
+            <td>48</td>
+            <td>96%</td>
+            <td>8.0 (ลำต้นแข็งแรง)</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="hint-card">
+        <strong>💡 ผลการทดลองและการแนะแนวทางอ้อม:</strong><br>
+        - การคำนวณร้อยละการงอก: \(\text{ร้อยละ} = \frac{\text{จำนวนเมล็ดที่งอก}}{\text{เมล็ดทั้งหมด}} \times 100\)<br>
+        - เมล็ดที่ไม่งอกในถาด C มีจำนวน \(50 - 48 = 2\text{ เมล็ด}\) คิดเป็นเพียง \(4\%\)<br>
+        - พืชในที่มืดมีความสูงเฉลี่ยเพิ่มขึ้นต่อวันเร็วที่สุด (\(1.4\text{ ซม./วัน}\)) เพื่อยืดหาแสง แต่ลำต้นไม่แข็งแรง
+      </div>
+
+      <div class="hint-note">
+        <strong>📚 บันทึกการวิเคราะห์ข้อมูลทางวิทยาศาสตร์:</strong><br>
+        • การเปรียบเทียบข้อมูลต้องระวังตัวแปรควบคุม เช่น ปริมาณน้ำและอุณหภูมิห้องแล็บ<br>
+        • ต้นพืชที่สมบูรณ์ที่สุดวัดจากทั้งความสูง ความแข็งแรง และอัตราการงอกรวม
+      </div>
+    </div>
+  </div>
+
+  <!-- แถวล่าง: คำถาม 8 ข้อ เรียงลำดับความสามารถ 1c ถึง 6 -->
+  <div class="panel">
+    <h2 style="margin-top:0; color:#1d4ed8; font-size:1.4rem; border-bottom:2px solid #bfdbfe; padding-bottom:8px;">
+      แบบทดสอบวัดการรู้เรื่องคณิตศาสตร์ (8 ระดับความสามารถ)
+    </h2>
+
+    <!-- ข้อ 1 (ระดับ 1c) -->
+    <div class="question-card">
+      <div class="q-header-line1">ข้อความ คณิตศาสตร์ (Mathematical Literacy)&nbsp;&nbsp;&nbsp;&nbsp;บริบทการศึกษา (Educational)</div>
+      <div class="q-header-line2">เนื้อหา: จำนวนและการดำเนินการ (การอ่านข้อมูลตรงตัวจากตารางผลการทดลอง) | ระดับชั้น:   -  | ระดับความสามารถ: 1c</div>
+      <div class="q-text">
+        <strong>คำถามข้อที่ 1:</strong> จากตารางบันทึกผลการทดลองของนักเรียน ถาดทดลองใดมีจำนวนเมล็ดถั่วเขียวที่งอกมากที่สุด?
+      </div>
+      <div class="options-grid">
+        <label class="option-label"><input type="radio" name="e1"> ก. ถาด A</label>
+        <label class="option-label"><input type="radio" name="e1"> ข. ถาด B</label>
+        <label class="option-label"><input type="radio" name="e1"> ค. ถาด C</label>
+        <label class="option-label"><input type="radio" name="e1"> ง. ทั้ง 3 ถาดงอกเท่ากัน</label>
+      </div>
+      <div class="solution-box">
+        <div class="solution-title">เฉลย: ค. ถาด C</div>
+        <strong>เหตุผล:</strong> ระดับ 1c อ่านข้อมูลโดยตรงขั้นตอนเดียว จากตารางระบุชัดเจนว่าถาด C มีจำนวนเมล็ดที่งอก 48 เมล็ด ซึ่งมากที่สุด
+      </div>
+    </div>
+
+    <!-- ข้อ 2 (ระดับ 1b) -->
+    <div class="question-card">
+      <div class="q-header-line1">ข้อความ คณิตศาสตร์ (Mathematical Literacy)&nbsp;&nbsp;&nbsp;&nbsp;บริบทการศึกษา (Educational)</div>
+      <div class="q-header-line2">เนื้อหา: จำนวนและการดำเนินการ (การลบจำนวนเต็มอย่างง่าย) | ระดับชั้น:   -  | ระดับความสามารถ: 1b</div>
+      <div class="q-text">
+        <strong>คำถามข้อที่ 2:</strong> ในถาดทดลอง B ที่เพาะเมล็ดถั่วเขียวทั้งหมด \(50\text{ เมล็ด}\) มีเมล็ดถั่วเขียวที่<strong>ไม่งอก</strong>จำนวนกี่เมล็ด?
+      </div>
+      <div class="options-grid">
+        <label class="option-label"><input type="radio" name="e2"> ก. 2 เมล็ด</label>
+        <label class="option-label"><input type="radio" name="e2"> ข. 5 เมล็ด</label>
+        <label class="option-label"><input type="radio" name="e2"> ค. 8 เมล็ด</label>
+        <label class="option-label"><input type="radio" name="e2"> ง. 10 เมล็ด</label>
+      </div>
+      <div class="solution-box">
+        <div class="solution-title">เฉลย: ข. 5 เมล็ด</div>
+        <strong>เหตุผล:</strong> ระดับ 1b คำนวณจำนวนเต็มอย่างง่ายจากข้อมูลที่ระบุชัด จากตารางถาด B งอก 45 เมล็ด ดังนั้นไม่งอก \(50 - 45 = 5\) เมล็ด
+      </div>
+    </div>
+
+    <!-- ข้อ 3 (ระดับ 1a) -->
+    <div class="question-card">
+      <div class="q-header-line1">ข้อความ คณิตศาสตร์ (Mathematical Literacy)&nbsp;&nbsp;&nbsp;&nbsp;บริบทการศึกษา (Educational)</div>
+      <div class="q-header-line2">เนื้อหา: ทศนิยมและการวัด (การหาค่าเฉลี่ยต่อวันขั้นพื้นฐาน) | ระดับชั้น:   -  | ระดับความสามารถ: 1a</div>
+      <div class="q-text">
+        <strong>คำถามข้อที่ 3:</strong> ต้นกล้าในถาด C มีความสูงเฉลี่ยเมื่อสิ้นสุดวันที่ 10 เท่ากับ \(8.0\text{ เซนติเมตร}\) ต้นกล้าในถาดนี้มีความสูงเพิ่มขึ้นเฉลี่ยวันละกี่เซนติเมตร?
+      </div>
+      <div class="options-grid">
+        <label class="option-label"><input type="radio" name="e3"> ก. 0.6 เซนติเมตร</label>
+        <label class="option-label"><input type="radio" name="e3"> ข. 0.8 เซนติเมตร</label>
+        <label class="option-label"><input type="radio" name="e3"> ค. 1.0 เซนติเมตร</label>
+        <label class="option-label"><input type="radio" name="e3"> ง. 1.2 เซนติเมตร</label>
+      </div>
+      <div class="solution-box">
+        <div class="solution-title">เฉลย: ข. 0.8 เซนติเมตร</div>
+        <strong>เหตุผล:</strong> ระดับ 1a แก้ปัญหาคุ้นเคยด้วยการหารพื้นฐาน \(\frac{8.0\text{ ซม.}}{10\text{ วัน}} = 0.8\text{ เซนติเมตรต่อวัน}\)
+      </div>
+    </div>
+
+    <!-- ข้อ 4 (ระดับ 2) -->
+    <div class="question-card">
+      <div class="q-header-line1">ข้อความ คณิตศาสตร์ (Mathematical Literacy)&nbsp;&nbsp;&nbsp;&nbsp;บริบทการศึกษา (Educational)</div>
+      <div class="q-header-line2">เนื้อหา: ร้อยละและการแปลงสัดส่วน | ระดับชั้น:   -  | ระดับความสามารถ: 2</div>
+      <div class="q-text">
+        <strong>คำถามข้อที่ 4:</strong> ถ้านักเรียนเตรียมถาดทดลองใหม่ D โดยเพาะเมล็ดถั่วเขียวจำนวน \(80\text{ เมล็ด}\) และมีอัตราการงอกเท่ากับถาด B คือ \(90\%\) จะมีเมล็ดถั่วเขียวในถาด D งอกขึ้นมากี่เมล็ด?
+      </div>
+      <div class="options-grid">
+        <label class="option-label"><input type="radio" name="e4"> ก. 68 เมล็ด</label>
+        <label class="option-label"><input type="radio" name="e4"> ข. 70 เมล็ด</label>
+        <label class="option-label"><input type="radio" name="e4"> ค. 72 เมล็ด</label>
+        <label class="option-label"><input type="radio" name="e4"> ง. 75 เมล็ด</label>
+      </div>
+      <div class="solution-box">
+        <div class="solution-title">เฉลย: ค. 72 เมล็ด</div>
+        <strong>เหตุผล:</strong> ระดับ 2 ตีความข้อมูลร้อยละและคำนวณในบริบทชัดเจน \(\frac{90}{100} \times 80 = 72\) เมล็ด
+      </div>
+    </div>
+
+    <!-- ข้อ 5 (ระดับ 3) -->
+    <div class="question-card">
+      <div class="q-header-line1">ข้อความ คณิตศาสตร์ (Mathematical Literacy)&nbsp;&nbsp;&nbsp;&nbsp;บริบทการศึกษา (Educational)</div>
+      <div class="q-header-line2">เนื้อหา: การคำนวณหลายขั้นตอนและการเปรียบเทียบอัตราส่วนต่าง | ระดับชั้น:   -  | ระดับความสามารถ: 3</div>
+      <div class="q-text">
+        <strong>คำถามข้อที่ 5:</strong> เมื่อครบ 10 วัน อัตราการเติบโตเฉลี่ยต่อวันของต้นกล้าในถาด A สูงกว่าอัตราการเติบโตเฉลี่ยต่อวันของต้นกล้าในถาด C อยู่กี่มิลลิเมตรต่อวัน? (\(1\text{ เซนติเมตร} = 10\text{ มิลลิเมตร}\))
+      </div>
+      <div class="options-grid">
+        <label class="option-label"><input type="radio" name="e5"> ก. 4 มิลลิเมตรต่อวัน</label>
+        <label class="option-label"><input type="radio" name="e5"> ข. 6 มิลลิเมตรต่อวัน</label>
+        <label class="option-label"><input type="radio" name="e5"> ค. 8 มิลลิเมตรต่อวัน</label>
+        <label class="option-label"><input type="radio" name="e5"> ง. 10 มิลลิเมตรต่อวัน</label>
+      </div>
+      <div class="solution-box">
+        <div class="solution-title">เฉลย: ข. 6 มิลลิเมตรต่อวัน</div>
+        <strong>เหตุผล:</strong> ระดับ 3 ดำเนินการหลายขั้นตอนพร้อมแปลงหน่วยวัด:<br>
+        - ถาด A เติบโตเฉลี่ยวันละ \(14.0 \div 10 = 1.4\text{ ซม./วัน}\)<br>
+        - ถาด C เติบโตเฉลี่ยวันละ \(8.0 \div 10 = 0.8\text{ ซม./วัน}\)<br>
+        - ความต่าง \(= 1.4 - 0.8 = 0.6\text{ ซม./วัน}\) แปลงเป็นมิลลิเมตร \(= 0.6 \times 10 = 6\text{ มิลลิเมตรต่อวัน}\)
+      </div>
+    </div>
+
+    <!-- ข้อ 6 (ระดับ 4) -->
+    <div class="question-card">
+      <div class="q-header-line1">ข้อความ คณิตศาสตร์ (Mathematical Literacy)&nbsp;&nbsp;&nbsp;&nbsp;บริบทการศึกษา (Educational)</div>
+      <div class="q-header-line2">เนื้อหา: แบบจำลองทางคณิตศาสตร์และการพยากรณ์เชิงเส้น | ระดับชั้น:   -  | ระดับความสามารถ: 4</div>
+      <div class="q-text">
+        <strong>คำถามข้อที่ 6:</strong> จากการสังเกตผลการทดลองของถาด B พบว่าความสูงของต้นกล้าเพิ่มขึ้นอย่างสม่ำเสมอเฉลี่ยวันละ \(1.1\text{ เซนติเมตร}\) หากเงื่อนไขการทดลองยังคงเดิมทุกประการ ในวันที่ 7 ของการทดลอง ต้นกล้าในถาด B จะมีความสูงต่างจากต้นกล้าในถาด C (ซึ่งโตสม่ำเสมอวันละ \(0.8\text{ เซนติเมตร}\)) อยู่กี่เซนติเมตร?
+      </div>
+      <div class="options-grid">
+        <label class="option-label"><input type="radio" name="e6"> ก. 1.8 เซนติเมตร</label>
+        <label class="option-label"><input type="radio" name="e6"> ข. 2.1 เซนติเมตร</label>
+        <label class="option-label"><input type="radio" name="e6"> ค. 2.5 เซนติเมตร</label>
+        <label class="option-label"><input type="radio" name="e6"> ง. 3.0 เซนติเมตร</label>
+      </div>
+      <div class="solution-box">
+        <div class="solution-title">เฉลย: ข. 2.1 เซนติเมตร</div>
+        <strong>เหตุผล:</strong> ระดับ 4 ใช้แบบจำลองการเติบโตเชิงเส้นและอธิบายผล:<br>
+        วิธีที่ 1: ถาด B วันที่ 7 สูง \(7 \times 1.1 = 7.7\text{ ซม.}\), ถาด C วันที่ 7 สูง \(7 \times 0.8 = 5.6\text{ ซม.}\) ผลต่าง \(= 7.7 - 5.6 = 2.1\text{ ซม.}\)<br>
+        วิธีที่ 2: ความต่างต่อวัน \(= 1.1 - 0.8 = 0.3\text{ ซม./วัน}\) เมื่อผ่านไป 7 วัน ต่างกัน \(7 \times 0.3 = 2.1\text{ ซม.}\)
+      </div>
+    </div>
+
+    <!-- ข้อ 7 (ระดับ 5) -->
+    <div class="question-card">
+      <div class="q-header-line1">ข้อความ คณิตศาสตร์ (Mathematical Literacy)&nbsp;&nbsp;&nbsp;&nbsp;บริบทการศึกษา (Educational)</div>
+      <div class="q-header-line2">เนื้อหา: การเชื่อมโยงข้อมูลหลายตัวแปรและข้อจำกัดของแบบจำลองการทดลอง | ระดับชั้น:   -  | ระดับความสามารถ: 5</div>
+      <div class="q-text">
+        <strong>คำถามข้อที่ 7:</strong> นักเรียนต้องการคำนวณ <em>"ดัชนีคุณภาพความสมบูรณ์รวมของถาดทดลอง (\(Q\))"</em> โดยกำหนดสูตร:<br>
+        \[Q = \text{ร้อยละการงอก} - (2 \times \text{ความสูงเฉลี่ยวันที่ 10})\]
+        (หมายเหตุ: พืชที่ยืดสูงเกินไปในที่มืดจะหักล้มง่าย จึงมีการหักลบด้วยสองเท่าของความสูง)<br>
+        ถาดทดลองใดได้ค่าดัชนี \(Q\) สูงที่สุด และมีค่าเท่าใด?
+      </div>
+      <div class="options-grid">
+        <label class="option-label"><input type="radio" name="e7"> ก. ถาด A ได้ค่า \(Q = 52\)</label>
+        <label class="option-label"><input type="radio" name="e7"> ข. ถาด B ได้ค่า \(Q = 68\)</label>
+        <label class="option-label"><input type="radio" name="e7"> ค. ถาด C ได้ค่า \(Q = 80\)</label>
+        <label class="option-label"><input type="radio" name="e7"> ง. ทุกถาดได้ค่า \(Q\) เท่ากัน</label>
+      </div>
+      <div class="solution-box">
+        <div class="solution-title">เฉลย: ค. ถาด C ได้ค่า \(Q = 80\)</div>
+        <strong>เหตุผล:</strong> ระดับ 5 พัฒนาและประยุกต์ใช้แบบจำลองเพื่อประเมินสถานการณ์ภายใต้เงื่อนไขจำกัด:<br>
+        - ถาด A: \(Q = 80 - (2 \times 14.0) = 80 - 28 = 52\)<br>
+        - ถาด B: \(Q = 90 - (2 \times 11.0) = 90 - 22 = 68\)<br>
+        - ถาด C: \(Q = 96 - (2 \times 8.0) = 96 - 16 = 80\)<br>
+        ดังนั้น ถาด C ได้ค่าสูงสุดคือ 80 สะท้อนว่ามีทั้งอัตรารอดตายสูงและลำต้นไม่อวบซีดยืดเกินไป
+      </div>
+    </div>
+
+    <!-- ข้อ 8 (ระดับ 6) -->
+    <div class="question-card">
+      <div class="q-header-line1">ข้อความ คณิตศาสตร์ (Mathematical Literacy)&nbsp;&nbsp;&nbsp;&nbsp;บริบทการศึกษา (Educational)</div>
+      <div class="q-header-line2">เนื้อหา: การให้เหตุผลเชิงนามธรรม ความสัมพันธ์แบบผกผัน และการสรุปนัยทั่วไปเชิงวิทยาศาสตร์ | ระดับชั้น:   -  | ระดับความสามารถ: 6</div>
+      <div class="q-text">
+        <strong>คำถามข้อที่ 8:</strong> จากข้อมูลทั้งหมด ข้อใดสรุปความสัมพันธ์ทางคณิตศาสตร์ระหว่าง <em>"ชั่วโมงแสงแดด (\(L\))"</em>, <em>"ร้อยละการงอก (\(G\))"</em> และ <em>"ความสูงของต้นกล้า (\(H\))"</em> ได้ถูกต้องและสะท้อนตรรกะของการทดลองได้ดีที่สุด?
+      </div>
+      <div class="options-grid">
+        <label class="option-label"><input type="radio" name="e8"> ก. เมื่อชั่วโมงแสงแดด \(L\) เพิ่มขึ้น ทั้ง \(G\) และ \(H\) จะเพิ่มขึ้นตามในอัตราส่วนคงที่</label>
+        <label class="option-label"><input type="radio" name="e8"> ข. เมื่อ \(L\) เพิ่มขึ้น \(G\) จะแปรผันตรงอย่างสมบูรณ์ แต่ \(H\) จะเป็นศูนย์เสมอ</label>
+        <label class="option-label"><input type="radio" name="e8"> ค. เมื่อชั่วโมงแสงแดด \(L\) เพิ่มขึ้น อัตราการงอก \(G\) มีแนวโน้มเพิ่มขึ้น (ความสัมพันธ์เชิงบวก) แต่ความสูง \(H\) มีแนวโน้มลดลง (ความสัมพันธ์เชิงลบ/ย้อนกลับ) เนื่องจากพืชในที่มืดเกิดการยืดลำต้นเพื่อหาแสง</label>
+        <label class="option-label"><input type="radio" name="e8"> ง. ชั่วโมงแสงแดดไม่มีผลต่อตัวแปรใด ๆ เลย เพราะเมล็ดพืชงอกได้จากอาหารสะสมในใบเลี้ยงเท่านั้น</label>
+      </div>
+      <div class="solution-box">
+        <div class="solution-title">เฉลย: ค. เมื่อชั่วโมงแสงแดด \(L\) เพิ่มขึ้น อัตราการงอก \(G\) มีแนวโน้มเพิ่มขึ้น (ความสัมพันธ์เชิงบวก) แต่ความสูง \(H\) มีแนวโน้มลดลง (ความสัมพันธ์เชิงลบ/ย้อนกลับ) เนื่องจากพืชในที่มืดเกิดการยืดลำต้นเพื่อหาแสง</div>
+        <strong>เหตุผล:</strong> ระดับ 6 ใช้เหตุผลเชิงนามธรรม สังเคราะห์ความสัมพันธ์สองทิศทาง (Positive & Inverse relationship):<br>
+        จากตาราง: แสง \(0 \rightarrow 4 \rightarrow 8\) ชม. ส่งผลให้อัตราการงอกเพิ่มขึ้น (\(80\% \rightarrow 90\% \rightarrow 96\%\)) ขณะที่ความสูงกลับลดลง (\(14 \rightarrow 11 \rightarrow 8\) ซม.) การวิเคราะห์นี้แสดงถึงการเชื่อมโยงข้อมูลหลายรูปแบบและให้เหตุผลเชิงวิทยาศาสตร์-คณิตศาสตร์ในระดับสูง
+      </div>
+    </div>
+
+  </div>
+
+</div>
+
+<script>
+function updateGrowthSim() {
+  const light = parseInt(document.getElementById('lightRange').value);
+  const days = parseInt(document.getElementById('dayRange').value);
+
+  document.getElementById('lightBadge').innerText = light + ' ชั่วโมง/วัน';
+  document.getElementById('dayBadge').innerText = days + ' วัน';
+
+  // Growth rate decreases with more light (etiolation effect in darkness)
+  // At 0 hrs: 1.4 cm/day, at 10 hrs: 0.7 cm/day
+  const rate = 1.4 - (light * 0.07);
+  const currentHeight = rate * days;
+
+  document.getElementById('growthRateText').innerText = rate.toFixed(2);
+  document.getElementById('currentHeightText').innerText = currentHeight.toFixed(1);
+
+  const stem = document.getElementById('plantStem');
+  // Scale visual height: max 120px
+  const visualHeight = Math.min(120, Math.max(15, currentHeight * 8));
+  stem.style.height = visualHeight + 'px';
+  stem.innerText = currentHeight.toFixed(1) + ' ซม.';
+}
+</script>
+
+</body>
+</html>

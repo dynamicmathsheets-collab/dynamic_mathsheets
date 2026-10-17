@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PISA Math - ชุดที่ 2: สถิติการยืมหนังสือและการบริหารจัดการห้องสมุดโรงเรียน</title>
+<script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+<style>
+  :root {
+    --primary: #7c3aed;
+    --primary-light: #f5f3ff;
+    --border: #ddd6fe;
+    --bg-card: #ffffff;
+    --text: #1e293b;
+    --accent: #6d28d9;
+  }
+  * { box-sizing: border-box; font-family: 'Sarabun', 'Segoe UI', Tahoma, sans-serif; }
+  body { margin: 0; padding: 20px; background-color: #faf5ff; color: var(--text); line-height: 1.6; }
+  .container { max-width: 1200px; margin: 0 auto; display: flex; flex-direction: column; gap: 20px; }
+
+  /* Top Grid Layout */
+  .top-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+  }
+  @media (max-width: 850px) {
+    .top-grid { grid-template-columns: 1fr; }
+  }
+
+  .panel {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 22px;
+    box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+  }
+
+  /* Interactive Simulator in Frame 1 */
+  .interactive-box {
+    background: #f5f3ff;
+    border: 1px solid #c4b5fd;
+    border-radius: 8px;
+    padding: 15px;
+    margin-top: 15px;
+  }
+  .control-group { margin-bottom: 12px; }
+  .control-group label { display: block; font-weight: 600; margin-bottom: 5px; font-size: 0.95rem; }
+  .control-group input[type="range"] { width: 100%; cursor: pointer; accent-color: #7c3aed; }
+  .val-badge { display: inline-block; background: #7c3aed; color: white; padding: 2px 8px; border-radius: 12px; font-size: 0.85rem; }
+
+  .chart-bar-container {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 12px;
+    margin-top: 10px;
+  }
+  .bar-row { display: flex; align-items: center; margin-bottom: 6px; font-size: 0.85rem; }
+  .bar-label { width: 110px; font-weight: 600; }
+  .bar-outer { flex-grow: 1; background: #e2e8f0; height: 16px; border-radius: 8px; overflow: hidden; margin: 0 8px; }
+  .bar-fill { height: 100%; background: #8b5cf6; transition: width 0.3s; }
+  .bar-val { width: 45px; text-align: right; font-weight: bold; }
+
+  /* Frame 2 Table / Hints */
+  table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 0.92rem; }
+  th, td { border: 1px solid var(--border); padding: 8px 10px; text-align: left; }
+  th { background: #f8fafc; font-weight: 600; }
+  .hint-card {
+    background: #f5f3ff;
+    border-left: 4px solid #8b5cf6;
+    padding: 10px 14px;
+    margin-top: 12px;
+    font-size: 0.9rem;
+    color: #5b21b6;
+    border-radius: 0 8px 8px 0;
+  }
+  .hint-rule {
+    background: #ecfeff;
+    border-left: 4px solid #06b6d4;
+    padding: 10px 14px;
+    margin-top: 10px;
+    font-size: 0.9rem;
+    color: #0e7490;
+    border-radius: 0 8px 8px 0;
+  }
+
+  /* Questions Area */
+  .question-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 20px;
+    margin-bottom: 24px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.03);
+  }
+  .q-header-line1 {
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: #6d28d9;
+    border-bottom: 1px dashed #cbd5e1;
+    padding-bottom: 4px;
+    margin-bottom: 4px;
+  }
+  .q-header-line2 {
+    font-size: 0.9rem;
+    color: #475569;
+    font-weight: 600;
+    margin-bottom: 12px;
+  }
+  .q-text { font-size: 1.05rem; margin-bottom: 12px; line-height: 1.6; }
+  .options-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 15px;
+  }
+  @media (max-width: 650px) {
+    .options-grid { grid-template-columns: 1fr; }
+  }
+  .option-label {
+    background: #f8fafc;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    padding: 10px 14px;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .option-label:hover { background: #f5f3ff; border-color: #a78bfa; }
+  .option-label input { accent-color: #7c3aed; }
+
+  .solution-box {
+    background: #f8fafc;
+    border-left: 4px solid #7c3aed;
+    border-radius: 0 6px 6px 0;
+    padding: 12px 16px;
+    margin-top: 12px;
+    font-size: 0.92rem;
+  }
+  .solution-title { font-weight: bold; color: #5b21b6; margin-bottom: 4px; }
+</style>
+</head>
+<body>
+
+<div class="container">
+
+  <!-- แถวบน: ด้านซ้าย (ส่วนให้ข้อมูล/แบบจำลอง) และ ด้านขวา (ผลการทดลอง/คำแนะนำทางอ้อม) -->
+  <div class="top-grid">
+    <!-- ส่วนข้อมูล/แบบจำลองการสำรวจ -->
+    <div class="panel">
+      <h2 style="margin-top:0; color:#6d28d9; font-size:1.3rem;">สถานการณ์: กิจกรรมส่งเสริมนิสัยรักการอ่านและการจัดสรรทรัพยากรห้องสมุดโรงเรียน</h2>
+      <p style="font-size:0.95rem; color:#475569;">
+        ครูบรรณารักษ์จัดทำโครงการสำรวจสถิติการยืมหนังสือของนักเรียนชั้นประถมศึกษา เพื่อจัดสรรงบประมาณซื้อหนังสือเข้าห้องสมุดจำนวน \(500\text{ เล่มใหม่}\) 
+        โรงเรียนมีนักเรียนทั้งหมด \(600\text{ คน}\) แบ่งเป็นระดับชั้น ป.1 ถึง ป.6 ระดับชั้นละ \(100\text{ คน}\)
+      </p>
+
+      <div class="interactive-box">
+        <h4 style="margin:0 0 10px 0; color:#6d28d9;">📊 เครื่องมือทดลองกระจายงบประมาณจัดซื้อหนังสือใหม่ (500 เล่ม)</h4>
+        
+        <div class="control-group">
+          <label>สัดส่วนหนังสือนิทาน/วรรณกรรม: <span id="storyBadge" class="val-badge">40% (200 เล่ม)</span></label>
+          <input type="range" id="storyRange" min="20" max="60" step="5" value="40" oninput="updateBookSim()">
+        </div>
+
+        <div class="control-group">
+          <label>สัดส่วนหนังสือวิทยาศาสตร์/ความรู้: <span id="sciBadge" class="val-badge">35% (175 เล่ม)</span></label>
+          <input type="range" id="sciRange" min="15" max="50" step="5" value="35" oninput="updateBookSim()">
+        </div>
+
+        <div class="chart-bar-container">
+          <div class="bar-row">
+            <span class="bar-label">นิทาน/วรรณกรรม</span>
+            <div class="bar-outer"><div id="barStory" class="bar-fill" style="width: 40%;"></div></div>
+            <span class="bar-val" id="valStoryText">200</span>
+          </div>
+          <div class="bar-row">
+            <span class="bar-label">วิทยาศาสตร์</span>
+            <div class="bar-outer"><div id="barSci" class="bar-fill" style="width: 35%; background:#06b6d4;"></div></div>
+            <span class="bar-val" id="valSciText">175</span>
+          </div>
+          <div class="bar-row">
+            <span class="bar-label">การ์ตูนความรู้</span>
+            <div class="bar-outer"><div id="barComic" class="bar-fill" style="width: 25%; background:#f59e0b;"></div></div>
+            <span class="bar-val" id="valComicText">125</span>
+          </div>
+        </div>
+
+        <div style="font-size:0.85rem; color:#475569; margin-top:8px;">
+          * ปรับสัดส่วนตามความต้องการของนักเรียน เพื่อให้หนังสือหมุนเวียนได้คุ้มค่าที่สุด
+        </div>
+      </div>
+    </div>
+
+    <!-- ส่วนผลการทดลอง/ข้อมูลแนะนำทางอ้อม -->
+    <div class="panel">
+      <h2 style="margin-top:0; color:#6d28d9; font-size:1.3rem;">ตารางสถิติการยืมหนังสือเฉลี่ยต่อเดือนของนักเรียนแต่ละช่วงชั้น</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>ระดับชั้น</th>
+            <th>จำนวนนักเรียน</th>
+            <th>ยอดการยืมเฉลี่ย<br>(เล่ม/คน/เดือน)</th>
+            <th>หมวดหนังสือที่ยืมสูงสุด</th>
+            <th>ยอดการยืมรวมของชั้น<br>(เล่ม/เดือน)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>ช่วงชั้นที่ 1 (ป.1 - ป.3)</td>
+            <td>300 คน</td>
+            <td>4.0</td>
+            <td>นิทานภาพและวรรณกรรมเด็ก</td>
+            <td>1,200</td>
+          </tr>
+          <tr>
+            <td>ช่วงชั้นที่ 2 (ป.4 - ป.6)</td>
+            <td>300 คน</td>
+            <td>6.0</td>
+            <td>วิทยาศาสตร์และการ์ตูนความรู้</td>
+            <td>1,800</td>
+          </tr>
+          <tr style="font-weight:bold; background:#f8fafc;">
+            <td>รวมทั้งโรงเรียน</td>
+            <td>600 คน</td>
+            <td>5.0 (เฉลี่ยรวม)</td>
+            <td>-</td>
+            <td>3,000</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="hint-card">
+        <strong>💡 ข้อคิดและการแนะแนวทางอ้อม:</strong><br>
+        - การหายอดเฉลี่ยรวมทั้งโรงเรียน: \(\text{ค่าเฉลี่ย} = \frac{1,200 + 1,800}{600} = \frac{3,000}{600} = 5.0\text{ เล่ม/คน/เดือน}\)<br>
+        - นักเรียนช่วงชั้นที่ 2 ยืมหนังสือคิดเป็นร้อยละ \(\frac{1,800}{3,000} \times 100 = 60\%\) ของยอดการยืมทั้งหมดในโรงเรียน
+      </div>
+
+      <div class="hint-rule">
+        <strong>📖 ระเบียบการยืมหนังสือของโรงเรียน:</strong><br>
+        • ยืมได้คนละไม่เกิน 3 เล่มต่อครั้ง มีกำหนดส่งคืนภายใน 7 วัน<br>
+        • นักเรียนที่อ่านสะสมครบ 50 เล่มต่อปีการศึกษา จะได้รับเกียรติบัตรยอดนักอ่าน
+      </div>
+    </div>
+  </div>
+
+  <!-- แถวล่าง: คำถาม 8 ข้อ เรียงลำดับความสามารถ 1c ถึง 6 -->
+  <div class="panel">
+    <h2 style="margin-top:0; color:#6d28d9; font-size:1.4rem; border-bottom:2px solid #ddd6fe; padding-bottom:8px;">
+      แบบทดสอบวัดการรู้เรื่องคณิตศาสตร์ (8 ระดับความสามารถ)
+    </h2>
+
+    <!-- ข้อ 1 (ระดับ 1c) -->
+    <div class="question-card">
+      <div class="q-header-line1">ข้อความ คณิตศาสตร์ (Mathematical Literacy)&nbsp;&nbsp;&nbsp;&nbsp;บริบทการศึกษา (Educational)</div>
+      <div class="q-header-line2">เนื้อหา: จำนวนและการดำเนินการ (การอ่านข้อมูลตรงตัวจากตารางสถิติโรงเรียน) | ระดับชั้น:   -  | ระดับความสามารถ: 1c</div>
+      <div class="q-text">
+        <strong>คำถามข้อที่ 1:</strong> จากตารางสถิติการยืมหนังสือ นักเรียนช่วงชั้นที่ 1 (ป.1 - ป.3) ยืมหนังสือเฉลี่ยคนละกี่เล่มต่อเดือน?
+      </div>
+      <div class="options-grid">
+        <label class="option-label"><input type="radio" name="L1"> ก. 3.0 เล่ม</label>
+        <label class="option-label"><input type="radio" name="L1"> ข. 4.0 เล่ม</label>
+        <label class="option-label"><input type="radio" name="L1"> ค. 5.0 เล่ม</label>
+        <label class="option-label"><input type="radio" name="L1"> ง. 6.0 เล่ม</label>
+      </div>
+      <div class="solution-box">
+        <div class="solution-title">เฉลย: ข. 4.0 เล่ม</div>
+        <strong>เหตุผล:</strong> ระดับ 1c อ่านข้อมูลตรงตัวขั้นตอนเดียว ตารางระบุในช่องยอดการยืมเฉลี่ยของช่วงชั้นที่ 1 เท่ากับ 4.0 เล่ม/คน/เดือน
+      </div>
+    </div>
+
+    <!-- ข้อ 2 (ระดับ 1b) -->
+    <div class="question-card">
+      <div class="q-header-line1">ข้อความ คณิตศาสตร์ (Mathematical Literacy)&nbsp;&nbsp;&nbsp;&nbsp;บริบทการศึกษา (Educational)</div>
+      <div class="q-header-line2">เนื้อหา: จำนวนและการดำเนินการ (การลบจำนวนเต็มอย่างง่าย) | ระดับชั้น:   -  | ระดับความสามารถ: 1b</div>
+      <div class="q-text">
+        <strong>คำถามข้อที่ 2:</strong> ในหนึ่งเดือน ยอดการยืมหนังสือรวมของนักเรียนช่วงชั้นที่ 2 มากกว่ายอดการยืมหนังสือรวมของนักเรียนช่วงชั้นที่ 1 อยู่กี่เล่ม?
+      </div>
+      <div class="options-grid">
+        <label class="option-label"><input type="radio" name="L2"> ก. 400 เล่ม</label>
+        <label class="option-label"><input type="radio" name="L2"> ข. 600 เล่ม</label>
+        <label class="option-label"><input type="radio" name="L2"> ค. 800 เล่ม</label>
+        <label class="option-label"><input type="radio" name="L2"> ง. 1,000 เล่ม</label>
+      </div>
+      <div class="solution-box">
+        <div class="solution-title">เฉลย: ข. 600 เล่ม</div>
+        <strong>เหตุผล:</strong> ระดับ 1b คำนวณจำนวนเต็มอย่างง่ายจากข้อมูลในตาราง \(1,800 - 1,200 = 600\) เล่ม
+      </div>
+    </div>
+
+    <!-- ข้อ 3 (ระดับ 1a) -->
+    <div class="question-card">
+      <div class="q-header-line1">ข้อความ คณิตศาสตร์ (Mathematical Literacy)&nbsp;&nbsp;&nbsp;&nbsp;บริบทการศึกษา (Educational)</div>
+      <div class="q-header-line2">เนื้อหา: จำนวนและการดำเนินการ (การหารและการกระจายตามส่วนเท่ากัน) | ระดับชั้น:   -  | ระดับความสามารถ: 1a</div>
+      <div class="q-text">
+        <strong>คำถามข้อที่ 3:</strong> ในช่วงชั้นที่ 2 มีนักเรียนชั้น ป.4, ป.5 และ ป.6 รวมกัน 300 คน โดยแต่ละระดับชั้นมีจำนวนนักเรียนเท่ากัน (ชั้นละ 100 คน) ถ้านักเรียนชั้น ป.6 มี 100 คน และยืมหนังสือรวมกัน \(700\text{ เล่ม}\) ในเดือนนั้น นักเรียนชั้น ป.6 ยืมหนังสือเฉลี่ยคนละกี่เล่ม?
+      </div>
+      <div class="options-grid">
+        <label class="option-label"><input type="radio" name="L3"> ก. 5 เล่ม</label>
+        <label class="option-label"><input type="radio" name="L3"> ข. 6 เล่ม</label>
+        <label class="option-label"><input type="radio" name="L3"> ค. 7 เล่ม</label>
+        <label class="option-label"><input type="radio" name="L3"> ง. 8 เล่ม</label>
+      </div>
+      <div class="solution-box">
+        <div class="solution-title">เฉลย: ค. 7 เล่ม</div>
+        <strong>เหตุผล:</strong> ระดับ 1a แก้ปัญหาคุ้นเคยด้วยการหารพื้นฐาน \(700 \div 100 = 7\) เล่มต่อคน
+      </div>
+    </div>
+
+    <!-- ข้อ 4 (ระดับ 2) -->
+    <div class="question-card">
+      <div class="q-header-line1">ข้อความ คณิตศาสตร์ (Mathematical Literacy)&nbsp;&nbsp;&nbsp;&nbsp;บริบทการศึกษา (Educational)</div>
+      <div class="q-header-line2">เนื้อหา: ร้อยละและการคำนวณจำนวนสิ่งของ | ระดับชั้น:   -  | ระดับความสามารถ: 2</div>
+      <div class="q-text">
+        <strong>คำถามข้อที่ 4:</strong> ห้องสมุดได้รับงบประมาณจัดซื้อหนังสือใหม่ทั้งหมด \(500\text{ เล่ม}\) หากครูบรรณารักษ์กำหนดให้จัดซื้อหนังสือนิทานและวรรณกรรมเด็กคิดเป็น \(40\%\) ของหนังสือใหม่ทั้งหมด จะต้องซื้อหนังสือนิทานและวรรณกรรมเด็กกี่เล่ม?
+      </div>
+      <div class="options-grid">
+        <label class="option-label"><input type="radio" name="L4"> ก. 150 เล่ม</label>
+        <label class="option-label"><input type="radio" name="L4"> ข. 200 เล่ม</label>
+        <label class="option-label"><input type="radio" name="L4"> ค. 250 เล่ม</label>
+        <label class="option-label"><input type="radio" name="L4"> ง. 300 เล่ม</label>
+      </div>
+      <div class="solution-box">
+        <div class="solution-title">เฉลย: ข. 200 เล่ม</div>
+        <strong>เหตุผล:</strong> ระดับ 2 ตีความร้อยละในบริบทที่กำหนดชัดเจน \(\frac{40}{100} \times 500 = 200\) เล่ม
+      </div>
+    </div>
+
+    <!-- ข้อ 5 (ระดับ 3) -->
+    <div class="question-card">
+      <div class="q-header-line1">ข้อความ คณิตศาสตร์ (Mathematical Literacy)&nbsp;&nbsp;&nbsp;&nbsp;บริบทการศึกษา (Educational)</div>
+      <div class="q-header-line2">เนื้อหา: สัดส่วนร้อยละและการเปรียบเทียบหลายขั้นตอน | ระดับชั้น:   -  | ระดับความสามารถ: 3</div>
+      <div class="q-text">
+        <strong>คำถามข้อที่ 5:</strong> ในบรรดาหนังสือที่นักเรียนยืมทั้งหมด \(3,000\text{ เล่ม}\) ในหนึ่งเดือน เป็นหนังสือหมวดวิทยาศาสตร์ \(900\text{ เล่ม}\) และหมวดการ์ตูนความรู้ \(1,200\text{ เล่ม}\) ยอดการยืมหนังสือสองหมวดนี้รวมกันคิดเป็นร้อยละเท่าใดของยอดการยืมหนังสือทั้งหมดในโรงเรียน?
+      </div>
+      <div class="options-grid">
+        <label class="option-label"><input type="radio" name="L5"> ก. ร้อยละ 55</label>
+        <label class="option-label"><input type="radio" name="L5"> ข. ร้อยละ 60</label>
+        <label class="option-label"><input type="radio" name="L5"> ค. ร้อยละ 70</label>
+        <label class="option-label"><input type="radio" name="L5"> ง. ร้อยละ 75</label>
+      </div>
+      <div class="solution-box">
+        <div class="solution-title">เฉลย: ค. ร้อยละ 70</div>
+        <strong>เหตุผล:</strong> ระดับ 3 กระบวนการทางคณิตศาสตร์หลายขั้นตอน:<br>
+        1. ผลรวมของสองหมวด \(= 900 + 1,200 = 2,100\text{ เล่ม}\)<br>
+        2. คิดเป็นร้อยละ \(= \frac{2,100}{3,000} \times 100 = 70\%\)
+      </div>
+    </div>
+
+    <!-- ข้อ 6 (ระดับ 4) -->
+    <div class="question-card">
+      <div class="q-header-line1">ข้อความ คณิตศาสตร์ (Mathematical Literacy)&nbsp;&nbsp;&nbsp;&nbsp;บริบทการศึกษา (Educational)</div>
+      <div class="q-header-line2">เนื้อหา: แบบจำลองงบประมาณการจัดซื้อและค่าเฉลี่ยต่อหน่วย | ระดับชั้น:   -  | ระดับความสามารถ: 4</div>
+      <div class="q-text">
+        <strong>คำถามข้อที่ 6:</strong> ห้องสมุดจัดซื้อหนังสือใหม่ 500 เล่ม ประกอบด้วย: หนังสือนิทาน \(200\text{ เล่ม}\) (ราคาเฉลี่ยเล่มละ 80 บาท), หนังสือวิทยาศาสตร์ \(175\text{ เล่ม}\) (ราคาเฉลี่ยเล่มละ 120 บาท) และการ์ตูนความรู้ \(125\text{ เล่ม}\) (ราคาเฉลี่ยเล่มละ 100 บาท) งบประมาณรวมที่ใช้จัดซื้อทั้งหมดคิดเป็นกี่บาท และตกราคาเฉลี่ยเล่มละกี่บาท?
+      </div>
+      <div class="options-grid">
+        <label class="option-label"><input type="radio" name="L6"> ก. รวม 45,000 บาท เฉลี่ยเล่มละ 90 บาท</label>
+        <label class="option-label"><input type="radio" name="L6"> ข. รวม 49,500 บาท เฉลี่ยเล่มละ 99 บาท</label>
+        <label class="option-label"><input type="radio" name="L6"> ค. รวม 52,000 บาท เฉลี่ยเล่มละ 104 บาท</label>
+        <label class="option-label"><input type="radio" name="L6"> ง. รวม 55,000 บาท เฉลี่ยเล่มละ 110 บาท</label>
+      </div>
+      <div class="solution-box">
+        <div class="solution-title">เฉลย: ข. รวม 49,500 บาท เฉลี่ยเล่มละ 99 บาท</div>
+        <strong>เหตุผล:</strong> ระดับ 4 ทำงานกับแบบจำลองต้นทุนรวมและค่าเฉลี่ยถ่วงน้ำหนัก:<br>
+        - นิทาน: \(200 \times 80 = 16,000\text{ บาท}\)<br>
+        - วิทยาศาสตร์: \(175 \times 120 = 21,000\text{ บาท}\)<br>
+        - การ์ตูนความรู้: \(125 \times 100 = 12,500\text{ บาท}\)<br>
+        รวมงบประมาณ \(= 16,000 + 21,000 + 12,500 = 49,500\text{ บาท}\)<br>
+        ราคาเฉลี่ยต่อเล่ม \(= \frac{49,500}{500} = 99\text{ บาท}\)
+      </div>
+    </div>
+
+    <!-- ข้อ 7 (ระดับ 5) -->
+    <div class="question-card">
+      <div class="q-header-line1">ข้อความ คณิตศาสตร์ (Mathematical Literacy)&nbsp;&nbsp;&nbsp;&nbsp;บริบทการศึกษา (Educational)</div>
+      <div class="q-header-line2">เนื้อหา: การแก้ปัญหาจัดสรรทรัพยากรภายใต้เงื่อนไขหลายด้าน | ระดับชั้น:   -  | ระดับความสามารถ: 5</div>
+      <div class="q-text">
+        <strong>คำถามข้อที่ 7:</strong> ในปีการศึกษาถัดไป โรงเรียนตั้งเป้าหมายว่า <em>"ยอดการยืมหนังสือเฉลี่ยรวมของทั้งโรงเรียนจะต้องเพิ่มขึ้นจาก 5.0 เล่ม เป็นอย่างน้อย 5.5 เล่ม/คน/เดือน"</em><br>
+        ถ้านักเรียนช่วงชั้นที่ 1 (300 คน) ยังคงยืมหนังสือเท่าเดิมคือเฉลี่ย \(4.0\text{ เล่ม/คน/เดือน}\) นักเรียนช่วงชั้นที่ 2 (300 คน) จะต้องทำยอดการยืมหนังสือเฉลี่ยเพิ่มขึ้นเป็นอย่างน้อยกี่เล่มต่อคนต่อเดือน จึงจะบรรลุเป้าหมายของโรงเรียน?
+      </div>
+      <div class="options-grid">
+        <label class="option-label"><input type="radio" name="L7"> ก. 6.5 เล่ม/คน/เดือน</label>
+        <label class="option-label"><input type="radio" name="L7"> ข. 7.0 เล่ม/คน/เดือน</label>
+        <label class="option-label"><input type="radio" name="L7"> ค. 7.2 เล่ม/คน/เดือน</label>
+        <label class="option-label"><input type="radio" name="L7"> ง. 7.5 เล่ม/คน/เดือน</label>
+      </div>
+      <div class="solution-box">
+        <div class="solution-title">เฉลย: ข. 7.0 เล่ม/คน/เดือน</div>
+        <strong>เหตุผล:</strong> ระดับ 5 สร้างและใช้แบบจำลองแก้ปัญหาซับซ้อนเชิงเงื่อนไข:<br>
+        1. ยอดการยืมรวมเป้าหมายทั้งโรงเรียน (600 คน) \(= 600 \times 5.5 = 3,300\text{ เล่ม}\)<br>
+        2. ช่วงชั้นที่ 1 ยืม \(= 300 \times 4.0 = 1,200\text{ เล่ม}\)<br>
+        3. ยอดที่ช่วงชั้นที่ 2 ต้องยืม \(= 3,300 - 1,200 = 2,100\text{ เล่ม}\)<br>
+        4. เฉลี่ยของช่วงชั้นที่ 2 (300 คน) \(= \frac{2,100}{300} = 7.0\text{ เล่ม/คน/เดือน}\)
+      </div>
+    </div>
+
+    <!-- ข้อ 8 (ระดับ 6) -->
+    <div class="question-card">
+      <div class="q-header-line1">ข้อความ คณิตศาสตร์ (Mathematical Literacy)&nbsp;&nbsp;&nbsp;&nbsp;บริบทการศึกษา (Educational)</div>
+      <div class="q-header-line2">เนื้อหา: การให้เหตุผลเชิงนามธรรม การสร้างตัวแบบหมุนเวียนหนังสือ และการตัดสินใจเชิงนโยบายการศึกษา | ระดับชั้น:   -  | ระดับความสามารถ: 6</div>
+      <div class="q-text">
+        <strong>คำถามข้อที่ 8:</strong> คณะกรรมการสถานศึกษาเสนอนโยบาย <em>"อัตราการหมุนเวียนหนังสือต่อสัปดาห์ (\(R\))"</em> กำหนดโดยสูตร:<br>
+        \[R = \frac{\text{ยอดการยืมรายสัปดาห์}}{\text{จำนวนหนังสือทั้งหมดในห้องสมุด}}\]
+        ในปัจจุบันห้องสมุดมีหนังสือทั้งหมด \(4,000\text{ เล่ม}\) และมียอดการยืมเฉลี่ยสัปดาห์ละ \(750\text{ เล่ม}\) ต่อมาโรงเรียนจัดงบซื้อหนังสือใหม่เพิ่มเข้ามาอีก \(1,000\text{ เล่ม}\)<br>
+        ข้อใดแสดงการวิเคราะห์ทางคณิตศาสตร์ที่ถูกต้องที่สุดเกี่ยวกับการเปลี่ยนแปลงของอัตราการหมุนเวียน \(R\) หากยอดการยืมรายสัปดาห์เพิ่มขึ้นตามมาเป็น \(900\text{ เล่ม}\)?
+      </div>
+      <div class="options-grid">
+        <label class="option-label"><input type="radio" name="L8"> ก. อัตราการหมุนเวียน \(R\) เพิ่มขึ้น เพราะมีจำนวนเล่มที่ถูกยืมต่อสัปดาห์เพิ่มขึ้นจาก 750 เป็น 900 เล่ม</label>
+        <label class="option-label"><input type="radio" name="L8"> ข. อัตราการหมุนเวียน \(R\) ลดลงจาก 0.1875 เหลือ 0.1800 เนื่องจากอัตราการเพิ่มขึ้นของจำนวนหนังสือทั้งหมดในคลัง (เพิ่มขึ้น 25%) สูงกว่าอัตราการเพิ่มขึ้นของยอดการยืม (เพิ่มขึ้น 20%)</label>
+        <label class="option-label"><input type="radio" name="L8"> ค. อัตราการหมุนเวียน \(R\) เท่าเดิมพอดี เพราะสัดส่วนหนังสือใหม่ที่ซื้อเข้ามาเป็นสัดส่วนเดียวกับยอดการยืมที่เพิ่มขึ้น</label>
+        <label class="option-label"><input type="radio" name="L8"> ง. อัตราการหมุนเวียน \(R\) ไม่สามารถคำนวณได้ เพราะระยะเวลาการยืมจำกัดเพียง 7 วัน</label>
+      </div>
+      <div class="solution-box">
+        <div class="solution-title">เฉลย: ข. อัตราการหมุนเวียน \(R\) ลดลงจาก 0.1875 เหลือ 0.1800 เนื่องจากอัตราการเพิ่มขึ้นของจำนวนหนังสือทั้งหมดในคลัง (เพิ่มขึ้น 25%) สูงกว่าอัตราการเพิ่มขึ้นของยอดการยืม (เพิ่มขึ้น 20%)</div>
+        <strong>เหตุผล:</strong> ระดับ 6 การให้เหตุผลเชิงนามธรรม เปรียบเทียบอัตราส่วนสัมพัทธ์และอัตราการเติบโต:<br>
+        1. ค่าเดิม: \(R_1 = \frac{750}{4,000} = 0.1875\) (หรือ \(18.75\%\))<br>
+        2. ค่าใหม่: จำนวนหนังสือเป็น \(4,000 + 1,000 = 5,000\text{ เล่ม}\), \(R_2 = \frac{900}{5,000} = 0.1800\) (หรือ \(18.00\%\))<br>
+        3. การวิเคราะห์เชิงสัดส่วน: ตัวตั้งเพิ่มขึ้น \(\frac{150}{750} = 20\%\) แต่ตัวหารเพิ่มขึ้น \(\frac{1,000}{4,000} = 25\%\) การที่ตัวหารโตเร็วกว่าตัวตั้งส่งผลให้ค่าอัตราส่วนลดลง
+      </div>
+    </div>
+
+  </div>
+
+</div>
+
+<script>
+function updateBookSim() {
+  const storyPct = parseInt(document.getElementById('storyRange').value);
+  const sciPct = parseInt(document.getElementById('sciRange').value);
+  
+  // Remaining for comics
+  let comicPct = 100 - storyPct - sciPct;
+  if (comicPct < 0) {
+    comicPct = 0;
+  }
+
+  document.getElementById('storyBadge').innerText = storyPct + '% (' + (500 * storyPct / 100) + ' เล่ม)';
+  document.getElementById('sciBadge').innerText = sciPct + '% (' + (500 * sciPct / 100) + ' เล่ม)';
+
+  const storyBooks = Math.round(500 * storyPct / 100);
+  const sciBooks = Math.round(500 * sciPct / 100);
+  const comicBooks = 500 - storyBooks - sciBooks;
+
+  document.getElementById('barStory').style.width = storyPct + '%';
+  document.getElementById('barSci').style.width = sciPct + '%';
+  document.getElementById('barComic').style.width = ((comicBooks / 500) * 100) + '%';
+
+  document.getElementById('valStoryText').innerText = storyBooks;
+  document.getElementById('valSciText').innerText = sciBooks;
+  document.getElementById('valComicText').innerText = comicBooks;
+}
+</script>
+
+</body>
+</html>

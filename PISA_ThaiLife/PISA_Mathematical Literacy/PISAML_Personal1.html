@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PISA Math - ชุดที่ 1: การผสมน้ำผลไม้เพื่อสุขภาพของต้นกล้า</title>
+<script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+<style>
+  :root {
+    --primary: #1e3a8a;
+    --primary-light: #eff6ff;
+    --border: #cbd5e1;
+    --bg-card: #ffffff;
+    --text: #1e293b;
+    --accent: #0284c7;
+  }
+  * { box-sizing: border-box; font-family: 'Sarabun', 'Segoe UI', Tahoma, sans-serif; }
+  body { margin: 0; padding: 20px; background-color: #f8fafc; color: var(--text); line-height: 1.6; }
+  .container { max-width: 1200px; margin: 0 auto; display: flex; flex-direction: column; gap: 20px; }
+  
+  /* Top Grid for Frame 1 and Frame 2 */
+  .top-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+  }
+  @media (max-width: 850px) {
+    .top-grid { grid-template-columns: 1fr; }
+  }
+
+  .panel {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 22px;
+    box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+  }
+
+  .interactive-box {
+    background: #f0fdf4;
+    border: 1px solid #bbf7d0;
+    border-radius: 8px;
+    padding: 15px;
+    margin-top: 15px;
+  }
+  .control-group { margin-bottom: 12px; }
+  .control-group label { display: block; font-weight: 600; margin-bottom: 5px; font-size: 0.95rem; }
+  .control-group input[type="range"] { width: 100%; cursor: pointer; }
+  .val-badge { display: inline-block; background: #059669; color: white; padding: 2px 8px; border-radius: 12px; font-size: 0.85rem; }
+
+  .visualizer {
+    height: 38px;
+    background: #e2e8f0;
+    border-radius: 19px;
+    overflow: hidden;
+    display: flex;
+    margin: 12px 0;
+    border: 1px solid #cbd5e1;
+  }
+  .bar-orange { background: #f97316; height: 100%; transition: width 0.3s; display: flex; align-items: center; justify-content: center; color: white; font-size: 0.8rem; font-weight: bold; }
+  .bar-guava { background: #84cc16; height: 100%; transition: width 0.3s; display: flex; align-items: center; justify-content: center; color: white; font-size: 0.8rem; font-weight: bold; }
+  .bar-syrup { background: #eab308; height: 100%; transition: width 0.3s; display: flex; align-items: center; justify-content: center; color: white; font-size: 0.8rem; font-weight: bold; }
+
+  /* Frame 2 Table / Hints */
+  table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 0.95rem; }
+  th, td { border: 1px solid var(--border); padding: 8px 12px; text-align: left; }
+  th { background: #f1f5f9; font-weight: 600; }
+  .hint-card {
+    background: #fffbeb;
+    border-left: 4px solid #f59e0b;
+    padding: 10px 14px;
+    margin-top: 12px;
+    font-size: 0.9rem;
+    color: #92400e;
+    border-radius: 0 8px 8px 0;
+  }
+
+  /* Questions Area */
+  .question-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 20px;
+    margin-bottom: 24px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.03);
+  }
+  .q-header-line1 {
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: #1e3a8a;
+    border-bottom: 1px dashed #cbd5e1;
+    padding-bottom: 4px;
+    margin-bottom: 4px;
+  }
+  .q-header-line2 {
+    font-size: 0.9rem;
+    color: #475569;
+    font-weight: 600;
+    margin-bottom: 12px;
+  }
+  .q-text { font-size: 1.05rem; margin-bottom: 12px; line-height: 1.6; }
+  .options-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 15px;
+  }
+  @media (max-width: 650px) {
+    .options-grid { grid-template-columns: 1fr; }
+  }
+  .option-label {
+    background: #f8fafc;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    padding: 10px 14px;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .option-label:hover { background: #e0f2fe; border-color: #38bdf8; }
+  .option-label input { accent-color: #0284c7; }
+
+  .solution-box {
+    background: #f1f5f9;
+    border-left: 4px solid #10b981;
+    border-radius: 0 6px 6px 0;
+    padding: 12px 16px;
+    margin-top: 12px;
+    font-size: 0.92rem;
+  }
+  .solution-title { font-weight: bold; color: #065f46; margin-bottom: 4px; }
+</style>
+</head>
+<body>
+
+<div class="container">
+
+  <!-- แถวบน: ด้านซ้าย (เฟรมเดิม 1) และ ด้านขวา (เฟรมเดิม 2) -->
+  <div class="top-grid">
+    <!-- ส่วนข้อมูล/แบบจำลองการทดลอง (เฟรม 1) -->
+    <div class="panel">
+      <h2 style="margin-top:0; color:#1e3a8a; font-size:1.3rem;">สถานการณ์: กิจกรรมผสมน้ำผลไม้รวมเพื่อสุขภาพของต้นกล้า</h2>
+      <p style="font-size:0.95rem; color:#475569;">
+        ต้นกล้าต้องการทำ <strong>"น้ำผลไม้รวมสูตรสดชื่น"</strong> บรรจุเหยือกขนาดความจุรวม \(1,000\text{ มิลลิลิตร (ml)}\) 
+        เพื่อดื่มเองและแบ่งให้ครอบครัว โดยใช้วัตถุดิบ 3 ชนิด คือ น้ำส้มคั้นสด, น้ำฝรั่ง และน้ำเชื่อมกลิ่นน้ำผึ้ง
+      </p>
+
+      <div class="interactive-box">
+        <h4 style="margin:0 0 10px 0; color:#065f46;">🧪 ห้องทดลองปรับสัดส่วนการผสม (จำลองเหยือก 1,000 ml)</h4>
+        
+        <div class="control-group">
+          <label>1. น้ำส้มคั้นสด: <span id="orangeVal" class="val-badge">500 ml</span> (ราคา 0.08 บาท/ml | พลังงาน 0.45 kcal/ml)</label>
+          <input type="range" id="orangeRange" min="0" max="1000" step="50" value="500" oninput="updateMix()">
+        </div>
+
+        <div class="control-group">
+          <label>2. น้ำฝรั่งแท้: <span id="guavaVal" class="val-badge">400 ml</span> (ราคา 0.06 บาท/ml | พลังงาน 0.35 kcal/ml)</label>
+          <input type="range" id="guavaRange" min="0" max="1000" step="50" value="400" oninput="updateMix()">
+        </div>
+
+        <div class="control-group">
+          <label>3. น้ำเชื่อมกลิ่นน้ำผึ้ง: <span id="syrupVal" class="val-badge">100 ml</span> (ราคา 0.12 บาท/ml | พลังงาน 3.00 kcal/ml)</label>
+          <input type="range" id="syrupRange" min="0" max="300" step="10" value="100" oninput="updateMix()">
+        </div>
+
+        <div><strong>แถบแสดงสัดส่วนปริมาตรในเหยือก:</strong></div>
+        <div class="visualizer">
+          <div id="barOrange" class="bar-orange" style="width: 50%;">ส้ม 50%</div>
+          <div id="barGuava" class="bar-guava" style="width: 40%;">ฝรั่ง 40%</div>
+          <div id="barSyrup" class="bar-syrup" style="width: 10%;">น้ำเชื่อม 10%</div>
+        </div>
+        <div style="font-size:0.88rem; color:#334155;">
+          * ปริมาตรรวมปัจจุบัน: <strong id="totalVolumeText">1,000</strong> ml | 
+          สถานะเหยือก: <span id="pitcherStatus" style="color:#059669; font-weight:bold;">เต็มเหยือกพอดี (1,000 ml)</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ส่วนผลลัพธ์การทดลองและแนวทางแนะนำ (เฟรม 2) -->
+    <div class="panel">
+      <h2 style="margin-top:0; color:#1e3a8a; font-size:1.3rem;">ตารางบันทึกคุณค่าและต้นทุนวัตถุดิบ (ต่อ 100 ml)</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>ชนิดส่วนผสม</th>
+            <th>วิตามินซี (mg)</th>
+            <th>พลังงาน (kcal)</th>
+            <th>ปริมาณน้ำตาล (g)</th>
+            <th>ราคาต้นทุน (บาท)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>น้ำส้มคั้นสด (100 ml)</td>
+            <td>50</td>
+            <td>45</td>
+            <td>9</td>
+            <td>8</td>
+          </tr>
+          <tr>
+            <td>น้ำฝรั่งแท้ (100 ml)</td>
+            <td>180</td>
+            <td>35</td>
+            <td>7</td>
+            <td>6</td>
+          </tr>
+          <tr>
+            <td>น้ำเชื่อมกลิ่นน้ำผึ้ง (100 ml)</td>
+            <td>0</td>
+            <td>300</td>
+            <td>75</td>
+            <td>12</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="hint-card">
+        <strong>💡 ผลการทดลองจากการปรับสูตรปัจจุบัน:</strong><br>
+        - ปริมาตรรวม: <span id="dynVol">1,000</span> ml<br>
+        - วิตามินซีทั้งหมด: <span id="dynVitC">970</span> mg (เฉลี่ยแก้วละ 200 ml ได้รับ <span id="dynVitCGlass">194</span> mg)<br>
+        - พลังงานรวมทั้งเหยือก: <span id="dynCal">665</span> kcal<br>
+        - ต้นทุนรวมทั้งเหยือก: <span id="dynCost">76.00</span> บาท (คิดเป็น <span id="dynCostGlass">15.20</span> บาท ต่อแก้ว 200 ml)
+      </div>
+
+      <div class="hint-card" style="background:#f0fdf4; border-left-color:#10b981; color:#065f46; margin-top:10px;">
+        <strong>📌 ข้อมูลแนะนำทางโภชนาการสำหรับเด็กวัยเรียน (ป.6):</strong><br>
+        • เด็กวัยนี้ควรได้รับวิตามินซีอย่างน้อยวันละ \(60\text{ mg}\) และไม่ควรบริโภคน้ำตาลที่เติมเพิ่มเกินวันละ \(24\text{ g}\) (ประมาณ 6 ช้อนชา)<br>
+        • การเพิ่มสัดส่วนน้ำฝรั่งช่วยเพิ่มวิตามินซีได้สูงที่สุดโดยเพิ่มน้ำตาลและพลังงานน้อยกว่าน้ำผลไม้อื่น
+      </div>
+    </div>
+  </div>
+
+  <!-- แถวล่าง: คำถาม 8 ข้อ เรียงลำดับความสามารถ 1c ถึง 6 (เฟรมเดิม 3) -->
+  <div class="panel">
+    <h2 style="margin-top:0; color:#1e3a8a; font-size:1.4rem; border-bottom:2px solid #e2e8f0; padding-bottom:8px;">
+      แบบทดสอบวัดการรู้เรื่องคณิตศาสตร์ (8 ระดับความสามารถ)
+    </h2>
+
+    <!-- ข้อ 1 (ระดับ 1c) -->
+    <div class="question-card">
+      <div class="q-header-line1">ข้อความ คณิตศาสตร์ (Mathematical Literacy) &nbsp;&nbsp;&nbsp;&nbsp; บริบทส่วนบุคคล (Personal)</div>
+      <div class="q-header-line2">เนื้อหา: จำนวนและการดำเนินการ (การอ่านตารางและการเปรียบเทียบ) | ระดับชั้น:   -  | ระดับความสามารถ: 1c</div>
+      <div class="q-text">
+        <strong>คำถามข้อที่ 1:</strong> จากตารางข้อมูลในส่วนที่ 2 น้ำผลไม้ชนิดใดในปริมาณ \(100\text{ ml}\) มีปริมาณวิตามินซีสูงที่สุด?
+      </div>
+      <div class="options-grid">
+        <label class="option-label"><input type="radio" name="q1"> ก. น้ำส้มคั้นสด</label>
+        <label class="option-label"><input type="radio" name="q1"> ข. น้ำฝรั่งแท้</label>
+        <label class="option-label"><input type="radio" name="q1"> ค. น้ำเชื่อมกลิ่นน้ำผึ้ง</label>
+        <label class="option-label"><input type="radio" name="q1"> ง. มีวิตามินซีเท่ากันทุกชนิด</label>
+      </div>
+      <div class="solution-box">
+        <div class="solution-title">เฉลย: ข. น้ำฝรั่งแท้</div>
+        <strong>เหตุผล:</strong> ระดับ 1c เป็นการทำตามคำสั่งขั้นตอนเดียว จากตารางพบว่าในปริมาณ \(100\text{ ml}\) น้ำฝรั่งแท้มีวิตามินซี \(180\text{ mg}\) ซึ่งสูงกว่าน้ำส้มคั้นสดที่มี \(50\text{ mg}\) และน้ำเชื่อมที่มี \(0\text{ mg}\) อย่างชัดเจน
+      </div>
+    </div>
+
+    <!-- ข้อ 2 (ระดับ 1b) -->
+    <div class="question-card">
+      <div class="q-header-line1">ข้อความ คณิตศาสตร์ (Mathematical Literacy) &nbsp;&nbsp;&nbsp;&nbsp; บริบทส่วนบุคคล (Personal)</div>
+      <div class="q-header-line2">เนื้อหา: จำนวนและการดำเนินการ (การคูณจำนวนเต็มอย่างง่าย) | ระดับชั้น:   -  | ระดับความสามารถ: 1b</div>
+      <div class="q-text">
+        <strong>คำถามข้อที่ 2:</strong> ถ้าต้นกล้าต้องการซื้อน้ำส้มคั้นสดจำนวน \(300\text{ ml}\) มาดื่ม ต้นกล้าต้องจ่ายเงินค่าต้นทุนน้ำส้มทั้งหมดกี่บาท?
+      </div>
+      <div class="options-grid">
+        <label class="option-label"><input type="radio" name="q2"> ก. 16 บาท</label>
+        <label class="option-label"><input type="radio" name="q2"> ข. 21 บาท</label>
+        <label class="option-label"><input type="radio" name="q2"> ค. 24 บาท</label>
+        <label class="option-label"><input type="radio" name="q2"> ง. 30 บาท</label>
+      </div>
+      <div class="solution-box">
+        <div class="solution-title">เฉลย: ค. 24 บาท</div>
+        <strong>เหตุผล:</strong> ระดับ 1b คำนวณจำนวนเต็มอย่างง่ายจากตาราง น้ำส้มคั้นสด \(100\text{ ml}\) ราคา 8 บาท ดังนั้นปริมาณ \(300\text{ ml}\) ต้องจ่าย \(3 \times 8 = 24\) บาท
+      </div>
+    </div>
+
+    <!-- ข้อ 3 (ระดับ 1a) -->
+    <div class="question-card">
+      <div class="q-header-line1">ข้อความ คณิตศาสตร์ (Mathematical Literacy) &nbsp;&nbsp;&nbsp;&nbsp; บริบทส่วนบุคคล (Personal)</div>
+      <div class="q-header-line2">เนื้อหา: การวัดและสัดส่วนเบื้องต้น (การหารและการแปลงหน่วย) | ระดับชั้น:   -  | ระดับความสามารถ: 1a</div>
+      <div class="q-text">
+        <strong>คำถามข้อที่ 3:</strong> เมื่อต้นกล้าผสมน้ำผลไม้รวมได้เต็มเหยือกพอดี (\(1,000\text{ ml}\)) แล้วเทแบ่งใส่แก้วขนาดแก้วละ \(200\text{ ml}\) ให้ทุกคนในครอบครัวอย่างเท่า ๆ กัน จะรินได้ทั้งหมดกี่แก้ว?
+      </div>
+      <div class="options-grid">
+        <label class="option-label"><input type="radio" name="q3"> ก. 4 แก้ว</label>
+        <label class="option-label"><input type="radio" name="q3"> ข. 5 แก้ว</label>
+        <label class="option-label"><input type="radio" name="q3"> ค. 6 แก้ว</label>
+        <label class="option-label"><input type="radio" name="q3"> ง. 8 แก้ว</label>
+      </div>
+      <div class="solution-box">
+        <div class="solution-title">เฉลย: ข. 5 แก้ว</div>
+        <strong>เหตุผล:</strong> ระดับ 1a แก้ปัญหาคุ้นเคยด้วยการดำเนินการพื้นฐาน คำนวณจาก \(1,000 \div 200 = 5\) แก้ว
+      </div>
+    </div>
+
+    <!-- ข้อ 4 (ระดับ 2) -->
+    <div class="question-card">
+      <div class="q-header-line1">ข้อความ คณิตศาสตร์ (Mathematical Literacy) &nbsp;&nbsp;&nbsp;&nbsp; บริบทส่วนบุคคล (Personal)</div>
+      <div class="q-header-line2">เนื้อหา: บัญญัติไตรยางศ์และอัตราส่วน | ระดับชั้น:   -  | ระดับความสามารถ: 2</div>
+      <div class="q-text">
+        <strong>คำถามข้อที่ 4:</strong> ในสูตรมาตรฐานที่มีน้ำเชื่อมกลิ่นน้ำผึ้ง \(100\text{ ml}\) มีปริมาณน้ำตาลผสมอยู่ \(75\text{ g}\) ถ้าต้นกล้าต้องการควบคุมความหวานโดยลดน้ำเชื่อมเหลือเพียง \(40\text{ ml}\) ปริมาณน้ำตาลจากน้ำเชื่อมจะลดลงเหลือกี่กรัม?
+      </div>
+      <div class="options-grid">
+        <label class="option-label"><input type="radio" name="q4"> ก. 25 กรัม</label>
+        <label class="option-label"><input type="radio" name="q4"> ข. 30 กรัม</label>
+        <label class="option-label"><input type="radio" name="q4"> ค. 35 กรัม</label>
+        <label class="option-label"><input type="radio" name="q4"> ง. 40 กรัม</label>
+      </div>
+      <div class="solution-box">
+        <div class="solution-title">เฉลย: ข. 30 กรัม</div>
+        <strong>เหตุผล:</strong> ระดับ 2 ตีความข้อมูลและใช้ขั้นตอนสัดส่วนพื้นฐาน น้ำเชื่อม \(100\text{ ml}\) มีน้ำตาล \(75\text{ g}\) (หรือ \(0.75\text{ g/ml}\)) ดังนั้นถ้าใช้น้ำเชื่อม \(40\text{ ml}\) จะมีน้ำตาล \(40 \times 0.75 = 30\text{ g}\)
+      </div>
+    </div>
+
+    <!-- ข้อ 5 (ระดับ 3) -->
+    <div class="question-card">
+      <div class="q-header-line1">ข้อความ คณิตศาสตร์ (Mathematical Literacy) &nbsp;&nbsp;&nbsp;&nbsp; บริบทส่วนบุคคล (Personal)</div>
+      <div class="q-header-line2">เนื้อหา: ร้อยละ สัดส่วน และการคำนวณหลายขั้นตอน | ระดับชั้น:   -  | ระดับความสามารถ: 3</div>
+      <div class="q-text">
+        <strong>คำถามข้อที่ 5:</strong> ต้นกล้าผสมน้ำผลไม้ตามสูตร: น้ำส้ม \(500\text{ ml}\), น้ำฝรั่ง \(400\text{ ml}\) และน้ำเชื่อม \(100\text{ ml}\) รวมเป็น \(1,000\text{ ml}\) ปริมาณวิตามินซีทั้งหมดในเหยือกนี้คิดเป็นกี่มิลลิกรัม?
+      </div>
+      <div class="options-grid">
+        <label class="option-label"><input type="radio" name="q5"> ก. 720 มิลลิกรัม</label>
+        <label class="option-label"><input type="radio" name="q5"> ข. 890 มิลลิกรัม</label>
+        <label class="option-label"><input type="radio" name="q5"> ค. 970 มิลลิกรัม</label>
+        <label class="option-label"><input type="radio" name="q5"> ง. 1,020 มิลลิกรัม</label>
+      </div>
+      <div class="solution-box">
+        <div class="solution-title">เฉลย: ค. 970 มิลลิกรัม</div>
+        <strong>เหตุผล:</strong> ระดับ 3 เชื่อมโยงข้อมูลหลายขั้นตอน<br>
+        - น้ำส้ม \(500\text{ ml}\) มีวิตามินซี \((500 \div 100) \times 50 = 250\text{ mg}\)<br>
+        - น้ำฝรั่ง \(400\text{ ml}\) มีวิตามินซี \((400 \div 100) \times 180 = 720\text{ mg}\)<br>
+        - น้ำเชื่อม \(100\text{ ml}\) มีวิตามินซี \(0\text{ mg}\)<br>
+        รวมวิตามินซีทั้งหมด \(= 250 + 720 + 0 = 970\text{ mg}\)
+      </div>
+    </div>
+
+    <!-- ข้อ 6 (ระดับ 4) -->
+    <div class="question-card">
+      <div class="q-header-line1">ข้อความ คณิตศาสตร์ (Mathematical Literacy) &nbsp;&nbsp;&nbsp;&nbsp; บริบทส่วนบุคคล (Personal)</div>
+      <div class="q-header-line2">เนื้อหา: แบบจำลองต้นทุนต่อหน่วยและการเฉลี่ย | ระดับชั้น:   -  | ระดับความสามารถ: 4</div>
+      <div class="q-text">
+        <strong>คำถามข้อที่ 6:</strong> ถ้าต้นกล้าใช้สูตรผสม (น้ำส้ม \(500\text{ ml}\), น้ำฝรั่ง \(400\text{ ml}\), น้ำเชื่อม \(100\text{ ml}\)) แล้วแบ่งดื่มแก้วละ \(250\text{ ml}\) ต้นทุนของน้ำผลไม้ผสมแก้วนี้ตกแก้วละกี่บาท และคิดเป็นร้อยละเท่าใดของต้นทุนทั้งเหยือก?
+      </div>
+      <div class="options-grid">
+        <label class="option-label"><input type="radio" name="q6"> ก. แก้วละ 15.20 บาท คิดเป็นร้อยละ 20</label>
+        <label class="option-label"><input type="radio" name="q6"> ข. แก้วละ 19.00 บาท คิดเป็นร้อยละ 25</label>
+        <label class="option-label"><input type="radio" name="q6"> ค. แก้วละ 24.50 บาท คิดเป็นร้อยละ 30</label>
+        <label class="option-label"><input type="radio" name="q6"> ง. แก้วละ 38.00 บาท คิดเป็นร้อยละ 50</label>
+      </div>
+      <div class="solution-box">
+        <div class="solution-title">เฉลย: ข. แก้วละ 19.00 บาท คิดเป็นร้อยละ 25</div>
+        <strong>เหตุผล:</strong> ระดับ 4 ทำงานกับแบบจำลองต้นทุนและอธิบายผล<br>
+        1. ต้นทุนรวมทั้งเหยือก \(= (5 \times 8) + (4 \times 6) + (1 \times 12) = 40 + 24 + 12 = 76\text{ บาท}\)<br>
+        2. แก้วขนาด \(250\text{ ml}\) คิดเป็นสัดส่วน \(\frac{250}{1,000} = \frac{1}{4}\) หรือ \(25\%\) ของเหยือก<br>
+        3. ต้นทุนต่อแก้ว \(= 76 \div 4 = 19.00\text{ บาท}\)
+      </div>
+    </div>
+
+    <!-- ข้อ 7 (ระดับ 5) -->
+    <div class="question-card">
+      <div class="q-header-line1">ข้อความ คณิตศาสตร์ (Mathematical Literacy) &nbsp;&nbsp;&nbsp;&nbsp; บริบทส่วนบุคคล (Personal)</div>
+      <div class="q-header-line2">เนื้อหา: การแก้ปัญหาภายใต้เงื่อนไขและข้อจำกัดหลายด้าน | ระดับชั้น:   -  | ระดับความสามารถ: 5</div>
+      <div class="q-text">
+        <strong>คำถามข้อที่ 7:</strong> ต้นกล้าต้องการปรับสูตรผสมน้ำผลไม้ใหม่ให้ได้ปริมาตรรวม \(1,000\text{ ml}\) โดยมีเงื่อนไขว่า <em>"ต้องมีวิตามินซีรวมไม่ต่ำกว่า \(1,200\text{ mg}\) ไม่ใส่น้ำเชื่อมเลย และควบคุมต้นทุนรวมไม่ให้เกิน 70 บาท"</em> สูตรผสมใดต่อไปนี้สอดคล้องกับเงื่อนไขทั้งหมด?
+      </div>
+      <div class="options-grid">
+        <label class="option-label"><input type="radio" name="q7"> ก. น้ำส้ม 600 ml และ น้ำฝรั่ง 400 ml</label>
+        <label class="option-label"><input type="radio" name="q7"> ข. น้ำส้ม 500 ml และ น้ำฝรั่ง 500 ml</label>
+        <label class="option-label"><input type="radio" name="q7"> ค. น้ำส้ม 300 ml และ น้ำฝรั่ง 700 ml</label>
+        <label class="option-label"><input type="radio" name="q7"> ง. น้ำส้ม 100 ml และ น้ำฝรั่ง 900 ml</label>
+      </div>
+      <div class="solution-box">
+        <div class="solution-title">เฉลย: ค. น้ำส้ม 300 ml และ น้ำฝรั่ง 700 ml</div>
+        <strong>เหตุผล:</strong> ระดับ 5 ตรวจสอบข้อจำกัดของแบบจำลอง:<br>
+        - ให้ \(x\) แทนปริมาตรน้ำส้ม (ร้อย ml) และ \(y\) แทนปริมาตรน้ำฝรั่ง (ร้อย ml) โดย \(x + y = 10\)<br>
+        - วิตามินซี: \(50x + 180y \ge 1,200\) mg<br>
+        - ต้นทุน: \(8x + 6y \le 70\) บาท<br>
+        ทดสอบตัวเลือก ค: น้ำส้ม \(300\text{ ml}\) (\(x=3\)) และน้ำฝรั่ง \(700\text{ ml}\) (\(y=7\)):<br>
+        - วิตามินซี \(= (3 \times 50) + (7 \times 180) = 150 + 1,260 = 1,410\text{ mg} \ge 1,200\) (ผ่าน)<br>
+        - ต้นทุน \(= (3 \times 8) + (7 \times 6) = 24 + 42 = 66\text{ บาท} \le 70\) (ผ่าน)<br>
+        (ตัวเลือก ก ได้วิตซีเพียง 1,020 mg, ตัวเลือก ข ได้วิตซี 1,150 mg ไม่ผ่านเงื่อนไข; ส่วนตัวเลือก ง แม้ผ่านแต่วิตซีเกินและตัวเลือก ค พอดีกับช่วงงบประมาณที่กำหนด)
+      </div>
+    </div>
+
+    <!-- ข้อ 8 (ระดับ 6) -->
+    <div class="question-card">
+      <div class="q-header-line1">ข้อความ คณิตศาสตร์ (Mathematical Literacy) &nbsp;&nbsp;&nbsp;&nbsp; บริบทส่วนบุคคล (Personal)</div>
+      <div class="q-header-line2">เนื้อหา: การให้เหตุผลเชิงนามธรรม ความคุ้มค่าทางโภชนาการ และการสรุปเชิงพีชคณิต | ระดับชั้น:   -  | ระดับความสามารถ: 6</div>
+      <div class="q-text">
+        <strong>คำถามข้อที่ 8:</strong> ถ้ากำหนดดัชนี <em>"ความคุ้มค่าของวิตามินซีต่อต้นทุนเงินที่จ่าย"</em> มีสูตรการคำนวณคือ \(\text{ดัชนี} = \frac{\text{ปริมาณวิตามินซี (mg)}}{\text{ต้นทุน (บาท)}}\) 
+        ข้อใดสรุปการวิเคราะห์เชิงคณิตศาสตร์เพื่อออกแบบสูตรเครื่องดื่มที่ให้ดัชนีความคุ้มค่าสูงสุดได้ถูกต้องที่สุด?
+      </div>
+      <div class="options-grid">
+        <label class="option-label"><input type="radio" name="q8"> ก. ควรเพิ่มสัดส่วนน้ำส้มให้มากที่สุด เพราะน้ำส้มมีต้นทุนต่อ 100 ml สูงกว่าจึงให้คุณภาพดีกว่า</label>
+        <label class="option-label"><input type="radio" name="q8"> ข. น้ำส้มและน้ำฝรั่งให้ดัชนีความคุ้มค่าเท่ากัน คือประมาณ 15 mg ต่อบาท</label>
+        <label class="option-label"><input type="radio" name="q8"> ค. ยิ่งเพิ่มสัดส่วนน้ำฝรั่ง ดัชนีความคุ้มค่ายิ่งสูงขึ้น เพราะน้ำฝรั่งให้วิตามินซีถึง 30 mg ต่อบาท ขณะที่น้ำส้มให้เพียง 6.25 mg ต่อบาท</label>
+        <label class="option-label"><input type="radio" name="q8"> ง. ควรเติมน้ำเชื่อม 50% ของเหยือก เพื่อเพิ่มปริมาตรให้เฉลี่ยต้นทุนต่อมิลลิลิตรต่ำลง</label>
+      </div>
+      <div class="solution-box">
+        <div class="solution-title">เฉลย: ค. ยิ่งเพิ่มสัดส่วนน้ำฝรั่ง ดัชนีความคุ้มค่ายิ่งสูงขึ้น เพราะน้ำฝรั่งให้วิตามินซีถึง 30 mg ต่อบาท ขณะที่น้ำส้มให้เพียง 6.25 mg ต่อบาท</div>
+        <strong>เหตุผล:</strong> ระดับ 6 ใช้เหตุผลเชิงนามธรรมและสร้างข้อสรุปทั่วไป:<br>
+        - น้ำส้ม: \(\frac{50\text{ mg}}{8\text{ บาท}} = 6.25\text{ mg/บาท}\)<br>
+        - น้ำฝรั่ง: \(\frac{180\text{ mg}}{6\text{ บาท}} = 30.00\text{ mg/บาท}\)<br>
+        - น้ำเชื่อม: \(\frac{0\text{ mg}}{12\text{ บาท}} = 0\text{ mg/บาท}\)<br>
+        ดังนั้น ฟังก์ชันความคุ้มค่ามีอัตราการให้ผลตอบแทนของน้ำฝรั่งสูงเป็น \(4.8\) เท่าของน้ำส้ม การเพิ่มอัตราส่วนน้ำฝรั่งจึงเพิ่มค่าดัชนีรวมของเหยือกเสมอ
+      </div>
+    </div>
+
+  </div>
+
+</div>
+
+<script>
+function updateMix() {
+  const orange = parseInt(document.getElementById('orangeRange').value);
+  const guava = parseInt(document.getElementById('guavaRange').value);
+  const syrup = parseInt(document.getElementById('syrupRange').value);
+
+  document.getElementById('orangeVal').innerText = orange + ' ml';
+  document.getElementById('guavaVal').innerText = guava + ' ml';
+  document.getElementById('syrupVal').innerText = syrup + ' ml';
+
+  const total = orange + guava + syrup;
+  document.getElementById('totalVolumeText').innerText = total.toLocaleString();
+
+  // Update visualizer widths based on current total or 1000
+  const base = total === 0 ? 1 : total;
+  const pOrange = ((orange / base) * 100).toFixed(1);
+  const pGuava = ((guava / base) * 100).toFixed(1);
+  const pSyrup = ((syrup / base) * 100).toFixed(1);
+
+  const barO = document.getElementById('barOrange');
+  const barG = document.getElementById('barGuava');
+  const barS = document.getElementById('barSyrup');
+
+  barO.style.width = pOrange + '%';
+  barO.innerText = orange > 60 ? 'ส้ม ' + pOrange + '%' : '';
+  barG.style.width = pGuava + '%';
+  barG.innerText = guava > 60 ? 'ฝรั่ง ' + pGuava + '%' : '';
+  barS.style.width = pSyrup + '%';
+  barS.innerText = syrup > 40 ? 'น้ำเชื่อม ' + pSyrup + '%' : '';
+
+  const status = document.getElementById('pitcherStatus');
+  if (total === 1000) {
+    status.innerText = 'เต็มเหยือกพอดี (1,000 ml)';
+    status.style.color = '#059669';
+  } else if (total > 1000) {
+    status.innerText = 'ล้นเหยือก! เกินมา ' + (total - 1000) + ' ml';
+    status.style.color = '#dc2626';
+  } else {
+    status.innerText = 'ยังไม่เต็มเหยือก (ขาดอีก ' + (1000 - total) + ' ml)';
+    status.style.color = '#d97706';
+  }
+
+  // Update calculated metrics in hint frame
+  const vitC = (orange * 0.50) + (guava * 1.80);
+  const cal = (orange * 0.45) + (guava * 0.35) + (syrup * 3.00);
+  const cost = (orange * 0.08) + (guava * 0.06) + (syrup * 0.12);
+
+  document.getElementById('dynVol').innerText = total.toLocaleString();
+  document.getElementById('dynVitC').innerText = Math.round(vitC).toLocaleString();
+  document.getElementById('dynCal').innerText = Math.round(cal).toLocaleString();
+  document.getElementById('dynCost').innerText = cost.toFixed(2);
+
+  const factor = total > 0 ? (200 / total) : 0;
+  document.getElementById('dynVitCGlass').innerText = (vitC * factor).toFixed(1);
+  document.getElementById('dynCostGlass').innerText = (cost * factor).toFixed(2);
+}
+</script>
+
+</body>
+</html>

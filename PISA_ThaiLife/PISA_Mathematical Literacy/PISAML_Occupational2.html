@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PISA Math - ชุดที่ 2: การออกแบบติดตั้งระบบปูพื้นกระเบื้องของช่างก่อสร้าง</title>
+<script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+<style>
+  :root {
+    --primary: #0284c7;
+    --primary-light: #f0f9ff;
+    --border: #bae6fd;
+    --bg-card: #ffffff;
+    --text: #1e293b;
+    --accent: #0369a1;
+  }
+  * { box-sizing: border-box; font-family: 'Sarabun', 'Segoe UI', Tahoma, sans-serif; }
+  body { margin: 0; padding: 20px; background-color: #f8fafc; color: var(--text); line-height: 1.6; }
+  .container { max-width: 1200px; margin: 0 auto; display: flex; flex-direction: column; gap: 20px; }
+
+  /* Top Grid for Frame 1 and Frame 2 */
+  .top-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+  }
+  @media (max-width: 850px) {
+    .top-grid { grid-template-columns: 1fr; }
+  }
+
+  .panel {
+    background: var(--bg-card);
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 22px;
+    box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+  }
+
+  /* Interactive Simulator in Frame 1 */
+  .interactive-box {
+    background: #f0f9ff;
+    border: 1px solid #bae6fd;
+    border-radius: 8px;
+    padding: 15px;
+    margin-top: 15px;
+  }
+  .control-group { margin-bottom: 12px; }
+  .control-group label { display: block; font-weight: 600; margin-bottom: 5px; font-size: 0.95rem; }
+  .control-group input[type="range"] { width: 100%; cursor: pointer; accent-color: #0284c7; }
+  .val-badge { display: inline-block; background: #0284c7; color: white; padding: 2px 8px; border-radius: 12px; font-size: 0.85rem; }
+
+  .summary-stat {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    background: #e0f2fe;
+    border-radius: 8px;
+    padding: 12px;
+    margin-top: 10px;
+  }
+  .stat-item { text-align: center; }
+  .stat-val { font-size: 1.25rem; font-weight: bold; color: #0369a1; }
+
+  /* Frame 2 Table / Hints */
+  table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 0.92rem; }
+  th, td { border: 1px solid #cbd5e1; padding: 8px 10px; text-align: left; }
+  th { background: #f8fafc; font-weight: 600; }
+  .hint-card {
+    background: #f0fdf4;
+    border-left: 4px solid #16a34a;
+    padding: 10px 14px;
+    margin-top: 12px;
+    font-size: 0.9rem;
+    color: #166534;
+    border-radius: 0 8px 8px 0;
+  }
+  .hint-safety {
+    background: #fffbeb;
+    border-left: 4px solid #f59e0b;
+    padding: 10px 14px;
+    margin-top: 10px;
+    font-size: 0.9rem;
+    color: #92400e;
+    border-radius: 0 8px 8px 0;
+  }
+
+  /* Questions Area (Frame 3) */
+  .question-card {
+    background: var(--bg-card);
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    padding: 20px;
+    margin-bottom: 24px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.03);
+  }
+  .q-header-line1 {
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: #0369a1;
+    border-bottom: 1px dashed #cbd5e1;
+    padding-bottom: 4px;
+    margin-bottom: 4px;
+  }
+  .q-header-line2 {
+    font-size: 0.9rem;
+    color: #475569;
+    font-weight: 600;
+    margin-bottom: 12px;
+  }
+  .q-text { font-size: 1.05rem; margin-bottom: 14px; line-height: 1.6; }
+  
+  /* Options List Layout - Clean, Stacked, and Flexible */
+  .options-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 15px;
+  }
+  .option-label {
+    background: #f8fafc;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    padding: 12px 16px;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+  }
+  .option-label:hover { background: #e0f2fe; border-color: #38bdf8; }
+  .option-label input[type="radio"] { 
+    margin-top: 4px; 
+    flex-shrink: 0; 
+    accent-color: #0284c7; 
+    width: 18px; 
+    height: 18px; 
+  }
+  .option-text {
+    flex-grow: 1;
+    font-size: 1rem;
+    line-height: 1.6;
+    color: #1e293b;
+  }
+
+  .solution-box {
+    background: #f8fafc;
+    border-left: 4px solid #0284c7;
+    border-radius: 0 6px 6px 0;
+    padding: 12px 16px;
+    margin-top: 14px;
+    font-size: 0.92rem;
+  }
+  .solution-title { font-weight: bold; color: #0369a1; margin-bottom: 4px; }
+</style>
+</head>
+<body>
+
+<div class="container">
+
+  <!-- แถวบน: ด้านซ้าย (ส่วนให้ข้อมูล/แบบจำลอง) และ ด้านขวา (ผลการทดลอง/คำแนะนำทางอ้อม) -->
+  <div class="top-grid">
+    <!-- ส่วนข้อมูล/แบบจำลองงานช่างปูกระเบื้อง -->
+    <div class="panel">
+      <h2 style="margin-top:0; color:#0369a1; font-size:1.3rem;">สถานการณ์: การประเมินวัสดุและค่าจ้างเหมาปูพื้นของช่างปูกระเบื้อง</h2>
+      <p style="font-size:0.95rem; color:#475569;">
+        นายช่างสมเกียรติได้รับมอบหมายให้ประเมินราคาและปูกระเบื้องพื้นห้องโถงสำนักงานรูปสี่เหลี่ยมผืนผ้า 
+        โดยห้องมีความกว้าง \(6\text{ เมตร (m)}\) และความยาว \(8\text{ เมตร (m)}\) มีพื้นที่รวม \(48\text{ ตารางเมตร (ตร.ม.)}\)
+      </p>
+
+      <div class="interactive-box">
+        <h4 style="margin:0 0 10px 0; color:#0369a1;">📐 เครื่องมือจำลองการคำนวณพื้นที่และกล่องกระเบื้อง</h4>
+        
+        <div class="control-group">
+          <label>ความกว้างของห้อง: <span id="widthBadge" class="val-badge">6 เมตร</span></label>
+          <input type="range" id="widthRange" min="4" max="10" step="1" value="6" oninput="updateTileSim()">
+        </div>
+
+        <div class="control-group">
+          <label>ความยาวของห้อง: <span id="lengthBadge" class="val-badge">8 เมตร</span></label>
+          <input type="range" id="lengthRange" min="5" max="15" step="1" value="8" oninput="updateTileSim()">
+        </div>
+
+        <div class="summary-stat">
+          <div class="stat-item">
+            <div style="font-size:0.85rem; color:#0369a1;">พื้นที่ห้องรวม</div>
+            <div class="stat-val" id="areaVal">48 ตร.ม.</div>
+          </div>
+          <div class="stat-item">
+            <div style="font-size:0.85rem; color:#0369a1;">จำนวนกล่องที่ต้องสั่ง (เผื่อ 10%)</div>
+            <div class="stat-val" id="boxVal">53 กล่อง</div>
+          </div>
+        </div>
+
+        <div style="font-size:0.85rem; color:#475569; margin-top:8px;">
+          * กระเบื้อง 1 กล่อง ปูได้พื้นที่พอดี \(1\text{ ตร.ม.}\) | ค่าแรงช่างปูตารางเมตรละ \(120\text{ บาท}\)
+        </div>
+      </div>
+    </div>
+
+    <!-- ส่วนผลการทดลอง/ข้อมูลแนะนำทางอ้อม -->
+    <div class="panel">
+      <h2 style="margin-top:0; color:#0369a1; font-size:1.3rem;">ข้อมูลรายการวัสดุและอัตราค่าจ้างเหมางานช่าง</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>รายการ</th>
+            <th>คุณลักษณะ</th>
+            <th>ราคาต่อหน่วย</th>
+            <th>หมายเหตุงานช่าง</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>กระเบื้องปูพื้น ขนาด \(50 \times 50\text{ ซม.}\)</td>
+            <td>1 กล่องมี 4 แผ่น ปูได้ \(1\text{ ตร.ม.}\)</td>
+            <td>250 บาท / กล่อง</td>
+            <td>ต้องเผื่อตัดเศษมุม \(10\%\)</td>
+          </tr>
+          <tr>
+            <td>ปูนกาวซีเมนต์สำเร็จรูป</td>
+            <td>1 ถุง (\(20\text{ กก.}\)) ปูได้ \(4\text{ ตร.ม.}\)</td>
+            <td>160 บาท / ถุง</td>
+            <td>ใช้ตามพื้นที่จริงของห้อง</td>
+          </tr>
+          <tr>
+            <td>ค่าแรงช่างปูกระเบื้อง</td>
+            <td>คิดตามพื้นที่จริงของห้อง</td>
+            <td>120 บาท / ตร.ม.</td>
+            <td>ไม่รวมเศษที่ตัดทิ้ง</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="hint-card">
+        <strong>💡 ตัวอย่างการคำนวณและข้อแนะนำทางอ้อม:</strong><br>
+        - พื้นที่ห้องขนาด \(6 \times 8 = 48\text{ ตร.ม.}\)<br>
+        - กระเบื้องที่ต้องใช้จริงพร้อมเผื่อเศษ \(10\%\): \(48 + (48 \times 0.10) = 48 + 4.8 = 52.8\text{ ตร.ม.}\) ปัดขึ้นเป็น <strong>53 กล่อง</strong><br>
+        - ปูนกาวที่ต้องใช้: \(48 \div 4 = 12\text{ ถุง}\) คิดเป็นเงิน \(12 \times 160 = 1,920\text{ บาท}\)
+      </div>
+
+      <div class="hint-safety">
+        <strong>🏗️ หลักการทำงานช่างอาชีพ (Professional Standard):</strong><br>
+        • ในงานช่าง กระเบื้องไม่สามารถสั่งซื้อเป็นเศษกล่องได้ เมื่อคำนวณได้เศษทศนิยมจำเป็นต้องปัดขึ้นเป็นจำนวนเต็มกล่องเสมอ เพื่อป้องกันกระเบื้องไม่พอจากรอยตัดขอบห้อง
+      </div>
+    </div>
+  </div>
+
+  <!-- แถวล่าง: คำถาม 8 ข้อ เรียงลำดับความสามารถ 1c ถึง 6 -->
+  <div class="panel">
+    <h2 style="margin-top:0; color:#0369a1; font-size:1.4rem; border-bottom:2px solid #bae6fd; padding-bottom:8px;">
+      แบบทดสอบวัดการรู้เรื่องคณิตศาสตร์ (8 ระดับความสามารถ)
+    </h2>
+
+    <!-- ข้อ 1 (ระดับ 1c) -->
+    <div class="question-card">
+      <div class="q-header-line1">ข้อความ คณิตศาสตร์ (Mathematical Literacy)&nbsp;&nbsp;&nbsp;&nbsp;บริบทอาชีพ (Occupational)</div>
+      <div class="q-header-line2">เนื้อหา: จำนวนและการดำเนินการ (การอ่านข้อมูลตรงตัวจากตารางรายการวัสดุ) | ระดับชั้น:   -  | ระดับความสามารถ: 1c</div>
+      <div class="q-text">
+        <strong>คำถามข้อที่ 1:</strong> จากตารางข้อมูลงานช่าง กระเบื้องปูพื้น 1 กล่อง บรรจุจำนวนกี่แผ่น?
+      </div>
+      <div class="options-list">
+        <label class="option-label"><input type="radio" name="t1"><span class="option-text">ก. 2 แผ่น</span></label>
+        <label class="option-label"><input type="radio" name="t1"><span class="option-text">ข. 4 แผ่น</span></label>
+        <label class="option-label"><input type="radio" name="t1"><span class="option-text">ค. 6 แผ่น</span></label>
+        <label class="option-label"><input type="radio" name="t1"><span class="option-text">ง. 8 แผ่น</span></label>
+      </div>
+      <div class="solution-box">
+        <div class="solution-title">เฉลย: ข. 4 แผ่น</div>
+        <strong>เหตุผล:</strong> ระดับ 1c อ่านข้อมูลตรงตัวขั้นตอนเดียว จากตารางระบุชัดเจนว่า 1 กล่องมี 4 แผ่น (แผ่นละ \(50 \times 50\text{ ซม.}\))
+      </div>
+    </div>
+
+    <!-- ข้อ 2 (ระดับ 1b) -->
+    <div class="question-card">
+      <div class="q-header-line1">ข้อความ คณิตศาสตร์ (Mathematical Literacy)&nbsp;&nbsp;&nbsp;&nbsp;บริบทอาชีพ (Occupational)</div>
+      <div class="q-header-line2">เนื้อหา: เรขาคณิตและการวัด (การหาพื้นที่รูปสี่เหลี่ยมผืนผ้าอย่างง่าย) | ระดับชั้น:   -  | ระดับความสามารถ: 1b</div>
+      <div class="q-text">
+        <strong>คำถามข้อที่ 2:</strong> ห้องทำงานรูปสี่เหลี่ยมผืนผ้า กว้าง \(6\text{ เมตร}\) และ ยาว \(8\text{ เมตร}\) มีพื้นที่ปูพื้นทั้งหมดกี่ตารางเมตร?
+      </div>
+      <div class="options-list">
+        <label class="option-label"><input type="radio" name="t2"><span class="option-text">ก. 28 ตารางเมตร</span></label>
+        <label class="option-label"><input type="radio" name="t2"><span class="option-text">ข. 42 ตารางเมตร</span></label>
+        <label class="option-label"><input type="radio" name="t2"><span class="option-text">ค. 48 ตารางเมตร</span></label>
+        <label class="option-label"><input type="radio" name="t2"><span class="option-text">ง. 54 ตารางเมตร</span></label>
+      </div>
+      <div class="solution-box">
+        <div class="solution-title">เฉลย: ค. 48 ตารางเมตร</div>
+        <strong>เหตุผล:</strong> ระดับ 1b คำนวณอย่างง่ายจากสูตรพื้นที่สี่เหลี่ยมผืนผ้า \(\text{กว้าง} \times \text{ยาว} = 6 \times 8 = 48\text{ ตารางเมตร}\)
+      </div>
+    </div>
+
+    <!-- ข้อ 3 (ระดับ 1a) -->
+    <div class="question-card">
+      <div class="q-header-line1">ข้อความ คณิตศาสตร์ (Mathematical Literacy)&nbsp;&nbsp;&nbsp;&nbsp;บริบทอาชีพ (Occupational)</div>
+      <div class="q-header-line2">เนื้อหา: จำนวนและการดำเนินการ (การหารจำนวนเต็มเพื่อคำนวณปริมาณวัสดุ) | ระดับชั้น:   -  | ระดับความสามารถ: 1a</div>
+      <div class="q-text">
+        <strong>คำถามข้อที่ 3:</strong> ปูนกาวซีเมนต์ 1 ถุง สามารถปูกระเบื้องได้พื้นที่ \(4\text{ ตารางเมตร}\) ในการปูพื้นห้องขนาด \(48\text{ ตารางเมตร}\) ช่างจะต้องใช้ปูนกาวทั้งหมดกี่ถุง?
+      </div>
+      <div class="options-list">
+        <label class="option-label"><input type="radio" name="t3"><span class="option-text">ก. 10 ถุง</span></label>
+        <label class="option-label"><input type="radio" name="t3"><span class="option-text">ข. 12 ถุง</span></label>
+        <label class="option-label"><input type="radio" name="t3"><span class="option-text">ค. 14 ถุง</span></label>
+        <label class="option-label"><input type="radio" name="t3"><span class="option-text">ง. 16 ถุง</span></label>
+      </div>
+      <div class="solution-box">
+        <div class="solution-title">เฉลย: ข. 12 ถุง</div>
+        <strong>เหตุผล:</strong> ระดับ 1a แก้ปัญหาคุ้นเคยด้วยการหารพื้นฐาน \(48 \div 4 = 12\text{ ถุง}\)
+      </div>
+    </div>
+
+    <!-- ข้อ 4 (ระดับ 2) -->
+    <div class="question-card">
+      <div class="q-header-line1">ข้อความ คณิตศาสตร์ (Mathematical Literacy)&nbsp;&nbsp;&nbsp;&nbsp;บริบทอาชีพ (Occupational)</div>
+      <div class="q-header-line2">เนื้อหา: การคำนวณค่าจ้างแรงงานจากพื้นที่ปฏิบัติงานจริง | ระดับชั้น:   -  | ระดับความสามารถ: 2</div>
+      <div class="q-text">
+        <strong>คำถามข้อที่ 4:</strong> ช่างสมเกียรติคิดค่าแรงปูกระเบื้องในอัตราตารางเมตรละ \(120\text{ บาท}\) สำหรับห้องพื้นที่ \(48\text{ ตารางเมตร}\) ช่างจะได้รับค่าแรงรวมกี่บาท?
+      </div>
+      <div class="options-list">
+        <label class="option-label"><input type="radio" name="t4"><span class="option-text">ก. 4,800 บาท</span></label>
+        <label class="option-label"><input type="radio" name="t4"><span class="option-text">ข. 5,260 บาท</span></label>
+        <label class="option-label"><input type="radio" name="t4"><span class="option-text">ค. 5,760 บาท</span></label>
+        <label class="option-label"><input type="radio" name="t4"><span class="option-text">ง. 6,360 บาท</span></label>
+      </div>
+      <div class="solution-box">
+        <div class="solution-title">เฉลย: ค. 5,760 บาท</div>
+        <strong>เหตุผล:</strong> ระดับ 2 ดำเนินการคูณในบริบทงานอาชีพ \(48 \times 120 = 5,760\text{ บาท}\)
+      </div>
+    </div>
+
+    <!-- ข้อ 5 (ระดับ 3) -->
+    <div class="question-card">
+      <div class="q-header-line1">ข้อความ คณิตศาสตร์ (Mathematical Literacy)&nbsp;&nbsp;&nbsp;&nbsp;บริบทอาชีพ (Occupational)</div>
+      <div class="q-header-line2">เนื้อหา: ร้อยละ การเผื่อเศษวัสดุ และการปัดเศษในงานช่าง | ระดับชั้น:   -  | ระดับความสามารถ: 3</div>
+      <div class="q-text">
+        <strong>คำถามข้อที่ 5:</strong> ในการสั่งซื้อกระเบื้อง ช่างต้องสั่งเผื่อรอยตัดขอบและแตกหักอีก \(10\%\) ของพื้นที่ห้อง (\(48\text{ ตร.ม.}\)) หากกระเบื้อง 1 กล่องปูได้ \(1\text{ ตร.ม.}\) พอดี และร้านค้าขายเฉพาะเต็มกล่องเท่านั้น ช่างจะต้องสั่งซื้อกระเบื้องทั้งหมดกี่กล่อง?
+      </div>
+      <div class="options-list">
+        <label class="option-label"><input type="radio" name="t5"><span class="option-text">ก. 48 กล่อง</span></label>
+        <label class="option-label"><input type="radio" name="t5"><span class="option-text">ข. 52 กล่อง</span></label>
+        <label class="option-label"><input type="radio" name="t5"><span class="option-text">ค. 53 กล่อง</span></label>
+        <label class="option-label"><input type="radio" name="t5"><span class="option-text">ง. 58 กล่อง</span></label>
+      </div>
+      <div class="solution-box">
+        <div class="solution-title">เฉลย: ค. 53 กล่อง</div>
+        <strong>เหตุผล:</strong> ระดับ 3 กระบวนการทางคณิตศาสตร์หลายขั้นตอนและตรรกะงานช่าง:<br>
+        1. เผื่อเศษ 10%: \(48 \times 0.10 = 4.8\text{ ตร.ม.}\)<br>
+        2. พื้นที่กระเบื้องที่ต้องใช้ทั้งหมด \(= 48 + 4.8 = 52.8\text{ ตร.ม.}\)<br>
+        3. เนื่องจากขายเป็นกล่องเต็ม (กล่องละ 1 ตร.ม.) 52 กล่องจะไม่พอ จึงต้องปัดขึ้นเป็น 53 กล่อง
+      </div>
+    </div>
+
+    <!-- ข้อ 6 (ระดับ 4) -->
+    <div class="question-card">
+      <div class="q-header-line1">ข้อความ คณิตศาสตร์ (Mathematical Literacy)&nbsp;&nbsp;&nbsp;&nbsp;บริบทอาชีพ (Occupational)</div>
+      <div class="q-header-line2">เนื้อหา: แบบจำลองการประมาณราคากลางรวม (ใบเสนอราคางานช่าง) | ระดับชั้น:   -  | ระดับความสามารถ: 4</div>
+      <div class="q-text">
+        <strong>คำถามข้อที่ 6:</strong> ช่างสมเกียรติทำใบเสนอราคาเหมางานให้ลูกค้า ประกอบด้วย: ค่ากระเบื้อง 53 กล่อง (กล่องละ 250 บาท), ค่าปูนกาว 12 ถุง (ถุงละ 160 บาท) และค่าแรงปูพื้น 48 ตร.ม. (ตร.ม. ละ 120 บาท) ยอดรวมค่าใช้จ่ายทั้งหมดในใบเสนอราคาคิดเป็นกี่บาท?
+      </div>
+      <div class="options-list">
+        <label class="option-label"><input type="radio" name="t6"><span class="option-text">ก. 19,850 บาท</span></label>
+        <label class="option-label"><input type="radio" name="t6"><span class="option-text">ข. 20,430 บาท</span></label>
+        <label class="option-label"><input type="radio" name="t6"><span class="option-text">ค. 20,930 บาท</span></label>
+        <label class="option-label"><input type="radio" name="t6"><span class="option-text">ง. 21,550 บาท</span></label>
+      </div>
+      <div class="solution-box">
+        <div class="solution-title">เฉลย: ค. 20,930 บาท</div>
+        <strong>เหตุผล:</strong> ระดับ 4 ทำงานกับแบบจำลองประมาณราคางานก่อสร้าง:<br>
+        - ค่ากระเบื้อง: \(53 \times 250 = 13,250\text{ บาท}\)<br>
+        - ค่าปูนกาว: \(12 \times 160 = 1,920\text{ บาท}\)<br>
+        - ค่าแรงช่าง: \(48 \times 120 = 5,760\text{ บาท}\)<br>
+        ยอดรวมทั้งหมด \(= 13,250 + 1,920 + 5,760 = 20,930\text{ บาท}\)
+      </div>
+    </div>
+
+    <!-- ข้อ 7 (ระดับ 5) -->
+    <div class="question-card">
+      <div class="q-header-line1">ข้อความ คณิตศาสตร์ (Mathematical Literacy)&nbsp;&nbsp;&nbsp;&nbsp;บริบทอาชีพ (Occupational)</div>
+      <div class="q-header-line2">เนื้อหา: การเปรียบเทียบขนาดวัสดุและประสิทธิภาพต้นทุนของทางเลือกในงานช่าง | ระดับชั้น:   -  | ระดับความสามารถ: 5</div>
+      <div class="q-text">
+        <strong>คำถามข้อที่ 7:</strong> ร้านวัสดุก่อสร้างเสนอทางเลือกกระเบื้องขนาดใหญ่พิเศษ \(60 \times 60\text{ ซม.}\) (1 กล่องมี 4 แผ่น ปูได้ \(1.44\text{ ตร.ม.}\) ราคา 360 บาท/กล่อง) หากต้องปูห้องขนาด \(48\text{ ตร.ม.}\) และต้องเผื่อเศษ \(10\%\) เท่ากัน (ต้องการพื้นที่กระเบื้อง \(52.8\text{ ตร.ม.}\)) ทางเลือกใหม่นี้จะต้องสั่งซื้อกระเบื้องกี่กล่อง และค่ากระเบื้องรวมจะประหยัดกว่าหรือแพงกว่ากระเบื้องเดิม (53 กล่อง เป็นเงิน 13,250 บาท) กี่บาท?
+      </div>
+      <div class="options-list">
+        <label class="option-label"><input type="radio" name="t7"><span class="option-text">ก. ซื้อ 36 กล่อง และประหยัดกว่าเดิม 290 บาท</span></label>
+        <label class="option-label"><input type="radio" name="t7"><span class="option-text">ข. ซื้อ 37 กล่อง และแพงกว่าเดิม 70 บาท</span></label>
+        <label class="option-label"><input type="radio" name="t7"><span class="option-text">ค. ซื้อ 37 กล่อง และประหยัดกว่าเดิม 70 บาท</span></label>
+        <label class="option-label"><input type="radio" name="t7"><span class="option-text">ง. ซื้อ 38 กล่อง และแพงกว่าเดิม 430 บาท</span></label>
+      </div>
+      <div class="solution-box">
+        <div class="solution-title">เฉลย: ข. ซื้อ 37 กล่อง และแพงกว่าเดิม 70 บาท</div>
+        <strong>เหตุผล:</strong> ระดับ 5 พัฒนาแบบจำลองเปรียบเทียบทางเลือกภายใต้ข้อจำกัด:<br>
+        1. คำนวณจำนวนกล่องใหม่: \(52.8 \div 1.44 \approx 36.67\) กล่อง ปัดขึ้นเป็น <strong>37 กล่อง</strong><br>
+        2. ค่ากระเบื้องใหม่ \(= 37 \times 360 = 13,320\text{ บาท}\)<br>
+        3. เปรียบเทียบกับแบบเดิม (\(13,250\text{ บาท}\)): \(13,320 - 13,250 = 70\text{ บาท}\) (แพงกว่าเดิม 70 บาท จากการปัดเศษกล่อง)
+      </div>
+    </div>
+
+    <!-- ข้อ 8 (ระดับ 6) -->
+    <div class="question-card">
+      <div class="q-header-line1">ข้อความ คณิตศาสตร์ (Mathematical Literacy)&nbsp;&nbsp;&nbsp;&nbsp;บริบทอาชีพ (Occupational)</div>
+      <div class="q-header-line2">เนื้อหา: การให้เหตุผลเชิงนามธรรม การวิเคราะห์ความสัมพันธ์ของรูปทรงเรขาคณิต และการลดเศษสูญเสียในงานช่าง | ระดับชั้น:   -  | ระดับความสามารถ: 6</div>
+      <div class="q-text">
+        <strong>คำถามข้อที่ 8:</strong> นายช่างให้ข้อสังเกตว่า: <em>"หากห้องมีขนาดด้านที่หารด้วยขนาดกระเบื้องลงตัวพอดี ช่างสามารถวางแผนตัดกระเบื้องให้เหลือเศษสูญเสียจริงน้อยกว่า \(10\%\) ได้"</em><br>
+        สำหรับห้องกว้าง \(6\text{ เมตร} (600\text{ ซม.})\) และยาว \(8\text{ เมตร} (800\text{ ซม.})\) หากใช้กระเบื้องขนาด \(50 \times 50\text{ ซม.}\) ข้อใดสรุปการวิเคราะห์เชิงเรขาคณิตและการใช้วัสดุจริงได้ถูกต้องและสมเหตุสมผลที่สุด?
+      </div>
+      <div class="options-list">
+        <label class="option-label">
+          <input type="radio" name="t8">
+          <span class="option-text">ก. ต้องตัดเศษทิ้ง 10% เสมอตามหลักสถิติ ไม่ว่าห้องจะมีขนาดเท่าใด</span>
+        </label>
+        <label class="option-label">
+          <input type="radio" name="t8">
+          <span class="option-text">ข. ด้านกว้างใช้กระเบื้องได้พอดี \(600 \div 50 = 12\text{ แผ่น}\) และด้านยาวใช้ได้พอดี \(800 \div 50 = 16\text{ แผ่น}\) รวมใช้กระเบื้องเต็มแผ่นพอดี \(12 \times 16 = 192\text{ แผ่น}\) (พอดี 48 กล่อง) โดยในทางทฤษฎีไม่ต้องตัดเศษขอบเลย การเผื่อ 1-2 กล่องก็เพียงพอเฉพาะกันแตกหัก</span>
+        </label>
+        <label class="option-label">
+          <input type="radio" name="t8">
+          <span class="option-text">ค. จะปูไม่ลงตัว เพราะด้านกว้างและด้านยาวเป็นจำนวนคู่ แต่ขนาดกระเบื้อง 50 ซม. เป็นจำนวนคี่</span>
+        </label>
+        <label class="option-label">
+          <input type="radio" name="t8">
+          <span class="option-text">ง. ต้องใช้กระเบื้องเพิ่มขึ้นเป็นสองเท่า เพราะต้องตัดมุมแผ่นละ 4 ด้าน</span>
+        </label>
+      </div>
+      <div class="solution-box">
+        <div class="solution-title">เฉลย: ข. ด้านกว้างใช้กระเบื้องได้พอดี \(600 \div 50 = 12\text{ แผ่น}\) และด้านยาวใช้ได้พอดี \(800 \div 50 = 16\text{ แผ่น}\) รวมใช้กระเบื้องเต็มแผ่นพอดี \(12 \times 16 = 192\text{ แผ่น}\) (พอดี 48 กล่อง) โดยในทางทฤษฎีไม่ต้องตัดเศษขอบเลย การเผื่อ 1-2 กล่องก็เพียงพอเฉพาะกันแตกหัก</div>
+        <strong>เหตุผล:</strong> ระดับ 6 การให้เหตุผลเชิงนามธรรมและการเชื่อมโยงมิติสัมพันธ์:<br>
+        - แปลงหน่วยห้อง: กว้าง \(600\text{ ซม.}\), ยาว \(800\text{ ซม.}\)<br>
+        - ตรวจสอบการหารลงตัว: \(600 \div 50 = 12\) (ลงตัว), \(800 \div 50 = 16\) (ลงตัว)<br>
+        - จำนวนแผ่นเต็ม: \(12 \times 16 = 192\text{ แผ่น}\)<br>
+        - คิดเป็นกล่อง: \(192 \div 4 = 48\text{ กล่องพอดี}\)<br>
+        ดังนั้น ความรู้เรื่องตัวประกอบและการหารลงตัวช่วยให้นายช่างวิเคราะห์ได้ว่าไม่มีเศษจากการตัดมุมห้อง ทำให้ประหยัดงบประมาณจากการเผื่อเศษเกินความจำเป็นได้จริง
+      </div>
+    </div>
+
+  </div>
+
+</div>
+
+<script>
+function updateTileSim() {
+  const w = parseInt(document.getElementById('widthRange').value);
+  const l = parseInt(document.getElementById('lengthRange').value);
+
+  document.getElementById('widthBadge').innerText = w + ' เมตร';
+  document.getElementById('lengthBadge').innerText = l + ' เมตร';
+
+  const area = w * l;
+  document.getElementById('areaVal').innerText = area + ' ตร.ม.';
+
+  // 10% waste and ceiling to integer box
+  const tilesNeeded = area * 1.10;
+  const boxes = Math.ceil(tilesNeeded);
+  document.getElementById('boxVal').innerText = boxes + ' กล่อง';
+}
+</script>
+
+</body>
+</html>

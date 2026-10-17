@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PISA Math - ชุดที่ 2: การบริหารจัดการขยะรีไซเคิลและพื้นที่สวนสาธารณะ</title>
+<script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+<style>
+  :root {
+    --primary: #c2410c;
+    --primary-light: #fff7ed;
+    --border: #fed7aa;
+    --bg-card: #ffffff;
+    --text: #1e293b;
+    --accent: #ea580c;
+  }
+  * { box-sizing: border-box; font-family: 'Sarabun', 'Segoe UI', Tahoma, sans-serif; }
+  body { margin: 0; padding: 20px; background-color: #fffaf5; color: var(--text); line-height: 1.6; }
+  .container { max-width: 1200px; margin: 0 auto; display: flex; flex-direction: column; gap: 20px; }
+
+  /* Top Grid for Frame 1 and Frame 2 */
+  .top-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+  }
+  @media (max-width: 850px) {
+    .top-grid { grid-template-columns: 1fr; }
+  }
+
+  .panel {
+    background: var(--bg-card);
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 22px;
+    box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+  }
+
+  /* Interactive Simulator in Frame 1 */
+  .interactive-box {
+    background: #fff7ed;
+    border: 1px solid #fdba74;
+    border-radius: 8px;
+    padding: 15px;
+    margin-top: 15px;
+  }
+  .control-group { margin-bottom: 12px; }
+  .control-group label { display: block; font-weight: 600; margin-bottom: 5px; font-size: 0.95rem; }
+  .control-group input[type="range"] { width: 100%; cursor: pointer; accent-color: #c2410c; }
+  .val-badge { display: inline-block; background: #c2410c; color: white; padding: 2px 8px; border-radius: 12px; font-size: 0.85rem; }
+
+  .summary-stat {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    background: #ffedd5;
+    border-radius: 8px;
+    padding: 12px;
+    margin-top: 10px;
+  }
+  .stat-item { text-align: center; }
+  .stat-val { font-size: 1.25rem; font-weight: bold; color: #9a3412; }
+
+  /* Frame 2 Table / Hints */
+  table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 0.92rem; }
+  th, td { border: 1px solid #cbd5e1; padding: 8px 10px; text-align: left; }
+  th { background: #f8fafc; font-weight: 600; }
+  .hint-card {
+    background: #f0fdf4;
+    border-left: 4px solid #16a34a;
+    padding: 10px 14px;
+    margin-top: 12px;
+    font-size: 0.9rem;
+    color: #166534;
+    border-radius: 0 8px 8px 0;
+  }
+  .hint-fund {
+    background: #eff6ff;
+    border-left: 4px solid #2563eb;
+    padding: 10px 14px;
+    margin-top: 10px;
+    font-size: 0.9rem;
+    color: #1e40af;
+    border-radius: 0 8px 8px 0;
+  }
+
+  /* Questions Area */
+  .question-card {
+    background: var(--bg-card);
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    padding: 20px;
+    margin-bottom: 24px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.03);
+  }
+  .q-header-line1 {
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: #9a3412;
+    border-bottom: 1px dashed #cbd5e1;
+    padding-bottom: 4px;
+    margin-bottom: 4px;
+  }
+  .q-header-line2 {
+    font-size: 0.9rem;
+    color: #475569;
+    font-weight: 600;
+    margin-bottom: 12px;
+  }
+  .q-text { font-size: 1.05rem; margin-bottom: 12px; line-height: 1.6; }
+  .options-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 15px;
+  }
+  @media (max-width: 650px) {
+    .options-grid { grid-template-columns: 1fr; }
+  }
+  .option-label {
+    background: #f8fafc;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    padding: 10px 14px;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .option-label:hover { background: #ffedd5; border-color: #fb923c; }
+  .option-label input { accent-color: #ea580c; }
+
+  .solution-box {
+    background: #f8fafc;
+    border-left: 4px solid #ea580c;
+    border-radius: 0 6px 6px 0;
+    padding: 12px 16px;
+    margin-top: 12px;
+    font-size: 0.92rem;
+  }
+  .solution-title { font-weight: bold; color: #9a3412; margin-bottom: 4px; }
+</style>
+</head>
+<body>
+
+<div class="container">
+
+  <!-- แถวบน: ด้านซ้าย (ส่วนให้ข้อมูล/แบบจำลอง) และ ด้านขวา (ผลการทดลอง/คำแนะนำทางอ้อม) -->
+  <div class="top-grid">
+    <!-- ส่วนข้อมูล/แบบจำลองการทดลอง -->
+    <div class="panel">
+      <h2 style="margin-top:0; color:#9a3412; font-size:1.3rem;">สถานการณ์: โครงการธนาคารขยะรีไซเคิลเพื่อกองทุนสวนสาธารณะเมือง</h2>
+      <p style="font-size:0.95rem; color:#475569;">
+        ชุมชนเมืองแห่งหนึ่งมีประชากร \(400\text{ หลังคาเรือน}\) ได้ร่วมมือกันจัดตั้ง <strong>"ธนาคารขยะรีไซเคิลชุมชน"</strong> 
+        โดยรวบรวมขยะรีไซเคิลขายเข้ากองทุนส่วนกลางเพื่อนำรายได้ทั้งหมดไปจัดซื้อต้นไม้และปรับปรุงสวนสาธารณะประจำตำบล
+      </p>
+
+      <div class="interactive-box">
+        <h4 style="margin:0 0 10px 0; color:#9a3412;">♻️ เครื่องมือทดลองประเมินปริมาณขยะและรายได้กองทุน (ต่อเดือน)</h4>
+        
+        <div class="control-group">
+          <label>อัตราการเข้าร่วมของครัวเรือน: <span id="houseBadge" class="val-badge">250 หลังคาเรือน</span></label>
+          <input type="range" id="houseRange" min="50" max="400" step="10" value="250" oninput="updateWasteSim()">
+          <small style="color:#64748b;">(จากทั้งหมด 400 หลังคาเรือนในชุมชน)</small>
+        </div>
+
+        <div class="control-group">
+          <label>ปริมาณขยะรีไซเคิลที่คัดแยกได้เฉลี่ย: <span id="kgBadge" class="val-badge">12 กก./ครัวเรือน/เดือน</span></label>
+          <input type="range" id="kgRange" min="4" max="24" step="2" value="12" oninput="updateWasteSim()">
+        </div>
+
+        <div class="summary-stat">
+          <div class="stat-item">
+            <div style="font-size:0.85rem; color:#7c2d12;">ปริมาณขยะรีไซเคิลรวม</div>
+            <div class="stat-val" id="totalWasteVal">3,000 กก.</div>
+          </div>
+          <div class="stat-item">
+            <div style="font-size:0.85rem; color:#7c2d12;">รายได้เข้ากองทุนชุมชน</div>
+            <div class="stat-val" id="totalFundVal">36,000 บาท</div>
+          </div>
+        </div>
+
+        <div style="font-size:0.85rem; color:#475569; margin-top:8px;">
+          * คำนวณจากราคาเฉลี่ยถ่วงน้ำหนักของขยะรีไซเคิลชุมชนที่ \(12\text{ บาทต่อกิโลกรัม}\)
+        </div>
+      </div>
+    </div>
+
+    <!-- ส่วนผลการทดลอง/ข้อมูลแนะนำทางอ้อม -->
+    <div class="panel">
+      <h2 style="margin-top:0; color:#9a3412; font-size:1.3rem;">ข้อมูลสัดส่วนประเภทขยะรีไซเคิล และงบประมาณจัดซื้อต้นไม้สวนสาธารณะ</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>ประเภทขยะรีไซเคิล</th>
+            <th>สัดส่วนเฉลี่ย (% โดยน้ำหนัก)</th>
+            <th>ราคารับซื้อ (บาท/กก.)</th>
+            <th>ลดพื้นที่หลุมฝังกลบ (ลบ.ม./กก.)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>ขวดพลาสติกใส (PET)</td>
+            <td>\(30\%\)</td>
+            <td>10</td>
+            <td>0.005</td>
+          </tr>
+          <tr>
+            <td>กระดาษและกล่องลัง</td>
+            <td>\(50\%\)</td>
+            <td>4</td>
+            <td>0.003</td>
+          </tr>
+          <tr>
+            <td>กระป๋องอะลูมิเนียม</td>
+            <td>\(20\%\)</td>
+            <td>35</td>
+            <td>0.004</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="hint-card">
+        <strong>💡 ผลการทดลองและการคำนวณราคาเฉลี่ยต่อกิโลกรัม:</strong><br>
+        - ในขยะ \(100\text{ กก.}\): พลาสติก \(30\text{ กก. } (300\text{ บ.})\) + กระดาษ \(50\text{ กก. } (200\text{ บ.})\) + อะลูมิเนียม \(20\text{ กก. } (700\text{ บ.})\)<br>
+        - ขายได้เงินรวม \(300 + 200 + 700 = 1,200\text{ บาท}\) เฉลี่ยเท่ากับ \(12\text{ บาท/กก.}\)
+      </div>
+
+      <div class="hint-fund">
+        <strong>🌳 ข้อมูลต้นไม้เพื่อสวนสาธารณะเมือง:</strong><br>
+        • ต้นไม้ใหญ่ยืนต้นให้ร่มเงา ราคาต้นละ \(400\text{ บาท}\) (ช่วยดูดซับก๊าซ \(\text{CO}_2\) ได้ปีละ \(15\text{ กิโลกรัมต่อต้น}\))<br>
+        • ไม้พุ่มดอกประดับทางเดิน ราคาต้นละ \(50\text{ บาท}\)
+      </div>
+    </div>
+  </div>
+
+  <!-- แถวล่าง: คำถาม 8 ข้อ เรียงลำดับความสามารถ 1c ถึง 6 -->
+  <div class="panel">
+    <h2 style="margin-top:0; color:#9a3412; font-size:1.4rem; border-bottom:2px solid #fed7aa; padding-bottom:8px;">
+      แบบทดสอบวัดการรู้เรื่องคณิตศาสตร์ (8 ระดับความสามารถ)
+    </h2>
+
+    <!-- ข้อ 1 (ระดับ 1c) -->
+    <div class="question-card">
+      <div class="q-header-line1">ข้อความ คณิตศาสตร์ (Mathematical Literacy)&nbsp;&nbsp;&nbsp;&nbsp;บริบทสาธารณะ (Public)</div>
+      <div class="q-header-line2">เนื้อหา: จำนวนและการดำเนินการ (การอ่านข้อมูลตรงตัวจากตารางสถิติ) | ระดับชั้น:   -  | ระดับความสามารถ: 1c</div>
+      <div class="q-text">
+        <strong>คำถามข้อที่ 1:</strong> จากตารางรับซื้อขยะรีไซเคิล ขยะประเภทใดมีราคารับซื้อต่อ 1 กิโลกรัมสูงที่สุด?
+      </div>
+      <div class="options-grid">
+        <label class="option-label"><input type="radio" name="w1"> ก. ขวดพลาสติกใส (PET)</label>
+        <label class="option-label"><input type="radio" name="w1"> ข. กระดาษและกล่องลัง</label>
+        <label class="option-label"><input type="radio" name="w1"> ค. กระป๋องอะลูมิเนียม</label>
+        <label class="option-label"><input type="radio" name="w1"> ง. ทุกประเภทมีราคาเท่ากัน</label>
+      </div>
+      <div class="solution-box">
+        <div class="solution-title">เฉลย: ค. กระป๋องอะลูมิเนียม</div>
+        <strong>เหตุผล:</strong> ระดับ 1c อ่านข้อมูลตรงตัวขั้นตอนเดียว จากตารางระบุชัดว่ากระป๋องอะลูมิเนียมราคากิโลกรัมละ 35 บาท ซึ่งสูงที่สุด
+      </div>
+    </div>
+
+    <!-- ข้อ 2 (ระดับ 1b) -->
+    <div class="question-card">
+      <div class="q-header-line1">ข้อความ คณิตศาสตร์ (Mathematical Literacy)&nbsp;&nbsp;&nbsp;&nbsp;บริบทสาธารณะ (Public)</div>
+      <div class="q-header-line2">เนื้อหา: จำนวนและการดำเนินการ (การคูณจำนวนเต็มอย่างง่าย) | ระดับชั้น:   -  | ระดับความสามารถ: 1b</div>
+      <div class="q-text">
+        <strong>คำถามข้อที่ 2:</strong> ถ้าจุดรับซื้อของชุมชนรวบรวมขวดพลาสติกใส (PET) ได้จำนวน \(150\text{ กิโลกรัม}\) จะขายได้เงินเข้ากองทุนกี่บาท?
+      </div>
+      <div class="options-grid">
+        <label class="option-label"><input type="radio" name="w2"> ก. 600 บาท</label>
+        <label class="option-label"><input type="radio" name="w2"> ข. 1,000 บาท</label>
+        <label class="option-label"><input type="radio" name="w2"> ค. 1,500 บาท</label>
+        <label class="option-label"><input type="radio" name="w2"> ง. 2,000 บาท</label>
+      </div>
+      <div class="solution-box">
+        <div class="solution-title">เฉลย: ค. 1,500 บาท</div>
+        <strong>เหตุผล:</strong> ระดับ 1b คำนวณจำนวนเต็มอย่างง่ายจากข้อมูลชัดเจน ขวดพลาสติกใสราคา 10 บาท/กก. ขาย 150 กก. ได้เงิน \(150 \times 10 = 1,500\) บาท
+      </div>
+    </div>
+
+    <!-- ข้อ 3 (ระดับ 1a) -->
+    <div class="question-card">
+      <div class="q-header-line1">ข้อความ คณิตศาสตร์ (Mathematical Literacy)&nbsp;&nbsp;&nbsp;&nbsp;บริบทสาธารณะ (Public)</div>
+      <div class="q-header-line2">เนื้อหา: จำนวนและการดำเนินการ (การหารและการประยุกต์ใช้งานงบประมาณ) | ระดับชั้น:   -  | ระดับความสามารถ: 1a</div>
+      <div class="q-text">
+        <strong>คำถามข้อที่ 3:</strong> ถ้ากองทุนขยะรีไซเคิลของชุมชนสะสมเงินได้ครบ \(12,000\text{ บาท}\) และต้องการนำเงินทั้งหมดไปซื้อต้นไม้ยืนต้นราคาต้นละ \(400\text{ บาท}\) เพื่อปลูกในสวนสาธารณะ จะสามารถซื้อได้ทั้งหมดกี่ต้น?
+      </div>
+      <div class="options-grid">
+        <label class="option-label"><input type="radio" name="w3"> ก. 25 ต้น</label>
+        <label class="option-label"><input type="radio" name="w3"> ข. 30 ต้น</label>
+        <label class="option-label"><input type="radio" name="w3"> ค. 35 ต้น</label>
+        <label class="option-label"><input type="radio" name="w3"> ง. 40 ต้น</label>
+      </div>
+      <div class="solution-box">
+        <div class="solution-title">เฉลย: ข. 30 ต้น</div>
+        <strong>เหตุผล:</strong> ระดับ 1a แก้ปัญหาคุ้นเคยด้วยการหารพื้นฐาน \(12,000 \div 400 = 30\) ต้น
+      </div>
+    </div>
+
+    <!-- ข้อ 4 (ระดับ 2) -->
+    <div class="question-card">
+      <div class="q-header-line1">ข้อความ คณิตศาสตร์ (Mathematical Literacy)&nbsp;&nbsp;&nbsp;&nbsp;บริบทสาธารณะ (Public)</div>
+      <div class="q-header-line2">เนื้อหา: ร้อยละ สัดส่วน และการคำนวณปริมาณสาร | ระดับชั้น:   -  | ระดับความสามารถ: 2</div>
+      <div class="q-text">
+        <strong>คำถามข้อที่ 4:</strong> ในเดือนหนึ่ง ชุมชนรวบรวมขยะรีไซเคิลทุกประเภทรวมกันได้ \(2,000\text{ กิโลกรัม}\) จากสัดส่วนในตาราง ปริมาณขยะที่เป็น <em>"กระดาษและกล่องลัง"</em> จะมีน้ำหนักกี่กิโลกรัม?
+      </div>
+      <div class="options-grid">
+        <label class="option-label"><input type="radio" name="w4"> ก. 600 กิโลกรัม</label>
+        <label class="option-label"><input type="radio" name="w4"> ข. 800 กิโลกรัม</label>
+        <label class="option-label"><input type="radio" name="w4"> ค. 1,000 กิโลกรัม</label>
+        <label class="option-label"><input type="radio" name="w4"> ง. 1,200 กิโลกรัม</label>
+      </div>
+      <div class="solution-box">
+        <div class="solution-title">เฉลย: ค. 1,000 กิโลกรัม</div>
+        <strong>เหตุผล:</strong> ระดับ 2 ตีความข้อมูลร้อยละในบริบทที่ระบุไว้ชัดเจน กระดาษคิดเป็น \(50\%\) ของขยะทั้งหมด คำนวณจาก \(\frac{50}{100} \times 2,000 = 1,000\) กิโลกรัม
+      </div>
+    </div>
+
+    <!-- ข้อ 5 (ระดับ 3) -->
+    <div class="question-card">
+      <div class="q-header-line1">ข้อความ คณิตศาสตร์ (Mathematical Literacy)&nbsp;&nbsp;&nbsp;&nbsp;บริบทสาธารณะ (Public)</div>
+      <div class="q-header-line2">เนื้อหา: การคำนวณหลายขั้นตอนและราคาถ่วงน้ำหนัก | ระดับชั้น:   -  | ระดับความสามารถ: 3</div>
+      <div class="q-text">
+        <strong>คำถามข้อที่ 5:</strong> หากในสัปดาห์รณรงค์สิ่งแวดล้อม ชุมชนรวบรวมขยะรีไซเคิลได้ตามสัดส่วนปกติรวม \(500\text{ กิโลกรัม}\) (พลาสติก \(30\%\), กระดาษ \(50\%\), อะลูมิเนียม \(20\%\)) ชุมชนจะได้รับเงินเข้ากองทุนทั้งหมดกี่บาท?
+      </div>
+      <div class="options-grid">
+        <label class="option-label"><input type="radio" name="w5"> ก. 4,500 บาท</label>
+        <label class="option-label"><input type="radio" name="w5"> ข. 5,200 บาท</label>
+        <label class="option-label"><input type="radio" name="w5"> ค. 6,000 บาท</label>
+        <label class="option-label"><input type="radio" name="w5"> ง. 7,500 บาท</label>
+      </div>
+      <div class="solution-box">
+        <div class="solution-title">เฉลย: ค. 6,000 บาท</div>
+        <strong>เหตุผล:</strong> ระดับ 3 กระบวนการทางคณิตศาสตร์หลายขั้นตอน:<br>
+        - พลาสติก: \(500 \times 30\% = 150\text{ กก.} \times 10 = 1,500\text{ บาท}\)<br>
+        - กระดาษ: \(500 \times 50\% = 250\text{ กก.} \times 4 = 1,000\text{ บาท}\)<br>
+        - อะลูมิเนียม: \(500 \times 20\% = 100\text{ กก.} \times 35 = 3,500\text{ บาท}\)<br>
+        รวมเงินทั้งหมด \(= 1,500 + 1,000 + 3,500 = 6,000\text{ บาท}\) (หรือคิดจากราคาเฉลี่ยกิโลกรัมละ 12 บาท: \(500 \times 12 = 6,000\) บาท)
+      </div>
+    </div>
+
+    <!-- ข้อ 6 (ระดับ 4) -->
+    <div class="question-card">
+      <div class="q-header-line1">ข้อความ คณิตศาสตร์ (Mathematical Literacy)&nbsp;&nbsp;&nbsp;&nbsp;บริบทสาธารณะ (Public)</div>
+      <div class="q-header-line2">เนื้อหา: แบบจำลองปริมาตรและผลกระทบต่อสิ่งแวดล้อมสาธารณะ | ระดับชั้น:   -  | ระดับความสามารถ: 4</div>
+      <div class="q-text">
+        <strong>คำถามข้อที่ 6:</strong> ในแต่ละเดือน ชุมชนช่วยลดพื้นที่ขยะในหลุมฝังกลบของเมืองได้ โดยขยะแต่ละกิโลกรัมลดพื้นที่ได้ตามระบุในตาราง หากใน 1 ปี ชุมชนสามารถคัดแยกขวดพลาสติกใสได้รวม \(3,600\text{ กิโลกรัม}\) และกระดาษ \(6,000\text{ กิโลกรัม}\) ชุมชนนี้จะช่วยประหยัดพื้นที่หลุมฝังกลบของเมืองได้รวมกี่ลูกบาศก์เมตร (\(\text{ลบ.ม.}\))?
+      </div>
+      <div class="options-grid">
+        <label class="option-label"><input type="radio" name="w6"> ก. 24 ลูกบาศก์เมตร</label>
+        <label class="option-label"><input type="radio" name="w6"> ข. 36 ลูกบาศก์เมตร</label>
+        <label class="option-label"><input type="radio" name="w6"> ค. 48 ลูกบาศก์เมตร</label>
+        <label class="option-label"><input type="radio" name="w6"> ง. 54 ลูกบาศก์เมตร</label>
+      </div>
+      <div class="solution-box">
+        <div class="solution-title">เฉลย: ข. 36 ลูกบาศก์เมตร</div>
+        <strong>เหตุผล:</strong> ระดับ 4 ทำงานกับแบบจำลองทศนิยมและการวัดปริมาตร:<br>
+        - ขวดพลาสติก: \(3,600 \times 0.005 = 18\text{ ลบ.ม.}\)<br>
+        - กระดาษ: \(6,000 \times 0.003 = 18\text{ ลบ.ม.}\)<br>
+        รวมประหยัดพื้นที่หลุมฝังกลบ \(= 18 + 18 = 36\text{ ลูกบาศก์เมตร}\)
+      </div>
+    </div>
+
+    <!-- ข้อ 7 (ระดับ 5) -->
+    <div class="question-card">
+      <div class="q-header-line1">ข้อความ คณิตศาสตร์ (Mathematical Literacy)&nbsp;&nbsp;&nbsp;&nbsp;บริบทสาธารณะ (Public)</div>
+      <div class="q-header-line2">เนื้อหา: การจัดสรรงบประมาณสาธารณะภายใต้เงื่อนไขหลายประการ | ระดับชั้น:   -  | ระดับความสามารถ: 5</div>
+      <div class="q-text">
+        <strong>คำถามข้อที่ 7:</strong> คณะกรรมการสวนสาธารณะได้รับเงินจากกองทุนขยะรีไซเคิลมาจำนวน \(10,000\text{ บาท}\) โดยมีเงื่อนไขการจัดซื้อว่า <em>"ต้องซื้อต้นไม้ยืนต้น (ต้นละ 400 บาท) อย่างน้อย 15 ต้น และนำเงินที่เหลือทั้งหมดไปซื้อไม้พุ่มดอก (ต้นละ 50 บาท) ประดับทางเดิน"</em> กรรมการจะสามารถซื้อไม้พุ่มดอกได้มากที่สุดกี่ต้น?
+      </div>
+      <div class="options-grid">
+        <label class="option-label"><input type="radio" name="w7"> ก. 50 ต้น</label>
+        <label class="option-label"><input type="radio" name="w7"> ข. 65 ต้น</label>
+        <label class="option-label"><input type="radio" name="w7"> ค. 80 ต้น</label>
+        <label class="option-label"><input type="radio" name="w7"> ง. 95 ต้น</label>
+      </div>
+      <div class="solution-box">
+        <div class="solution-title">เฉลย: ค. 80 ต้น</div>
+        <strong>เหตุผล:</strong> ระดับ 5 พัฒนาแบบจำลองเพื่อหาค่าเหมาะที่สุดภายใต้เงื่อนไข:<br>
+        1. เพื่อให้ได้จำนวนไม้พุ่มดอกมากที่สุด ต้องซื้อต้นไม้ยืนต้นในจำนวนขั้นต่ำพอดี คือ 15 ต้น<br>
+        2. ค่าใช้จ่ายซื้อต้นไม้ยืนต้น \(= 15 \times 400 = 6,000\text{ บาท}\)<br>
+        3. เงินคงเหลือสำหรับไม้พุ่ม \(= 10,000 - 6,000 = 4,000\text{ บาท}\)<br>
+        4. ซื้อไม้พุ่มดอกได้ \(= 4,000 \div 50 = 80\text{ ต้น}\)
+      </div>
+    </div>
+
+    <!-- ข้อ 8 (ระดับ 6) -->
+    <div class="question-card">
+      <div class="q-header-line1">ข้อความ คณิตศาสตร์ (Mathematical Literacy)&nbsp;&nbsp;&nbsp;&nbsp;บริบทสาธารณะ (Public)</div>
+      <div class="q-header-line2">เนื้อหา: การคิดยืดหยุ่น การเชื่อมโยงวัฏจักรสิ่งแวดล้อม และการชดเชยคาร์บอนสุทธิ | ระดับชั้น:   -  | ระดับความสามารถ: 6</div>
+      <div class="q-text">
+        <strong>คำถามข้อที่ 8:</strong> เทศบาลตั้งเป้าหมายสาธารณะ: <em>"ต้องการปลูกต้นไม้ยืนต้นในสวนสาธารณะให้สามารถช่วยดูดซับก๊าซ \(\text{CO}_2\) ได้อย่างน้อยปีละ \(450\text{ กิโลกรัม}\)"</em><br>
+        กำหนดให้: ต้นไม้ยืนต้น 1 ต้นราคา 400 บาท และดูดซับ \(\text{CO}_2\) ได้ปีละ 15 กิโลกรัม โดยเงินทั้งหมดได้มาจากการขายขยะรีไซเคิลชุมชน (เฉลี่ยได้เงิน \(12\text{ บาทต่อกิโลกรัม}\))<br>
+        หากชุมชนมี 400 ครัวเรือน และเข้าร่วมโครงการครบทุกครัวเรือน ในเวลา 1 เดือน แต่ละครัวเรือนจะต้องช่วยคัดแยกขยะรีไซเคิลส่งเข้าธนาคารขยะเฉลี่ยอย่างน้อยครัวเรือนละกี่กิโลกรัม จึงจะบรรลุเป้าหมายการจัดซื้อต้นไม้ดังกล่าวได้สำเร็จ?
+      </div>
+      <div class="options-grid">
+        <label class="option-label"><input type="radio" name="w8"> ก. ครัวเรือนละ 2.0 กิโลกรัม</label>
+        <label class="option-label"><input type="radio" name="w8"> ข. ครัวเรือนละ 2.5 กิโลกรัม</label>
+        <label class="option-label"><input type="radio" name="w8"> ค. ครัวเรือนละ 3.0 กิโลกรัม</label>
+        <label class="option-label"><input type="radio" name="w8"> ง. ครัวเรือนละ 4.2 กิโลกรัม</label>
+      </div>
+      <div class="solution-box">
+        <div class="solution-title">เฉลย: ข. ครัวเรือนละ 2.5 กิโลกรัม</div>
+        <strong>เหตุผล:</strong> ระดับ 6 ใช้เหตุผลเชิงนามธรรม เชื่อมโยงหลายตัวแปรย้อนกลับ (Backward reasoning):<br>
+        1. หาจำนวนต้นไม้ที่ต้องการ: \(\frac{450\text{ กก. }\text{CO}_2}{15\text{ กก./ต้น}} = 30\text{ ต้น}\)<br>
+        2. หางบประมาณที่ต้องใช้: \(30 \times 400 = 12,000\text{ บาท}\)<br>
+        3. หาปริมาณขยะรีไซเคิลรวมที่ต้องขาย: \(\frac{12,000\text{ บาท}}{12\text{ บาท/กก.}} = 1,000\text{ กิโลกรัม}\)<br>
+        4. เฉลี่ยต่อครัวเรือนใน 400 หลังคาเรือน: \(\frac{1,000\text{ กก.}}{400\text{ ครัวเรือน}} = 2.5\text{ กิโลกรัมต่อครัวเรือน}\)
+      </div>
+    </div>
+
+  </div>
+
+</div>
+
+<script>
+function updateWasteSim() {
+  const houses = parseInt(document.getElementById('houseRange').value);
+  const kg = parseInt(document.getElementById('kgRange').value);
+
+  document.getElementById('houseBadge').innerText = houses + ' หลังคาเรือน';
+  document.getElementById('kgBadge').innerText = kg + ' กก./ครัวเรือน/เดือน';
+
+  const totalKg = houses * kg;
+  document.getElementById('totalWasteVal').innerText = totalKg.toLocaleString() + ' กก.';
+
+  // Weighted average price is 12 baht per kg
+  const totalFund = totalKg * 12;
+  document.getElementById('totalFundVal').innerText = totalFund.toLocaleString() + ' บาท';
+}
+</script>
+
+</body>
+</html>

@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PISA Math - ชุดที่ 1: การวางแผนการผลิตและจัดการต้นทุนในร้านเบเกอรี</title>
+<script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+<style>
+  :root {
+    --primary: #b45309;
+    --primary-light: #fef3c7;
+    --border: #fde68a;
+    --bg-card: #ffffff;
+    --text: #1e293b;
+    --accent: #d97706;
+  }
+  * { box-sizing: border-box; font-family: 'Sarabun', 'Segoe UI', Tahoma, sans-serif; }
+  body { margin: 0; padding: 20px; background-color: #fffbeb; color: var(--text); line-height: 1.6; }
+  .container { max-width: 1200px; margin: 0 auto; display: flex; flex-direction: column; gap: 20px; }
+
+  /* Top Grid for Frame 1 and Frame 2 */
+  .top-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+  }
+  @media (max-width: 850px) {
+    .top-grid { grid-template-columns: 1fr; }
+  }
+
+  .panel {
+    background: var(--bg-card);
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 22px;
+    box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+  }
+
+  /* Interactive Simulator in Frame 1 */
+  .interactive-box {
+    background: #fffbeb;
+    border: 1px solid #fde68a;
+    border-radius: 8px;
+    padding: 15px;
+    margin-top: 15px;
+  }
+  .control-group { margin-bottom: 12px; }
+  .control-group label { display: block; font-weight: 600; margin-bottom: 5px; font-size: 0.95rem; }
+  .control-group input[type="range"] { width: 100%; cursor: pointer; accent-color: #b45309; }
+  .val-badge { display: inline-block; background: #b45309; color: white; padding: 2px 8px; border-radius: 12px; font-size: 0.85rem; }
+
+  .summary-stat {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    background: #fef3c7;
+    border-radius: 8px;
+    padding: 12px;
+    margin-top: 10px;
+  }
+  .stat-item { text-align: center; }
+  .stat-val { font-size: 1.25rem; font-weight: bold; color: #92400e; }
+
+  /* Frame 2 Table / Hints */
+  table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 0.92rem; }
+  th, td { border: 1px solid #cbd5e1; padding: 8px 10px; text-align: left; }
+  th { background: #f8fafc; font-weight: 600; }
+  .hint-card {
+    background: #f0fdf4;
+    border-left: 4px solid #16a34a;
+    padding: 10px 14px;
+    margin-top: 12px;
+    font-size: 0.9rem;
+    color: #166534;
+    border-radius: 0 8px 8px 0;
+  }
+  .hint-work {
+    background: #eff6ff;
+    border-left: 4px solid #2563eb;
+    padding: 10px 14px;
+    margin-top: 10px;
+    font-size: 0.9rem;
+    color: #1e40af;
+    border-radius: 0 8px 8px 0;
+  }
+
+  /* Questions Area (Frame 3) */
+  .question-card {
+    background: var(--bg-card);
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    padding: 20px;
+    margin-bottom: 24px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.03);
+  }
+  .q-header-line1 {
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: #92400e;
+    border-bottom: 1px dashed #cbd5e1;
+    padding-bottom: 4px;
+    margin-bottom: 4px;
+  }
+  .q-header-line2 {
+    font-size: 0.9rem;
+    color: #475569;
+    font-weight: 600;
+    margin-bottom: 12px;
+  }
+  .q-text { font-size: 1.05rem; margin-bottom: 12px; line-height: 1.6; }
+  .options-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 15px;
+  }
+  @media (max-width: 650px) {
+    .options-grid { grid-template-columns: 1fr; }
+  }
+  .option-label {
+    background: #f8fafc;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    padding: 10px 14px;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .option-label:hover { background: #fef3c7; border-color: #f59e0b; }
+  .option-label input { accent-color: #b45309; }
+
+  .solution-box {
+    background: #f8fafc;
+    border-left: 4px solid #b45309;
+    border-radius: 0 6px 6px 0;
+    padding: 12px 16px;
+    margin-top: 12px;
+    font-size: 0.92rem;
+  }
+  .solution-title { font-weight: bold; color: #92400e; margin-bottom: 4px; }
+</style>
+</head>
+<body>
+
+<div class="container">
+
+  <!-- แถวบน: ด้านซ้าย (ส่วนให้ข้อมูล/แบบจำลอง) และ ด้านขวา (ผลการทดลอง/คำแนะนำทางอ้อม) -->
+  <div class="top-grid">
+    <!-- ส่วนข้อมูล/แบบจำลองการผลิตในอาชีพช่างทำขนม -->
+    <div class="panel">
+      <h2 style="margin-top:0; color:#92400e; font-size:1.3rem;">สถานการณ์: การวางแผนการอบและจัดการต้นทุนในร้านเบเกอรี "อบอุ่น"</h2>
+      <p style="font-size:0.95rem; color:#475569;">
+        เชฟเบเกอรีต้องวางแผนการผลิต <strong>"ครัวซองต์เนยสดแท้"</strong> ในแต่ละวัน โดยเตาอบมาตรฐานของร้านสามารถอบได้รอบละ \(24\text{ ชิ้น}\) 
+        และใช้เวลาเตรียมรวมถึงอบรอบละ \(45\text{ นาที}\) เพื่อส่งขายหน้าร้านในราคาชิ้นละ \(35\text{ บาท}\)
+      </p>
+
+      <div class="interactive-box">
+        <h4 style="margin:0 0 10px 0; color:#92400e;">🥐 เครื่องมือจำลองแผนการผลิตรายวันของเชฟ</h4>
+        
+        <div class="control-group">
+          <label>จำนวนรอบที่เปิดเตาอบต่อวัน: <span id="batchBadge" class="val-badge">5 รอบ</span></label>
+          <input type="range" id="batchRange" min="1" max="10" step="1" value="5" oninput="updateBakeSim()">
+          <small style="color:#64748b;">(รอบละ 24 ชิ้น ใช้เวลา 45 นาทีต่อรอบ)</small>
+        </div>
+
+        <div class="control-group">
+          <label>ต้นทุนวัตถุดิบเฉลี่ยต่อชิ้น: <span id="costBadge" class="val-badge">15 บาท/ชิ้น</span></label>
+          <input type="range" id="costRange" min="10" max="25" step="1" value="15" oninput="updateBakeSim()">
+        </div>
+
+        <div class="summary-stat">
+          <div class="stat-item">
+            <div style="font-size:0.85rem; color:#92400e;">ผลผลิตครัวซองต์รวม</div>
+            <div class="stat-val" id="totalBakeVal">120 ชิ้น</div>
+          </div>
+          <div class="stat-item">
+            <div style="font-size:0.85rem; color:#92400e;">กำไรขั้นต้นจากการขายหมด</div>
+            <div class="stat-val" id="totalProfitVal">2,400 บาท</div>
+          </div>
+        </div>
+
+        <div style="font-size:0.85rem; color:#475569; margin-top:8px;">
+          * เวลารวมที่ใช้ในการอบเตา: <strong id="totalBakeTimeText">225 นาที</strong> (หรือ 3 ชั่วโมง 45 นาที)
+        </div>
+      </div>
+    </div>
+
+    <!-- ส่วนผลการทดลอง/ข้อมูลแนะนำทางอ้อม -->
+    <div class="panel">
+      <h2 style="margin-top:0; color:#92400e; font-size:1.3rem;">ตารางสูตรมาตรฐานและต้นทุนวัตถุดิบ (สำหรับการผลิต 1 รอบ = 24 ชิ้น)</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>รายการวัตถุดิบ</th>
+            <th>ปริมาณที่ใช้ต่อ 1 รอบ</th>
+            <th>ราคาต่อหน่วยซื้อ</th>
+            <th>คิดเป็นต้นทุนต่อรอบ (บาท)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>แป้งสาลีทำขนมปัง</td>
+            <td>\(1,200\text{ กรัม (g)}\)</td>
+            <td>40 บาท / กิโลกรัม (\(1,000\text{ g}\))</td>
+            <td>48</td>
+          </tr>
+          <tr>
+            <td>เนยสดชนิดจืดแท้</td>
+            <td>\(600\text{ กรัม (g)}\)</td>
+            <td>400 บาท / กิโลกรัม (\(1,000\text{ g}\))</td>
+            <td>240</td>
+          </tr>
+          <tr>
+            <td>นมสด น้ำตาล และยีสต์</td>
+            <td>รวมชุดสำเร็จรูป</td>
+            <td>เหมาจ่ายต่อรอบ</td>
+            <td>72</td>
+          </tr>
+          <tr style="font-weight:bold; background:#f8fafc;">
+            <td colspan="3">รวมต้นทุนวัตถุดิบต่อ 1 รอบ (\(24\text{ ชิ้น}\))</td>
+            <td>360 บาท</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="hint-card">
+        <strong>💡 ผลการคำนวณและข้อคิดทางอาชีพ:</strong><br>
+        - ต้นทุนวัตถุดิบต่อชิ้น: \(\frac{360}{24} = 15\text{ บาทต่อชิ้น}\)<br>
+        - กำไรต่อชิ้นเมื่อขายราคา 35 บาท: \(35 - 15 = 20\text{ บาทต่อชิ้น}\) (คิดเป็นกำไรขั้นต้น \(\frac{20}{35} \times 100 \approx 57.1\%\))
+      </div>
+
+      <div class="hint-work">
+        <strong>💼 มาตรฐานสุขอนามัยและการบริหารร้าน:</strong><br>
+        • ขนมปังอบสดหน้าร้านมีอายุวางจำหน่ายวันต่อวัน หากเหลือค้างคืนจะนำไปลดราคา \(50\%\) ในช่วงชั่วโมงสุดท้ายก่อนปิดร้าน (Clearance Sale)
+      </div>
+    </div>
+  </div>
+
+  <!-- แถวล่าง: คำถาม 8 ข้อ เรียงลำดับความสามารถ 1c ถึง 6 -->
+  <div class="panel">
+    <h2 style="margin-top:0; color:#92400e; font-size:1.4rem; border-bottom:2px solid #fde68a; padding-bottom:8px;">
+      แบบทดสอบวัดการรู้เรื่องคณิตศาสตร์ (8 ระดับความสามารถ)
+    </h2>
+
+    <!-- ข้อ 1 (ระดับ 1c) -->
+    <div class="question-card">
+      <div class="q-header-line1">ข้อความ คณิตศาสตร์ (Mathematical Literacy)&nbsp;&nbsp;&nbsp;&nbsp;บริบทอาชีพ (Occupational)</div>
+      <div class="q-header-line2">เนื้อหา: จำนวนและการดำเนินการ (การอ่านข้อมูลตรงตัวจากตารางงาน) | ระดับชั้น:   -  | ระดับความสามารถ: 1c</div>
+      <div class="q-text">
+        <strong>คำถามข้อที่ 1:</strong> จากตารางสูตรมาตรฐานการอบครัวซองต์ 1 รอบ (\(24\text{ ชิ้น}\)) เชฟต้องใช้เนยสดชนิดจืดแท้ในปริมาณกี่กรัม?
+      </div>
+      <div class="options-grid">
+        <label class="option-label"><input type="radio" name="c1"> ก. 360 กรัม</label>
+        <label class="option-label"><input type="radio" name="c1"> ข. 600 กรัม</label>
+        <label class="option-label"><input type="radio" name="c1"> ค. 1,000 กรัม</label>
+        <label class="option-label"><input type="radio" name="c1"> ง. 1,200 กรัม</label>
+      </div>
+      <div class="solution-box">
+        <div class="solution-title">เฉลย: ข. 600 กรัม</div>
+        <strong>เหตุผล:</strong> ระดับ 1c อ่านข้อมูลตรงตัวขั้นตอนเดียว จากตารางในช่องปริมาณเนยสดระบุไว้ชัดเจนคือ \(600\text{ กรัม}\)
+      </div>
+    </div>
+
+    <!-- ข้อ 2 (ระดับ 1b) -->
+    <div class="question-card">
+      <div class="q-header-line1">ข้อความ คณิตศาสตร์ (Mathematical Literacy)&nbsp;&nbsp;&nbsp;&nbsp;บริบทอาชีพ (Occupational)</div>
+      <div class="q-header-line2">เนื้อหา: จำนวนและการดำเนินการ (การคูณจำนวนเต็มอย่างง่าย) | ระดับชั้น:   -  | ระดับความสามารถ: 1b</div>
+      <div class="q-text">
+        <strong>คำถามข้อที่ 2:</strong> ถ้าในวันหยุดสุดสัปดาห์ เชฟเปิดเตาอบครัวซองต์ทั้งหมด \(4\text{ รอบ}\) ทางร้านจะได้ผลผลิตครัวซองต์ทั้งหมดกี่ชิ้น?
+      </div>
+      <div class="options-grid">
+        <label class="option-label"><input type="radio" name="c2"> ก. 72 ชิ้น</label>
+        <label class="option-label"><input type="radio" name="c2"> ข. 80 ชิ้น</label>
+        <label class="option-label"><input type="radio" name="c2"> ค. 96 ชิ้น</label>
+        <label class="option-label"><input type="radio" name="c2"> ง. 120 ชิ้น</label>
+      </div>
+      <div class="solution-box">
+        <div class="solution-title">เฉลย: ค. 96 ชิ้น</div>
+        <strong>เหตุผล:</strong> ระดับ 1b คำนวณจำนวนเต็มอย่างง่ายจากข้อมูลที่ระบุชัด แต่ละรอบอบได้ 24 ชิ้น เปิดเตา 4 รอบ ได้ผลผลิต \(4 \times 24 = 96\) ชิ้น
+      </div>
+    </div>
+
+    <!-- ข้อ 3 (ระดับ 1a) -->
+    <div class="question-card">
+      <div class="q-header-line1">ข้อความ คณิตศาสตร์ (Mathematical Literacy)&nbsp;&nbsp;&nbsp;&nbsp;บริบทอาชีพ (Occupational)</div>
+      <div class="q-header-line2">เนื้อหา: การวัด เวลา และการหารพื้นฐาน | ระดับชั้น:   -  | ระดับความสามารถ: 1a</div>
+      <div class="q-text">
+        <strong>คำถามข้อที่ 3:</strong> ในการอบแต่ละรอบใช้เวลา \(45\text{ นาที}\) หากเชฟเริ่มอบรอบแรกเวลา \(08:00\text{ น.}\) และอบต่อเนื่องทันที 2 รอบ (รวม 2 รอบ) การอบรอบที่สองจะเสร็จสิ้นในเวลาใด?
+      </div>
+      <div class="options-grid">
+        <label class="option-label"><input type="radio" name="c3"> ก. 09:15 น.</label>
+        <label class="option-label"><input type="radio" name="c3"> ข. 09:30 น.</label>
+        <label class="option-label"><input type="radio" name="c3"> ค. 09:45 น.</label>
+        <label class="option-label"><input type="radio" name="c3"> ง. 10:00 น.</label>
+      </div>
+      <div class="solution-box">
+        <div class="solution-title">เฉลย: ข. 09:30 น.</div>
+        <strong>เหตุผล:</strong> ระดับ 1a แก้ปัญหาคุ้นเคยเรื่องเวลา เวลาที่ใช้รวม 2 รอบคือ \(45 \times 2 = 90\text{ นาที}\) (หรือ 1 ชั่วโมง 30 นาที) เริ่มเวลา 08:00 น. บวกเพิ่ม 1 ชม. 30 นาที เป็นเวลา 09:30 น.
+      </div>
+    </div>
+
+    <!-- ข้อ 4 (ระดับ 2) -->
+    <div class="question-card">
+      <div class="q-header-line1">ข้อความ คณิตศาสตร์ (Mathematical Literacy)&nbsp;&nbsp;&nbsp;&nbsp;บริบทอาชีพ (Occupational)</div>
+      <div class="q-header-line2">เนื้อหา: บัญญัติไตรยางศ์และการคำนวณต้นทุนต่อหน่วย | ระดับชั้น:   -  | ระดับความสามารถ: 2</div>
+      <div class="q-text">
+        <strong>คำถามข้อที่ 4:</strong> จากตารางสูตรมาตรฐาน การอบครัวซองต์ 1 รอบจำนวน \(24\text{ ชิ้น}\) มีต้นทุนวัตถุดิบรวม \(360\text{ บาท}\) ถ้าเชฟต้องการคำนวณต้นทุนวัตถุดิบเฉลี่ยของครัวซองต์ต่อ 1 ชิ้น จะคิดเป็นกี่บาท?
+      </div>
+      <div class="options-grid">
+        <label class="option-label"><input type="radio" name="c4"> ก. 12 บาท</label>
+        <label class="option-label"><input type="radio" name="c4"> ข. 15 บาท</label>
+        <label class="option-label"><input type="radio" name="c4"> ค. 18 บาท</label>
+        <label class="option-label"><input type="radio" name="c4"> ง. 20 บาท</label>
+      </div>
+      <div class="solution-box">
+        <div class="solution-title">เฉลย: ข. 15 บาท</div>
+        <strong>เหตุผล:</strong> ระดับ 2 ใช้ขั้นตอนพื้นฐานในบริบทชัดเจน \(\frac{360\text{ บาท}}{24\text{ ชิ้น}} = 15\text{ บาทต่อชิ้น}\)
+      </div>
+    </div>
+
+    <!-- ข้อ 5 (ระดับ 3) -->
+    <div class="question-card">
+      <div class="q-header-line1">ข้อความ คณิตศาสตร์ (Mathematical Literacy)&nbsp;&nbsp;&nbsp;&nbsp;บริบทอาชีพ (Occupational)</div>
+      <div class="q-header-line2">เนื้อหา: ร้อยละ กำไร และการคำนวณหลายขั้นตอน | ระดับชั้น:   -  | ระดับความสามารถ: 3</div>
+      <div class="q-text">
+        <strong>คำถามข้อที่ 5:</strong> ในวันหนึ่งร้านอบครัวซองต์ทั้งหมด \(120\text{ ชิ้น}\) (ต้นทุนชิ้นละ 15 บาท) ในระหว่างวันขายราคาปกติชิ้นละ 35 บาทได้จำนวน 100 ชิ้น ส่วนอีก 20 ชิ้นที่เหลือนำมาขายลดราคา \(50\%\) ในช่วงปิดร้านจนหมดเกลี้ยง ในวันนั้นร้านเบเกอรีจะได้รับ<strong>กำไรสุทธิจากการขายทั้งหมดกี่บาท</strong>?
+      </div>
+      <div class="options-grid">
+        <label class="option-label"><input type="radio" name="c5"> ก. 1,800 บาท</label>
+        <label class="option-label"><input type="radio" name="c5"> ข. 2,050 บาท</label>
+        <label class="option-label"><input type="radio" name="c5"> ค. 2,250 บาท</label>
+        <label class="option-label"><input type="radio" name="c5"> ง. 2,400 บาท</label>
+      </div>
+      <div class="solution-box">
+        <div class="solution-title">เฉลย: ข. 2,050 บาท</div>
+        <strong>เหตุผล:</strong> ระดับ 3 กระบวนการทางคณิตศาสตร์หลายขั้นตอน:<br>
+        1. ต้นทุนรวม \(= 120 \times 15 = 1,800\text{ บาท}\)<br>
+        2. ขายราคาปกติ 100 ชิ้น: \(100 \times 35 = 3,500\text{ บาท}\)<br>
+        3. ขายลดราคา 50%: ราคาชิ้นละ \(35 \times 0.5 = 17.50\text{ บาท}\) จำนวน 20 ชิ้น: \(20 \times 17.50 = 350\text{ บาท}\)<br>
+        4. รายรับรวม \(= 3,500 + 350 = 3,850\text{ บาท}\)<br>
+        5. กำไรสุทธิ \(= 3,850 - 1,800 = 2,050\text{ บาท}\)
+      </div>
+    </div>
+
+    <!-- ข้อ 6 (ระดับ 4) -->
+    <div class="question-card">
+      <div class="q-header-line1">ข้อความ คณิตศาสตร์ (Mathematical Literacy)&nbsp;&nbsp;&nbsp;&nbsp;บริบทอาชีพ (Occupational)</div>
+      <div class="q-header-line2">เนื้อหา: แบบจำลองสัดส่วนวัตถุดิบและขนาดบรรจุภัณฑ์ในตลาด | ระดับชั้น:   -  | ระดับความสามารถ: 4</div>
+      <div class="q-text">
+        <strong>คำถามข้อที่ 6:</strong> เชฟได้รับคำสั่งซื้อล่วงหน้าสำหรับจัดเลี้ยงสัมมนาจำนวน \(120\text{ ชิ้น}\) ในการทำครัวซองต์ตามสูตร เชฟจะต้องใช้แป้งสาลีทั้งหมดกี่กิโลกรัม และหากร้านขายส่งขายแป้งสาลีเป็นถุงละ \(1\text{ กิโลกรัม}\) เท่านั้น เชฟจะต้องซื้อแป้งสาลีอย่างน้อยที่สุดกี่ถุง?
+      </div>
+      <div class="options-grid">
+        <label class="option-label"><input type="radio" name="c6"> ก. ใช้ 5.0 กิโลกรัม ซื้ออย่างน้อย 5 ถุง</label>
+        <label class="option-label"><input type="radio" name="c6"> ข. ใช้ 6.0 กิโลกรัม ซื้ออย่างน้อย 6 ถุง</label>
+        <label class="option-label"><input type="radio" name="c6"> ค. ใช้ 7.2 กิโลกรัม ซื้ออย่างน้อย 8 ถุง</label>
+        <label class="option-label"><input type="radio" name="c6"> ง. ใช้ 8.0 กิโลกรัม ซื้ออย่างน้อย 8 ถุง</label>
+      </div>
+      <div class="solution-box">
+        <div class="solution-title">เฉลย: ข. ใช้ 6.0 กิโลกรัม ซื้ออย่างน้อย 6 ถุง</div>
+        <strong>เหตุผล:</strong> ระดับ 4 ทำงานกับแบบจำลองการผลิตและการปัดหน่วยจริง:<br>
+        1. คำนวณจำนวนรอบการผลิต: \(120 \div 24 = 5\text{ รอบ}\)<br>
+        2. แป้งสาลีต่อรอบใช้ \(1,200\text{ กรัม}\) ดังนั้น 5 รอบใช้ \(5 \times 1,200 = 6,000\text{ กรัม}\)<br>
+        3. แปลงหน่วยเป็นกิโลกรัม: \(6,000 \div 1,000 = 6.0\text{ กิโลกรัม}\)<br>
+        4. แป้งบรรจุถุงละ 1 กิโลกรัม พอดี 6 ถุงพอดี
+      </div>
+    </div>
+
+    <!-- ข้อ 7 (ระดับ 5) -->
+    <div class="question-card">
+      <div class="q-header-line1">ข้อความ คณิตศาสตร์ (Mathematical Literacy)&nbsp;&nbsp;&nbsp;&nbsp;บริบทอาชีพ (Occupational)</div>
+      <div class="q-header-line2">เนื้อหา: การคำนวณจุดคุ้มทุน (Break-even Point) ภายใต้ต้นทุนคงที่และต้นทุนผันแปร | ระดับชั้น:   -  | ระดับความสามารถ: 5</div>
+      <div class="q-text">
+        <strong>คำถามข้อที่ 7:</strong> นอกจากต้นทุนวัตถุดิบชิ้นละ \(15\text{ บาท}\) ร้านเบเกอรียังมีค่าใช้จ่ายคงที่รายวัน (ค่าเช่าร้านและค่าจ้างลูกจ้าง) รวมวันละ \(1,600\text{ บาท}\) หากขายครัวซองต์ราคาปกติชิ้นละ \(35\text{ บาท}\) เชฟจะต้องขายครัวซองต์ให้ได้<strong>อย่างน้อยที่สุดกี่ชิ้นต่อวัน</strong> จึงจะเท่าทุนพอดี (ไม่ขาดทุน)?
+      </div>
+      <div class="options-grid">
+        <label class="option-label"><input type="radio" name="c7"> ก. 46 ชิ้น</label>
+        <label class="option-label"><input type="radio" name="c7"> ข. 65 ชิ้น</label>
+        <label class="option-label"><input type="radio" name="c7"> ค. 80 ชิ้น</label>
+        <label class="option-label"><input type="radio" name="c7"> ง. 107 ชิ้น</label>
+      </div>
+      <div class="solution-box">
+        <div class="solution-title">เฉลย: ค. 80 ชิ้น</div>
+        <strong>เหตุผล:</strong> ระดับ 5 สร้างและประยุกต์ใช้แบบจำลองทางการเงินในอาชีพ:<br>
+        1. กำไรส่วนเกินต่อชิ้น (Contribution Margin) \(= 35 - 15 = 20\text{ บาทต่อชิ้น}\)<br>
+        2. ค่าใช้จ่ายคงที่ที่ต้องครอบคลุม \(= 1,600\text{ บาท}\)<br>
+        3. จำนวนชิ้นที่จุดคุ้มทุน \(= \frac{1,600}{20} = 80\text{ ชิ้น}\)
+      </div>
+    </div>
+
+    <!-- ข้อ 8 (ระดับ 6) -->
+    <div class="question-card">
+      <div class="q-header-line1">ข้อความ คณิตศาสตร์ (Mathematical Literacy)&nbsp;&nbsp;&nbsp;&nbsp;บริบทอาชีพ (Occupational)</div>
+      <div class="q-header-line2">เนื้อหา: การให้เหตุผลเชิงนามธรรม การวิเคราะห์ความอ่อนไหวของราคาเนย และการตั้งราคาเพื่อรักษาอัตรากำไร | ระดับชั้น:   -  | ระดับความสามารถ: 6</div>
+      <div class="q-text">
+        <strong>คำถามข้อที่ 8:</strong> ราคาเนยสดแท้ในตลาดโลกปรับตัวสูงขึ้น \(25\%\) ส่งผลให้ต้นทุนเนยต่อ 1 รอบการอบ (\(24\text{ ชิ้น}\)) เพิ่มขึ้นจากเดิม 240 บาท ขณะที่วัตถุดิบอื่นราคาคงเดิม หากร้านค้าต้องการรักษากำไรส่วนเกินไว้ที่ <strong>20 บาทต่อชิ้นเท่าเดิม</strong> ร้านค้าจำเป็นต้องปรับราคาขายครัวซองต์หน้าร้านใหม่เป็นชิ้นละกี่บาท และข้อใดแสดงการให้เหตุผลทางคณิตศาสตร์ที่ถูกต้องที่สุด?
+      </div>
+      <div class="options-grid">
+        <label class="option-label"><input type="radio" name="c8"> ก. ขายราคาเดิม 35 บาท เพราะเนยเป็นเพียงส่วนผสมหนึ่งในสามส่วนเท่านั้น</label>
+        <label class="option-label"><input type="radio" name="c8"> ข. ปรับเป็นชิ้นละ 37.50 บาท เพราะต้นทุนเนยเพิ่มขึ้นรอบละ 60 บาท ซึ่งกระจายตกชิ้นละ 2.50 บาท</label>
+        <label class="option-label"><input type="radio" name="c8"> ค. ปรับเป็นชิ้นละ 40.00 บาท เพราะต้นทุนเพิ่มขึ้น 25% จึงต้องขึ้นราคาขาย 25% ด้วย</label>
+        <label class="option-label"><input type="radio" name="c8"> ง. ปรับเป็นชิ้นละ 43.75 บาท โดยนำอัตรากำไรร้อยละ 25 มาบวกทบจากราคาขายเดิม</label>
+      </div>
+      <div class="solution-box">
+        <div class="solution-title">เฉลย: ข. ปรับเป็นชิ้นละ 37.50 บาท เพราะต้นทุนเนยเพิ่มขึ้นรอบละ 60 บาท ซึ่งกระจายตกชิ้นละ 2.50 บาท</div>
+        <strong>เหตุผล:</strong> ระดับ 6 ใช้เหตุผลเชิงนามธรรมและคิดยืดหยุ่นในสถานการณ์ต้นทุนผันแปร:<br>
+        1. ต้นทุนเนยเดิมรอบละ 240 บาท เพิ่มขึ้น \(25\% = 240 \times \frac{25}{100} = 60\text{ บาทต่อรอบ}\)<br>
+        2. ต้นทุนรวมใหม่ต่อรอบ \(= 360 + 60 = 420\text{ บาท}\)<br>
+        3. ต้นทุนต่อชิ้นใหม่ \(= \frac{420}{24} = 17.50\text{ บาทต่อชิ้น}\) (เพิ่มขึ้น \(17.50 - 15 = 2.50\text{ บาท}\))<br>
+        4. ต้องการกำไร 20 บาทเท่าเดิม ต้องตั้งราคาขายใหม่ \(= 17.50 + 20 = 37.50\text{ บาท}\)
+      </div>
+    </div>
+
+  </div>
+
+</div>
+
+<script>
+function updateBakeSim() {
+  const batches = parseInt(document.getElementById('batchRange').value);
+  const costPerPiece = parseInt(document.getElementById('costRange').value);
+
+  document.getElementById('batchBadge').innerText = batches + ' รอบ';
+  document.getElementById('costBadge').innerText = costPerPiece + ' บาท/ชิ้น';
+
+  const totalPieces = batches * 24;
+  document.getElementById('totalBakeVal').innerText = totalPieces.toLocaleString() + ' ชิ้น';
+
+  const revenue = totalPieces * 35;
+  const totalCost = totalPieces * costPerPiece;
+  const profit = revenue - totalCost;
+  document.getElementById('totalProfitVal').innerText = profit.toLocaleString() + ' บาท';
+
+  const totalMinutes = batches * 45;
+  const hrs = Math.floor(totalMinutes / 60);
+  const mins = totalMinutes % 60;
+  let timeStr = totalMinutes + ' นาที';
+  if (hrs > 0) {
+    timeStr += ' (หรือ ' + hrs + ' ชั่วโมง ' + (mins > 0 ? mins + ' นาที' : '') + ')';
+  }
+  document.getElementById('totalBakeTimeText').innerText = timeStr;
+}
+</script>
+
+</body>
+</html>

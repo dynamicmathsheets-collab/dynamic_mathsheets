@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PISA Math - ชุดที่ 2: การวางแผนออมเงินและช้อปปิ้งสมาร์ทของฟ้าใส</title>
+<script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+<style>
+  :root {
+    --primary: #4f46e5;
+    --primary-light: #eef2ff;
+    --border: #cbd5e1;
+    --bg-card: #ffffff;
+    --text: #1e293b;
+    --accent: #4338ca;
+  }
+  * { box-sizing: border-box; font-family: 'Sarabun', 'Segoe UI', Tahoma, sans-serif; }
+  body { margin: 0; padding: 20px; background-color: #f8fafc; color: var(--text); line-height: 1.6; }
+  .container { max-width: 1200px; margin: 0 auto; display: flex; flex-direction: column; gap: 20px; }
+
+  .top-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+  }
+  @media (max-width: 850px) {
+    .top-grid { grid-template-columns: 1fr; }
+  }
+
+  .panel {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 22px;
+    box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+  }
+
+  .interactive-sim {
+    background: #f5f3ff;
+    border: 1px solid #ddd6fe;
+    border-radius: 8px;
+    padding: 15px;
+    margin-top: 15px;
+  }
+  .control-group { margin-bottom: 12px; }
+  .control-group label { display: block; font-weight: 600; margin-bottom: 5px; font-size: 0.95rem; }
+  .control-group input[type="range"] { width: 100%; cursor: pointer; accent-color: #6366f1; }
+  .val-badge { display: inline-block; background: #6366f1; color: white; padding: 2px 8px; border-radius: 12px; font-size: 0.85rem; }
+
+  table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 0.92rem; }
+  th, td { border: 1px solid var(--border); padding: 8px 10px; text-align: left; }
+  th { background: #f1f5f9; font-weight: 600; }
+
+  .hint-card {
+    background: #eff6ff;
+    border-left: 4px solid #3b82f6;
+    padding: 10px 14px;
+    margin-top: 12px;
+    font-size: 0.9rem;
+    color: #1e40af;
+    border-radius: 0 8px 8px 0;
+  }
+
+  .question-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 20px;
+    margin-bottom: 24px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.03);
+  }
+  .q-header-line1 {
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: #3730a3;
+    border-bottom: 1px dashed #cbd5e1;
+    padding-bottom: 4px;
+    margin-bottom: 4px;
+  }
+  .q-header-line2 {
+    font-size: 0.9rem;
+    color: #475569;
+    font-weight: 600;
+    margin-bottom: 12px;
+  }
+  .q-text { font-size: 1.05rem; margin-bottom: 12px; line-height: 1.6; }
+  .options-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 15px;
+  }
+  @media (max-width: 650px) {
+    .options-grid { grid-template-columns: 1fr; }
+  }
+  .option-label {
+    background: #f8fafc;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    padding: 10px 14px;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .option-label:hover { background: #e0e7ff; border-color: #818cf8; }
+  .option-label input { accent-color: #4f46e5; }
+
+  .solution-box {
+    background: #f1f5f9;
+    border-left: 4px solid #10b981;
+    border-radius: 0 6px 6px 0;
+    padding: 12px 16px;
+    margin-top: 12px;
+    font-size: 0.92rem;
+  }
+  .solution-title { font-weight: bold; color: #065f46; margin-bottom: 4px; }
+  .progress-wrap { background: #e2e8f0; border-radius: 10px; height: 18px; width: 100%; margin-top: 6px; overflow: hidden; }
+  .progress-bar { background: #4f46e5; height: 100%; width: 0%; transition: width 0.3s; }
+</style>
+</head>
+<body>
+
+<div class="container">
+
+  <!-- แถวบน: ด้านซ้าย (เฟรมเดิม 1) และ ด้านขวา (เฟรมเดิม 2) -->
+  <div class="top-grid">
+    <!-- ส่วนข้อมูล/แบบจำลองการทดลอง (เฟรม 1) -->
+    <div class="panel">
+      <h2 style="margin-top:0; color:#3730a3; font-size:1.3rem;">สถานการณ์: แผนการออมเงินเพื่อซื้ออุปกรณ์การเรียนของฟ้าใส</h2>
+      <p style="font-size:0.95rem; color:#475569;">
+        ฟ้าใสได้รับเงินค่าขนมไปโรงเรียนสัปดาห์ละ \(350\text{ บาท}\) (จันทร์ - ศุกร์) เธอตั้งเป้าหมายจะเก็บเงินสะสมเพื่อซื้อ 
+        <strong>"ชุดกระเป๋านักเรียนและเครื่องเขียนพร้อมกระติกน้ำ"</strong> ราคาป้ายรวม \(1,200\text{ บาท}\)
+      </p>
+
+      <div class="interactive-sim">
+        <h4 style="margin:0 0 10px 0; color:#4338ca;">💰 แบบจำลองทดลองวางแผนการออมเงิน (ปรับตัวแปรได้)</h4>
+        
+        <div class="control-group">
+          <label>เงินเก็บออมต่อสัปดาห์: <span id="saveRateBadge" class="val-badge">120 บาท/สัปดาห์</span></label>
+          <input type="range" id="saveRateRange" min="20" max="250" step="10" value="120" oninput="runSim()">
+          <small style="color:#64748b;">(จากค่าขนมสัปดาห์ละ 350 บาท เหลือใช้จ่ายจริงสัปดาห์ละ <span id="remainSpend">230</span> บาท)</small>
+        </div>
+
+        <div class="control-group">
+          <label>ระยะเวลาที่ตั้งใจออม: <span id="weekBadge" class="val-badge">8 สัปดาห์</span></label>
+          <input type="range" id="weekRange" min="1" max="16" step="1" value="8" oninput="runSim()">
+        </div>
+
+        <div style="margin-top:10px;">
+          <div style="display:flex; justify-content:space-between; font-size:0.9rem;">
+            <span>ความคืบหน้าเงินออม: <strong id="currentSavedText">960</strong> / 1,200 บาท</span>
+            <span id="percentText">80%</span>
+          </div>
+          <div class="progress-wrap">
+            <div id="simProgressBar" class="progress-bar" style="width: 80%;"></div>
+          </div>
+        </div>
+
+        <div style="font-size:0.85rem; color:#475569; margin-top:8px;">
+          * สรุป: ออมได้รวม <strong id="totalSavedSim">960</strong> บาท (ขาดอีก <span id="deficitSim">240</span> บาท)
+        </div>
+      </div>
+    </div>
+
+    <!-- ส่วนผลลัพธ์การทดลองและแนวทางแนะนำ (เฟรม 2) -->
+    <div class="panel">
+      <h2 style="margin-top:0; color:#3730a3; font-size:1.3rem;">ข้อมูลโปรโมชันของร้านค้า 2 แห่ง (เปรียบเทียบทางเลือก)</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>ร้านค้า</th>
+            <th>ราคาป้าย</th>
+            <th>เงื่อนไขโปรโมชันส่วนลด</th>
+            <th>ของแถม / ค่าจัดส่ง</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>ร้าน ก (หน้าร้าน)</strong></td>
+            <td>1,200 บาท</td>
+            <td>ลดทันที \(15\%\) จากราคาป้าย</td>
+            <td>ไม่มีของแถม เดินไปซื้อได้ฟรี</td>
+          </tr>
+          <tr>
+            <td><strong>ร้าน ข (ออนไลน์)</strong></td>
+            <td>1,200 บาท</td>
+            <td>ซื้อครบ 1,000 บาท ลดทันที \(200\text{ บาท}\)</td>
+            <td>แถมสมุดโน้ตมูลค่า 50 บาท แต่มีค่าส่ง 40 บาท</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="hint-card">
+        <strong>💡 ผลลัพธ์จากการคำนวณเบื้องต้น:</strong><br>
+        - ส่วนลด \(15\%\) ของร้าน ก คิดเป็นเงินส่วนลด \(1,200 \times \frac{15}{100} = 180\) บาท จ่ายสุทธิ <strong>1,020 บาท</strong><br>
+        - ร้าน ข ได้รับส่วนลด 200 บาท เหลือ 1,000 บาท แต่บวกค่าจัดส่ง 40 บาท จ่ายสุทธิ <strong>1,040 บาท</strong>
+      </div>
+
+      <div class="hint-card" style="background:#fef2f2; border-left-color:#ef4444; color:#991b1b; margin-top:10px;">
+        <strong>📌 ปัจจัยการตัดสินใจทางการเงินส่วนบุคคล:</strong><br>
+        • การประหยัดเงินสุทธิช่วยให้ถึงเป้าหมายได้เร็วขึ้น<br>
+        • หากของแถมเป็นสิ่งที่ไม่จำเป็น การจ่ายเงินออกจากกระเป๋าจริงน้อยที่สุดมักเป็นทางเลือกที่ประหยัดเงินกว่า
+      </div>
+    </div>
+  </div>
+
+  <!-- แถวล่าง: คำถาม 8 ข้อ เรียงลำดับความสามารถ 1c ถึง 6 (เฟรมเดิม 3) -->
+  <div class="panel">
+    <h2 style="margin-top:0; color:#3730a3; font-size:1.4rem; border-bottom:2px solid #e2e8f0; padding-bottom:8px;">
+      แบบทดสอบวัดการรู้เรื่องคณิตศาสตร์ (8 ระดับความสามารถ)
+    </h2>
+
+    <!-- ข้อ 1 (ระดับ 1c) -->
+    <div class="question-card">
+      <div class="q-header-line1">ข้อความ คณิตศาสตร์ (Mathematical Literacy) &nbsp;&nbsp;&nbsp;&nbsp; บริบทส่วนบุคคล (Personal)</div>
+      <div class="q-header-line2">เนื้อหา: จำนวนและการดำเนินการ (การอ่านข้อมูลตรงตัว) | ระดับชั้น:   -  | ระดับความสามารถ: 1c</div>
+      <div class="q-text">
+        <strong>คำถามข้อที่ 1:</strong> ตามข้อมูลที่ระบุในสถานการณ์ ฟ้าใสได้รับเงินค่าขนมไปโรงเรียนสัปดาห์ละกี่บาท?
+      </div>
+      <div class="options-grid">
+        <label class="option-label"><input type="radio" name="p1"> ก. 200 บาท</label>
+        <label class="option-label"><input type="radio" name="p1"> ข. 250 บาท</label>
+        <label class="option-label"><input type="radio" name="p1"> ค. 350 บาท</label>
+        <label class="option-label"><input type="radio" name="p1"> ง. 500 บาท</label>
+      </div>
+      <div class="solution-box">
+        <div class="solution-title">เฉลย: ค. 350 บาท</div>
+        <strong>เหตุผล:</strong> ระดับ 1c เป็นการระบุข้อมูลที่ปรากฏชัดเจนในเนื้อหาโจทย์โดยตรงโดยไม่ต้องคำนวณซับซ้อน
+      </div>
+    </div>
+
+    <!-- ข้อ 2 (ระดับ 1b) -->
+    <div class="question-card">
+      <div class="q-header-line1">ข้อความ คณิตศาสตร์ (Mathematical Literacy) &nbsp;&nbsp;&nbsp;&nbsp; บริบทส่วนบุคคล (Personal)</div>
+      <div class="q-header-line2">เนื้อหา: จำนวนและการดำเนินการ (การลบจำนวนเต็มอย่างง่าย) | ระดับชั้น:   -  | ระดับความสามารถ: 1b</div>
+      <div class="q-text">
+        <strong>คำถามข้อที่ 2:</strong> จากตารางโปรโมชันของร้าน ข หากสินค้าราคาป้าย 1,200 บาท ได้รับส่วนลด 200 บาท ฟ้าใสจะเหลือยอดค่าสินค้าก่อนรวมค่าจัดส่งกี่บาท?
+      </div>
+      <div class="options-grid">
+        <label class="option-label"><input type="radio" name="p2"> ก. 900 บาท</label>
+        <label class="option-label"><input type="radio" name="p2"> ข. 1,000 บาท</label>
+        <label class="option-label"><input type="radio" name="p2"> ค. 1,050 บาท</label>
+        <label class="option-label"><input type="radio" name="p2"> ง. 1,100 บาท</label>
+      </div>
+      <div class="solution-box">
+        <div class="solution-title">เฉลย: ข. 1,000 บาท</div>
+        <strong>เหตุผล:</strong> ระดับ 1b คำนวณจำนวนเต็มอย่างง่ายจากข้อมูลในตาราง \(1,200 - 200 = 1,000\) บาท
+      </div>
+    </div>
+
+    <!-- ข้อ 3 (ระดับ 1a) -->
+    <div class="question-card">
+      <div class="q-header-line1">ข้อความ คณิตศาสตร์ (Mathematical Literacy) &nbsp;&nbsp;&nbsp;&nbsp; บริบทส่วนบุคคล (Personal)</div>
+      <div class="q-header-line2">เนื้อหา: จำนวนและการดำเนินการ (การคูณและการบวกขั้นตอนพื้นฐาน) | ระดับชั้น:   -  | ระดับความสามารถ: 1a</div>
+      <div class="q-text">
+        <strong>คำถามข้อที่ 3:</strong> ถ้าฟ้าใสตัดสินใจออมเงินสัปดาห์ละ \(150\text{ บาท}\) อย่างสม่ำเสมอ เมื่อครบ 6 สัปดาห์ ฟ้าใสจะมีเงินออมรวมทั้งหมดกี่บาท?
+      </div>
+      <div class="options-grid">
+        <label class="option-label"><input type="radio" name="p3"> ก. 750 บาท</label>
+        <label class="option-label"><input type="radio" name="p3"> ข. 800 บาท</label>
+        <label class="option-label"><input type="radio" name="p3"> ค. 900 บาท</label>
+        <label class="option-label"><input type="radio" name="p3"> ง. 1,050 บาท</label>
+      </div>
+      <div class="solution-box">
+        <div class="solution-title">เฉลย: ค. 900 บาท</div>
+        <strong>เหตุผล:</strong> ระดับ 1a แก้ปัญหาคุ้นเคยโดยใช้การคูณพื้นฐาน \(150 \times 6 = 900\) บาท
+      </div>
+    </div>
+
+    <!-- ข้อ 4 (ระดับ 2) -->
+    <div class="question-card">
+      <div class="q-header-line1">ข้อความ คณิตศาสตร์ (Mathematical Literacy) &nbsp;&nbsp;&nbsp;&nbsp; บริบทส่วนบุคคล (Personal)</div>
+      <div class="q-header-line2">เนื้อหา: ร้อยละและการคำนวณส่วนลด | ระดับชั้น:   -  | ระดับความสามารถ: 2</div>
+      <div class="q-text">
+        <strong>คำถามข้อที่ 4:</strong> ร้าน ก ติดป้ายลดราคา \(15\%\) จากราคาป้าย \(1,200\text{ บาท}\) จำนวนเงินส่วนลดที่ฟ้าใสจะได้รับจากร้าน ก คิดเป็นกี่บาท?
+      </div>
+      <div class="options-grid">
+        <label class="option-label"><input type="radio" name="p4"> ก. 150 บาท</label>
+        <label class="option-label"><input type="radio" name="p4"> ข. 180 บาท</label>
+        <label class="option-label"><input type="radio" name="p4"> ค. 200 บาท</label>
+        <label class="option-label"><input type="radio" name="p4"> ง. 240 บาท</label>
+      </div>
+      <div class="solution-box">
+        <div class="solution-title">เฉลย: ข. 180 บาท</div>
+        <strong>เหตุผล:</strong> ระดับ 2 ตีความร้อยละและคำนวณในบริบทที่ชัดเจน \(\frac{15}{100} \times 1,200 = 15 \times 12 = 180\) บาท
+      </div>
+    </div>
+
+    <!-- ข้อ 5 (ระดับ 3) -->
+    <div class="question-card">
+      <div class="q-header-line1">ข้อความ คณิตศาสตร์ (Mathematical Literacy) &nbsp;&nbsp;&nbsp;&nbsp; บริบทส่วนบุคคล (Personal)</div>
+      <div class="q-header-line2">เนื้อหา: การเปรียบเทียบต้นทุนสุทธิหลายขั้นตอน | ระดับชั้น:   -  | ระดับความสามารถ: 3</div>
+      <div class="q-text">
+        <strong>คำถามข้อที่ 5:</strong> เมื่อพิจารณายอดเงินสุทธิที่ต้องจ่ายจริงทั้งหมด (รวมค่าจัดส่งถ้ามี) ฟ้าใสควรเลือกซื้อจากร้านใด และประหยัดเงินกว่าอีกร้านหนึ่งกี่บาท?
+      </div>
+      <div class="options-grid">
+        <label class="option-label"><input type="radio" name="p5"> ก. ซื้อร้าน ก ประหยัดกว่าร้าน ข อยู่ 20 บาท</label>
+        <label class="option-label"><input type="radio" name="p5"> ข. ซื้อร้าน ข ประหยัดกว่าร้าน ก อยู่ 20 บาท</label>
+        <label class="option-label"><input type="radio" name="p5"> ค. ซื้อร้าน ก ประหยัดกว่าร้าน ข อยู่ 40 บาท</label>
+        <label class="option-label"><input type="radio" name="p5"> ง. ทั้งสองร้านต้องจ่ายเงินสุทธิเท่ากันพอดี</label>
+      </div>
+      <div class="solution-box">
+        <div class="solution-title">เฉลย: ก. ซื้อร้าน ก ประหยัดกว่าร้าน ข อยู่ 20 บาท</div>
+        <strong>เหตุผล:</strong> ระดับ 3 ดำเนินการเปรียบเทียบหลายขั้นตอน:<br>
+        - ร้าน ก: จ่ายสุทธิ \(1,200 - 180 = 1,020\) บาท<br>
+        - ร้าน ข: จ่ายสุทธิ \((1,200 - 200) + 40 = 1,040\) บาท<br>
+        ร้าน ก จ่ายน้อยกว่าร้าน ข อยู่ \(1,040 - 1,020 = 20\) บาท จึงประหยัดกว่า
+      </div>
+    </div>
+
+    <!-- ข้อ 6 (ระดับ 4) -->
+    <div class="question-card">
+      <div class="q-header-line1">ข้อความ คณิตศาสตร์ (Mathematical Literacy) &nbsp;&nbsp;&nbsp;&nbsp; บริบทส่วนบุคคล (Personal)</div>
+      <div class="q-header-line2">เนื้อหา: สมการและการหารแบบปัดเศษในแบบจำลองเวลา | ระดับชั้น:   -  | ระดับความสามารถ: 4</div>
+      <div class="q-text">
+        <strong>คำถามข้อที่ 6:</strong> ถ้าฟ้าใสตัดสินใจซื้อของที่ร้าน ก ซึ่งมีราคาสุทธิ \(1,020\text{ บาท}\) และเธอสามารถออมเงินได้สัปดาห์ละ \(130\text{ บาท}\) ฟ้าใสจะต้องใช้เวลาออมเงินอย่างน้อยที่สุดกี่สัปดาห์ จึงจะมีเงินเพียงพอสำหรับซื้อชุดอุปกรณ์นี้?
+      </div>
+      <div class="options-grid">
+        <label class="option-label"><input type="radio" name="p6"> ก. 7 สัปดาห์</label>
+        <label class="option-label"><input type="radio" name="p6"> ข. 8 สัปดาห์</label>
+        <label class="option-label"><input type="radio" name="p6"> ค. 9 สัปดาห์</label>
+        <label class="option-label"><input type="radio" name="p6"> ง. 10 สัปดาห์</label>
+      </div>
+      <div class="solution-box">
+        <div class="solution-title">เฉลย: ข. 8 สัปดาห์</div>
+        <strong>เหตุผล:</strong> ระดับ 4 ทำงานกับแบบจำลองและพิจารณาบริบทความเป็นจริง:<br>
+        คำนวณ \(1,020 \div 130 \approx 7.85\) สัปดาห์<br>
+        เนื่องจากการออมนับเป็นรอบสัปดาห์เต็ม: ถ้าออม 7 สัปดาห์ จะได้ \(7 \times 130 = 910\) บาท (ยังไม่พอ ขาดอีก 110 บาท) ดังนั้นจึงต้องออมอย่างน้อย 8 สัปดาห์ (จะได้ \(8 \times 130 = 1,040\) บาท ซึ่งเพียงพอ)
+      </div>
+    </div>
+
+    <!-- ข้อ 7 (ระดับ 5) -->
+    <div class="question-card">
+      <div class="q-header-line1">ข้อความ คณิตศาสตร์ (Mathematical Literacy) &nbsp;&nbsp;&nbsp;&nbsp; บริบทส่วนบุคคล (Personal)</div>
+      <div class="q-header-line2">เนื้อหา: การวางแผนงบประมาณภายใต้ข้อจำกัดชีวิตประจำวัน | ระดับชั้น:   -  | ระดับความสามารถ: 5</div>
+      <div class="q-text">
+        <strong>คำถามข้อที่ 7:</strong> ฟ้าใสต้องการซื้อสินค้าจากร้าน ก (\(1,020\text{ บาท}\)) ให้ได้ภายในเวลา <strong>6 สัปดาห์</strong> โดยเธอได้รับค่าขนมสัปดาห์ละ 350 บาท (ไปโรงเรียน 5 วันต่อสัปดาห์) ในแต่ละวันไปโรงเรียน ฟ้าใสจะต้องควบคุมการใช้จ่ายค่าขนมเฉลี่ยไม่ให้เกินวันละกี่บาท เพื่อให้มีเงินออมเหลือเพียงพอตามเป้าหมาย?
+      </div>
+      <div class="options-grid">
+        <label class="option-label"><input type="radio" name="p7"> ก. ไม่เกินวันละ 30 บาท</label>
+        <label class="option-label"><input type="radio" name="p7"> ข. ไม่เกินวันละ 36 บาท</label>
+        <label class="option-label"><input type="radio" name="p7"> ค. ไม่เกินวันละ 42 บาท</label>
+        <label class="option-label"><input type="radio" name="p7"> ง. ไม่เกินวันละ 50 บาท</label>
+      </div>
+      <div class="solution-box">
+        <div class="solution-title">เฉลย: ข. ไม่เกินวันละ 36 บาท</div>
+        <strong>เหตุผล:</strong> ระดับ 5 พัฒนาแบบจำลองแก้ปัญหาซับซ้อนหลายขั้นตอน:<br>
+        1. เงินที่ต้องออมต่อสัปดาห์ \(= 1,020 \div 6 = 170\) บาท/สัปดาห์<br>
+        2. จำนวนเงินที่เหลือให้ใช้จ่ายได้ต่อสัปดาห์ \(= 350 - 170 = 180\) บาท/สัปดาห์<br>
+        3. ใน 1 สัปดาห์มีวันไปโรงเรียน 5 วัน ค่าใช้จ่ายเฉลี่ยสูงสุดต่อวัน \(= 180 \div 5 = 36\) บาท/วัน
+      </div>
+    </div>
+
+    <!-- ข้อ 8 (ระดับ 6) -->
+    <div class="question-card">
+      <div class="q-header-line1">ข้อความ คณิตศาสตร์ (Mathematical Literacy) &nbsp;&nbsp;&nbsp;&nbsp; บริบทส่วนบุคคล (Personal)</div>
+      <div class="q-header-line2">เนื้อหา: การให้เหตุผลเชิงนามธรรม การประเมินมูลค่าส่วนเพิ่ม และเกณฑ์ตัดสินใจ | ระดับชั้น:   -  | ระดับความสามารถ: 6</div>
+      <div class="q-text">
+        <strong>คำถามข้อที่ 8:</strong> ร้าน ข ให้ของแถมเป็นสมุดโน้ตที่มีมูลค่า 50 บาท แต่ต้องจ่ายเงินสุทธิมากกว่าร้าน ก อยู่ 20 บาท ฟ้าใสให้เหตุผลในการตัดสินใจดังข้อความด้านล่าง ข้อความใดแสดงการให้เหตุผลเชิงคณิตศาสตร์และตรรกะที่สมเหตุสมผลที่สุด?
+      </div>
+      <div class="options-grid">
+        <label class="option-label"><input type="radio" name="p8"> ก. ซื้อร้าน ข เสมอ เพราะของแถม 50 บาทยังไงก็คุ้มกว่าเงินส่วนต่าง 20 บาท โดยไม่ต้องคำนึงถึงว่าจำเป็นต้องใช้หรือไม่</label>
+        <label class="option-label"><input type="radio" name="p8"> ข. หากฟ้าใสจำเป็นต้องซื้อสมุดโน้ตราคานี้อยู่แล้ว การเลือกร้าน ข จะทำให้เธอประหยัดเงินรวมในชีวิตประจำวันได้มากกว่า 30 บาท แต่หากเธอไม่ได้จำเป็นต้องใช้สมุดโน้ตเลย การเลือกร้าน ก จะทำให้เสียเงินสดน้อยกว่า 20 บาท</label>
+        <label class="option-label"><input type="radio" name="p8"> ค. ร้าน ก ถูกกว่าเสมอในทุกกรณี เพราะค่าจัดส่ง 40 บาทของร้าน ข เป็นการสูญเปล่าที่ไม่ก่อให้เกิดประโยชน์ใด ๆ</label>
+        <label class="option-label"><input type="radio" name="p8"> ง. ควรเลือกร้าน ข หากฟ้าใสออมเงินเกิน 1,200 บาท แต่ถ้าออมเงินได้ไม่ถึง 1,020 บาทให้เลือกร้าน ก</label>
+      </div>
+      <div class="solution-box">
+        <div class="solution-title">เฉลย: ข. หากฟ้าใสจำเป็นต้องซื้อสมุดโน้ตราคานี้อยู่แล้ว การเลือกร้าน ข จะทำให้เธอประหยัดเงินรวมในชีวิตประจำวันได้มากกว่า 30 บาท แต่หากเธอไม่ได้จำเป็นต้องใช้สมุดโน้ตเลย การเลือกร้าน ก จะทำให้เสียเงินสดน้อยกว่า 20 บาท</div>
+        <strong>เหตุผล:</strong> ระดับ 6 การให้เหตุผลเชิงนามธรรมและการคิดยืดหยุ่นภายใต้สถานการณ์ไม่คุ้นเคย/มีตัวแปรแฝง:<br>
+        - กรณีที่ 1 (จำเป็นต้องใช้สมุดมูลค่า 50 บาท): ถ้าร้าน ก ต้องจ่ายค่าของ 1,020 + ค่าสมุด 50 = 1,070 บาท ขณะที่ร้าน ข จ่ายเพียง 1,040 บาท (ประหยัดกว่า 30 บาท)<br>
+        - กรณีที่ 2 (ไม่ต้องการสมุด): การซื้อร้าน ข เท่ากับจ่ายเงินสดเพิ่ม 20 บาทโดยไม่จำเป็น ดังนั้นการเลือกร้าน ก เสียเงินสดจริงเพียง 1,020 บาท จึงเป็นการตัดสินใจที่รอบคอบกว่า
+      </div>
+    </div>
+
+  </div>
+
+</div>
+
+<script>
+function runSim() {
+  const saveRate = parseInt(document.getElementById('saveRateRange').value);
+  const weeks = parseInt(document.getElementById('weekRange').value);
+
+  document.getElementById('saveRateBadge').innerText = saveRate + ' บาท/สัปดาห์';
+  document.getElementById('weekBadge').innerText = weeks + ' สัปดาห์';
+  document.getElementById('remainSpend').innerText = (350 - saveRate);
+
+  const totalSaved = saveRate * weeks;
+  document.getElementById('currentSavedText').innerText = totalSaved.toLocaleString();
+  document.getElementById('totalSavedSim').innerText = totalSaved.toLocaleString();
+
+  const pct = Math.min(100, Math.round((totalSaved / 1200) * 100));
+  document.getElementById('percentText').innerText = pct + '%';
+  document.getElementById('simProgressBar').style.width = pct + '%';
+
+  const deficit = Math.max(0, 1200 - totalSaved);
+  document.getElementById('deficitSim').innerText = deficit.toLocaleString();
+}
+</script>
+
+</body>
+</html>
