@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PISA Science Literacy - Personal 2: การเลือกกระบอกน้ำเก็บอุณหภูมิ</title>
+<style>
+  :root {
+    --primary: #0f766e;
+    --primary-bg: #ccfbf1;
+    --border: #cbd5e1;
+    --card: #ffffff;
+    --text: #1e293b;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Sarabun', 'Segoe UI', Tahoma, sans-serif; }
+  body { background: #f8fafc; color: var(--text); padding: 20px; line-height: 1.6; max-width: 1200px; margin: 0 auto; }
+
+  .top-grid { display: grid; grid-template-columns: 1.15fr 0.85fr; gap: 20px; margin-bottom: 24px; }
+  @media (max-width: 900px) { .top-grid { grid-template-columns: 1fr; } }
+
+  .panel { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 18px; box-shadow: 0 2px 4px rgba(0,0,0,0.04); }
+  .panel-title { font-size: 1.15rem; font-weight: 700; color: var(--primary); border-bottom: 2px solid var(--primary-bg); padding-bottom: 8px; margin-bottom: 12px; }
+
+  .form-group { margin-bottom: 12px; }
+  .form-group label { display: block; font-weight: 600; font-size: 0.9rem; margin-bottom: 4px; }
+  select, input[type=range] { width: 100%; padding: 8px; border: 1px solid var(--border); border-radius: 6px; }
+  .slider-row { display: flex; align-items: center; gap: 10px; }
+  .badge { background: var(--primary-bg); color: var(--primary); font-weight: 700; padding: 2px 8px; border-radius: 4px; font-size: 0.85rem; min-width: 80px; text-align: center; }
+
+  .sim-view {
+    margin-top: 14px; background: #f1f5f9; border: 2px dashed #0d9488; border-radius: 8px;
+    height: 175px; position: relative; overflow: hidden; display: flex; align-items: center; justify-content: center; gap: 30px; padding: 10px;
+  }
+  .bottle {
+    width: 65px; height: 135px; border-radius: 10px; position: relative; display: flex; flex-direction: column; justify-content: flex-end; overflow: hidden;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1); border: 4px solid var(--primary);
+  }
+  .cap { position: absolute; top: 0; left: 16px; width: 32px; height: 16px; background: #334155; border-radius: 4px 4px 0 0; }
+  .liquid { width: 100%; height: 75%; background: #38bdf8; display: flex; align-items: center; justify-content: center; color: #fff; font-weight: 700; font-size: 0.85rem; transition: background 0.4s; }
+  .thermo { display: flex; flex-direction: column; align-items: center; gap: 4px; font-weight: 600; font-size: 0.85rem; }
+  .bar { width: 12px; height: 100px; background: #e2e8f0; border-radius: 6px; position: relative; overflow: hidden; border: 2px solid #94a3b8; }
+  .fill { position: absolute; bottom: 0; width: 100%; background: #ef4444; transition: height 0.4s; }
+
+  table { width: 100%; border-collapse: collapse; margin-top: 8px; font-size: 0.85rem; }
+  th, td { border: 1px solid var(--border); padding: 6px 8px; text-align: center; }
+  th { background: #f1f5f9; font-weight: 600; }
+  .note-box { background: #f0fdfa; border-left: 4px solid var(--primary); padding: 8px 12px; font-size: 0.85rem; color: #115e59; margin-bottom: 10px; border-radius: 4px; }
+
+  .q-container { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 20px; }
+  .q-item { border: 1px solid var(--border); border-radius: 8px; padding: 16px; margin-bottom: 20px; background: #ffffff; }
+
+  .q-meta { margin-bottom: 12px; padding-bottom: 8px; border-bottom: 1px dashed #cbd5e1; }
+  .q-meta-line1 { font-size: 0.95rem; font-weight: 700; color: var(--primary); }
+  .q-meta-line2 { font-size: 0.85rem; color: #475569; margin-top: 2px; }
+
+  .q-title-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+  .q-title { font-weight: 700; color: #0f172a; font-size: 1.05rem; }
+  .level-tag { font-size: 0.78rem; background: var(--primary-bg); color: var(--primary); font-weight: 700; padding: 2px 10px; border-radius: 12px; }
+  .q-desc { font-size: 0.95rem; margin-bottom: 12px; font-weight: 500; }
+  .opts { display: flex; flex-direction: column; gap: 8px; margin-bottom: 12px; font-size: 0.92rem; }
+  .opt-item { display: flex; gap: 8px; align-items: center; padding: 8px 12px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 5px; }
+
+  .ans-box { background: #f0fdf4; border: 1px solid #bbf7d0; color: #166534; padding: 12px 14px; border-radius: 6px; font-size: 0.9rem; margin-top: 10px; }
+  .ans-head { font-weight: 700; margin-bottom: 3px; }
+</style>
+</head>
+<body>
+
+  <div class="top-grid">
+    <div class="panel">
+      <div class="panel-title">แบบจำลอง: การถ่ายโอนความร้อนของกระบอกน้ำพกพาส่วนบุคคล</div>
+      <p style="font-size: 0.88rem; color: #475569; margin-bottom: 12px;">
+        น้องพลอยต้องการเลือกกระบอกน้ำพกพาไปโรงเรียนในวันที่อากาศร้อน (ห้อง 30 °C) เพื่อรักษาอุณหภูมิน้ำดื่มให้เย็นหรือร้อนได้นานที่สุด ลองเลือกชนิดกระบอกน้ำ อุณหภูมิเริ่มต้น และเวลาที่ตั้งทิ้งไว้
+      </p>
+
+      <div class="form-group">
+        <label>ชนิดกระบอกน้ำ (วัสดุและโครงสร้าง):</label>
+        <select id="bottleSel" onchange="calcBottle()">
+          <option value="metal">กระบอกสเตนเลสชั้นเดียว (Single-wall Metal)</option>
+          <option value="plastic">กระบอกพลาสติกชั้นเดียว (Single-wall Plastic)</option>
+          <option value="glass">กระบอกแก้วหนา (Glass)</option>
+          <option value="vacuum" selected>กระบอกสเตนเลสสุญญากาศ 2 ชั้น (Double-wall Vacuum)</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label>อุณหภูมิน้ำเริ่มต้น:</label>
+        <div class="slider-row">
+          <input type="range" id="t0Range" min="5" max="85" step="20" value="5" oninput="updateT0(this.value)">
+          <span class="badge" id="t0Label">5 °C (เย็นจัด)</span>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>เวลาที่วางทิ้งไว้ในห้อง:</label>
+        <div class="slider-row">
+          <input type="range" id="timeRange" min="0" max="6" step="1" value="3" oninput="updateTime(this.value)">
+          <span class="badge" id="timeLabel">3 ชั่วโมง</span>
+        </div>
+      </div>
+
+      <div class="sim-view">
+        <div class="bottle" id="bottleBody">
+          <div class="cap"></div>
+          <div class="liquid" id="liquidLabel">7.0 °C</div>
+        </div>
+        <div class="thermo">
+          <span>อุณหภูมิวัดได้</span>
+          <div class="bar"><div class="fill" id="fillBar" style="height: 15%;"></div></div>
+          <span id="tempText" style="color: var(--primary); font-size: 1.1rem; font-weight: 700;">7.0 °C</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-title">ข้อมูลผลการทดสอบการเก็บความเย็น/ร้อน</div>
+      <div class="note-box">
+        💡 <strong>แนวคิดสำคัญ:</strong> ความร้อนจะถ่ายโอนจากบริเวณอุณหภูมิสูงไปยังบริเวณอุณหภูมิต่ำเสมอ ผ่านการนำ การพา และการแผ่รังสีความร้อน ฉนวนความร้อนที่ดีจะชะลอการถ่ายโอนนี้
+      </div>
+
+      <p style="font-size: 0.85rem; font-weight: 600; margin-bottom: 6px;">อุณหภูมิน้ำเย็น (5 °C) ตั้งในห้อง 30 °C ตลอด 6 ชั่วโมง:</p>
+      <table>
+        <thead>
+          <tr>
+            <th>ชนิดกระบอก</th>
+            <th>0 ชม.</th>
+            <th>1 ชม.</th>
+            <th>3 ชม.</th>
+            <th>6 ชม.</th>
+            <th>หยดน้ำเกาะนอกขวด</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>สเตนเลสชั้นเดียว</td><td>5.0 °C</td><td>18.5 °C</td><td>28.0 °C</td><td>29.8 °C</td><td>เกาะหนาแน่นทันที</td></tr>
+          <tr><td>พลาสติกชั้นเดียว</td><td>5.0 °C</td><td>12.0 °C</td><td>22.5 °C</td><td>28.5 °C</td><td>เกาะเล็กน้อย</td></tr>
+          <tr><td>แก้วหนา</td><td>5.0 °C</td><td>10.0 °C</td><td>19.0 °C</td><td>26.0 °C</td><td>เกาะบางๆ</td></tr>
+          <tr><td>สุญญากาศ 2 ชั้น</td><td>5.0 °C</td><td>5.5 °C</td><td>7.0 °C</td><td>9.5 °C</td><td>ไม่มีหยดน้ำเกาะ</td></tr>
+        </tbody>
+      </table>
+      <p style="font-size: 0.75rem; color: #64748b; margin-top: 8px;">
+        * อัตราการเปลี่ยนแปลงอุณหภูมิยิ่งน้อย แสดงว่ารักษาอุณหภูมิได้ดีเยี่ยม
+      </p>
+    </div>
+  </div>
+
+  <!-- เฟรมที่ 3: คำถาม 6 ข้อ เรียงระดับ 1b - 6 มี 2 บรรทัดกำกับเหนือแต่ละข้อ -->
+  <div class="q-container">
+    <div class="panel-title" style="margin-bottom: 16px;">คำถามวัดระดับความฉลาดรู้ทางวิทยาศาสตร์ (6 ข้อ)</div>
+
+    <!-- ข้อ 1 (1b) -->
+    <div class="q-item">
+      <div class="q-meta">
+        <div class="q-meta-line1">วิทยาศาสตร์ (Science Literacy)  บริบท ส่วนบุคคล (Personal)</div>
+        <div class="q-meta-line2">เนื้อหา: พลังงานความร้อนและการถ่ายโอนความร้อน | ระดับชั้น:   -  | ระดับความสามารถ: 1b</div>
+      </div>
+      <div class="q-title-row"><span class="q-title">ข้อที่ 1</span><span class="level-tag">ระดับความสามารถ 1b</span></div>
+      <div class="q-desc">จากตารางข้อมูล เมื่อใส่น้ำเย็น 5.0 °C ไว้เป็นเวลา 6 ชั่วโมง กระบอกน้ำชนิดใดสามารถรักษาระดับความเย็นของน้ำได้ดีที่สุด (มีอุณหภูมิต่ำที่สุด)?</div>
+      <div class="opts">
+        <label class="opt-item"><input type="radio" name="q1"> ก. กระบอกสเตนเลสชั้นเดียว</label>
+        <label class="opt-item"><input type="radio" name="q1"> ข. กระบอกพลาสติกชั้นเดียว</label>
+        <label class="opt-item"><input type="radio" name="q1"> ค. กระบอกแก้วหนา</label>
+        <label class="opt-item"><input type="radio" name="q1"> ง. กระบอกสเตนเลสสุญญากาศ 2 ชั้น</label>
+      </div>
+      <div class="ans-box">
+        <div class="ans-head">✅ เฉลย: ง. กระบอกสเตนเลสสุญญากาศ 2 ชั้น</div>
+        <div><strong>เหตุผลทางวิทยาศาสตร์:</strong> ในระดับ 1b ผู้เรียนอ่านข้อมูลเชิงประจักษ์จากตารางได้โดยตรง ที่ 6 ชั่วโมง กระบอกสเตนเลสสุญญากาศ 2 ชั้นมีอุณหภูมิเพียง 9.5 °C ซึ่งต่ำที่สุดในทุกชนิด</div>
+      </div>
+    </div>
+
+    <!-- ข้อ 2 (2) -->
+    <div class="q-item">
+      <div class="q-meta">
+        <div class="q-meta-line1">วิทยาศาสตร์ (Science Literacy)  บริบท ส่วนบุคคล (Personal)</div>
+        <div class="q-meta-line2">เนื้อหา: การเปลี่ยนสถานะของน้ำและการควบแน่น | ระดับชั้น:   -  | ระดับความสามารถ: 2</div>
+      </div>
+      <div class="q-title-row"><span class="q-title">ข้อที่ 2</span><span class="level-tag">ระดับความสามารถ 2</span></div>
+      <div class="q-desc">น้องพลอยสังเกตเห็น "หยดน้ำเกาะอยู่รอบผิวนอก" ของกระบอกสเตนเลสชั้นเดียวอย่างรวดเร็วหลังจากใส่น้ำเย็น หยดน้ำเหล่านั้นมีที่มาจากแหล่งใดตามหลักการวิทยาศาสตร์?</div>
+      <div class="opts">
+        <label class="opt-item"><input type="radio" name="q2"> ก. น้ำเย็นจากภายในกระบอกซึมผ่านรูพรุนขนาดเล็กของโลหะออกมา</label>
+        <label class="opt-item"><input type="radio" name="q2"> ข. ไอน้ำในอากาศรอบตัวกระบอกสูญเสียความร้อนให้ผิวขวดที่เย็นแล้วควบแน่นเป็นหยดน้ำ</label>
+        <label class="opt-item"><input type="radio" name="q2"> ค. โลหะสเตนเลสคายน้ำออกมาเมื่อสัมผัสกับความเย็น</label>
+        <label class="opt-item"><input type="radio" name="q2"> ง. ความดันอากาศดันโมเลกุลน้ำจากฝาขวดให้ไหลย้อนลงมา</label>
+      </div>
+      <div class="ans-box">
+        <div class="ans-head">✅ เฉลย: ข. ไอน้ำในอากาศรอบตัวกระบอกสูญเสียความร้อนให้ผิวขวดที่เย็นแล้วควบแน่นเป็นหยดน้ำ</div>
+        <div><strong>เหตุผลทางวิทยาศาสตร์:</strong> ไอน้ำในอากาศมีสถานะเป็นก๊าซ เมื่อกระทบกับผิวขวดที่มีอุณหภูมิต่ำกว่า ไอน้ำจะคายความร้อนและควบแน่น (Condensation) กลายเป็นหยดน้ำของเหลวเกาะอยู่ภายนอก</div>
+      </div>
+    </div>
+
+    <!-- ข้อ 3 (3) -->
+    <div class="q-item">
+      <div class="q-meta">
+        <div class="q-meta-line1">วิทยาศาสตร์ (Science Literacy)  บริบท ส่วนบุคคล (Personal)</div>
+        <div class="q-meta-line2">เนื้อหา: โครงสร้างสุญญากาศกับการถ่ายโอนความร้อน | ระดับชั้น:   -  | ระดับความสามารถ: 3</div>
+      </div>
+      <div class="q-title-row"><span class="q-title">ข้อที่ 3</span><span class="level-tag">ระดับความสามารถ 3</span></div>
+      <div class="q-desc">เหตุใดกระบอกน้ำแบบ "สุญญากาศ 2 ชั้น" จึงไม่มีหยดน้ำเกาะที่ผิวด้านนอกเมื่อใส่น้ำเย็นจัด? ข้อใดระบุคำอธิบายได้ถูกต้อง?</div>
+      <div class="opts">
+        <label class="opt-item"><input type="radio" name="q3"> ก. ชั้นสุญญากาศช่วยป้องกันความร้อนจากภายนอกไม่ให้ถ่ายโอนเข้าสู่ภายใน ทำให้อุณหภูมิที่ผิวภายนอกกระบอกใกล้เคียงกับอุณหภูมิห้อง</label>
+        <label class="opt-item"><input type="radio" name="q3"> ข. สุญญากาศดูดซับหยดน้ำทั้งหมดเข้าไปเก็บไว้ในช่องว่างระหว่างผนัง</label>
+        <label class="opt-item"><input type="radio" name="q3"> ค. ผิวด้านนอกของกระบอกชนิดนี้มีสารเคลือบกันน้ำเกาะ 100%</label>
+        <label class="opt-item"><input type="radio" name="q3"> ง. น้ำเย็นภายในกระบอกไม่สามารถแผ่รังสีความร้อนออกมาสู่ภายนอกได้</label>
+      </div>
+      <div class="ans-box">
+        <div class="ans-head">✅ เฉลย: ก. ชั้นสุญญากาศช่วยป้องกันความร้อนจากภายนอกไม่ให้ถ่ายโอนเข้าสู่ภายใน ทำให้อุณหภูมิที่ผิวภายนอกกระบอกใกล้เคียงกับอุณหภูมิห้อง</div>
+        <div><strong>เหตุผลทางวิทยาศาสตร์:</strong> ชั้นสุญญากาศไม่มีอนุภาคของสาร จึงไม่เกิดการนำความร้อนและการพาความร้อน ผนังด้านนอกจึงยังคงมีอุณหภูมิสูงใกล้เคียงกับอุณหภูมิห้อง ไอน้ำในอากาศจึงไม่เกิดการควบแน่น</div>
+      </div>
+    </div>
+
+    <!-- ข้อ 4 (4) -->
+    <div class="q-item">
+      <div class="q-meta">
+        <div class="q-meta-line1">วิทยาศาสตร์ (Science Literacy)  บริบท ส่วนบุคคล (Personal)</div>
+        <div class="q-meta-line2">เนื้อหา: ผลต่างอุณหภูมิและสมดุลความร้อน | ระดับชั้น:   -  | ระดับความสามารถ: 4</div>
+      </div>
+      <div class="q-title-row"><span class="q-title">ข้อที่ 4</span><span class="level-tag">ระดับความสามารถ 4</span></div>
+      <div class="q-desc">จากตาราง ในชั่วโมงแรก อุณหภูมิน้ำในกระบอกสเตนเลสชั้นเดียวเพิ่มขึ้น 13.5 °C แต่ระหว่างชั่วโมงที่ 3 ถึง 6 (เป็นเวลา 3 ชั่วโมง) อุณหภูมิกลับเพิ่มขึ้นเพียง 1.8 °C ข้อสรุปใดให้เหตุผลได้ถูกต้อง?</div>
+      <div class="opts">
+        <label class="opt-item"><input type="radio" name="q4"> ก. ปริมาณน้ำในกระบอกลดลงทำให้อัตราการดูดกลืนความร้อนลดต่ำลง</label>
+        <label class="opt-item"><input type="radio" name="q4"> ข. อัตราการถ่ายโอนความร้อนขึ้นอยู่กับ 'ผลต่างอุณหภูมิ' ระหว่างน้ำกับห้อง เมื่ออุณหภูมิน้ำใกล้เคียงอุณหภูมิห้อง การถ่ายโอนความร้อนจะช้าลงอย่างมาก</label>
+        <label class="opt-item"><input type="radio" name="q4"> ค. หยดน้ำที่เกาะรอบขวดกลายเป็นฉนวนกันความร้อนที่สมบูรณ์แบบ</label>
+        <label class="opt-item"><input type="radio" name="q4"> ง. สเตนเลสเริ่มสูญเสียคุณสมบัติการนำความร้อนเมื่อเวลาผ่านไปเกิน 3 ชั่วโมง</label>
+      </div>
+      <div class="ans-box">
+        <div class="ans-head">✅ เฉลย: ข. อัตราการถ่ายโอนความร้อนขึ้นอยู่กับ 'ผลต่างอุณหภูมิ' ระหว่างน้ำกับห้อง เมื่ออุณหภูมิน้ำใกล้เคียงอุณหภูมิห้อง การถ่ายโอนความร้อนจะช้าลงอย่างมาก</div>
+        <div><strong>เหตุผลทางวิทยาศาสตร์:</strong> อัตราการถ่ายโอนความร้อนเป็นสัดส่วนกับความแตกต่างของอุณหภูมิ (ΔT) เมื่อน้ำอุ่นขึ้นจนใกล้ 30 °C ค่า ΔT จะน้อยลง ทำให้อัตราการถ่ายโอนความร้อนช้าลงจนเข้าสู่สมดุลความร้อน</div>
+      </div>
+    </div>
+
+    <!-- ข้อ 5 (5) -->
+    <div class="q-item">
+      <div class="q-meta">
+        <div class="q-meta-line1">วิทยาศาสตร์ (Science Literacy)  บริบท ส่วนบุคคล (Personal)</div>
+        <div class="q-meta-line2">เนื้อหา: การพาความร้อนในของไหลและการนำความร้อน | ระดับชั้น:   -  | ระดับความสามารถ: 5</div>
+      </div>
+      <div class="q-title-row"><span class="q-title">ข้อที่ 5</span><span class="level-tag">ระดับความสามารถ 5</span></div>
+      <div class="q-desc">หากออกแบบกระบอกน้ำโดยใช้วัสดุสเตนเลส 2 ชั้นแต่ "ไม่ได้ดูดอากาศออก (เป็นช่องอากาศธรรมดา)" พบว่าเก็บอุณหภูมิได้แย่กว่ากระบอกสุญญากาศ 2 ชั้นอย่างมาก เพราะเหตุใด?</div>
+      <div class="opts">
+        <label class="opt-item"><input type="radio" name="q5"> ก. อากาศระหว่างผนังเกิดการไหลเวียนหมุนวน ทำให้เกิด 'การพาความร้อน' และอากาศยังคงเกิด 'การนำความร้อน' ได้บางส่วน</label>
+        <label class="opt-item"><input type="radio" name="q5"> ข. อากาศมีแรงเสียดทานสูงกว่าสุญญากาศทำให้เกิดความร้อนจากการเสียดสีขึ้นเอง</label>
+        <label class="opt-item"><input type="radio" name="q5"> ค. ช่องอากาศทำให้น้ำหนักของกระบอกเพิ่มขึ้นจึงดึงดูดความร้อนจากแสงแดด</label>
+        <label class="opt-item"><input type="radio" name="q5"> ง. โมเลกุลของอากาศจะดูดกลืนน้ำให้รั่วซึมเข้าไปในช่องว่าง</label>
+      </div>
+      <div class="ans-box">
+        <div class="ans-head">✅ เฉลย: ก. อากาศระหว่างผนังเกิดการไหลเวียนหมุนวน ทำให้เกิดการพาความร้อน และอากาศยังคงเกิดการนำความร้อนได้บางส่วน</div>
+        <div><strong>เหตุผลทางวิทยาศาสตร์:</strong> อากาศเป็นของไหล เมื่อมีผลต่างอุณหภูมิจะเกิดการหมุนเวียนแบบกระแสพาความร้อน (Convection Currents) ถ่ายโอนความร้อนข้ามช่องว่างได้ ในขณะที่สุญญากาศกำจัดการพาความร้อนและการนำความร้อนได้อย่างสมบูรณ์</div>
+      </div>
+    </div>
+
+    <!-- ข้อ 6 (6) -->
+    <div class="q-item">
+      <div class="q-meta">
+        <div class="q-meta-line1">วิทยาศาสตร์ (Science Literacy)  บริบท ส่วนบุคคล (Personal)</div>
+        <div class="q-meta-line2">เนื้อหา: การแผ่รังสีความร้อนและคลื่นแม่เหล็กไฟฟ้า | ระดับชั้น:   -  | ระดับความสามารถ: 6</div>
+      </div>
+      <div class="q-title-row"><span class="q-title">ข้อที่ 6</span><span class="level-tag">ระดับความสามารถ 6</span></div>
+      <div class="q-desc">ผู้ผลิตปรับปรุงกระบอกสุญญากาศ 2 ชั้น โดย <em>"เคลือบผิวด้านในของช่องสุญญากาศให้เป็นสีเงินวาวสะท้อนแสงคล้ายกระจกเงา"</em> การปรับปรุงนี้แก้ปัญหาการสูญเสียความร้อนในรูปแบบใด และสมเหตุสมผลหรือไม่?</div>
+      <div class="opts">
+        <label class="opt-item"><input type="radio" name="q6"> ก. ไม่สมเหตุสมผล เพราะกระจกเงาจะทำให้สนามแม่เหล็กโลกผลักความร้อนออกจากตัวกระบอกเร็วขึ้น</label>
+        <label class="opt-item"><input type="radio" name="q6"> ข. สมเหตุสมผล เพราะแม้สุญญากาศจะหยุดการนำและการพาความร้อนได้ แต่ความร้อนยังถ่ายโอนผ่าน 'การแผ่รังสีความร้อน' (Radiation) ได้ ผิวสีเงินวาวจึงช่วยสะท้อนรังสีอินฟราเรดกลับเข้ามา</label>
+        <label class="opt-item"><input type="radio" name="q6"> ค. สมเหตุสมผล เพราะผิวสีเงินวาวจะเพิ่มความจุความร้อนจำเพาะของผนังโลหะได้มากกว่า 10 เท่า</label>
+        <label class="opt-item"><input type="radio" name="q6"> ง. ไม่สมเหตุสมผล เพราะในสุญญากาศไม่มีตัวกลาง คลื่นแม่เหล็กไฟฟ้าจึงเดินทางผ่านไม่ได้</label>
+      </div>
+      <div class="ans-box">
+        <div class="ans-head">✅ เฉลย: ข. สมเหตุสมผล เพราะแม้สุญญากาศจะหยุดการนำและการพาความร้อนได้ แต่ความร้อนยังถ่ายโอนผ่านการแผ่รังสีความร้อนได้ ผิวสีเงินวาวจึงช่วยสะท้อนรังสีอินฟราเรดกลับเข้ามา</div>
+        <div><strong>เหตุผลทางวิทยาศาสตร์:</strong> สุญญากาศหยุดได้เฉพาะการนำและการพาความร้อนซึ่งต้องอาศัยตัวกลาง แต่การแผ่รังสีความร้อนในรูปคลื่นแม่เหล็กไฟฟ้ายังผ่านสุญญากาศได้ การเคลือบผิวเงินสะท้อนแสงจึงช่วยลดการสูญเสียความร้อนจากการแผ่รังสีได้อย่างมีประสิทธิภาพ</div>
+      </div>
+    </div>
+  </div>
+
+<script>
+  function updateT0(v) {
+    let lbl = v + ' °C';
+    if(v <= 10) lbl += ' (เย็นจัด)';
+    else if(v >= 60) lbl += ' (ร้อนมาก)';
+    else lbl += ' (ปกติ)';
+    document.getElementById('t0Label').innerText = lbl;
+    calcBottle();
+  }
+  function updateTime(v) {
+    document.getElementById('timeLabel').innerText = v + ' ชั่วโมง';
+    calcBottle();
+  }
+  function calcBottle() {
+    let type = document.getElementById('bottleSel').value;
+    let t0 = parseFloat(document.getElementById('t0Range').value);
+    let t = parseFloat(document.getElementById('timeRange').value);
+
+    let k = 0.05;
+    let bottle = document.getElementById('bottleBody');
+    if(type === 'metal') { k = 0.80; bottle.style.borderColor = '#94a3b8'; }
+    else if(type === 'plastic') { k = 0.40; bottle.style.borderColor = '#38bdf8'; }
+    else if(type === 'glass') { k = 0.28; bottle.style.borderColor = '#0284c7'; }
+    else if(type === 'vacuum') { k = 0.035; bottle.style.borderColor = '#0f766e'; }
+
+    let cur = 30.0 + (t0 - 30.0) * Math.exp(-k * t);
+    let rounded = cur.toFixed(1);
+
+    document.getElementById('tempText').innerText = rounded + ' °C';
+    let liq = document.getElementById('liquidLabel');
+    liq.innerText = rounded + ' °C';
+    liq.style.background = cur < 15 ? '#0284c7' : (cur > 50 ? '#ef4444' : '#0d9488');
+
+    let fillH = Math.min(100, Math.max(5, (cur / 90) * 100));
+    let bar = document.getElementById('fillBar');
+    bar.style.height = fillH + '%';
+    bar.style.background = cur > 40 ? '#ef4444' : '#0284c7';
+  }
+  calcBottle();
+</script>
+</body>
+</html>

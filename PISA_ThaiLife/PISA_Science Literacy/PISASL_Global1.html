@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PISA Science Literacy - Global: ก๊าซเรือนกระจกและระดับน้ำทะเล</title>
+<style>
+  :root {
+    --primary: #0369a1;
+    --primary-bg: #e0f2fe;
+    --border: #cbd5e1;
+    --card: #ffffff;
+    --text: #1e293b;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Sarabun', 'Segoe UI', Tahoma, sans-serif; }
+  body { background: #f8fafc; color: var(--text); padding: 20px; line-height: 1.6; max-width: 1200px; margin: 0 auto; }
+
+  /* 2 คอลัมน์บน: เฟรม 1 (จำลอง) และ เฟรม 2 (ตารางข้อมูล) */
+  .top-grid { display: grid; grid-template-columns: 1.15fr 0.85fr; gap: 20px; margin-bottom: 24px; }
+  @media (max-width: 900px) { .top-grid { grid-template-columns: 1fr; } }
+
+  .panel { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 18px; box-shadow: 0 2px 4px rgba(0,0,0,0.04); }
+  .panel-title { font-size: 1.15rem; font-weight: 700; color: var(--primary); border-bottom: 2px solid var(--primary-bg); padding-bottom: 8px; margin-bottom: 12px; }
+
+  .form-group { margin-bottom: 12px; }
+  .form-group label { display: block; font-weight: 600; font-size: 0.9rem; margin-bottom: 4px; }
+  select, input[type=range] { width: 100%; padding: 8px; border: 1px solid var(--border); border-radius: 6px; }
+  .slider-row { display: flex; align-items: center; gap: 10px; }
+  .badge { background: var(--primary-bg); color: var(--primary); font-weight: 700; padding: 2px 8px; border-radius: 4px; font-size: 0.85rem; min-width: 75px; text-align: center; }
+
+  .sim-view {
+    margin-top: 14px; background: #f1f5f9; border: 2px dashed #94a3b8; border-radius: 8px;
+    height: 175px; position: relative; overflow: hidden; display: flex; flex-direction: column; justify-content: space-between; padding: 10px;
+  }
+  .sky-layer { position: absolute; inset: 0; transition: background 0.4s; }
+  .readout { z-index: 2; background: rgba(255,255,255,0.92); padding: 8px 12px; border-radius: 6px; display: flex; justify-content: space-between; align-items: center; }
+  .val-big { font-size: 1.25rem; font-weight: 700; }
+  .coastline { display: flex; align-items: flex-end; height: 60px; z-index: 1; position: relative; }
+  .land { width: 40%; height: 100%; background: #65a30d; border-radius: 0 30px 0 0; position: relative; }
+  .ice { position: absolute; top: -12px; left: 10px; background: #ffffff; border: 1px solid #cbd5e1; border-radius: 8px; padding: 1px 8px; font-size: 0.75rem; font-weight: 700; color: #0369a1; }
+  .sea { width: 60%; background: #0284c7; transition: height 0.4s; display: flex; align-items: center; justify-content: center; color: white; font-size: 0.8rem; font-weight: 600; }
+
+  table { width: 100%; border-collapse: collapse; margin-top: 8px; font-size: 0.85rem; }
+  th, td { border: 1px solid var(--border); padding: 6px 8px; text-align: center; }
+  th { background: #f1f5f9; font-weight: 600; }
+  .note-box { background: #f0f9ff; border-left: 4px solid var(--primary); padding: 8px 12px; font-size: 0.85rem; color: #075985; margin-bottom: 10px; border-radius: 4px; }
+
+  /* เฟรม 3: คำถาม 6 ข้อ */
+  .q-container { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 20px; }
+  .q-item { border: 1px solid var(--border); border-radius: 8px; padding: 16px; margin-bottom: 20px; background: #ffffff; }
+
+  .q-meta { margin-bottom: 12px; padding-bottom: 8px; border-bottom: 1px dashed #cbd5e1; }
+  .q-meta-line1 { font-size: 0.95rem; font-weight: 700; color: var(--primary); }
+  .q-meta-line2 { font-size: 0.85rem; color: #475569; margin-top: 2px; }
+
+  .q-title-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+  .q-title { font-weight: 700; color: #0f172a; font-size: 1.05rem; }
+  .level-tag { font-size: 0.78rem; background: var(--primary-bg); color: var(--primary); font-weight: 700; padding: 2px 10px; border-radius: 12px; }
+  .q-desc { font-size: 0.95rem; margin-bottom: 12px; font-weight: 500; }
+  .opts { display: flex; flex-direction: column; gap: 8px; margin-bottom: 12px; font-size: 0.92rem; }
+  .opt-item { display: flex; gap: 8px; align-items: center; padding: 8px 12px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 5px; }
+
+  .ans-box { background: #f0fdf4; border: 1px solid #bbf7d0; color: #166534; padding: 12px 14px; border-radius: 6px; font-size: 0.9rem; margin-top: 10px; }
+  .ans-head { font-weight: 700; margin-bottom: 3px; }
+  .math { font-style: italic; font-family: 'Cambria Math', 'Times New Roman', serif; }
+</style>
+</head>
+<body>
+
+  <!-- เฟรมที่ 1 (ซ้าย) & เฟรมที่ 2 (ขวา) -->
+  <div class="top-grid">
+    <div class="panel">
+      <div class="panel-title">แบบจำลอง: ก๊าซเรือนกระจกกับสมดุลความร้อนและระดับน้ำทะเลทั่วโลก</div>
+      <p style="font-size: 0.88rem; color: #475569; margin-bottom: 12px;">
+        การเพิ่มขึ้นของก๊าซคาร์บอนไดออกไซด์ (CO<sub>2</sub>) จากกิจกรรมของมนุษย์ทั่วโลกส่งผลให้อุณหภูมิเฉลี่ยของพื้นผิวโลกเพิ่มขึ้น ลองปรับระดับความเข้มข้นของก๊าซและประเภทของน้ำแข็งที่ละลาย
+      </p>
+
+      <div class="form-group">
+        <label>ความเข้มข้นของ CO<sub>2</sub> ในบรรยากาศโลก:</label>
+        <div class="slider-row">
+          <input type="range" id="co2Range" min="280" max="600" step="40" value="420" oninput="updateCO2(this.value)">
+          <span class="badge" id="co2Label">420 ppm</span>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>รูปแบบการละลายของน้ำแข็งขั้วโลก:</label>
+        <select id="iceSel" onchange="calcClimate()">
+          <option value="land">แผ่นน้ำแข็งบนแผ่นดิน (กรีนแลนด์/แอนตาร์กติกา)</option>
+          <option value="sea">แผ่นน้ำแข็งที่ลอยอยู่ในทะเล (มหาสมุทรอาร์กติก)</option>
+          <option value="both" selected>ละลายพร้อมกันทั้งน้ำแข็งบนบกและในทะเล</option>
+        </select>
+      </div>
+
+      <div class="sim-view">
+        <div class="sky-layer" id="skyLayer"></div>
+        <div class="readout">
+          <div>
+            <div style="font-size: 0.75rem; color: #64748b;">อุณหภูมิผิวโลกเพิ่มขึ้น (Δ<span class="math">T</span>)</div>
+            <div class="val-big" id="tempText" style="color: #b91c1c;">+1.3 °C</div>
+          </div>
+          <div>
+            <div style="font-size: 0.75rem; color: #64748b;">ระดับน้ำทะเลโลกสูงขึ้น (Δ<span class="math">h</span>)</div>
+            <div class="val-big" id="seaText" style="color: #0284c7;">+22 cm</div>
+          </div>
+        </div>
+        <div class="coastline">
+          <div class="land"><div class="ice" id="iceTag">ธารน้ำแข็งบนบก 🏔️</div></div>
+          <div class="sea" id="seaBody" style="height: 35px;">มหาสมุทร</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-title">รายงานสถิติภูมิอากาศโลก (IPCC Assessment Data)</div>
+      <div class="note-box">
+        💡 <strong>แนวคิดสำคัญ:</strong> การเพิ่มขึ้นของระดับน้ำทะเลเกิดจาก 2 ปัจจัยหลัก: (1) <em>การขยายตัวทางความร้อนของน้ำทะเล</em> เมื่อน้ำอุ่นขึ้นจะมีปริมาตรเพิ่มขึ้น และ (2) <em>การละลายของน้ำแข็งบนแผ่นดิน</em> ไหลลงสู่มหาสมุทร
+      </div>
+
+      <p style="font-size: 0.85rem; font-weight: 600; margin-bottom: 6px;">ข้อมูลเปรียบเทียบตามรายงานสภาพภูมิอากาศโลก:</p>
+      <table>
+        <thead>
+          <tr>
+            <th>ยุคสมัย / แบบจำลอง</th>
+            <th>CO<sub>2</sub></th>
+            <th>อุณหภูมิโลก (Δ<span class="math">T</span>)</th>
+            <th>ระดับน้ำทะเล (Δ<span class="math">h</span>)</th>
+            <th>ผลกระทบเด่นชัด</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>ก่อนอุตสาหกรรม (1850)</td><td>280 ppm</td><td>0.0 °C (ฐาน)</td><td>0.0 cm</td><td>สมดุลธรรมชาติ</td></tr>
+          <tr><td>ปัจจุบัน (2026)</td><td>425 ppm</td><td>+1.3 °C</td><td>+21.5 cm</td><td>น้ำท่วมชายฝั่งบ่อยครั้ง</td></tr>
+          <tr><td>ฉากทัศน์ A (ควบคุมเข้ม)</td><td>450 ppm</td><td>+1.6 °C</td><td>+32.0 cm</td><td>ปะการังฟอกขาวบางส่วน</td></tr>
+          <tr><td>ฉากทัศน์ B (ปล่อยมลพิษสูง)</td><td>580 ppm</td><td>+3.1 °C</td><td>+74.0 cm</td><td>เกาะต่ำเสี่ยงจมน้ำถาวร</td></tr>
+        </tbody>
+      </table>
+      <p style="font-size: 0.75rem; color: #64748b; margin-top: 8px;">
+        * หมายเหตุ: น้ำแข็งที่ลอยอยู่ในทะเลอยู่แล้ว เมื่อละลายจะไม่ส่งผลต่อระดับน้ำทะเลตามหลักการลอยตัวของอาร์คิมีดีส
+      </p>
+    </div>
+  </div>
+
+  <!-- เฟรมที่ 3: คำถาม 6 ข้อ เรียงระดับ 1b - 6 มี 2 บรรทัดหัวข้อเหนือข้อสอบแต่ละข้อ -->
+  <div class="q-container">
+    <div class="panel-title" style="margin-bottom: 16px;">คำถามวัดระดับความฉลาดรู้ทางวิทยาศาสตร์ (6 ข้อ)</div>
+
+    <!-- ข้อ 1 (1b) -->
+    <div class="q-item">
+      <div class="q-meta">
+        <div class="q-meta-line1">วิทยาศาสตร์ (Science Literacy)  บริบท ระดับโลก (Global)</div>
+        <div class="q-meta-line2">เนื้อหา: การเปลี่ยนแปลงสภาพภูมิอากาศ (ก๊าซเรือนกระจก) | ระดับชั้น:   -  | ระดับความสามารถ: 1b</div>
+      </div>
+      <div class="q-title-row"><span class="q-title">ข้อที่ 1</span><span class="level-tag">ระดับความสามารถ 1b</span></div>
+      <div class="q-desc">จากตารางข้อมูลสถิติภูมิอากาศโลก ฉากทัศน์ใดมีความเข้มข้นของก๊าซคาร์บอนไดออกไซด์ (CO<sub>2</sub>) สูงที่สุด และส่งผลให้อุณหภูมิเฉลี่ยของโลกเพิ่มขึ้นมากที่สุด?</div>
+      <div class="opts">
+        <label class="opt-item"><input type="radio" name="q1"> ก. ยุคก่อนอุตสาหกรรม</label>
+        <label class="opt-item"><input type="radio" name="q1"> ข. ปัจจุบัน</label>
+        <label class="opt-item"><input type="radio" name="q1"> ค. ฉากทัศน์ A</label>
+        <label class="opt-item"><input type="radio" name="q1"> ง. ฉากทัศน์ B</label>
+      </div>
+      <div class="ans-box">
+        <div class="ans-head">✅ เฉลย: ง. ฉากทัศน์ B</div>
+        <div><strong>เหตุผลทางวิทยาศาสตร์:</strong> ในระดับ 1b ผู้เรียนอ่านข้อมูลโดยตรงจากตาราง ฉากทัศน์ B มีค่า CO<sub>2</sub> สูงถึง 580 ppm ซึ่งทำให้อุณหภูมิโลกเพิ่มขึ้นสูงสุดคือ +3.1 °C</div>
+      </div>
+    </div>
+
+    <!-- ข้อ 2 (2) -->
+    <div class="q-item">
+      <div class="q-meta">
+        <div class="q-meta-line1">วิทยาศาสตร์ (Science Literacy)  บริบท ระดับโลก (Global)</div>
+        <div class="q-meta-line2">เนื้อหา: การขยายตัวของสสารเมื่อได้รับความร้อน | ระดับชั้น:   -  | ระดับความสามารถ: 2</div>
+      </div>
+      <div class="q-title-row"><span class="q-title">ข้อที่ 2</span><span class="level-tag">ระดับความสามารถ 2</span></div>
+      <div class="q-desc">เมื่ออุณหภูมิของน้ำในมหาสมุทรทั่วโลกสูงขึ้น น้ำทะเลจะมีพฤติกรรมตามข้อใดที่ทำให้ "ระดับน้ำทะเลเฉลี่ยของโลกสูงขึ้น" โดยตรง แม้ยังไม่มีน้ำแข็งขั้วโลกละลายเพิ่มขึ้น?</div>
+      <div class="opts">
+        <label class="opt-item"><input type="radio" name="q2"> ก. น้ำทะเลจะเกิดการขยายตัวทางความร้อน (Thermal Expansion) ทำให้ปริมาตรน้ำเพิ่มขึ้น</label>
+        <label class="opt-item"><input type="radio" name="q2"> ข. อนุภาคน้ำทะเลจะรวมตัวกันหนาแน่นขึ้นจนมีน้ำหนักเพิ่มขึ้น</label>
+        <label class="opt-item"><input type="radio" name="q2"> ค. น้ำทะเลจะดูดซับเกลือจากก้นมหาสมุทรขึ้นมาลอยตัว</label>
+        <label class="opt-item"><input type="radio" name="q2"> ง. น้ำทะเลจะสูญเสียความดันจนลอยตัวขึ้นสู่ชั้นบรรยากาศ</label>
+      </div>
+      <div class="ans-box">
+        <div class="ans-head">✅ เฉลย: ก. น้ำทะเลจะเกิดการขยายตัวทางความร้อน (Thermal Expansion) ทำให้ปริมาตรน้ำเพิ่มขึ้น</div>
+        <div><strong>เหตุผลทางวิทยาศาสตร์:</strong> เมื่อของเหลวได้รับความร้อน อนุภาคจะเคลื่อนที่เร็วขึ้นและอยู่ห่างกันมากขึ้น ส่งผลให้ปริมาตรรวมของน้ำในมหาสมุทรขยายตัวขึ้น ระดับน้ำจึงสูงขึ้น</div>
+      </div>
+    </div>
+
+    <!-- ข้อ 3 (3) -->
+    <div class="q-item">
+      <div class="q-meta">
+        <div class="q-meta-line1">วิทยาศาสตร์ (Science Literacy)  บริบท ระดับโลก (Global)</div>
+        <div class="q-meta-line2">เนื้อหา: แหล่งน้ำ การเปลี่ยนสถานะ และการลอยตัว | ระดับชั้น:   -  | ระดับความสามารถ: 3</div>
+      </div>
+      <div class="q-title-row"><span class="q-title">ข้อที่ 3</span><span class="level-tag">ระดับความสามารถ 3</span></div>
+      <div class="q-desc">นักเรียนทำการทดลอง: <em>กล่อง A ใส่น้ำแข็งลอยอยู่ในน้ำเต็มแก้ว</em> ส่วน <em>กล่อง B วางก้อนน้ำแข็งไว้บนแท่นหินเหนือผิวน้ำ</em> เมื่อน้ำแข็งละลายหมด น้ำในกล่อง B ล้นแก้ว แต่น้ำในกล่อง A ไม่ล้น การทดลองนี้สนับสนุนข้ออ้างใดเกี่ยวกับโลกจริง?</div>
+      <div class="opts">
+        <label class="opt-item"><input type="radio" name="q3"> ก. การละลายของแผ่นน้ำแข็งบนแผ่นดิน (เช่น กรีนแลนด์) ทำให้ระดับน้ำทะเลสูงขึ้น ส่วนน้ำแข็งที่ลอยในทะเลอยู่แล้วไม่ทำให้ระดับน้ำทะเลเพิ่มขึ้น</label>
+        <label class="opt-item"><input type="radio" name="q3"> ข. ก้อนหินช่วยเร่งปฏิกิริยาเคมีทำให้น้ำเพิ่มปริมาณขึ้นมาเอง</label>
+        <label class="opt-item"><input type="radio" name="q3"> ค. น้ำแข็งที่ลอยอยู่ในน้ำไม่มีการละลายในสภาวะจริง</label>
+        <label class="opt-item"><input type="radio" name="q3"> ง. แผ่นน้ำแข็งในทะเลมีเกลือผสมอยู่จึงระเหยกลายเป็นไอไปทั้งหมด</label>
+      </div>
+      <div class="ans-box">
+        <div class="ans-head">✅ เฉลย: ก. การละลายของแผ่นน้ำแข็งบนแผ่นดิน (เช่น กรีนแลนด์) ทำให้ระดับน้ำทะเลสูงขึ้น ส่วนน้ำแข็งที่ลอยในทะเลอยู่แล้วไม่ทำให้ระดับน้ำทะเลเพิ่มขึ้น</div>
+        <div><strong>เหตุผลทางวิทยาศาสตร์:</strong> น้ำแข็งที่ลอยในน้ำได้แทนที่ปริมาตรน้ำเท่ากับมวลของมันไว้แล้วตั้งแต่แรก (หลักอาร์คิมีดีส) ส่วนน้ำแข็งบนบกเป็นการเติมมวลน้ำใหม่เข้าสู่มหาสมุทร</div>
+      </div>
+    </div>
+
+    <!-- ข้อ 4 (4) -->
+    <div class="q-item">
+      <div class="q-meta">
+        <div class="q-meta-line1">วิทยาศาสตร์ (Science Literacy)  บริบท ระดับโลก (Global)</div>
+        <div class="q-meta-line2">เนื้อหา: ผลกระทบของการเปลี่ยนแปลงภูมิอากาศโลก | ระดับชั้น:   -  | ระดับความสามารถ: 4</div>
+      </div>
+      <div class="q-title-row"><span class="q-title">ข้อที่ 4</span><span class="level-tag">ระดับความสามารถ 4</span></div>
+      <div class="q-desc">จากตาราง หากความเข้มข้นของ CO<sub>2</sub> เพิ่มขึ้นถึงฉากทัศน์ B (580 ppm) ระดับน้ำทะเลเฉลี่ยของโลกจะเพิ่มขึ้นอีกประมาณ 52.5 cm ข้อสรุปใดระบุผลกระทบต่อประชากรโลกได้สมเหตุสมผลที่สุด?</div>
+      <div class="opts">
+        <label class="opt-item"><input type="radio" name="q4"> ก. ประเทศหมู่เกาะขนาดเล็กและพื้นที่ชายฝั่งลุ่มต่ำจะเผชิญการกัดเซาะชายฝั่ง น้ำเค็มรุกล้ำแหล่งน้ำจืด และเสี่ยงจมน้ำถาวร</label>
+        <label class="opt-item"><input type="radio" name="q4"> ข. แผ่นดินใหญ่ทุกทวีปจะจมหายไปใต้ท้องทะเลทั้งหมดภายใน 1 เดือน</label>
+        <label class="opt-item"><input type="radio" name="q4"> ค. น้ำทะเลที่เพิ่มขึ้นจะช่วยลดอุณหภูมิของโลกให้เย็นลงสู่ยุคน้ำแข็งทันที</label>
+        <label class="opt-item"><input type="radio" name="q4"> ง. ทะเลทรายทั่วโลกจะเปลี่ยนเป็นป่าดิบชื้นเนื่องจากน้ำทะเลล้นเข้าไปหล่อเลี้ยง</label>
+      </div>
+      <div class="ans-box">
+        <div class="ans-head">✅ เฉลย: ก. ประเทศหมู่เกาะขนาดเล็กและพื้นที่ชายฝั่งลุ่มต่ำจะเผชิญการกัดเซาะชายฝั่ง น้ำเค็มรุกล้ำแหล่งน้ำจืด และเสี่ยงจมน้ำถาวร</div>
+        <div><strong>เหตุผลทางวิทยาศาสตร์:</strong> ระดับน้ำทะเลที่เพิ่มขึ้นกว่าครึ่งเมตรส่งผลกระทบรุนแรงต่อพื้นที่ปากแม่น้ำและประเทศที่เป็นเกาะต่ำ ทำให้สูญเสียพื้นที่อยู่อาศัยและการเกษตร</div>
+      </div>
+    </div>
+
+    <!-- ข้อ 5 (5) -->
+    <div class="q-item">
+      <div class="q-meta">
+        <div class="q-meta-line1">วิทยาศาสตร์ (Science Literacy)  บริบท ระดับโลก (Global)</div>
+        <div class="q-meta-line2">เนื้อหา: สมดุลพลังงานและความจุความร้อนของมหาสมุทร | ระดับชั้น:   -  | ระดับความสามารถ: 5</div>
+      </div>
+      <div class="q-title-row"><span class="q-title">ข้อที่ 5</span><span class="level-tag">ระดับความสามารถ 5</span></div>
+      <div class="q-desc">หากมีข้อเสนอว่า <em>"การปลูกป่าขนาดใหญ่ทั่วโลกจะสามารถหยุดการเพิ่มขึ้นของระดับน้ำทะเลได้ทันที โดยไม่ต้องลดการปล่อย CO<sub>2</sub> จากภาคพลังงาน"</em> ข้อเสนอนี้มีข้อจำกัดทางวิทยาศาสตร์อย่างไร?</div>
+      <div class="opts">
+        <label class="opt-item"><input type="radio" name="q5"> ก. ป่าไม้ช่วยดูดซับ CO<sub>2</sub> ได้เพียงส่วนหนึ่ง แต่ความร้อนส่วนเกินส่วนใหญ่ถูกสะสมไว้ในมหาสมุทรแล้ว ซึ่งการขยายตัวทางความร้อนจะยังดำเนินต่อไป</label>
+        <label class="opt-item"><input type="radio" name="q5"> ข. ต้นไม้ที่โตเต็มวัยจะปล่อยก๊าซมีเทนออกมามากกว่าคาร์บอนไดออกไซด์</label>
+        <label class="opt-item"><input type="radio" name="q5"> ค. ป่าไม้ทำให้อุณหภูมิผิวดินเย็นจัดจนน้ำทะเลกลายเป็นน้ำแข็งแห้ง</label>
+        <label class="opt-item"><input type="radio" name="q5"> ง. ป่าไม้ดึงน้ำจากแม่น้ำไปใช้จนระดับน้ำทะเลลดฮวบ</label>
+      </div>
+      <div class="ans-box">
+        <div class="ans-head">✅ เฉลย: ก. ป่าไม้ช่วยดูดซับ CO2 ได้เพียงส่วนหนึ่ง แต่ความร้อนส่วนเกินส่วนใหญ่ถูกสะสมไว้ในมหาสมุทรแล้ว ซึ่งการขยายตัวทางความร้อนจะยังดำเนินต่อไป</div>
+        <div><strong>เหตุผลทางวิทยาศาสตร์:</strong> มหาสมุทรมีความจุความร้อนสูงมากและสะสมความร้อนส่วนใหญ่ไว้ ความร้อนนี้จะยังคงทำให้น้ำทะเลขยายตัวต่อเนื่อง การปลูกป่าอย่างเดียวจึงหยุดระดับน้ำทะเลไม่ได้ทันที</div>
+      </div>
+    </div>
+
+    <!-- ข้อ 6 (6) -->
+    <div class="q-item">
+      <div class="q-meta">
+        <div class="q-meta-line1">วิทยาศาสตร์ (Science Literacy)  บริบท ระดับโลก (Global)</div>
+        <div class="q-meta-line2">เนื้อหา: กระแสน้ำในมหาสมุทรและความหนาแน่นของของไหล | ระดับชั้น:   -  | ระดับความสามารถ: 6</div>
+      </div>
+      <div class="q-title-row"><span class="q-title">ข้อที่ 6</span><span class="level-tag">ระดับความสามารถ 6</span></div>
+      <div class="q-desc">นักวิทยาศาสตร์ตั้งสมมติฐานว่า: <em>"หากธารน้ำแข็งบนเกาะกรีนแลนด์ละลายลงสู่มหาสมุทรแอตแลนติกเหนือปริมาณมหาศาล น้ำจืดที่มีความหนาแน่นต่ำจะทำให้ 'สายพานกระแสน้ำลึกโลก' ชะลอตัวลงหรือหยุดชะงัก"</em> ท่านประเมินสมมติฐานนี้อย่างไร?</div>
+      <div class="opts">
+        <label class="opt-item"><input type="radio" name="q6"> ก. สมเหตุสมผล เพราะการจมตัวของน้ำแถบขั้วโลกอาศัยน้ำเย็นและเค็มจัดที่มีความหนาแน่นสูง เมื่อมีน้ำจืดมาเจือจาง ความหนาแน่นจะลดลงจนน้ำไม่สามารถจมตัวลงได้</label>
+        <label class="opt-item"><input type="radio" name="q6"> ข. ไม่สมเหตุสมผล เพราะน้ำจืดมีความหนาแน่นมากกว่าน้ำเค็มเสมอ</label>
+        <label class="opt-item"><input type="radio" name="q6"> ค. ไม่สมเหตุสมผล เพราะกระแสน้ำขับเคลื่อนด้วยแรงดึงดูดของดวงจันทร์เท่านั้น</label>
+        <label class="opt-item"><input type="radio" name="q6"> ง. สมเหตุสมผล เพราะน้ำจืดจะทำปฏิกิริยากับสนามแม่เหล็กโลกทำให้โลกหมุนกลับทิศ</label>
+      </div>
+      <div class="ans-box">
+        <div class="ans-head">✅ เฉลย: ก. สมเหตุสมผล เพราะการจมตัวของน้ำแถบขั้วโลกอาศัยน้ำเย็นและเค็มจัดที่มีความหนาแน่นสูง เมื่อมีน้ำจืดมาเจือจาง ความหนาแน่นจะลดลงจนน้ำไม่สามารถจมตัวลงได้</div>
+        <div><strong>เหตุผลทางวิทยาศาสตร์:</strong> สายพานกระแสน้ำลึก (Thermohaline Circulation) ขับเคลื่อนด้วยผลต่างความหนาแน่น น้ำเย็นเค็มจัดจะจมตัวเพื่อดึงกระแสน้ำอุ่นขึ้นมา หากมีน้ำจืดเจือจาง น้ำจะไม่จมตัวและทำให้ระบบชะลอตัวลง</div>
+      </div>
+    </div>
+  </div>
+
+<script>
+  function updateCO2(v) {
+    document.getElementById('co2Label').innerText = v + ' ppm';
+    calcClimate();
+  }
+  function calcClimate() {
+    let co2 = parseInt(document.getElementById('co2Range').value);
+    let iceType = document.getElementById('iceSel').value;
+
+    let deltaT = Math.max(0, ((co2 - 280) / 100) * 0.95);
+    let thermalExp = deltaT * 12.0;
+    let iceMelt = iceType === 'land' ? deltaT * 14.0 : (iceType === 'sea' ? 0.5 : deltaT * 14.5);
+
+    let seaRise = Math.round(thermalExp + iceMelt);
+
+    document.getElementById('tempText').innerText = '+' + deltaT.toFixed(1) + ' °C';
+    document.getElementById('seaText').innerText = '+' + seaRise + ' cm';
+
+    let sky = document.getElementById('skyLayer');
+    let heatAlpha = Math.min(0.55, (co2 - 280) / 480);
+    sky.style.background = 'rgba(239, 68, 68, ' + heatAlpha + ')';
+
+    let sea = document.getElementById('seaBody');
+    sea.style.height = (35 + Math.min(30, seaRise * 0.35)) + 'px';
+
+    let ice = document.getElementById('iceTag');
+    if(iceType === 'sea') {
+      ice.style.opacity = '1.0';
+      ice.innerText = 'ธารน้ำแข็งบนบก (คงที่) 🏔️';
+    } else {
+      let op = Math.max(0.15, 1.0 - (deltaT / 3.2));
+      ice.style.opacity = op.toFixed(2);
+      ice.innerText = op < 0.4 ? 'ธารน้ำแข็งละลายมาก 💧' : 'ธารน้ำแข็งบนบก 🏔️';
+    }
+  }
+  calcClimate();
+</script>
+</body>
+</html>
