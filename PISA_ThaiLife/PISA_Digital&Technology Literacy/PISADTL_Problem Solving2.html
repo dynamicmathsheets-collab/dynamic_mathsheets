@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PISA DTL - Problem Solving Context Item 2</title>
+  <!-- MathJax สำหรับแสดงผลสัญลักษณ์คณิตศาสตร์ -->
+  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+  <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      font-family: 'Sarabun', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background-color: #f8fafc;
+      margin: 0;
+      padding: 20px;
+      color: #0f172a;
+    }
+    .container {
+      width: 1200px;
+      margin: 0 auto;
+      background: #ffffff;
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      padding: 24px;
+      box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+    }
+    .top-layout {
+      display: flex;
+      gap: 20px;
+      margin-bottom: 24px;
+    }
+    .frame-1 {
+      flex: 1.2;
+      border: 1px solid #e2e8f0;
+      border-radius: 6px;
+      padding: 18px;
+      background: #fafafa;
+      line-height: 1.6;
+    }
+    .frame-2 {
+      flex: 0.8;
+      border: 1px solid #e2e8f0;
+      border-radius: 6px;
+      padding: 18px;
+      background: #eff6ff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+    .frame-3 {
+      border-top: 2px dashed #94a3b8;
+      padding-top: 20px;
+    }
+    .debug-box {
+      width: 100%;
+      border: 1px solid #cbd5e1;
+      border-radius: 6px;
+      background: #ffffff;
+      overflow: hidden;
+      font-size: 12px;
+    }
+    .code-editor {
+      background: #1e293b;
+      color: #e2e8f0;
+      padding: 12px;
+      font-family: monospace;
+      font-size: 11.5px;
+      line-height: 1.6;
+    }
+    .code-line {
+      display: flex;
+    }
+    .line-no {
+      width: 25px;
+      color: #64748b;
+    }
+    .bug-highlight {
+      background: rgba(239, 68, 68, 0.25);
+      border-left: 3px solid #ef4444;
+      padding-left: 4px;
+    }
+    .trace-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+      font-size: 11px;
+    }
+    .trace-table th, .trace-table td {
+      border: 1px solid #cbd5e1;
+      padding: 4px 8px;
+      text-align: center;
+    }
+    .trace-table th {
+      background: #f1f5f9;
+      color: #334155;
+    }
+    .question-card {
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-radius: 6px;
+      padding: 18px;
+      margin-bottom: 22px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+    .q-header-banner {
+      border-bottom: 2px solid #2563eb;
+      padding-bottom: 8px;
+      margin-bottom: 12px;
+    }
+    .q-header-line1 {
+      font-size: 17px;
+      font-weight: bold;
+      color: #1d4ed8;
+    }
+    .q-header-line2 {
+      font-size: 13.5px;
+      color: #475569;
+      margin-top: 3px;
+    }
+    .q-text {
+      font-size: 15px;
+      font-weight: bold;
+      margin-bottom: 12px;
+      line-height: 1.5;
+    }
+    .options {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 8px;
+      margin-left: 8px;
+    }
+    .option {
+      font-size: 14.5px;
+    }
+    .answer-key {
+      margin-top: 12px;
+      padding: 8px 12px;
+      background: #f0fdf4;
+      border-left: 4px solid #16a34a;
+      font-size: 13.5px;
+      color: #14532d;
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <div class="top-layout">
+    <!-- ส่วนที่ 1: ข้อความให้อ่าน -->
+    <div class="frame-1">
+      <h3 style="margin-top:0; color:#1d4ed8;">สถานการณ์: การค้นหาและแก้ไขข้อผิดพลาด (Debugging) ในโปรแกรมควบคุมหุ่นยนต์</h3>
+      <p>กลุ่มของกมลกำลังเขียนชุดคำสั่ง (Algorithm) เพื่อสั่งให้หุ่นยนต์จำลองเดินเก็บตัวอย่างขยะรีไซเคิลในสนามความยาว 20 เมตร โดยมีเป้าหมายให้หุ่นยนต์คำนวณระยะทางรวมและหยุดทำงานอย่างถูกต้อง</p>
+      <p>กมลต้องการให้โปรแกรมคำนวณตำแหน่งสะสมของหุ่นยนต์ โดยเริ่มจากตำแหน่ง \(x = 0\) และเดินหน้าครั้งละ \(d = 4\) เมตร เป็นจำนวน 5 ครั้ง เพื่อให้สิ้นสุดที่จุดหมาย:
+        $$x_{\text{target}} = 5 \times 4 = 20\text{ เมตร}$$
+      </p>
+      <p>แต่เมื่อรันโปรแกรม หุ่นยนต์กลับเดินเลยสนามและชนกำแพงที่ระยะ 24 เมตร ครูจึงแนะนำให้นักเรียนทำ <b>การไล่ตรวจค่าตัวแปร (Dry Run / Variable Tracing)</b> ทีละบรรทัด</p>
+      <p>จากการตรวจสอบโค้ดพบข้อผิดพลาดเชิงตรรกะ (Logic Bug) ในเงื่อนไขการวนซ้ำ (Loop Condition) ซึ่งเขียนไว้ว่า <code>while (count &lt;= 5)</code> และมีการบวกค่าซ้ำซ้อน ทำให้ลูปทำงานทั้งหมด 6 รอบ ส่งผลให้ผลลัพธ์คณิตศาสตร์คลาดเคลื่อน:</p>
+      <p style="text-align:center;">$$x_{\text{actual}} = 6 \times 4 = 24\text{ เมตร}$$</p>
+      <p>กมลและเพื่อนๆ ต้องประยุกต์ใช้การคิดเชิงคำนวณเพื่อหาสาเหตุ แก้ไขโค้ด และทดสอบระบบให้กลับมาทำงานได้อย่างถูกต้อง</p>
+    </div>
+
+    <!-- ส่วนที่ 2: ภาพประกอบแนะนำ -->
+    <div class="frame-2">
+      <div class="debug-box">
+        <div style="background:#0f172a; color:#fff; padding:6px 10px; font-weight:bold; font-size:11px;">
+          โปรแกรมจำลอง: Robot_Controller.algo
+        </div>
+        <div class="code-editor">
+          <div class="code-line"><span class="line-no">01</span><span>x = 0; count = 1;</span></div>
+          <div class="code-line bug-highlight"><span class="line-no">02</span><span>while (count &lt;= 5) {  // จุดเกิด Logic Bug</span></div>
+          <div class="code-line"><span class="line-no">03</span><span>    x = x + 4;</span></div>
+          <div class="code-line"><span class="line-no">04</span><span>    move_forward(4);</span></div>
+          <div class="code-line"><span class="line-no">05</span><span>    count = count + 1;</span></div>
+          <div class="code-line"><span class="line-no">06</span><span>}</span></div>
+          <div class="code-line"><span class="line-no">07</span><span>stop_robot();</span></div>
+        </div>
+        <div style="padding:10px;">
+          <div style="font-weight:bold; font-size:11px; color:#334155;">ตารางไล่ตรวจค่าตัวแปร (Trace Table):</div>
+          <table class="trace-table">
+            <tr>
+              <th>รอบที่ (Loop)</th>
+              <th>เงื่อนไข (count &lt;= 5)</th>
+              <th>ระยะสะสม (x)</th>
+              <th>ค่าถัดไปของ count</th>
+            </tr>
+            <tr><td>เริ่ม</td><td>-</td><td>0</td><td>1</td></tr>
+            <tr><td>รอบ 1</td><td>จริง (1 &lt;= 5)</td><td>4</td><td>2</td></tr>
+            <tr><td>รอบ 2</td><td>จริง (2 &lt;= 5)</td><td>8</td><td>3</td></tr>
+            <tr><td>รอบ 3</td><td>จริง (3 &lt;= 5)</td><td>12</td><td>4</td></tr>
+            <tr><td>รอบ 4</td><td>จริง (4 &lt;= 5)</td><td>16</td><td>5</td></tr>
+            <tr style="background:#fee2e2;"><td>รอบ 5</td><td>จริง (5 &lt;= 5)</td><td>20</td><td>6 (เป้าหมายครบที่นี่)</td></tr>
+            <tr style="background:#fecaca; font-weight:bold; color:#b91c1c;"><td>รอบ 6 (เกิน)</td><td>จริง (นับรอบผิดพลาด)</td><td>24</td><td>ชนกำแพง!</td></tr>
+          </table>
+        </div>
+      </div>
+      <p style="font-size:12px; color:#64748b; margin-top:8px; text-align:center;">ภาพจำลองการตรวจหาบั๊กในโค้ดและตารางแสดงการทำงานวนซ้ำ</p>
+    </div>
+  </div>
+
+  <!-- ส่วนที่ 3: ข้อสอบ 8 ข้อ -->
+  <div class="frame-3">
+
+    <!-- ข้อ 1 -->
+    <div class="question-card">
+      <div class="q-header-banner">
+        <div class="q-header-line1">Digital & Technology Literacy บริบท การแก้ปัญหา (Problem Solving)</div>
+        <div class="q-header-line2">เนื้อหา: การหยุดโปรแกรมฉุกเฉินเมื่อเกิดความผิดพลาด | ระดับชั้น:   -  | ระดับความสามารถที่ 1: ทำงานดิจิทัลพื้นฐานอย่างง่าย ภายใต้คำแนะนำและความช่วยเหลือ</div>
+      </div>
+      <div class="q-text">1. เมื่อหุ่นยนต์จำลองเริ่มเดินออกนอกเส้นทางและกำลังจะชนสิ่งกีดขวาง ครูบอกกมลว่า "ให้กดปุ่มหยุดฉุกเฉินบนหน้าจอทันที" ปุ่มใดบนแถบเครื่องมือที่กมลควรคลิกตามคำแนะนำ?</div>
+      <div class="options">
+        <div class="option">ก. ปุ่มสี่เหลี่ยมสีแดง (Stop / Reset) บนหน้าจอจำลอง</div>
+        <div class="option">ข. ปุ่มเครื่องหมายบวกเพื่อเร่งความเร็วหุ่นยนต์</div>
+        <div class="option">ค. ปุ่มบันทึกไฟล์ทับของเดิม</div>
+        <div class="option">ง. ปุ่มขยายหน้าต่างให้เต็มจอ</div>
+      </div>
+      <div class="answer-key">เฉลย: ก. คลิกปุ่มหยุดฉุกเฉิน (Stop) สีแดงตามขั้นตอนพื้นฐานที่ได้รับคำแนะนำเพื่อความปลอดภัย</div>
+    </div>
+
+    <!-- ข้อ 2 -->
+    <div class="question-card">
+      <div class="q-header-banner">
+        <div class="q-header-line1">Digital & Technology Literacy บริบท การแก้ปัญหา (Problem Solving)</div>
+        <div class="q-header-line2">เนื้อหา: การแก้ไขคำผิดทางไวยากรณ์ (Syntax Error) ในโปรแกรมอย่างง่าย | ระดับชั้น:   -  | ระดับความสามารถที่ 2: ทำงานง่าย ๆ ที่ไม่ซับซ้อนด้วยตนเอง และขอความช่วยเหลือเมื่อจำเป็น</div>
+      </div>
+      <div class="q-text">2. เมื่อกมลลองรันโปรแกรม โปรแกรมแจ้งเตือนว่า: <i>"Syntax Error at line 07: missing semicolon (;)"</i> สิ่งที่กมลควรทำด้วยตนเองเพื่อแก้ไขปัญหาก่อนขอความช่วยเหลือคือข้อใด?</div>
+      <div class="options">
+        <div class="option">ก. เลื่อนไปที่บรรทัดที่ 07 แล้วพิมพ์เครื่องหมายอัฒภาค <code>;</code> ปิดท้ายคำสั่ง <code>stop_robot()</code></div>
+        <div class="option">ข. ลบโค้ดทั้ง 7 บรรทัดทิ้งแล้วปิดเครื่องคอมพิวเตอร์</div>
+        <div class="option">ค. ซื้อหุ่นยนต์ตัวจริงมาปล่อยบนโต๊ะเรียน</div>
+        <div class="option">ง. พิมพ์ชื่อตัวเองลงไปในบรรทัดที่ 07 แทน</div>
+      </div>
+      <div class="answer-key">เฉลย: ก. แก้ไข Syntax Error ง่ายๆ ด้วยตนเองโดยเติมเครื่องหมาย <code>;</code> ตามที่ระบบแจ้งเตือนอย่างตรงไปตรงมา</div>
+    </div>
+
+    <!-- ข้อ 3 -->
+    <div class="question-card">
+      <div class="q-header-banner">
+        <div class="q-header-line1">Digital & Technology Literacy บริบท การแก้ปัญหา (Problem Solving)</div>
+        <div class="q-header-line2">เนื้อหา: การแก้ไขเงื่อนไขทางคณิตศาสตร์ในการวนซ้ำ (Off-by-one Bug) | ระดับชั้น:   -  | ระดับความสามารถที่ 3: ทำงานประจำและแก้ปัญหาตรงไปตรงมาได้ด้วยตนเอง</div>
+      </div>
+      <div class="q-text">3. เพื่อแก้ปัญหาหุ่นยนต์เดินเกินเป็น 6 รอบ (\(24\text{ เมตร}\)) และทำให้หุ่นยนต์เดินเพียง 5 รอบพอดี (\(20\text{ เมตร}\)) เมื่อเริ่มต้นที่ <code>count = 1</code> ควรแก้เงื่อนไขในบรรทัดที่ 02 อย่างไรให้ถูกต้องและตรงไปตรงมาที่สุด?</div>
+      <div class="options">
+        <div class="option">ก. แก้ไขเป็น <code>while (count &lt; 5)</code> หรือสั่งวนซ้ำแบบกำหนดรอบ <code>repeat (5)</code></div>
+        <div class="option">ข. แก้ไขเป็น <code>while (count &lt;= 10)</code></div>
+        <div class="option">ค. แก้ไขเป็น <code>while (count == 0)</code></div>
+        <div class="option">ง. ลบบรรทัดที่ 02 ออกทั้งหมดโดยไม่ต้องมีลูป</div>
+      </div>
+      <div class="answer-key">เฉลย: ก. แก้ไขเงื่อนไขการนับรอบให้หยุดเมื่อครบ 5 รอบพอดี เพื่อให้ได้ระยะทาง \(5 \times 4 = 20\text{ เมตร}\)</div>
+    </div>
+
+    <!-- ข้อ 4 -->
+    <div class="question-card">
+      <div class="q-header-banner">
+        <div class="q-header-line1">Digital & Technology Literacy บริบท การแก้ปัญหา (Problem Solving)</div>
+        <div class="q-header-line2">เนื้อหา: การปรับเปลี่ยนอัลกอริทึมและช่วยเหลือผู้อื่นแก้ปัญหาเฉพาะหน้า | ระดับชั้น:   -  | ระดับความสามารถที่ 4: ทำงานได้หลากหลาย ปรับวิธีการ และช่วยเหลือผู้อื่นในบางสถานการณ์</div>
+      </div>
+      <div class="q-text">4. เพื่อนคนหนึ่งเขียนโปรแกรมโดยไม่ใช้การวนซ้ำ (Loop) แต่ใช้วิธีก็อปปี้คำสั่งเดินหน้าซ้ำๆ 20 บรรทัด ทำให้แก้ไขยากเมื่อต้องการเปลี่ยนระยะทาง กมลควรแนะนำและช่วยเหลือเพื่อนปรับปรุงโครงสร้างโค้ดอย่างไร?</div>
+      <div class="options">
+        <div class="option">ก. แนะนำให้นำแนวคิดการทำซ้ำ (Loop / Repeat) มาใช้แทน โดยใช้ตัวแปรควบคุมรอบ เพื่อลดความยาวของโค้ดและทำให้ปรับแก้ระยะทางได้ง่าย</div>
+        <div class="option">ข. บอกให้เพื่อนก็อปปี้คำสั่งเพิ่มเป็น 100 บรรทัดเพื่อให้โค้ดยาวขึ้น</div>
+        <div class="option">ค. แนะนำให้เพื่อนเลิกเขียนโค้ดและไปนั่งรอหมดชั่วโมง</div>
+        <div class="option">ง. สั่งให้เพื่อนลบไฟล์ทิ้งทั้งหมด</div>
+      </div>
+      <div class="answer-key">เฉลย: ก. ช่วยเหลือโดยปรับเปลี่ยนวิธีการเขียนโค้ดให้มีประสิทธิภาพ (Efficiency) ด้วยโครงสร้าง Loop</div>
+    </div>
+
+    <!-- ข้อ 5 -->
+    <div class="question-card">
+      <div class="q-header-banner">
+        <div class="q-header-line1">Digital & Technology Literacy บริบท การแก้ปัญหา (Problem Solving)</div>
+        <div class="q-header-line2">เนื้อหา: การประยุกต์ใช้เซนเซอร์แก้ปัญหาตัวแปรแวดล้อมที่เปลี่ยนแปลง | ระดับชั้น:   -  | ระดับความสามารถที่ 5: ประยุกต์ใช้ความรู้กับงานและปัญหาหลากหลาย พร้อมแนะนำผู้อื่นได้</div>
+      </div>
+      <div class="q-text">5. เมื่อนำหุ่นยนต์ไปทดสอบในสนามจริงที่มีพื้นผิวลื่น ทำให้การนับก้าวเดิน \(4\text{ เมตร}\) คลาดเคลื่อน หุ่นยนต์หยุดไม่ตรงตำแหน่งขยะ กมลควรประยุกต์ใช้อุปกรณ์ดิจิทัลใดมาช่วยแก้ปัญหานี้ พร้อมให้คำแนะนำแก่กลุ่ม?</div>
+      <div class="options">
+        <div class="option">ก. ติดตั้งเซนเซอร์วัดระยะทางอัลตราโซนิก (Ultrasonic Sensor) หรือเซนเซอร์ตรวจจับสี เพื่อตรวจจับวัตถุจริงแทนการกะระยะด้วยเวลาหรือการนับรอบเพียงอย่างเดียว</div>
+        <div class="option">ข. เทกาวตราช้างลงบนพื้นสนามเพื่อไม่ให้ล้อลื่น</div>
+        <div class="option">ค. เร่งมอเตอร์ให้หมุนเร็วขึ้นเป็น 2 เท่า</div>
+        <div class="option">ง. ลดความสว่างหน้าจอคอมพิวเตอร์ลง</div>
+      </div>
+      <div class="answer-key">เฉลย: ก. ประยุกต์ใช้ความรู้ด้านอุปกรณ์เซนเซอร์ป้อนกลับ (Feedback Sensor) เพื่อแก้ปัญหาความคลาดเคลื่อนในโลกจริง</div>
+    </div>
+
+    <!-- ข้อ 6 -->
+    <div class="question-card">
+      <div class="q-header-banner">
+        <div class="q-header-line1">Digital & Technology Literacy บริบท การแก้ปัญหา (Problem Solving)</div>
+        <div class="q-header-line2">เนื้อหา: การวางแผนทดสอบระบบหลายเงื่อนไข (Test-case Design) | ระดับชั้น:   -  | ระดับความสามารถที่ 6: เลือกแนวทางแก้ปัญหาที่เหมาะสมในสถานการณ์ซับซ้อน และช่วยพัฒนาการทำงานของผู้อื่น</div>
+      </div>
+      <div class="q-text">6. หุ่นยนต์มักเจอกรณีที่มีสิ่งกีดขวางโผล่ขึ้นมาขวางทางอย่างกะทันหัน กมลควรออกแบบและพัฒนาโครงสร้างชุดคำสั่งของกลุ่มอย่างไรเพื่อแก้ปัญหานี้ได้อย่างเป็นระบบ?</div>
+      <div class="options">
+        <div class="option">ก. เพิ่มเงื่อนไขตรวจสอบ (Conditional Statement) เช่น <code>if (พบสิ่งกีดขวาง &lt; 10 cm) then { หลบสิ่งกีดขวาง } else { เดินหน้าต่อ }</code> ภายในลูปการทำงานทุกรอบ</div>
+        <div class="option">ข. สั่งให้หุ่นยนต์พุ่งชนสิ่งกีดขวางด้วยแรงสูงสุดเพื่อดันสิ่งกีดขวางออกไป</div>
+        <div class="option">ค. เขียนคำสั่งให้หุ่นยนต์ดับเครื่องและตัดกระแสไฟทันทีเมื่อเริ่มสตาร์ต</div>
+        <div class="option">ง. ไม่ต้องแก้ไขโค้ดแต่คอยหยิบสิ่งกีดขวางออกด้วยมือตลอดเวลา</div>
+      </div>
+      <div class="answer-key">เฉลย: ก. เลือกแนวทางการเขียนโค้ดแบบเงื่อนไข (Selection/Condition) เพื่อให้ระบบตัดสินใจแก้ปัญหาเฉพาะหน้าได้อย่างอัตโนมัติ</div>
+    </div>
+
+    <!-- ข้อ 7 -->
+    <div class="question-card">
+      <div class="q-header-banner">
+        <div class="q-header-line1">Digital & Technology Literacy บริบท การแก้ปัญหา (Problem Solving)</div>
+        <div class="q-header-line2">เนื้อหา: การคำนวณปรับแต่งฟังก์ชันความเร็วและเวลาในการเคลื่อนที่เชิงฟิสิกส์คณิตศาสตร์ | ระดับชั้น:   -  | ระดับความสามารถที่ 7: แก้ปัญหาที่ซับซ้อนมาก พัฒนาวิธีการใหม่ และบูรณาการความรู้เฉพาะด้าน</div>
+      </div>
+      <div class="q-text">7. หุ่นยนต์ต้องเคลื่อนที่รวมระยะทาง \(S = 20\text{ เมตร}\) โดยมีมอเตอร์ที่ขับเคลื่อนด้วยความเร็วคงที่ \(v = 0.8\text{ เมตร/วินาที}\) และในการเก็บขยะแต่ละจุด (มีทั้งหมด 4 จุดระหว่างทาง) หุ่นยนต์ต้องหยุดนิ่งจุดละ \(3\text{ วินาที}\) จากความสัมพันธ์ \(S = v \times t\) หุ่นยนต์จะใช้เวลาทำงานทั้งหมดตั้งแต่ต้นจนจบกี่วินาที?</div>
+      <div class="options">
+        <div class="option">ก. \(37\text{ วินาที}\) (เวลาเดิน \(25\text{ วินาที}\) + เวลาหยุดเก็บ \(12\text{ วินาที}\))</div>
+        <div class="option">ข. \(25\text{ วินาที}\)</div>
+        <div class="option">ค. \(40\text{ วินาที}\)</div>
+        <div class="option">ง. \(16\text{ วินาที}\)</div>
+      </div>
+      <div class="answer-key">เฉลย: ก. เวลาเดิน \(t_1 = \frac{S}{v} = \frac{20}{0.8} = 25\text{ วินาที}\) เวลาหยุดเก็บขยะ \(t_2 = 4 \times 3 = 12\text{ วินาที}\) รวมเวลาทั้งหมด \(25 + 12 = 37\text{ วินาที}\)</div>
+    </div>
+
+    <!-- ข้อ 8 -->
+    <div class="question-card">
+      <div class="q-header-banner">
+        <div class="q-header-line1">Digital & Technology Literacy บริบท การแก้ปัญหา (Problem Solving)</div>
+        <div class="q-header-line2">เนื้อหา: การออกแบบอัลกอริทึมค้นหาเส้นทางที่สั้นที่สุดและการเรียนรู้ของเครื่อง (Autonomous Pathfinding) | ระดับชั้น:   -  | ระดับความสามารถที่ 8: สร้างแนวทางใหม่เพื่อแก้ปัญหาที่ซับซ้อนมาก และพัฒนาความรู้หรือแนวปฏิบัติใหม่ในสาขานั้นทดลองที่ซับซ้อน</div>
+      </div>
+      <div class="q-text">8. กลุ่มต้องการต่อยอดสร้าง "หุ่นยนต์ทำความสะอาดสนามอัจฉริยะ" ที่สามารถสำรวจแผนที่สนามที่มีสิ่งกีดขวางไม่แน่นอน คำนวณหาเส้นทางเก็บขยะที่สั้นที่สุด (Shortest Path) และเดินทางกลับจุดชาร์จเองได้ แนวทางการสร้างสรรค์นวัตกรรมการแก้ปัญหาข้อใดมีประสิทธิภาพสูงสุด?</div>
+      <div class="options">
+        <div class="option">ก. พัฒนาอัลกอริทึมสร้างแผนที่และระบุตำแหน่งเสมือนจริง (SLAM) ผสานกับอัลกอริทึมค้นหาเส้นทางแบบ A* (A-Star Algorithm) ที่จำลองและอัปเดตกริดแผนที่ตลอดเวลา เพื่อหลบหลีกแบบเรียลไทม์และใช้พลังงานแบตเตอรี่น้อยที่สุด</div>
+        <div class="option">ข. สั่งให้หุ่นยนต์หมุนตัวรอบทิศทางแบบสุ่มไปเรื่อยๆ จนกว่าแบตเตอรี่จะหมด</div>
+        <div class="option">ค. ติดกล้องวงจรปิดรอบโรงเรียน 100 ตัวเพื่อบังคับหุ่นยนต์ด้วยรีโมตคอนโทรลทุกวินาที</div>
+        <div class="option">ง. ลดขนาดสนามให้เหลือเพียง 1 เมตรเพื่อไม่ต้องเขียนโปรแกรมนำทาง</div>
+      </div>
+      <div class="answer-key">เฉลย: ก. การออกแบบนวัตกรรมอัลกอริทึมค้นหาเส้นทางอัจฉริยะ (Pathfinding & SLAM) บูรณาการคณิตศาสตร์และวิทยาการหุ่นยนต์ขั้นสูง</div>
+    </div>
+
+  </div>
+</div>
+
+</body>
+</html>
