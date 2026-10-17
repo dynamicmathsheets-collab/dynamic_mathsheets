@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PISA Financial Literacy - บริบทบ้านและครอบครัว: งบประมาณและค่าสาธารณูปโภค</title>
+<style>
+  body {
+    font-family: 'Sarabun', 'Segoe UI', Tahoma, sans-serif;
+    margin: 0;
+    padding: 16px;
+    background-color: #f1f5f9;
+    color: #1e293b;
+    line-height: 1.6;
+  }
+  .container {
+    max-width: 1200px;
+    margin: auto;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+  .card-box {
+    background: #ffffff;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 4px 14px rgba(0,0,0,0.05);
+    border: 1px solid #e2e8f0;
+  }
+  .col-left {
+    grid-column: 1 / 2;
+  }
+  .col-right {
+    grid-column: 2 / 3;
+    border-left: 5px solid #0284c7;
+    background-color: #f8fafc;
+  }
+  .col-full {
+    grid-column: 1 / 3;
+    margin-top: 8px;
+  }
+  h2, h3, h4 {
+    margin-top: 0;
+    color: #0f172a;
+  }
+  .control-item {
+    margin-bottom: 14px;
+  }
+  label {
+    display: block;
+    font-weight: 600;
+    font-size: 14px;
+    margin-bottom: 4px;
+    color: #334155;
+  }
+  input[type="range"] {
+    width: 100%;
+  }
+  .badge-val {
+    display: inline-block;
+    padding: 2px 8px;
+    background: #e0f2fe;
+    color: #0369a1;
+    border-radius: 4px;
+    font-weight: bold;
+  }
+  .stat-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-top: 15px;
+    background: #f1f5f9;
+    padding: 12px;
+    border-radius: 8px;
+  }
+  .stat-cell {
+    font-size: 14px;
+  }
+  .question-item {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    padding: 20px;
+    margin-bottom: 24px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.03);
+  }
+  .meta-line1 {
+    font-size: 15px;
+    font-weight: bold;
+    color: #0369a1;
+    border-bottom: 1px solid #e2e8f0;
+    padding-bottom: 4px;
+    margin-bottom: 4px;
+  }
+  .meta-line2 {
+    font-size: 14px;
+    font-weight: 600;
+    color: #64748b;
+    margin-bottom: 12px;
+  }
+  .q-text {
+    font-size: 16px;
+    font-weight: 500;
+    color: #0f172a;
+    margin-bottom: 14px;
+  }
+  .options-list {
+    list-style-type: none;
+    padding-left: 0;
+    margin-bottom: 15px;
+  }
+  .options-list li {
+    margin-bottom: 8px;
+    padding: 10px 14px;
+    background: #f8fafc;
+    border-radius: 6px;
+    border: 1px solid #e2e8f0;
+  }
+  .ans-box {
+    background: #f0fdf4;
+    border: 1px solid #bbf7d0;
+    border-radius: 8px;
+    padding: 14px;
+    color: #166534;
+    font-size: 14px;
+  }
+  .formula-txt {
+    font-family: 'Cambria Math', 'Times New Roman', serif;
+    font-style: italic;
+    background: #e2e8f0;
+    padding: 2px 6px;
+    border-radius: 4px;
+    color: #0f172a;
+  }
+  @media (max-width: 800px) {
+    .container {
+      grid-template-columns: 1fr;
+    }
+    .col-left, .col-right, .col-full {
+      grid-column: 1 / 2;
+    }
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+  <!-- ส่วนข้อมูลและการทดลอง (เฟรม 1) -->
+  <div class="card-box col-left">
+    <h3>แบบจำลองงบประมาณค่าใช้จ่ายในครอบครัวของ "ครอบครัวสุขใจ"</h3>
+    <p style="font-size: 14px; color: #64748b;">
+      ครอบครัวสุขใจมีสมาชิก 4 คน มีรายได้สุทธิรวมเดือนละ <strong>30,000 บาท</strong> นักเรียนสามารถทดลองปรับพฤติกรรมการใช้น้ำ-ไฟ และค่าใช้จ่ายต่าง ๆ เพื่อดูว่างบประมาณรายรับ-รายจ่ายของครอบครัวจะเปลี่ยนแปลงอย่างไร:
+    </p>
+
+    <div class="control-item">
+      <label>1. ค่าอาหารและของใช้จำเป็นในบ้าน (บาท/เดือน): <span id="groceriesVal" class="badge-val">14,000</span></label>
+      <input type="range" id="groceriesInput" min="10000" max="18000" step="500" value="14000" oninput="recalcHomeBudget()">
+    </div>
+
+    <div class="control-item">
+      <label>2. พฤติกรรมการใช้ไฟฟ้าและเปิดแอร์ (ชั่วโมง/วัน): <span id="acHoursVal" class="badge-val">8</span> ชม.</label>
+      <input type="range" id="acHoursInput" min="2" max="14" step="1" value="8" oninput="recalcHomeBudget()">
+    </div>
+
+    <div class="control-item">
+      <label>3. ค่าใช้จ่ายบันเทิงและท่องเที่ยวของครอบครัว (บาท/เดือน): <span id="leisureVal" class="badge-val">4,000</span></label>
+      <input type="range" id="leisureInput" min="1000" max="8000" step="500" value="4000" oninput="recalcHomeBudget()">
+    </div>
+
+    <div class="control-item">
+      <label>4. เงินสำรองฉุกเฉินประจำบ้านที่กันไว้ล่วงหน้า (บาท/เดือน): <span id="emerVal" class="badge-val">3,000</span></label>
+      <input type="range" id="emerInput" min="1000" max="6000" step="500" value="3000" oninput="recalcHomeBudget()">
+    </div>
+  </div>
+
+  <!-- ส่วนผลการทดลองและการแนะนำทางอ้อม (เฟรม 2) -->
+  <div class="card-box col-right">
+    <h3>สรุปผลการบริหารงบประมาณและข้อคิดทางการเงินในบ้าน</h3>
+    <div class="stat-grid">
+      <div class="stat-cell"><strong>รายรับครอบครัว:</strong> 30,000 บาท</div>
+      <div class="stat-cell"><strong>ค่าไฟฟ้าประเมิน:</strong> <span id="elecCostText" style="font-weight:bold; color:#d97706;">2,400</span> บาท</div>
+      <div class="stat-cell"><strong>ค่าใช้จ่ายรวม:</strong> <span id="totalExpText" style="font-weight:bold; color:#dc2626;">23,400</span> บาท</div>
+      <div class="stat-cell"><strong>เงินออมสุทธิคงเหลือ:</strong> <span id="netSaveText" style="font-weight:bold; color:#16a34a;">3,600</span> บาท</div>
+    </div>
+
+    <h4 style="margin-top: 15px; margin-bottom: 8px; color: #0284c7;">ข้อสังเกตและแนวทางสำหรับครอบครัว:</h4>
+    <ul style="font-size: 13.5px; color: #475569; padding-left: 20px; margin: 0;">
+      <li style="margin-bottom: 6px;">
+        <strong>การร่วมมือลดค่าใช้จ่าย:</strong> การปิดไฟและปรับแอร์ขึ้น <span class="formula-txt">1&deg;C</span> หรือลดชั่วโมงการเปิด สามารถลดค่าไฟฟ้ารายเดือนของครอบครัวลงได้ทันทีถึง 10%–15%
+      </li>
+      <li style="margin-bottom: 6px;">
+        <strong>แยกแยะค่าใช้จ่ายในบ้าน:</strong> ค่าอาหาร ค่าน้ำ ค่าไฟ เป็น <em>"รายจ่ายจำเป็น"</em> ส่วนการทานข้าวนอกบ้านหรือการท่องเที่ยวเป็น <em>"รายจ่ายผันแปรเพื่อความสุข"</em> ที่ปรับลดได้ยามจำเป็น
+      </li>
+      <li style="margin-bottom: 6px;">
+        <strong>วินัยเงินสำรองฉุกเฉิน:</strong> ครอบครัวควรมีเงินออมสำรองเผื่อเหตุการณ์ไม่คาดฝัน (เช่น สมาชิกในบ้านเจ็บป่วย หรือเครื่องใช้ไฟฟ้าพัง) อย่างน้อย 3–6 เท่าของรายจ่ายต่อเดือน
+      </li>
+    </ul>
+  </div>
+
+    <!-- ข้อสอบ 5 ข้อ เรียงระดับความสามารถ 1 - 5 (เฟรม 3) -->
+  <div class="card-box col-full">
+    <h3>แบบทดสอบวัดความฉลาดรู้ทางการเงินสำหรับครอบครัว (ข้อสอบปรนัย 4 ตัวเลือก จำนวน 5 ข้อ)</h3>
+
+    <!-- ข้อ 1 (ระดับ 1) -->
+    <div class="question-item">
+      <div class="meta-line1">ความฉลาดรู้ทางการเงิน (Financial Literacy)&nbsp;&nbsp;&nbsp;บริบทบ้านและครอบครัว (Home and family)</div>
+      <div class="meta-line2">เนื้อหา: การจำแนกประเภทรายจ่ายจำเป็นและรายจ่ายตามความต้องการในบ้าน | ระดับชั้น:   -  | ระดับความสามารถที่ 1</div>
+      <div class="q-text">
+        1. รายการค่าใช้จ่ายในบ้านข้อใด จัดเป็น "รายจ่ายที่จำเป็น (Needs)" ต่อการดำรงชีวิตของสมาชิกในครอบครัวทั้งหมด
+      </div>
+      <ul class="options-list">
+        <li>ก. ค่าสมาชิกบริการดูภาพยนตร์ออนไลน์รายเดือน และค่าตกแต่งสวนหย่อมหน้าบ้าน</li>
+        <li>ข. ค่าน้ำประปา ค่าไฟฟ้า ค่าข้าวสาร และยารักษาโรคประจำบ้าน</li>
+        <li>ค. ค่าเดินทางไปท่องเที่ยวต่างจังหวัดในช่วงวันหยุดยาว และค่าของเล่นของลูก</li>
+        <li>ง. ค่าเปลี่ยนสมาร์ตโฟนเครื่องใหม่ของสมาชิกในบ้านทุกปี และค่าสั่งอาหารมื้อพิเศษ</li>
+      </ul>
+      <div class="ans-box">
+        <strong>เฉลย: ข. ค่าน้ำประปา ค่าไฟฟ้า ค่าข้าวสาร และยารักษาโรคประจำบ้าน</strong><br>
+        <strong>คำอธิบาย:</strong> ปัจจัยสี่และสาธารณูปโภคพื้นฐาน (น้ำประปา ไฟฟ้า อาหาร ยารักษาโรค) เป็นสิ่งจำเป็นต่อการดำรงชีพของทุกครอบครัว ส่วนบริการบันเทิงและการท่องเที่ยวจัดเป็นความต้องการ (Wants)
+      </div>
+    </div>
+
+    <!-- ข้อ 2 (ระดับ 2) -->
+    <div class="question-item">
+      <div class="meta-line1">ความฉลาดรู้ทางการเงิน (Financial Literacy)&nbsp;&nbsp;&nbsp;บริบทบ้านและครอบครัว (Home and family)</div>
+      <div class="meta-line2">เนื้อหา: การจัดทำและคำนวณงบประมาณครอบครัวอย่างง่าย | ระดับชั้น:   -  | ระดับความสามารถที่ 2</div>
+      <div class="q-text">
+        2. ในเดือนมีนาคม ครอบครัวสุขใจมีรายรับรวม <span class="formula-txt">30,000</span> บาท มีรายจ่ายค่าอาหาร <span class="formula-txt">13,500</span> บาท ค่าน้ำค่าไฟ <span class="formula-txt">2,800</span> บาท ค่าเดินทาง <span class="formula-txt">3,200</span> บาท และค่าใช้จ่ายเบ็ดเตล็ด <span class="formula-txt">2,500</span> บาท ครอบครัวนี้จะเหลือเงินออมประจำเดือนกี่บาท
+      </div>
+      <ul class="options-list">
+        <li>ก. 7,000 บาท</li>
+        <li>ข. 8,000 บาท</li>
+        <li>ค. 8,500 บาท</li>
+        <li>ง. 9,000 บาท</li>
+      </ul>
+      <div class="ans-box">
+        <strong>เฉลย: ข. 8,000 บาท</strong><br>
+        <strong>คำอธิบาย:</strong><br>
+        รายจ่ายรวม = <span class="formula-txt">13,500 + 2,800 + 3,200 + 2,500 = 22,000</span> บาท<br>
+        เงินออมสุทธิ = <span class="formula-txt">30,000 - 22,000 = 8,000</span> บาท
+      </div>
+    </div>
+
+    <!-- ข้อ 3 (ระดับ 3) -->
+    <div class="question-item">
+      <div class="meta-line1">ความฉลาดรู้ทางการเงิน (Financial Literacy)&nbsp;&nbsp;&nbsp;บริบทบ้านและครอบครัว (Home and family)</div>
+      <div class="meta-line2">เนื้อหา: การคำนวณร้อยละและสัดส่วนของงบประมาณค่าใช้จ่ายในครัวเรือน | ระดับชั้น:   -  | ระดับความสามารถที่ 3</div>
+      <div class="q-text">
+        3. หากครอบครัวตั้งเป้าหมายทางการเงินว่าจะต้องแบ่งเงินออมไว้เป็น "กองทุนสำรองฉุกเฉินของครอบครัว" คิดเป็นร้อยละ <span class="formula-txt">15%</span> ของรายรับรวม <span class="formula-txt">30,000</span> บาททุกเดือน ครอบครัวต้องเก็บเงินเข้ากองทุนนี้เดือนละกี่บาท
+      </div>
+      <ul class="options-list">
+        <li>ก. 3,500 บาท</li>
+        <li>ข. 4,000 บาท</li>
+        <li>ค. 4,500 บาท</li>
+        <li>ง. 5,000 บาท</li>
+      </ul>
+      <div class="ans-box">
+        <strong>เฉลย: ค. 4,500 บาท</strong><br>
+        <strong>คำอธิบาย:</strong> คำนวณร้อยละ:<br>
+        <span class="formula-txt">30,000 &times; (15 / 100) = 4,500</span> บาทต่อเดือน
+      </div>
+    </div>
+
+    <!-- ข้อ 4 (ระดับ 4) -->
+    <div class="question-item">
+      <div class="meta-line1">ความฉลาดรู้ทางการเงิน (Financial Literacy)&nbsp;&nbsp;&nbsp;บริบทบ้านและครอบครัว (Home and family)</div>
+      <div class="meta-line2">เนื้อหา: การคำนวณดอกเบี้ยทบต้นของเงินออมเพื่อการศึกษาและเป้าหมายครอบครัว | ระดับชั้น:   -  | ระดับความสามารถที่ 4</div>
+      <div class="q-text">
+        4. พ่อและแม่เปิดบัญชีเงินฝากประจำสะสมทรัพย์เพื่อเป็นทุนการศึกษาของลูกจำนวน <span class="formula-txt">20,000</span> บาท โดยได้รับดอกเบี้ยทบต้นร้อยละ <span class="formula-txt">5%</span> ต่อปี หากไม่เคยถอนดอกเบี้ยหรือเงินต้นออกมาเลย เมื่อสิ้นสุดปีที่ 2 ครอบครัวนี้จะมีเงินรวมในบัญชีทั้งหมดกี่บาท
+      </div>
+      <ul class="options-list">
+        <li>ก. 21,000 บาท</li>
+        <li>ข. 22,000 บาท</li>
+        <li>ค. 22,050 บาท</li>
+        <li>ง. 22,100 บาท</li>
+      </ul>
+      <div class="ans-box">
+        <strong>เฉลย: ค. 22,050 บาท</strong><br>
+        <strong>คำอธิบาย:</strong><br>
+        - สิ้นปีที่ 1: ดอกเบี้ย = <span class="formula-txt">20,000 &times; 0.05 = 1,000</span> บาท &rarr; เงินรวม = 21,000 บาท<br>
+        - สิ้นปีที่ 2: ดอกเบี้ยทบต้นคิดจาก 21,000 บาท = <span class="formula-txt">21,000 &times; 0.05 = 1,050</span> บาท<br>
+        - เงินรวมสิ้นปีที่ 2 = <span class="formula-txt">21,000 + 1,050 = 22,050</span> บาท (หรือคำนวณจาก <span class="formula-txt">20,000 &times; (1.05)<sup>2</sup> = 22,050</span> บาท)
+      </div>
+    </div>
+
+    <!-- ข้อ 5 (ระดับ 5) -->
+    <div class="question-item">
+      <div class="meta-line1">ความฉลาดรู้ทางการเงิน (Financial Literacy)&nbsp;&nbsp;&nbsp;บริบทบ้านและครอบครัว (Home and family)</div>
+      <div class="meta-line2">เนื้อหา: การแก้ปัญหาที่ไม่เป็นกิจวัตรและการคาดการณ์ผลกระทบระยะยาวของความเสี่ยงในบ้าน | ระดับชั้น:   -  | ระดับความสามารถที่ 5</div>
+      <div class="q-text">
+        5. หลังคาบ้านของครอบครัวรั่ว ช่างประเมินว่าหากซ่อมแซมทันทีสัปดาห์นี้จะเสียค่าซ่อม 2,500 บาท แต่หากปล่อยทิ้งไว้จนเข้าฤดูฝนอีก 2 เดือน ฝ้าเพดานจะพังและอาจทำให้เฟอร์นิเจอร์เสียหาย ซึ่งต้องเสียค่าซ่อมแซมรวม 12,000 บาท หากครอบครัวมีเงินออมสำรองฉุกเฉินอยู่ 5,000 บาท การตัดสินใจทางการเงินข้อใดสมเหตุสมผลและลดความเสี่ยงต่อฐานะการเงินของครอบครัวได้ดีที่สุดในระยะยาว
+      </div>
+      <ul class="options-list">
+        <li>ก. รอให้พังในฤดูฝนแล้วค่อยกู้ยืมเงินนอกระบบ 12,000 บาท เพื่อไม่ต้องนำเงินออมสำรองมาใช้</li>
+        <li>ข. นำเงินออมสำรองฉุกเฉิน 2,500 บาทมาซ่อมทันที เพราะช่วยป้องกันความเสียหายในอนาคตและประหยัดเงินได้ถึง 9,500 บาท</li>
+        <li>ค. นำเงินออมสำรอง 5,000 บาทไปเสี่ยงซื้อสลากกินแบ่งรัฐบาลเพื่อหวังได้เงินก้อนใหญ่มาซ่อมบ้านทีเดียว</li>
+        <li>ง. ปล่อยทิ้งไว้โดยไม่ต้องซ่อมแซม เพราะถือว่าเป็นรายจ่ายฟุ่มเฟือยที่ไม่จำเป็นต่อชีวิตประจำวัน</li>
+      </ul>
+      <div class="ans-box">
+        <strong>เฉลย: ข. นำเงินออมสำรองฉุกเฉิน 2,500 บาทมาซ่อมทันที เพราะช่วยป้องกันความเสียหายในอนาคตและประหยัดเงินได้ถึง 9,500 บาท</strong><br>
+        <strong>คำอธิบาย:</strong> หน้าที่ของเงินสำรองฉุกเฉินคือใช้ป้องกันและแก้ไขความเสียหายเร่งด่วน การซ่อมแซมเชิงรุกช่วยหลีกเลี่ยงภาระค่าใช้จ่ายลุกลาม (<span class="formula-txt">12,000 - 2,500 = 9,500</span> บาท) และป้องกันไม่ให้ครอบครัวต้องเป็นหนี้สินในอนาคต
+      </div>
+    </div>
+
+  </div>
+</div>
+<script>
+function recalcHomeBudget() {
+  const groceries = parseInt(document.getElementById('groceriesInput').value);
+  const acHours = parseInt(document.getElementById('acHoursInput').value);
+  const leisure = parseInt(document.getElementById('leisureInput').value);
+  const emer = parseInt(document.getElementById('emerInput').value);
+
+  document.getElementById('groceriesVal').innerText = groceries.toLocaleString();
+  document.getElementById('acHoursVal').innerText = acHours;
+  document.getElementById('leisureVal').innerText = leisure.toLocaleString();
+  document.getElementById('emerVal').innerText = emer.toLocaleString();
+
+  // Electricity estimate: 800 base + 200 per ac hour
+  const elecCost = 800 + (acHours * 200);
+  document.getElementById('elecCostText').innerText = elecCost.toLocaleString();
+
+  const totalExpense = groceries + elecCost + leisure + emer;
+  document.getElementById('totalExpText').innerText = totalExpense.toLocaleString();
+
+  const netSavings = 30000 - totalExpense;
+  const netSaveEl = document.getElementById('netSaveText');
+  netSaveEl.innerText = netSavings.toLocaleString();
+  if (netSavings < 0) {
+    netSaveEl.style.color = "#dc2626";
+  } else {
+    netSaveEl.style.color = "#16a34a";
+  }
+}
+</script>
+
+</body>
+</html>
