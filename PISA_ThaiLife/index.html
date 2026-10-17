@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ศูนย์รวมแบบทดสอบความฉลาดรู้ (PISA Literacy Portal)</title>
+  <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      font-family: 'Sarabun', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: #f1f5f9;
+      color: #1e293b;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Header สไตล์โมเดิร์น */
+    header {
+      background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #334155 100%);
+      color: #ffffff;
+      padding: 3rem 1.5rem 2.8rem;
+      text-align: center;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+      position: relative;
+    }
+    header h1 {
+      font-size: 2.2rem;
+      font-weight: 700;
+      margin-bottom: 0.6rem;
+      letter-spacing: -0.5px;
+      background: linear-gradient(90deg, #ffffff, #cbd5e1);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    header p.subtitle {
+      font-size: 1.05rem;
+      color: #94a3b8;
+      max-width: 650px;
+      margin: 0 auto 0.75rem;
+    }
+    .badge-thai-context {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(56, 189, 248, 0.12);
+      border: 1px solid rgba(56, 189, 248, 0.35);
+      color: #38bdf8;
+      font-size: 0.92rem;
+      font-weight: 500;
+      padding: 0.35rem 1rem;
+      border-radius: 9999px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    }
+    .badge-thai-context svg {
+      width: 16px;
+      height: 16px;
+      fill: currentColor;
+    }
+
+    /* Grid Layout สำหรับการ์ด */
+    .container {
+      max-width: 1200px;
+      margin: -25px auto 40px;
+      padding: 0 1.5rem;
+      flex: 1;
+      width: 100%;
+    }
+    .cards-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(270px, 1fr));
+      gap: 1.5rem;
+    }
+
+    /* สไตล์การ์ด */
+    .card {
+      background: #ffffff;
+      border-radius: 16px;
+      overflow: hidden;
+      text-decoration: none;
+      color: inherit;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+      border: 1px solid rgba(226, 232, 240, 0.8);
+      display: flex;
+      flex-direction: column;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      position: relative;
+    }
+    .card:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 12px 24px rgba(0, 0, 0, 0.12);
+      border-color: rgba(99, 102, 241, 0.4);
+    }
+
+    /* ส่วนหัวของการ์ดพร้อมแถบสีและไอคอน */
+    .card-banner {
+      height: 100px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+    .card-icon {
+      width: 48px;
+      height: 48px;
+      background: rgba(255, 255, 255, 0.2);
+      backdrop-filter: blur(8px);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+    }
+    .card-icon svg {
+      width: 28px;
+      height: 28px;
+      fill: currentColor;
+    }
+
+    /* เนื้อหาการ์ด */
+    .card-body {
+      padding: 1.25rem 1.4rem;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+    .card-title-th {
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: #1e293b;
+      margin-bottom: 0.35rem;
+      line-height: 1.4;
+    }
+    .card-title-en {
+      font-size: 0.85rem;
+      color: #64748b;
+      font-weight: 500;
+      margin-bottom: 1rem;
+    }
+    .card-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-top: 1px solid #f1f5f9;
+      padding-top: 0.85rem;
+      margin-top: 0.5rem;
+      font-size: 0.85rem;
+      font-weight: 600;
+    }
+    .card-btn-text {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: gap 0.2s ease;
+    }
+    .card:hover .card-btn-text {
+      gap: 10px;
+    }
+
+    /* ธีมสีแยกตามรายวิชา */
+    /* 1. คณิต */
+    .theme-math .card-banner { background: linear-gradient(135deg, #0f766e, #14b8a6); }
+    .theme-math .card-footer { color: #0f766e; }
+    /* 2. วิทย์ */
+    .theme-science .card-banner { background: linear-gradient(135deg, #1e3c72, #2563eb); }
+    .theme-science .card-footer { color: #1e3c72; }
+    /* 3. การอ่าน */
+    .theme-reading .card-banner { background: linear-gradient(135deg, #374151, #6b7280); }
+    .theme-reading .card-footer { color: #374151; }
+    /* 4. การเงิน */
+    .theme-finance .card-banner { background: linear-gradient(135deg, #15803d, #22c55e); }
+    .theme-finance .card-footer { color: #15803d; }
+    /* 5. AI */
+    .theme-ai .card-banner { background: linear-gradient(135deg, #6d28d9, #a855f7); }
+    .theme-ai .card-footer { color: #6d28d9; }
+    /* 6. Digital & Tech */
+    .theme-digital .card-banner { background: linear-gradient(135deg, #1e293b, #4f46e5); }
+    .theme-digital .card-footer { color: #4f46e5; }
+    /* 7. Media & AI */
+    .theme-media-ai .card-banner { background: linear-gradient(135deg, #0369a1, #06b6d4); }
+    .theme-media-ai .card-footer { color: #0369a1; }
+    /* 8. Climate */
+    .theme-climate .card-banner { background: linear-gradient(135deg, #047857, #10b981); }
+    .theme-climate .card-footer { color: #047857; }
+
+    footer {
+      text-align: center;
+      padding: 1.5rem;
+      color: #94a3b8;
+      font-size: 0.85rem;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>ศูนย์รวมแบบทดสอบความฉลาดรู้</h1>
+    <p class="subtitle">ระบบการประเมินสมรรถนะและความฉลาดรู้ตามแนวทางการประเมิน PISA</p>
+    <div class="badge-thai-context">
+      <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/></svg>
+       อิงตามบริบทของประเทศไทย 
+    </div>
+  </header>
+
+  <main class="container">
+    <div class="cards-grid">
+
+      <!-- 1. คณิตศาสตร์ -->
+      <a href="PISA_Mathematical%20Literacy/index.html" class="card theme-math">
+        <div class="card-banner">
+          <div class="card-icon">
+            <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-6 2h5v3h-5V5zm-6 0h5v3H7V5zm0 5h5v3H7v-3zm6 0h5v3h-5v-3zm-6 5h5v3H7v-3zm6 0h5v3h-5v-3z"/></svg>
+          </div>
+        </div>
+        <div class="card-body">
+          <div>
+            <div class="card-title-th">คณิตศาสตร์</div>
+            <div class="card-title-en">(Mathematical Literacy)</div>
+          </div>
+          <div class="card-footer">
+            <span>เข้าสู่แบบทดสอบ</span>
+            <span class="card-btn-text">➔</span>
+          </div>
+        </div>
+      </a>
+
+      <!-- 2. วิทยาศาสตร์ -->
+      <a href="PISA_Science%20Literacy/index.html" class="card theme-science">
+        <div class="card-banner">
+          <div class="card-icon">
+            <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm6 12H6v-1.4c0-2 4-3.1 6-3.1s6 1.1 6 3.1V18z"/></svg>
+          </div>
+        </div>
+        <div class="card-body">
+          <div>
+            <div class="card-title-th">วิทยาศาสตร์</div>
+            <div class="card-title-en">(Science Literacy)</div>
+          </div>
+          <div class="card-footer">
+            <span>เข้าสู่แบบทดสอบ</span>
+            <span class="card-btn-text">➔</span>
+          </div>
+        </div>
+      </a>
+
+      <!-- 3. การอ่าน -->
+      <a href="PISA_Reading%20Literacy/index.html" class="card theme-reading">
+        <div class="card-banner">
+          <div class="card-icon">
+            <svg viewBox="0 0 24 24"><path d="M18 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM6 4h5v8l-2.5-1.5L6 12V4z"/></svg>
+          </div>
+        </div>
+        <div class="card-body">
+          <div>
+            <div class="card-title-th">การอ่าน</div>
+            <div class="card-title-en">(Reading Literacy)</div>
+          </div>
+          <div class="card-footer">
+            <span>เข้าสู่แบบทดสอบ</span>
+            <span class="card-btn-text">➔</span>
+          </div>
+        </div>
+      </a>
+
+      <!-- 4. ความฉลาดรู้ทางการเงิน -->
+      <a href="PISA_Financial%20Literacy/index.html" class="card theme-finance">
+        <div class="card-banner">
+          <div class="card-icon">
+            <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 16.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/></svg>
+          </div>
+        </div>
+        <div class="card-body">
+          <div>
+            <div class="card-title-th">ความฉลาดรู้ทางการเงิน</div>
+            <div class="card-title-en">(Financial Literacy)</div>
+          </div>
+          <div class="card-footer">
+            <span>เข้าสู่แบบทดสอบ</span>
+            <span class="card-btn-text">➔</span>
+          </div>
+        </div>
+      </a>
+
+      <!-- 5. ความฉลาดรู้ด้านปัญญาประดิษฐ์ -->
+      <a href="PISA_AI%20Literacy/index.html" class="card theme-ai">
+        <div class="card-banner">
+          <div class="card-icon">
+            <svg viewBox="0 0 24 24"><path d="M19 9l1.25-2.75L23 5l-2.75-1.25L19 1l-1.25 2.75L15 5l2.75 1.25L19 9zm-7.5.5L9 4 6.5 9.5 1 12l5.5 2.5L9 20l2.5-5.5L17 12l-5.5-2.5zM19 15l-1.25 2.75L15 19l2.75 1.25L19 23l1.25-2.75L23 19l-2.75-1.25L19 15z"/></svg>
+          </div>
+        </div>
+        <div class="card-body">
+          <div>
+            <div class="card-title-th">ความฉลาดรู้ด้านปัญญาประดิษฐ์</div>
+            <div class="card-title-en">(AI Literacy)</div>
+          </div>
+          <div class="card-footer">
+            <span>เข้าสู่แบบทดสอบ</span>
+            <span class="card-btn-text">➔</span>
+          </div>
+        </div>
+      </a>
+
+      <!-- 6. ดิจิทัลและเทคโนโลยี -->
+      <a href="PISA_Digital%26Technology%20Literacy/index.html" class="card theme-digital">
+        <div class="card-banner">
+          <div class="card-icon">
+            <svg viewBox="0 0 24 24"><path d="M20 18c1.1 0 1.99-.9 1.99-2L22 5c0-1.1-.9-2-2-2H4c-1.1 0-2 .9-2 2v11c0 1.1.9 2 2 2H0c0 1.1.9 2 2 2h20c1.1 0 2-.9 2-2h-4zM4 5h16v11H4V5zm8 14c-.55 0-1-.45-1-1s.45-1 1-1 1 .45 1 1-.45 1-1 1z"/></svg>
+          </div>
+        </div>
+        <div class="card-body">
+          <div>
+            <div class="card-title-th" style="font-size: 1.05rem;">ความฉลาดรู้เรื่องดิจิทัลและเทคโนโลยี</div>
+            <div class="card-title-en">(Digital & Technology Literacy)</div>
+          </div>
+          <div class="card-footer">
+            <span>เข้าสู่แบบทดสอบ</span>
+            <span class="card-btn-text">➔</span>
+          </div>
+        </div>
+      </a>
+
+      <!-- 7. สื่อและปัญญาประดิษฐ์ -->
+      <a href="PISA_Media%20%26%20AI%20Literacy/index.html" class="card theme-media-ai">
+        <div class="card-banner">
+          <div class="card-icon">
+            <svg viewBox="0 0 24 24"><path d="M12 2a2 2 0 0 1 2 2c0 .74-.4 1.38-1 1.72V7h2a3 3 0 0 1 3 3v1h1a2 2 0 0 1 2 2v2a2 2 0 0 1-2 2h-1v1a3 3 0 0 1-3 3h-2v1.28c.6.34 1 .98 1 1.72a2 2 0 0 1-4 0c0-.74.4-1.38 1-1.72V20H9a3 3 0 0 1-3-3v-1H5a2 2 0 0 1-2-2v-2a2 2 0 0 1 2-2h1v-1a3 3 0 0 1 3-3h2V5.72c-.6-.34-1-.98-1-1.72a2 2 0 0 1 2-2m-1 7H9a1 1 0 0 0-1 1v1h3V9m4 0v2h3v-1a1 1 0 0 0-1-1h-2m-4 4H9v2h2v-2m4 0v2h2a1 1 0 0 0 1-1v-1h-3z"/></svg>
+          </div>
+        </div>
+        <div class="card-body">
+          <div>
+            <div class="card-title-th">ความฉลาดรู้ด้านสื่อและ AI</div>
+            <div class="card-title-en">(Media & AI Literacy)</div>
+          </div>
+          <div class="card-footer">
+            <span>เข้าสู่แบบทดสอบ</span>
+            <span class="card-btn-text">➔</span>
+          </div>
+        </div>
+      </a>
+
+      <!-- 8. สภาพภูมิอากาศ -->
+      <a href="PISA_Climate%20Literacy/index.html" class="card theme-climate">
+        <div class="card-banner">
+          <div class="card-icon">
+            <svg viewBox="0 0 24 24"><path d="M17 8C8 10 5.9 16.17 3.82 21.34L5.71 22l1-2.3A4.49 4.49 0 0 0 8 20C19 20 22 3 22 3c-1 2-8 2.25-13 3.25S2 11.5 2 13.5s1.75 3.75 1.75 3.75C7 8 17 8 17 8z"/></svg>
+          </div>
+        </div>
+        <div class="card-body">
+          <div>
+            <div class="card-title-th">ความรู้เรื่องสภาพภูมิอากาศ</div>
+            <div class="card-title-en">(Climate Literacy)</div>
+          </div>
+          <div class="card-footer">
+            <span>เข้าสู่แบบทดสอบ</span>
+            <span class="card-btn-text">➔</span>
+          </div>
+        </div>
+      </a>
+
+    </div>
+  </main>
+
+  <footer>
+    <p>© พัฒนาขึ้นเพื่อส่งเสริมและยกระดับสมรรถนะความฉลาดรู้ (PISA) อิงบริบทไทย </p>
+  </footer>
+
+</body>
+</html>
