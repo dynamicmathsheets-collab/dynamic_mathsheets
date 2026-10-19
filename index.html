@@ -3,113 +3,192 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Dynamic Mathsheets</title>
+  <title>Dynamic Mathsheets - Portal</title>
   <style>
     * {
       box-sizing: border-box;
       margin: 0;
       padding: 0;
-      font-family: 'Sarabun', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      font-family: 'Sarabun', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     }
 
     body {
-      /* พื้นหลังโทนสว่างนุ่มนวล ไม่สะท้อนตา อมเขียวธรรมชาติจางๆ */
-      background-color: #f8faf8;
-      background: radial-gradient(circle at center, #ffffff 0%, #f7faf8 55%, #edf3ef 100%);
-      color: #2d3b34;
+      /* โทนมืด อึมครึม ลึกลับ */
+      background: radial-gradient(circle at 50% 30%, #151a1e 0%, #0c0f12 60%, #050708 100%);
+      color: #c4d1d9;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
       min-height: 100vh;
-      padding: 20px;
+      padding: 24px;
+      overflow-x: hidden;
+    }
+
+    /* บรรยากาศหมอกควัน/แสงเรืองลึกลับด้านหลัง */
+    body::before {
+      content: "";
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: radial-gradient(circle at 50% 50%, rgba(30, 58, 47, 0.12) 0%, transparent 70%);
+      pointer-events: none;
+      z-index: 0;
     }
 
     .container {
+      position: relative;
+      z-index: 1;
       width: 100%;
-      max-width: 650px;
+      max-width: 540px;
+      background: rgba(18, 24, 28, 0.75);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-radius: 16px;
+      padding: 40px 32px;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.7),
+                  inset 0 1px 1px rgba(255, 255, 255, 0.05);
+    }
+
+    .header {
       text-align: center;
+      margin-bottom: 30px;
     }
 
     h1 {
-      color: #234233; /* เขียวเข้มสุภาพ อ่านชัดแต่นุ่มนวล */
-      font-size: 32px;
-      font-weight: 500;
-      margin-bottom: 30px;
-      letter-spacing: -0.5px;
+      color: #e2ecf2;
+      font-size: 26px;
+      font-weight: 600;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      text-shadow: 0 0 12px rgba(99, 153, 131, 0.35);
+      margin-bottom: 6px;
     }
 
-    /* กล่องสำหรับช่องพิมพ์ข้อความ */
-    .input-wrapper {
-      background: #ffffff;
-      padding: 8px 18px 8px 24px;
-      border-radius: 50px;
-      box-shadow: 0 2px 14px rgba(0, 0, 0, 0.05); /* เงานุ่มจางๆ สบายตา */
-      display: flex;
-      align-items: center;
+    .subtitle {
+      font-size: 12px;
+      color: #5d707c;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+    }
+
+    /* ฟอร์มและช่องกรอกข้อมูล */
+    .form-group {
+      margin-bottom: 22px;
+      text-align: left;
+    }
+
+    label {
+      display: block;
+      font-size: 13.5px;
+      color: #8da1ad;
+      margin-bottom: 8px;
+      letter-spacing: 0.3px;
+    }
+
+    .input-box {
       width: 100%;
-      border: 1px solid #dbe6df;
-      transition: all 0.2s ease;
-    }
-
-    .input-wrapper:focus-within {
-      border-color: #7da890;
-      box-shadow: 0 3px 18px rgba(0, 0, 0, 0.08);
-    }
-
-    /* ช่องพิมพ์ข้อความ */
-    textarea {
-      flex-grow: 1;
-      border: none;
+      background: rgba(10, 14, 17, 0.7);
+      border: 1px solid #232d34;
+      border-radius: 10px;
+      color: #e4edf2;
+      font-size: 15px;
+      padding: 12px 16px;
       outline: none;
-      font-size: 16px;
-      color: #2d3b34;
-      padding: 12px 0;
-      height: 48px;
-      resize: none;
-      background: transparent;
-      line-height: 24px;
+      transition: all 0.25s ease;
+      box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.4);
     }
 
-    textarea::placeholder {
-      color: #9eb0a6;
+    .input-box:focus {
+      border-color: #3e6b56;
+      background: rgba(12, 17, 21, 0.95);
+      box-shadow: 0 0 12px rgba(62, 107, 86, 0.35),
+                  inset 0 2px 4px rgba(0, 0, 0, 0.5);
     }
 
-    /* ปุ่มส่งคำสั่ง */
+    .input-box::placeholder {
+      color: #43515b;
+      font-size: 14px;
+    }
+
+    textarea.input-box {
+      min-height: 100px;
+      resize: vertical;
+      line-height: 1.6;
+    }
+
+    /* ปุ่มกดส่งข้อมูล */
     button {
-      background: #edf5f0;
-      border: 1px solid #d4e3d9;
-      color: #24523a;
-      cursor: pointer;
+      width: 100%;
+      margin-top: 8px;
+      padding: 14px;
+      background: linear-gradient(180deg, #1f382c 0%, #13241c 100%);
+      border: 1px solid #335946;
+      border-radius: 10px;
+      color: #bfe5d0;
       font-size: 15px;
       font-weight: 600;
-      padding: 9px 20px;
-      border-radius: 50px;
-      transition: all 0.2s ease;
-      margin-left: 10px;
-      white-space: nowrap;
+      letter-spacing: 1px;
+      cursor: pointer;
+      transition: all 0.25s ease;
+      text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
     }
 
     button:hover {
-      background-color: #3b6e52;
-      border-color: #3b6e52;
-      color: #ffffff;
+      background: linear-gradient(180deg, #284c3b 0%, #182e23 100%);
+      border-color: #4a7e64;
+      color: #e8f7ee;
+      box-shadow: 0 0 20px rgba(50, 120, 85, 0.35);
     }
 
-    /* ส่วนติดต่อทีมพัฒนา */
+    button:active {
+      transform: translateY(1px);
+    }
+
+    button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      box-shadow: none;
+    }
+
+    /* กล่องข้อความแจ้งเตือนสถานะ */
+    .status-msg {
+      margin-top: 15px;
+      font-size: 13.5px;
+      text-align: center;
+      display: none;
+      letter-spacing: 0.2px;
+    }
+
+    .status-msg.success {
+      color: #6ed49b;
+    }
+
+    .status-msg.error {
+      color: #e57373;
+    }
+
+    /* ส่วนติดต่อด้านล่าง */
     .contact-info {
-      margin-top: 28px;
-      font-size: 14px;
-      color: #6d7f75;
+      margin-top: 30px;
+      text-align: center;
+      font-size: 12px;
+      color: #495861;
+      letter-spacing: 0.5px;
     }
 
     .contact-info a {
-      color: #2e6648;
+      color: #627b8a;
       text-decoration: none;
-      font-weight: 500;
+      transition: color 0.2s ease;
     }
 
     .contact-info a:hover {
+      color: #8daab9;
       text-decoration: underline;
     }
   </style>
@@ -117,34 +196,86 @@
 <body>
 
   <div class="container">
-    <h1>Dynamic Mathsheets</h1>
-
-    <div class="input-wrapper">
-      <textarea id="commandInput" placeholder="พิมพ์คำสั่งหรือข้อความที่นี่..."></textarea>
-      <button type="button" onclick="sendCommand()">ส่งคำสั่ง</button>
+    <div class="header">
+      <h1>Dynamic Mathsheets</h1>
+      <div class="subtitle">Access Point / Secure Relay</div>
     </div>
 
+    <!-- ช่องที่ 1: ข้อความ -->
+    <div class="form-group">
+      <label for="messageInput">มีอะไรอยากให้เราช่วยหรือเปล่า หรือ เป็นสมาชิกเราอยู่แล้ว</label>
+      <textarea id="messageInput" class="input-box" placeholder="ระบุรายละเอียด หรือรหัสสมาชิก / ความต้องการของคุณที่นี่..."></textarea>
+    </div>
+
+    <!-- ช่องที่ 2: อีเมล -->
+    <div class="form-group">
+      <label for="emailInput">อีเมลติดต่อกลับ</label>
+      <input type="email" id="emailInput" class="input-box" placeholder="name@domain.com" autocomplete="off">
+    </div>
+
+    <button type="button" id="submitBtn" onclick="sendData()">ส่งข้อมูล</button>
+
+    <div id="statusMessage" class="status-msg"></div>
+
     <div class="contact-info">
-      ติดต่อทีมผู้พัฒนา: 
+      Secure Relay Channel: 
       <a href="mailto:dynamic.mathsheets@gmail.com">dynamic.mathsheets@gmail.com</a>
     </div>
   </div>
 
   <script>
-    function sendCommand() {
-      const input = document.getElementById('commandInput').value.trim();
-      if (!input) return;
+    // วาง Web App URL จาก Google Apps Script ตรงนี้
+    const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbx3YnE3bd46XOnsV3l_WEYdR25IzTv3tLFEgt2XodXN_RD6CD_fYkV-obwiFkRB6ei4/exec';
 
-      alert('ส่งคำสั่งเรียบร้อย: ' + input);
-      document.getElementById('commandInput').value = '';
+    async function sendData() {
+      const message = document.getElementById('messageInput').value.trim();
+      const email = document.getElementById('emailInput').value.trim();
+      const submitBtn = document.getElementById('submitBtn');
+      const statusMsg = document.getElementById('statusMessage');
+
+      // ตรวจสอบค่าว่าง
+      if (!message || !email) {
+        showStatus('กรุณากรอกข้อมูลให้ครบถ้วนทั้งสองช่อง', 'error');
+        return;
+      }
+
+      // ปิดปุ่มชั่วคราวระหว่างส่ง
+      submitBtn.disabled = true;
+      submitBtn.innerText = 'กำลังส่งข้อมูลเข้าระบบ...';
+      statusMsg.style.display = 'none';
+
+      try {
+        await fetch(GOOGLE_SCRIPT_URL, {
+          method: 'POST',
+          mode: 'no-cors',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            message: message,
+            email: email
+          })
+        });
+
+        // แจ้งเตือนสำเร็จ
+        showStatus('ส่งข้อมูลเข้าระบบเรียบร้อยแล้ว', 'success');
+        document.getElementById('messageInput').value = '';
+        document.getElementById('emailInput').value = '';
+      } catch (error) {
+        console.error('Error:', error);
+        showStatus('เกิดข้อผิดพลาด ไม่สามารถส่งข้อมูลได้ในขณะนี้', 'error');
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.innerText = 'ส่งข้อมูล';
+      }
     }
 
-    document.getElementById('commandInput').addEventListener('keydown', function(e) {
-      if (e.key === 'Enter' && !e.shiftKey) {
-        e.preventDefault();
-        sendCommand();
-      }
-    });
+    function showStatus(text, type) {
+      const statusMsg = document.getElementById('statusMessage');
+      statusMsg.innerText = text;
+      statusMsg.className = 'status-msg ' + type;
+      statusMsg.style.display = 'block';
+    }
   </script>
 
 </body>
