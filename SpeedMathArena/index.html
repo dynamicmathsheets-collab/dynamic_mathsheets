@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ระบบช่วยจัดการแข่งขันคณิตคิดเร็ว</title>
+  <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Sarabun', sans-serif;
+    }
+
+    body {
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      overflow: hidden;
+      background-color: #0f172a;
+    }
+
+    /* แถบบาร์ด้านบน (Top Navigation Bar) */
+    .top-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: linear-gradient(90deg, #0f172a 0%, #1e293b 50%, #0f172a 100%);
+      padding: 8px 16px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+      border-bottom: 2px solid #334155;
+      z-index: 1000;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: #f8fafc;
+      font-size: 1.15rem;
+      font-weight: 800;
+      letter-spacing: 0.5px;
+      white-space: nowrap;
+    }
+
+    .brand-icon {
+      background: linear-gradient(135deg, #38bdf8, #6366f1);
+      width: 36px;
+      height: 36px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.2rem;
+      box-shadow: 0 2px 8px rgba(56, 189, 248, 0.4);
+    }
+
+    /* กลุ่มปุ่มสลับช่วงชั้น */
+    .nav-tabs {
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      padding: 4px;
+      scrollbar-width: none;
+    }
+    .nav-tabs::-webkit-scrollbar {
+      display: none;
+    }
+
+    .tab-btn {
+      background: #1e293b;
+      color: #94a3b8;
+      border: 1px solid #334155;
+      padding: 8px 16px;
+      border-radius: 8px;
+      font-size: 0.95rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s ease;
+      white-space: nowrap;
+    }
+
+    .tab-btn:hover {
+      background: #334155;
+      color: #f1f5f9;
+      transform: translateY(-1px);
+    }
+
+    /* ปุ่มที่กำลังเลือกอยู่แยกตามธีมสี */
+    .tab-btn.active.level-p1 {
+      background: linear-gradient(135deg, #2563eb, #1d4ed8);
+      color: #ffffff;
+      border-color: #60a5fa;
+      box-shadow: 0 0 12px rgba(37, 99, 235, 0.5);
+    }
+
+    .tab-btn.active.level-p4 {
+      background: linear-gradient(135deg, #0284c7, #0369a1);
+      color: #ffffff;
+      border-color: #38bdf8;
+      box-shadow: 0 0 12px rgba(2, 132, 199, 0.5);
+    }
+
+    .tab-btn.active.level-m1 {
+      background: linear-gradient(135deg, #4f46e5, #4338ca);
+      color: #ffffff;
+      border-color: #818cf8;
+      box-shadow: 0 0 12px rgba(79, 70, 229, 0.5);
+    }
+
+    .tab-btn.active.level-m4 {
+      background: linear-gradient(135deg, #059669, #047857);
+      color: #ffffff;
+      border-color: #34d399;
+      box-shadow: 0 0 12px rgba(5, 150, 105, 0.5);
+    }
+
+    /* ฝั่งเครื่องมือเสริม */
+    .tools {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .tool-btn {
+      background: #334155;
+      color: #f8fafc;
+      border: 1px solid #475569;
+      padding: 8px 12px;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      transition: 0.2s;
+    }
+
+    .tool-btn:hover {
+      background: #475569;
+    }
+
+    /* พื้นที่แสดงหน้าจอสนามสอบ (Iframe Container) */
+    .content-area {
+      flex: 1;
+      width: 100%;
+      height: 100%;
+      position: relative;
+      background-color: #020617;
+    }
+
+    iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+      display: block;
+    }
+
+    /* โหลดเดอร์เล็กๆ เวลาสลับหน้า */
+    .loading-hint {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      color: #64748b;
+      font-size: 1.1rem;
+      z-index: 0;
+      pointer-events: none;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- แถบบาร์ด้านบน -->
+  <header class="top-bar">
+    <div class="brand">
+      <div class="brand-icon">⚡</div>
+      <span>ระบบจัดการแข่งขันคณิตคิดเร็ว</span>
+    </div>
+
+    <!-- แถบเลือกระดับชั้น -->
+    <nav class="nav-tabs">
+      <button class="tab-btn active level-p1" onclick="switchLevel(this, 'การแข่งขันคณิตคิดเร็ว ระดับประถมศึกษาตอนต้น.html', 'level-p1')">
+        📘 ป.1 – ป.3
+      </button>
+      <button class="tab-btn level-p4" onclick="switchLevel(this, 'การแข่งขันคณิตคิดเร็ว ระดับประถมศึกษาตอนปลาย.html', 'level-p4')">
+        📗 ป.4 – ป.6
+      </button>
+      <button class="tab-btn level-m1" onclick="switchLevel(this, 'การแข่งขันคณิตคิดเร็ว ระดับมัธยมศึกษาตอนต้น.html', 'level-m1')">
+        📙 ม.1 – ม.3
+      </button>
+      <button class="tab-btn level-m4" onclick="switchLevel(this, 'การแข่งขันคณิตคิดเร็ว ระดับมัธยมศึกษาตอนปลาย.html', 'level-m4')">
+        📕 ม.4 – ม.6
+      </button>
+    </nav>
+
+    <!-- ปุ่มควบคุมเสริม -->
+    <div class="tools">
+      <button class="tool-btn" onclick="reloadFrame()" title="รีเฟรชหน้าปัจจุบัน">
+        🔄 รีเซ็ตหน้านี้
+      </button>
+      <button class="tool-btn" onclick="toggleFullScreen()" title="เปิดเต็มจอ สำหรับโปรเจกเตอร์">
+        ⛶ จอเต็ม
+      </button>
+    </div>
+  </header>
+
+  <!-- หน้าจอสนามสอบที่ฝังผ่าน Iframe -->
+  <main class="content-area">
+    <div class="loading-hint">กำลังเปิดสนามสอบ...</div>
+    <iframe id="examFrame" src="การแข่งขันคณิตคิดเร็ว ระดับประถมศึกษาตอนต้น.html"></iframe>
+  </main>
+
+  <script>
+    function switchLevel(button, fileName, activeClass) {
+      // อัปเดตลิงก์ใน iframe
+      const frame = document.getElementById('examFrame');
+      frame.src = encodeURI(fileName);
+
+      // จัดการสถานะปุ่ม Active
+      document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.classList.remove('active', 'level-p1', 'level-p4', 'level-m1', 'level-m4');
+      });
+      button.classList.add('active', activeClass);
+    }
+
+    function reloadFrame() {
+      const frame = document.getElementById('examFrame');
+      frame.src = frame.src;
+    }
+
+    function toggleFullScreen() {
+      if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen().catch(err => {
+          alert(`ไม่สามารถเปิดโหมดเต็มจอได้: ${err.message}`);
+        });
+      } else {
+        if (document.exitFullscreen) {
+          document.exitFullscreen();
+        }
+      }
+    }
+  </script>
+</body>
+</html>
