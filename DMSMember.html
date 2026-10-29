@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ระบบสมัครสมาชิก - Dynamic Mathsheets</title>
+  <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #2563eb;
+      --primary-hover: #1d4ed8;
+      --bg-color: #f1f5f9;
+      --card-bg: #ffffff;
+      --text: #1e293b;
+      --border: #cbd5e1;
+      --error: #ef4444;
+      --success: #10b981;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Prompt', sans-serif;
+    }
+
+    body {
+      background-color: var(--bg-color);
+      color: var(--text);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 20px;
+      position: relative;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 580px;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
+
+    /* เฟรมที่ 1: หัวข้อระบบ */
+    .frame-header {
+      background: linear-gradient(135deg, #1e40af, #3b82f6);
+      color: #ffffff;
+      padding: 28px 24px;
+      border-radius: 16px;
+      text-align: center;
+      box-shadow: 0 8px 20px rgba(37, 99, 235, 0.2);
+    }
+
+    .frame-header h1 {
+      font-size: 1.5rem;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      margin-bottom: 6px;
+    }
+
+    .frame-header p {
+      font-size: 0.95rem;
+      opacity: 0.9;
+    }
+
+    /* เฟรมที่ 2: ฟอร์มรับข้อมูล */
+    .frame-form {
+      background: var(--card-bg);
+      padding: 32px 28px;
+      border-radius: 16px;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+    }
+
+    .meta-bar {
+      display: flex;
+      justify-content: space-between;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      padding: 10px 14px;
+      border-radius: 8px;
+      font-size: 0.85rem;
+      color: #64748b;
+      margin-bottom: 22px;
+    }
+
+    .form-group {
+      margin-bottom: 18px;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 6px;
+      font-size: 0.95rem;
+      font-weight: 500;
+    }
+
+    .required {
+      color: var(--error);
+    }
+
+    input[type="text"],
+    input[type="email"],
+    input[type="password"] {
+      width: 100%;
+      padding: 11px 14px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-size: 0.95rem;
+      color: var(--text);
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+    input[type="text"]:focus,
+    input[type="email"]:focus,
+    input[type="password"]:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+    }
+
+    .row {
+      display: flex;
+      gap: 14px;
+    }
+
+    .row .form-group {
+      flex: 1;
+    }
+
+    button.btn-submit {
+      width: 100%;
+      padding: 13px;
+      background-color: var(--primary);
+      color: #ffffff;
+      border: none;
+      border-radius: 8px;
+      font-size: 1rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background-color 0.2s;
+      margin-top: 10px;
+    }
+
+    button.btn-submit:hover {
+      background-color: var(--primary-hover);
+    }
+
+    button.btn-submit:disabled {
+      background-color: #94a3b8;
+      cursor: not-allowed;
+    }
+
+    .status-msg {
+      margin-top: 16px;
+      padding: 12px;
+      border-radius: 8px;
+      font-size: 0.95rem;
+      text-align: center;
+      display: none;
+    }
+
+    .status-msg.error {
+      display: block;
+      background-color: #fef2f2;
+      color: var(--error);
+      border: 1px solid #fecaca;
+    }
+
+    /* กล่องแจ้งเตือนกึ่งกลางหน้าจอ (Modal Popup) */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.6);
+      backdrop-filter: blur(4px);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 999;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.3s ease, visibility 0.3s ease;
+    }
+
+    .modal-overlay.active {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .modal-box {
+      background: #ffffff;
+      border-radius: 20px;
+      padding: 36px 28px;
+      width: 90%;
+      max-width: 420px;
+      text-align: center;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+      transform: scale(0.85);
+      transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    .modal-overlay.active .modal-box {
+      transform: scale(1);
+    }
+
+    .modal-icon {
+      width: 68px;
+      height: 68px;
+      background-color: #ecfdf5;
+      color: var(--success);
+      border-radius: 50%;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 34px;
+      margin-bottom: 18px;
+      box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2);
+    }
+
+    .modal-title {
+      font-size: 1.35rem;
+      font-weight: 600;
+      color: #0f172a;
+      margin-bottom: 8px;
+    }
+
+    .modal-desc {
+      font-size: 0.95rem;
+      color: #64748b;
+      margin-bottom: 24px;
+      line-height: 1.5;
+    }
+
+    .btn-modal-close {
+      background: var(--primary);
+      color: #ffffff;
+      border: none;
+      padding: 12px 28px;
+      border-radius: 10px;
+      font-size: 1rem;
+      font-weight: 500;
+      cursor: pointer;
+      width: 100%;
+      transition: background 0.2s;
+    }
+
+    .btn-modal-close:hover {
+      background: var(--primary-hover);
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <!-- เฟรมที่ 1: หัวข้อระบบ -->
+    <div class="frame-header">
+      <h1>ระบบสมัครสมาชิกของ Dynamic Mathsheets</h1>
+      <p>กรอกข้อมูลของท่านเพื่อลงทะเบียนเข้าสู่ระบบบริหารจัดการ</p>
+    </div>
+
+    <!-- เฟรมที่ 2: ฟอร์มรับข้อมูล -->
+    <div class="frame-form">
+      <div class="meta-bar">
+        <span>วันที่: <strong id="lblDate">กำลังตรวจสอบ...</strong></span>
+        <span>IP: <strong id="lblIp">กำลังค้นหา...</strong></span>
+      </div>
+
+      <form id="regForm">
+        <input type="hidden" id="Udate" name="Udate">
+        <input type="hidden" id="Uip" name="Uip">
+
+        <div class="form-group">
+          <label for="Uname">ชื่อ-สกุล <span class="required">*</span></label>
+          <input type="text" id="Uname" name="Uname" placeholder="ระบุชื่อและนามสกุล" required>
+        </div>
+
+        <div class="form-group">
+          <label for="Uemail">อีเมล (Email) <span class="required">*</span></label>
+          <input type="email" id="Uemail" name="Uemail" placeholder="example@email.com" required>
+        </div>
+
+        <!-- เพิ่มช่องรหัสผ่าน -->
+        <div class="form-group">
+          <label for="Upass">รหัสผ่าน (Password) <span class="required">*</span></label>
+          <input type="password" id="Upass" name="Upass" placeholder="กำหนดรหัสผ่านสำหรับเข้าใช้งาน" required>
+        </div>
+
+        <div class="form-group">
+          <label for="Ucompany">หน่วยงาน <span class="required">*</span></label>
+          <input type="text" id="Ucompany" name="Ucompany" placeholder="ชื่อโรงเรียน / สถาบันการศึกษา / หน่วยงาน" required>
+        </div>
+
+        <div class="row">
+          <div class="form-group">
+            <label for="Uprivate">จังหวัด <span class="required">*</span></label>
+            <input type="text" id="Uprivate" name="Uprivate" placeholder="เช่น ร้อยเอ็ด" required>
+          </div>
+
+          <div class="form-group">
+            <label for="Ucuntry">อำเภอ <span class="required">*</span></label>
+            <input type="text" id="Ucuntry" name="Ucuntry" placeholder="เช่น เมือง" required>
+          </div>
+        </div>
+
+        <button type="submit" id="btnSubmit" class="btn-submit">บันทึกข้อมูลการสมัคร</button>
+      </form>
+
+      <div id="statusMsg" class="status-msg"></div>
+    </div>
+  </div>
+
+  <!-- กล่องแสดงข้อความตรงกลางหน้าจอเมื่อสำเร็จ -->
+  <div id="successModal" class="modal-overlay">
+    <div class="modal-box">
+      <div class="modal-icon">✓</div>
+      <h2 class="modal-title">สมัครสมาชิกเรียบร้อยแล้ว</h2>
+      <p class="modal-desc">ข้อมูลของคุณถูกบันทึกลงสู่ระบบและเปิดสิทธิ์เข้าใช้งานเรียบร้อยแล้ว</p>
+      <button type="button" class="btn-modal-close" onclick="closeSuccessModal()">ตกลง</button>
+    </div>
+  </div>
+
+  <script>
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycby1xfgp5uhHnlB5spDJRrpRGWdaNnYOXc4yBIb3p12uMpAxEnNCk4E2u9AlmRtRg_Pz/exec";
+
+    function setupDateTime() {
+      const now = new Date();
+      const formatted = now.getFullYear() + "-" +
+        String(now.getMonth() + 1).padStart(2, '0') + "-" +
+        String(now.getDate()).padStart(2, '0') + " " +
+        String(now.getHours()).padStart(2, '0') + ":" +
+        String(now.getMinutes()).padStart(2, '0') + ":" +
+        String(now.getSeconds()).padStart(2, '0');
+
+      document.getElementById("Udate").value = formatted;
+      document.getElementById("lblDate").textContent = formatted;
+    }
+
+    async function fetchIp() {
+      try {
+        const res = await fetch("https://api.ipify.org?format=json");
+        const data = await res.json();
+        document.getElementById("Uip").value = data.ip;
+        document.getElementById("lblIp").textContent = data.ip;
+      } catch (e) {
+        document.getElementById("Uip").value = "-";
+        document.getElementById("lblIp").textContent = "ไม่สามารถระบุได้";
+      }
+    }
+
+    function showSuccessModal() {
+      document.getElementById("successModal").classList.add("active");
+    }
+
+    function closeSuccessModal() {
+      document.getElementById("successModal").classList.remove("active");
+    }
+
+    document.getElementById("regForm").addEventListener("submit", async function (e) {
+      e.preventDefault();
+
+      const btn = document.getElementById("btnSubmit");
+      const msg = document.getElementById("statusMsg");
+
+      const payload = {
+        Udate: document.getElementById("Udate").value,
+        Uip: document.getElementById("Uip").value,
+        Uname: document.getElementById("Uname").value.trim(),
+        Uemail: document.getElementById("Uemail").value.trim(),
+        Upass: document.getElementById("Upass").value.trim(),
+        Ucompany: document.getElementById("Ucompany").value.trim(),
+        Uprivate: document.getElementById("Uprivate").value.trim(),
+        Ucuntry: document.getElementById("Ucuntry").value.trim()
+      };
+
+      btn.disabled = true;
+      btn.textContent = "กำลังบันทึกข้อมูล...";
+      msg.style.display = "none";
+
+      try {
+        const response = await fetch(SCRIPT_URL, {
+          method: "POST",
+          headers: { "Content-Type": "text/plain;charset=utf-8" },
+          body: JSON.stringify(payload)
+        });
+
+        const result = await response.json();
+
+        if (result.status === "success") {
+          document.getElementById("regForm").reset();
+          setupDateTime();
+          showSuccessModal();
+        } else {
+          throw new Error(result.message || "เกิดข้อผิดพลาดในการบันทึก");
+        }
+      } catch (err) {
+        msg.className = "status-msg error";
+        msg.textContent = "เกิดข้อผิดพลาด: " + err.message;
+      } finally {
+        btn.disabled = false;
+        btn.textContent = "บันทึกข้อมูลการสมัคร";
+      }
+    });
+
+    setupDateTime();
+    fetchIp();
+  </script>
+</body>
+</html>
