@@ -3,280 +3,853 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Dynamic Mathsheets - Portal</title>
+  <title>Dynamic Math Sheets</title>
+  <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <style>
+    :root {
+      --primary: #2563eb;
+      --primary-hover: #1d4ed8;
+      --bg-color: #f8fafc;
+      --card-bg: #ffffff;
+      --text-main: #0f172a;
+      --text-sub: #475569;
+      --border: #e2e8f0;
+      --error: #ef4444;
+      --success: #10b981;
+    }
+
     * {
       box-sizing: border-box;
       margin: 0;
       padding: 0;
-      font-family: 'Sarabun', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      font-family: 'Prompt', sans-serif;
     }
 
     body {
-      /* โทนมืด อึมครึม ลึกลับ */
-      background: radial-gradient(circle at 50% 30%, #151a1e 0%, #0c0f12 60%, #050708 100%);
-      color: #c4d1d9;
+      background-color: var(--bg-color);
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* กล่องม่านปิดบังหน้าจอ (Overlay Lock) */
+    .lock-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.85);
+      backdrop-filter: blur(8px);
+      z-index: 9999;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+      transition: opacity 0.4s ease, visibility 0.4s ease;
+    }
+
+    .lock-overlay.unlocked {
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+    }
+
+    .login-modal {
+      background: #ffffff;
+      width: 100%;
+      max-width: 440px;
+      border-radius: 20px;
+      padding: 36px 30px;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.35);
+      text-align: center;
+    }
+
+    .login-modal h2 {
+      font-size: 1.45rem;
+      font-weight: 600;
+      color: var(--text-main);
+      margin-bottom: 6px;
+    }
+
+    .login-modal p {
+      font-size: 0.95rem;
+      color: var(--text-sub);
+      margin-bottom: 24px;
+    }
+
+    .form-group {
+      text-align: left;
+      margin-bottom: 16px;
+    }
+
+    .form-group label {
+      display: block;
+      font-size: 0.9rem;
+      font-weight: 500;
+      margin-bottom: 6px;
+      color: var(--text-main);
+    }
+
+    .form-group input {
+      width: 100%;
+      padding: 12px 14px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      font-size: 0.95rem;
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+    .form-group input:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+    }
+
+    .btn-login {
+      width: 100%;
+      padding: 13px;
+      background: var(--primary);
+      color: #ffffff;
+      border: none;
+      border-radius: 10px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s;
+      margin-top: 8px;
+    }
+
+    .btn-login:hover {
+      background: var(--primary-hover);
+    }
+
+    .btn-login:disabled {
+      background: #94a3b8;
+      cursor: not-allowed;
+    }
+
+    .modal-msg {
+      margin-top: 14px;
+      padding: 10px;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      display: none;
+    }
+
+    .modal-msg.error {
+      display: block;
+      background: #fef2f2;
+      color: var(--error);
+      border: 1px solid #fecaca;
+    }
+
+    .modal-footer {
+      margin-top: 20px;
+      font-size: 0.9rem;
+      color: var(--text-sub);
+    }
+
+    .modal-footer a {
+      color: var(--primary);
+      font-weight: 500;
+      text-decoration: none;
+    }
+
+    .modal-footer a:hover {
+      text-decoration: underline;
+    }
+
+    /* โครงสร้างหน้าเว็บหลัก */
+    .app-wrapper {
+      flex: 1;
+      max-width: 1100px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 24px 20px 40px;
+    }
+
+    /* แถบด้านบน: แท็บ + ปุ่มภาษา + ปุ่มออกจากระบบ */
+    .top-action-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 14px;
+      margin-bottom: 28px;
+    }
+
+    .tab-bar {
+      display: inline-flex;
+      background: #e2e8f0;
+      padding: 5px;
+      border-radius: 16px;
+      box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.05);
+      gap: 6px;
+    }
+
+    .tab-btn {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 22px;
+      background: transparent;
+      border: none;
+      border-radius: 12px;
+      font-size: 0.95rem;
+      font-weight: 500;
+      color: var(--text-sub);
+      cursor: pointer;
+      transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .tab-btn:hover {
+      color: var(--primary);
+      background: rgba(255, 255, 255, 0.5);
+    }
+
+    .tab-btn.active {
+      color: #ffffff;
+      background: linear-gradient(135deg, #2563eb, #3b82f6);
+      font-weight: 600;
+      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+    }
+
+    .tab-btn svg {
+      width: 18px;
+      height: 18px;
+    }
+
+    /* กลุ่มปุ่มฝั่งขวา: ภาษา + Logout */
+    .nav-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .lang-switcher {
+      display: flex;
+      background: #e2e8f0;
+      padding: 4px;
+      border-radius: 12px;
+      gap: 4px;
+    }
+
+    .btn-lang {
+      border: none;
+      padding: 6px 12px;
+      border-radius: 8px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--text-sub);
+      background: transparent;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .btn-lang.active {
+      background: #ffffff;
+      color: var(--primary);
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+    }
+
+    .btn-logout {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: #fee2e2;
+      color: #dc2626;
+      border: 1px solid #fecaca;
+      padding: 8px 16px;
+      border-radius: 12px;
+      font-size: 0.9rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .btn-logout:hover {
+      background: #dc2626;
+      color: #ffffff;
+    }
+
+    .btn-logout svg {
+      width: 16px;
+      height: 16px;
+    }
+
+    .tab-content {
+      display: none;
+      flex-direction: column;
+      gap: 24px;
+    }
+
+    .tab-content.active {
+      display: flex;
+      animation: fadeIn 0.3s ease-in-out;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* เฟรมแบบการ์ด */
+    .card-frame {
+      background: var(--card-bg);
+      border-radius: 20px;
+      padding: 32px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
+      border: 1px solid var(--border);
+    }
+
+    .card-frame.gradient-header {
+      background: linear-gradient(135deg, #1e3a8a, #2563eb, #38bdf8);
+      color: #ffffff;
+      border: none;
+      box-shadow: 0 8px 24px rgba(37, 99, 235, 0.2);
+    }
+
+    .card-frame.gradient-header h1 {
+      font-size: 1.8rem;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    .card-frame.gradient-header p {
+      font-size: 1rem;
+      opacity: 0.95;
+    }
+
+    .frame-title {
+      font-size: 1.35rem;
+      font-weight: 600;
+      color: var(--text-main);
+      margin-bottom: 18px;
+    }
+
+    .article-body {
+      color: var(--text-sub);
+      font-size: 1rem;
+      line-height: 1.9;
+      text-align: justify;
+    }
+
+    .article-body p {
+      margin-bottom: 16px;
+    }
+
+    /* การ์ดเมนูสีสัน */
+    .grid-menu {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 20px;
+      margin-top: 10px;
+    }
+
+    .menu-card {
+      position: relative;
+      background: #ffffff;
+      border-radius: 18px;
+      padding: 26px 20px;
+      text-align: center;
+      cursor: pointer;
+      border: 1px solid transparent;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      min-height: 100vh;
-      padding: 24px;
-      overflow-x: hidden;
+      gap: 14px;
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.04);
     }
 
-    /* บรรยากาศหมอกควัน/แสงเรืองลึกลับด้านหลัง */
-    body::before {
-      content: "";
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100vw;
-      height: 100vh;
-      background: radial-gradient(circle at 50% 50%, rgba(30, 58, 47, 0.12) 0%, transparent 70%);
-      pointer-events: none;
-      z-index: 0;
+    .menu-card:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 16px 28px rgba(0, 0, 0, 0.09);
     }
 
-    .container {
-      position: relative;
-      z-index: 1;
-      width: 100%;
-      max-width: 540px;
-      background: rgba(18, 24, 28, 0.75);
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
-      border-radius: 16px;
-      padding: 40px 32px;
-      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.7),
-                  inset 0 1px 1px rgba(255, 255, 255, 0.05);
+    .card-badge {
+      position: absolute;
+      top: 12px;
+      left: 12px;
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      font-size: 0.8rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
 
-    .header {
-      text-align: center;
-      margin-bottom: 30px;
+    .card-icon-wrapper {
+      width: 70px;
+      height: 70px;
+      border-radius: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: transform 0.3s ease;
     }
 
-    h1 {
-      color: #e2ecf2;
-      font-size: 26px;
+    .menu-card:hover .card-icon-wrapper {
+      transform: scale(1.1) rotate(2deg);
+    }
+
+    .card-icon-wrapper svg {
+      width: 36px;
+      height: 36px;
+    }
+
+    .menu-card h3 {
+      font-size: 1.05rem;
       font-weight: 600;
-      letter-spacing: 2px;
-      text-transform: uppercase;
-      text-shadow: 0 0 12px rgba(99, 153, 131, 0.35);
-      margin-bottom: 6px;
+      color: var(--text-main);
+      line-height: 1.4;
     }
 
-    .subtitle {
-      font-size: 12px;
-      color: #5d707c;
-      letter-spacing: 1.5px;
-      text-transform: uppercase;
+    /* ธีมสีเฉพาะแต่ละการ์ด */
+    .card-theme-1 { background: linear-gradient(180deg, #f0f9ff 0%, #ffffff 100%); border-color: #bae6fd; }
+    .card-theme-1 .card-badge { background: #e0f2fe; color: #0284c7; }
+    .card-theme-1 .card-icon-wrapper { background: #bae6fd; color: #0284c7; }
+
+    .card-theme-2 { background: linear-gradient(180deg, #eef2ff 0%, #ffffff 100%); border-color: #c7d2fe; }
+    .card-theme-2 .card-badge { background: #e0e7ff; color: #4f46e5; }
+    .card-theme-2 .card-icon-wrapper { background: #c7d2fe; color: #4f46e5; }
+
+    .card-theme-3 { background: linear-gradient(180deg, #ecfdf5 0%, #ffffff 100%); border-color: #a7f3d0; }
+    .card-theme-3 .card-badge { background: #d1fae5; color: #059669; }
+    .card-theme-3 .card-icon-wrapper { background: #a7f3d0; color: #059669; }
+
+    .card-theme-4 { background: linear-gradient(180deg, #fffbeb 0%, #ffffff 100%); border-color: #fde68a; }
+    .card-theme-4 .card-badge { background: #fef3c7; color: #d97706; }
+    .card-theme-4 .card-icon-wrapper { background: #fde68a; color: #d97706; }
+
+    .card-theme-5 { background: linear-gradient(180deg, #fdf2f8 0%, #ffffff 100%); border-color: #fbcfe8; }
+    .card-theme-5 .card-badge { background: #fce7f3; color: #db2777; }
+    .card-theme-5 .card-icon-wrapper { background: #fbcfe8; color: #db2777; }
+
+    /* ส่วนท้าย Footer */
+    footer {
+      background: #ffffff;
+      border-top: 1px solid var(--border);
+      padding: 22px 20px;
+      margin-top: auto;
     }
 
-    /* ฟอร์มและช่องกรอกข้อมูล */
-    .form-group {
-      margin-bottom: 22px;
-      text-align: left;
+    .footer-inner {
+      max-width: 1100px;
+      margin: 0 auto;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      font-size: 0.95rem;
+      color: var(--text-sub);
     }
 
-    label {
-      display: block;
-      font-size: 13.5px;
-      color: #8da1ad;
-      margin-bottom: 8px;
-      letter-spacing: 0.3px;
-    }
-
-    .input-box {
-      width: 100%;
-      background: rgba(10, 14, 17, 0.7);
-      border: 1px solid #232d34;
-      border-radius: 10px;
-      color: #e4edf2;
-      font-size: 15px;
-      padding: 12px 16px;
-      outline: none;
-      transition: all 0.25s ease;
-      box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.4);
-    }
-
-    .input-box:focus {
-      border-color: #3e6b56;
-      background: rgba(12, 17, 21, 0.95);
-      box-shadow: 0 0 12px rgba(62, 107, 86, 0.35),
-                  inset 0 2px 4px rgba(0, 0, 0, 0.5);
-    }
-
-    .input-box::placeholder {
-      color: #43515b;
-      font-size: 14px;
-    }
-
-    textarea.input-box {
-      min-height: 100px;
-      resize: vertical;
-      line-height: 1.6;
-    }
-
-    /* ปุ่มกดส่งข้อมูล */
-    button {
-      width: 100%;
-      margin-top: 8px;
-      padding: 14px;
-      background: linear-gradient(180deg, #1f382c 0%, #13241c 100%);
-      border: 1px solid #335946;
-      border-radius: 10px;
-      color: #bfe5d0;
-      font-size: 15px;
-      font-weight: 600;
-      letter-spacing: 1px;
-      cursor: pointer;
-      transition: all 0.25s ease;
-      text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
-      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
-    }
-
-    button:hover {
-      background: linear-gradient(180deg, #284c3b 0%, #182e23 100%);
-      border-color: #4a7e64;
-      color: #e8f7ee;
-      box-shadow: 0 0 20px rgba(50, 120, 85, 0.35);
-    }
-
-    button:active {
-      transform: translateY(1px);
-    }
-
-    button:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
-      box-shadow: none;
-    }
-
-    /* กล่องข้อความแจ้งเตือนสถานะ */
-    .status-msg {
-      margin-top: 15px;
-      font-size: 13.5px;
-      text-align: center;
-      display: none;
-      letter-spacing: 0.2px;
-    }
-
-    .status-msg.success {
-      color: #6ed49b;
-    }
-
-    .status-msg.error {
-      color: #e57373;
-    }
-
-    /* ส่วนติดต่อด้านล่าง */
-    .contact-info {
-      margin-top: 30px;
-      text-align: center;
-      font-size: 12px;
-      color: #495861;
-      letter-spacing: 0.5px;
-    }
-
-    .contact-info a {
-      color: #627b8a;
+    .footer-inner a {
+      color: var(--primary);
       text-decoration: none;
-      transition: color 0.2s ease;
+      word-break: break-all;
     }
 
-    .contact-info a:hover {
-      color: #8daab9;
+    .footer-inner a:hover {
       text-decoration: underline;
     }
   </style>
 </head>
 <body>
 
-  <div class="container">
-    <div class="header">
-      <h1>Dynamic Mathsheets</h1>
-      <div class="subtitle">Access Point / Secure Relay</div>
-    </div>
+  <!-- ม่านบังคับล็อกอินเต็มจอ (Overlay Window) -->
+  <div id="loginOverlay" class="lock-overlay">
+    <div class="login-modal">
+      <h2 data-i18n="login_title">เข้าสู่ระบบ Dynamic Mathsheets</h2>
+      <p data-i18n="login_desc">กรุณายืนยันตัวตนเพื่อเข้าสู่ระบบการเรียนรู้</p>
 
-    <!-- ช่องที่ 1: ข้อความ -->
-    <div class="form-group">
-      <label for="messageInput">มีอะไรอยากให้เราช่วยหรือเปล่า หรือ เป็นสมาชิกเราอยู่แล้ว</label>
-      <textarea id="messageInput" class="input-box" placeholder="ระบุรายละเอียด หรือรหัสสมาชิก / ความต้องการของคุณที่นี่..."></textarea>
-    </div>
+      <form id="authForm">
+        <div class="form-group">
+          <label for="uEmail" data-i18n="lbl_email">อีเมลสมาชิก (Email)</label>
+          <input type="email" id="uEmail" placeholder="example@email.com" required>
+        </div>
 
-    <!-- ช่องที่ 2: อีเมล -->
-    <div class="form-group">
-      <label for="emailInput">อีเมลติดต่อกลับ</label>
-      <input type="email" id="emailInput" class="input-box" placeholder="name@domain.com" autocomplete="off">
-    </div>
+        <div class="form-group">
+          <label for="uPass" data-i18n="lbl_pass">รหัสผ่าน (Password)</label>
+          <input type="password" id="uPass" placeholder="••••••••" required>
+        </div>
 
-    <button type="button" id="submitBtn" onclick="sendData()">ส่งข้อมูล</button>
+        <button type="submit" id="btnAuth" class="btn-login" data-i18n="btn_login">เข้าใช้งานระบบ</button>
+      </form>
 
-    <div id="statusMessage" class="status-msg"></div>
+      <div id="modalMsg" class="modal-msg"></div>
 
-    <div class="contact-info">
-      Secure Relay Channel: 
-      <a href="mailto:dynamic.mathsheets@gmail.com">dynamic.mathsheets@gmail.com</a>
+      <div class="modal-footer">
+        <span data-i18n="not_member_text">ยังไม่ได้เป็นสมาชิก?</span> <a href="DMSMember.html" data-i18n="register_link">สมัครสมาชิกที่นี่</a>
+      </div>
     </div>
   </div>
 
+  <!-- โครงสร้างเนื้อหาหลัก -->
+  <div class="app-wrapper">
+
+    <!-- แถบเครื่องมือด้านบน: แท็บ + ตัวเลือกภาษา + ออกจากระบบ -->
+    <div class="top-action-bar">
+      <div class="tab-bar">
+        <button class="tab-btn active" onclick="switchTab('tab1', event)">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+          </svg>
+          <span data-i18n="tab1_title">แนะนำ Dynamic Mathsheets</span>
+        </button>
+        <button class="tab-btn" onclick="switchTab('tab2', event)">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/>
+          </svg>
+          <span data-i18n="tab2_title">ตัวอย่างชิ้นงานทดลองใช้</span>
+        </button>
+      </div>
+
+      <div class="nav-actions">
+        <!-- ตัวเลือก 2 ภาษา -->
+        <div class="lang-switcher">
+          <button class="btn-lang" id="btnTh" onclick="setLanguage('th')">TH</button>
+          <button class="btn-lang" id="btnEn" onclick="setLanguage('en')">EN</button>
+        </div>
+
+        <!-- ปุ่มออกจากระบบ -->
+        <button class="btn-logout" onclick="handleLogout()">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
+          </svg>
+          <span data-i18n="btn_logout">ออกจากระบบ</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- แถบที่ 1 -->
+    <div id="tab1" class="tab-content active">
+      <div class="card-frame gradient-header">
+        <h1 data-i18n="intro_banner_title">แนะนำ Dynamic Math Sheets</h1>
+        <p data-i18n="intro_banner_sub">นวัตกรรมระบบนิเวศการเรียนรู้คณิตศาสตร์และวิทยาศาสตร์เพื่อการศึกษา</p>
+      </div>
+
+      <div class="card-frame">
+        <h2 class="frame-title" data-i18n="essay_title">แนวคิดและทิศทางการพัฒนา Dynamic Mathsheets</h2>
+        <div class="article-body">
+          <p data-i18n="essay_p1">การจัดการเรียนการสอนคณิตศาสตร์และวิทยาศาสตร์ในห้องเรียนปัจจุบัน ครูมักเผชิญกับภาระงานสร้างสื่อและการวัดผลที่ใช้เวลามาก ขณะเดียวกันนักเรียนมักเจอกับแบบฝึกหัดรูปแบบเดิมที่เน้นการจำคำตอบมากกว่าความเข้าใจ โครงการ Dynamic Mathsheets จึงถูกออกแบบขึ้นมาเพื่อทำหน้าที่เป็นผู้ช่วยครูและพื้นที่การเรียนรู้ของนักเรียน โดยมุ่งเน้นความเรียบง่าย ใช้ได้จริง และตอบสนองการจัดการเรียนการสอนใน 5 มิติหลัก</p>
+          <p data-i18n="essay_p2">มิติแรกคือการแก้ปัญหาความจำเจของโจทย์ ด้วยระบบสร้างและสุ่มตัวเลขแบบเรียลไทม์ ทำให้สามารถสร้างแบบฝึกหัดที่ไม่ซ้ำเดิมได้เรื่อย ๆ ช่วยให้นักเรียนได้ฝึกคิดวิเคราะห์ตามหลักการจริง ไม่ใช่การท่องจำชุดคำตอบ ข้อมูลเหล่านี้เชื่อมต่อเข้าสู่มิติที่สอง คือการจัดรวมโจทย์และกิจกรรมให้อยู่ในรูปแบบใบงานกระดาษที่พร้อมพิมพ์ ครูผู้สอนสามารถกดสั่งพิมพ์ไปใช้งานในชั้นเรียนได้ทันทีโดยไม่ต้องเสียเวลาจัดหน้าหรือพิมพ์เอกสารซ้ำซ้อน</p>
+          <p data-i18n="essay_p3">ในมิติของความเข้าใจเชิงลึก โครงการได้เพิ่มแบบจำลองทางการศึกษาและโมเดลทางวิทยาศาสตร์แบบปฏิสัมพันธ์ เพื่อเปลี่ยนเนื้อหาที่ซับซ้อนและเป็นนามธรรมให้เห็นเป็นภาพที่จับต้องได้ นักเรียนสามารถทดลองปรับเปลี่ยนตัวแปรและสังเกตผลลัพธ์ด้วยตนเอง ควบคู่ไปกับมิติที่สี่ คือการสอดแทรกกิจกรรมและเกมคณิตศาสตร์ เพื่อสร้างบรรยากาศการเรียนรู้ที่ผ่อนคลาย ช่วยกระตุ้นความสนใจและทำให้เนื้อหาตัวเลขไม่น่าเบื่อ และในมิติสุดท้ายด้านการวัดผล โครงการได้พัฒนาระบบแบบทดสอบออนไลน์ที่ออกแบบให้ยืดหยุ่นต่อความพร้อมของโรงเรียน โดยนักเรียนสามารถใช้อุปกรณ์เพียงเครื่องเดียวที่มีอยู่ เช่น สมาร์ตโฟน แท็บเล็ต หรือคอมพิวเตอร์ ในการทำข้อสอบ ขณะที่ระบบมีกลไกป้องกันการทุจริตและการตรวจจับการสลับหน้าจอ พร้อมแดชบอร์ดให้ผู้คุมสอบติดตามความเคลื่อนไหวได้แบบเรียลไทม์ ทำให้การประเมินผลมีความน่าเชื่อถือและเป็นธรรม</p>
+          <p data-i18n="essay_p4">โดยสรุป Dynamic Mathsheets คือการพัฒนาเครื่องมือการสอนที่มุ่งเน้นการใช้งานได้จริงในห้องเรียน ช่วยลดภาระการเตรียมงานของครู เพิ่มความเข้าใจและความสนุกในการเรียนรู้ของนักเรียน</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- แถบที่ 2 -->
+    <div id="tab2" class="tab-content">
+      <div class="card-frame gradient-header">
+        <h1 data-i18n="demo_banner_title">ตัวอย่างชิ้นงานทดลองใช้</h1>
+        <p data-i18n="demo_banner_sub">เลือกสื่อและกิจกรรมการเรียนรู้ที่ต้องการทดลองใช้งานในชั้นเรียน</p>
+      </div>
+
+      <div class="card-frame">
+        <h2 class="frame-title" data-i18n="menu_title">เมนูสื่อและกิจกรรม</h2>
+        <div class="grid-menu">
+          
+          <!-- 1. ใบงานคณิตศาสตร์ -->
+          <div class="menu-card card-theme-1">
+            <span class="card-badge">1</span>
+            <div class="card-icon-wrapper">
+              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+              </svg>
+            </div>
+            <h3 data-i18n="menu_item1">ใบงานคณิตศาสตร์</h3>
+          </div>
+
+          <!-- 2. สื่อการสอนคณิตศาสตร์ -->
+          <div class="menu-card card-theme-2">
+            <span class="card-badge">2</span>
+            <div class="card-icon-wrapper">
+              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2zM9 7h6M9 11h6m-6 4h2"/>
+              </svg>
+            </div>
+            <h3 data-i18n="menu_item2">สื่อการสอนคณิตศาสตร์</h3>
+          </div>
+
+          <!-- 3. สื่อการสอนวิทยาศาสตร์ -->
+          <div class="menu-card card-theme-3">
+            <span class="card-badge">3</span>
+            <div class="card-icon-wrapper">
+              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"/>
+              </svg>
+            </div>
+            <h3 data-i18n="menu_item3">สื่อการสอนวิทยาศาสตร์</h3>
+          </div>
+
+          <!-- 4. แบบทดสอบออนไลน์ -->
+          <div class="menu-card card-theme-4">
+            <span class="card-badge">4</span>
+            <div class="card-icon-wrapper">
+              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/>
+              </svg>
+            </div>
+            <h3 data-i18n="menu_item4">แบบทดสอบออนไลน์</h3>
+          </div>
+
+          <!-- 5. เกมส์การแข่งขันทางคณิตศาสตร์ -->
+          <div class="menu-card card-theme-5">
+            <span class="card-badge">5</span>
+            <div class="card-icon-wrapper">
+              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664zM21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+              </svg>
+            </div>
+            <h3 data-i18n="menu_item5">เกมส์การแข่งขันทางคณิตศาสตร์</h3>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ส่วนท้าย Footer -->
+  <footer>
+    <div class="footer-inner">
+      <div><strong data-i18n="footer_contact">ติดต่อเรา Email :</strong> dynamic.mathsheets@gmail.com</div>
+      <div><strong data-i18n="footer_page">เพจ :</strong> <a href="https://www.facebook.com/profile.php?id=61577190162363" target="_blank" rel="noopener noreferrer">Dynamic Mathsheets Facebook Page</a></div>
+    </div>
+  </footer>
+
   <script>
-    // วาง Web App URL จาก Google Apps Script ตรงนี้
-    const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbx3YnE3bd46XOnsV3l_WEYdR25IzTv3tLFEgt2XodXN_RD6CD_fYkV-obwiFkRB6ei4/exec';
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycby1xfgp5uhHnlB5spDJRrpRGWdaNnYOXc4yBIb3p12uMpAxEnNCk4E2u9AlmRtRg_Pz/exec";
 
-    async function sendData() {
-      const message = document.getElementById('messageInput').value.trim();
-      const email = document.getElementById('emailInput').value.trim();
-      const submitBtn = document.getElementById('submitBtn');
-      const statusMsg = document.getElementById('statusMessage');
-
-      // ตรวจสอบค่าว่าง
-      if (!message || !email) {
-        showStatus('กรุณากรอกข้อมูลให้ครบถ้วนทั้งสองช่อง', 'error');
-        return;
+    // คลังคำแปล 2 ภาษา (i18n dictionary)
+    const translations = {
+      th: {
+        login_title: "เข้าสู่ระบบ Dynamic Mathsheets",
+        login_desc: "กรุณายืนยันตัวตนเพื่อเข้าสู่ระบบการเรียนรู้",
+        lbl_email: "อีเมลสมาชิก (Email)",
+        lbl_pass: "รหัสผ่าน (Password)",
+        btn_login: "เข้าใช้งานระบบ",
+        not_member_text: "ยังไม่ได้เป็นสมาชิก?",
+        register_link: "สมัครสมาชิกที่นี่",
+        tab1_title: "แนะนำ Dynamic Mathsheets",
+        tab2_title: "ตัวอย่างชิ้นงานทดลองใช้",
+        btn_logout: "ออกจากระบบ",
+        intro_banner_title: "แนะนำ Dynamic Math Sheets",
+        intro_banner_sub: "นวัตกรรมระบบนิเวศการเรียนรู้คณิตศาสตร์และวิทยาศาสตร์เพื่อการศึกษา",
+        essay_title: "แนวคิดและทิศทางการพัฒนา Dynamic Mathsheets",
+        essay_p1: "การจัดการเรียนการสอนคณิตศาสตร์และวิทยาศาสตร์ในห้องเรียนปัจจุบัน ครูมักเผชิญกับภาระงานสร้างสื่อและการวัดผลที่ใช้เวลามาก ขณะเดียวกันนักเรียนมักเจอกับแบบฝึกหัดรูปแบบเดิมที่เน้นการจำคำตอบมากกว่าความเข้าใจ โครงการ Dynamic Mathsheets จึงถูกออกแบบขึ้นมาเพื่อทำหน้าที่เป็นผู้ช่วยครูและพื้นที่การเรียนรู้ของนักเรียน โดยมุ่งเน้นความเรียบง่าย ใช้ได้จริง และตอบสนองการจัดการเรียนการสอนใน 5 มิติหลัก",
+        essay_p2: "มิติแรกคือการแก้ปัญหาความจำเจของโจทย์ ด้วยระบบสร้างและสุ่มตัวเลขแบบเรียลไทม์ ทำให้สามารถสร้างแบบฝึกหัดที่ไม่ซ้ำเดิมได้เรื่อย ๆ ช่วยให้นักเรียนได้ฝึกคิดวิเคราะห์ตามหลักการจริง ไม่ใช่การท่องจำชุดคำตอบ ข้อมูลเหล่านี้เชื่อมต่อเข้าสู่มิติที่สอง คือการจัดรวมโจทย์และกิจกรรมให้อยู่ในรูปแบบใบงานกระดาษที่พร้อมพิมพ์ ครูผู้สอนสามารถกดสั่งพิมพ์ไปใช้งานในชั้นเรียนได้ทันทีโดยไม่ต้องเสียเวลาจัดหน้าหรือพิมพ์เอกสารซ้ำซ้อน",
+        essay_p3: "ในมิติของความเข้าใจเชิงลึก โครงการได้เพิ่มแบบจำลองทางการศึกษาและโมเดลทางวิทยาศาสตร์แบบปฏิสัมพันธ์ เพื่อเปลี่ยนเนื้อหาที่ซับซ้อนและเป็นนามธรรมให้เห็นเป็นภาพที่จับต้องได้ นักเรียนสามารถทดลองปรับเปลี่ยนตัวแปรและสังเกตผลลัพธ์ด้วยตนเอง ควบคู่ไปกับมิติที่สี่ คือการสอดแทรกกิจกรรมและเกมคณิตศาสตร์ เพื่อสร้างบรรยากาศการเรียนรู้ที่ผ่อนคลาย ช่วยกระตุ้นความสนใจและทำให้เนื้อหาตัวเลขไม่น่าเบื่อ และในมิติสุดท้ายด้านการวัดผล โครงการได้พัฒนาระบบแบบทดสอบออนไลน์ที่ออกแบบให้ยืดหยุ่นต่อความพร้อมของโรงเรียน โดยนักเรียนสามารถใช้อุปกรณ์เพียงเครื่องเดียวที่มีอยู่ เช่น สมาร์ตโฟน แท็บเล็ต หรือคอมพิวเตอร์ ในการทำข้อสอบ ขณะที่ระบบมีกลไกป้องกันการทุจริตและการตรวจจับการสลับหน้าจอ พร้อมแดชบอร์ดให้ผู้คุมสอบติดตามความเคลื่อนไหวได้แบบเรียลไทม์ ทำให้การประเมินผลมีความน่าเชื่อถือและเป็นธรรม",
+        essay_p4: "โดยสรุป Dynamic Mathsheets คือการพัฒนาเครื่องมือการสอนที่มุ่งเน้นการใช้งานได้จริงในห้องเรียน ช่วยลดภาระการเตรียมงานของครู เพิ่มความเข้าใจและความสนุกในการเรียนรู้ของนักเรียน",
+        demo_banner_title: "ตัวอย่างชิ้นงานทดลองใช้",
+        demo_banner_sub: "เลือกสื่อและกิจกรรมการเรียนรู้ที่ต้องการทดลองใช้งานในชั้นเรียน",
+        menu_title: "เมนูสื่อและกิจกรรม",
+        menu_item1: "ใบงานคณิตศาสตร์",
+        menu_item2: "สื่อการสอนคณิตศาสตร์",
+        menu_item3: "สื่อการสอนวิทยาศาสตร์",
+        menu_item4: "แบบทดสอบออนไลน์",
+        menu_item5: "เกมส์การแข่งขันทางคณิตศาสตร์",
+        footer_contact: "ติดต่อเรา Email :",
+        footer_page: "เพจ :"
+      },
+      en: {
+        login_title: "Sign in to Dynamic Mathsheets",
+        login_desc: "Please authenticate to access the learning platform",
+        lbl_email: "Member Email",
+        lbl_pass: "Password",
+        btn_login: "Sign In",
+        not_member_text: "Don't have an account?",
+        register_link: "Register here",
+        tab1_title: "About Dynamic Mathsheets",
+        tab2_title: "Sample Interactive Works",
+        btn_logout: "Sign Out",
+        intro_banner_title: "Introduction to Dynamic Math Sheets",
+        intro_banner_sub: "An Innovative Learning Ecosystem for Mathematics and Science Education",
+        essay_title: "Development Concepts & Directions of Dynamic Mathsheets",
+        essay_p1: "In modern mathematics and science education, teachers often bear a heavy burden in creating instructional media and conducting assessments. At the same time, students encounter repetitive exercises that encourage memorization over genuine understanding. Dynamic Mathsheets was designed to serve as an educator's assistant and a dynamic learning space for learners, focusing on practicality across five core dimensions.",
+        essay_p2: "The first dimension solves repetitive problem sets through real-time dynamic number and problem generation, enabling endless unique exercises that train true problem-solving skills. The second dimension links these problems into print-ready physical worksheets, allowing teachers to print classroom activities immediately without tedious formatting.",
+        essay_p3: "For deeper conceptual understanding, the third dimension introduces interactive math and science models that turn abstract concepts into tangible visuals where learners can manipulate variables independently. The fourth dimension incorporates gamified math activities to create an engaging and relaxing classroom atmosphere. Finally, the fifth dimension provides a secure single-device online assessment system with anti-cheat mechanisms and real-time monitoring for reliable testing.",
+        essay_p4: "In summary, Dynamic Mathsheets provides practical teaching tools that reduce teacher preparation workload while enhancing comprehension and enthusiasm for learning.",
+        demo_banner_title: "Sample Interactive Works",
+        demo_banner_sub: "Explore learning materials and trial modules for classroom instruction",
+        menu_title: "Instructional Media & Activities",
+        menu_item1: "Math Worksheets",
+        menu_item2: "Math Instructional Media",
+        menu_item3: "Science Learning Models",
+        menu_item4: "Online Assessments",
+        menu_item5: "Math Competitions & Games",
+        footer_contact: "Contact us Email :",
+        footer_page: "Facebook Page :"
       }
+    };
 
-      // ปิดปุ่มชั่วคราวระหว่างส่ง
-      submitBtn.disabled = true;
-      submitBtn.innerText = 'กำลังส่งข้อมูลเข้าระบบ...';
-      statusMsg.style.display = 'none';
+    let currentLang = "th";
+
+    // ตรวจสอบภาษาเครื่องอัตโนมัติ: ถ้าไม่ใช่ไทย ให้ขึ้นภาษาอังกฤษก่อน
+function detectInitialLanguage() {
+  // 1. ถ้าผู้ใช้เคยกดเลือกภาษาเอง ให้ใช้ภาษานั้น
+  const savedLang = localStorage.getItem("dms_lang");
+  if (savedLang) return savedLang;
+
+  // 2. ตรวจสอบ Timezone ของเครื่อง (ถ้าเป็นเวลาไทย ให้เป็น TH ทันที)
+  try {
+    const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+    if (timeZone === "Asia/Bangkok" || timeZone.includes("Bangkok")) {
+      return "th";
+    }
+  } catch (e) {}
+
+  // 3. ตรวจสอบ Timezone Offset (ไทยคือ UTC+7 หรือ -420 นาที)
+  const offset = new Date().getTimezoneOffset();
+  if (offset === -420) {
+    return "th";
+  }
+
+  // 4. ตรวจสอบภาษาเบราว์เซอร์สำรอง
+  const userLang = (navigator.language || navigator.userLanguage || "").toLowerCase();
+  if (userLang.startsWith("th")) {
+    return "th";
+  }
+
+  // ถ้าอยู่นอกเขตเวลาไทย และภาษาเครื่องไม่ใช่ไทย ให้เป็น EN
+  return "en";
+}
+    // ฟังก์ชันเปลี่ยนภาษา
+    function setLanguage(lang) {
+      currentLang = lang;
+      localStorage.setItem("dms_lang", lang);
+
+      document.querySelectorAll("[data-i18n]").forEach(el => {
+        const key = el.getAttribute("data-i18n");
+        if (translations[lang] && translations[lang][key]) {
+          el.textContent = translations[lang][key];
+        }
+      });
+
+      document.getElementById("btnTh").classList.toggle("active", lang === "th");
+      document.getElementById("btnEn").classList.toggle("active", lang === "en");
+    }
+
+    // สลับแท็บ
+    function switchTab(tabId, event) {
+      document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+      document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+
+      event.currentTarget.classList.add('active');
+      document.getElementById(tabId).classList.add('active');
+    }
+
+    // ตรวจสอบสถานะและส่งข้อมูลแบบ JSONP
+    function callAppsScriptJSONP(params) {
+      return new Promise((resolve, reject) => {
+        const callbackName = "jsonp_cb_" + Math.round(100000 * Math.random());
+        const script = document.createElement("script");
+
+        const timer = setTimeout(() => {
+          cleanup();
+          reject(new Error(currentLang === "th" ? "การเชื่อมต่อหมดเวลา" : "Connection timed out"));
+        }, 15000);
+
+        function cleanup() {
+          if (window[callbackName]) delete window[callbackName];
+          if (script.parentNode) script.parentNode.removeChild(script);
+          clearTimeout(timer);
+        }
+
+        window[callbackName] = function(data) {
+          cleanup();
+          resolve(data);
+        };
+
+        const query = Object.keys(params)
+          .map(k => `${encodeURIComponent(k)}=${encodeURIComponent(params[k])}`)
+          .join("&");
+
+        script.src = `${SCRIPT_URL}?${query}&callback=${callbackName}`;
+        script.onerror = function() {
+          cleanup();
+          reject(new Error(currentLang === "th" ? "ไม่สามารถเชื่อมต่อฐานข้อมูลได้" : "Database connection failed"));
+        };
+
+        document.body.appendChild(script);
+      });
+    }
+
+    const authForm = document.getElementById("authForm");
+    const btnAuth = document.getElementById("btnAuth");
+    const modalMsg = document.getElementById("modalMsg");
+    const loginOverlay = document.getElementById("loginOverlay");
+
+    // เข้าสู่ระบบ (Login)
+    authForm.addEventListener("submit", async function(e) {
+      e.preventDefault();
+
+      const email = document.getElementById("uEmail").value.trim().toLowerCase();
+      const pass = document.getElementById("uPass").value.trim();
+
+      btnAuth.disabled = true;
+      btnAuth.textContent = currentLang === "th" ? "กำลังตรวจสอบสิทธิ์..." : "Verifying...";
+      modalMsg.className = "modal-msg";
+      modalMsg.style.display = "none";
 
       try {
-        await fetch(GOOGLE_SCRIPT_URL, {
-          method: 'POST',
-          mode: 'no-cors',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
-            message: message,
-            email: email
-          })
+        const res = await callAppsScriptJSONP({
+          action: "login",
+          email: email,
+          pass: pass
         });
 
-        // แจ้งเตือนสำเร็จ
-        showStatus('ส่งข้อมูลเข้าระบบเรียบร้อยแล้ว', 'success');
-        document.getElementById('messageInput').value = '';
-        document.getElementById('emailInput').value = '';
-      } catch (error) {
-        console.error('Error:', error);
-        showStatus('เกิดข้อผิดพลาด ไม่สามารถส่งข้อมูลได้ในขณะนี้', 'error');
+        if (res.status === "success") {
+          sessionStorage.setItem("dms_current_user", email);
+          loginOverlay.classList.add("unlocked");
+        } else if (res.status === "not_member") {
+          alert(currentLang === "th" 
+            ? "ไม่พบบัญชีสมาชิกนี้ในระบบ กำลังนำท่านไปสู่หน้าสมัครสมาชิก..." 
+            : "Account not found. Redirecting to registration page...");
+          window.location.href = "DMSMember.html";
+        } else {
+          modalMsg.className = "modal-msg error";
+          modalMsg.textContent = res.message || (currentLang === "th" ? "อีเมลหรือรหัสผ่านไม่ถูกต้อง" : "Invalid email or password");
+        }
+      } catch (err) {
+        modalMsg.className = "modal-msg error";
+        modalMsg.textContent = err.message;
       } finally {
-        submitBtn.disabled = false;
-        submitBtn.innerText = 'ส่งข้อมูล';
+        btnAuth.disabled = false;
+        btnAuth.textContent = translations[currentLang].btn_login;
+      }
+    });
+
+    // ออกจากระบบ (Logout) -> เปลี่ยนสถานะเป็น F และล็อกหน้าจอ
+    async function handleLogout() {
+      const confirmText = currentLang === "th" ? "คุณต้องการออกจากระบบหรือไม่?" : "Do you want to log out?";
+      if (!confirm(confirmText)) return;
+
+      const userEmail = sessionStorage.getItem("dms_current_user") || document.getElementById("uEmail").value.trim().toLowerCase();
+
+      try {
+        if (userEmail) {
+          await callAppsScriptJSONP({ action: "logout", email: userEmail });
+        }
+      } catch (err) {
+        console.error("Logout update error:", err);
+      } finally {
+        sessionStorage.removeItem("dms_current_user");
+        document.getElementById("uPass").value = "";
+        modalMsg.style.display = "none";
+        // ดึงม่านล็อกหน้าจอกลับมา
+        loginOverlay.classList.remove("unlocked");
       }
     }
 
-    function showStatus(text, type) {
-      const statusMsg = document.getElementById('statusMessage');
-      statusMsg.innerText = text;
-      statusMsg.className = 'status-msg ' + type;
-      statusMsg.style.display = 'block';
-    }
+    // เริ่มต้นทำงาน: ตั้งค่าภาษาตามภูมิภาคของผู้ใช้
+    setLanguage(detectInitialLanguage());
   </script>
-
 </body>
 </html>
