@@ -1,0 +1,908 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ดีเทอร์มิแนนต์ (Determinants)</title>
+  
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- Google Fonts: Prompt & Sarabun -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Prompt:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=Sarabun:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  
+  <!-- KaTeX -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js" onload="renderMath()"></script>
+  
+  <style>
+    body {
+      font-family: 'Sarabun', sans-serif;
+      background-color: #f8fafc;
+      color: #1e293b;
+    }
+    h1, h2, h3, h4, .font-heading {
+      font-family: 'Prompt', sans-serif;
+    }
+    .font-mono {
+      font-family: 'JetBrains Mono', monospace;
+    }
+    .custom-scroll::-webkit-scrollbar {
+      height: 6px;
+      width: 6px;
+    }
+    .custom-scroll::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 4px;
+    }
+    .matrix-bracket {
+      position: relative;
+    }
+    .matrix-bracket::before {
+      content: "";
+      position: absolute;
+      top: -4px;
+      bottom: -4px;
+      left: -8px;
+      width: 10px;
+      border-left: 3px solid #334155;
+      border-top: 3px solid #334155;
+      border-bottom: 3px solid #334155;
+      border-top-left-radius: 6px;
+      border-bottom-left-radius: 6px;
+    }
+    .matrix-bracket::after {
+      content: "";
+      position: absolute;
+      top: -4px;
+      bottom: -4px;
+      right: -8px;
+      width: 10px;
+      border-right: 3px solid #334155;
+      border-top: 3px solid #334155;
+      border-bottom: 3px solid #334155;
+      border-top-right-radius: 6px;
+      border-bottom-right-radius: 6px;
+    }
+    .det-bar {
+      position: relative;
+    }
+    .det-bar::before {
+      content: "";
+      position: absolute;
+      top: -4px;
+      bottom: -4px;
+      left: -8px;
+      width: 3px;
+      background-color: #334155;
+    }
+    .det-bar::after {
+      content: "";
+      position: absolute;
+      top: -4px;
+      bottom: -4px;
+      right: -8px;
+      width: 3px;
+      background-color: #334155;
+    }
+  </style>
+</head>
+<body class="min-h-screen text-slate-800 antialiased selection:bg-indigo-500 selection:text-white">
+
+  <!-- Main Container: Standard max-w-6xl (1152px) -->
+  <main class="max-w-6xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 space-y-8">
+
+    <!-- Hero Title Header -->
+    <div class="bg-gradient-to-r from-indigo-900 via-indigo-800 to-blue-900 rounded-3xl p-6 sm:p-8 text-white shadow-xl relative overflow-hidden">
+      <div class="absolute -right-12 -top-12 w-64 h-64 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none"></div>
+      <div class="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
+        <div>
+          <h1 class="text-2xl sm:text-3xl lg:text-4xl font-bold tracking-tight">ดีเทอร์มิแนนต์ (Determinants)</h1>
+          <p class="text-indigo-200 text-sm sm:text-base mt-2 max-w-2xl font-light">
+            ทำความเข้าใจดีเทอร์มิแนนต์ทั้งในแง่การคำนวณพีชคณิตและการตีความเชิงเรขาคณิต ผ่านการแปลงพื้นที่และเวกเตอร์ 2 มิติ
+          </p>
+        </div>
+        <div class="flex items-center gap-2">
+          <a href="#lab-section" class="px-5 py-2.5 bg-indigo-500 hover:bg-indigo-600 text-white rounded-xl text-sm font-semibold transition-all shadow-md flex items-center gap-2">
+            <i data-lucide="play" class="w-4 h-4"></i> เข้าสู่ห้องทดลอง
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- วัตถุประสงค์การเรียนรู้ -->
+    <section class="bg-white rounded-2xl p-6 border border-slate-200/80 shadow-sm">
+      <div class="flex items-start gap-4">
+        <div class="p-3 bg-indigo-50 text-indigo-600 rounded-xl">
+          <i data-lucide="target" class="w-6 h-6"></i>
+        </div>
+        <div>
+          <h2 class="text-lg font-bold text-slate-800 mb-1">วัตถุประสงค์การเรียนรู้</h2>
+          <p class="text-slate-600 leading-relaxed text-sm sm:text-base">
+            นักศึกษาสามารถคำนวณดีเทอร์มิแนนต์ของเมทริกซ์จัตุรัสขนาด \(2\times2\) และ \(3\times3\) พร้อมทั้งอธิบายความหมายเชิงเรขาคณิตของดีเทอร์มิแนนต์ในกรณีเมทริกซ์ \(2\times2\) ได้
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- เนื้อหาบทเรียน (Accordion / Tabs) -->
+    <section class="bg-white rounded-2xl border border-slate-200/80 shadow-sm overflow-hidden">
+      <div class="p-5 border-b border-slate-100 flex items-center justify-between">
+        <h2 class="text-lg font-bold text-slate-800 flex items-center gap-2">
+          <i data-lucide="book-open" class="w-5 h-5 text-indigo-600"></i> สรุปเนื้อหาสำคัญ
+        </h2>
+        <span class="text-xs text-slate-400">คลิกที่หัวข้อเพื่ออ่านเนื้อหา</span>
+      </div>
+
+      <div class="divide-y divide-slate-100">
+        <!-- Topic 1 -->
+        <details class="group p-5 hover:bg-slate-50/50 transition-colors" open>
+          <summary class="flex justify-between items-center cursor-pointer list-none font-semibold text-slate-800 group-open:text-indigo-600">
+            <span class="flex items-center gap-3">
+              <span class="w-6 h-6 rounded-full bg-indigo-100 text-indigo-700 flex items-center justify-center text-xs">1</span>
+              ความหมายและสัญลักษณ์ของดีเทอร์มิแนนต์
+            </span>
+            <i data-lucide="chevron-down" class="w-5 h-5 transition-transform group-open:rotate-180 text-slate-400"></i>
+          </summary>
+          <div class="mt-4 text-slate-600 text-sm leading-relaxed pl-9 space-y-2">
+            <p><strong>ดีเทอร์มิแนนต์ (Determinant)</strong> คือค่าสเกลาร์ (จำนวนจริง) ที่คำนวณได้จาก <em>เมทริกซ์จัตุรัส</em> เท่านั้น สัญลักษณ์ที่ใช้คือ \(\det(A)\) หรือ \(|A|\)</p>
+            <div class="p-3 bg-amber-50 border-l-4 border-amber-400 text-amber-800 rounded text-xs sm:text-sm">
+              <strong>ข้อควรระวัง:</strong> สัญลักษณ์ขีดตรง \(|A|\) ไม่ใช่ค่าสัมบูรณ์ (Absolute Value) แต่คือดีเทอร์มิแนนต์ ซึ่งค่าของมันสามารถเป็นจำนวนบวก ลบ หรือศูนย์ก็ได้
+            </div>
+          </div>
+        </details>
+
+        <!-- Topic 2 -->
+        <details class="group p-5 hover:bg-slate-50/50 transition-colors">
+          <summary class="flex justify-between items-center cursor-pointer list-none font-semibold text-slate-800 group-open:text-indigo-600">
+            <span class="flex items-center gap-3">
+              <span class="w-6 h-6 rounded-full bg-indigo-100 text-indigo-700 flex items-center justify-center text-xs">2</span>
+              การคำนวณดีเทอร์มิแนนต์ขนาด \(2\times2\)
+            </span>
+            <i data-lucide="chevron-down" class="w-5 h-5 transition-transform group-open:rotate-180 text-slate-400"></i>
+          </summary>
+          <div class="mt-4 text-slate-600 text-sm leading-relaxed pl-9 space-y-3">
+            <p>สำหรับเมทริกซ์ \(A = \begin{bmatrix} a & b \\ c & d \end{bmatrix}\) ดีเทอร์มิแนนต์คือผลคูณแนวทแยงลงลบด้วยผลคูณแนวทแยงขึ้น:</p>
+            <div class="text-center py-2 bg-slate-50 rounded-xl font-mono text-base border border-slate-200">
+              $$\det(A) = \begin{vmatrix} a & b \\ c & d \end{vmatrix} = ad - bc$$
+            </div>
+            <p class="text-xs text-slate-500">จำง่าย ๆ: <em>(ทแยงลงเป็นบวก) ลบด้วย (ทแยงขึ้น)</em></p>
+          </div>
+        </details>
+
+        <!-- Topic 3 -->
+        <details class="group p-5 hover:bg-slate-50/50 transition-colors">
+          <summary class="flex justify-between items-center cursor-pointer list-none font-semibold text-slate-800 group-open:text-indigo-600">
+            <span class="flex items-center gap-3">
+              <span class="w-6 h-6 rounded-full bg-indigo-100 text-indigo-700 flex items-center justify-center text-xs">3</span>
+              การคำนวณดีเทอร์มิแนนต์ขนาด \(3\times3\) (กฎของซาร์รัส)
+            </span>
+            <i data-lucide="chevron-down" class="w-5 h-5 transition-transform group-open:rotate-180 text-slate-400"></i>
+          </summary>
+          <div class="mt-4 text-slate-600 text-sm leading-relaxed pl-9 space-y-3">
+            <p>สามารถหาค่าได้โดยการต่อ 2 หลักแรกออกไปทางขวา แล้วนำผลรวมทแยงลง ลบด้วย ผลรวมทแยงขึ้น:</p>
+            <div class="text-center py-2 bg-slate-50 rounded-xl font-mono text-xs sm:text-sm border border-slate-200 overflow-x-auto">
+              $$\det(A) = (a_{11}a_{22}a_{33} + a_{12}a_{23}a_{31} + a_{13}a_{21}a_{32}) - (a_{31}a_{22}a_{13} + a_{32}a_{23}a_{11} + a_{33}a_{21}a_{12})$$
+            </div>
+            <p class="text-xs text-amber-700 bg-amber-50 p-2 rounded">
+              *หมายเหตุ: วิธีคูณทแยงต่อหลักแบบนี้ใช้ได้เฉพาะเมทริกซ์ขนาด \(3\times3\) เท่านั้น ไม่สามารถใช้กับเมทริกซ์ \(4\times4\) ขึ้นไปได้
+            </p>
+          </div>
+        </details>
+
+        <!-- Topic 4 -->
+        <details class="group p-5 hover:bg-slate-50/50 transition-colors">
+          <summary class="flex justify-between items-center cursor-pointer list-none font-semibold text-slate-800 group-open:text-indigo-600">
+            <span class="flex items-center gap-3">
+              <span class="w-6 h-6 rounded-full bg-indigo-100 text-indigo-700 flex items-center justify-center text-xs">4</span>
+              ความหมายเชิงเรขาคณิต: พื้นที่และทิศทาง (Orientation)
+            </span>
+            <i data-lucide="chevron-down" class="w-5 h-5 transition-transform group-open:rotate-180 text-slate-400"></i>
+          </summary>
+          <div class="mt-4 text-slate-600 text-sm leading-relaxed pl-9 space-y-3">
+            <p>เมื่อเรานำหลักทั้งสองของเมทริกซ์ \(A = \begin{bmatrix} a & b \\ c & d \end{bmatrix}\) มามองเป็นเวกเตอร์ 2 มิติ คือ \(\vec{v}_1 = \begin{bmatrix} a \\ c \end{bmatrix}\) และ \(\vec{v}_2 = \begin{bmatrix} b \\ d \end{bmatrix}\):</p>
+            <ul class="list-disc pl-5 space-y-2 text-slate-700">
+              <li><strong>ขนาดของพื้นที่:</strong> พื้นที่ของรูปสี่เหลี่ยมด้านขนานที่ประกอบด้วยเวกเตอร์ทั้งสอง จะเท่ากับ <strong>ค่าสัมบูรณ์ของดีเทอร์มิแนนต์</strong> พอดี:
+                $$\text{พื้นที่} = |\det(A)| = |ad - bc|$$
+              </li>
+              <li><strong>เครื่องหมายบวก (+):</strong> เกิดเมื่อเวกเตอร์ \(\vec{v}_1\) กวาดมุมไปยัง \(\vec{v}_2\) ใน <em>ทิศทวนเข็มนาฬิกา</em> (ทิศทางปกติ)</li>
+              <li><strong>เครื่องหมายลบ (&minus;):</strong> เกิดเมื่อเวกเตอร์ \(\vec{v}_1\) กวาดมุมไปยัง \(\vec{v}_2\) ใน <em>ทิศตามเข็มนาฬิกา</em> (เกิดการสะท้อนหรือพลิกด้าน)</li>
+              <li><strong>ค่าศูนย์ (0):</strong> เกิดเมื่อเวกเตอร์ทั้งสอง <em>ขนานกัน (Collinear)</em> หรือทับกัน ทำให้รูปสี่เหลี่ยมด้านขนานยุบตัวกลายเป็นเส้นตรง พื้นที่จึงเป็น 0</li>
+            </ul>
+          </div>
+        </details>
+      </div>
+    </section>
+
+    <!-- แบบจำลองโต้ตอบ (Interactive Simulator Section) -->
+    <section id="lab-section" class="bg-white rounded-3xl border border-slate-200 shadow-md p-6 sm:p-8 space-y-6">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-slate-100 gap-4">
+        <div>
+          <span class="text-xs font-bold uppercase tracking-wider text-indigo-600 bg-indigo-50 px-2.5 py-1 rounded-md">Interactive Visualizer</span>
+          <h2 class="text-xl sm:text-2xl font-bold text-slate-800 mt-1">ห้องทดลองดีเทอร์มิแนนต์เชิงเรขาคณิต</h2>
+        </div>
+        
+        <!-- Tab selector between 2x2 and 3x3 -->
+        <div class="inline-flex p-1 bg-slate-100 rounded-xl text-sm font-medium">
+          <button id="tab-2x2-btn" onclick="switchLabTab('2x2')" class="px-4 py-2 rounded-lg bg-white shadow-sm text-indigo-700 font-semibold transition-all">
+            ขนาด 2×2 (เวกเตอร์ & พื้นที่)
+          </button>
+          <button id="tab-3x3-btn" onclick="switchLabTab('3x3')" class="px-4 py-2 rounded-lg text-slate-600 hover:text-slate-900 transition-all">
+            ขนาด 3×3 (การคำนวณ)
+          </button>
+        </div>
+      </div>
+
+      <!-- VIEW 1: 2x2 Geometric Lab -->
+      <div id="lab-2x2-view" class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+        <!-- Controls Column (Left) -->
+        <div class="lg:col-span-5 space-y-5">
+          <div class="bg-slate-50 p-5 rounded-2xl border border-slate-200/70 space-y-4">
+            <h3 class="text-sm font-bold text-slate-700 flex items-center gap-2">
+              <i data-lucide="edit-3" class="w-4 h-4 text-indigo-600"></i> กำหนดสมาชิกของเมทริกซ์ \(A\)
+            </h3>
+            
+            <!-- Matrix 2x2 Input Grid -->
+            <div class="flex items-center justify-center py-2">
+              <div class="matrix-bracket grid grid-cols-2 gap-3 p-2 bg-white rounded-xl shadow-sm border border-slate-200">
+                <!-- Cell a (v1_x) -->
+                <div class="flex flex-col items-center">
+                  <span class="text-[11px] font-semibold text-blue-600 mb-1">\(a\) (พิกัด \(x\) ของ \(\vec{v}_1\))</span>
+                  <input type="number" id="m-a" value="3" step="1" oninput="updateLab2x2()"
+                    class="w-20 text-center font-mono font-bold text-lg py-2 border-2 border-blue-200 focus:border-blue-500 rounded-lg bg-blue-50/40 outline-none">
+                </div>
+                <!-- Cell b (v2_x) -->
+                <div class="flex flex-col items-center">
+                  <span class="text-[11px] font-semibold text-emerald-600 mb-1">\(b\) (พิกัด \(x\) ของ \(\vec{v}_2\))</span>
+                  <input type="number" id="m-b" value="1" step="1" oninput="updateLab2x2()"
+                    class="w-20 text-center font-mono font-bold text-lg py-2 border-2 border-emerald-200 focus:border-emerald-500 rounded-lg bg-emerald-50/40 outline-none">
+                </div>
+                <!-- Cell c (v1_y) -->
+                <div class="flex flex-col items-center">
+                  <span class="text-[11px] font-semibold text-blue-600 mb-1">\(c\) (พิกัด \(y\) ของ \(\vec{v}_1\))</span>
+                  <input type="number" id="m-c" value="1" step="1" oninput="updateLab2x2()"
+                    class="w-20 text-center font-mono font-bold text-lg py-2 border-2 border-blue-200 focus:border-blue-500 rounded-lg bg-blue-50/40 outline-none">
+                </div>
+                <!-- Cell d (v2_y) -->
+                <div class="flex flex-col items-center">
+                  <span class="text-[11px] font-semibold text-emerald-600 mb-1">\(d\) (พิกัด \(y\) ของ \(\vec{v}_2\))</span>
+                  <input type="number" id="m-d" value="2" step="1" oninput="updateLab2x2()"
+                    class="w-20 text-center font-mono font-bold text-lg py-2 border-2 border-emerald-200 focus:border-emerald-500 rounded-lg bg-emerald-50/40 outline-none">
+                </div>
+              </div>
+            </div>
+
+            <!-- Vector Summary Badges -->
+            <div class="grid grid-cols-2 gap-2 text-xs">
+              <div class="p-2.5 rounded-lg bg-blue-50 border border-blue-200 text-blue-900 flex items-center justify-between">
+                <span class="font-semibold flex items-center gap-1.5">
+                  <span class="w-2 h-2 rounded-full bg-blue-600"></span> เวกเตอร์ \(\vec{v}_1\) (หลักที่ 1):
+                </span>
+                <span class="font-mono font-bold" id="badge-v1">(3, 1)</span>
+              </div>
+              <div class="p-2.5 rounded-lg bg-emerald-50 border border-emerald-200 text-emerald-900 flex items-center justify-between">
+                <span class="font-semibold flex items-center gap-1.5">
+                  <span class="w-2 h-2 rounded-full bg-emerald-600"></span> เวกเตอร์ \(\vec{v}_2\) (หลักที่ 2):
+                </span>
+                <span class="font-mono font-bold" id="badge-v2">(1, 2)</span>
+              </div>
+            </div>
+
+            <!-- Preset Buttons -->
+            <div>
+              <span class="text-xs font-semibold text-slate-500 block mb-2">กรณีทดสอบตัวอย่าง:</span>
+              <div class="grid grid-cols-2 gap-2">
+                <button onclick="setMatrix2x2(3, 1, 1, 2)" class="px-2.5 py-1.5 text-xs bg-white hover:bg-slate-100 text-slate-700 rounded-lg border border-slate-200 transition-colors text-left font-medium">
+                  • ดีเทอร์มิแนนต์บวก (+)
+                </button>
+                <button onclick="setMatrix2x2(1, 3, 2, 1)" class="px-2.5 py-1.5 text-xs bg-white hover:bg-slate-100 text-slate-700 rounded-lg border border-slate-200 transition-colors text-left font-medium">
+                  • สลับคอลัมน์ (ค่าติดลบ &minus;)
+                </button>
+                <button onclick="setMatrix2x2(2, 4, 1, 2)" class="px-2.5 py-1.5 text-xs bg-rose-50 hover:bg-rose-100 text-rose-700 rounded-lg border border-rose-200 transition-colors text-left font-medium">
+                  • เวกเตอร์ขนานกัน (\(\det=0\))
+                </button>
+                <button onclick="setMatrix2x2(1, 0, 0, 1)" class="px-2.5 py-1.5 text-xs bg-white hover:bg-slate-100 text-slate-700 rounded-lg border border-slate-200 transition-colors text-left font-medium">
+                  • เมทริกซ์เอกลักษณ์ \(I_2\)
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Calculation Steps Box -->
+          <div class="bg-indigo-900 text-white p-5 rounded-2xl shadow-lg space-y-3">
+            <h4 class="text-xs font-semibold uppercase tracking-wider text-indigo-300">ผลการคำนวณแบบละเอียด</h4>
+            
+            <div class="font-mono text-sm sm:text-base space-y-1">
+              <div class="text-indigo-200 text-xs">สูตร: \(\det(A) = ad - bc\)</div>
+              <div class="flex items-center gap-2 pt-1">
+                <span>=</span>
+                <span id="step-calc" class="font-bold text-amber-300">(3)(2) - (1)(1)</span>
+              </div>
+              <div class="flex items-center gap-2 text-xl font-bold">
+                <span>=</span>
+                <span id="result-det" class="text-emerald-400 text-2xl font-black">5</span>
+              </div>
+            </div>
+
+            <!-- Geometric Interpretation Indicators -->
+            <div class="pt-3 border-t border-indigo-800 space-y-2 text-xs">
+              <div class="flex justify-between items-center">
+                <span class="text-indigo-200">พื้นที่สี่เหลี่ยมด้านขนาน:</span>
+                <span id="result-area" class="font-mono font-bold text-white bg-indigo-800 px-2.5 py-1 rounded">5 ตร.หน่วย</span>
+              </div>
+              <div class="flex justify-between items-center">
+                <span class="text-indigo-200">ทิศทางการกวาดมุม:</span>
+                <span id="result-orientation" class="font-bold px-2 py-0.5 rounded text-emerald-300 bg-emerald-950/50">ทวนเข็มนาฬิกา (บวก)</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Canvas Column (Right) -->
+        <div class="lg:col-span-7 flex flex-col items-center">
+          <div class="w-full bg-slate-900 rounded-2xl p-4 shadow-inner relative flex flex-col items-center">
+            <!-- Canvas Header Legend -->
+            <div class="w-full flex justify-between items-center mb-2 text-xs text-slate-300 px-2">
+              <span class="flex items-center gap-4">
+                <span class="flex items-center gap-1.5"><span class="w-3 h-1 bg-blue-500 rounded"></span> \(\vec{v}_1\) (แกน x: a, แกน y: c)</span>
+                <span class="flex items-center gap-1.5"><span class="w-3 h-1 bg-emerald-500 rounded"></span> \(\vec{v}_2\) (แกน x: b, แกน y: d)</span>
+              </span>
+              <span class="text-slate-400">ระนาบพิกัดฉาก 2 มิติ</span>
+            </div>
+
+            <!-- Canvas Element -->
+            <div class="relative w-full aspect-square max-w-[420px] bg-slate-950 rounded-xl overflow-hidden border border-slate-800">
+              <canvas id="geoCanvas" width="420" height="420" class="w-full h-full block cursor-crosshair"></canvas>
+              
+              <!-- Zero Area Warning Overlay -->
+              <div id="zero-warning" class="hidden absolute inset-0 bg-rose-950/80 backdrop-blur-sm flex flex-col items-center justify-center p-6 text-center text-white transition-opacity">
+                <i data-lucide="alert-triangle" class="w-10 h-10 text-rose-400 mb-2 animate-bounce"></i>
+                <div class="font-bold text-lg font-heading">ดีเทอร์มิแนนต์เท่ากับ 0</div>
+                <p class="text-xs text-rose-200 mt-1 max-w-xs leading-relaxed">
+                  เวกเตอร์ทั้งสองอยู่บนแนวเส้นตรงเดียวกัน (ขนานกัน) ทำให้รูปสี่เหลี่ยมด้านขนานยุบตัวกลายเป็นเส้นตรงและไม่มีพื้นที่ (\(\text{พื้นที่} = 0\))
+                </p>
+              </div>
+            </div>
+
+            <p class="text-xs text-slate-400 mt-3 text-center">
+              พื้นที่แรเงาสีม่วงคือรูปสี่เหลี่ยมด้านขนานที่เกิดจากผลรวมเวกเตอร์ \(\vec{v}_1 + \vec{v}_2\)
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- VIEW 2: 3x3 Determinant Lab -->
+      <div id="lab-3x3-view" class="hidden space-y-6">
+        <div class="bg-slate-50 p-6 rounded-2xl border border-slate-200/80">
+          <div class="max-w-xl mx-auto space-y-4">
+            <h3 class="text-sm font-bold text-slate-700 text-center">กำหนดสมาชิกเมทริกซ์ \(3\times3\)</h3>
+            
+            <!-- 3x3 Grid -->
+            <div class="flex items-center justify-center">
+              <div class="matrix-bracket grid grid-cols-3 gap-2.5 p-3 bg-white rounded-2xl shadow-sm border border-slate-200">
+                <input type="number" id="m3-11" value="1" oninput="updateLab3x3()" class="w-16 h-12 text-center font-mono font-bold border border-slate-300 rounded-lg focus:border-indigo-500 focus:bg-indigo-50/30 outline-none">
+                <input type="number" id="m3-12" value="2" oninput="updateLab3x3()" class="w-16 h-12 text-center font-mono font-bold border border-slate-300 rounded-lg focus:border-indigo-500 focus:bg-indigo-50/30 outline-none">
+                <input type="number" id="m3-13" value="0" oninput="updateLab3x3()" class="w-16 h-12 text-center font-mono font-bold border border-slate-300 rounded-lg focus:border-indigo-500 focus:bg-indigo-50/30 outline-none">
+
+                <input type="number" id="m3-21" value="3" oninput="updateLab3x3()" class="w-16 h-12 text-center font-mono font-bold border border-slate-300 rounded-lg focus:border-indigo-500 focus:bg-indigo-50/30 outline-none">
+                <input type="number" id="m3-22" value="1" oninput="updateLab3x3()" class="w-16 h-12 text-center font-mono font-bold border border-slate-300 rounded-lg focus:border-indigo-500 focus:bg-indigo-50/30 outline-none">
+                <input type="number" id="m3-23" value="4" oninput="updateLab3x3()" class="w-16 h-12 text-center font-mono font-bold border border-slate-300 rounded-lg focus:border-indigo-500 focus:bg-indigo-50/30 outline-none">
+
+                <input type="number" id="m3-31" value="2" oninput="updateLab3x3()" class="w-16 h-12 text-center font-mono font-bold border border-slate-300 rounded-lg focus:border-indigo-500 focus:bg-indigo-50/30 outline-none">
+                <input type="number" id="m3-32" value="0" oninput="updateLab3x3()" class="w-16 h-12 text-center font-mono font-bold border border-slate-300 rounded-lg focus:border-indigo-500 focus:bg-indigo-50/30 outline-none">
+                <input type="number" id="m3-33" value="1" oninput="updateLab3x3()" class="w-16 h-12 text-center font-mono font-bold border border-slate-300 rounded-lg focus:border-indigo-500 focus:bg-indigo-50/30 outline-none">
+              </div>
+            </div>
+
+            <!-- Presets for 3x3 -->
+            <div class="flex flex-wrap justify-center gap-2 pt-2">
+              <button onclick="setMatrix3x3([1,2,0, 3,1,4, 2,0,1])" class="px-3 py-1.5 text-xs bg-white hover:bg-slate-100 border border-slate-200 rounded-lg font-medium text-slate-700">
+                โหลดตัวอย่างโจทย์แบบฝึกหัด
+              </button>
+              <button onclick="setMatrix3x3([1,0,0, 0,1,0, 0,0,1])" class="px-3 py-1.5 text-xs bg-white hover:bg-slate-100 border border-slate-200 rounded-lg font-medium text-slate-700">
+                เมทริกซ์เอกลักษณ์ \(I_3\)
+              </button>
+              <button onclick="setMatrix3x3([1,2,3, 2,4,6, 1,0,1])" class="px-3 py-1.5 text-xs bg-rose-50 hover:bg-rose-100 border border-rose-200 rounded-lg font-medium text-rose-700">
+                แถวเป็นสัดส่วนกัน (\(\det=0\))
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- 3x3 Sarrus Breakdown Box -->
+        <div class="bg-slate-900 text-white p-6 rounded-2xl shadow-lg space-y-4">
+          <h4 class="text-xs font-semibold uppercase tracking-wider text-indigo-300">ขั้นตอนการกระจายตามกฎของซาร์รัส (Sarrus' Rule)</h4>
+          
+          <div class="space-y-4 font-mono text-sm">
+            <!-- Down Diagonals -->
+            <div class="p-4 bg-emerald-950/40 border border-emerald-500/30 rounded-xl space-y-1">
+              <div class="text-xs text-emerald-400 font-bold flex items-center gap-1.5">
+                <i data-lucide="arrow-down-right" class="w-4 h-4"></i> ผลคูณแนวทแยงลง (เครื่องหมายบวก):
+              </div>
+              <div id="diag-down-terms" class="text-slate-200 text-xs sm:text-sm pl-5 pt-1">
+                (1)(1)(1) + (2)(4)(2) + (0)(3)(0) = 1 + 16 + 0 = 17
+              </div>
+            </div>
+
+            <!-- Up Diagonals -->
+            <div class="p-4 bg-rose-950/40 border border-rose-500/30 rounded-xl space-y-1">
+              <div class="text-xs text-rose-400 font-bold flex items-center gap-1.5">
+                <i data-lucide="arrow-up-right" class="w-4 h-4"></i> ผลคูณแนวทแยงขึ้น (เครื่องหมายลบ):
+              </div>
+              <div id="diag-up-terms" class="text-slate-200 text-xs sm:text-sm pl-5 pt-1">
+                (2)(1)(0) + (0)(4)(1) + (1)(3)(2) = 0 + 0 + 6 = 6
+              </div>
+            </div>
+
+            <!-- Final Result 3x3 -->
+            <div class="p-4 bg-slate-800 rounded-xl flex flex-col sm:flex-row items-center justify-between gap-3">
+              <div class="text-xs text-slate-300">
+                \(\det(A) = (\text{ผลรวมทแยงลง}) - (\text{ผลรวมทแยงขึ้น})\)
+              </div>
+              <div class="text-2xl font-black text-indigo-300 flex items-center gap-2">
+                <span>=</span>
+                <span id="final-det-3x3" class="text-3xl text-emerald-400">11</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- คำถามนำเพื่อค้นพบ (Inquiry-based Discovery Cards) -->
+    <section class="space-y-4">
+      <div class="flex items-center gap-2">
+        <i data-lucide="help-circle" class="w-5 h-5 text-indigo-600"></i>
+        <h2 class="text-xl font-bold text-slate-800">คำถามนำเพื่อค้นพบ</h2>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <!-- Q1 -->
+        <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex flex-col justify-between">
+          <div>
+            <div class="flex items-center gap-2 font-bold text-indigo-700 text-sm mb-2">
+              <span class="w-6 h-6 rounded-full bg-indigo-100 flex items-center justify-center text-xs">1</span>
+              การเปลี่ยนแปลงสมาชิก
+            </div>
+            <p class="text-slate-700 text-sm font-medium">
+              เมื่อเปลี่ยนสมาชิกของเมทริกซ์ ค่า \(ad - bc\) เปลี่ยนไปอย่างไร?
+            </p>
+          </div>
+          <details class="mt-4 pt-3 border-t border-slate-100 text-xs text-slate-600">
+            <summary class="cursor-pointer text-indigo-600 hover:text-indigo-700 font-semibold select-none">ดูแนวคิดคำตอบ</summary>
+            <p class="mt-2 pl-2 border-l-2 border-indigo-400 leading-relaxed">
+              ค่า \(ad - bc\) จะเปลี่ยนไปตามขนาดและทิศทางของเวกเตอร์ โดยถ้าเพิ่มขนาดของสมาชิกในแนวทแยงหลัก (\(a\) หรือ \(d\)) ค่ามักจะเพิ่มขึ้น แต่ถ้าเพิ่มสมาชิกในแนวทแยงรอง (\(b\) หรือ \(c\)) ค่าจะลดลง (หรือติดลบมากขึ้น)
+            </p>
+          </details>
+        </div>
+
+        <!-- Q2 -->
+        <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex flex-col justify-between">
+          <div>
+            <div class="flex items-center gap-2 font-bold text-indigo-700 text-sm mb-2">
+              <span class="w-6 h-6 rounded-full bg-indigo-100 flex items-center justify-center text-xs">2</span>
+              กรณีดีเทอร์มิแนนต์เป็นศูนย์
+            </div>
+            <p class="text-slate-700 text-sm font-medium">
+              เมื่อดีเทอร์มิแนนต์เป็นศูนย์ รูปเรขาคณิตมีลักษณะอย่างไร?
+            </p>
+          </div>
+          <details class="mt-4 pt-3 border-t border-slate-100 text-xs text-slate-600">
+            <summary class="cursor-pointer text-indigo-600 hover:text-indigo-700 font-semibold select-none">ดูแนวคิดคำตอบ</summary>
+            <p class="mt-2 pl-2 border-l-2 border-indigo-400 leading-relaxed">
+              รูปสี่เหลี่ยมด้านขนานจะ **ยุบตัวกลายเป็นเส้นตรง (Degenerate)** ไม่มีพื้นที่สองมิติหลงเหลืออยู่ (\(\text{Area} = 0\)) เนื่องจากเวกเตอร์ทั้งสองวางตัวอยู่บนแนวเส้นตรงเดียวกัน (ขนานกันหรือมีอัตราส่วนพิกัดเท่ากัน)
+            </p>
+          </details>
+        </div>
+
+        <!-- Q3 -->
+        <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex flex-col justify-between">
+          <div>
+            <div class="flex items-center gap-2 font-bold text-indigo-700 text-sm mb-2">
+              <span class="w-6 h-6 rounded-full bg-indigo-100 flex items-center justify-center text-xs">3</span>
+              การเปลี่ยนเครื่องหมายบวกเป็นลบ
+            </div>
+            <p class="text-slate-700 text-sm font-medium">
+              เมื่อดีเทอร์มิแนนต์เปลี่ยนจากบวกเป็นลบ เกิดอะไรขึ้นกับทิศทางของการแปลง?
+            </p>
+          </div>
+          <details class="mt-4 pt-3 border-t border-slate-100 text-xs text-slate-600">
+            <summary class="cursor-pointer text-indigo-600 hover:text-indigo-700 font-semibold select-none">ดูแนวคิดคำตอบ</summary>
+            <p class="mt-2 pl-2 border-l-2 border-indigo-400 leading-relaxed">
+              เกิดการสลับลำดับการกวาดมุม (Orientation Flipping) จากเดิมที่ \(\vec{v}_1\) กวาดไป \(\vec{v}_2\) ทวนเข็มนาฬิกา จะกลับกลายเป็นกวาดแบบตามเข็มนาฬิกา เปรียบเสมือนการพลิกหน้ากระดาษหรือการสะท้อนกระจก (Reflection)
+            </p>
+          </details>
+        </div>
+
+        <!-- Q4 -->
+        <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex flex-col justify-between">
+          <div>
+            <div class="flex items-center gap-2 font-bold text-indigo-700 text-sm mb-2">
+              <span class="w-6 h-6 rounded-full bg-indigo-100 flex items-center justify-center text-xs">4</span>
+              ความสัมพันธ์กับค่าสัมบูรณ์
+            </div>
+            <p class="text-slate-700 text-sm font-medium">
+              เหตุใดพื้นที่จึงสัมพันธ์กับค่าสัมบูรณ์ของดีเทอร์มิแนนต์?
+            </p>
+          </div>
+          <details class="mt-4 pt-3 border-t border-slate-100 text-xs text-slate-600">
+            <summary class="cursor-pointer text-indigo-600 hover:text-indigo-700 font-semibold select-none">ดูแนวคิดคำตอบ</summary>
+            <p class="mt-2 pl-2 border-l-2 border-indigo-400 leading-relaxed">
+              เพราะในทางเรขาคณิต ขนาดของ "พื้นที่" ไม่สามารถมีค่าติดลบได้ เครื่องหมายบวกหรือลบของดีเทอร์มิแนนต์เป็นเพียงตัวบ่งบอกทิศทางการหมุน ดังนั้นพื้นที่จริงจึงต้องนำค่าสัมบูรณ์มาครอบ: \(\text{พื้นที่} = |\det(A)|\)
+            </p>
+          </details>
+        </div>
+      </div>
+    </section>
+
+    <!-- แบบฝึกหัดสำหรับนักศึกษา (Exercises) -->
+    <section class="bg-white rounded-3xl border border-slate-200 p-6 sm:p-8 space-y-6">
+      <div class="flex items-center gap-3 pb-3 border-b border-slate-100">
+        <div class="p-2.5 bg-blue-50 text-blue-600 rounded-xl">
+          <i data-lucide="clipboard-list" class="w-6 h-6"></i>
+        </div>
+        <div>
+          <h2 class="text-xl font-bold text-slate-800">แบบฝึกหัดสำหรับนักศึกษา</h2>
+          <p class="text-xs text-slate-500">ทดสอบความเข้าใจและสามารถโหลดตัวเลขเข้าห้องทดลองเพื่อตรวจคำตอบได้</p>
+        </div>
+      </div>
+
+      <div class="space-y-4">
+        <!-- Exercise 1 -->
+        <div class="p-5 rounded-2xl border border-slate-200 bg-slate-50/50 hover:bg-slate-50 transition-colors">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div class="space-y-1">
+              <span class="text-xs font-bold text-indigo-600 uppercase">ข้อที่ 1</span>
+              <p class="text-slate-800 font-medium text-sm sm:text-base">
+                จงหาดีเทอร์มิแนนต์ของเมทริกซ์ \(A = \begin{bmatrix} 3 & 2 \\ 1 & 4 \end{bmatrix}\)
+              </p>
+            </div>
+            <button onclick="setMatrix2x2(3, 2, 1, 4); switchLabTab('2x2');" class="px-3.5 py-1.5 text-xs bg-white hover:bg-indigo-50 text-indigo-600 border border-indigo-200 rounded-xl font-medium transition-colors flex items-center gap-1.5 self-start sm:self-center">
+              <i data-lucide="external-link" class="w-3.5 h-3.5"></i> ตรวจสอบในห้องทดลอง
+            </button>
+          </div>
+          <details class="mt-3 pt-3 border-t border-slate-200/60 text-xs">
+            <summary class="cursor-pointer text-slate-500 hover:text-slate-800 font-semibold select-none">เฉลยวิธีทำ</summary>
+            <div class="mt-2 text-slate-600 font-mono space-y-1 pl-3 border-l-2 border-indigo-400">
+              <div>\(\det(A) = (3)(4) - (2)(1)\)</div>
+              <div>\(\det(A) = 12 - 2 = 10\)</div>
+            </div>
+          </details>
+        </div>
+
+        <!-- Exercise 2 -->
+        <div class="p-5 rounded-2xl border border-slate-200 bg-slate-50/50 hover:bg-slate-50 transition-colors">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div class="space-y-1">
+              <span class="text-xs font-bold text-indigo-600 uppercase">ข้อที่ 2</span>
+              <p class="text-slate-800 font-medium text-sm sm:text-base">
+                จงหาดีเทอร์มิแนนต์ของ \(B = \begin{bmatrix} 1 & 2 & 0 \\ 3 & 1 & 4 \\ 2 & 0 & 1 \end{bmatrix}\) โดยแสดงวิธีคำนวณ
+              </p>
+            </div>
+            <button onclick="setMatrix3x3([1,2,0, 3,1,4, 2,0,1]); switchLabTab('3x3');" class="px-3.5 py-1.5 text-xs bg-white hover:bg-indigo-50 text-indigo-600 border border-indigo-200 rounded-xl font-medium transition-colors flex items-center gap-1.5 self-start sm:self-center">
+              <i data-lucide="external-link" class="w-3.5 h-3.5"></i> ตรวจสอบในห้องทดลอง 3×3
+            </button>
+          </div>
+          <details class="mt-3 pt-3 border-t border-slate-200/60 text-xs">
+            <summary class="cursor-pointer text-slate-500 hover:text-slate-800 font-semibold select-none">เฉลยวิธีทำ</summary>
+            <div class="mt-2 text-slate-600 font-mono space-y-1 pl-3 border-l-2 border-indigo-400">
+              <div>ผลคูณทแยงลง: \((1)(1)(1) + (2)(4)(2) + (0)(3)(0) = 1 + 16 + 0 = 17\)</div>
+              <div>ผลคูณทแยงขึ้น: \((2)(1)(0) + (0)(4)(1) + (1)(3)(2) = 0 + 0 + 6 = 6\)</div>
+              <div class="font-bold text-indigo-700">\(\det(B) = 17 - 6 = 11\)</div>
+            </div>
+          </details>
+        </div>
+
+        <!-- Exercise 3 -->
+        <div class="p-5 rounded-2xl border border-slate-200 bg-slate-50/50 hover:bg-slate-50 transition-colors">
+          <div class="space-y-1">
+            <span class="text-xs font-bold text-indigo-600 uppercase">ข้อที่ 3</span>
+            <p class="text-slate-800 font-medium text-sm sm:text-base">
+              ปรับสมาชิกของเมทริกซ์ \(2\times2\) ให้ดีเทอร์มิแนนต์เป็นศูนย์ พร้อมอธิบายสิ่งที่เกิดขึ้นกับเวกเตอร์
+            </p>
+          </div>
+          <details class="mt-3 pt-3 border-t border-slate-200/60 text-xs">
+            <summary class="cursor-pointer text-slate-500 hover:text-slate-800 font-semibold select-none">แนวคำตอบ</summary>
+            <div class="mt-2 text-slate-600 leading-relaxed pl-3 border-l-2 border-indigo-400 space-y-1">
+              <p>ตัวอย่างเมทริกซ์: \(\begin{bmatrix} 2 & 4 \\ 1 & 2 \end{bmatrix}\) โดย \(\det = (2)(2) - (4)(1) = 0\)</p>
+              <p><strong>คำอธิบาย:</strong> สังเกตว่าเวกเตอร์หลักที่สองคือ \((4, 2)\) ซึ่งมีขนาดเป็น 2 เท่าของหลักแรก \((2, 1)\) ทำให้เวกเตอร์ทั้งสองขนานและชี้ไปในแนวแกนเดียวกัน เวกเตอร์จึงไม่สามารถกางออกเพื่อสร้างพื้นที่สองมิติได้</p>
+            </div>
+          </details>
+        </div>
+
+        <!-- Exercise 4 -->
+        <div class="p-5 rounded-2xl border border-slate-200 bg-slate-50/50 hover:bg-slate-50 transition-colors">
+          <div class="space-y-1">
+            <span class="text-xs font-bold text-indigo-600 uppercase">ข้อที่ 4</span>
+            <p class="text-slate-800 font-medium text-sm sm:text-base">
+              ใช้แบบจำลองสร้างกรณีที่ดีเทอร์มิแนนต์เป็นบวกและลบ แล้วอธิบายความแตกต่าง
+            </p>
+          </div>
+          <details class="mt-3 pt-3 border-t border-slate-200/60 text-xs">
+            <summary class="cursor-pointer text-slate-500 hover:text-slate-800 font-semibold select-none">แนวคำตอบ</summary>
+            <div class="mt-2 text-slate-600 leading-relaxed pl-3 border-l-2 border-indigo-400 space-y-1">
+              <p>• กรณีค่าบวก เช่น \(\begin{bmatrix} 3 & 1 \\ 1 & 2 \end{bmatrix}\) (\(\det = +5\)): เวกเตอร์ \(\vec{v}_1\) จะกวาดมุมทวนเข็มนาฬิกาไปยัง \(\vec{v}_2\)</p>
+              <p>• กรณีค่าลบ เช่น สลับตำแหน่งเป็น \(\begin{bmatrix} 1 & 3 \\ 2 & 1 \end{bmatrix}\) (\(\det = -5\)): ทิศทางการกวาดมุมจะสลับเป็นตามเข็มนาฬิกา</p>
+              <p><strong>ข้อสรุป:</strong> ทั้งสองกรณีมีขนาดพื้นที่เท่ากันคือ \(5\) ตารางหน่วย แต่เครื่องหมายบอกถึงการพลิกด้าน (Orientation) ของระนาบพิกัด</p>
+            </div>
+          </details>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Interactive Scripts -->
+  <script>
+    // Initialize Lucide Icons
+    lucide.createIcons();
+
+    // KaTeX Auto-render
+    function renderMath() {
+      if (typeof renderMathInElement !== 'undefined') {
+        renderMathInElement(document.body, {
+          delimiters: [
+            {left: '$$', right: '$$', display: true},
+            {left: '\\[', right: '\\]', display: true},
+            {left: '\\(', right: '\\)', display: false},
+            {left: '$', right: '$', display: false}
+          ],
+          throwOnError: false
+        });
+      }
+    }
+
+    // Tab Switching
+    function switchLabTab(tab) {
+      const v2 = document.getElementById('lab-2x2-view');
+      const v3 = document.getElementById('lab-3x3-view');
+      const b2 = document.getElementById('tab-2x2-btn');
+      const b3 = document.getElementById('tab-3x3-btn');
+
+      if (tab === '2x2') {
+        v2.classList.remove('hidden');
+        v3.classList.add('hidden');
+        b2.className = "px-4 py-2 rounded-lg bg-white shadow-sm text-indigo-700 font-semibold transition-all";
+        b3.className = "px-4 py-2 rounded-lg text-slate-600 hover:text-slate-900 transition-all";
+        updateLab2x2();
+      } else {
+        v2.classList.add('hidden');
+        v3.classList.remove('hidden');
+        b3.className = "px-4 py-2 rounded-lg bg-white shadow-sm text-indigo-700 font-semibold transition-all";
+        b2.className = "px-4 py-2 rounded-lg text-slate-600 hover:text-slate-900 transition-all";
+        updateLab3x3();
+      }
+      lucide.createIcons();
+    }
+
+    // 2x2 Logic and Canvas Drawing
+    function setMatrix2x2(a, b, c, d) {
+      document.getElementById('m-a').value = a;
+      document.getElementById('m-b').value = b;
+      document.getElementById('m-c').value = c;
+      document.getElementById('m-d').value = d;
+      updateLab2x2();
+    }
+
+    function updateLab2x2() {
+      const a = parseFloat(document.getElementById('m-a').value) || 0;
+      const b = parseFloat(document.getElementById('m-b').value) || 0;
+      const c = parseFloat(document.getElementById('m-c').value) || 0;
+      const d = parseFloat(document.getElementById('m-d').value) || 0;
+
+      // Update Badges
+      document.getElementById('badge-v1').innerText = `(${a}, ${c})`;
+      document.getElementById('badge-v2').innerText = `(${b}, ${d})`;
+
+      // Calculation
+      const det = (a * d) - (b * c);
+      const area = Math.abs(det);
+
+      document.getElementById('step-calc').innerText = `(${a})(${d}) - (${b})(${c})`;
+      const detEl = document.getElementById('result-det');
+      detEl.innerText = det;
+
+      if (det > 0) {
+        detEl.className = "text-emerald-400 text-2xl font-black";
+      } else if (det < 0) {
+        detEl.className = "text-amber-400 text-2xl font-black";
+      } else {
+        detEl.className = "text-rose-400 text-2xl font-black";
+      }
+
+      document.getElementById('result-area').innerText = `${area} ตร.หน่วย`;
+
+      const oriEl = document.getElementById('result-orientation');
+      const zeroWarn = document.getElementById('zero-warning');
+
+      if (det > 0) {
+        oriEl.innerText = "ทวนเข็มนาฬิกา (บวก)";
+        oriEl.className = "font-bold px-2 py-0.5 rounded text-emerald-300 bg-emerald-950/50";
+        zeroWarn.classList.add('hidden');
+      } else if (det < 0) {
+        oriEl.innerText = "ตามเข็มนาฬิกา (ลบ)";
+        oriEl.className = "font-bold px-2 py-0.5 rounded text-amber-300 bg-amber-950/50";
+        zeroWarn.classList.add('hidden');
+      } else {
+        oriEl.innerText = "ยุบตัวเป็นเส้น (ไม่มีทิศทาง)";
+        oriEl.className = "font-bold px-2 py-0.5 rounded text-rose-300 bg-rose-950/50";
+        zeroWarn.classList.remove('hidden');
+      }
+
+      drawCanvas2x2(a, b, c, d);
+    }
+
+    function drawCanvas2x2(a, b, c, d) {
+      const canvas = document.getElementById('geoCanvas');
+      const ctx = canvas.getContext('2d');
+      const width = canvas.width;
+      const height = canvas.height;
+
+      ctx.clearRect(0, 0, width, height);
+
+      // Determine scale dynamically
+      const maxVal = Math.max(Math.abs(a), Math.abs(b), Math.abs(c), Math.abs(d), Math.abs(a + b), Math.abs(c + d), 4);
+      const scale = (width / 2) / (maxVal * 1.25);
+      const originX = width / 2;
+      const originY = height / 2;
+
+      const toScreenX = (x) => originX + x * scale;
+      const toScreenY = (y) => originY - y * scale;
+
+      // Draw Grid Lines
+      ctx.strokeStyle = '#1e293b';
+      ctx.lineWidth = 1;
+      const step = maxVal > 6 ? 2 : 1;
+      for (let i = -12; i <= 12; i += step) {
+        ctx.beginPath();
+        ctx.moveTo(toScreenX(i), 0);
+        ctx.lineTo(toScreenX(i), height);
+        ctx.stroke();
+
+        ctx.beginPath();
+        ctx.moveTo(0, toScreenY(i));
+        ctx.lineTo(width, toScreenY(i));
+        ctx.stroke();
+      }
+
+      // Draw Main Axes
+      ctx.strokeStyle = '#475569';
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      ctx.moveTo(0, originY);
+      ctx.lineTo(width, originY);
+      ctx.moveTo(originX, 0);
+      ctx.lineTo(originX, height);
+      ctx.stroke();
+
+      // Parallelogram Coordinates
+      const p0 = {x: 0, y: 0};
+      const p1 = {x: a, y: c};
+      const p2 = {x: a + b, y: c + d};
+      const p3 = {x: b, y: d};
+
+      const det = (a * d) - (b * c);
+
+      // Draw Parallelogram fill
+      if (Math.abs(det) > 0.0001) {
+        ctx.fillStyle = det > 0 ? 'rgba(99, 102, 241, 0.25)' : 'rgba(244, 63, 94, 0.25)';
+        ctx.strokeStyle = det > 0 ? 'rgba(129, 140, 248, 0.7)' : 'rgba(251, 113, 133, 0.7)';
+        ctx.lineWidth = 1.5;
+        ctx.setLineDash([4, 4]);
+
+        ctx.beginPath();
+        ctx.moveTo(toScreenX(p0.x), toScreenY(p0.y));
+        ctx.lineTo(toScreenX(p1.x), toScreenY(p1.y));
+        ctx.lineTo(toScreenX(p2.x), toScreenY(p2.y));
+        ctx.lineTo(toScreenX(p3.x), toScreenY(p3.y));
+        ctx.closePath();
+        ctx.fill();
+        ctx.stroke();
+        ctx.setLineDash([]);
+      } else {
+        // Collinear Line
+        ctx.strokeStyle = '#f43f5e';
+        ctx.lineWidth = 3;
+        ctx.beginPath();
+        ctx.moveTo(toScreenX(0), toScreenY(0));
+        ctx.lineTo(toScreenX(p2.x), toScreenY(p2.y));
+        ctx.stroke();
+      }
+
+      // Helper function: Draw Vector Arrow
+      function drawArrow(fromX, fromY, toX, toY, color, width = 3) {
+        const headlen = 10;
+        const dx = toX - fromX;
+        const dy = toY - fromY;
+        const angle = Math.atan2(dy, dx);
+
+        ctx.strokeStyle = color;
+        ctx.fillStyle = color;
+        ctx.lineWidth = width;
+
+        ctx.beginPath();
+        ctx.moveTo(fromX, fromY);
+        ctx.lineTo(toX, toY);
+        ctx.stroke();
+
+        ctx.beginPath();
+        ctx.moveTo(toX, toY);
+        ctx.lineTo(toX - headlen * Math.cos(angle - Math.PI / 6), toY - headlen * Math.sin(angle - Math.PI / 6));
+        ctx.lineTo(toX - headlen * Math.cos(angle + Math.PI / 6), toY - headlen * Math.sin(angle + Math.PI / 6));
+        ctx.closePath();
+        ctx.fill();
+      }
+
+      // Draw Vector v1 (Blue)
+      drawArrow(originX, originY, toScreenX(a), toScreenY(c), '#3b82f6', 3.5);
+
+      // Draw Vector v2 (Emerald)
+      drawArrow(originX, originY, toScreenX(b), toScreenY(d), '#10b981', 3.5);
+
+      // Draw Points & Labels
+      ctx.font = "bold 12px Prompt, sans-serif";
+      
+      // Label v1
+      ctx.fillStyle = '#60a5fa';
+      ctx.fillText(`v⃗₁ (${a}, ${c})`, toScreenX(a) + 8, toScreenY(c) - 8);
+
+      // Label v2
+      ctx.fillStyle = '#34d399';
+      ctx.fillText(`v⃗₂ (${b}, ${d})`, toScreenX(b) + 8, toScreenY(d) - 8);
+    }
+
+    // 3x3 Logic
+    function setMatrix3x3(arr) {
+      const ids = ['11','12','13', '21','22','23', '31','32','33'];
+      ids.forEach((id, idx) => {
+        document.getElementById(`m3-${id}`).value = arr[idx];
+      });
+      updateLab3x3();
+    }
+
+    function updateLab3x3() {
+      const getVal = (r, c) => parseFloat(document.getElementById(`m3-${r}${c}`).value) || 0;
+
+      const a11 = getVal(1,1), a12 = getVal(1,2), a13 = getVal(1,3);
+      const a21 = getVal(2,1), a22 = getVal(2,2), a23 = getVal(2,3);
+      const a31 = getVal(3,1), a32 = getVal(3,2), a33 = getVal(3,3);
+
+      const d1 = a11 * a22 * a33;
+      const d2 = a12 * a23 * a31;
+      const d3 = a13 * a21 * a32;
+      const sumDown = d1 + d2 + d3;
+
+      const u1 = a31 * a22 * a13;
+      const u2 = a32 * a23 * a11;
+      const u3 = a33 * a21 * a12;
+      const sumUp = u1 + u2 + u3;
+
+      const det = sumDown - sumUp;
+
+      document.getElementById('diag-down-terms').innerText = 
+        `(${a11})(${a22})(${a33}) + (${a12})(${a23})(${a31}) + (${a13})(${a21})(${a32}) = ${d1} + ${d2} + ${d3} = ${sumDown}`;
+
+      document.getElementById('diag-up-terms').innerText = 
+        `(${a31})(${a22})(${a13}) + (${a32})(${a23})(${a11}) + (${a33})(${a21})(${a12}) = ${u1} + ${u2} + ${u3} = ${sumUp}`;
+
+      const resEl = document.getElementById('final-det-3x3');
+      resEl.innerText = det;
+      if (det > 0) resEl.className = "text-3xl text-emerald-400";
+      else if (det < 0) resEl.className = "text-3xl text-amber-400";
+      else resEl.className = "text-3xl text-rose-400";
+    }
+
+    // Initial Load
+    window.addEventListener('DOMContentLoaded', () => {
+      updateLab2x2();
+      updateLab3x3();
+    });
+  </script>
+</body>
+</html>

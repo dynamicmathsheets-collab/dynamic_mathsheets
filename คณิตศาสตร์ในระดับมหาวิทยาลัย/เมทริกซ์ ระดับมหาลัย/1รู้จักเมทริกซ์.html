@@ -1,0 +1,1005 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ความรู้เบื้องต้นเกี่ยวกับเมทริกซ์ (Introduction to Matrices)</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Google Fonts: Prompt & Sarabun & Fira Code -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;600&family=Prompt:wght@300;400;500;600;700&family=Sarabun:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+  <!-- Font Awesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- KaTeX for crisp math rendering -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js"
+    onload="renderMathInElement(document.body, {delimiters: [{left: '$$', right: '$$', display: true}, {left: '$', right: '$', display: false}]});"></script>
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Sarabun', 'sans-serif'],
+            display: ['Prompt', 'sans-serif'],
+            mono: ['Fira Code', 'monospace'],
+          },
+          colors: {
+            brand: {
+              50: '#eff6ff',
+              100: '#dbeafe',
+              200: '#bfdbfe',
+              500: '#3b82f6',
+              600: '#2563eb',
+              700: '#1d4ed8',
+              800: '#1e40af',
+              900: '#1e3a8a',
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    /* Custom bracket styling for matrices */
+    .matrix-bracket-left {
+      border-left: 3px solid #2563eb;
+      border-top: 3px solid #2563eb;
+      border-bottom: 3px solid #2563eb;
+      border-top-left-radius: 8px;
+      border-bottom-left-radius: 8px;
+      width: 12px;
+    }
+    .matrix-bracket-right {
+      border-right: 3px solid #2563eb;
+      border-top: 3px solid #2563eb;
+      border-bottom: 3px solid #2563eb;
+      border-top-right-radius: 8px;
+      border-bottom-right-radius: 8px;
+      width: 12px;
+    }
+    input[type=number]::-webkit-inner-spin-button, 
+    input[type=number]::-webkit-outer-spin-button { 
+      -webkit-appearance: none; 
+      margin: 0; 
+    }
+    input[type=number] {
+      -moz-appearance: textfield;
+    }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-800 font-sans antialiased min-h-screen selection:bg-brand-500 selection:text-white">
+
+  <!-- Main Container -->
+  <main class="max-w-6xl w-full mx-auto px-4 sm:px-6 py-6 sm:py-8 space-y-10">
+
+    <!-- Hero Section & Topic -->
+    <section class="text-center md:text-left md:flex md:items-center md:justify-between pb-2">
+      <div class="md:max-w-2xl space-y-3">
+        <h2 class="text-3xl sm:text-4xl font-display font-extrabold text-slate-900 tracking-tight">
+          ความรู้เบื้องต้นเกี่ยวกับเมทริกซ์
+        </h2>
+        <p class="text-slate-600 text-base leading-relaxed">
+          เมทริกซ์ (Matrix) คือการจัดกลุ่มตัวเลขหรือข้อมูลเป็นแถวและหลักในรูปตารางสี่เหลี่ยมผืนผ้า เป็นเครื่องมือทางคณิตศาสตร์ที่สำคัญอย่างยิ่งในพีชคณิตเชิงเส้น, วิทยาการคอมพิวเตอร์, ปัญญาประดิษฐ์ (AI) และงานฟิสิกส์วิศวกรรม
+        </p>
+      </div>
+      <div class="mt-6 md:mt-0 flex justify-center">
+        <div class="p-4 bg-white rounded-2xl shadow-sm border border-slate-200/80 flex items-center gap-4 text-center">
+          <div class="p-3 bg-blue-50 rounded-xl text-brand-600">
+            <span class="font-mono text-2xl font-bold block">A</span>
+            <span class="text-xs text-slate-500 font-mono">m &times; n</span>
+          </div>
+          <div class="text-left">
+            <div class="text-xs uppercase text-slate-400 font-semibold tracking-wider">สัญลักษณ์สากล</div>
+            <div class="font-mono text-slate-700 font-medium text-sm">$A = [a_{ij}]_{m \times n}$</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 1. Learning Objectives -->
+    <section id="objectives" class="bg-gradient-to-r from-blue-50 via-indigo-50/40 to-slate-50 border border-blue-200/60 rounded-2xl p-6 sm:p-7 shadow-sm">
+      <div class="flex items-start gap-4">
+        <div class="w-10 h-10 rounded-xl bg-blue-600 text-white flex-shrink-0 flex items-center justify-center shadow-md">
+          <i class="fa-solid fa-bullseye text-lg"></i>
+        </div>
+        <div class="space-y-3">
+          <div>
+            <h3 class="text-lg font-display font-bold text-slate-900">วัตถุประสงค์การเรียนรู้</h3>
+            <p class="text-slate-600 text-sm">เมื่อเรียนรู้และทดลองด้วยแบบจำลองนี้แล้ว นักศึกษาจะสามารถ:</p>
+          </div>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
+            <div class="flex items-start gap-2 bg-white/70 p-3 rounded-xl border border-blue-100">
+              <i class="fa-solid fa-circle-check text-brand-600 mt-1"></i>
+              <span class="text-slate-700">อธิบายความหมายและสัญลักษณ์แทนเมทริกซ์ได้อย่างถูกต้อง</span>
+            </div>
+            <div class="flex items-start gap-2 bg-white/70 p-3 rounded-xl border border-blue-100">
+              <i class="fa-solid fa-circle-check text-brand-600 mt-1"></i>
+              <span class="text-slate-700">ระบุขนาด (มิติ) แถว หลัก และตำแหน่งของสมาชิก $a_{ij}$ ได้อย่างแม่นยำ</span>
+            </div>
+            <div class="flex items-start gap-2 bg-white/70 p-3 rounded-xl border border-blue-100">
+              <i class="fa-solid fa-circle-check text-brand-600 mt-1"></i>
+              <span class="text-slate-700">จำแนกประเภทและชนิดต่าง ๆ ของเมทริกซ์จากคุณสมบัติเฉพาะตัวได้</span>
+            </div>
+            <div class="flex items-start gap-2 bg-white/70 p-3 rounded-xl border border-blue-100">
+              <i class="fa-solid fa-circle-check text-brand-600 mt-1"></i>
+              <span class="text-slate-700">สร้างเมทริกซ์จากข้อมูลที่กำหนดและตรวจสอบเงื่อนไขความเท่ากันได้</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 2. Lessons & Concepts (Tabbed Interface) -->
+    <section id="lessons" class="space-y-4">
+      <div class="flex items-center justify-between border-b border-slate-200 pb-3">
+        <div>
+          <h3 class="text-xl font-display font-bold text-slate-900">เนื้อหาบทเรียน</h3>
+          <p class="text-slate-500 text-sm">เลือกหัวข้อเพื่อศึกษาหลักการและตัวอย่างอย่างละเอียด</p>
+        </div>
+      </div>
+
+      <!-- Tab Buttons -->
+      <div class="flex flex-wrap gap-2 border-b border-slate-200 pb-2" id="tab-nav">
+        <button onclick="switchTab('tab-definition')" id="btn-tab-definition" class="tab-btn active px-4 py-2 rounded-lg text-sm font-semibold transition-all bg-brand-600 text-white shadow-sm">
+          <i class="fa-solid fa-book-open mr-1.5"></i> 1. ความหมายและสัญลักษณ์
+        </button>
+        <button onclick="switchTab('tab-dimension')" id="btn-tab-dimension" class="tab-btn px-4 py-2 rounded-lg text-sm font-semibold transition-all bg-slate-100 text-slate-600 hover:bg-slate-200">
+          <i class="fa-solid fa-table-cells mr-1.5"></i> 2. แถว หลัก สมาชิก & ขนาด
+        </button>
+        <button onclick="switchTab('tab-types')" id="btn-tab-types" class="tab-btn px-4 py-2 rounded-lg text-sm font-semibold transition-all bg-slate-100 text-slate-600 hover:bg-slate-200">
+          <i class="fa-solid fa-shapes mr-1.5"></i> 3. ชนิดของเมทริกซ์
+        </button>
+        <button onclick="switchTab('tab-equality')" id="btn-tab-equality" class="tab-btn px-4 py-2 rounded-lg text-sm font-semibold transition-all bg-slate-100 text-slate-600 hover:bg-slate-200">
+          <i class="fa-solid fa-equals mr-1.5"></i> 4. ความเท่ากันของเมทริกซ์
+        </button>
+      </div>
+
+      <!-- Tab 1: ความหมายและสัญลักษณ์ -->
+      <div id="tab-definition" class="tab-content bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+        <h4 class="text-lg font-display font-bold text-slate-900 text-brand-700">1. ความหมายและสัญลักษณ์ของเมทริกซ์</h4>
+        <p class="text-slate-700 leading-relaxed">
+          <strong>เมทริกซ์ (Matrix)</strong> คือ กลุ่มของจำนวนจริงหรือจำนวนเชิงซ้อนที่ถูกนำมาจัดเรียงในรูปแถวแนวนอน (Rows) และหลักแนวตั้ง (Columns) ภายใต้วงเล็บสี่เหลี่ยม $[ \quad ]$ หรือวงเล็บโค้ง $( \quad )$
+        </p>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
+          <div class="p-4 bg-slate-50 rounded-xl border border-slate-200">
+            <h5 class="font-bold text-slate-800 mb-2 text-sm flex items-center gap-2">
+              <i class="fa-solid fa-tag text-brand-600"></i> การเขียนแบบแจกแจงสมาชิก:
+            </h5>
+            <div class="overflow-x-auto text-center py-3 bg-white rounded-lg border border-slate-200">
+              $$A = \begin{bmatrix} a_{11} & a_{12} & \dots & a_{1n} \\ a_{21} & a_{22} & \dots & a_{2n} \\ \vdots & \vdots & \ddots & \vdots \\ a_{m1} & a_{m2} & \dots & a_{mn} \end{bmatrix}$$
+            </div>
+          </div>
+          <div class="p-4 bg-slate-50 rounded-xl border border-slate-200">
+            <h5 class="font-bold text-slate-800 mb-2 text-sm flex items-center gap-2">
+              <i class="fa-solid fa-pen-nib text-brand-600"></i> การเขียนแบบย่อ:
+            </h5>
+            <div class="p-4 bg-white rounded-lg border border-slate-200 text-center space-y-2">
+              <div class="text-xl font-mono font-semibold text-brand-700">$$A = [a_{ij}]_{m \times n}$$</div>
+              <p class="text-xs text-slate-500">
+                เมื่อ $i = 1, 2, \dots, m$ (ดัชนีแถว) และ $j = 1, 2, \dots, n$ (ดัชนีหลัก)
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tab 2: แถว หลัก สมาชิก และมิติ -->
+      <div id="tab-dimension" class="tab-content hidden bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+        <h4 class="text-lg font-display font-bold text-slate-900 text-brand-700">2. แถว หลัก สมาชิก และมิติ (Dimension)</h4>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div class="p-4 rounded-xl border border-blue-100 bg-blue-50/50">
+            <div class="font-bold text-blue-900 mb-1 flex items-center gap-2">
+              <i class="fa-solid fa-arrows-left-right text-blue-600"></i> แถว (Row - แนวนอน)
+            </div>
+            <p class="text-sm text-slate-600">
+              กลุ่มสมาชิกที่เรียงตัวกันใน <strong>แนวนอน</strong> โดยแถวแรกเรียกว่า แถวที่ 1 ($i=1$) เรียงลงไปเรื่อยๆ จนถึงแถวที่ $m$
+            </p>
+          </div>
+          <div class="p-4 rounded-xl border border-emerald-100 bg-emerald-50/50">
+            <div class="font-bold text-emerald-900 mb-1 flex items-center gap-2">
+              <i class="fa-solid fa-arrows-up-down text-emerald-600"></i> หลัก (Column - แนวตั้ง)
+            </div>
+            <p class="text-sm text-slate-600">
+              กลุ่มสมาชิกที่เรียงตัวกันใน <strong>แนวตั้ง</strong> โดยหลักแรกคือ หลักที่ 1 ($j=1$) เรียงจากซ้ายไปขวาจนถึงหลักที่ $n$
+            </p>
+          </div>
+          <div class="p-4 rounded-xl border border-amber-100 bg-amber-50/50">
+            <div class="font-bold text-amber-900 mb-1 flex items-center gap-2">
+              <i class="fa-solid fa-expand text-amber-600"></i> ขนาด/มิติ ($m \times n$)
+            </div>
+            <p class="text-sm text-slate-600">
+              ระบุเป็น <strong>(จำนวนแถว) &times; (จำนวนหลัก)</strong> เช่น ขนาด $2 \times 3$ มี 2 แถวและ 3 หลัก รวมมีสมาชิกทั้งหมด $2 \times 3 = 6$ ตัว
+            </p>
+          </div>
+        </div>
+        <div class="bg-slate-50 p-4 rounded-xl border border-slate-200">
+          <p class="text-sm text-slate-700">
+            <strong>สัญลักษณ์ตำแหน่งสมาชิก $a_{ij}$ :</strong> ตัวอักษรห้อยตัวหน้า ($i$) หมายถึง <strong>แถว</strong> และตัวห้อยหลัง ($j$) หมายถึง <strong>หลัก</strong> เช่น $a_{23}$ คือ สมาชิกที่อยู่ <em>แถวที่ 2 และหลักที่ 3</em>
+          </p>
+        </div>
+      </div>
+
+      <!-- Tab 3: ชนิดของเมทริกซ์ -->
+      <div id="tab-types" class="tab-content hidden bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+        <h4 class="text-lg font-display font-bold text-slate-900 text-brand-700">3. ชนิดของเมทริกซ์ที่ควรรู้จัก</h4>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          <!-- Row Matrix -->
+          <div class="p-4 rounded-xl border border-slate-200 hover:border-brand-400 transition bg-slate-50">
+            <h5 class="font-bold text-slate-800 text-sm flex items-center justify-between">
+              <span>เมทริกซ์แถว (Row Matrix)</span>
+              <span class="text-xs bg-slate-200 px-2 py-0.5 rounded text-slate-700 font-mono">1 &times; n</span>
+            </h5>
+            <p class="text-xs text-slate-600 mt-1 mb-2">มีแถวเพียงแถวเดียว</p>
+            <div class="text-xs font-mono bg-white p-2 rounded border border-slate-200 text-center">
+              $$A = \begin{bmatrix} 2 & -1 & 5 \end{bmatrix}$$
+            </div>
+          </div>
+
+          <!-- Column Matrix -->
+          <div class="p-4 rounded-xl border border-slate-200 hover:border-brand-400 transition bg-slate-50">
+            <h5 class="font-bold text-slate-800 text-sm flex items-center justify-between">
+              <span>เมทริกซ์หลัก (Column Matrix)</span>
+              <span class="text-xs bg-slate-200 px-2 py-0.5 rounded text-slate-700 font-mono">m &times; 1</span>
+            </h5>
+            <p class="text-xs text-slate-600 mt-1 mb-2">มีหลักเพียงหลักเดียว</p>
+            <div class="text-xs font-mono bg-white p-2 rounded border border-slate-200 text-center">
+              $$B = \begin{bmatrix} 4 \\ 0 \\ -3 \end{bmatrix}$$
+            </div>
+          </div>
+
+          <!-- Square Matrix -->
+          <div class="p-4 rounded-xl border border-slate-200 hover:border-brand-400 transition bg-slate-50">
+            <h5 class="font-bold text-slate-800 text-sm flex items-center justify-between">
+              <span>เมทริกซ์จัตุรัส (Square Matrix)</span>
+              <span class="text-xs bg-slate-200 px-2 py-0.5 rounded text-slate-700 font-mono">n &times; n</span>
+            </h5>
+            <p class="text-xs text-slate-600 mt-1 mb-2">จำนวนแถวเท่ากับจำนวนหลัก ($m = n$)</p>
+            <div class="text-xs font-mono bg-white p-2 rounded border border-slate-200 text-center">
+              $$C = \begin{bmatrix} 1 & 3 \\ 2 & 4 \end{bmatrix}$$
+            </div>
+          </div>
+
+          <!-- Zero Matrix -->
+          <div class="p-4 rounded-xl border border-slate-200 hover:border-brand-400 transition bg-slate-50">
+            <h5 class="font-bold text-slate-800 text-sm flex items-center justify-between">
+              <span>เมทริกซ์ศูนย์ (Zero Matrix: 0)</span>
+              <span class="text-xs bg-slate-200 px-2 py-0.5 rounded text-slate-700 font-mono">ทุกขนาด</span>
+            </h5>
+            <p class="text-xs text-slate-600 mt-1 mb-2">สมาชิกทุกตำแหน่งเป็นเลขศูนย์ทั้งหมด ($a_{ij}=0$)</p>
+            <div class="text-xs font-mono bg-white p-2 rounded border border-slate-200 text-center">
+              $$\mathbf{0} = \begin{bmatrix} 0 & 0 \\ 0 & 0 \end{bmatrix}$$
+            </div>
+          </div>
+
+          <!-- Diagonal Matrix -->
+          <div class="p-4 rounded-xl border border-slate-200 hover:border-brand-400 transition bg-slate-50">
+            <h5 class="font-bold text-slate-800 text-sm flex items-center justify-between">
+              <span>เมทริกซ์ทแยงมุม (Diagonal)</span>
+              <span class="text-xs bg-slate-200 px-2 py-0.5 rounded text-slate-700 font-mono">จัตุรัส</span>
+            </h5>
+            <p class="text-xs text-slate-600 mt-1 mb-2">สมาชิกนอกเส้นทแยงมุมหลักเป็น 0 หมด ($i \neq j \implies a_{ij}=0$)</p>
+            <div class="text-xs font-mono bg-white p-2 rounded border border-slate-200 text-center">
+              $$D = \begin{bmatrix} 5 & 0 \\ 0 & 9 \end{bmatrix}$$
+            </div>
+          </div>
+
+          <!-- Identity Matrix -->
+          <div class="p-4 rounded-xl border border-slate-200 hover:border-brand-400 transition bg-slate-50">
+            <h5 class="font-bold text-slate-800 text-sm flex items-center justify-between">
+              <span>เมทริกซ์เอกลักษณ์ (Identity: I)</span>
+              <span class="text-xs bg-slate-200 px-2 py-0.5 rounded text-slate-700 font-mono">จัตุรัส</span>
+            </h5>
+            <p class="text-xs text-slate-600 mt-1 mb-2">ทแยงมุมหลักเป็น 1 ตำแหน่งอื่นเป็น 0 หมด</p>
+            <div class="text-xs font-mono bg-white p-2 rounded border border-slate-200 text-center">
+              $$I = \begin{bmatrix} 1 & 0 \\ 0 & 1 \end{bmatrix}$$
+            </div>
+          </div>
+
+          <!-- Triangular Matrices -->
+          <div class="p-4 rounded-xl border border-slate-200 hover:border-brand-400 transition bg-slate-50 sm:col-span-2 lg:col-span-3">
+            <h5 class="font-bold text-slate-800 text-sm mb-1">เมทริกซ์สามเหลี่ยม (Triangular Matrix)</h5>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mt-2">
+              <div class="bg-white p-3 rounded-lg border border-slate-200 text-xs">
+                <span class="font-semibold text-brand-600 block mb-1">สามเหลี่ยมบน (Upper Triangular):</span>
+                สมาชิกที่อยู่ <strong>ใต้</strong> เส้นทแยงมุมหลักเป็น 0 ทั้งหมด ($i > j \implies a_{ij} = 0$)
+                <div class="text-center font-mono mt-1">$$\begin{bmatrix} 2 & 5 & 7 \\ 0 & 4 & 1 \\ 0 & 0 & 8 \end{bmatrix}$$</div>
+              </div>
+              <div class="bg-white p-3 rounded-lg border border-slate-200 text-xs">
+                <span class="font-semibold text-brand-600 block mb-1">สามเหลี่ยมล่าง (Lower Triangular):</span>
+                สมาชิกที่อยู่ <strong>เหนือ</strong> เส้นทแยงมุมหลักเป็น 0 ทั้งหมด ($i < j \implies a_{ij} = 0$)
+                <div class="text-center font-mono mt-1">$$\begin{bmatrix} 3 & 0 & 0 \\ 4 & 6 & 0 \\ 1 & 2 & 9 \end{bmatrix}$$</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tab 4: ความเท่ากันของเมทริกซ์ -->
+      <div id="tab-equality" class="tab-content hidden bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+        <h4 class="text-lg font-display font-bold text-slate-900 text-brand-700">4. ความเท่ากันของเมทริกซ์ (Matrix Equality)</h4>
+        <p class="text-slate-700 leading-relaxed text-sm">
+          เมทริกซ์สองเมทริกซ์ $A = [a_{ij}]$ และ $B = [b_{ij}]$ จะกล่าวได้ว่า <strong>เท่ากัน ($A = B$)</strong> ก็ต่อเมื่อเป็นไปตาม 2 เงื่อนไขนี้พร้อมกัน:
+        </p>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div class="p-4 bg-emerald-50 border border-emerald-200 rounded-xl flex items-start gap-3">
+            <span class="w-7 h-7 rounded-full bg-emerald-600 text-white flex items-center justify-center font-bold text-sm flex-shrink-0">1</span>
+            <div>
+              <h5 class="font-bold text-emerald-900 text-sm">มีมิติ (ขนาด) เท่ากันทุกประการ</h5>
+              <p class="text-xs text-emerald-700 mt-1">
+                เช่น ถ้า $A$ มีขนาด $2 \times 3$ แล้ว $B$ จะต้องมีขนาด $2 \times 3$ เช่นเดียวกัน
+              </p>
+            </div>
+          </div>
+          <div class="p-4 bg-emerald-50 border border-emerald-200 rounded-xl flex items-start gap-3">
+            <span class="w-7 h-7 rounded-full bg-emerald-600 text-white flex items-center justify-center font-bold text-sm flex-shrink-0">2</span>
+            <div>
+              <h5 class="font-bold text-emerald-900 text-sm">สมาชิกในตำแหน่งเดียวกันต้องเท่ากัน</h5>
+              <p class="text-xs text-emerald-700 mt-1">
+                กล่าวคือ $a_{ij} = b_{ij}$ สำหรับทุกๆ ค่าของ $i$ และ $j$
+              </p>
+            </div>
+          </div>
+        </div>
+        <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 text-xs text-slate-600">
+          <strong>ตัวอย่าง:</strong> ถ้า $\begin{bmatrix} x & 2 \\ 5 & y \end{bmatrix} = \begin{bmatrix} 7 & 2 \\ 5 & -3 \end{bmatrix}$ สรุปได้ทันทีว่า $x = 7$ และ $y = -3$
+        </div>
+      </div>
+    </section>
+
+    <!-- 3. Interactive Matrix Simulator & Playground -->
+    <section id="playground" class="bg-white rounded-3xl border border-slate-200/90 shadow-lg p-6 sm:p-8 space-y-6">
+      <div class="border-b border-slate-100 pb-5 flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div>
+          <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold bg-indigo-50 text-indigo-700 border border-indigo-100">
+            <i class="fa-solid fa-flask"></i> Interactive Playground & Inspector
+          </div>
+          <h3 class="text-2xl font-display font-bold text-slate-900 mt-1">แบบจำลองโต้ตอบ: สร้างและวิเคราะห์เมทริกซ์</h3>
+          <p class="text-slate-500 text-sm">ปรับขนาดเมทริกซ์ คลิกพิมพ์เปลี่ยนตัวเลข และสังเกตผลการจำแนกชนิดเมทริกซ์อัตโนมัติ</p>
+        </div>
+        <!-- Real-time Dimension Badge -->
+        <div class="flex items-center gap-3 bg-slate-50 px-4 py-2.5 rounded-2xl border border-slate-200 self-start md:self-auto">
+          <span class="text-xs font-medium text-slate-500 uppercase">มิติปัจจุบัน:</span>
+          <span id="badge-dimension" class="font-mono text-lg font-bold text-brand-600 bg-white px-3 py-1 rounded-xl shadow-xs border border-slate-200">
+            3 &times; 3
+          </span>
+        </div>
+      </div>
+
+      <!-- Controls: Sliders & Presets -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 bg-slate-50/70 p-5 rounded-2xl border border-slate-200/70">
+        <!-- Sliders -->
+        <div class="lg:col-span-5 space-y-4">
+          <div>
+            <div class="flex justify-between text-sm font-semibold text-slate-700 mb-1.5">
+              <span><i class="fa-solid fa-arrows-left-right text-brand-600 mr-1"></i> จำนวนแถว ($m$):</span>
+              <span id="row-val" class="font-mono text-brand-600 font-bold bg-white px-2 py-0.5 rounded border border-slate-200">3</span>
+            </div>
+            <input type="range" id="input-rows" min="1" max="5" value="3" 
+              class="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-brand-600"
+              oninput="handleDimensionChange()">
+            <div class="flex justify-between text-[11px] text-slate-400 font-mono mt-1">
+              <span>1</span><span>2</span><span>3</span><span>4</span><span>5</span>
+            </div>
+          </div>
+
+          <div>
+            <div class="flex justify-between text-sm font-semibold text-slate-700 mb-1.5">
+              <span><i class="fa-solid fa-arrows-up-down text-emerald-600 mr-1"></i> จำนวนหลัก ($n$):</span>
+              <span id="col-val" class="font-mono text-emerald-600 font-bold bg-white px-2 py-0.5 rounded border border-slate-200">3</span>
+            </div>
+            <input type="range" id="input-cols" min="1" max="5" value="3" 
+              class="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-emerald-600"
+              oninput="handleDimensionChange()">
+            <div class="flex justify-between text-[11px] text-slate-400 font-mono mt-1">
+              <span>1</span><span>2</span><span>3</span><span>4</span><span>5</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Preset Buttons -->
+        <div class="lg:col-span-7 flex flex-col justify-center space-y-2.5">
+          <label class="text-xs font-semibold text-slate-500 uppercase tracking-wider flex items-center gap-1.5">
+            <i class="fa-solid fa-wand-magic-sparkles text-amber-500"></i> ปุ่มทางลัดสร้างเมทริกซ์ (Presets)
+          </label>
+          <div class="flex flex-wrap gap-2">
+            <button onclick="applyPreset('zero')" class="px-3 py-2 bg-white hover:bg-slate-100 border border-slate-300 text-slate-700 text-xs font-medium rounded-xl transition shadow-xs flex items-center gap-1.5">
+              <i class="fa-regular fa-circle text-slate-400"></i> เมทริกซ์ศูนย์
+            </button>
+            <button onclick="applyPreset('identity')" id="btn-preset-identity" class="px-3 py-2 bg-white hover:bg-slate-100 border border-slate-300 text-slate-700 text-xs font-medium rounded-xl transition shadow-xs flex items-center gap-1.5">
+              <i class="fa-solid fa-fingerprint text-brand-500"></i> เมทริกซ์เอกลักษณ์
+            </button>
+            <button onclick="applyPreset('diagonal')" class="px-3 py-2 bg-white hover:bg-slate-100 border border-slate-300 text-slate-700 text-xs font-medium rounded-xl transition shadow-xs flex items-center gap-1.5">
+              <i class="fa-solid fa-slash text-purple-500"></i> เมทริกซ์ทแยงมุม
+            </button>
+            <button onclick="applyPreset('random')" class="px-3 py-2 bg-white hover:bg-slate-100 border border-slate-300 text-slate-700 text-xs font-medium rounded-xl transition shadow-xs flex items-center gap-1.5">
+              <i class="fa-solid fa-shuffle text-emerald-500"></i> สุ่มตัวเลข (-9 ถึง 9)
+            </button>
+            <button onclick="applyPreset('clear')" class="px-3 py-2 bg-white hover:bg-rose-50 border border-rose-200 text-rose-600 text-xs font-medium rounded-xl transition shadow-xs flex items-center gap-1.5">
+              <i class="fa-solid fa-trash-can"></i> ล้างค่า (เป็น 0)
+            </button>
+          </div>
+          <p id="preset-hint" class="text-[12px] text-slate-500 italic"></p>
+        </div>
+      </div>
+
+      <!-- Matrix Canvas & Visual Grid Area -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start pt-2">
+        <!-- The Matrix Box -->
+        <div class="lg:col-span-7 flex flex-col items-center justify-center p-6 bg-slate-50/50 rounded-2xl border border-slate-200/80 min-h-[300px]">
+          <div class="flex items-center justify-center w-full overflow-x-auto py-4">
+            <!-- Left Bracket -->
+            <div class="matrix-bracket-left self-stretch"></div>
+            <!-- Matrix Cells Container -->
+            <div id="matrix-container" class="grid gap-2 sm:gap-3 p-3">
+              <!-- Grid elements rendered dynamically by JS -->
+            </div>
+            <!-- Right Bracket -->
+            <div class="matrix-bracket-right self-stretch"></div>
+          </div>
+
+          <!-- Position Inspector Hover/Focus Feedback -->
+          <div id="cell-inspector" class="mt-4 px-4 py-2 bg-white border border-brand-200 rounded-xl text-center shadow-xs w-full max-w-sm transition-all">
+            <span class="text-xs text-slate-500">แตะหรือเลือกช่องเพื่อดูรายละเอียดตำแหน่ง</span>
+            <div class="text-sm font-mono font-bold text-brand-700" id="cell-detail-label">
+              เลือกสมาชิกในตาราง
+            </div>
+          </div>
+        </div>
+
+        <!-- Inspector: Live Type Analysis -->
+        <div class="lg:col-span-5 space-y-4">
+          <div class="bg-slate-900 text-white p-5 rounded-2xl shadow-md space-y-4">
+            <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+              <h4 class="font-display font-semibold text-slate-200 flex items-center gap-2 text-sm">
+                <i class="fa-solid fa-magnifying-glass-chart text-brand-400"></i> ผลการวิเคราะห์เมทริกซ์ (Matrix Inspector)
+              </h4>
+              <span class="text-[11px] bg-slate-800 text-emerald-400 font-mono px-2 py-0.5 rounded-md">Realtime</span>
+            </div>
+
+            <!-- Analysis Badges Container -->
+            <div id="inspector-results" class="space-y-2 min-h-[140px] flex flex-col justify-center">
+              <!-- Injected by JavaScript -->
+            </div>
+
+            <div class="text-[12px] text-slate-400 border-t border-slate-800/80 pt-3 flex items-center gap-2">
+              <i class="fa-solid fa-circle-info text-brand-400"></i>
+              <span>ระบบตรวจสอบคุณสมบัติทางคณิตศาสตร์จากค่าสมาชิกที่คุณป้อนโดยตรง</span>
+            </div>
+          </div>
+
+          <!-- Quick Tip Card -->
+          <div class="p-4 bg-amber-50/70 border border-amber-200 rounded-2xl text-xs text-amber-900 leading-relaxed">
+            <strong class="font-semibold block mb-1 flex items-center gap-1.5">
+              <i class="fa-regular fa-lightbulb text-amber-600"></i> ข้อสังเกต:
+            </strong>
+            เมทริกซ์เอกลักษณ์จะต้องเป็น <strong>เมทริกซ์จัตุรัส</strong> ($m=n$) เสมอ หากจำนวนแถวไม่เท่ากับหลักจะไม่สามารถเกิดเมทริกซ์เอกลักษณ์ได้
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 4. Interactive Discovery Questions -->
+    <section id="discovery" class="space-y-6">
+      <div class="border-b border-slate-200 pb-3">
+        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-100 mb-1">
+          <i class="fa-solid fa-lightbulb"></i> Discovery & Inquiry
+        </div>
+        <h3 class="text-2xl font-display font-bold text-slate-900">คำถามนำเพื่อค้นพบ (Inquiry Questions)</h3>
+        <p class="text-slate-500 text-sm">ทดลองคิด วิเคราะห์จากแบบจำลองด้านบน แล้วคลิกดูแนวคิดคำตอบ</p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <!-- Question 1 -->
+        <div class="bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden flex flex-col">
+          <div class="p-5 flex-1">
+            <div class="flex items-start gap-3">
+              <span class="w-7 h-7 rounded-lg bg-brand-100 text-brand-700 font-bold text-sm flex items-center justify-center flex-shrink-0">1</span>
+              <div>
+                <h4 class="font-display font-bold text-slate-800 text-base">เมื่อเพิ่มจำนวนแถวหรือหลัก ขนาดของเมทริกซ์เปลี่ยนอย่างไร?</h4>
+                <p class="text-xs text-slate-500 mt-1">ให้ลองเลื่อนแถบสไลเดอร์ $m$ และ $n$ ในแบบจำลองดูการเปลี่ยนแปลง</p>
+              </div>
+            </div>
+          </div>
+          <div class="px-5 pb-4">
+            <button onclick="toggleAnswer('ans-1')" class="w-full py-2.5 px-4 text-xs font-semibold text-brand-700 bg-brand-50 hover:bg-brand-100 rounded-xl transition flex items-center justify-between">
+              <span><i class="fa-solid fa-key mr-1.5"></i> ดูแนวคิดคำตอบ</span>
+              <i id="icon-ans-1" class="fa-solid fa-chevron-down text-xs transition-transform"></i>
+            </button>
+            <div id="ans-1" class="hidden mt-3 p-4 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-700 space-y-2 leading-relaxed">
+              <p>
+                <strong>แนวคิด:</strong> ขนาด (มิติ) ของเมทริกซ์เขียนแทนด้วย $m \times n$ (แถว &times; หลัก)
+              </p>
+              <ul class="list-disc list-inside space-y-1 text-slate-600">
+                <li>เมื่อเพิ่มแถว ($m$): เมทริกซ์จะมีความสูงเพิ่มขึ้นในแนวนอน และจำนวนสมาชิกเพิ่มขึ้นทีละ $n$ ตัว</li>
+                <li>เมื่อเพิ่มหลัก ($n$): เมทริกซ์จะมีความกว้างขึ้นในแนวตั้ง และจำนวนสมาชิกเพิ่มขึ้นทีละ $m$ ตัว</li>
+                <li>จำนวนสมาชิกทั้งหมด = $m \times n$ ตัวเสมอ</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <!-- Question 2 -->
+        <div class="bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden flex flex-col">
+          <div class="p-5 flex-1">
+            <div class="flex items-start gap-3">
+              <span class="w-7 h-7 rounded-lg bg-brand-100 text-brand-700 font-bold text-sm flex items-center justify-center flex-shrink-0">2</span>
+              <div>
+                <h4 class="font-display font-bold text-slate-800 text-base">สมาชิก $a_{23}$ หมายถึงสมาชิกตำแหน่งใด?</h4>
+                <p class="text-xs text-slate-500 mt-1">พิจารณาดัชนีตัวเลขห้อย $i$ และ $j$ ในสัญลักษณ์ $a_{ij}$</p>
+              </div>
+            </div>
+          </div>
+          <div class="px-5 pb-4">
+            <button onclick="toggleAnswer('ans-2')" class="w-full py-2.5 px-4 text-xs font-semibold text-brand-700 bg-brand-50 hover:bg-brand-100 rounded-xl transition flex items-center justify-between">
+              <span><i class="fa-solid fa-key mr-1.5"></i> ดูแนวคิดคำตอบ</span>
+              <i id="icon-ans-2" class="fa-solid fa-chevron-down text-xs transition-transform"></i>
+            </button>
+            <div id="ans-2" class="hidden mt-3 p-4 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-700 space-y-2 leading-relaxed">
+              <p>
+                <strong>แนวคิด:</strong> ในสัญลักษณ์สากล $a_{ij}$ ดัชนีตัวแรกแทน <em>แถว</em> และตัวที่สองแทน <em>หลัก</em>
+              </p>
+              <div class="p-2.5 bg-white rounded-lg border border-slate-200 font-mono text-center text-brand-700 font-bold">
+                $a_{23} \implies$ แถวที่ 2 และ หลักที่ 3
+              </div>
+              <p class="text-slate-600">
+                (ไม่ใช่ตัวเลขยี่สิบสาม แต่อ่านว่า "เอ สอง สาม" หมายถึงสมาชิกในแนวนอนที่ 2 ตัดกับแนวตั้งที่ 3)
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Question 3 -->
+        <div class="bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden flex flex-col">
+          <div class="p-5 flex-1">
+            <div class="flex items-start gap-3">
+              <span class="w-7 h-7 rounded-lg bg-brand-100 text-brand-700 font-bold text-sm flex items-center justify-center flex-shrink-0">3</span>
+              <div>
+                <h4 class="font-display font-bold text-slate-800 text-base">เมทริกซ์จัตุรัสทุกเมทริกซ์เป็นเมทริกซ์ทแยงมุมหรือไม่ เพราะเหตุใด?</h4>
+                <p class="text-xs text-slate-500 mt-1">ทดลองใส่ตัวเลขตำแหน่งอื่นๆ นอกเส้นทแยงมุมหลักในเครื่องมือ Inspector</p>
+              </div>
+            </div>
+          </div>
+          <div class="px-5 pb-4">
+            <button onclick="toggleAnswer('ans-3')" class="w-full py-2.5 px-4 text-xs font-semibold text-brand-700 bg-brand-50 hover:bg-brand-100 rounded-xl transition flex items-center justify-between">
+              <span><i class="fa-solid fa-key mr-1.5"></i> ดูแนวคิดคำตอบ</span>
+              <i id="icon-ans-3" class="fa-solid fa-chevron-down text-xs transition-transform"></i>
+            </button>
+            <div id="ans-3" class="hidden mt-3 p-4 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-700 space-y-2 leading-relaxed">
+              <p class="font-bold text-rose-600">
+                <i class="fa-solid fa-xmark"></i> ไม่เป็นทุกเมทริกซ์!
+              </p>
+              <p>
+                <strong>เพราะเหตุใด:</strong> แม้ว่าเมทริกซ์ทแยงมุมจำเป็นต้องมีคุณสมบัติเป็นเมทริกซ์จัตุรัสก่อน แต่มีเงื่อนไขเพิ่มเติมที่เข้มงวดคือ:
+                <strong>"สมาชิกทุกตัวที่อยู่นอกเส้นทแยงมุมหลัก ($i \neq j$) จะต้องมีค่าเป็น 0 ทั้งหมด"</strong>
+              </p>
+              <p class="text-slate-600">
+                ดังนั้น หากเมทริกซ์จัตุรัสนั้นมีสมาชิกนอกเส้นทแยงมุมหลักตัวใดตัวหนึ่งที่ไม่ใช่ 0 ก็จะไม่จัดเป็นเมทริกซ์ทแยงมุม
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Question 4 -->
+        <div class="bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden flex flex-col">
+          <div class="p-5 flex-1">
+            <div class="flex items-start gap-3">
+              <span class="w-7 h-7 rounded-lg bg-brand-100 text-brand-700 font-bold text-sm flex items-center justify-center flex-shrink-0">4</span>
+              <div>
+                <h4 class="font-display font-bold text-slate-800 text-base">เมทริกซ์สองเมทริกซ์ต้องมีเงื่อนไขใดจึงจะเท่ากัน?</h4>
+                <p class="text-xs text-slate-500 mt-1">พิจารณาเงื่อนไขด้านมิติและสมาชิกภายในเมทริกซ์</p>
+              </div>
+            </div>
+          </div>
+          <div class="px-5 pb-4">
+            <button onclick="toggleAnswer('ans-4')" class="w-full py-2.5 px-4 text-xs font-semibold text-brand-700 bg-brand-50 hover:bg-brand-100 rounded-xl transition flex items-center justify-between">
+              <span><i class="fa-solid fa-key mr-1.5"></i> ดูแนวคิดคำตอบ</span>
+              <i id="icon-ans-4" class="fa-solid fa-chevron-down text-xs transition-transform"></i>
+            </button>
+            <div id="ans-4" class="hidden mt-3 p-4 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-700 space-y-2 leading-relaxed">
+              <p>
+                เมทริกซ์สองตัว $A$ และ $B$ จะเท่ากัน ($A = B$) ก็ต่อเมื่อตรงตาม <strong>2 เงื่อนไขพร้อมกัน</strong>:
+              </p>
+              <ol class="list-decimal list-inside space-y-1.5 text-slate-600">
+                <li><strong>มิติเท่ากัน:</strong> ต้องมีจำนวนแถวและจำนวนหลักเท่ากันทุกประการ ($m_A = m_B$ และ $n_A = n_B$)</li>
+                <li><strong>สมาชิกเหมือนกันทุกตำแหน่ง:</strong> $a_{ij} = b_{ij}$ ในทุกๆ ตำแหน่ง $i, j$ ที่ตรงกัน (หากต่างกันแม้เพียงตัวเดียว จะไม่เท่ากันทันที)</li>
+              </ol>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Application Logic -->
+  <script>
+    // State management
+    let state = {
+      rows: 3,
+      cols: 3,
+      matrix: [
+        [1, 0, 0],
+        [0, 1, 0],
+        [0, 0, 1]
+      ],
+      selectedCell: null
+    };
+
+    // Tab switching function
+    function switchTab(tabId) {
+      document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+      document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.classList.remove('bg-brand-600', 'text-white', 'shadow-sm');
+        btn.classList.add('bg-slate-100', 'text-slate-600');
+      });
+
+      const activeTab = document.getElementById(tabId);
+      const activeBtn = document.getElementById('btn-' + tabId);
+      if (activeTab) activeTab.classList.remove('hidden');
+      if (activeBtn) {
+        activeBtn.classList.add('bg-brand-600', 'text-white', 'shadow-sm');
+        activeBtn.classList.remove('bg-slate-100', 'text-slate-600');
+      }
+
+      // Re-trigger KaTeX rendering for newly visible content if needed
+      if (window.renderMathInElement) {
+        renderMathInElement(document.getElementById(tabId), {
+          delimiters: [{left: '$$', right: '$$', display: true}, {left: '$', right: '$', display: false}]
+        });
+      }
+    }
+
+    // Toggle discovery answer cards
+    function toggleAnswer(ansId) {
+      const panel = document.getElementById(ansId);
+      const icon = document.getElementById('icon-' + ansId);
+      if (panel.classList.contains('hidden')) {
+        panel.classList.remove('hidden');
+        icon.classList.add('rotate-180');
+      } else {
+        panel.classList.add('hidden');
+        icon.classList.remove('rotate-180');
+      }
+    }
+
+    // Handle slider changes for dimensions
+    function handleDimensionChange() {
+      const newRows = parseInt(document.getElementById('input-rows').value, 10);
+      const newCols = parseInt(document.getElementById('input-cols').value, 10);
+
+      document.getElementById('row-val').innerText = newRows;
+      document.getElementById('col-val').innerText = newCols;
+      document.getElementById('badge-dimension').innerHTML = `${newRows} &times; ${newCols}`;
+
+      // Adjust matrix array preserving existing values where possible
+      const newMatrix = [];
+      for (let r = 0; r < newRows; r++) {
+        const row = [];
+        for (let c = 0; c < newCols; c++) {
+          if (state.matrix[r] && state.matrix[r][c] !== undefined) {
+            row.push(state.matrix[r][c]);
+          } else {
+            // Default 0 for new cells
+            row.push(0);
+          }
+        }
+        newMatrix.push(row);
+      }
+
+      state.rows = newRows;
+      state.cols = newCols;
+      state.matrix = newMatrix;
+
+      renderMatrixUI();
+      analyzeMatrix();
+      updatePresetButtonStates();
+    }
+
+    // Update Presets UI state
+    function updatePresetButtonStates() {
+      const identityBtn = document.getElementById('btn-preset-identity');
+      const hint = document.getElementById('preset-hint');
+      if (state.rows !== state.cols) {
+        identityBtn.classList.add('opacity-50', 'cursor-not-allowed');
+        hint.innerText = '* เมทริกซ์เอกลักษณ์และเมทริกซ์ทแยงมุมใช้ได้เมื่อมิติเป็นจัตุรัส (แถว = หลัก)';
+      } else {
+        identityBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+        hint.innerText = '';
+      }
+    }
+
+    // Cell value change handler
+    function handleCellInput(r, c, value) {
+      let num = parseFloat(value);
+      if (isNaN(num)) num = 0;
+      state.matrix[r][c] = num;
+      analyzeMatrix();
+    }
+
+    // Select/Highlight a cell
+    function selectCell(r, c) {
+      state.selectedCell = { r, c };
+      const label = document.getElementById('cell-detail-label');
+      label.innerHTML = `ตำแหน่ง: <span class="text-brand-600 font-extrabold text-base">a<sub>${r+1}${c+1}</sub></span> (แถวที่ ${r+1}, หลักที่ ${c+1}) = <span class="text-slate-900">${state.matrix[r][c]}</span>`;
+      
+      // Update styling highlight
+      document.querySelectorAll('.matrix-input-cell').forEach(el => {
+        el.classList.remove('ring-2', 'ring-brand-500', 'bg-blue-50');
+      });
+      const activeEl = document.getElementById(`cell-${r}-${c}`);
+      if (activeEl) {
+        activeEl.classList.add('ring-2', 'ring-brand-500', 'bg-blue-50');
+      }
+    }
+
+    // Render Matrix inputs into grid
+    function renderMatrixUI() {
+      const container = document.getElementById('matrix-container');
+      container.innerHTML = '';
+      container.style.gridTemplateColumns = `repeat(${state.cols}, minmax(0, 1fr))`;
+
+      for (let r = 0; r < state.rows; r++) {
+        for (let c = 0; c < state.cols; c++) {
+          const val = state.matrix[r][c];
+          const cellWrapper = document.createElement('div');
+          cellWrapper.className = 'relative flex flex-col items-center group';
+
+          // Index tooltip tag (a_ij)
+          const tag = document.createElement('span');
+          tag.className = 'text-[10px] text-slate-400 font-mono mb-0.5 group-hover:text-brand-600 transition';
+          tag.innerHTML = `a<sub>${r+1}${c+1}</sub>`;
+
+          // Input element
+          const input = document.createElement('input');
+          input.id = `cell-${r}-${c}`;
+          input.type = 'number';
+          input.step = 'any';
+          input.value = val;
+          input.className = 'matrix-input-cell w-11 h-11 sm:w-14 sm:h-12 text-center font-mono text-base font-semibold text-slate-800 bg-white border border-slate-300 rounded-xl shadow-xs focus:outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-200 transition';
+
+          // Highlight main diagonal if square
+          if (state.rows === state.cols && r === c) {
+            input.classList.add('border-brand-300', 'bg-slate-50/70');
+          }
+
+          input.addEventListener('focus', () => selectCell(r, c));
+          input.addEventListener('input', (e) => handleCellInput(r, c, e.target.value));
+          input.addEventListener('mouseenter', () => {
+            if (!state.selectedCell || (state.selectedCell.r !== r || state.selectedCell.c !== c)) {
+              document.getElementById('cell-detail-label').innerHTML = `ชี้ตำแหน่ง: a<sub>${r+1}${c+1}</sub> (แถว ${r+1}, หลัก ${c+1})`;
+            }
+          });
+
+          cellWrapper.appendChild(tag);
+          cellWrapper.appendChild(input);
+          container.appendChild(cellWrapper);
+        }
+      }
+    }
+
+    // Apply Presets
+    function applyPreset(type) {
+      const rows = state.rows;
+      const cols = state.cols;
+
+      if ((type === 'identity' || type === 'diagonal') && rows !== cols) {
+        // Automatically make square to satisfy condition
+        state.cols = state.rows;
+        document.getElementById('input-cols').value = state.rows;
+        document.getElementById('col-val').innerText = state.rows;
+        document.getElementById('badge-dimension').innerHTML = `${state.rows} &times; ${state.rows}`;
+      }
+
+      const m = state.rows;
+      const n = state.cols;
+      const newMat = Array.from({ length: m }, () => Array(n).fill(0));
+
+      if (type === 'zero' || type === 'clear') {
+        // Already zeroed
+      } else if (type === 'identity') {
+        for (let i = 0; i < Math.min(m, n); i++) {
+          newMat[i][i] = 1;
+        }
+      } else if (type === 'diagonal') {
+        for (let i = 0; i < Math.min(m, n); i++) {
+          newMat[i][i] = Math.floor(Math.random() * 8) + 2; // non-zero values
+        }
+      } else if (type === 'random') {
+        for (let r = 0; r < m; r++) {
+          for (let c = 0; c < n; c++) {
+            newMat[r][c] = Math.floor(Math.random() * 19) - 9; // -9 to 9
+          }
+        }
+      }
+
+      state.matrix = newMat;
+      renderMatrixUI();
+      analyzeMatrix();
+      updatePresetButtonStates();
+
+      // Reset selection label
+      document.getElementById('cell-detail-label').innerText = 'เลือกสมาชิกในตาราง';
+    }
+
+    // Matrix Inspector Analyzer Logic
+    function analyzeMatrix() {
+      const m = state.rows;
+      const n = state.cols;
+      const mat = state.matrix;
+
+      const types = [];
+
+      // 1. Row Matrix
+      if (m === 1) {
+        types.push({
+          name: 'เมทริกซ์แถว (Row Matrix)',
+          desc: 'มีเพียง 1 แถวเท่านั้น (มิติ 1 &times; ' + n + ')',
+          status: 'success'
+        });
+      }
+
+      // 2. Column Matrix
+      if (n === 1) {
+        types.push({
+          name: 'เมทริกซ์หลัก (Column Matrix)',
+          desc: 'มีเพียง 1 หลักเท่านั้น (มิติ ' + m + ' &times; 1)',
+          status: 'success'
+        });
+      }
+
+      // 3. Square Matrix
+      const isSquare = (m === n);
+      if (isSquare) {
+        types.push({
+          name: 'เมทริกซ์จัตุรัส (Square Matrix)',
+          desc: `จำนวนแถวเท่ากับจำนวนหลัก (${m} &times; ${n})`,
+          status: 'success'
+        });
+      }
+
+      // Check Zero Matrix
+      let allZeros = true;
+      for (let r = 0; r < m; r++) {
+        for (let c = 0; c < n; c++) {
+          if (mat[r][c] !== 0) {
+            allZeros = false;
+            break;
+          }
+        }
+      }
+
+      if (allZeros) {
+        types.push({
+          name: 'เมทริกซ์ศูนย์ (Zero Matrix : 0)',
+          desc: 'สมาชิกทุกตำแหน่งมีค่าเป็นศูนย์ทั้งหมด',
+          status: 'accent'
+        });
+      }
+
+      // Properties requiring Square Matrix
+      if (isSquare) {
+        // Diagonal Matrix check
+        let isDiag = true;
+        let hasNonZeroDiag = false;
+        for (let r = 0; r < m; r++) {
+          for (let c = 0; c < n; c++) {
+            if (r !== c && mat[r][c] !== 0) {
+              isDiag = false;
+            }
+            if (r === c && mat[r][c] !== 0) {
+              hasNonZeroDiag = true;
+            }
+          }
+        }
+
+        if (isDiag) {
+          types.push({
+            name: 'เมทริกซ์ทแยงมุม (Diagonal Matrix)',
+            desc: 'สมาชิกที่อยู่นอกเส้นทแยงมุมหลักเป็นศูนย์ทั้งหมด',
+            status: 'success'
+          });
+        }
+
+        // Identity Matrix check
+        let isIdentity = isDiag;
+        for (let i = 0; i < m; i++) {
+          if (mat[i][i] !== 1) {
+            isIdentity = false;
+            break;
+          }
+        }
+        if (isIdentity) {
+          types.push({
+            name: 'เมทริกซ์เอกลักษณ์ (Identity Matrix : I)',
+            desc: 'ทแยงมุมหลักเป็น 1 ทุกตัว และสมาชิกอื่นเป็น 0',
+            status: 'accent'
+          });
+        }
+
+        // Upper Triangular: beneath diagonal (r > c) must be 0
+        let isUpper = true;
+        for (let r = 0; r < m; r++) {
+          for (let c = 0; c < n; c++) {
+            if (r > c && mat[r][c] !== 0) {
+              isUpper = false;
+            }
+          }
+        }
+        if (isUpper && !isDiag) {
+          types.push({
+            name: 'เมทริกซ์สามเหลี่ยมบน (Upper Triangular)',
+            desc: 'สมาชิกใต้เส้นทแยงมุมหลักเป็นศูนย์ทั้งหมด',
+            status: 'neutral'
+          });
+        }
+
+        // Lower Triangular: above diagonal (r < c) must be 0
+        let isLower = true;
+        for (let r = 0; r < m; r++) {
+          for (let c = 0; c < n; c++) {
+            if (r < c && mat[r][c] !== 0) {
+              isLower = false;
+            }
+          }
+        }
+        if (isLower && !isDiag) {
+          types.push({
+            name: 'เมทริกซ์สามเหลี่ยมล่าง (Lower Triangular)',
+            desc: 'สมาชิกเหนือเส้นทแยงมุมหลักเป็นศูนย์ทั้งหมด',
+            status: 'neutral'
+          });
+        }
+      }
+
+      // Render Inspector Badges
+      const resultBox = document.getElementById('inspector-results');
+      resultBox.innerHTML = '';
+
+      if (types.length === 0) {
+        resultBox.innerHTML = `
+          <div class="p-3 bg-slate-800/80 rounded-xl border border-slate-700 text-slate-400 text-xs text-center">
+            <i class="fa-solid fa-shapes text-slate-500 mb-1 block text-base"></i>
+            เป็นเมทริกซ์ทั่วไป (ขนาด ${m} &times; ${n})<br>ยังไม่ตรงกับเงื่อนไขเมทริกซ์ชนิดพิเศษ
+          </div>
+        `;
+      } else {
+        types.forEach(t => {
+          const item = document.createElement('div');
+          let colorStyle = 'bg-slate-800 text-slate-200 border-slate-700';
+          let icon = 'fa-check';
+
+          if (t.status === 'accent') {
+            colorStyle = 'bg-brand-900/40 text-brand-200 border-brand-500/50';
+            icon = 'fa-star';
+          } else if (t.status === 'success') {
+            colorStyle = 'bg-emerald-950/40 text-emerald-200 border-emerald-500/50';
+            icon = 'fa-circle-check';
+          }
+
+          item.className = `p-2.5 rounded-xl border ${colorStyle} flex items-start gap-2.5 transition`;
+          item.innerHTML = `
+            <i class="fa-solid ${icon} mt-0.5 text-xs text-emerald-400"></i>
+            <div>
+              <div class="font-bold text-xs text-white">${t.name}</div>
+              <div class="text-[11px] text-slate-300 opacity-90">${t.desc}</div>
+            </div>
+          `;
+          resultBox.appendChild(item);
+        });
+      }
+    }
+
+    // Initialize application
+    window.onload = function() {
+      renderMatrixUI();
+      analyzeMatrix();
+      updatePresetButtonStates();
+    };
+  </script>
+</body>
+</html>

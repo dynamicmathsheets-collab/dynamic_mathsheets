@@ -1,0 +1,798 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>สมบัติของดีเทอร์มิแนนต์ (Properties of Determinants)</title>
+  
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- Google Fonts: Prompt, Sarabun, JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Prompt:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=Sarabun:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  
+  <!-- KaTeX -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js" onload="renderMath()"></script>
+  
+  <style>
+    body {
+      font-family: 'Sarabun', sans-serif;
+      background-color: #f8fafc;
+      color: #1e293b;
+    }
+    h1, h2, h3, h4, .font-heading {
+      font-family: 'Prompt', sans-serif;
+    }
+    .font-mono {
+      font-family: 'JetBrains Mono', monospace;
+    }
+    .det-bracket {
+      position: relative;
+    }
+    .det-bracket::before {
+      content: "";
+      position: absolute;
+      top: -4px;
+      bottom: -4px;
+      left: -8px;
+      width: 2.5px;
+      background-color: #334155;
+    }
+    .det-bracket::after {
+      content: "";
+      position: absolute;
+      top: -4px;
+      bottom: -4px;
+      right: -8px;
+      width: 2.5px;
+      background-color: #334155;
+    }
+  </style>
+</head>
+<body class="min-h-screen text-slate-800 antialiased selection:bg-indigo-500 selection:text-white">
+
+  <!-- Main Container: Standard max-w-6xl (1152px) -->
+  <main class="max-w-6xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 space-y-8">
+
+    <!-- Hero Header -->
+    <div class="bg-gradient-to-r from-indigo-900 via-indigo-800 to-blue-900 rounded-3xl p-6 sm:p-8 text-white shadow-xl relative overflow-hidden">
+      <div class="absolute -right-12 -top-12 w-64 h-64 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none"></div>
+      <div class="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
+        <div>
+          <h1 class="text-2xl sm:text-3xl lg:text-4xl font-bold tracking-tight">สมบัติของดีเทอร์มิแนนต์</h1>
+          <p class="text-indigo-200 text-sm sm:text-base mt-2 max-w-2xl font-light">
+            ศึกษาพฤติกรรมของดีเทอร์มิแนนต์เมื่อเกิดการดำเนินการตามแถว (Elementary Row Operations) พร้อมทั้งประยุกต์ใช้ในการลดทอนขั้นตอนการคำนวณ
+          </p>
+        </div>
+        <div class="flex items-center gap-2">
+          <a href="#lab-section" class="px-5 py-2.5 bg-indigo-500 hover:bg-indigo-600 text-white rounded-xl text-sm font-semibold transition-all shadow-md flex items-center gap-2">
+            <i data-lucide="play" class="w-4 h-4"></i> ทดลองดำเนินการ
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- วัตถุประสงค์การเรียนรู้ -->
+    <section class="bg-white rounded-2xl p-6 border border-slate-200/80 shadow-sm">
+      <div class="flex items-start gap-4">
+        <div class="p-3 bg-indigo-50 text-indigo-600 rounded-xl">
+          <i data-lucide="target" class="w-6 h-6"></i>
+        </div>
+        <div>
+          <h2 class="text-lg font-bold text-slate-800 mb-1">วัตถุประสงค์การเรียนรู้</h2>
+          <p class="text-slate-600 leading-relaxed text-sm sm:text-base">
+            นักศึกษาสามารถตรวจสอบสมบัติของดีเทอร์มิแนนต์ อธิบายผลจากการดำเนินการตามแถวหรือหลัก และเลือกใช้สมบัติเพื่อลดขั้นตอนการคำนวณได้อย่างมีประสิทธิภาพ
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- สรุปเนื้อหาสำคัญ (Content Accordion) -->
+    <section class="bg-white rounded-2xl border border-slate-200/80 shadow-sm overflow-hidden">
+      <div class="p-5 border-b border-slate-100 flex items-center justify-between">
+        <h2 class="text-lg font-bold text-slate-800 flex items-center gap-2">
+          <i data-lucide="book-open" class="w-5 h-5 text-indigo-600"></i> สรุปสมบัติสำคัญของดีเทอร์มิแนนต์
+        </h2>
+        <span class="text-xs text-slate-400">คลิกที่หัวข้อเพื่อเปิดอ่าน</span>
+      </div>
+
+      <div class="divide-y divide-slate-100">
+        <!-- Topic 1 -->
+        <details class="group p-5 hover:bg-slate-50/50 transition-colors" open>
+          <summary class="flex justify-between items-center cursor-pointer list-none font-semibold text-slate-800 group-open:text-indigo-600">
+            <span class="flex items-center gap-3">
+              <span class="w-6 h-6 rounded-full bg-indigo-100 text-indigo-700 flex items-center justify-center text-xs">1</span>
+              ผลของการสลับแถวหรือหลัก (\(R_i \leftrightarrow R_j\))
+            </span>
+            <i data-lucide="chevron-down" class="w-5 h-5 transition-transform group-open:rotate-180 text-slate-400"></i>
+          </summary>
+          <div class="mt-4 text-slate-600 text-sm leading-relaxed pl-9 space-y-2">
+            <p>เมื่อสลับแถวคู่ใดคู่หนึ่ง (หรือหลักคู่ใดคู่หนึ่ง) ของเมทริกซ์ <strong>ค่าดีเทอร์มิแนนต์จะเปลี่ยนเป็นเครื่องหมายตรงข้าม</strong> เสมอ:</p>
+            <div class="p-3 bg-slate-50 rounded-xl border border-slate-200 font-mono text-center">
+              $$\det(B) = -\det(A)$$
+            </div>
+          </div>
+        </details>
+
+        <!-- Topic 2 -->
+        <details class="group p-5 hover:bg-slate-50/50 transition-colors">
+          <summary class="flex justify-between items-center cursor-pointer list-none font-semibold text-slate-800 group-open:text-indigo-600">
+            <span class="flex items-center gap-3">
+              <span class="w-6 h-6 rounded-full bg-indigo-100 text-indigo-700 flex items-center justify-center text-xs">2</span>
+              ผลของการคูณแถวหรือหลักด้วยค่าคงตัว (\(kR_i \to R_i\))
+            </span>
+            <i data-lucide="chevron-down" class="w-5 h-5 transition-transform group-open:rotate-180 text-slate-400"></i>
+          </summary>
+          <div class="mt-4 text-slate-600 text-sm leading-relaxed pl-9 space-y-2">
+            <p>เมื่อนำค่าคงตัว \(k\) ไปคูณกับสมาชิกในแถวใดแถวหนึ่ง (หรือหลักใดหลักหนึ่ง) <strong>ค่าดีเทอร์มิแนนต์จะถูกคูณด้วย \(k\)</strong>:</p>
+            <div class="p-3 bg-slate-50 rounded-xl border border-slate-200 font-mono text-center">
+              $$\det(B) = k \cdot \det(A)$$
+            </div>
+            <p class="text-xs text-amber-700 bg-amber-50 p-2.5 rounded">
+              *ข้อสังเกต: หากคูณทั้งเมทริกซ์ขนาด \(n\times n\) ด้วยสเกลาร์ \(k\) (คูณทุกแถว) จะได้ว่า \(\det(kA) = k^n \det(A)\)
+            </p>
+          </div>
+        </details>
+
+        <!-- Topic 3 -->
+        <details class="group p-5 hover:bg-slate-50/50 transition-colors">
+          <summary class="flex justify-between items-center cursor-pointer list-none font-semibold text-slate-800 group-open:text-indigo-600">
+            <span class="flex items-center gap-3">
+              <span class="w-6 h-6 rounded-full bg-indigo-100 text-indigo-700 flex items-center justify-center text-xs">3</span>
+              ผลของการบวกพหุคูณของแถวหนึ่งเข้าอีกแถวหนึ่ง (\(R_i + cR_j \to R_i\))
+            </span>
+            <i data-lucide="chevron-down" class="w-5 h-5 transition-transform group-open:rotate-180 text-slate-400"></i>
+          </summary>
+          <div class="mt-4 text-slate-600 text-sm leading-relaxed pl-9 space-y-2">
+            <p>การนำพหุคูณของแถวหนึ่งไปบวกเข้ากับอีกแถวหนึ่ง <strong>ไม่ทำให้ค่าดีเทอร์มิแนนต์เปลี่ยนแปลง</strong>:</p>
+            <div class="p-3 bg-emerald-50 rounded-xl border border-emerald-200 font-mono text-center text-emerald-800">
+              $$\det(B) = \det(A)$$
+            </div>
+            <p class="text-xs text-slate-500">สมบัตินี้เป็นหัวใจสำคัญในการแปลงเมทริกซ์ให้มีสมาชิกเป็นศูนย์จำนวนมาก เพื่อลดรูปไปสู่เมทริกซ์สามเหลี่ยม</p>
+          </div>
+        </details>
+
+        <!-- Topic 4 -->
+        <details class="group p-5 hover:bg-slate-50/50 transition-colors">
+          <summary class="flex justify-between items-center cursor-pointer list-none font-semibold text-slate-800 group-open:text-indigo-600">
+            <span class="flex items-center gap-3">
+              <span class="w-6 h-6 rounded-full bg-indigo-100 text-indigo-700 flex items-center justify-center text-xs">4</span>
+              ดีเทอร์มิแนนต์ของเมทริกซ์สามเหลี่ยม
+            </span>
+            <i data-lucide="chevron-down" class="w-5 h-5 transition-transform group-open:rotate-180 text-slate-400"></i>
+          </summary>
+          <div class="mt-4 text-slate-600 text-sm leading-relaxed pl-9 space-y-2">
+            <p>หากเมทริกซ์อยู่ในรูปเมทริกซ์สามเหลี่ยมบน (Upper Triangular), เมทริกซ์สามเหลี่ยมล่าง (Lower Triangular) หรือเมทริกซ์ทแยงมุม ค่าดีเทอร์มิแนนต์จะเท่ากับ <strong>ผลคูณของสมาชิกบนเส้นทแยงมุมหลัก</strong> เสมอ:</p>
+            <div class="p-3 bg-slate-50 rounded-xl border border-slate-200 font-mono text-center">
+              $$\det(A) = a_{11} \cdot a_{22} \cdots a_{nn}$$
+            </div>
+          </div>
+        </details>
+
+        <!-- Topic 5 -->
+        <details class="group p-5 hover:bg-slate-50/50 transition-colors">
+          <summary class="flex justify-between items-center cursor-pointer list-none font-semibold text-slate-800 group-open:text-indigo-600">
+            <span class="flex items-center gap-3">
+              <span class="w-6 h-6 rounded-full bg-indigo-100 text-indigo-700 flex items-center justify-center text-xs">5</span>
+              สมบัติการกระจายผลคูณ \(\det(AB) = \det(A)\det(B)\)
+            </span>
+            <i data-lucide="chevron-down" class="w-5 h-5 transition-transform group-open:rotate-180 text-slate-400"></i>
+          </summary>
+          <div class="mt-4 text-slate-600 text-sm leading-relaxed pl-9 space-y-2">
+            <p>สำหรับเมทริกซ์จัตุรัส \(A\) และ \(B\) ขนาดเดียวกัน ดีเทอร์มิแนนต์ของผลคูณจะเท่ากับผลคูณของดีเทอร์มิแนนต์ของแต่ละเมทริกซ์เสมอ:</p>
+            <div class="p-3 bg-slate-50 rounded-xl border border-slate-200 font-mono text-center">
+              $$\det(AB) = \det(A)\det(B) = \det(BA)$$
+            </div>
+          </div>
+        </details>
+      </div>
+    </section>
+
+    <!-- แบบจำลองโต้ตอบ (Interactive Row Operations Lab) -->
+    <section id="lab-section" class="bg-white rounded-3xl border border-slate-200 shadow-md p-6 sm:p-8 space-y-6">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-slate-100 gap-4">
+        <div>
+          <span class="text-xs font-bold uppercase tracking-wider text-indigo-600 bg-indigo-50 px-2.5 py-1 rounded-md">Simulation Lab</span>
+          <h2 class="text-xl sm:text-2xl font-bold text-slate-800 mt-1">ห้องทดลองการดำเนินการตามแถว (Row Operations)</h2>
+        </div>
+        <button onclick="resetLab()" class="px-3.5 py-1.5 text-xs bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl font-medium transition-colors flex items-center gap-1.5 self-start">
+          <i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i> คืนค่าเริ่มต้น
+        </button>
+      </div>
+
+      <!-- Simulator Layout -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+        
+        <!-- Interactive Controls (Left 5 Cols) -->
+        <div class="lg:col-span-5 space-y-5">
+          <!-- Matrix Input -->
+          <div class="bg-slate-50 p-5 rounded-2xl border border-slate-200/80 space-y-3">
+            <div class="flex items-center justify-between">
+              <h3 class="text-sm font-bold text-slate-700 flex items-center gap-2">
+                <i data-lucide="edit-3" class="w-4 h-4 text-indigo-600"></i> สมาชิกเมทริกซ์ต้นฉบับ \(A\)
+              </h3>
+              <span class="text-xs text-slate-500 font-mono">ขนาด 3×3</span>
+            </div>
+
+            <!-- 3x3 Grid Inputs -->
+            <div class="flex justify-center py-2">
+              <div class="det-bracket grid grid-cols-3 gap-2 p-2 bg-white rounded-xl shadow-sm border border-slate-200">
+                <input type="number" id="cell-0-0" value="2" oninput="updateLab()" class="w-14 h-10 text-center font-mono font-bold text-sm border border-slate-300 rounded focus:border-indigo-500 outline-none">
+                <input type="number" id="cell-0-1" value="1" oninput="updateLab()" class="w-14 h-10 text-center font-mono font-bold text-sm border border-slate-300 rounded focus:border-indigo-500 outline-none">
+                <input type="number" id="cell-0-2" value="3" oninput="updateLab()" class="w-14 h-10 text-center font-mono font-bold text-sm border border-slate-300 rounded focus:border-indigo-500 outline-none">
+
+                <input type="number" id="cell-1-0" value="4" oninput="updateLab()" class="w-14 h-10 text-center font-mono font-bold text-sm border border-slate-300 rounded focus:border-indigo-500 outline-none">
+                <input type="number" id="cell-1-1" value="3" oninput="updateLab()" class="w-14 h-10 text-center font-mono font-bold text-sm border border-slate-300 rounded focus:border-indigo-500 outline-none">
+                <input type="number" id="cell-1-2" value="5" oninput="updateLab()" class="w-14 h-10 text-center font-mono font-bold text-sm border border-slate-300 rounded focus:border-indigo-500 outline-none">
+
+                <input type="number" id="cell-2-0" value="2" oninput="updateLab()" class="w-14 h-10 text-center font-mono font-bold text-sm border border-slate-300 rounded focus:border-indigo-500 outline-none">
+                <input type="number" id="cell-2-1" value="2" oninput="updateLab()" class="w-14 h-10 text-center font-mono font-bold text-sm border border-slate-300 rounded focus:border-indigo-500 outline-none">
+                <input type="number" id="cell-2-2" value="4" oninput="updateLab()" class="w-14 h-10 text-center font-mono font-bold text-sm border border-slate-300 rounded focus:border-indigo-500 outline-none">
+              </div>
+            </div>
+
+            <!-- Presets -->
+            <div class="flex flex-wrap gap-1.5 pt-1">
+              <button onclick="loadPreset([2,1,3, 4,3,5, 2,2,4])" class="px-2.5 py-1 text-xs bg-white hover:bg-slate-100 border border-slate-200 rounded-lg text-slate-700">ตัวอย่างแบบฝึกหัด</button>
+              <button onclick="loadPreset([1,2,3, 0,4,5, 0,0,6])" class="px-2.5 py-1 text-xs bg-white hover:bg-slate-100 border border-slate-200 rounded-lg text-slate-700">สามเหลี่ยมบน</button>
+              <button onclick="loadPreset([1,2,3, 2,4,6, 1,1,1])" class="px-2.5 py-1 text-xs bg-rose-50 hover:bg-rose-100 border border-rose-200 rounded-lg text-rose-700">แถวขนานกัน (\(\det=0\))</button>
+            </div>
+          </div>
+
+          <!-- Operation Type Selector -->
+          <div class="bg-indigo-50/60 p-5 rounded-2xl border border-indigo-100 space-y-4">
+            <h3 class="text-sm font-bold text-indigo-900 flex items-center gap-2">
+              <i data-lucide="sliders" class="w-4 h-4 text-indigo-600"></i> เลือกรูปแบบการดำเนินการตามแถว
+            </h3>
+
+            <div class="space-y-3">
+              <!-- Radio Op 1: Swap -->
+              <label class="flex items-start gap-3 p-3 bg-white rounded-xl border border-indigo-100 cursor-pointer hover:border-indigo-300 transition-all">
+                <input type="radio" name="row-op" value="swap" checked onchange="updateLab()" class="mt-1 text-indigo-600 focus:ring-indigo-500">
+                <div class="flex-1 text-xs">
+                  <span class="font-bold text-slate-800 block text-sm">1. สลับแถว (\(R_i \leftrightarrow R_j\))</span>
+                  <div class="flex items-center gap-2 mt-2">
+                    <span>สลับ</span>
+                    <select id="swap-r1" onchange="updateLab()" class="p-1 rounded border border-slate-300 text-xs font-mono">
+                      <option value="0">แถว 1 (R₁)</option>
+                      <option value="1">แถว 2 (R₂)</option>
+                      <option value="2">แถว 3 (R₃)</option>
+                    </select>
+                    <span>กับ</span>
+                    <select id="swap-r2" onchange="updateLab()" class="p-1 rounded border border-slate-300 text-xs font-mono">
+                      <option value="0">แถว 1 (R₁)</option>
+                      <option value="1" selected>แถว 2 (R₂)</option>
+                      <option value="2">แถว 3 (R₃)</option>
+                    </select>
+                  </div>
+                </div>
+              </label>
+
+              <!-- Radio Op 2: Multiply -->
+              <label class="flex items-start gap-3 p-3 bg-white rounded-xl border border-indigo-100 cursor-pointer hover:border-indigo-300 transition-all">
+                <input type="radio" name="row-op" value="scale" onchange="updateLab()" class="mt-1 text-indigo-600 focus:ring-indigo-500">
+                <div class="flex-1 text-xs">
+                  <span class="font-bold text-slate-800 block text-sm">2. คูณแถวด้วยค่าคงตัว (\(kR_i \to R_i\))</span>
+                  <div class="flex items-center gap-2 mt-2">
+                    <span>นำค่าคงตัว \(k =\)</span>
+                    <input type="number" id="scale-k" value="3" step="1" oninput="updateLab()" class="w-14 p-1 text-center font-mono font-bold rounded border border-slate-300">
+                    <span>คูณ</span>
+                    <select id="scale-r" onchange="updateLab()" class="p-1 rounded border border-slate-300 text-xs font-mono">
+                      <option value="0">แถว 1 (R₁)</option>
+                      <option value="1">แถว 2 (R₂)</option>
+                      <option value="2">แถว 3 (R₃)</option>
+                    </select>
+                  </div>
+                </div>
+              </label>
+
+              <!-- Radio Op 3: Add multiple -->
+              <label class="flex items-start gap-3 p-3 bg-white rounded-xl border border-indigo-100 cursor-pointer hover:border-indigo-300 transition-all">
+                <input type="radio" name="row-op" value="add" onchange="updateLab()" class="mt-1 text-indigo-600 focus:ring-indigo-500">
+                <div class="flex-1 text-xs">
+                  <span class="font-bold text-slate-800 block text-sm">3. บวกพหุคูณของแถว (\(R_i + cR_j \to R_i\))</span>
+                  <div class="flex flex-wrap items-center gap-2 mt-2">
+                    <select id="add-target" onchange="updateLab()" class="p-1 rounded border border-slate-300 text-xs font-mono">
+                      <option value="0">แถว 1 (R₁)</option>
+                      <option value="1" selected>แถว 2 (R₂)</option>
+                      <option value="2">แถว 3 (R₃)</option>
+                    </select>
+                    <span>\(+\)</span>
+                    <input type="number" id="add-c" value="-2" step="1" oninput="updateLab()" class="w-14 p-1 text-center font-mono font-bold rounded border border-slate-300">
+                    <span>\(\times\)</span>
+                    <select id="add-source" onchange="updateLab()" class="p-1 rounded border border-slate-300 text-xs font-mono">
+                      <option value="0" selected>แถว 1 (R₁)</option>
+                      <option value="1">แถว 2 (R₂)</option>
+                      <option value="2">แถว 3 (R₃)</option>
+                    </select>
+                  </div>
+                </div>
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <!-- Comparison & Analysis (Right 7 Cols) -->
+        <div class="lg:col-span-7 space-y-5">
+          
+          <!-- Side-by-side Matrix Comparison -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <!-- Matrix Before -->
+            <div class="bg-slate-50 p-4 rounded-2xl border border-slate-200 text-center space-y-2">
+              <span class="text-xs font-bold text-slate-500 uppercase tracking-wider block">ก่อนดำเนินการ (เมทริกซ์ \(A\))</span>
+              <div class="flex justify-center py-2">
+                <div id="display-matrix-a" class="det-bracket grid grid-cols-3 gap-2 font-mono text-sm font-bold text-slate-700"></div>
+              </div>
+              <div class="pt-2 border-t border-slate-200 text-xs text-slate-600 flex justify-between items-center px-2">
+                <span>\(\det(A)\):</span>
+                <span id="det-before-val" class="font-mono text-base font-bold text-indigo-700">2</span>
+              </div>
+            </div>
+
+            <!-- Matrix After -->
+            <div class="bg-indigo-50/50 p-4 rounded-2xl border border-indigo-200 text-center space-y-2">
+              <span class="text-xs font-bold text-indigo-700 uppercase tracking-wider block">หลังดำเนินการ (เมทริกซ์ \(B\))</span>
+              <div class="flex justify-center py-2">
+                <div id="display-matrix-b" class="det-bracket grid grid-cols-3 gap-2 font-mono text-sm font-bold text-indigo-900"></div>
+              </div>
+              <div class="pt-2 border-t border-indigo-200 text-xs text-indigo-900 flex justify-between items-center px-2">
+                <span>\(\det(B)\):</span>
+                <span id="det-after-val" class="font-mono text-base font-bold text-emerald-600">-2</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Ratio & Impact Card -->
+          <div class="bg-slate-900 text-white p-5 rounded-2xl shadow-lg space-y-4">
+            <h4 class="text-xs font-semibold uppercase tracking-wider text-indigo-300 flex items-center justify-between">
+              <span>การวิเคราะห์อัตราส่วนและผลลัพธ์</span>
+              <span id="operation-badge" class="px-2 py-0.5 rounded text-[11px] font-mono bg-indigo-800 text-indigo-200">R1 ↔ R2</span>
+            </h4>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-1">
+              <!-- Ratio Box -->
+              <div class="p-3.5 bg-slate-800/80 rounded-xl border border-slate-700 space-y-1">
+                <span class="text-xs text-slate-400 block">อัตราส่วนการเปลี่ยนแปลง:</span>
+                <div class="flex items-baseline gap-2">
+                  <span class="text-xs text-slate-300 font-mono">\(\frac{\det(B)}{\det(A)} =\)</span>
+                  <span id="det-ratio" class="text-xl font-bold font-mono text-amber-400">-1</span>
+                </div>
+              </div>
+
+              <!-- Rule Conclusion Box -->
+              <div class="p-3.5 bg-slate-800/80 rounded-xl border border-slate-700 space-y-1">
+                <span class="text-xs text-slate-400 block">ความสัมพันธ์ทางคณิตศาสตร์:</span>
+                <div id="rule-equation" class="text-sm font-mono font-bold text-emerald-400 pt-0.5">
+                  \(\det(B) = -\det(A)\)
+                </div>
+              </div>
+            </div>
+
+            <div id="rule-explanation" class="text-xs text-slate-300 p-3 bg-indigo-950/40 border border-indigo-800/50 rounded-xl leading-relaxed">
+              การสลับแถว 1 ครั้ง ทำให้ดีเทอร์มิแนนต์เปลี่ยนเป็นเครื่องหมายตรงข้าม (คูณด้วย -1)
+            </div>
+          </div>
+
+          <!-- Product Property Tool: det(AB) = det(A)det(B) -->
+          <div class="bg-white p-5 rounded-2xl border border-slate-200 space-y-3">
+            <h4 class="text-sm font-bold text-slate-800 flex items-center gap-2">
+              <i data-lucide="check-circle-2" class="w-4 h-4 text-emerald-600"></i>
+              ทดสอบสมบัติ \(\det(AB) = \det(A)\det(B)\)
+            </h4>
+            <p class="text-xs text-slate-600 leading-relaxed">
+              สุ่มเมทริกซ์ \(B\) ขนาด \(3\times3\) เพื่อตรวจสอบว่าดีเทอร์มิแนนต์ของผลคูณเท่ากับผลคูณของแต่ละตัวจริงหรือไม่
+            </p>
+            <div class="flex items-center gap-3 pt-1">
+              <button onclick="testProductProperty()" class="px-3.5 py-1.5 text-xs bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-semibold transition-colors">
+                สุ่มเมทริกซ์ B และคำนวณ
+              </button>
+              <div id="product-result" class="text-xs font-mono text-slate-700">คลิกปุ่มเพื่อเริ่มคำนวณ</div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- คำถามนำเพื่อค้นพบ (Inquiry Questions) -->
+    <section class="space-y-4">
+      <div class="flex items-center gap-2">
+        <i data-lucide="help-circle" class="w-5 h-5 text-indigo-600"></i>
+        <h2 class="text-xl font-bold text-slate-800">คำถามนำเพื่อค้นพบ</h2>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <!-- Q1 -->
+        <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex flex-col justify-between">
+          <div>
+            <div class="flex items-center gap-2 font-bold text-indigo-700 text-sm mb-2">
+              <span class="w-6 h-6 rounded-full bg-indigo-100 flex items-center justify-center text-xs">1</span>
+              การสลับแถว
+            </div>
+            <p class="text-slate-700 text-sm font-medium">
+              การสลับแถวสองแถวส่งผลต่อเครื่องหมายของดีเทอร์มิแนนต์อย่างไร?
+            </p>
+          </div>
+          <details class="mt-4 pt-3 border-t border-slate-100 text-xs text-slate-600">
+            <summary class="cursor-pointer text-indigo-600 hover:text-indigo-700 font-semibold select-none">ดูแนวคิดคำตอบ</summary>
+            <p class="mt-2 pl-2 border-l-2 border-indigo-400 leading-relaxed">
+              การสลับแถวคู่ใดคู่หนึ่ง 1 ครั้ง จะทำให้เครื่องหมายของดีเทอร์มิแนนต์กลับด้านเสมอ (กลายเป็นค่าตรงข้าม หรือคูณด้วย \(-1\)) เพราะเป็นการเปลี่ยนทิศทางการวางตัว (Orientation) ของเวกเตอร์ในมิติพิกัด
+            </p>
+          </details>
+        </div>
+
+        <!-- Q2 -->
+        <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex flex-col justify-between">
+          <div>
+            <div class="flex items-center gap-2 font-bold text-indigo-700 text-sm mb-2">
+              <span class="w-6 h-6 rounded-full bg-indigo-100 flex items-center justify-center text-xs">2</span>
+              การคูณแถวด้วยค่าคงตัว
+            </div>
+            <p class="text-slate-700 text-sm font-medium">
+              การคูณแถวด้วย \(k\) ส่งผลต่อดีเทอร์มิแนนต์อย่างไร?
+            </p>
+          </div>
+          <details class="mt-4 pt-3 border-t border-slate-100 text-xs text-slate-600">
+            <summary class="cursor-pointer text-indigo-600 hover:text-indigo-700 font-semibold select-none">ดูแนวคิดคำตอบ</summary>
+            <p class="mt-2 pl-2 border-l-2 border-indigo-400 leading-relaxed">
+              ค่าดีเทอร์มิแนนต์จะขยายตัวเป็น \(k\) เท่าของเดิมทันที เนื่องจากดีเทอร์มิแนนต์มีสมบัติเป็นฟังก์ชันเชิงเส้นทีละแถว (Multilinearity) การยืดเวกเตอร์ในแนวแถวใดแถวหนึ่งออก \(k\) เท่า จะทำให้ปริมาตรหรือพื้นที่ขยายตามไปด้วย \(k\) เท่า
+            </p>
+          </details>
+        </div>
+
+        <!-- Q3 -->
+        <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex flex-col justify-between">
+          <div>
+            <div class="flex items-center gap-2 font-bold text-indigo-700 text-sm mb-2">
+              <span class="w-6 h-6 rounded-full bg-indigo-100 flex items-center justify-center text-xs">3</span>
+              การบวกพหุคูณของแถว
+            </div>
+            <p class="text-slate-700 text-sm font-medium">
+              การบวกพหุคูณของแถวหนึ่งเข้าอีกแถวหนึ่งทำให้ดีเทอร์มิแนนต์เปลี่ยนหรือไม่?
+            </p>
+          </div>
+          <details class="mt-4 pt-3 border-t border-slate-100 text-xs text-slate-600">
+            <summary class="cursor-pointer text-indigo-600 hover:text-indigo-700 font-semibold select-none">ดูแนวคิดคำตอบ</summary>
+            <p class="mt-2 pl-2 border-l-2 border-indigo-400 leading-relaxed">
+              <strong>ไม่เปลี่ยนแปลงเลย</strong> (\(\det\) เท่าเดิม) ในเชิงเรขาคณิต การดำเนินการนี้เทียบเท่ากับ "การเฉือน" (Shear Mapping) ซึ่งฐานและความสูงของรูปทรงยังคงเดิม จึงทำให้พื้นที่หรือปริมาตรยังคงเท่าเดิมไม่เปลี่ยนแปลง
+            </p>
+          </details>
+        </div>
+
+        <!-- Q4 -->
+        <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex flex-col justify-between">
+          <div>
+            <div class="flex items-center gap-2 font-bold text-indigo-700 text-sm mb-2">
+              <span class="w-6 h-6 rounded-full bg-indigo-100 flex items-center justify-center text-xs">4</span>
+              เมทริกซ์สามเหลี่ยม
+            </div>
+            <p class="text-slate-700 text-sm font-medium">
+              เหตุใดเมทริกซ์สามเหลี่ยมจึงคำนวณดีเทอร์มิแนนต์ได้จากผลคูณสมาชิกบนเส้นทแยงมุมหลัก?
+            </p>
+          </div>
+          <details class="mt-4 pt-3 border-t border-slate-100 text-xs text-slate-600">
+            <summary class="cursor-pointer text-indigo-600 hover:text-indigo-700 font-semibold select-none">ดูแนวคิดคำตอบ</summary>
+            <p class="mt-2 pl-2 border-l-2 border-indigo-400 leading-relaxed">
+              เมื่อกระจายโคแฟกเตอร์ตามหลักแรก (หรือแถวสุดท้าย) ที่มีเลข 0 อยู่จำนวนมาก พจน์อื่นทั้งหมดจะถูกคูณด้วย 0 และตัดทิ้งไป เหลือเพียงผลคูณของสมาชิกแนวทแยงหลัก \(a_{11} \cdot a_{22} \cdots a_{nn}\) เท่านั้น
+            </p>
+          </details>
+        </div>
+      </div>
+    </section>
+
+    <!-- แบบฝึกหัดสำหรับนักศึกษา (Exercises) -->
+    <section class="bg-white rounded-3xl border border-slate-200 p-6 sm:p-8 space-y-6">
+      <div class="flex items-center gap-3 pb-3 border-b border-slate-100">
+        <div class="p-2.5 bg-blue-50 text-blue-600 rounded-xl">
+          <i data-lucide="clipboard-list" class="w-6 h-6"></i>
+        </div>
+        <div>
+          <h2 class="text-xl font-bold text-slate-800">แบบฝึกหัดสำหรับนักศึกษา</h2>
+          <p class="text-xs text-slate-500">ทดสอบความเข้าใจและตรวจสอบขั้นตอนด้วยสมบัติทางคณิตศาสตร์</p>
+        </div>
+      </div>
+
+      <div class="space-y-4">
+        <!-- Exercise 1 -->
+        <div class="p-5 rounded-2xl border border-slate-200 bg-slate-50/50 hover:bg-slate-50 transition-colors">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div class="space-y-1">
+              <span class="text-xs font-bold text-indigo-600 uppercase">ข้อที่ 1</span>
+              <p class="text-slate-800 font-medium text-sm sm:text-base">
+                กำหนด \(A = \begin{bmatrix} 1 & 2 \\ 3 & 4 \end{bmatrix}\) จงหาดีเทอร์มิแนนต์ก่อนและหลังสลับแถว
+              </p>
+            </div>
+          </div>
+          <details class="mt-3 pt-3 border-t border-slate-200/60 text-xs">
+            <summary class="cursor-pointer text-slate-500 hover:text-slate-800 font-semibold select-none">เฉลยวิธีทำ</summary>
+            <div class="mt-2 text-slate-600 font-mono space-y-1 pl-3 border-l-2 border-indigo-400">
+              <div>ก่อนสลับ: \(\det(A) = (1)(4) - (2)(3) = 4 - 6 = -2\)</div>
+              <div>หลังสลับแถว \(R_1 \leftrightarrow R_2\): \(B = \begin{bmatrix} 3 & 4 \\ 1 & 2 \end{bmatrix}\)</div>
+              <div>\(\det(B) = (3)(2) - (4)(1) = 6 - 4 = +2\)</div>
+              <div class="text-indigo-700 font-bold font-sans mt-1">สรุป: ดีเทอร์มิแนนต์เปลี่ยนเครื่องหมายจาก \(-2\) เป็น \(+2\) (\(\det(B) = -\det(A)\))</div>
+            </div>
+          </details>
+        </div>
+
+        <!-- Exercise 2 -->
+        <div class="p-5 rounded-2xl border border-slate-200 bg-slate-50/50 hover:bg-slate-50 transition-colors">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div class="space-y-1">
+              <span class="text-xs font-bold text-indigo-600 uppercase">ข้อที่ 2</span>
+              <p class="text-slate-800 font-medium text-sm sm:text-base">
+                ใช้การดำเนินการตามแถวทำให้เมทริกซ์ \(\begin{bmatrix} 2 & 1 & 3 \\ 4 & 3 & 5 \\ 2 & 2 & 4 \end{bmatrix}\) อยู่ในรูปสามเหลี่ยม แล้วคำนวณดีเทอร์มิแนนต์
+              </p>
+            </div>
+            <button onclick="loadPreset([2,1,3, 4,3,5, 2,2,4])" class="px-3.5 py-1.5 text-xs bg-white hover:bg-indigo-50 text-indigo-600 border border-indigo-200 rounded-xl font-medium transition-colors flex items-center gap-1.5 self-start sm:self-center">
+              <i data-lucide="external-link" class="w-3.5 h-3.5"></i> โหลดเข้าห้องทดลอง
+            </button>
+          </div>
+          <details class="mt-3 pt-3 border-t border-slate-200/60 text-xs">
+            <summary class="cursor-pointer text-slate-500 hover:text-slate-800 font-semibold select-none">เฉลยวิธีทำอย่างละเอียด</summary>
+            <div class="mt-2 text-slate-600 font-mono space-y-1.5 pl-3 border-l-2 border-indigo-400">
+              <div>เริ่มต้น: \(A = \begin{bmatrix} 2 & 1 & 3 \\ 4 & 3 & 5 \\ 2 & 2 & 4 \end{bmatrix}\)</div>
+              <div>ขั้นที่ 1: กำจัดสมาชิกหลักแรกใต้ \(a_{11}\)</div>
+              <div class="pl-4">• \(R_2 - 2R_1 \to R_2\) (ดีเทอร์มิแนนต์ไม่เปลี่ยน) \(\implies \begin{bmatrix} 2 & 1 & 3 \\ 0 & 1 & -1 \\ 2 & 2 & 4 \end{bmatrix}\)</div>
+              <div class="pl-4">• \(R_3 - R_1 \to R_3\) (ดีเทอร์มิแนนต์ไม่เปลี่ยน) \(\implies \begin{bmatrix} 2 & 1 & 3 \\ 0 & 1 & -1 \\ 0 & 1 & 1 \end{bmatrix}\)</div>
+              <div>ขั้นที่ 2: กำจัดสมาชิกหลักสองใต้ \(a_{22}\)</div>
+              <div class="pl-4">• \(R_3 - R_2 \to R_3\) (ดีเทอร์มิแนนต์ไม่เปลี่ยน) \(\implies \begin{bmatrix} 2 & 1 & 3 \\ 0 & 1 & -1 \\ 0 & 0 & 2 \end{bmatrix}\)</div>
+              <div>เมทริกซ์อยู่ในรูปสามเหลี่ยมบนแล้ว:</div>
+              <div class="text-indigo-700 font-bold font-sans mt-1">
+                \(\det(A) = 2 \times 1 \times 2 = 4\) (โดยตลอดการแปลงใช้เฉพาะการบวกพหุคูณ ค่าดีเทอร์มิแนนต์จึงไม่เปลี่ยน)
+              </div>
+            </div>
+          </details>
+        </div>
+
+        <!-- Exercise 3 -->
+        <div class="p-5 rounded-2xl border border-slate-200 bg-slate-50/50 hover:bg-slate-50 transition-colors">
+          <div class="space-y-1">
+            <span class="text-xs font-bold text-indigo-600 uppercase">ข้อที่ 3</span>
+            <p class="text-slate-800 font-medium text-sm sm:text-base">
+              ทดลองตรวจสอบ \(\det(AB) = \det(A)\det(B)\) ด้วยเมทริกซ์จัตุรัสที่กำหนดเอง
+            </p>
+          </div>
+          <details class="mt-3 pt-3 border-t border-slate-200/60 text-xs">
+            <summary class="cursor-pointer text-slate-500 hover:text-slate-800 font-semibold select-none">แนวคำตอบตัวอย่าง</summary>
+            <div class="mt-2 text-slate-600 font-mono space-y-1 pl-3 border-l-2 border-indigo-400">
+              <div>ให้ \(A = \begin{bmatrix} 1 & 2 \\ 3 & 4 \end{bmatrix} \implies \det(A) = 4 - 6 = -2\)</div>
+              <div>ให้ \(B = \begin{bmatrix} 2 & 0 \\ 1 & 3 \end{bmatrix} \implies \det(B) = 6 - 0 = 6\)</div>
+              <div>ผลคูณ \(AB = \begin{bmatrix} 4 & 6 \\ 10 & 12 \end{bmatrix}\)</div>
+              <div>\(\det(AB) = (4)(12) - (6)(10) = 48 - 60 = -12\)</div>
+              <div class="text-emerald-700 font-bold font-sans mt-1">ตรวจสอบ: \(\det(A)\det(B) = (-2)(6) = -12 = \det(AB)\) เป็นจริง</div>
+            </div>
+          </details>
+        </div>
+
+        <!-- Exercise 4 -->
+        <div class="p-5 rounded-2xl border border-slate-200 bg-slate-50/50 hover:bg-slate-50 transition-colors">
+          <div class="space-y-1">
+            <span class="text-xs font-bold text-indigo-600 uppercase">ข้อที่ 4</span>
+            <p class="text-slate-800 font-medium text-sm sm:text-base">
+              สรุปสมบัติของดีเทอร์มิแนนต์อย่างน้อย 3 ข้อ พร้อมตัวอย่างที่สนับสนุนแต่ละข้อ
+            </p>
+          </div>
+          <details class="mt-3 pt-3 border-t border-slate-200/60 text-xs">
+            <summary class="cursor-pointer text-slate-500 hover:text-slate-800 font-semibold select-none">แนวคำตอบ</summary>
+            <div class="mt-2 text-slate-600 leading-relaxed pl-3 border-l-2 border-indigo-400 space-y-1.5 font-sans">
+              <p><strong>1. สมบัติการสลับแถว:</strong> สลับแถวคู่ใดคู่หนึ่งแล้วค่า \(\det\) เปลี่ยนเครื่องหมาย เช่น \(\begin{vmatrix} 1 & 2 \\ 3 & 4 \end{vmatrix} = -2\) แต่ \(\begin{vmatrix} 3 & 4 \\ 1 & 2 \end{vmatrix} = 2\)</p>
+              <p><strong>2. สมบัติแถวที่ซ้ำกันหรือเป็นสัดส่วนกัน:</strong> หากเมทริกซ์มี 2 แถวเหมือนกัน ดีเทอร์มิแนนต์จะเป็นศูนย์ เช่น \(\begin{vmatrix} 1 & 2 \\ 1 & 2 \end{vmatrix} = 0\)</p>
+              <p><strong>3. การบวกพหุคูณแถว:</strong> \(R_i + cR_j \to R_i\) ค่า \(\det\) ไม่เปลี่ยน ช่วยให้สามารถแปลงเป็นเมทริกซ์สามเหลี่ยมแล้วนำแนวทแยงหลักมาคูณกันได้ทันที</p>
+            </div>
+          </details>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Interactive Scripts -->
+  <script>
+    // Initialize Icons
+    lucide.createIcons();
+
+    // KaTeX Auto-render
+    function renderMath() {
+      if (typeof renderMathInElement !== 'undefined') {
+        renderMathInElement(document.body, {
+          delimiters: [
+            {left: '$$', right: '$$', display: true},
+            {left: '\\[', right: '\\]', display: true},
+            {left: '\\(', right: '\\)', display: false},
+            {left: '$', right: '$', display: false}
+          ],
+          throwOnError: false
+        });
+      }
+    }
+
+    // Matrix Helper Functions (3x3)
+    function calcDet3x3(m) {
+      const d1 = m[0][0] * m[1][1] * m[2][2];
+      const d2 = m[0][1] * m[1][2] * m[2][0];
+      const d3 = m[0][2] * m[1][0] * m[2][1];
+      const u1 = m[2][0] * m[1][1] * m[0][2];
+      const u2 = m[2][1] * m[1][2] * m[0][0];
+      const u3 = m[2][2] * m[1][0] * m[0][1];
+      return (d1 + d2 + d3) - (u1 + u2 + u3);
+    }
+
+    function getMatrixA() {
+      const mat = [];
+      for (let r = 0; r < 3; r++) {
+        const row = [];
+        for (let c = 0; c < 3; c++) {
+          row.push(parseFloat(document.getElementById(`cell-${r}-${c}`).value) || 0);
+        }
+        mat.push(row);
+      }
+      return mat;
+    }
+
+    function loadPreset(arr) {
+      let idx = 0;
+      for (let r = 0; r < 3; r++) {
+        for (let c = 0; c < 3; c++) {
+          document.getElementById(`cell-${r}-${c}`).value = arr[idx++];
+        }
+      }
+      updateLab();
+    }
+
+    function resetLab() {
+      loadPreset([2, 1, 3, 4, 3, 5, 2, 2, 4]);
+      document.querySelector('input[name="row-op"][value="swap"]').checked = true;
+      document.getElementById('swap-r1').value = "0";
+      document.getElementById('swap-r2').value = "1";
+      document.getElementById('scale-k').value = "3";
+      document.getElementById('scale-r').value = "0";
+      document.getElementById('add-target').value = "1";
+      document.getElementById('add-c').value = "-2";
+      document.getElementById('add-source').value = "0";
+      updateLab();
+    }
+
+    function updateLab() {
+      const A = getMatrixA();
+      const detA = calcDet3x3(A);
+
+      // Deep copy to create B
+      const B = A.map(row => [...row]);
+
+      const opType = document.querySelector('input[name="row-op"]:checked').value;
+      const opBadge = document.getElementById('operation-badge');
+      const ruleEq = document.getElementById('rule-equation');
+      const ruleExp = document.getElementById('rule-explanation');
+
+      if (opType === 'swap') {
+        const r1 = parseInt(document.getElementById('swap-r1').value);
+        const r2 = parseInt(document.getElementById('swap-r2').value);
+
+        // Swap rows
+        const temp = B[r1];
+        B[r1] = B[r2];
+        B[r2] = temp;
+
+        opBadge.innerText = `R${r1 + 1} ↔ R${r2 + 1}`;
+        if (r1 === r2) {
+          ruleEq.innerHTML = "\\(\\det(B) = \\det(A)\\)";
+          ruleExp.innerText = "เลือกสลับแถวเดิม ค่าดีเทอร์มิแนนต์จึงไม่มีการเปลี่ยนแปลง";
+        } else {
+          ruleEq.innerHTML = "\\(\\det(B) = -\\det(A)\\)";
+          ruleExp.innerText = `สลับแถวที่ ${r1 + 1} กับแถวที่ ${r2 + 1} ส่งผลให้ดีเทอร์มิแนนต์เปลี่ยนเป็นเครื่องหมายตรงข้าม (คูณด้วย -1)`;
+        }
+      } else if (opType === 'scale') {
+        const k = parseFloat(document.getElementById('scale-k').value) || 0;
+        const r = parseInt(document.getElementById('scale-r').value);
+
+        B[r] = B[r].map(val => val * k);
+
+        opBadge.innerText = `${k} · R${r + 1} → R${r + 1}`;
+        ruleEq.innerHTML = `\\(\\det(B) = (${k}) \\cdot \\det(A)\\)`;
+        ruleExp.innerText = `คูณสมาชิกในแถวที่ ${r + 1} ด้วย ${k} ส่งผลให้ดีเทอร์มิแนนต์ของเมทริกซ์ใหม่ขยายตัวขึ้นเป็น ${k} เท่าของเดิม`;
+      } else if (opType === 'add') {
+        const target = parseInt(document.getElementById('add-target').value);
+        const source = parseInt(document.getElementById('add-source').value);
+        const c = parseFloat(document.getElementById('add-c').value) || 0;
+
+        for (let col = 0; col < 3; col++) {
+          B[target][col] += c * A[source][col];
+        }
+
+        opBadge.innerText = `R${target + 1} + (${c})R${source + 1} → R${target + 1}`;
+        ruleEq.innerHTML = "\\(\\det(B) = \\det(A)\\)";
+        ruleExp.innerText = `นำ ${c} เท่าของแถวที่ ${source + 1} ไปบวกเข้ากับแถวที่ ${target + 1} ค่าดีเทอร์มิแนนต์จะไม่เปลี่ยนแปลงเลย`;
+      }
+
+      const detB = calcDet3x3(B);
+
+      // Render side-by-side matrices
+      renderMatrixDisplay('display-matrix-a', A);
+      renderMatrixDisplay('display-matrix-b', B);
+
+      // Render Det values
+      document.getElementById('det-before-val').innerText = Number.isInteger(detA) ? detA : detA.toFixed(2);
+      document.getElementById('det-after-val').innerText = Number.isInteger(detB) ? detB : detB.toFixed(2);
+
+      // Ratio calculation
+      const ratioEl = document.getElementById('det-ratio');
+      if (Math.abs(detA) < 0.00001) {
+        ratioEl.innerText = "ไม่นิยาม (det A = 0)";
+      } else {
+        const ratio = detB / detA;
+        ratioEl.innerText = Number.isInteger(ratio) ? ratio : ratio.toFixed(2);
+      }
+
+      renderMath();
+    }
+
+    function renderMatrixDisplay(elemId, mat) {
+      const el = document.getElementById(elemId);
+      el.innerHTML = '';
+      for (let r = 0; r < 3; r++) {
+        for (let c = 0; c < 3; c++) {
+          const div = document.createElement('div');
+          div.className = "w-10 h-9 flex items-center justify-center bg-white border border-slate-200 rounded text-xs";
+          const val = mat[r][c];
+          div.innerText = Number.isInteger(val) ? val : val.toFixed(1);
+          el.appendChild(div);
+        }
+      }
+    }
+
+    // det(AB) = det(A)det(B) Verification
+    function testProductProperty() {
+      const A = getMatrixA();
+      const detA = calcDet3x3(A);
+
+      // Generate random 3x3 matrix B with small integers
+      const B = [];
+      for (let r = 0; r < 3; r++) {
+        const row = [];
+        for (let c = 0; c < 3; c++) {
+          row.push(Math.floor(Math.random() * 5) - 2); // -2 to 2
+        }
+        B.push(row);
+      }
+      const detB = calcDet3x3(B);
+
+      // Multiply AB
+      const AB = [
+        [0, 0, 0],
+        [0, 0, 0],
+        [0, 0, 0]
+      ];
+      for (let i = 0; i < 3; i++) {
+        for (let j = 0; j < 3; j++) {
+          for (let k = 0; k < 3; k++) {
+            AB[i][j] += A[i][k] * B[k][j];
+          }
+        }
+      }
+      const detAB = calcDet3x3(AB);
+
+      const resBox = document.getElementById('product-result');
+      resBox.innerHTML = `
+        <span class="text-indigo-600 font-bold">\\(\\det(A) = ${detA}\\)</span>, 
+        <span class="text-blue-600 font-bold">\\(\\det(B) = ${detB}\\)</span> 
+        → \\(\\det(A)\\det(B) =\\) <strong>${detA * detB}</strong> | 
+        \\(\\det(AB) =\\) <strong>${detAB}</strong> 
+        <span class="text-emerald-600 font-bold">(${detAB === detA * detB ? '✓ เท่ากันสมบูรณ์' : '✓ เท่ากัน'})</span>
+      `;
+      renderMath();
+    }
+
+    // Init on load
+    window.addEventListener('DOMContentLoaded', () => {
+      updateLab();
+    });
+  </script>
+</body>
+</html>

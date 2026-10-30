@@ -1,0 +1,1186 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>การบวก การลบ และการคูณด้วยสเกลาร์ (Matrix Operations)</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Google Fonts: Prompt & Sarabun & Fira Code -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;600&family=Prompt:wght@400;500;600;700&family=Sarabun:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+  <!-- Font Awesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- KaTeX -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js"
+    onload="renderMathInElement(document.body, {delimiters: [{left: '$$', right: '$$', display: true}, {left: '$', right: '$', display: false}]});"></script>
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Sarabun', 'sans-serif'],
+            display: ['Prompt', 'sans-serif'],
+            mono: ['Fira Code', 'monospace'],
+          },
+          colors: {
+            brand: {
+              50: '#eff6ff',
+              100: '#dbeafe',
+              200: '#bfdbfe',
+              500: '#3b82f6',
+              600: '#2563eb',
+              700: '#1d4ed8',
+              800: '#1e40af',
+              900: '#1e3a8a',
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    .matrix-bracket-left {
+      border-left: 3px solid currentColor;
+      border-top: 3px solid currentColor;
+      border-bottom: 3px solid currentColor;
+      border-top-left-radius: 7px;
+      border-bottom-left-radius: 7px;
+      width: 10px;
+    }
+    .matrix-bracket-right {
+      border-right: 3px solid currentColor;
+      border-top: 3px solid currentColor;
+      border-bottom: 3px solid currentColor;
+      border-top-right-radius: 7px;
+      border-bottom-right-radius: 7px;
+      width: 10px;
+    }
+    input[type=number]::-webkit-inner-spin-button, 
+    input[type=number]::-webkit-outer-spin-button { 
+      -webkit-appearance: none; 
+      margin: 0; 
+    }
+    input[type=number] {
+      -moz-appearance: textfield;
+    }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-800 font-sans antialiased min-h-screen selection:bg-brand-500 selection:text-white">
+
+  <!-- Main Container: 1,152px (max-w-6xl) matching module 1 -->
+  <main class="max-w-6xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 space-y-10">
+
+    <!-- Topic Banner Card -->
+    <section class="text-center md:text-left md:flex md:items-center md:justify-between pb-2">
+      <div class="md:max-w-2xl space-y-3">
+        <h2 class="text-3xl sm:text-4xl font-display font-extrabold text-slate-900 tracking-tight">
+          การบวก การลบ และการคูณด้วยสเกลาร์
+        </h2>
+        <p class="text-slate-600 text-base leading-relaxed">
+          การดำเนินการเลขคณิตพื้นฐานบนเมทริกซ์ โดยการบวกและการลบกระทำกับสมาชิกในตำแหน่งเดียวกัน และการคูณด้วยสเกลาร์เป็นการกระจายจำนวนจริงคูณกับสมาชิกทุกตัวในเมทริกซ์
+        </p>
+      </div>
+
+      <!-- Quick Concept Mini-Formula Card -->
+      <div class="mt-6 md:mt-0 flex justify-center">
+        <div class="p-4 bg-white rounded-2xl shadow-sm border border-slate-200/90 flex flex-col gap-2 min-w-[240px]">
+          <div class="flex items-center justify-between text-xs font-mono text-slate-500 border-b border-slate-100 pb-2">
+            <span>สรุปรูปแบบหลัก</span>
+            <span class="text-emerald-600 font-bold">m &times; n เดียวกัน</span>
+          </div>
+          <div class="font-mono text-xs sm:text-sm text-slate-700 space-y-1 text-center py-1">
+            <div>$[A \pm B]_{ij} = a_{ij} \pm b_{ij}$</div>
+            <div>$[k \cdot A]_{ij} = k \cdot a_{ij}$</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 1. Learning Objectives -->
+    <section class="bg-gradient-to-r from-blue-50 via-indigo-50/40 to-slate-50 border border-blue-200/60 rounded-2xl p-6 sm:p-7 shadow-sm">
+      <div class="flex items-start gap-4">
+        <div class="w-10 h-10 rounded-xl bg-blue-600 text-white flex-shrink-0 flex items-center justify-center shadow-md">
+          <i class="fa-solid fa-bullseye text-lg"></i>
+        </div>
+        <div class="space-y-3">
+          <div>
+            <h3 class="text-lg font-display font-bold text-slate-900">วัตถุประสงค์การเรียนรู้</h3>
+            <p class="text-slate-600 text-sm">เมื่อศึกษาเนื้อหาและฝึกปฏิบัติการคำนวณผ่านแบบจำลองนี้แล้ว นักศึกษาจะสามารถ:</p>
+          </div>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
+            <div class="flex items-start gap-2 bg-white/70 p-3 rounded-xl border border-blue-100">
+              <i class="fa-solid fa-circle-check text-brand-600 mt-1"></i>
+              <span class="text-slate-700">อธิบายเงื่อนไขความเข้ากันได้ในการบวกและการลบเมทริกซ์ได้อย่างถูกต้อง</span>
+            </div>
+            <div class="flex items-start gap-2 bg-white/70 p-3 rounded-xl border border-blue-100">
+              <i class="fa-solid fa-circle-check text-brand-600 mt-1"></i>
+              <span class="text-slate-700">คำนวณผลบวก ผลลบ และการคูณเมทริกซ์ด้วยสเกลาร์ (จำนวนจริง) ได้อย่างแม่นยำ</span>
+            </div>
+            <div class="flex items-start gap-2 bg-white/70 p-3 rounded-xl border border-blue-100">
+              <i class="fa-solid fa-circle-check text-brand-600 mt-1"></i>
+              <span class="text-slate-700">อธิบายและจำแนกบทบาทของเมทริกซ์ศูนย์และเมทริกซ์ตรงข้าม ($-A$) ได้</span>
+            </div>
+            <div class="flex items-start gap-2 bg-white/70 p-3 rounded-xl border border-blue-100">
+              <i class="fa-solid fa-circle-check text-brand-600 mt-1"></i>
+              <span class="text-slate-700">พิสูจน์และตรวจสอบสมบัติการสลับที่ การเปลี่ยนหมู่ และการแจกแจงของการคูณด้วยสเกลาร์ได้</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 2. Lessons & Concepts (Tabbed Navigation) -->
+    <section class="space-y-4">
+      <div class="flex items-center justify-between border-b border-slate-200 pb-3">
+        <div>
+          <h3 class="text-xl font-display font-bold text-slate-900">สรุปเนื้อหาสำคัญ</h3>
+          <p class="text-slate-500 text-sm">คลิกเลือกหัวข้อย่อยเพื่อศึกษาเงื่อนไข นิยาม และสมบัติทางพีชคณิต</p>
+        </div>
+      </div>
+
+      <!-- Tab Buttons -->
+      <div class="flex flex-wrap gap-2 border-b border-slate-200 pb-2">
+        <button onclick="switchTab('tab-add-sub')" id="btn-tab-add-sub" class="tab-btn active px-4 py-2 rounded-lg text-sm font-semibold transition-all bg-brand-600 text-white shadow-sm">
+          <i class="fa-solid fa-plus-minus mr-1.5"></i> 1. เงื่อนไขการบวก-ลบ
+        </button>
+        <button onclick="switchTab('tab-scalar')" id="btn-tab-scalar" class="tab-btn px-4 py-2 rounded-lg text-sm font-semibold transition-all bg-slate-100 text-slate-600 hover:bg-slate-200">
+          <i class="fa-solid fa-xmark mr-1.5"></i> 2. การคูณด้วยสเกลาร์
+        </button>
+        <button onclick="switchTab('tab-props-add')" id="btn-tab-props-add" class="tab-btn px-4 py-2 rounded-lg text-sm font-semibold transition-all bg-slate-100 text-slate-600 hover:bg-slate-200">
+          <i class="fa-solid fa-shuffle mr-1.5"></i> 3. สมบัติการสลับที่ & เปลี่ยนหมู่
+        </button>
+        <button onclick="switchTab('tab-identity-inverse')" id="btn-tab-identity-inverse" class="tab-btn px-4 py-2 rounded-lg text-sm font-semibold transition-all bg-slate-100 text-slate-600 hover:bg-slate-200">
+          <i class="fa-solid fa-yin-yang mr-1.5"></i> 4. เมทริกซ์ศูนย์ & เมทริกซ์ตรงข้าม
+        </button>
+        <button onclick="switchTab('tab-props-distrib')" id="btn-tab-props-distrib" class="tab-btn px-4 py-2 rounded-lg text-sm font-semibold transition-all bg-slate-100 text-slate-600 hover:bg-slate-200">
+          <i class="fa-solid fa-share-nodes mr-1.5"></i> 5. สมบัติการแจกแจง
+        </button>
+      </div>
+
+      <!-- Tab 1: เงื่อนไขการบวกและการลบ -->
+      <div id="tab-add-sub" class="tab-content bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+        <h4 class="text-lg font-display font-bold text-slate-900 text-brand-700">1. เงื่อนไขและวิธีการบวก-ลบเมทริกซ์</h4>
+        <p class="text-slate-700 leading-relaxed text-sm">
+          เมทริกซ์สองเมทริกซ์จะบวกหรือลบกันได้ <strong>มีเพียงเงื่อนไขเดียวที่สำคัญที่สุดคือ ต้องมีขนาด (มิติ) เท่ากันทุกประการ</strong> ($m_A = m_B$ และ $n_A = n_B$)
+        </p>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 pt-1">
+          <div class="p-4 bg-blue-50/60 rounded-xl border border-blue-200 space-y-2">
+            <span class="font-bold text-blue-900 text-sm block"><i class="fa-solid fa-plus text-blue-600 mr-1"></i> การบวก (Addition)</span>
+            <p class="text-xs text-slate-600">นำสมาชิกในตำแหน่งเดียวกันของทั้งสองเมทริกซ์มาบวกกันโดยตรง:</p>
+            <div class="bg-white p-3 rounded-lg border border-blue-100 text-center font-mono text-xs">
+              $$[A + B]_{ij} = a_{ij} + b_{ij}$$
+            </div>
+          </div>
+          <div class="p-4 bg-rose-50/60 rounded-xl border border-rose-200 space-y-2">
+            <span class="font-bold text-rose-900 text-sm block"><i class="fa-solid fa-minus text-rose-600 mr-1"></i> การลบ (Subtraction)</span>
+            <p class="text-xs text-slate-600">นำสมาชิกในตำแหน่งเดียวกันมาลบกัน หรือมองเป็นการบวกด้วยเมทริกซ์ตรงข้าม $A - B = A + (-B)$:</p>
+            <div class="bg-white p-3 rounded-lg border border-rose-100 text-center font-mono text-xs">
+              $$[A - B]_{ij} = a_{ij} - b_{ij}$$
+            </div>
+          </div>
+        </div>
+        <div class="p-3 bg-amber-50 border border-amber-200 rounded-xl text-xs text-amber-900 flex items-center gap-2">
+          <i class="fa-solid fa-triangle-exclamation text-amber-600"></i>
+          <span><strong>ข้อพึงระวัง:</strong> หากเมทริกซ์ทั้งสองมีมิติไม่เท่ากัน เช่น ขนาด $2 \times 3$ กับ $3 \times 2$ จะ<strong>ไม่สามารถหาผลบวกหรือผลลบได้ (Undefined)</strong></span>
+        </div>
+      </div>
+
+      <!-- Tab 2: การคูณด้วยสเกลาร์ -->
+      <div id="tab-scalar" class="tab-content hidden bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+        <h4 class="text-lg font-display font-bold text-slate-900 text-brand-700">2. การคูณเมทริกซ์ด้วยสเกลาร์ (Scalar Multiplication)</h4>
+        <p class="text-slate-700 leading-relaxed text-sm">
+          เมื่อ $k$ เป็นจำนวนจริง (สเกลาร์) ใด ๆ การคูณเมทริกซ์ $A$ ด้วย $k$ เขียนแทนด้วย $kA$ หมายถึงการนำค่า $k$ ไปคูณกับ <strong>สมาชิกทุกตัว</strong> ภายในเมทริกซ์ $A$
+        </p>
+        <div class="p-4 bg-slate-50 rounded-xl border border-slate-200 text-center">
+          <div class="text-sm font-mono font-semibold text-slate-800">
+            $$k A = k \begin{bmatrix} a_{11} & a_{12} \\ a_{21} & a_{22} \end{bmatrix} = \begin{bmatrix} k \cdot a_{11} & k \cdot a_{12} \\ k \cdot a_{21} & k \cdot a_{22} \end{bmatrix}$$
+          </div>
+          <p class="text-xs text-slate-500 mt-2">ผลลัพธ์ $kA$ ยังคงมีมิติขนาด $m \times n$ เท่าเดิมกับเมทริกซ์ $A$</p>
+        </div>
+      </div>
+
+      <!-- Tab 3: สมบัติการสลับที่และเปลี่ยนหมู่ -->
+      <div id="tab-props-add" class="tab-content hidden bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+        <h4 class="text-lg font-display font-bold text-slate-900 text-brand-700">3. สมบัติการสลับที่และการเปลี่ยนหมู่ของการบวก</h4>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div class="p-4 bg-slate-50 rounded-xl border border-slate-200 space-y-2">
+            <span class="font-bold text-slate-800 text-sm flex items-center gap-2">
+              <i class="fa-solid fa-arrows-rotate text-brand-600"></i> สมบัติการสลับที่ (Commutative Property)
+            </span>
+            <div class="text-center bg-white p-3 rounded-lg border border-slate-200 font-mono text-sm font-bold text-brand-700">
+              $$A + B = B + A$$
+            </div>
+            <p class="text-xs text-slate-600">
+              ลำดับการบวกไม่มีผลต่อผลลัพธ์สุดท้าย เพราะจำนวนจริงมีสมบัติการสลับที่การบวก ($a_{ij} + b_{ij} = b_{ij} + a_{ij}$)
+            </p>
+          </div>
+          <div class="p-4 bg-slate-50 rounded-xl border border-slate-200 space-y-2">
+            <span class="font-bold text-slate-800 text-sm flex items-center gap-2">
+              <i class="fa-solid fa-layer-group text-emerald-600"></i> สมบัติการเปลี่ยนหมู่ (Associative Property)
+            </span>
+            <div class="text-center bg-white p-3 rounded-lg border border-slate-200 font-mono text-sm font-bold text-emerald-700">
+              $$(A + B) + C = A + (B + C)$$
+            </div>
+            <p class="text-xs text-slate-600">
+              เมื่อมีเมทริกซ์ 3 ตัวขนาดเท่ากัน จะรวมคู่หน้าก่อนหรือคู่หลังก่อนก็ได้ผลลัพธ์เท่ากัน
+            </p>
+          </div>
+        </div>
+        <p class="text-xs text-rose-600 bg-rose-50 p-2.5 rounded-lg border border-rose-200 font-medium">
+          <i class="fa-solid fa-circle-exclamation mr-1"></i> ข้อควรระวัง: การลบเมทริกซ์ <strong>ไม่มี</strong> สมบัติการสลับที่ กล่าวคือ $A - B \neq B - A$ (ยกเว้น $A = B$)
+        </p>
+      </div>
+
+      <!-- Tab 4: เมทริกซ์ศูนย์และเมทริกซ์ตรงข้าม -->
+      <div id="tab-identity-inverse" class="tab-content hidden bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+        <h4 class="text-lg font-display font-bold text-slate-900 text-brand-700">4. เมทริกซ์ศูนย์และเมทริกซ์ตรงข้าม</h4>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div class="p-4 bg-slate-50 rounded-xl border border-slate-200 space-y-2">
+            <span class="font-bold text-slate-800 text-sm flex items-center gap-2">
+              <i class="fa-regular fa-circle text-slate-500"></i> เมทริกซ์ศูนย์ (เอกลักษณ์การบวก)
+            </span>
+            <p class="text-xs text-slate-600">เมทริกซ์ที่สมาชิกทุกตำแหน่งเป็น $0$ ทำหน้าที่เป็นเอกลักษณ์การบวก:</p>
+            <div class="text-center bg-white p-3 rounded-lg border border-slate-200 font-mono text-sm">
+              $$A + \mathbf{0} = \mathbf{0} + A = A$$
+            </div>
+          </div>
+          <div class="p-4 bg-slate-50 rounded-xl border border-slate-200 space-y-2">
+            <span class="font-bold text-slate-800 text-sm flex items-center gap-2">
+              <i class="fa-solid fa-yin-yang text-purple-600"></i> เมทริกซ์ตรงข้าม (ตัวผกผันการบวก)
+            </span>
+            <p class="text-xs text-slate-600">เมทริกซ์ตรงข้ามของ $A$ คือ $-A = (-1)A$ เมื่อนำมาบวกกับ $A$ จะได้เมทริกซ์ศูนย์:</p>
+            <div class="text-center bg-white p-3 rounded-lg border border-slate-200 font-mono text-sm">
+              $$A + (-A) = (-A) + A = \mathbf{0}$$
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tab 5: สมบัติการแจกแจงของการคูณสเกลาร์ -->
+      <div id="tab-props-distrib" class="tab-content hidden bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+        <h4 class="text-lg font-display font-bold text-slate-900 text-brand-700">5. สมบัติการแจกแจงของการคูณด้วยสเกลาร์</h4>
+        <p class="text-slate-700 leading-relaxed text-sm">
+          ให้ $c, d$ เป็นจำนวนจริง (สเกลาร์) และ $A, B$ เป็นเมทริกซ์ที่มีมิติเท่ากัน จะมีสมบัติสำคัญดังนี้:
+        </p>
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+          <div class="p-3 bg-slate-50 rounded-xl border border-slate-200 text-center space-y-1">
+            <div class="text-xs text-slate-500 font-semibold">แจกแจงสเกลาร์เข้าเมทริกซ์</div>
+            <div class="font-mono text-sm font-bold text-brand-700">$$k(A + B) = kA + kB$$</div>
+          </div>
+          <div class="p-3 bg-slate-50 rounded-xl border border-slate-200 text-center space-y-1">
+            <div class="text-xs text-slate-500 font-semibold">แจกแจงเมทริกซ์เข้าสเกลาร์</div>
+            <div class="font-mono text-sm font-bold text-brand-700">$$(c + d)A = cA + dA$$</div>
+          </div>
+          <div class="p-3 bg-slate-50 rounded-xl border border-slate-200 text-center space-y-1">
+            <div class="text-xs text-slate-500 font-semibold">การคูณร่วมของสเกลาร์</div>
+            <div class="font-mono text-sm font-bold text-brand-700">$$c(dA) = (cd)A$$</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3. Interactive Matrix Lab / Simulator -->
+    <section id="simulator" class="bg-white rounded-3xl border border-slate-200/90 shadow-lg p-6 sm:p-8 space-y-6">
+      
+      <!-- Simulator Header -->
+      <div class="border-b border-slate-100 pb-5 flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div>
+          <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold bg-indigo-50 text-indigo-700 border border-indigo-100">
+            <i class="fa-solid fa-flask"></i> Interactive Matrix Operations Lab
+          </div>
+          <h3 class="text-2xl font-display font-bold text-slate-900 mt-1">แบบจำลองโต้ตอบ: ปฏิบัติการบวก ลบ และคูณสเกลาร์</h3>
+          <p class="text-slate-500 text-sm">ปรับเปลี่ยนค่าสมาชิก $A, B$ หรือสเกลาร์ $k$ เพื่อดูการคำนวณทีละตำแหน่งและตรวจสอบสมบัติแบบทันที</p>
+        </div>
+
+        <!-- Controls: Quick Actions -->
+        <div class="flex flex-wrap items-center gap-2">
+          <button onclick="swapMatrices()" class="px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-medium transition flex items-center gap-1.5 shadow-xs">
+            <i class="fa-solid fa-right-left text-brand-600"></i> สลับ A กับ B
+          </button>
+          <button onclick="randomizeMatrices()" class="px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-medium transition flex items-center gap-1.5 shadow-xs">
+            <i class="fa-solid fa-shuffle text-emerald-600"></i> สุ่มตัวเลข
+          </button>
+          <button onclick="loadExercise1()" class="px-3 py-2 bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200 rounded-xl text-xs font-medium transition flex items-center gap-1.5 shadow-xs">
+            <i class="fa-solid fa-pen-to-square"></i> โหลดโจทย์ข้อ 1
+          </button>
+        </div>
+      </div>
+
+      <!-- Config Row: Dimensions & Scalar (k) -->
+      <div class="grid grid-cols-1 md:grid-cols-12 gap-4 bg-slate-50/80 p-4 rounded-2xl border border-slate-200/70 items-center">
+        <!-- Dimension Picker -->
+        <div class="md:col-span-5 flex items-center gap-3">
+          <span class="text-xs font-semibold text-slate-600 uppercase">ขนาดเมทริกซ์ ($m \times n$):</span>
+          <div class="inline-flex rounded-xl bg-white p-1 border border-slate-200 shadow-xs">
+            <button onclick="setDimension(2, 2)" id="dim-2-2" class="dim-btn active px-3 py-1 text-xs font-bold rounded-lg bg-brand-600 text-white transition">2 &times; 2</button>
+            <button onclick="setDimension(2, 3)" id="dim-2-3" class="dim-btn px-3 py-1 text-xs font-bold rounded-lg text-slate-600 hover:bg-slate-100 transition">2 &times; 3</button>
+            <button onclick="setDimension(3, 3)" id="dim-3-3" class="dim-btn px-3 py-1 text-xs font-bold rounded-lg text-slate-600 hover:bg-slate-100 transition">3 &times; 3</button>
+          </div>
+        </div>
+
+        <!-- Scalar (k) Control -->
+        <div class="md:col-span-7 flex flex-wrap items-center justify-start md:justify-end gap-3">
+          <div class="flex items-center gap-2 bg-white px-3 py-1.5 rounded-xl border border-amber-300 shadow-xs">
+            <label for="scalar-k" class="text-xs font-bold text-amber-700">สเกลาร์ $k$ =</label>
+            <input type="number" id="scalar-k" value="2" step="any" oninput="handleScalarChange(this.value)"
+              class="w-14 text-center font-mono font-bold text-amber-800 bg-amber-50/50 rounded border border-amber-200 text-sm py-0.5 focus:outline-none focus:ring-1 focus:ring-amber-500">
+          </div>
+          <div class="flex items-center gap-1">
+            <span class="text-[11px] text-slate-400">ลัด:</span>
+            <button onclick="setScalar(0)" class="px-2 py-1 text-xs bg-white hover:bg-slate-100 border border-slate-200 rounded-lg text-slate-600">0</button>
+            <button onclick="setScalar(1)" class="px-2 py-1 text-xs bg-white hover:bg-slate-100 border border-slate-200 rounded-lg text-slate-600">1</button>
+            <button onclick="setScalar(-1)" class="px-2 py-1 text-xs bg-white hover:bg-slate-100 border border-slate-200 rounded-lg text-slate-600">-1</button>
+            <button onclick="setScalar(2)" class="px-2 py-1 text-xs bg-white hover:bg-slate-100 border border-slate-200 rounded-lg text-slate-600">2</button>
+            <button onclick="setScalar(3)" class="px-2 py-1 text-xs bg-white hover:bg-slate-100 border border-slate-200 rounded-lg text-slate-600">3</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Operation Selector Tabs -->
+      <div class="flex flex-wrap gap-2 border-b border-slate-200 pb-3">
+        <button onclick="setOperation('A+B')" id="op-btn-A+B" class="op-btn active px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold bg-brand-600 text-white shadow-xs transition">
+          $A + B$
+        </button>
+        <button onclick="setOperation('A-B')" id="op-btn-A-B" class="op-btn px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold bg-slate-100 text-slate-700 hover:bg-slate-200 transition">
+          $A - B$
+        </button>
+        <button onclick="setOperation('B-A')" id="op-btn-B-A" class="op-btn px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold bg-slate-100 text-slate-700 hover:bg-slate-200 transition">
+          $B - A$
+        </button>
+        <button onclick="setOperation('kA')" id="op-btn-kA" class="op-btn px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold bg-slate-100 text-slate-700 hover:bg-slate-200 transition">
+          $k \cdot A$
+        </button>
+        <button onclick="setOperation('kB')" id="op-btn-kB" class="op-btn px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold bg-slate-100 text-slate-700 hover:bg-slate-200 transition">
+          $k \cdot B$
+        </button>
+        <button onclick="setOperation('comm')" id="op-btn-comm" class="op-btn px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold bg-indigo-50 text-indigo-700 border border-indigo-200 hover:bg-indigo-100 transition">
+          <i class="fa-solid fa-scale-balanced mr-1"></i> ตรวจสอบ: $A+B = B+A$
+        </button>
+        <button onclick="setOperation('distrib')" id="op-btn-distrib" class="op-btn px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold bg-amber-50 text-amber-800 border border-amber-200 hover:bg-amber-100 transition">
+          <i class="fa-solid fa-code-branch mr-1"></i> ตรวจสอบ: $k(A+B) = kA+kB$
+        </button>
+      </div>
+
+      <!-- Main Visual Workspace: Matrix A [op] Matrix B = Matrix Result -->
+      <div id="standard-calc-view" class="space-y-6">
+        <div class="flex flex-col lg:flex-row items-center justify-center gap-4 py-4 overflow-x-auto">
+          
+          <!-- Matrix A Container -->
+          <div class="flex flex-col items-center">
+            <span class="text-xs font-bold text-blue-700 mb-2 flex items-center gap-1.5">
+              <span class="w-2 h-2 rounded-full bg-blue-500"></span> เมทริกซ์ A
+            </span>
+            <div class="flex items-center text-blue-600">
+              <div class="matrix-bracket-left self-stretch"></div>
+              <div id="grid-a" class="grid gap-1.5 sm:gap-2 p-2"></div>
+              <div class="matrix-bracket-right self-stretch"></div>
+            </div>
+          </div>
+
+          <!-- Operator Sign Symbol -->
+          <div id="operator-symbol" class="text-2xl font-bold font-mono text-slate-500 px-2 py-4">
+            +
+          </div>
+
+          <!-- Matrix B Container (Hidden during k*A) -->
+          <div id="container-matrix-b" class="flex flex-col items-center">
+            <span class="text-xs font-bold text-emerald-700 mb-2 flex items-center gap-1.5">
+              <span class="w-2 h-2 rounded-full bg-emerald-500"></span> เมทริกซ์ B
+            </span>
+            <div class="flex items-center text-emerald-600">
+              <div class="matrix-bracket-left self-stretch"></div>
+              <div id="grid-b" class="grid gap-1.5 sm:gap-2 p-2"></div>
+              <div class="matrix-bracket-right self-stretch"></div>
+            </div>
+          </div>
+
+          <!-- Equal Sign -->
+          <div class="text-2xl font-bold font-mono text-slate-500 px-2 py-4">
+            =
+          </div>
+
+          <!-- Matrix Result Container -->
+          <div class="flex flex-col items-center">
+            <span id="result-label" class="text-xs font-bold text-purple-700 mb-2 flex items-center gap-1.5">
+              <span class="w-2 h-2 rounded-full bg-purple-500"></span> ผลลัพธ์
+            </span>
+            <div class="flex items-center text-purple-700">
+              <div class="matrix-bracket-left self-stretch"></div>
+              <div id="grid-result" class="grid gap-1.5 sm:gap-2 p-2 bg-purple-50/40 rounded-xl"></div>
+              <div class="matrix-bracket-right self-stretch"></div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Step-by-Step Position Inspection Breakdown -->
+        <div class="bg-slate-50 rounded-2xl p-4 sm:p-5 border border-slate-200">
+          <div class="flex items-center justify-between mb-2">
+            <span class="text-xs font-bold text-slate-600 uppercase tracking-wider flex items-center gap-1.5">
+              <i class="fa-solid fa-list-check text-brand-600"></i> การแจกแจงผลคำนวณทีละตำแหน่ง (Step-by-step element calculation)
+            </span>
+            <span class="text-[11px] text-slate-400">คลิกที่ช่องผลลัพธ์เพื่อไฮไลต์</span>
+          </div>
+          <div id="calculation-steps" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2.5 text-xs font-mono">
+            <!-- Injected by JavaScript -->
+          </div>
+        </div>
+      </div>
+
+      <!-- Property Verification View (Commutative / Distributive) -->
+      <div id="property-calc-view" class="hidden space-y-6">
+        <div id="property-content" class="bg-indigo-50/50 rounded-2xl p-6 border border-indigo-100 space-y-4">
+          <!-- Injected dynamically when property mode is clicked -->
+        </div>
+      </div>
+
+    </section>
+
+    <!-- 4. Inquiry & Discovery Questions -->
+    <section class="space-y-6">
+      <div class="border-b border-slate-200 pb-3">
+        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-100 mb-1">
+          <i class="fa-solid fa-lightbulb"></i> Discovery & Inquiry
+        </div>
+        <h3 class="text-2xl font-display font-bold text-slate-900">คำถามนำเพื่อค้นพบ (Inquiry Questions)</h3>
+        <p class="text-slate-500 text-sm">ทดลองตั้งสมมติฐาน สังเกตจากแบบจำลองด้านบน และคลิกเพื่อดูแนวคิดเฉลย</p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        
+        <!-- Q1 -->
+        <div class="bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden flex flex-col">
+          <div class="p-5 flex-1">
+            <div class="flex items-start gap-3">
+              <span class="w-7 h-7 rounded-lg bg-brand-100 text-brand-700 font-bold text-sm flex items-center justify-center flex-shrink-0">1</span>
+              <div>
+                <h4 class="font-display font-bold text-slate-800 text-base">การบวกเมทริกซ์ต้องมีเงื่อนไขด้านขนาดอย่างไร?</h4>
+                <p class="text-xs text-slate-500 mt-1">ทำไมจึงไม่สามารถนำเมทริกซ์ขนาด $2 \times 3$ มาบวกกับ $3 \times 2$ ได้?</p>
+              </div>
+            </div>
+          </div>
+          <div class="px-5 pb-4">
+            <button onclick="toggleAnswer('ans-1')" class="w-full py-2.5 px-4 text-xs font-semibold text-brand-700 bg-brand-50 hover:bg-brand-100 rounded-xl transition flex items-center justify-between">
+              <span><i class="fa-solid fa-key mr-1.5"></i> ดูแนวคิดคำตอบ</span>
+              <i id="icon-ans-1" class="fa-solid fa-chevron-down text-xs transition-transform"></i>
+            </button>
+            <div id="ans-1" class="hidden mt-3 p-4 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-700 space-y-2 leading-relaxed">
+              <p>
+                <strong>เงื่อนไขสำคัญ:</strong> เมทริกซ์ที่จะบวกหรือลบกันได้ <strong>ต้องมีขนาด (มิติ) เท่ากันทุกประการ</strong> ($m_A = m_B$ และ $n_A = n_B$)
+              </p>
+              <p class="text-slate-600">
+                <strong>เหตุผล:</strong> นิยามการบวกเมทริกซ์กำหนดให้นำสมาชิกในตำแหน่งเดียวกันมาบวกกันแบบตัวต่อตัว ($a_{ij} + b_{ij}$) หากจำนวนแถวหรือหลักไม่เท่ากัน จะมีสมาชิกบางตัวที่ไม่มีคู่จับตำแหน่ง ทำให้ไม่นิยามการบวก
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Q2 -->
+        <div class="bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden flex flex-col">
+          <div class="p-5 flex-1">
+            <div class="flex items-start gap-3">
+              <span class="w-7 h-7 rounded-lg bg-brand-100 text-brand-700 font-bold text-sm flex items-center justify-center flex-shrink-0">2</span>
+              <div>
+                <h4 class="font-display font-bold text-slate-800 text-base">ผลของ $A+B$ กับ $B+A$ แตกต่างกันหรือไม่?</h4>
+                <p class="text-xs text-slate-500 mt-1">ทดลองกดปุ่ม "สลับ A กับ B" หรือโหมดตรวจสอบในห้องทดลอง</p>
+              </div>
+            </div>
+          </div>
+          <div class="px-5 pb-4">
+            <button onclick="toggleAnswer('ans-2')" class="w-full py-2.5 px-4 text-xs font-semibold text-brand-700 bg-brand-50 hover:bg-brand-100 rounded-xl transition flex items-center justify-between">
+              <span><i class="fa-solid fa-key mr-1.5"></i> ดูแนวคิดคำตอบ</span>
+              <i id="icon-ans-2" class="fa-solid fa-chevron-down text-xs transition-transform"></i>
+            </button>
+            <div id="ans-2" class="hidden mt-3 p-4 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-700 space-y-2 leading-relaxed">
+              <p class="font-bold text-emerald-700">
+                <i class="fa-solid fa-circle-check"></i> ได้ผลลัพธ์เท่ากันทุกประการ ($A + B = B + A$)
+              </p>
+              <p class="text-slate-600">
+                <strong>เพราะว่า:</strong> สมาชิกในแต่ละตำแหน่งคือ $a_{ij} + b_{ij}$ ซึ่งสมาชิกแต่ละตัวเป็นจำนวนจริง และจำนวนจริงมีสมบัติการสลับที่สำหรับการบวก ($a_{ij} + b_{ij} = b_{ij} + a_{ij}$) จึงส่งผลให้การบวกเมทริกซ์มีสมบัติการสลับที่ด้วย
+              </p>
+              <p class="text-slate-500 text-[11px] italic">
+                *หมายเหตุ: สำหรับการลบ $A - B \neq B - A$ สลับที่ไม่ได้
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Q3 -->
+        <div class="bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden flex flex-col">
+          <div class="p-5 flex-1">
+            <div class="flex items-start gap-3">
+              <span class="w-7 h-7 rounded-lg bg-brand-100 text-brand-700 font-bold text-sm flex items-center justify-center flex-shrink-0">3</span>
+              <div>
+                <h4 class="font-display font-bold text-slate-800 text-base">เมื่อคูณเมทริกซ์ด้วย $0$, $1$ หรือ $-1$ ผลเปลี่ยนอย่างไร?</h4>
+                <p class="text-xs text-slate-500 mt-1">ทดลองเปลี่ยนค่า $k$ ที่แถบควบคุมด้านบน</p>
+              </div>
+            </div>
+          </div>
+          <div class="px-5 pb-4">
+            <button onclick="toggleAnswer('ans-3')" class="w-full py-2.5 px-4 text-xs font-semibold text-brand-700 bg-brand-50 hover:bg-brand-100 rounded-xl transition flex items-center justify-between">
+              <span><i class="fa-solid fa-key mr-1.5"></i> ดูแนวคิดคำตอบ</span>
+              <i id="icon-ans-3" class="fa-solid fa-chevron-down text-xs transition-transform"></i>
+            </button>
+            <div id="ans-3" class="hidden mt-3 p-4 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-700 space-y-2 leading-relaxed">
+              <ul class="list-disc list-inside space-y-1.5 text-slate-600">
+                <li><strong>เมื่อคูณด้วย $0$ ($0 \cdot A$):</strong> สมาชิกทุกตำแหน่งจะกลายเป็นศูนย์ทั้งหมด ได้ผลลัพธ์เป็น <strong>เมทริกซ์ศูนย์ ($\mathbf{0}$)</strong></li>
+                <li><strong>เมื่อคูณด้วย $1$ ($1 \cdot A$):</strong> สมาชิกทุกตำแหน่งคงเดิม ได้ผลลัพธ์เป็น <strong>เมทริกซ์ $A$ ตัวเดิม</strong></li>
+                <li><strong>เมื่อคูณด้วย $-1$ ($(-1) \cdot A$):</strong> สมาชิกทุกตำแหน่งจะกลับเครื่องหมายเป็นตรงข้าม ได้ <strong>เมทริกซ์ตรงข้าม ($-A$)</strong></li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <!-- Q4 -->
+        <div class="bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden flex flex-col">
+          <div class="p-5 flex-1">
+            <div class="flex items-start gap-3">
+              <span class="w-7 h-7 rounded-lg bg-brand-100 text-brand-700 font-bold text-sm flex items-center justify-center flex-shrink-0">4</span>
+              <div>
+                <h4 class="font-display font-bold text-slate-800 text-base">สมบัติ $k(A+B) = kA + kB$ เป็นจริงหรือไม่?</h4>
+                <p class="text-xs text-slate-500 mt-1">พิจารณาการกระจายของจำนวนจริงเข้าไปในผลบวก</p>
+              </div>
+            </div>
+          </div>
+          <div class="px-5 pb-4">
+            <button onclick="toggleAnswer('ans-4')" class="w-full py-2.5 px-4 text-xs font-semibold text-brand-700 bg-brand-50 hover:bg-brand-100 rounded-xl transition flex items-center justify-between">
+              <span><i class="fa-solid fa-key mr-1.5"></i> ดูแนวคิดคำตอบ</span>
+              <i id="icon-ans-4" class="fa-solid fa-chevron-down text-xs transition-transform"></i>
+            </button>
+            <div id="ans-4" class="hidden mt-3 p-4 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-700 space-y-2 leading-relaxed">
+              <p class="font-bold text-emerald-700">
+                <i class="fa-solid fa-circle-check"></i> เป็นจริงเสมอ สำหรับทุกจำนวนจริง $k$ และเมทริกซ์ $A, B$ ขนาดเท่ากัน
+              </p>
+              <p class="text-slate-600">
+                <strong>การพิสูจน์ระดับสมาชิก:</strong>
+                <br>สมาชิกตำแหน่งที่ $(i, j)$ ของ $k(A + B)$ คือ $k(a_{ij} + b_{ij})$
+                <br>เนื่องจาก $k, a_{ij}, b_{ij}$ เป็นจำนวนจริง จึงมีสมบัติการแจกแจง $k(a_{ij} + b_{ij}) = k \cdot a_{ij} + k \cdot b_{ij}$ ซึ่งเท่ากับสมาชิกตำแหน่ง $(i, j)$ ของ $kA + kB$
+              </p>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- 5. Student Practice Exercises -->
+    <section class="space-y-6">
+      <div class="border-b border-slate-200 pb-3 flex items-center justify-between">
+        <div>
+          <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold bg-purple-50 text-purple-700 border border-purple-100 mb-1">
+            <i class="fa-solid fa-pen-nib"></i> Practice & Exercises
+          </div>
+          <h3 class="text-2xl font-display font-bold text-slate-900">แบบฝึกหัดสำหรับนักศึกษา</h3>
+          <p class="text-slate-500 text-sm">ทดลองทำด้วยตนเอง แล้วคลิกเพื่อตรวจคำตอบอย่างละเอียด</p>
+        </div>
+      </div>
+
+      <div class="space-y-4">
+        
+        <!-- Exercise 1 -->
+        <div class="bg-white rounded-2xl border border-slate-200 shadow-xs p-6 space-y-4">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div class="space-y-1">
+              <span class="text-xs font-bold text-brand-600 uppercase">ข้อที่ 1 (การคำนวณพื้นฐาน)</span>
+              <h4 class="font-bold text-slate-900 text-base">
+                กำหนด $A = \begin{bmatrix} 1 & 2 \\ -3 & 4 \end{bmatrix}$ และ $B = \begin{bmatrix} 5 & -1 \\ 2 & 0 \end{bmatrix}$ จงหาค่าของ $A+B$, $A-B$ และ $3A$
+              </h4>
+            </div>
+            <button onclick="loadExercise1(); document.getElementById('simulator').scrollIntoView({behavior:'smooth'});"
+              class="self-start sm:self-auto px-3.5 py-1.5 bg-blue-50 hover:bg-blue-100 text-brand-700 border border-blue-200 rounded-xl text-xs font-semibold transition flex items-center gap-1.5 flex-shrink-0">
+              <i class="fa-solid fa-arrow-up-right-from-square"></i> โหลดเข้าห้องทดลอง
+            </button>
+          </div>
+
+          <div>
+            <button onclick="toggleAnswer('ex-ans-1')" class="text-xs font-semibold text-brand-600 hover:text-brand-800 flex items-center gap-1">
+              <span>แสดงเฉลยวิธีทำข้อ 1</span>
+              <i id="icon-ex-ans-1" class="fa-solid fa-chevron-down text-[10px] transition-transform"></i>
+            </button>
+            <div id="ex-ans-1" class="hidden mt-3 p-4 bg-slate-50 rounded-xl border border-slate-200 text-xs text-slate-700 space-y-3">
+              <div>
+                <strong>1. หา $A + B$:</strong>
+                <div class="font-mono mt-1 text-slate-800 bg-white p-2 rounded border border-slate-200 text-center">
+                  $$A + B = \begin{bmatrix} 1+5 & 2+(-1) \\ -3+2 & 4+0 \end{bmatrix} = \begin{bmatrix} 6 & 1 \\ -1 & 4 \end{bmatrix}$$
+                </div>
+              </div>
+              <div>
+                <strong>2. หา $A - B$:</strong>
+                <div class="font-mono mt-1 text-slate-800 bg-white p-2 rounded border border-slate-200 text-center">
+                  $$A - B = \begin{bmatrix} 1-5 & 2-(-1) \\ -3-2 & 4-0 \end{bmatrix} = \begin{bmatrix} -4 & 3 \\ -5 & 4 \end{bmatrix}$$
+                </div>
+              </div>
+              <div>
+                <strong>3. หา $3A$:</strong>
+                <div class="font-mono mt-1 text-slate-800 bg-white p-2 rounded border border-slate-200 text-center">
+                  $$3A = \begin{bmatrix} 3(1) & 3(2) \\ 3(-3) & 3(4) \end{bmatrix} = \begin{bmatrix} 3 & 6 \\ -9 & 12 \end{bmatrix}$$
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Exercise 2 -->
+        <div class="bg-white rounded-2xl border border-slate-200 shadow-xs p-6 space-y-4">
+          <div class="space-y-1">
+            <span class="text-xs font-bold text-brand-600 uppercase">ข้อที่ 2 (การตรวจสอบสมบัติการสลับที่)</span>
+            <h4 class="font-bold text-slate-900 text-base">
+              สร้างตัวอย่างเพื่อแสดงว่า $A + B = B + A$
+            </h4>
+          </div>
+
+          <div>
+            <button onclick="toggleAnswer('ex-ans-2')" class="text-xs font-semibold text-brand-600 hover:text-brand-800 flex items-center gap-1">
+              <span>แสดงตัวอย่างแนวทางการเขียนอธิบาย</span>
+              <i id="icon-ex-ans-2" class="fa-solid fa-chevron-down text-[10px] transition-transform"></i>
+            </button>
+            <div id="ex-ans-2" class="hidden mt-3 p-4 bg-slate-50 rounded-xl border border-slate-200 text-xs text-slate-700 space-y-2">
+              <p><strong>ตัวอย่างการแสดง:</strong> กำหนดให้ $A = \begin{bmatrix} 2 & 4 \\ 1 & 3 \end{bmatrix}$ และ $B = \begin{bmatrix} -1 & 0 \\ 5 & 2 \end{bmatrix}$</p>
+              <div class="bg-white p-3 rounded border border-slate-200 font-mono text-center">
+                $$A + B = \begin{bmatrix} 2+(-1) & 4+0 \\ 1+5 & 3+2 \end{bmatrix} = \begin{bmatrix} 1 & 4 \\ 6 & 5 \end{bmatrix}$$
+                $$B + A = \begin{bmatrix} (-1)+2 & 0+4 \\ 5+1 & 2+3 \end{bmatrix} = \begin{bmatrix} 1 & 4 \\ 6 & 5 \end{bmatrix}$$
+              </div>
+              <p>พบว่าสมาชิกทุกตำแหน่งเท่ากันทุกประการ ดังนั้นสรุปได้ว่า $A + B = B + A$</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Exercise 3 -->
+        <div class="bg-white rounded-2xl border border-slate-200 shadow-xs p-6 space-y-4">
+          <div class="space-y-1">
+            <span class="text-xs font-bold text-brand-600 uppercase">ข้อที่ 3 (สมบัติการแจกแจงสเกลาร์)</span>
+            <h4 class="font-bold text-slate-900 text-base">
+              ทดลองตรวจสอบสมบัติ $2(A + B) = 2A + 2B$ ด้วยเมทริกซ์ที่กำหนดเอง
+            </h4>
+          </div>
+
+          <div>
+            <button onclick="toggleAnswer('ex-ans-3')" class="text-xs font-semibold text-brand-600 hover:text-brand-800 flex items-center gap-1">
+              <span>แสดงตัวอย่างการคิดคำนวณ</span>
+              <i id="icon-ex-ans-3" class="fa-solid fa-chevron-down text-[10px] transition-transform"></i>
+            </button>
+            <div id="ex-ans-3" class="hidden mt-3 p-4 bg-slate-50 rounded-xl border border-slate-200 text-xs text-slate-700 space-y-2">
+              <p>ใช้เมทริกซ์ $A = \begin{bmatrix} 1 & 2 \\ -3 & 4 \end{bmatrix}$ และ $B = \begin{bmatrix} 5 & -1 \\ 2 & 0 \end{bmatrix}$ จากข้อ 1:</p>
+              <ul class="list-disc list-inside space-y-1 text-slate-600">
+                <li>ฝั่งซ้าย: $2(A+B) = 2 \begin{bmatrix} 6 & 1 \\ -1 & 4 \end{bmatrix} = \begin{bmatrix} 12 & 2 \\ -2 & 8 \end{bmatrix}$</li>
+                <li>ฝั่งขวา: $2A = \begin{bmatrix} 2 & 4 \\ -6 & 8 \end{bmatrix}$ และ $2B = \begin{bmatrix} 10 & -2 \\ 4 & 0 \end{bmatrix}$
+                  <br>&nbsp;&nbsp;&nbsp;&nbsp;ดังนั้น $2A + 2B = \begin{bmatrix} 2+10 & 4+(-2) \\ -6+4 & 8+0 \end{bmatrix} = \begin{bmatrix} 12 & 2 \\ -2 & 8 \end{bmatrix}$</li>
+              </ul>
+              <p class="font-semibold text-emerald-700">ผลลัพธ์ทั้งสองฝั่งเท่ากันอย่างสมบูรณ์</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Exercise 4 -->
+        <div class="bg-white rounded-2xl border border-slate-200 shadow-xs p-6 space-y-4">
+          <div class="space-y-1">
+            <span class="text-xs font-bold text-brand-600 uppercase">ข้อที่ 4 (การวิเคราะห์เงื่อนไขที่ไม่นิยาม)</span>
+            <h4 class="font-bold text-slate-900 text-base">
+              ยกตัวอย่างเมทริกซ์สองเมทริกซ์ที่ไม่สามารถบวกกันได้ และอธิบายเหตุผล
+            </h4>
+          </div>
+
+          <div>
+            <button onclick="toggleAnswer('ex-ans-4')" class="text-xs font-semibold text-brand-600 hover:text-brand-800 flex items-center gap-1">
+              <span>แสดงแนวคิดและคำอธิบาย</span>
+              <i id="icon-ex-ans-4" class="fa-solid fa-chevron-down text-[10px] transition-transform"></i>
+            </button>
+            <div id="ex-ans-4" class="hidden mt-3 p-4 bg-slate-50 rounded-xl border border-slate-200 text-xs text-slate-700 space-y-2">
+              <p><strong>ตัวอย่าง:</strong> กำหนดให้ $A = \begin{bmatrix} 1 & 2 & 3 \\ 4 & 5 & 6 \end{bmatrix}$ (ขนาด $2 \times 3$) และ $B = \begin{bmatrix} 7 & 8 \\ 9 & 10 \\ 11 & 12 \end{bmatrix}$ (ขนาด $3 \times 2$)</p>
+              <p class="text-rose-700 font-medium">
+                <strong>เหตุผลที่ไม่สามารถบวกกันได้:</strong> เมทริกซ์ $A$ และ $B$ มีมิติไม่เท่ากัน ($2 \times 3 \neq 3 \times 2$) ทำให้ไม่สามารถจับคู่สมาชิกในตำแหน่งเดียวกันมาบวกกันได้ จึงไม่นิยามการบวก $A + B$
+              </p>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Interactive Logic Script -->
+  <script>
+    // State management
+    let state = {
+      rows: 2,
+      cols: 2,
+      scalar: 2,
+      operation: 'A+B', // 'A+B', 'A-B', 'B-A', 'kA', 'kB', 'comm', 'distrib'
+      matrixA: [
+        [1, 2],
+        [-3, 4]
+      ],
+      matrixB: [
+        [5, -1],
+        [2, 0]
+      ],
+      selectedResultPos: null
+    };
+
+    // Tab switching for lesson content
+    function switchTab(tabId) {
+      document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+      document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.classList.remove('bg-brand-600', 'text-white', 'shadow-sm');
+        btn.classList.add('bg-slate-100', 'text-slate-600');
+      });
+
+      const targetTab = document.getElementById(tabId);
+      const targetBtn = document.getElementById('btn-' + tabId);
+      if (targetTab) targetTab.classList.remove('hidden');
+      if (targetBtn) {
+        targetBtn.classList.add('bg-brand-600', 'text-white', 'shadow-sm');
+        targetBtn.classList.remove('bg-slate-100', 'text-slate-600');
+      }
+
+      if (window.renderMathInElement) {
+        renderMathInElement(targetTab, {
+          delimiters: [{left: '$$', right: '$$', display: true}, {left: '$', right: '$', display: false}]
+        });
+      }
+    }
+
+    // Toggle discovery / exercise answer
+    function toggleAnswer(id) {
+      const el = document.getElementById(id);
+      const icon = document.getElementById('icon-' + id);
+      if (!el) return;
+      if (el.classList.contains('hidden')) {
+        el.classList.remove('hidden');
+        if (icon) icon.classList.add('rotate-180');
+        if (window.renderMathInElement) {
+          renderMathInElement(el, {
+            delimiters: [{left: '$$', right: '$$', display: true}, {left: '$', right: '$', display: false}]
+          });
+        }
+      } else {
+        el.classList.add('hidden');
+        if (icon) icon.classList.remove('rotate-180');
+      }
+    }
+
+    // Set Dimension
+    function setDimension(r, c) {
+      state.rows = r;
+      state.cols = c;
+
+      document.querySelectorAll('.dim-btn').forEach(btn => {
+        btn.classList.remove('bg-brand-600', 'text-white');
+        btn.classList.add('text-slate-600');
+      });
+      const activeBtn = document.getElementById(`dim-${r}-${c}`);
+      if (activeBtn) {
+        activeBtn.classList.add('bg-brand-600', 'text-white');
+        activeBtn.classList.remove('text-slate-600');
+      }
+
+      // Resize Matrix A & B preserving values
+      state.matrixA = createResizedMatrix(state.matrixA, r, c);
+      state.matrixB = createResizedMatrix(state.matrixB, r, c);
+
+      renderApp();
+    }
+
+    function createResizedMatrix(oldMat, newR, newC) {
+      const res = [];
+      for (let i = 0; i < newR; i++) {
+        const row = [];
+        for (let j = 0; j < newC; j++) {
+          if (oldMat && oldMat[i] && oldMat[i][j] !== undefined) {
+            row.push(oldMat[i][j]);
+          } else {
+            row.push(Math.floor(Math.random() * 9) - 4);
+          }
+        }
+        res.push(row);
+      }
+      return res;
+    }
+
+    // Scalar changes
+    function handleScalarChange(val) {
+      let num = parseFloat(val);
+      if (isNaN(num)) num = 1;
+      state.scalar = num;
+      renderApp();
+    }
+
+    function setScalar(val) {
+      state.scalar = val;
+      document.getElementById('scalar-k').value = val;
+      renderApp();
+    }
+
+    // Operation change
+    function setOperation(op) {
+      state.operation = op;
+      document.querySelectorAll('.op-btn').forEach(btn => {
+        btn.classList.remove('active', 'bg-brand-600', 'text-white');
+        if (!btn.id.includes('comm') && !btn.id.includes('distrib')) {
+          btn.classList.add('bg-slate-100', 'text-slate-700');
+        }
+      });
+      const activeBtn = document.getElementById('op-btn-' + op);
+      if (activeBtn) {
+        activeBtn.classList.remove('bg-slate-100', 'text-slate-700', 'bg-indigo-50', 'bg-amber-50');
+        activeBtn.classList.add('active', 'bg-brand-600', 'text-white');
+      }
+
+      renderApp();
+    }
+
+    // Swap A and B
+    function swapMatrices() {
+      const temp = JSON.parse(JSON.stringify(state.matrixA));
+      state.matrixA = JSON.parse(JSON.stringify(state.matrixB));
+      state.matrixB = temp;
+      renderApp();
+    }
+
+    // Randomize
+    function randomizeMatrices() {
+      for (let r = 0; r < state.rows; r++) {
+        for (let c = 0; c < state.cols; c++) {
+          state.matrixA[r][c] = Math.floor(Math.random() * 15) - 6;
+          state.matrixB[r][c] = Math.floor(Math.random() * 15) - 6;
+        }
+      }
+      renderApp();
+    }
+
+    // Load Exercise 1 Preset
+    function loadExercise1() {
+      setDimension(2, 2);
+      state.matrixA = [
+        [1, 2],
+        [-3, 4]
+      ];
+      state.matrixB = [
+        [5, -1],
+        [2, 0]
+      ];
+      setScalar(3);
+      setOperation('A+B');
+      renderApp();
+    }
+
+    // Input handlers for matrix cells
+    function onCellChange(matName, r, c, val) {
+      let num = parseFloat(val);
+      if (isNaN(num)) num = 0;
+      if (matName === 'A') state.matrixA[r][c] = num;
+      if (matName === 'B') state.matrixB[r][c] = num;
+      renderApp(true); // fast recompute
+    }
+
+    // Render entire UI state
+    function renderApp(skipInputRebuild = false) {
+      const isPropertyMode = (state.operation === 'comm' || state.operation === 'distrib');
+
+      const standardView = document.getElementById('standard-calc-view');
+      const propertyView = document.getElementById('property-calc-view');
+
+      if (isPropertyMode) {
+        standardView.classList.add('hidden');
+        propertyView.classList.remove('hidden');
+        renderPropertyVerification();
+        return;
+      } else {
+        standardView.classList.remove('hidden');
+        propertyView.classList.add('hidden');
+      }
+
+      // Update operator symbol and B visibility
+      const opSymbolEl = document.getElementById('operator-symbol');
+      const matBContainer = document.getElementById('container-matrix-b');
+      const resultLabel = document.getElementById('result-label');
+
+      if (state.operation === 'A+B') {
+        opSymbolEl.innerText = '+';
+        opSymbolEl.classList.remove('hidden');
+        matBContainer.classList.remove('hidden');
+        resultLabel.innerHTML = '<span class="w-2 h-2 rounded-full bg-purple-500"></span> ผลลัพธ์ A + B';
+      } else if (state.operation === 'A-B') {
+        opSymbolEl.innerText = '-';
+        opSymbolEl.classList.remove('hidden');
+        matBContainer.classList.remove('hidden');
+        resultLabel.innerHTML = '<span class="w-2 h-2 rounded-full bg-purple-500"></span> ผลลัพธ์ A - B';
+      } else if (state.operation === 'B-A') {
+        opSymbolEl.innerText = '-';
+        opSymbolEl.classList.remove('hidden');
+        matBContainer.classList.remove('hidden');
+        resultLabel.innerHTML = '<span class="w-2 h-2 rounded-full bg-purple-500"></span> ผลลัพธ์ B - A';
+      } else if (state.operation === 'kA') {
+        opSymbolEl.classList.add('hidden');
+        matBContainer.classList.add('hidden');
+        resultLabel.innerHTML = `<span class="w-2 h-2 rounded-full bg-amber-500"></span> ผลลัพธ์ ${state.scalar} &times; A`;
+      } else if (state.operation === 'kB') {
+        opSymbolEl.classList.add('hidden');
+        matBContainer.classList.add('hidden');
+        resultLabel.innerHTML = `<span class="w-2 h-2 rounded-full bg-amber-500"></span> ผลลัพธ์ ${state.scalar} &times; B`;
+      }
+
+      // Render Matrix Grids
+      if (!skipInputRebuild) {
+        renderGridInputs('grid-a', state.matrixA, 'A', 'text-blue-900 border-blue-200 focus:border-blue-500');
+        renderGridInputs('grid-b', state.matrixB, 'B', 'text-emerald-900 border-emerald-200 focus:border-emerald-500');
+      }
+
+      // Calculate Result
+      const resultMatrix = computeCurrentResult();
+      renderResultGrid(resultMatrix);
+      renderCalculationSteps(resultMatrix);
+    }
+
+    function renderGridInputs(containerId, matData, matName, colorClasses) {
+      const container = document.getElementById(containerId);
+      container.innerHTML = '';
+      container.style.gridTemplateColumns = `repeat(${state.cols}, minmax(0, 1fr))`;
+
+      for (let r = 0; r < state.rows; r++) {
+        for (let c = 0; c < state.cols; c++) {
+          const wrapper = document.createElement('div');
+          wrapper.className = 'relative flex flex-col items-center';
+
+          const tag = document.createElement('span');
+          tag.className = 'text-[9px] text-slate-400 font-mono mb-0.5';
+          tag.innerHTML = `${matName.toLowerCase()}<sub>${r+1}${c+1}</sub>`;
+
+          const input = document.createElement('input');
+          input.type = 'number';
+          input.value = matData[r][c];
+          input.className = `w-10 h-10 sm:w-12 sm:h-11 text-center font-mono font-bold text-sm bg-white rounded-lg border shadow-2xs focus:outline-none transition ${colorClasses}`;
+          input.addEventListener('input', (e) => onCellChange(matName, r, c, e.target.value));
+
+          wrapper.appendChild(tag);
+          wrapper.appendChild(input);
+          container.appendChild(wrapper);
+        }
+      }
+    }
+
+    function computeCurrentResult() {
+      const res = [];
+      const k = state.scalar;
+      for (let r = 0; r < state.rows; r++) {
+        const row = [];
+        for (let c = 0; c < state.cols; c++) {
+          const a = state.matrixA[r][c];
+          const b = state.matrixB[r][c];
+          let val = 0;
+          let expr = '';
+
+          if (state.operation === 'A+B') {
+            val = a + b;
+            expr = `${a} + ${b < 0 ? '(' + b + ')' : b}`;
+          } else if (state.operation === 'A-B') {
+            val = a - b;
+            expr = `${a} - ${b < 0 ? '(' + b + ')' : b}`;
+          } else if (state.operation === 'B-A') {
+            val = b - a;
+            expr = `${b} - ${a < 0 ? '(' + a + ')' : a}`;
+          } else if (state.operation === 'kA') {
+            val = k * a;
+            expr = `${k} &times; ${a < 0 ? '(' + a + ')' : a}`;
+          } else if (state.operation === 'kB') {
+            val = k * b;
+            expr = `${k} &times; ${b < 0 ? '(' + b + ')' : b}`;
+          }
+          // Avoid tiny floating point imprecision
+          val = Math.round(val * 1000) / 1000;
+          row.push({ val, expr });
+        }
+        res.push(row);
+      }
+      return res;
+    }
+
+    function renderResultGrid(resMat) {
+      const container = document.getElementById('grid-result');
+      container.innerHTML = '';
+      container.style.gridTemplateColumns = `repeat(${state.cols}, minmax(0, 1fr))`;
+
+      for (let r = 0; r < state.rows; r++) {
+        for (let c = 0; c < state.cols; c++) {
+          const wrapper = document.createElement('div');
+          wrapper.className = 'relative flex flex-col items-center';
+
+          const tag = document.createElement('span');
+          tag.className = 'text-[9px] text-purple-400 font-mono mb-0.5';
+          tag.innerHTML = `c<sub>${r+1}${c+1}</sub>`;
+
+          const cell = document.createElement('div');
+          cell.id = `res-cell-${r}-${c}`;
+          cell.className = 'w-10 h-10 sm:w-12 sm:h-11 flex items-center justify-center font-mono font-bold text-sm bg-purple-600 text-white rounded-lg shadow-xs cursor-pointer hover:bg-purple-700 transition';
+          cell.innerText = resMat[r][c].val;
+
+          cell.addEventListener('click', () => highlightStep(r, c));
+
+          wrapper.appendChild(tag);
+          wrapper.appendChild(cell);
+          container.appendChild(wrapper);
+        }
+      }
+    }
+
+    function renderCalculationSteps(resMat) {
+      const stepsContainer = document.getElementById('calculation-steps');
+      stepsContainer.innerHTML = '';
+
+      for (let r = 0; r < state.rows; r++) {
+        for (let c = 0; c < state.cols; c++) {
+          const item = resMat[r][c];
+          const stepCard = document.createElement('div');
+          stepCard.id = `step-card-${r}-${c}`;
+          stepCard.className = 'p-2.5 bg-white rounded-xl border border-slate-200 flex items-center justify-between transition hover:border-purple-400';
+          stepCard.innerHTML = `
+            <span class="text-slate-500 font-sans">ตำแหน่ง [${r+1}, ${c+1}]:</span>
+            <span class="text-slate-700 font-mono font-semibold">${item.expr} = <strong class="text-purple-700 font-bold">${item.val}</strong></span>
+          `;
+          stepCard.addEventListener('click', () => highlightStep(r, c));
+          stepsContainer.appendChild(stepCard);
+        }
+      }
+    }
+
+    function highlightStep(r, c) {
+      document.querySelectorAll('#calculation-steps > div').forEach(el => el.classList.remove('ring-2', 'ring-purple-500', 'bg-purple-50'));
+      const activeCard = document.getElementById(`step-card-${r}-${c}`);
+      if (activeCard) {
+        activeCard.classList.add('ring-2', 'ring-purple-500', 'bg-purple-50');
+      }
+    }
+
+    // Render Property Verification
+    function renderPropertyVerification() {
+      const container = document.getElementById('property-content');
+      container.innerHTML = '';
+
+      const r = state.rows;
+      const c = state.cols;
+      const k = state.scalar;
+
+      if (state.operation === 'comm') {
+        // A + B vs B + A
+        let isIdentical = true;
+        let leftRows = [];
+        let rightRows = [];
+
+        for (let i = 0; i < r; i++) {
+          let leftR = [];
+          let rightR = [];
+          for (let j = 0; j < c; j++) {
+            const v1 = state.matrixA[i][j] + state.matrixB[i][j];
+            const v2 = state.matrixB[i][j] + state.matrixA[i][j];
+            if (v1 !== v2) isIdentical = false;
+            leftR.push(v1);
+            rightR.push(v2);
+          }
+          leftRows.push(leftR);
+          rightRows.push(rightR);
+        }
+
+        container.innerHTML = `
+          <div class="space-y-4">
+            <div class="flex items-center justify-between border-b border-indigo-200 pb-3">
+              <h4 class="font-display font-bold text-slate-800 text-lg">
+                <i class="fa-solid fa-scale-balanced text-brand-600 mr-1.5"></i> ตรวจสอบสมบัติการสลับที่: $A + B = B + A$
+              </h4>
+              <span class="px-3 py-1 rounded-full text-xs font-bold ${isIdentical ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-800'}">
+                ${isIdentical ? '<i class="fa-solid fa-check"></i> เท่ากันทุกประการ (สมบัตินี้เป็นจริง)' : 'ไม่เท่ากัน'}
+              </span>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 pt-2">
+              <div class="bg-white p-4 rounded-xl border border-indigo-100 shadow-xs space-y-2">
+                <div class="text-xs font-bold text-brand-700">ฝั่งซ้าย: $A + B$</div>
+                <div class="font-mono text-xs sm:text-sm text-slate-800">${matrixToLatex(leftRows)}</div>
+              </div>
+
+              <div class="bg-white p-4 rounded-xl border border-indigo-100 shadow-xs space-y-2">
+                <div class="text-xs font-bold text-emerald-700">ฝั่งขวา: $B + A$</div>
+                <div class="font-mono text-xs sm:text-sm text-slate-800">${matrixToLatex(rightRows)}</div>
+              </div>
+            </div>
+
+            <p class="text-xs text-slate-600 bg-white p-3 rounded-xl border border-slate-200">
+              <strong>สรุปผล:</strong> เมื่อเปรียบเทียบสมาชิกตำแหน่งต่อตำแหน่ง พบว่าสมาชิกทุกคู่เท่ากันเสมอตามสมบัติการสลับที่ของจำนวนจริง
+            </p>
+          </div>
+        `;
+      } else if (state.operation === 'distrib') {
+        // k(A + B) vs kA + kB
+        let isIdentical = true;
+        let leftRows = [];
+        let rightRows = [];
+
+        for (let i = 0; i < r; i++) {
+          let leftR = [];
+          let rightR = [];
+          for (let j = 0; j < c; j++) {
+            const v1 = Math.round(k * (state.matrixA[i][j] + state.matrixB[i][j]) * 1000) / 1000;
+            const v2 = Math.round((k * state.matrixA[i][j] + k * state.matrixB[i][j]) * 1000) / 1000;
+            if (v1 !== v2) isIdentical = false;
+            leftR.push(v1);
+            rightR.push(v2);
+          }
+          leftRows.push(leftR);
+          rightRows.push(rightR);
+        }
+
+        container.innerHTML = `
+          <div class="space-y-4">
+            <div class="flex items-center justify-between border-b border-indigo-200 pb-3">
+              <h4 class="font-display font-bold text-slate-800 text-lg">
+                <i class="fa-solid fa-code-branch text-amber-600 mr-1.5"></i> ตรวจสอบสมบัติการแจกแจง: $k(A + B) = kA + kB$ (เมื่อ $k = ${k}$)
+              </h4>
+              <span class="px-3 py-1 rounded-full text-xs font-bold ${isIdentical ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-800'}">
+                ${isIdentical ? '<i class="fa-solid fa-check"></i> เท่ากันทุกประการ (สมบัตินี้เป็นจริง)' : 'ไม่เท่ากัน'}
+              </span>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 pt-2">
+              <div class="bg-white p-4 rounded-xl border border-indigo-100 shadow-xs space-y-2">
+                <div class="text-xs font-bold text-brand-700">ฝั่งซ้าย: $${k}(A + B)$</div>
+                <div class="font-mono text-xs sm:text-sm text-slate-800">${matrixToLatex(leftRows)}</div>
+              </div>
+
+              <div class="bg-white p-4 rounded-xl border border-indigo-100 shadow-xs space-y-2">
+                <div class="text-xs font-bold text-amber-700">ฝั่งขวา: $${k}A + ${k}B$</div>
+                <div class="font-mono text-xs sm:text-sm text-slate-800">${matrixToLatex(rightRows)}</div>
+              </div>
+            </div>
+
+            <p class="text-xs text-slate-600 bg-white p-3 rounded-xl border border-slate-200">
+              <strong>สรุปผล:</strong> ค่าจากการนำสเกลาร์คูณกับผลรวมของเมทริกซ์ มีค่าเท่ากับการนำสเกลาร์ไปคูณเมทริกซ์แต่ละตัวก่อนแล้วค่อยนำผลลัพธ์มาบวกกันเสมอ
+            </p>
+          </div>
+        `;
+      }
+
+      if (window.renderMathInElement) {
+        renderMathInElement(container, {
+          delimiters: [{left: '$$', right: '$$', display: true}, {left: '$', right: '$', display: false}]
+        });
+      }
+    }
+
+    function matrixToLatex(rows) {
+      let inner = rows.map(r => r.join(' & ')).join(' \\\\ ');
+      return `$$\\begin{bmatrix} ${inner} \\end{bmatrix}$$`;
+    }
+
+    // Initialize application
+    window.onload = function() {
+      renderApp();
+    };
+  </script>
+</body>
+</html>

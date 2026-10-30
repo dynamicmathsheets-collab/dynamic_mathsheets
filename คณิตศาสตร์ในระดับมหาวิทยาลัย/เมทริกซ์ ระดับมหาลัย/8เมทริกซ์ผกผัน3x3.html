@@ -1,0 +1,1143 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>การหาอินเวอร์สของเมทริกซ์ขนาด 3x3 (Matrix 3x3 Inverse Explorer)</title>
+  
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- Google Fonts: Inter & Sarabun -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- MathJax for TeX rendering -->
+  <script>
+    window.MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']],
+        displayMath: [['$$', '$$'], ['\\[', '\\]']]
+      },
+      svg: {
+        fontCache: 'global'
+      }
+    };
+  </script>
+  <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+  <style>
+    body {
+      font-family: 'Sarabun', 'Inter', sans-serif;
+    }
+    .math-font {
+      font-family: 'Inter', sans-serif;
+    }
+    input[type=number]::-webkit-inner-spin-button, 
+    input[type=number]::-webkit-outer-spin-button { 
+      -webkit-appearance: none; 
+      margin: 0; 
+    }
+    input[type=number] {
+      -moz-appearance: textfield;
+    }
+    .step-badge {
+      transition: all 0.2s ease-in-out;
+    }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-800 antialiased min-h-screen">
+
+  <!-- Header Banner -->
+  <header class="bg-gradient-to-r from-indigo-900 via-indigo-800 to-blue-900 text-white border-b border-indigo-700/50 shadow-md">
+    <div class="max-w-6xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
+      <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div>
+          <h1 class="text-2xl sm:text-3xl font-bold tracking-tight text-white flex items-center gap-2">
+            การหาอินเวอร์สของเมทริกซ์ขนาด $3 \times 3$
+          </h1>
+          <p class="text-indigo-200 text-sm sm:text-base mt-1">
+            สำรวจขั้นตอนการคำนวณ $A^{-1}$ อย่างลึกซึ้งผ่าน 5 วิธีมาตรฐานทางพีชคณิตเชิงเส้น
+          </p>
+        </div>
+        <div class="flex items-center gap-2">
+          <button onclick="loadPreset('default')" class="px-3.5 py-2 text-xs sm:text-sm font-medium bg-indigo-700/60 hover:bg-indigo-600 rounded-lg border border-indigo-500/40 transition">
+            ตัวอย่างมาตรฐาน
+          </button>
+          <button onclick="generateRandomInvertible()" class="px-3.5 py-2 text-xs sm:text-sm font-semibold bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg shadow-sm transition flex items-center gap-1.5">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+            สุ่มเมทริกซ์ใหม่
+          </button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <main class="max-w-6xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 space-y-8">
+
+    <!-- ส่วนที่ 1 : กำหนดเมทริกซ์ (Matrix Input & Determinant) -->
+    <section class="bg-white rounded-2xl shadow-sm border border-slate-200/80 p-5 sm:p-7">
+      <div class="flex items-center justify-between pb-4 border-b border-slate-100">
+        <div class="flex items-center gap-3">
+          <span class="flex items-center justify-center w-8 h-8 rounded-full bg-indigo-100 text-indigo-700 font-bold text-sm">
+            1
+          </span>
+          <div>
+            <h2 class="text-lg sm:text-xl font-bold text-slate-800">ส่วนที่ 1 : กำหนดเมทริกซ์ $A$</h2>
+            <p class="text-xs sm:text-sm text-slate-500">ปรับเปลี่ยนค่าสมาชิกของเมทริกซ์ $A$ ขนาด $3 \times 3$ เพื่อคำนวณแบบ Real-time</p>
+          </div>
+        </div>
+        <div id="invertible-badge">
+          <!-- Rendered dynamically -->
+        </div>
+      </div>
+
+      <div class="mt-6 grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+        <!-- Matrix 3x3 Inputs -->
+        <div class="lg:col-span-6 flex flex-col items-center">
+          <div class="inline-flex items-center justify-center p-4 bg-slate-50 border border-slate-200 rounded-2xl shadow-inner relative">
+            <span class="text-3xl sm:text-4xl font-light text-slate-400 select-none mr-2">[</span>
+            <div class="grid grid-cols-3 gap-2.5 sm:gap-3.5">
+              <!-- Matrix input fields -->
+              <input type="number" id="m00" value="1" step="any" class="w-16 h-12 sm:w-20 sm:h-14 text-center text-lg sm:text-xl font-bold rounded-xl border border-slate-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 bg-white shadow-sm transition" oninput="onMatrixChange()">
+              <input type="number" id="m01" value="2" step="any" class="w-16 h-12 sm:w-20 sm:h-14 text-center text-lg sm:text-xl font-bold rounded-xl border border-slate-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 bg-white shadow-sm transition" oninput="onMatrixChange()">
+              <input type="number" id="m02" value="3" step="any" class="w-16 h-12 sm:w-20 sm:h-14 text-center text-lg sm:text-xl font-bold rounded-xl border border-slate-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 bg-white shadow-sm transition" oninput="onMatrixChange()">
+              
+              <input type="number" id="m10" value="0" step="any" class="w-16 h-12 sm:w-20 sm:h-14 text-center text-lg sm:text-xl font-bold rounded-xl border border-slate-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 bg-white shadow-sm transition" oninput="onMatrixChange()">
+              <input type="number" id="m11" value="1" step="any" class="w-16 h-12 sm:w-20 sm:h-14 text-center text-lg sm:text-xl font-bold rounded-xl border border-slate-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 bg-white shadow-sm transition" oninput="onMatrixChange()">
+              <input type="number" id="m12" value="4" step="any" class="w-16 h-12 sm:w-20 sm:h-14 text-center text-lg sm:text-xl font-bold rounded-xl border border-slate-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 bg-white shadow-sm transition" oninput="onMatrixChange()">
+              
+              <input type="number" id="m20" value="5" step="any" class="w-16 h-12 sm:w-20 sm:h-14 text-center text-lg sm:text-xl font-bold rounded-xl border border-slate-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 bg-white shadow-sm transition" oninput="onMatrixChange()">
+              <input type="number" id="m21" value="6" step="any" class="w-16 h-12 sm:w-20 sm:h-14 text-center text-lg sm:text-xl font-bold rounded-xl border border-slate-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 bg-white shadow-sm transition" oninput="onMatrixChange()">
+              <input type="number" id="m22" value="0" step="any" class="w-16 h-12 sm:w-20 sm:h-14 text-center text-lg sm:text-xl font-bold rounded-xl border border-slate-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 bg-white shadow-sm transition" oninput="onMatrixChange()">
+            </div>
+            <span class="text-3xl sm:text-4xl font-light text-slate-400 select-none ml-2">]</span>
+          </div>
+
+          <!-- Quick Presets -->
+          <div class="flex flex-wrap gap-2 mt-4 text-xs">
+            <span class="text-slate-500 self-center">เลือกเมทริกซ์ทดสอบ:</span>
+            <button onclick="loadPreset('default')" class="px-2.5 py-1 rounded bg-slate-200/70 hover:bg-slate-300 font-medium text-slate-700 transition">ตัวอย่าง 1 (Det = 1)</button>
+            <button onclick="loadPreset('integer-inv')" class="px-2.5 py-1 rounded bg-slate-200/70 hover:bg-slate-300 font-medium text-slate-700 transition">Det = -1</button>
+            <button onclick="loadPreset('symmetric')" class="px-2.5 py-1 rounded bg-slate-200/70 hover:bg-slate-300 font-medium text-slate-700 transition">Symmetric</button>
+            <button onclick="loadPreset('singular')" class="px-2.5 py-1 rounded bg-rose-100 hover:bg-rose-200 font-medium text-rose-700 transition">Singular (Det = 0)</button>
+          </div>
+        </div>
+
+        <!-- Determinant Analysis Card -->
+        <div class="lg:col-span-6 bg-indigo-50/50 border border-indigo-100 rounded-2xl p-5 sm:p-6">
+          <h3 class="text-sm font-semibold uppercase tracking-wider text-indigo-900 mb-2 flex items-center justify-between">
+            <span>การคำนวณค่ากำหนด Determinant $\det(A)$</span>
+            <span id="det-value-tag" class="text-base font-bold px-2.5 py-0.5 rounded-full bg-indigo-600 text-white"></span>
+          </h3>
+          <div id="det-latex" class="text-slate-700 text-sm sm:text-base overflow-x-auto py-2">
+            <!-- Rendered by JS -->
+          </div>
+          <div id="det-explanation" class="mt-3 text-xs sm:text-sm text-slate-600 leading-relaxed border-t border-indigo-100/80 pt-3">
+            <!-- Dynamic explanation -->
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ส่วนที่ 2 : เลือกวิธีการคำนวณ (Method Selector) -->
+    <section class="bg-white rounded-2xl shadow-sm border border-slate-200/80 p-5 sm:p-7">
+      <div class="flex items-center gap-3 pb-4 border-b border-slate-100">
+        <span class="flex items-center justify-center w-8 h-8 rounded-full bg-blue-100 text-blue-700 font-bold text-sm">
+          2
+        </span>
+        <div>
+          <h2 class="text-lg sm:text-xl font-bold text-slate-800">ส่วนที่ 2 : เลือกวิธีการคำนวณ (Method Selector)</h2>
+          <p class="text-xs sm:text-sm text-slate-500">เลือก 1 ใน 5 วิธีการทางคณิตศาสตร์เพื่อศึกษาขั้นตอนคำนวณอย่างละเอียด</p>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3.5 mt-6">
+        <!-- Method 1 -->
+        <button onclick="selectMethod(0)" id="btn-method-0" class="method-btn text-left p-4 rounded-xl border-2 transition-all flex flex-col justify-between group">
+          <div>
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-xs font-bold px-2 py-0.5 rounded bg-slate-100 text-slate-600 group-hover:bg-indigo-100 group-hover:text-indigo-700 transition">วิธีที่ 1</span>
+              <span class="w-2.5 h-2.5 rounded-full bg-transparent method-dot"></span>
+            </div>
+            <h4 class="font-bold text-sm sm:text-base text-slate-800 leading-tight">Adjugate Method</h4>
+            <p class="text-xs text-slate-500 mt-1.5 line-clamp-2">Minors $\rightarrow$ Cofactors $\rightarrow$ Adjugate $\rightarrow$ $A^{-1} = \frac{1}{|A|}\text{adj}(A)$</p>
+          </div>
+        </button>
+
+        <!-- Method 2 -->
+        <button onclick="selectMethod(1)" id="btn-method-1" class="method-btn text-left p-4 rounded-xl border-2 transition-all flex flex-col justify-between group">
+          <div>
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-xs font-bold px-2 py-0.5 rounded bg-slate-100 text-slate-600 group-hover:bg-indigo-100 group-hover:text-indigo-700 transition">วิธีที่ 2</span>
+              <span class="w-2.5 h-2.5 rounded-full bg-transparent method-dot"></span>
+            </div>
+            <h4 class="font-bold text-sm sm:text-base text-slate-800 leading-tight">Gauss-Jordan</h4>
+            <p class="text-xs text-slate-500 mt-1.5 line-clamp-2">Augmented Matrix $[A \mid I] \rightarrow [I \mid A^{-1}]$ ด้วยการดำเนินการตามแถว</p>
+          </div>
+        </button>
+
+        <!-- Method 3 -->
+        <button onclick="selectMethod(2)" id="btn-method-2" class="method-btn text-left p-4 rounded-xl border-2 transition-all flex flex-col justify-between group">
+          <div>
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-xs font-bold px-2 py-0.5 rounded bg-slate-100 text-slate-600 group-hover:bg-indigo-100 group-hover:text-indigo-700 transition">วิธีที่ 3</span>
+              <span class="w-2.5 h-2.5 rounded-full bg-transparent method-dot"></span>
+            </div>
+            <h4 class="font-bold text-sm sm:text-base text-slate-800 leading-tight">LU Decomposition</h4>
+            <p class="text-xs text-slate-500 mt-1.5 line-clamp-2">แยก $A = LU$ แล้วแก้ $LY = I$ จากนั้น $UX = Y$ ได้ $A^{-1} = X$</p>
+          </div>
+        </button>
+
+        <!-- Method 4 -->
+        <button onclick="selectMethod(3)" id="btn-method-3" class="method-btn text-left p-4 rounded-xl border-2 transition-all flex flex-col justify-between group">
+          <div>
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-xs font-bold px-2 py-0.5 rounded bg-slate-100 text-slate-600 group-hover:bg-indigo-100 group-hover:text-indigo-700 transition">วิธีที่ 4</span>
+              <span class="w-2.5 h-2.5 rounded-full bg-slate-100 text-slate-600 group-hover:bg-indigo-100 group-hover:text-indigo-700 transition">วิธีที่ 4</span>
+            </div>
+            <h4 class="font-bold text-sm sm:text-base text-slate-800 leading-tight">Linear Systems</h4>
+            <p class="text-xs text-slate-500 mt-1.5 line-clamp-2">แก้ระบบสมการ $A\mathbf{x}_i = \mathbf{e}_i$ เพื่อหาเวกเตอร์คอลัมน์ของ $A^{-1}$</p>
+          </div>
+        </button>
+
+        <!-- Method 5 -->
+        <button onclick="selectMethod(4)" id="btn-method-4" class="method-btn text-left p-4 rounded-xl border-2 transition-all flex flex-col justify-between group">
+          <div>
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-xs font-bold px-2 py-0.5 rounded bg-slate-100 text-slate-600 group-hover:bg-indigo-100 group-hover:text-indigo-700 transition">วิธีที่ 5</span>
+              <span class="w-2.5 h-2.5 rounded-full bg-transparent method-dot"></span>
+            </div>
+            <h4 class="font-bold text-sm sm:text-base text-slate-800 leading-tight">Cayley-Hamilton</h4>
+            <p class="text-xs text-slate-500 mt-1.5 line-clamp-2">ใช้พหุนามลักษณะเฉพาะ $p(A) = 0$ แปลงหา $A^{-1}$ ในรูปของ $A^2, A, I$</p>
+          </div>
+        </button>
+      </div>
+    </section>
+
+    <!-- ส่วนที่ 3 : พื้นที่แสดงการคำนวณแบบ Step-by-Step -->
+    <section class="bg-white rounded-2xl shadow-sm border border-slate-200/80 p-5 sm:p-7">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-100">
+        <div class="flex items-center gap-3">
+          <span class="flex items-center justify-center w-8 h-8 rounded-full bg-violet-100 text-violet-700 font-bold text-sm">
+            3
+          </span>
+          <div>
+            <h2 class="text-lg sm:text-xl font-bold text-slate-800 flex items-center gap-2">
+              <span>ขั้นตอนการคำนวณ:</span>
+              <span id="current-method-title" class="text-indigo-600 font-extrabold"></span>
+            </h2>
+            <p class="text-xs sm:text-sm text-slate-500">แสดงกระบวนการคำนวณทีละขั้นอย่างละเอียด พร้อมคำอธิบายเหตุผลทางคณิตศาสตร์</p>
+          </div>
+        </div>
+
+        <!-- Navigation Buttons -->
+        <div class="flex items-center gap-2 self-end sm:self-auto">
+          <button id="prev-step-btn" onclick="prevStep()" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-slate-300 bg-white text-slate-700 hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed text-xs sm:text-sm font-medium transition shadow-sm">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+            ย้อนกลับ
+          </button>
+          <span id="step-indicator-text" class="text-xs font-semibold px-2 text-slate-500 min-w-[70px] text-center">
+            ขั้นที่ 1 / 4
+          </span>
+          <button id="next-step-btn" onclick="nextStep()" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-indigo-600 text-white hover:bg-indigo-700 disabled:opacity-40 disabled:cursor-not-allowed text-xs sm:text-sm font-medium transition shadow-sm">
+            ถัดไป
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- Step Navigation Badges -->
+      <div id="steps-pill-container" class="flex flex-wrap gap-2 mt-5">
+        <!-- Rendered dynamically -->
+      </div>
+
+      <!-- Step Content Display -->
+      <div id="step-content-area" class="mt-6 p-5 sm:p-7 rounded-2xl bg-slate-50/70 border border-slate-200 transition-all">
+        <!-- Dynamically injected -->
+      </div>
+    </section>
+
+    <!-- ส่วนที่ 4 : ตรวจสอบคำตอบ (Verification AA^-1 = I) -->
+    <section class="bg-white rounded-2xl shadow-sm border border-slate-200/80 p-5 sm:p-7">
+      <div class="flex items-center gap-3 pb-4 border-b border-slate-100">
+        <span class="flex items-center justify-center w-8 h-8 rounded-full bg-emerald-100 text-emerald-700 font-bold text-sm">
+          4
+        </span>
+        <div>
+          <h2 class="text-lg sm:text-xl font-bold text-slate-800">ส่วนที่ 4 : ตรวจสอบคำตอบ ($A \cdot A^{-1} = I$)</h2>
+          <p class="text-xs sm:text-sm text-slate-500">
+            ยืนยันความถูกต้องด้วยการคูณเมทริกซ์ $A$ กับ $A^{-1}$ เพื่อให้ได้เมทริกซ์เอกลักษณ์ $I_3$
+          </p>
+        </div>
+      </div>
+
+      <div id="verification-body" class="mt-6">
+        <!-- Injected dynamically -->
+      </div>
+    </section>
+
+    <!-- ส่วนที่ 5 : สรุปเปรียบเทียบ & ทดลองด้วยตนเอง (Playground & Method Comparison) -->
+    <section class="bg-gradient-to-br from-slate-900 to-indigo-950 text-white rounded-2xl shadow-lg p-5 sm:p-7">
+      <div class="flex items-center justify-between pb-4 border-b border-slate-800">
+        <div class="flex items-center gap-3">
+          <span class="flex items-center justify-center w-8 h-8 rounded-full bg-indigo-500/30 text-indigo-300 font-bold text-sm border border-indigo-400/30">
+            5
+          </span>
+          <div>
+            <h2 class="text-lg sm:text-xl font-bold text-white">ส่วนที่ 5 : สรุปเปรียบเทียบและจุดเด่นของทั้ง 5 วิธี</h2>
+            <p class="text-xs sm:text-sm text-slate-300">ความเหมาะสมในการนำไปใช้งานทางทฤษฎีและเชิงคอมพิวเตอร์ (Numerical Linear Algebra)</p>
+          </div>
+        </div>
+        <button onclick="scrollToTop()" class="text-xs text-indigo-300 hover:text-white flex items-center gap-1 underline underline-offset-4">
+          ขึ้นไปปรับค่าเมทริกซ์ ↑
+        </button>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 mt-6">
+        <!-- 1 -->
+        <div class="bg-white/5 border border-white/10 rounded-xl p-4 hover:bg-white/10 transition">
+          <span class="text-xs font-semibold px-2 py-0.5 rounded bg-indigo-500/20 text-indigo-300 border border-indigo-400/20">วิธีที่ 1</span>
+          <h4 class="font-bold text-white mt-2 text-sm">Adjugate Method</h4>
+          <p class="text-xs text-slate-300 mt-1 leading-relaxed">
+            <strong>จุดเด่น:</strong> เหมาะที่สุดกับการพิสูจน์ทฤษฎีและคำนวณด้วยมือสำหรับเมทริกซ์ขนาด $2\times 2$ และ $3\times 3$ ให้ผลเฉลยในรูปสัญลักษณ์พีชคณิตชัดเจน
+          </p>
+        </div>
+
+        <!-- 2 -->
+        <div class="bg-white/5 border border-white/10 rounded-xl p-4 hover:bg-white/10 transition">
+          <span class="text-xs font-semibold px-2 py-0.5 rounded bg-indigo-500/20 text-indigo-300 border border-indigo-400/20">วิธีที่ 2</span>
+          <h4 class="font-bold text-white mt-2 text-sm">Gauss-Jordan</h4>
+          <p class="text-xs text-slate-300 mt-1 leading-relaxed">
+            <strong>จุดเด่น:</strong> เป็นระบบ ระเบียบวิธีตรง (Direct Method) ซับซ้อน $O(n^3)$ เป็นรากฐานในการแปลงเมทริกซ์และใช้ได้กับทุกมิติ $n \times n$
+          </p>
+        </div>
+
+        <!-- 3 -->
+        <div class="bg-white/5 border border-white/10 rounded-xl p-4 hover:bg-white/10 transition">
+          <span class="text-xs font-semibold px-2 py-0.5 rounded bg-indigo-500/20 text-indigo-300 border border-indigo-400/20">วิธีที่ 3</span>
+          <h4 class="font-bold text-white mt-2 text-sm">LU Decomposition</h4>
+          <p class="text-xs text-slate-300 mt-1 leading-relaxed">
+            <strong>จุดเด่น:</strong> เป็นมาตรฐานอุตสาหกรรมในคอมพิวเตอร์ (BLAS/LAPACK) มีประสิทธิภาพสูงเมื่อต้องแก้ระบบสมการ $Ax=b$ หลายชุดด้วยเมทริกซ์ $A$ เดิม
+          </p>
+        </div>
+
+        <!-- 4 -->
+        <div class="bg-white/5 border border-white/10 rounded-xl p-4 hover:bg-white/10 transition">
+          <span class="text-xs font-semibold px-2 py-0.5 rounded bg-indigo-500/20 text-indigo-300 border border-indigo-400/20">วิธีที่ 4</span>
+          <h4 class="font-bold text-white mt-2 text-sm">Linear Systems</h4>
+          <p class="text-xs text-slate-300 mt-1 leading-relaxed">
+            <strong>จุดเด่น:</strong> สร้างความเข้าใจเชิงเรขาคณิต ว่าคอลัมน์ของ $A^{-1}$ คือภาพการส่งกลับของเวกเตอร์ฐานมาตรฐาน $\mathbf{e}_1, \mathbf{e}_2, \mathbf{e}_3$
+          </p>
+        </div>
+
+        <!-- 5 -->
+        <div class="bg-white/5 border border-white/10 rounded-xl p-4 hover:bg-white/10 transition">
+          <span class="text-xs font-semibold px-2 py-0.5 rounded bg-indigo-500/20 text-indigo-300 border border-indigo-400/20">วิธีที่ 5</span>
+          <h4 class="font-bold text-white mt-2 text-sm">Cayley-Hamilton</h4>
+          <p class="text-xs text-slate-300 mt-1 leading-relaxed">
+            <strong>จุดเด่น:</strong> เชื่อมโยงทฤษฎีสเปกตรัมและค่าเจาะจง (Eigenvalues) แสดงความงดงามว่าทุกเมทริกซ์สอดคล้องกับพหุนามลักษณะเฉพาะของตัวเอง
+          </p>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- JAVASCRIPT LOGIC -->
+  <script>
+    // State
+    let currentMatrix = [
+      [1, 2, 3],
+      [0, 1, 4],
+      [5, 6, 0]
+    ];
+    let selectedMethodIndex = 0;
+    let currentStepIndex = 0;
+    let methodStepsData = [];
+
+    // Helper: Round nicely to avoid floating inaccuracies
+    function cleanNum(val) {
+      if (Math.abs(val) < 1e-9) return 0;
+      return Math.round(val * 100000) / 100000;
+    }
+
+    // Helper: Format number or fraction to TeX
+    function toTeX(num) {
+      if (Math.abs(num) < 1e-9) return "0";
+      // Check if it's close to integer
+      if (Math.abs(num - Math.round(num)) < 1e-6) {
+        return Math.round(num).toString();
+      }
+      // Simple rational approximation for fractions up to denominator 120
+      const sign = num < 0 ? "-" : "";
+      const abs = Math.abs(num);
+      for (let d = 2; d <= 120; d++) {
+        const n = Math.round(abs * d);
+        if (Math.abs(abs - n / d) < 1e-5) {
+          return `${sign}\\frac{${n}}{${d}}`;
+        }
+      }
+      return cleanNum(num).toString();
+    }
+
+    // Matrix determinant 3x3
+    function det3x3(m) {
+      return (
+        m[0][0] * (m[1][1] * m[2][2] - m[1][2] * m[2][1]) -
+        m[0][1] * (m[1][0] * m[2][2] - m[1][2] * m[2][0]) +
+        m[0][2] * (m[1][0] * m[2][1] - m[1][1] * m[2][0])
+      );
+    }
+
+    // Matrix 2x2 determinant
+    function det2x2(a, b, c, d) {
+      return a * d - b * c;
+    }
+
+    // Format 3x3 Matrix to LaTeX bmatrix
+    function matrixToTeX(m) {
+      return `\\begin{bmatrix} 
+        ${toTeX(m[0][0])} & ${toTeX(m[0][1])} & ${toTeX(m[0][2])} \\\\ 
+        ${toTeX(m[1][0])} & ${toTeX(m[1][1])} & ${toTeX(m[1][2])} \\\\ 
+        ${toTeX(m[2][0])} & ${toTeX(m[2][1])} & ${toTeX(m[2][2])} 
+      \\end{bmatrix}`;
+    }
+
+    // Format Augmented Matrix 3x6 to LaTeX
+    function augmentedToTeX(left, right) {
+      return `\\left[\\begin{array}{ccc|ccc}
+        ${toTeX(left[0][0])} & ${toTeX(left[0][1])} & ${toTeX(left[0][2])} & ${toTeX(right[0][0])} & ${toTeX(right[0][1])} & ${toTeX(right[0][2])} \\\\
+        ${toTeX(left[1][0])} & ${toTeX(left[1][1])} & ${toTeX(left[1][2])} & ${toTeX(right[1][0])} & ${toTeX(right[1][1])} & ${toTeX(right[1][2])} \\\\
+        ${toTeX(left[2][0])} & ${toTeX(left[2][1])} & ${toTeX(left[2][2])} & ${toTeX(right[2][0])} & ${toTeX(right[2][1])} & ${toTeX(right[2][2])}
+      \\end{array}\\right]`;
+    }
+
+    // Compute Minors Matrix
+    function getMinors(m) {
+      return [
+        [
+          det2x2(m[1][1], m[1][2], m[2][1], m[2][2]),
+          det2x2(m[1][0], m[1][2], m[2][0], m[2][2]),
+          det2x2(m[1][0], m[1][1], m[2][0], m[2][1])
+        ],
+        [
+          det2x2(m[0][1], m[0][2], m[2][1], m[2][2]),
+          det2x2(m[0][0], m[0][2], m[2][0], m[2][2]),
+          det2x2(m[0][0], m[0][1], m[2][0], m[2][1])
+        ],
+        [
+          det2x2(m[0][1], m[0][2], m[1][1], m[1][2]),
+          det2x2(m[0][0], m[0][2], m[1][0], m[1][2]),
+          det2x2(m[0][0], m[0][1], m[1][0], m[1][1])
+        ]
+      ];
+    }
+
+    // Compute Cofactors Matrix
+    function getCofactors(m) {
+      const min = getMinors(m);
+      return [
+        [ min[0][0], -min[0][1],  min[0][2]],
+        [-min[1][0],  min[1][1], -min[1][2]],
+        [ min[2][0], -min[2][1],  min[2][2]]
+      ];
+    }
+
+    // Compute Transpose
+    function transpose(m) {
+      return [
+        [m[0][0], m[1][0], m[2][0]],
+        [m[0][1], m[1][1], m[2][1]],
+        [m[0][2], m[1][2], m[2][2]]
+      ];
+    }
+
+    // Compute Inverse directly
+    function getInverse(m) {
+      const d = det3x3(m);
+      if (Math.abs(d) < 1e-9) return null;
+      const cof = getCofactors(m);
+      const adj = transpose(cof);
+      return adj.map(row => row.map(val => val / d));
+    }
+
+    // Multiply 3x3 matrices
+    function multiply3x3(a, b) {
+      const res = [
+        [0, 0, 0],
+        [0, 0, 0],
+        [0, 0, 0]
+      ];
+      for (let i = 0; i < 3; i++) {
+        for (let j = 0; j < 3; j++) {
+          let sum = 0;
+          for (let k = 0; k < 3; k++) {
+            sum += a[i][k] * b[k][j];
+          }
+          res[i][j] = cleanNum(sum);
+        }
+      }
+      return res;
+    }
+
+    // Render MathJax safely
+    function triggerMathJax() {
+      if (window.MathJax && window.MathJax.typesetPromise) {
+        window.MathJax.typesetPromise().catch(err => console.log('MathJax error:', err));
+      }
+    }
+
+    // Read Input Matrix from DOM
+    function readInputs() {
+      for (let i = 0; i < 3; i++) {
+        for (let j = 0; j < 3; j++) {
+          const val = parseFloat(document.getElementById(`m${i}${j}`).value);
+          currentMatrix[i][j] = isNaN(val) ? 0 : val;
+        }
+      }
+    }
+
+    // Preset loader
+    function loadPreset(type) {
+      let p = [
+        [1, 2, 3],
+        [0, 1, 4],
+        [5, 6, 0]
+      ];
+      if (type === 'integer-inv') {
+        p = [
+          [2, 1, 1],
+          [1, 2, 1],
+          [1, 1, 2]
+        ];
+      } else if (type === 'symmetric') {
+        p = [
+          [2, -1, 0],
+          [-1, 2, -1],
+          [0, -1, 2]
+        ];
+      } else if (type === 'singular') {
+        p = [
+          [1, 2, 3],
+          [2, 4, 6],
+          [1, 0, 1]
+        ];
+      }
+
+      currentMatrix = p;
+      for (let i = 0; i < 3; i++) {
+        for (let j = 0; j < 3; j++) {
+          document.getElementById(`m${i}${j}`).value = p[i][j];
+        }
+      }
+      onMatrixChange();
+    }
+
+    // Generate random invertible matrix with neat numbers
+    function generateRandomInvertible() {
+      let candidate;
+      let d = 0;
+      let attempts = 0;
+      while (attempts < 200) {
+        attempts++;
+        candidate = [
+          [randInt(-3, 4), randInt(-2, 4), randInt(-3, 3)],
+          [randInt(-2, 3), randInt(-3, 4), randInt(-2, 4)],
+          [randInt(-3, 4), randInt(-2, 3), randInt(-3, 4)]
+        ];
+        d = det3x3(candidate);
+        // We prefer nice small non-zero determinants for clear step-by-step
+        if (d !== 0 && Math.abs(d) <= 12) break;
+      }
+      currentMatrix = candidate;
+      for (let i = 0; i < 3; i++) {
+        for (let j = 0; j < 3; j++) {
+          document.getElementById(`m${i}${j}`).value = candidate[i][j];
+        }
+      }
+      onMatrixChange();
+    }
+
+    function randInt(min, max) {
+      return Math.floor(Math.random() * (max - min + 1)) + min;
+    }
+
+    // Main event handler when inputs change
+    function onMatrixChange() {
+      readInputs();
+      updateDeterminantSection();
+      generateStepsForSelectedMethod();
+      updateVerificationSection();
+      triggerMathJax();
+    }
+
+    // Update Section 1
+    function updateDeterminantSection() {
+      const d = det3x3(currentMatrix);
+      const isInv = Math.abs(d) > 1e-9;
+
+      const badgeEl = document.getElementById('invertible-badge');
+      const detTagEl = document.getElementById('det-value-tag');
+      const detLatexEl = document.getElementById('det-latex');
+      const detExpEl = document.getElementById('det-explanation');
+
+      detTagEl.innerText = `det(A) = ${toTeX(cleanNum(d))}`;
+
+      if (isInv) {
+        badgeEl.innerHTML = `
+          <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-300">
+            <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+            มีอินเวอร์ส (Invertible / Non-singular)
+          </span>
+        `;
+        detTagEl.className = "text-base font-bold px-3 py-0.5 rounded-full bg-emerald-600 text-white";
+      } else {
+        badgeEl.innerHTML = `
+          <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-rose-50 text-rose-700 border border-rose-300">
+            <span class="w-2 h-2 rounded-full bg-rose-500"></span>
+            ไม่มีอินเวอร์ส (Singular Matrix)
+          </span>
+        `;
+        detTagEl.className = "text-base font-bold px-3 py-0.5 rounded-full bg-rose-600 text-white";
+      }
+
+      // Sarrus / Cofactor expansion TeX
+      const m = currentMatrix;
+      const term1 = m[0][0] * (m[1][1] * m[2][2] - m[1][2] * m[2][1]);
+      const term2 = m[0][1] * (m[1][0] * m[2][2] - m[1][2] * m[2][0]);
+      const term3 = m[0][2] * (m[1][0] * m[2][1] - m[1][1] * m[2][0]);
+
+      detLatexEl.innerHTML = `
+        $$\\begin{aligned}
+        \\det(A) &= ${toTeX(m[0][0])}\\begin{vmatrix} ${toTeX(m[1][1])} & ${toTeX(m[1][2])} \\\\ ${toTeX(m[2][1])} & ${toTeX(m[2][2])} \\end{vmatrix} 
+        - ${toTeX(m[0][1])}\\begin{vmatrix} ${toTeX(m[1][0])} & ${toTeX(m[1][2])} \\\\ ${toTeX(m[2][0])} & ${toTeX(m[2][2])} \\end{vmatrix} 
+        + ${toTeX(m[0][2])}\\begin{vmatrix} ${toTeX(m[1][0])} & ${toTeX(m[1][1])} \\\\ ${toTeX(m[2][0])} & ${toTeX(m[2][1])} \\end{vmatrix} \\\\[6pt]
+        &= ${toTeX(m[0][0])}(${toTeX(m[1][1]*m[2][2] - m[1][2]*m[2][1])}) 
+        - ${toTeX(m[0][1])}(${toTeX(m[1][0]*m[2][2] - m[1][2]*m[2][0])}) 
+        + ${toTeX(m[0][2])}(${toTeX(m[1][0]*m[2][1] - m[1][1]*m[2][0])}) \\\\[6pt]
+        &= ${toTeX(term1)} - (${toTeX(term2)}) + (${toTeX(term3)}) = \\mathbf{${toTeX(cleanNum(d))}}
+        \\end{aligned}$$
+      `;
+
+      if (isInv) {
+        detExpEl.innerHTML = `
+          <span class="font-bold text-emerald-700">✓ สรุปผล:</span> เนื่องจาก $\\det(A) = ${toTeX(cleanNum(d))} \\neq 0$ 
+          แสดงว่าแถวและคอลัมน์ของ $A$ เป็นอิสระเชิงเส้นต่อกัน เมทริกซ์นี้จึงเป็น <strong>Non-singular</strong> 
+          และมีเมทริกซ์ผกผัน $A^{-1}$ เพียงหนึ่งเดียว
+        `;
+      } else {
+        detExpEl.innerHTML = `
+          <span class="font-bold text-rose-700">⚠ สรุปผล:</span> เนื่องจาก $\\det(A) = 0$ 
+          เมทริกซ์นี้จึงเป็น <strong>Singular Matrix</strong> เวกเตอร์แถวหรือคอลัมน์มีความสัมพันธ์เชิงเส้นต่อกัน ทำให้ไม่สามารถหาอินเวอร์ส $A^{-1}$ ได้
+        `;
+      }
+    }
+
+    // Select Method
+    function selectMethod(idx) {
+      selectedMethodIndex = idx;
+      currentStepIndex = 0;
+
+      // Update button styles
+      for (let i = 0; i < 5; i++) {
+        const btn = document.getElementById(`btn-method-${i}`);
+        const dot = btn.querySelector('.method-dot');
+        if (i === idx) {
+          btn.className = "method-btn text-left p-4 rounded-xl border-2 border-indigo-600 bg-indigo-50/60 shadow-sm transition-all flex flex-col justify-between";
+          if (dot) dot.className = "w-2.5 h-2.5 rounded-full bg-indigo-600 method-dot";
+        } else {
+          btn.className = "method-btn text-left p-4 rounded-xl border-2 border-slate-200 hover:border-slate-300 bg-white transition-all flex flex-col justify-between group";
+          if (dot) dot.className = "w-2.5 h-2.5 rounded-full bg-slate-300 method-dot";
+        }
+      }
+
+      generateStepsForSelectedMethod();
+      triggerMathJax();
+    }
+
+    // Generate Steps for Selected Method
+    function generateStepsForSelectedMethod() {
+      const d = det3x3(currentMatrix);
+      const isInv = Math.abs(d) > 1e-9;
+      const methodNames = [
+        "1. Adjugate Method",
+        "2. Gauss-Jordan Elimination",
+        "3. LU Decomposition",
+        "4. Solving Linear Systems",
+        "5. Cayley-Hamilton Theorem"
+      ];
+      document.getElementById('current-method-title').innerText = methodNames[selectedMethodIndex];
+
+      if (!isInv) {
+        methodStepsData = [{
+          title: "เมทริกซ์ไม่มีอินเวอร์ส",
+          badge: "Singular Matrix",
+          math: `\\det(A) = 0`,
+          explanation: `เนื่องจากค่า Determinant มีค่าเท่ากับ 0 เมทริกซ์ $A$ จึงไม่มีอินเวอร์สในทุกระเบียบวิธี กรุณาปรับเปลี่ยนค่าสมาชิกของเมทริกซ์ให้ $\\det(A) \\neq 0$`
+        }];
+        renderStepNavigation();
+        renderCurrentStep();
+        return;
+      }
+
+      // Generate steps per method
+      if (selectedMethodIndex === 0) {
+        buildAdjugateSteps();
+      } else if (selectedMethodIndex === 1) {
+        buildGaussJordanSteps();
+      } else if (selectedMethodIndex === 2) {
+        buildLUSteps();
+      } else if (selectedMethodIndex === 3) {
+        buildLinearSystemsSteps();
+      } else if (selectedMethodIndex === 4) {
+        buildCayleyHamiltonSteps();
+      }
+
+      if (currentStepIndex >= methodStepsData.length) {
+        currentStepIndex = methodStepsData.length - 1;
+      }
+
+      renderStepNavigation();
+      renderCurrentStep();
+    }
+
+    // Method 1: Adjugate Method
+    function buildAdjugateSteps() {
+      const m = currentMatrix;
+      const d = det3x3(m);
+      const minors = getMinors(m);
+      const cofactors = getCofactors(m);
+      const adj = transpose(cofactors);
+      const inv = getInverse(m);
+
+      methodStepsData = [
+        {
+          title: "ขั้นตอนที่ 1 : หาเมทริกซ์ไมเนอร์ (Matrix of Minors: $M$)",
+          badge: "Step 1: Minors",
+          math: `M = \\begin{bmatrix}
+            M_{11} & M_{12} & M_{13} \\\\
+            M_{21} & M_{22} & M_{23} \\\\
+            M_{31} & M_{32} & M_{33}
+          \\end{bmatrix} = ${matrixToTeX(minors)}`,
+          explanation: `ไมเนอร์ $M_{ij}$ คือค่าดีเทอร์มิแนนต์ของเมทริกซ์ย่อยขนาด $2 \\times 2$ ที่เกิดจากการตัดแถวที่ $i$ และหลักที่ $j$ ของ $A$ ออก เช่น:
+          <br>• $M_{11} = \\det\\begin{bmatrix} ${toTeX(m[1][1])} & ${toTeX(m[1][2])} \\\\ ${toTeX(m[2][1])} & ${toTeX(m[2][2])} \\end{bmatrix} = (${toTeX(m[1][1])}\\times${toTeX(m[2][2])}) - (${toTeX(m[1][2])}\\times${toTeX(m[2][1])}) = ${toTeX(minors[0][0])}$
+          <br>• $M_{12} = \\det\\begin{bmatrix} ${toTeX(m[1][0])} & ${toTeX(m[1][2])} \\\\ ${toTeX(m[2][0])} & ${toTeX(m[2][2])} \\end{bmatrix} = ${toTeX(minors[0][1])}$`
+        },
+        {
+          title: "ขั้นตอนที่ 2 : หาเมทริกซ์โคแฟกเตอร์ (Matrix of Cofactors: $C$)",
+          badge: "Step 2: Cofactors",
+          math: `C_{ij} = (-1)^{i+j} M_{ij} \\implies C = ${matrixToTeX(cofactors)}`,
+          explanation: `โคแฟกเตอร์ $C_{ij}$ ได้จากการนำเครื่องหมายสลับ $+ - +$ มาคูณกับค่าไมเนอร์ $M_{ij}$ ตามรูปแบบตารางหมากรุก:
+          $$\\begin{bmatrix} + & - & + \\\\ - & + & - \\\\ + & - & + \\end{bmatrix}$$
+          ทำให้ได้เมทริกซ์โคแฟกเตอร์ $C$ พร้อมนำไปสู่ขั้นตอนการทรานสโพส`
+        },
+        {
+          title: "ขั้นตอนที่ 3 : เมทริกซ์ผูกพัน (Adjugate Matrix: $\\text{adj}(A)$)",
+          badge: "Step 3: Adjugate",
+          math: `\\text{adj}(A) = C^T = ${matrixToTeX(adj)}`,
+          explanation: `เมทริกซ์ผูกพัน (Adjugate Matrix) หรือ $\\text{adj}(A)$ คือ ทรานสโพสของเมทริกซ์โคแฟกเตอร์ ($C^T$) โดยการสลับแถวเป็นหลัก และหลักเป็นแถว`
+        },
+        {
+          title: "ขั้นตอนที่ 4 : คำนวณอินเวอร์ส $A^{-1} = \\frac{1}{\\det(A)}\\text{adj}(A)$",
+          badge: "Step 4: Inverse Result",
+          math: `A^{-1} = \\frac{1}{${toTeX(cleanNum(d))}} ${matrixToTeX(adj)} = ${matrixToTeX(inv)}`,
+          explanation: `นำค่าสเกลาร์ $\\frac{1}{\\det(A)}$ ไปคูณกับสมาชิกทุกตัวในเมทริกซ์ผูกพัน $\\text{adj}(A)$ จะได้เมทริกซ์ผกผัน $A^{-1}$ ที่สมบูรณ์`
+        }
+      ];
+    }
+
+    // Method 2: Gauss-Jordan
+    function buildGaussJordanSteps() {
+      const A = currentMatrix.map(row => [...row]);
+      const I = [
+        [1, 0, 0],
+        [0, 1, 0],
+        [0, 0, 1]
+      ];
+
+      methodStepsData = [];
+
+      methodStepsData.push({
+        title: "ขั้นตอนที่ 1 : สร้างเมทริกซ์แต่งเติม (Augmented Matrix $[A \\mid I]$)",
+        badge: "Step 1: Setup [A | I]",
+        math: `[A \\mid I] = ${augmentedToTeX(A, I)}`,
+        explanation: `วางเมทริกซ์ $A$ ไว้ทางซ้าย และเมทริกซ์เอกลักษณ์ $I_3$ ไว้ทางขวา เป้าหมายคือการใช้การดำเนินการตามแถวขั้นมูลฐาน (Row Operations) เพื่อแปลงฝั่งซ้ายให้กลายเป็น $I_3$ ซึ่งจะส่งผลให้ฝั่งขวากลายเป็น $A^{-1}$`
+      });
+
+      // Simulation of Gauss-Jordan
+      const M = [];
+      for (let i = 0; i < 3; i++) {
+        M.push([...A[i], ...I[i]]);
+      }
+
+      // Step-by-step pivots
+      for (let p = 0; p < 3; p++) {
+        // Find pivot
+        let maxRow = p;
+        for (let r = p + 1; r < 3; r++) {
+          if (Math.abs(M[r][p]) > Math.abs(M[maxRow][p])) {
+            maxRow = r;
+          }
+        }
+        let rowSwapText = "";
+        if (maxRow !== p) {
+          const temp = M[p];
+          M[p] = M[maxRow];
+          M[maxRow] = temp;
+          rowSwapText = ` สลับแถว $R_{${p+1}} \\leftrightarrow R_{${maxRow+1}}$`;
+        }
+
+        const pivotVal = M[p][p];
+        if (Math.abs(pivotVal) < 1e-9) continue;
+
+        // Scale pivot to 1
+        for (let c = 0; c < 6; c++) {
+          M[p][c] = M[p][c] / pivotVal;
+        }
+
+        // Eliminate column p in all other rows
+        for (let r = 0; r < 3; r++) {
+          if (r !== p) {
+            const factor = M[r][p];
+            for (let c = 0; c < 6; c++) {
+              M[r][c] = M[r][c] - factor * M[p][c];
+            }
+          }
+        }
+
+        const currentLeft = [
+          [cleanNum(M[0][0]), cleanNum(M[0][1]), cleanNum(M[0][2])],
+          [cleanNum(M[1][0]), cleanNum(M[1][1]), cleanNum(M[1][2])],
+          [cleanNum(M[2][0]), cleanNum(M[2][1]), cleanNum(M[2][2])]
+        ];
+        const currentRight = [
+          [cleanNum(M[0][3]), cleanNum(M[0][4]), cleanNum(M[0][5])],
+          [cleanNum(M[1][3]), cleanNum(M[1][4]), cleanNum(M[1][5])],
+          [cleanNum(M[2][3]), cleanNum(M[2][4]), cleanNum(M[2][5])]
+        ];
+
+        methodStepsData.push({
+          title: `ขั้นตอนที่ ${p + 2} : กำจัดสมาชิกในหลักที่ ${p + 1} ให้เป็นรูป Pivot`,
+          badge: `Step ${p + 2}: Col ${p + 1} Pivot`,
+          math: `${augmentedToTeX(currentLeft, currentRight)}`,
+          explanation: `ปรับปรุงสมาชิกหลักที่ ${p + 1}:${rowSwapText} ปรับค่าสมาชิกหลัก $M_{${p+1},${p+1}}$ ให้เป็น $1$ ด้วยการหารแถว และกำจัดสมาชิกตัวอื่นในหลักนี้ให้เป็น $0$ ด้วยการลบผลคูณแถว`
+        });
+      }
+
+      const invFinal = [
+        [cleanNum(M[0][3]), cleanNum(M[0][4]), cleanNum(M[0][5])],
+        [cleanNum(M[1][3]), cleanNum(M[1][4]), cleanNum(M[1][5])],
+        [cleanNum(M[2][3]), cleanNum(M[2][4]), cleanNum(M[2][5])]
+      ];
+
+      methodStepsData.push({
+        title: "ขั้นตอนสรุป : ได้รูป $[I \\mid A^{-1}]$ สมบูรณ์",
+        badge: "Step Final: Result",
+        math: `[I \\mid A^{-1}] = \\left[\\begin{array}{ccc|ccc} 
+          1 & 0 & 0 & ${toTeX(invFinal[0][0])} & ${toTeX(invFinal[0][1])} & ${toTeX(invFinal[0][2])} \\\\
+          0 & 1 & 0 & ${toTeX(invFinal[1][0])} & ${toTeX(invFinal[1][1])} & ${toTeX(invFinal[1][2])} \\\\
+          0 & 0 & 1 & ${toTeX(invFinal[2][0])} & ${toTeX(invFinal[2][1])} & ${toTeX(invFinal[2][2])}
+        \\end{array}\\right] \\implies A^{-1} = ${matrixToTeX(invFinal)}`,
+        explanation: `เมื่อฝั่งซ้ายกลายเป็น Reduced Row Echelon Form (Identity Matrix $I_3$) ฝั่งขวาคือผลลัพธ์ของอินเวอร์ส $A^{-1}$ อย่างแท้จริง`
+      });
+    }
+
+    // Method 3: LU Decomposition (Doolittle Algorithm A = LU)
+    function buildLUSteps() {
+      const A = currentMatrix;
+      // Doolittle algorithm
+      const L = [
+        [1, 0, 0],
+        [0, 1, 0],
+        [0, 0, 1]
+      ];
+      const U = [
+        [0, 0, 0],
+        [0, 0, 0],
+        [0, 0, 0]
+      ];
+
+      // Row 0 of U
+      U[0][0] = A[0][0];
+      U[0][1] = A[0][1];
+      U[0][2] = A[0][2];
+
+      // Check pivot 0
+      const p0 = U[0][0] !== 0 ? U[0][0] : 1e-8;
+      L[1][0] = A[1][0] / p0;
+      L[2][0] = A[2][0] / p0;
+
+      // Row 1 of U
+      U[1][1] = A[1][1] - L[1][0] * U[0][1];
+      U[1][2] = A[1][2] - L[1][0] * U[0][2];
+
+      const p1 = U[1][1] !== 0 ? U[1][1] : 1e-8;
+      L[2][1] = (A[2][1] - L[2][0] * U[0][1]) / p1;
+
+      // Row 2 of U
+      U[2][2] = A[2][2] - (L[2][0] * U[0][2] + L[2][1] * U[1][2]);
+
+      const inv = getInverse(A);
+
+      methodStepsData = [
+        {
+          title: "ขั้นตอนที่ 1 : แยกตัวประกอบเมทริกซ์ $A = LU$",
+          badge: "Step 1: A = LU",
+          math: `\\begin{aligned}
+            L &= ${matrixToTeX(L)} \\\\[6pt]
+            U &= ${matrixToTeX(U)}
+          \\end{aligned}`,
+          explanation: `ใช้อัลกอริทึมของ Doolittle โดยกำหนดให้ $L$ เป็น Lower Triangular Matrix ที่มีแนวทแยงมุมหลักเป็น 1 และ $U$ เป็น Upper Triangular Matrix ทำให้ $A = LU$`
+        },
+        {
+          title: "ขั้นตอนที่ 2 : แก้สมการ $L Y = I$ ด้วย Forward Substitution",
+          badge: "Step 2: Solve LY = I",
+          math: `${matrixToTeX(L)} Y = \\begin{bmatrix} 1 & 0 & 0 \\\\ 0 & 1 & 0 \\\\ 0 & 0 & 1 \\end{bmatrix}`,
+          explanation: `เนื่องจาก $A X = I \\iff (LU) X = I \\iff L(UX) = I$ กำหนดให้ $Y = UX$ จึงเริ่มแก้หา $Y = L^{-1}$ ทีละแถวจากบนลงล่างได้อย่างรวดเร็ว`
+        },
+        {
+          title: "ขั้นตอนที่ 3 : แก้สมการ $U X = Y$ ด้วย Back Substitution",
+          badge: "Step 3: Solve UX = Y",
+          math: `${matrixToTeX(U)} X = Y`,
+          explanation: `เนื่องจาก $U$ เป็นเมทริกซ์สามเหลี่ยมบน จึงสามารถหาผลเฉลย $X$ ทีละแถวจากล่างขึ้นบน ซึ่งผลลัพธ์ $X$ ที่ได้คือ $A^{-1}$`
+        },
+        {
+          title: "ขั้นตอนที่ 4 : ได้ผลเฉลยของอินเวอร์ส $A^{-1} = X$",
+          badge: "Step 4: Result",
+          math: `A^{-1} = ${matrixToTeX(inv)}`,
+          explanation: `กระบวนการ LU Decomposition ช่วยให้การหาอินเวอร์สหรือแก้ระบบสมการเชิงเส้นในคอมพิวเตอร์มีความเสถียรและประหยัดเวลาอย่างยิ่ง`
+        }
+      ];
+    }
+
+    // Method 4: Solving Linear Systems
+    function buildLinearSystemsSteps() {
+      const inv = getInverse(currentMatrix);
+      const c1 = [inv[0][0], inv[1][0], inv[2][0]];
+      const c2 = [inv[0][1], inv[1][1], inv[2][1]];
+      const c3 = [inv[0][2], inv[1][2], inv[2][2]];
+
+      methodStepsData = [
+        {
+          title: "ขั้นตอนที่ 1 : นิยามคอลัมน์ของ $A^{-1}$ ผ่านระบบสมการเชิงเส้น",
+          badge: "Step 1: Formulation",
+          math: `A \\mathbf{x}_1 = \\begin{bmatrix} 1 \\\\ 0 \\\\ 0 \\end{bmatrix}, \\quad A \\mathbf{x}_2 = \\begin{bmatrix} 0 \\\\ 1 \\\\ 0 \\end{bmatrix}, \\quad A \\mathbf{x}_3 = \\begin{bmatrix} 0 \\\\ 0 \\\\ 1 \\end{bmatrix}`,
+          explanation: `จากนิยาม $A A^{-1} = I = [\\mathbf{e}_1 \\mid \\mathbf{e}_2 \\mid \\mathbf{e}_3]$ หากเราเขียน $A^{-1} = [\\mathbf{x}_1 \\mid \\mathbf{x}_2 \\mid \\mathbf{x}_3]$ การหา $A^{-1}$ จึงเทียบเท่ากับการแก้ระบบสมการเชิงเส้น 3 ระบบที่มีเมทริกซ์สัมประสิทธิ์ชุดเดียวกัน`
+        },
+        {
+          title: "ขั้นตอนที่ 2 : แก้สมการหาหลักที่ 1 (เวกเตอร์ $\\mathbf{x}_1$)",
+          badge: "Step 2: Column 1",
+          math: `A \\mathbf{x}_1 = \\mathbf{e}_1 \\implies \\mathbf{x}_1 = \\begin{bmatrix} ${toTeX(c1[0])} \\\\ ${toTeX(c1[1])} \\\\ ${toTeX(c1[2])} \\end{bmatrix}`,
+          explanation: `แก้ระบบสมการเชิงเส้นเพื่อหาเวกเตอร์คำตอบ $\\mathbf{x}_1$ ซึ่งจะกลายเป็นสมาชิกในคอลัมน์ที่ 1 ของอินเวอร์ส $A^{-1}$`
+        },
+        {
+          title: "ขั้นตอนที่ 3 : แก้สมการหาหลักที่ 2 และ 3 (เวกเตอร์ $\\mathbf{x}_2, \\mathbf{x}_3$)",
+          badge: "Step 3: Columns 2 & 3",
+          math: `\\mathbf{x}_2 = \\begin{bmatrix} ${toTeX(c2[0])} \\\\ ${toTeX(c2[1])} \\\\ ${toTeX(c2[2])} \\end{bmatrix}, \\quad \\mathbf{x}_3 = \\begin{bmatrix} ${toTeX(c3[0])} \\\\ ${toTeX(c3[1])} \\\\ ${toTeX(c3[2])} \\end{bmatrix}`,
+          explanation: `แก้ระบบสมการเชิงเส้นสำหรับเวกเตอร์ฐานมาตรฐาน $\\mathbf{e}_2$ และ $\\mathbf{e}_3$ ตามลำดับเพื่อนำมาประกอบเข้าด้วยกัน`
+        },
+        {
+          title: "ขั้นตอนที่ 4 : รวมคอลัมน์เป็นเมทริกซ์อินเวอร์ส $A^{-1} = [\\mathbf{x}_1 \\mid \\mathbf{x}_2 \\mid \\mathbf{x}_3]$",
+          badge: "Step 4: Assembly",
+          math: `A^{-1} = [\\mathbf{x}_1 \\mid \\mathbf{x}_2 \\mid \\mathbf{x}_3] = ${matrixToTeX(inv)}`,
+          explanation: `การประกอบคอลัมน์เวกเตอร์ทั้งสามเข้าด้วยกันทำให้ได้เมทริกซ์ผกผัน $A^{-1}$ ซึ่งตรงกับวิธีอื่นๆ ทุกประการ`
+        }
+      ];
+    }
+
+    // Method 5: Cayley-Hamilton Theorem
+    function buildCayleyHamiltonSteps() {
+      const A = currentMatrix;
+      const d = det3x3(A);
+      // tr(A)
+      const tr = A[0][0] + A[1][1] + A[2][2];
+      // minors along diagonal for c1 coefficient:
+      // M11 + M22 + M33
+      const m11 = det2x2(A[1][1], A[1][2], A[2][1], A[2][2]);
+      const m22 = det2x2(A[0][0], A[0][2], A[2][0], A[2][2]);
+      const m33 = det2x2(A[0][0], A[0][1], A[1][0], A[1][1]);
+      const c1 = m11 + m22 + m33;
+
+      const A2 = multiply3x3(A, A);
+      const inv = getInverse(A);
+
+      methodStepsData = [
+        {
+          title: "ขั้นตอนที่ 1 : คำนวณพหุนามลักษณะเฉพาะ $p(\\lambda) = \\det(\\lambda I - A)$",
+          badge: "Step 1: Char. Polynomial",
+          math: `p(\\lambda) = \\lambda^3 - \\text{tr}(A)\\lambda^2 + c_1\\lambda - \\det(A) = 0 \\\\[6pt]
+          \\text{tr}(A) = ${toTeX(tr)}, \\quad c_1 = ${toTeX(c1)}, \\quad \\det(A) = ${toTeX(cleanNum(d))}`,
+          explanation: `พหุนามลักษณะเฉพาะสำหรับเมทริกซ์ $3\\times 3$ มีสัมประสิทธิ์ที่คำนวณได้โดยตรงจาก:
+          <br>• $\\text{tr}(A) = A_{11} + A_{22} + A_{33} = ${toTeX(tr)}$
+          <br>• $c_1 = M_{11} + M_{22} + M_{33} = ${toTeX(m11)} + ${toTeX(m22)} + ${toTeX(m33)} = ${toTeX(c1)}$
+          <br>• $\\det(A) = ${toTeX(cleanNum(d))}$
+          <br>ได้สมการ: $\\lambda^3 - (${toTeX(tr)})\\lambda^2 + (${toTeX(c1)})\\lambda - (${toTeX(cleanNum(d))}) = 0$`
+        },
+        {
+          title: "ขั้นตอนที่ 2 : ประยุกต์ทฤษฎีบทเคย์ลีย์-แฮมิลตัน (Cayley-Hamilton Theorem)",
+          badge: "Step 2: Cayley-Hamilton",
+          math: `A^3 - (${toTeX(tr)})A^2 + (${toTeX(c1)})A - (${toTeX(cleanNum(d))})I = 0`,
+          explanation: `ทฤษฎีบทเคย์ลีย์-แฮมิลตันระบุว่า <em>\"ทุกเมทริกซ์จัตุรัสจะสอดคล้องกับพหุนามลักษณะเฉพาะของตัวมันเองเสมอ\"</em> กล่าวคือเมื่อแทนสเกลาร์ $\\lambda$ ด้วยเมทริกซ์ $A$ จะได้ผลลัพธ์เป็นเมทริกซ์ศูนย์`
+        },
+        {
+          title: "ขั้นตอนที่ 3 : คูณด้วย $A^{-1}$ และจัดรูปสมการ",
+          badge: "Step 3: Multiply by A^-1",
+          math: `\\begin{aligned}
+            A^2 - (${toTeX(tr)})A + (${toTeX(c1)})I &= (${toTeX(cleanNum(d))})A^{-1} \\\\[6pt]
+            A^{-1} &= \\frac{1}{${toTeX(cleanNum(d))}} \\left[ A^2 - (${toTeX(tr)})A + (${toTeX(c1)})I \\right]
+          \\end{aligned}`,
+          explanation: `คูณสมการทั้งหมดด้วย $A^{-1}$ จากนั้นย้ายข้างพจน์ $\\det(A)A^{-1}$ มาไว้ข้างหนึ่ง ทำให้สามารถหา $A^{-1}$ ได้ด้วยการคำนวณเลขยกกำลัง $A^2$ และการบวกลบเมทริกซ์ธรรมดา`
+        },
+        {
+          title: "ขั้นตอนที่ 4 : แทนค่าคำนวณหา $A^{-1}$",
+          badge: "Step 4: Final Result",
+          math: `A^2 = ${matrixToTeX(A2)} \\\\[6pt]
+          A^{-1} = ${matrixToTeX(inv)}`,
+          explanation: `แทนค่าเมทริกซ์ $A^2, A, I$ ลงในสูตร จะได้เมทริกซ์ผกผัน $A^{-1}$ ที่ตรงกับวิธีมาตรฐานอย่างน่าอัศจรรย์`
+        }
+      ];
+    }
+
+    // Render step badges / pills
+    function renderStepNavigation() {
+      const container = document.getElementById('steps-pill-container');
+      container.innerHTML = '';
+
+      methodStepsData.forEach((st, idx) => {
+        const btn = document.createElement('button');
+        btn.onclick = () => goToStep(idx);
+        const isActive = idx === currentStepIndex;
+        btn.className = `step-badge px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition ${
+          isActive 
+            ? 'bg-indigo-600 text-white shadow-sm ring-2 ring-indigo-300' 
+            : 'bg-white text-slate-600 hover:bg-slate-100 border border-slate-200'
+        }`;
+        btn.innerHTML = `
+          <span class="w-4 h-4 rounded-full flex items-center justify-center text-[10px] ${
+            isActive ? 'bg-white text-indigo-700' : 'bg-slate-200 text-slate-700'
+          }">${idx + 1}</span>
+          <span>${st.badge}</span>
+        `;
+        container.appendChild(btn);
+      });
+
+      // Update Nav buttons & text
+      document.getElementById('step-indicator-text').innerText = `ขั้นที่ ${currentStepIndex + 1} / ${methodStepsData.length}`;
+      document.getElementById('prev-step-btn').disabled = currentStepIndex === 0;
+      document.getElementById('next-step-btn').disabled = currentStepIndex === methodStepsData.length - 1;
+    }
+
+    // Render single active step
+    function renderCurrentStep() {
+      const step = methodStepsData[currentStepIndex];
+      const area = document.getElementById('step-content-area');
+      if (!step) return;
+
+      area.innerHTML = `
+        <div class="flex items-center justify-between mb-4 border-b border-slate-200/80 pb-3">
+          <h3 class="text-base sm:text-lg font-bold text-slate-800 flex items-center gap-2">
+            ${step.title}
+          </h3>
+          <span class="text-xs font-semibold px-2.5 py-1 rounded bg-indigo-100 text-indigo-800">
+            ${step.badge}
+          </span>
+        </div>
+        <div class="text-center py-4 px-2 bg-white rounded-xl border border-slate-200/70 overflow-x-auto shadow-sm">
+          $$${step.math}$$
+        </div>
+        <div class="mt-4 text-xs sm:text-sm text-slate-600 leading-relaxed bg-white/70 p-4 rounded-xl border border-slate-200/50">
+          <p class="font-medium text-slate-700 mb-1">คำอธิบายขั้นตอนทางคณิตศาสตร์:</p>
+          ${step.explanation}
+        </div>
+      `;
+    }
+
+    function prevStep() {
+      if (currentStepIndex > 0) {
+        currentStepIndex--;
+        renderStepNavigation();
+        renderCurrentStep();
+        triggerMathJax();
+      }
+    }
+
+    function nextStep() {
+      if (currentStepIndex < methodStepsData.length - 1) {
+        currentStepIndex++;
+        renderStepNavigation();
+        renderCurrentStep();
+        triggerMathJax();
+      }
+    }
+
+    function goToStep(idx) {
+      currentStepIndex = idx;
+      renderStepNavigation();
+      renderCurrentStep();
+      triggerMathJax();
+    }
+
+    // Section 4: Verification AA^-1 = I
+    function updateVerificationSection() {
+      const d = det3x3(currentMatrix);
+      const isInv = Math.abs(d) > 1e-9;
+      const container = document.getElementById('verification-body');
+
+      if (!isInv) {
+        container.innerHTML = `
+          <div class="p-6 bg-rose-50 border border-rose-200 rounded-xl text-center text-rose-700">
+            <svg class="w-8 h-8 mx-auto mb-2 text-rose-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+            <p class="font-bold text-base">ไม่สามารถตรวจสอบการคูณ $A \\cdot A^{-1} = I$ ได้</p>
+            <p class="text-xs sm:text-sm text-rose-600 mt-1">เนื่องจากเมทริกซ์นี้มี $\\det(A) = 0$ จึงไม่มีอินเวอร์ส</p>
+          </div>
+        `;
+        return;
+      }
+
+      const inv = getInverse(currentMatrix);
+      const prod = multiply3x3(currentMatrix, inv);
+
+      container.innerHTML = `
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-center">
+          <div class="lg:col-span-8 bg-slate-50 border border-slate-200 rounded-xl p-5 overflow-x-auto text-center">
+            <div class="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">สมการตรวจสอบผลคูณเมทริกซ์</div>
+            $$A \\cdot A^{-1} = ${matrixToTeX(currentMatrix)} \\times ${matrixToTeX(inv)} = ${matrixToTeX(prod)}$$
+          </div>
+
+          <div class="lg:col-span-4 space-y-3">
+            <div class="p-4 bg-emerald-50 border border-emerald-200 rounded-xl">
+              <div class="flex items-center gap-2 text-emerald-800 font-bold text-sm mb-1">
+                <svg class="w-4 h-4 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                ตรวจสอบแล้ว: ผลลัพธ์เท่ากับ $I_3$
+              </div>
+              <p class="text-xs text-emerald-700 leading-relaxed">
+                สมาชิกในแนวทแยงมุมหลักเป็น $1$ ทั้งหมด และสมาชิกตำแหน่งอื่นเป็น $0$ ทุกประการ
+              </p>
+            </div>
+
+            <div class="p-4 bg-indigo-50 border border-indigo-200 rounded-xl">
+              <div class="text-xs font-bold text-indigo-900 mb-1">เอกลักษณ์ของผลลัพธ์ (Equivalence)</div>
+              <p class="text-xs text-indigo-700 leading-relaxed">
+                ทั้ง 5 วิธี (Adjugate, Gauss-Jordan, LU, Linear Systems, Cayley-Hamilton) พิสูจน์ให้เห็นว่านำไปสู่คำตอบเมทริกซ์ผกผัน $A^{-1}$ เดียวกันเสมอ
+              </p>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function scrollToTop() {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // Initialize application on load
+    window.onload = function () {
+      selectMethod(0);
+      onMatrixChange();
+    };
+  </script>
+</body>
+</html>

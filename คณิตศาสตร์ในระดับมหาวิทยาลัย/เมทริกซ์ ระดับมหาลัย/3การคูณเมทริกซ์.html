@@ -1,0 +1,1259 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>การคูณเมทริกซ์ (Matrix Multiplication)</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Google Fonts: Prompt, Sarabun, Fira Code -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;600;700&family=Prompt:wght@400;500;600;700&family=Sarabun:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+  <!-- Font Awesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- KaTeX for math rendering -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js"
+    onload="renderMathInElement(document.body, {delimiters: [{left: '$$', right: '$$', display: true}, {left: '$', right: '$', display: false}]});"></script>
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Sarabun', 'sans-serif'],
+            display: ['Prompt', 'sans-serif'],
+            mono: ['Fira Code', 'monospace'],
+          },
+          colors: {
+            brand: {
+              50: '#eff6ff',
+              100: '#dbeafe',
+              200: '#bfdbfe',
+              500: '#3b82f6',
+              600: '#2563eb',
+              700: '#1d4ed8',
+              800: '#1e40af',
+              900: '#1e3a8a',
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    .matrix-bracket-left {
+      border-left: 3px solid currentColor;
+      border-top: 3px solid currentColor;
+      border-bottom: 3px solid currentColor;
+      border-top-left-radius: 8px;
+      border-bottom-left-radius: 8px;
+      width: 10px;
+    }
+    .matrix-bracket-right {
+      border-right: 3px solid currentColor;
+      border-top: 3px solid currentColor;
+      border-bottom: 3px solid currentColor;
+      border-top-right-radius: 8px;
+      border-bottom-right-radius: 8px;
+      width: 10px;
+    }
+    input[type=number]::-webkit-inner-spin-button, 
+    input[type=number]::-webkit-outer-spin-button { 
+      -webkit-appearance: none; 
+      margin: 0; 
+    }
+    input[type=number] {
+      -moz-appearance: textfield;
+    }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-800 font-sans antialiased min-h-screen selection:bg-brand-500 selection:text-white">
+
+  <!-- Main Container: Standard max-w-6xl (1,152px) -->
+  <main class="max-w-6xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 space-y-10">
+
+    <!-- Topic Banner Section -->
+    <section class="text-center md:text-left md:flex md:items-center md:justify-between pb-2">
+      <div class="md:max-w-2xl space-y-3">
+        <h2 class="text-3xl sm:text-4xl font-display font-extrabold text-slate-900 tracking-tight">
+          การคูณเมทริกซ์ (Matrix Multiplication)
+        </h2>
+        <p class="text-slate-600 text-base leading-relaxed">
+          การคูณเมทริกซ์ไม่ได้นำสมาชิกในตำแหน่งเดียวกันมาคูณกัน แต่ใช้วิธี <strong>"แถวคูณหลัก" (Row &times; Column)</strong> ซึ่งเป็นหัวใจสำคัญของการแปลงเชิงเส้น (Linear Transformation), การประมวลผลกราฟิก 3D และโครงข่ายประสาทเทียมในระบบ AI
+        </p>
+      </div>
+
+      <!-- Quick Formula Badge -->
+      <div class="mt-6 md:mt-0 flex justify-center">
+        <div class="p-4 bg-white rounded-2xl shadow-sm border border-slate-200/90 flex flex-col gap-2 min-w-[260px]">
+          <div class="flex items-center justify-between text-xs font-mono text-slate-500 border-b border-slate-100 pb-2">
+            <span>กฎมิติของการคูณ</span>
+            <span class="text-emerald-600 font-bold">หลักในต้องเท่ากัน</span>
+          </div>
+          <div class="font-mono text-center text-sm font-bold text-brand-700 py-1">
+            $(m \times \mathbf{k}) \times (\mathbf{k} \times n) = (m \times n)$
+          </div>
+          <div class="text-[11px] text-center text-slate-400 font-mono">
+            $c_{ij} = \sum_{r=1}^k a_{ir} \cdot b_{rj}$
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 1. Learning Objectives -->
+    <section class="bg-gradient-to-r from-blue-50 via-indigo-50/40 to-slate-50 border border-blue-200/60 rounded-2xl p-6 sm:p-7 shadow-sm">
+      <div class="flex items-start gap-4">
+        <div class="w-10 h-10 rounded-xl bg-blue-600 text-white flex-shrink-0 flex items-center justify-center shadow-md">
+          <i class="fa-solid fa-bullseye text-lg"></i>
+        </div>
+        <div class="space-y-3">
+          <div>
+            <h3 class="text-lg font-display font-bold text-slate-900">วัตถุประสงค์การเรียนรู้</h3>
+            <p class="text-slate-600 text-sm">เมื่อศึกษาเนื้อหาและทำการทดลองผ่านแบบจำลองนี้แล้ว นักศึกษาจะสามารถ:</p>
+          </div>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
+            <div class="flex items-start gap-2 bg-white/70 p-3 rounded-xl border border-blue-100">
+              <i class="fa-solid fa-circle-check text-brand-600 mt-1"></i>
+              <span class="text-slate-700">ตรวจสอบเงื่อนไขความสัมพันธ์ของขนาดมิติในการคูณเมทริกซ์ได้อย่างถูกต้อง</span>
+            </div>
+            <div class="flex items-start gap-2 bg-white/70 p-3 rounded-xl border border-blue-100">
+              <i class="fa-solid fa-circle-check text-brand-600 mt-1"></i>
+              <span class="text-slate-700">คำนวณผลคูณเมทริกซ์ด้วยวิธี "แถวคูณหลัก" ทีละขั้นตอนได้อย่างแม่นยำ</span>
+            </div>
+            <div class="flex items-start gap-2 bg-white/70 p-3 rounded-xl border border-blue-100">
+              <i class="fa-solid fa-circle-check text-brand-600 mt-1"></i>
+              <span class="text-slate-700">อธิบายบทบาทของเมทริกซ์เอกลักษณ์ ($I$) และเมทริกซ์ศูนย์ ($0$) ในการคูณได้</span>
+            </div>
+            <div class="flex items-start gap-2 bg-white/70 p-3 rounded-xl border border-blue-100">
+              <i class="fa-solid fa-circle-check text-brand-600 mt-1"></i>
+              <span class="text-slate-700">อธิบายและพิสูจน์ได้ว่าโดยทั่วไปการคูณเมทริกซ์ <strong>ไม่มีสมบัติการสลับที่ ($AB \neq BA$)</strong></span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 2. Lessons & Concepts (Tabbed Navigation) -->
+    <section class="space-y-4">
+      <div class="flex items-center justify-between border-b border-slate-200 pb-3">
+        <div>
+          <h3 class="text-xl font-display font-bold text-slate-900">สรุปเนื้อหาสำคัญ</h3>
+          <p class="text-slate-500 text-sm">คลิกเลือกหัวข้อเพื่อศึกษากฎการคูณ วิธีคิดขั้นตอน และข้อควรระวัง</p>
+        </div>
+      </div>
+
+      <!-- Tab Buttons -->
+      <div class="flex flex-wrap gap-2 border-b border-slate-200 pb-2">
+        <button onclick="switchTab('tab-conditions')" id="btn-tab-conditions" class="tab-btn active px-4 py-2 rounded-lg text-sm font-semibold transition-all bg-brand-600 text-white shadow-sm">
+          <i class="fa-solid fa-link mr-1.5"></i> 1. เงื่อนไขการคูณ
+        </button>
+        <button onclick="switchTab('tab-how-to')" id="btn-tab-how-to" class="tab-btn px-4 py-2 rounded-lg text-sm font-semibold transition-all bg-slate-100 text-slate-600 hover:bg-slate-200">
+          <i class="fa-solid fa-arrows-split-up-and-left mr-1.5"></i> 2. วิธีแถวคูณหลัก
+        </button>
+        <button onclick="switchTab('tab-identity-zero')" id="btn-tab-identity-zero" class="tab-btn px-4 py-2 rounded-lg text-sm font-semibold transition-all bg-slate-100 text-slate-600 hover:bg-slate-200">
+          <i class="fa-solid fa-fingerprint mr-1.5"></i> 3. เอกลักษณ์ & ศูนย์
+        </button>
+        <button onclick="switchTab('tab-properties')" id="btn-tab-properties" class="tab-btn px-4 py-2 rounded-lg text-sm font-semibold transition-all bg-slate-100 text-slate-600 hover:bg-slate-200">
+          <i class="fa-solid fa-network-wired mr-1.5"></i> 4. สมบัติการเปลี่ยนหมู่ & แจกแจง
+        </button>
+        <button onclick="switchTab('tab-non-commutative')" id="btn-tab-non-commutative" class="tab-btn px-4 py-2 rounded-lg text-sm font-semibold transition-all bg-slate-100 text-slate-600 hover:bg-slate-200">
+          <i class="fa-solid fa-ban text-rose-500 mr-1.5"></i> 5. การสลับที่ไม่ได้ (AB &ne; BA)
+        </button>
+      </div>
+
+      <!-- Tab 1: เงื่อนไขการคูณ -->
+      <div id="tab-conditions" class="tab-content bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+        <h4 class="text-lg font-display font-bold text-slate-900 text-brand-700">1. เงื่อนไขและกฎมิติของการคูณเมทริกซ์</h4>
+        <p class="text-slate-700 leading-relaxed text-sm">
+          เมทริกซ์ $A$ และ $B$ จะสามารถคูณกันในลำดับ $AB$ ได้ ก็ต่อเมื่อ:
+          <strong class="text-brand-700">"จำนวนหลักของเมทริกซ์ตัวหน้า ($A$) ต้องเท่ากับจำนวนแถวของเมทริกซ์ตัวหลัง ($B$)"</strong>
+        </p>
+
+        <div class="p-5 bg-slate-50 rounded-2xl border border-slate-200 flex flex-col md:flex-row items-center justify-around gap-6 text-center">
+          <div>
+            <div class="text-xs uppercase text-slate-400 font-semibold mb-1">เมทริกซ์ตัวตั้ง (A)</div>
+            <div class="text-2xl font-mono font-bold text-blue-600">$m \times \mathbf{k}$</div>
+            <div class="text-xs text-slate-500 mt-1">มี $k$ หลัก</div>
+          </div>
+          <div class="text-3xl text-slate-300 font-light">&times;</div>
+          <div>
+            <div class="text-xs uppercase text-slate-400 font-semibold mb-1">เมทริกซ์ตัวคูณ (B)</div>
+            <div class="text-2xl font-mono font-bold text-emerald-600">$\mathbf{k} \times n$</div>
+            <div class="text-xs text-slate-500 mt-1">มี $k$ แถว</div>
+          </div>
+          <div class="text-3xl text-slate-300 font-light">&rarr;</div>
+          <div class="p-3 bg-white rounded-xl border border-purple-200 shadow-xs">
+            <div class="text-xs uppercase text-purple-600 font-semibold mb-1">เมทริกซ์ผลลัพธ์ (C = AB)</div>
+            <div class="text-2xl font-mono font-bold text-purple-700">$m \times n$</div>
+            <div class="text-xs text-slate-500 mt-1">แถวเท่ากับตัวหน้า &bull; หลักเท่ากับตัวหลัง</div>
+          </div>
+        </div>
+
+        <div class="p-3.5 bg-amber-50 border border-amber-200 rounded-xl text-xs text-amber-900 flex items-center gap-2.5">
+          <i class="fa-solid fa-triangle-exclamation text-amber-600 text-base"></i>
+          <span>หากตัวเลขเชื่อมตรงกลางไม่เท่ากัน ($\text{หลักของ } A \neq \text{แถวของ } B$) จะ<strong>ไม่สามารถหาผลคูณได้ (Undefined)</strong></span>
+        </div>
+      </div>
+
+      <!-- Tab 2: วิธีแถวคูณหลัก -->
+      <div id="tab-how-to" class="tab-content hidden bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+        <h4 class="text-lg font-display font-bold text-slate-900 text-brand-700">2. วิธีคูณสมาชิก: "แถวคูณหลัก" (Dot Product)</h4>
+        <p class="text-slate-700 leading-relaxed text-sm">
+          สมาชิกตำแหน่ง $c_{ij}$ (แถวที่ $i$, หลักที่ $j$ ของผลลัพธ์) เกิดจากการนำสมาชิก <strong>แถวที่ $i$ ของเมทริกซ์หน้า</strong> มาจับคู่คูณกับสมาชิก <strong>หลักที่ $j$ ของเมทริกซ์หลัง</strong> ตามลำดับ แล้วนำผลคูณทั้งหมดมาบวกกัน
+        </p>
+
+        <div class="p-4 bg-slate-50 rounded-xl border border-slate-200 text-center font-mono text-sm space-y-2">
+          <div class="text-brand-700 font-bold text-base">
+            $$c_{ij} = a_{i1}b_{1j} + a_{i2}b_{2j} + \dots + a_{ik}b_{kj} = \sum_{r=1}^k a_{ir} b_{rj}$$
+          </div>
+          <p class="text-xs text-slate-500 font-sans">
+            ตัวอย่างสำหรับมิติ $2 \times 2$: สมาชิกช่องบนซ้าย $c_{11} = (a_{11} \cdot b_{11}) + (a_{12} \cdot b_{21})$
+          </p>
+        </div>
+      </div>
+
+      <!-- Tab 3: เอกลักษณ์และศูนย์ -->
+      <div id="tab-identity-zero" class="tab-content hidden bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+        <h4 class="text-lg font-display font-bold text-slate-900 text-brand-700">3. เมทริกซ์เอกลักษณ์ ($I$) และเมทริกซ์ศูนย์ ($0$) ในการคูณ</h4>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div class="p-4 bg-slate-50 rounded-xl border border-slate-200 space-y-2">
+            <span class="font-bold text-slate-800 text-sm flex items-center gap-2">
+              <i class="fa-solid fa-fingerprint text-brand-600"></i> เมทริกซ์เอกลักษณ์ (Identity Matrix : $I$)
+            </span>
+            <p class="text-xs text-slate-600">
+              ทำหน้าที่เสมือนเลข $1$ ในระบบจำนวนจริง เมื่อนำไปคูณกับเมทริกซ์ใด ๆ (ที่มีมิติคูณกันได้) จะได้เมทริกซ์เดิมเสมอ:
+            </p>
+            <div class="text-center bg-white p-3 rounded-lg border border-slate-200 font-mono text-sm font-bold text-brand-700">
+              $$A I = I A = A$$
+            </div>
+          </div>
+
+          <div class="p-4 bg-slate-50 rounded-xl border border-slate-200 space-y-2">
+            <span class="font-bold text-slate-800 text-sm flex items-center gap-2">
+              <i class="fa-regular fa-circle text-slate-500"></i> เมทริกซ์ศูนย์ (Zero Matrix : $0$)
+            </span>
+            <p class="text-xs text-slate-600">
+              ทำหน้าที่เสมือนเลข $0$ เมื่อนำไปคูณกับเมทริกซ์ใด ๆ จะได้เมทริกซ์ศูนย์เสมอ:
+            </p>
+            <div class="text-center bg-white p-3 rounded-lg border border-slate-200 font-mono text-sm font-bold text-slate-700">
+              $$A \mathbf{0} = \mathbf{0} A = \mathbf{0}$$
+            </div>
+          </div>
+        </div>
+        <p class="text-xs text-slate-500 bg-slate-50 p-3 rounded-xl border border-slate-200">
+          * ข้อสังเกตเพิ่มเติม: หาก $AB = \mathbf{0}$ <strong>ไม่จำเป็น</strong> ที่ $A = \mathbf{0}$ หรือ $B = \mathbf{0}$ เสมอไป (ซึ่งต่างจากระบบจำนวนจริง)
+        </p>
+      </div>
+
+      <!-- Tab 4: สมบัติการเปลี่ยนหมู่และแจกแจง -->
+      <div id="tab-properties" class="tab-content hidden bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+        <h4 class="text-lg font-display font-bold text-slate-900 text-brand-700">4. สมบัติการเปลี่ยนหมู่และการแจกแจง</h4>
+        <p class="text-slate-700 text-sm leading-relaxed">
+          หากเมทริกซ์ทุกตัวมีมิติที่สามารถดำเนินการกันได้ จะมีสมบัติสำคัญต่อไปนี้:
+        </p>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div class="p-4 bg-slate-50 rounded-xl border border-slate-200 space-y-2">
+            <span class="font-bold text-slate-800 text-sm flex items-center gap-2">
+              <i class="fa-solid fa-link text-emerald-600"></i> สมบัติการเปลี่ยนหมู่ (Associative)
+            </span>
+            <div class="text-center bg-white p-3 rounded-lg border border-slate-200 font-mono text-sm font-bold text-emerald-700">
+              $$(AB)C = A(BC)$$
+            </div>
+            <p class="text-xs text-slate-600">คูณคู่หน้าก่อนหรือคู่หลังก่อนได้ผลลัพธ์เท่ากัน โดย <strong>ห้ามสลับลำดับตัวอักษร</strong></p>
+          </div>
+
+          <div class="p-4 bg-slate-50 rounded-xl border border-slate-200 space-y-2">
+            <span class="font-bold text-slate-800 text-sm flex items-center gap-2">
+              <i class="fa-solid fa-code-branch text-purple-600"></i> สมบัติการแจกแจง (Distributive)
+            </span>
+            <div class="text-center bg-white p-3 rounded-lg border border-slate-200 font-mono text-xs sm:text-sm font-bold text-purple-700">
+              $$A(B + C) = AB + AC$$
+              $$(A + B)C = AC + BC$$
+            </div>
+            <p class="text-xs text-slate-600">กระจายการคูณเข้าไปในการบวกได้ โดยต้องคงตำแหน่งหน้าหรือหลังเดิมไว้</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tab 5: การสลับที่ไม่ได้ -->
+      <div id="tab-non-commutative" class="tab-content hidden bg-white p-6 rounded-2xl border border-rose-200 bg-rose-50/30 shadow-sm space-y-4">
+        <div class="flex items-center gap-2">
+          <span class="w-8 h-8 rounded-lg bg-rose-100 text-rose-700 flex items-center justify-center font-bold">
+            <i class="fa-solid fa-ban"></i>
+          </span>
+          <h4 class="text-lg font-display font-bold text-rose-900">5. กฎเหล็ก: การคูณเมทริกซ์ไม่มีสมบัติการสลับที่ทั่วไป</h4>
+        </div>
+        <div class="bg-white p-4 rounded-xl border border-rose-200 text-center font-mono text-xl font-bold text-rose-700">
+          $$AB \neq BA$$
+        </div>
+        <p class="text-slate-700 text-sm leading-relaxed">
+          เหตุผลที่ $AB$ และ $BA$ ไม่เท่ากันโดยทั่วไป:
+        </p>
+        <ul class="list-disc list-inside text-xs sm:text-sm text-slate-600 space-y-2">
+          <li><strong>ปัญหาด้านมิติ:</strong> ถ้า $A$ ขนาด $2 \times 3$ และ $B$ ขนาด $3 \times 2$ ผลคูณ $AB$ จะมีขนาด $2 \times 2$ แต่ $BA$ จะมีขนาด $3 \times 3$ (ขนาดไม่เท่ากันทันที!)</li>
+          <li><strong>ปัญหาการนิยาม:</strong> บ่อยครั้ง $AB$ หาค่าได้ แต่ $BA$ ไม่สามารถคูณกันได้เลย</li>
+          <li><strong>แม้ขนาดเท่ากัน ผลลัพธ์ก็ต่างกัน:</strong> แม้ว่า $A$ และ $B$ จะเป็นเมทริกซ์จัตุรัสขนาดเท่ากัน สมาชิกที่ได้จากการจับคู่แถวกับหลักจะคนละชุดกัน</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- 3. Interactive Matrix Multiplication Simulator -->
+    <section id="simulator" class="bg-white rounded-3xl border border-slate-200/90 shadow-lg p-6 sm:p-8 space-y-6">
+      
+      <!-- Simulator Top Header -->
+      <div class="border-b border-slate-100 pb-5 flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div>
+          <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold bg-indigo-50 text-indigo-700 border border-indigo-100">
+            <i class="fa-solid fa-flask"></i> Interactive Row &times; Column Visualizer
+          </div>
+          <h3 class="text-2xl font-display font-bold text-slate-900 mt-1">แบบจำลองโต้ตอบ: ห้องทดลองการคูณเมทริกซ์</h3>
+          <p class="text-slate-500 text-sm">คลิกหรือชี้ที่สมาชิกผลลัพธ์ $C$ เพื่อดูแถวและหลักที่จับคู่คูณกัน พร้อมปุ่มสลับลำดับ $AB \leftrightarrow BA$</p>
+        </div>
+
+        <!-- Presets and Swap Button -->
+        <div class="flex flex-wrap items-center gap-2">
+          <button onclick="toggleOrder()" id="btn-swap-order" class="px-3 py-2 bg-brand-50 hover:bg-brand-100 border border-brand-200 text-brand-700 rounded-xl text-xs font-bold transition flex items-center gap-1.5 shadow-xs">
+            <i class="fa-solid fa-repeat"></i> สลับลำดับเป็น B &times; A
+          </button>
+          <button onclick="randomizeMatrices()" class="px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-medium transition flex items-center gap-1.5 shadow-xs">
+            <i class="fa-solid fa-shuffle text-emerald-600"></i> สุ่มตัวเลข
+          </button>
+          <button onclick="loadExercise1()" class="px-3 py-2 bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200 rounded-xl text-xs font-medium transition flex items-center gap-1.5 shadow-xs">
+            <i class="fa-solid fa-pen-to-square"></i> โจทย์ข้อ 1
+          </button>
+        </div>
+      </div>
+
+      <!-- Dimension Configuration Bar -->
+      <div class="bg-slate-50/90 p-4 sm:p-5 rounded-2xl border border-slate-200 space-y-4">
+        <div class="flex flex-wrap items-center justify-between gap-3">
+          <div class="flex items-center gap-2 text-xs font-bold text-slate-700 uppercase tracking-wider">
+            <i class="fa-solid fa-sliders text-brand-600"></i> ปรับขนาดมิติเมทริกซ์:
+          </div>
+          <!-- Compatibility Status Badge -->
+          <div id="dim-status-badge" class="px-3 py-1 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800 flex items-center gap-1.5">
+            <i class="fa-solid fa-circle-check"></i> คูณกันได้: ขนาดผลลัพธ์ 2 &times; 2
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs">
+          <!-- m : Rows of Left -->
+          <div class="bg-white p-3 rounded-xl border border-slate-200 space-y-1.5">
+            <div class="flex justify-between font-semibold">
+              <span class="text-blue-700">แถวของเมทริกซ์หน้า ($m$):</span>
+              <span id="label-m" class="font-mono font-bold text-blue-800 text-sm">2</span>
+            </div>
+            <input type="range" id="slider-m" min="1" max="4" value="2" class="w-full h-1.5 bg-slate-200 rounded-lg accent-blue-600 cursor-pointer" oninput="updateDimensions()">
+            <div class="flex justify-between text-[10px] text-slate-400 font-mono"><span>1</span><span>2</span><span>3</span><span>4</span></div>
+          </div>
+
+          <!-- k : Inner Dimension -->
+          <div class="bg-white p-3 rounded-xl border border-amber-300 shadow-2xs space-y-1.5">
+            <div class="flex justify-between font-semibold">
+              <span class="text-amber-800">มิติด้านในร่วมกัน ($k$):</span>
+              <span id="label-k" class="font-mono font-bold text-amber-900 text-sm">2</span>
+            </div>
+            <input type="range" id="slider-k" min="1" max="4" value="2" class="w-full h-1.5 bg-amber-200 rounded-lg accent-amber-600 cursor-pointer" oninput="updateDimensions()">
+            <div class="flex justify-between text-[10px] text-amber-700 font-mono"><span>1</span><span>2</span><span>3</span><span>4</span></div>
+          </div>
+
+          <!-- n : Cols of Right -->
+          <div class="bg-white p-3 rounded-xl border border-slate-200 space-y-1.5">
+            <div class="flex justify-between font-semibold">
+              <span class="text-emerald-700">หลักของเมทริกซ์หลัง ($n$):</span>
+              <span id="label-n" class="font-mono font-bold text-emerald-800 text-sm">2</span>
+            </div>
+            <input type="range" id="slider-n" min="1" max="4" value="2" class="w-full h-1.5 bg-slate-200 rounded-lg accent-emerald-600 cursor-pointer" oninput="updateDimensions()">
+            <div class="flex justify-between text-[10px] text-slate-400 font-mono"><span>1</span><span>2</span><span>3</span><span>4</span></div>
+          </div>
+        </div>
+
+        <!-- Quick Dimension Presets -->
+        <div class="flex flex-wrap items-center gap-2 pt-1 text-xs">
+          <span class="text-slate-400 text-[11px]">รูปแบบตัวอย่าง:</span>
+          <button onclick="applyDimPreset(2,2,2)" class="px-2.5 py-1 bg-white hover:bg-slate-100 rounded-lg border border-slate-200 font-mono text-slate-600">(2&times;2) &times; (2&times;2)</button>
+          <button onclick="applyDimPreset(2,3,2)" class="px-2.5 py-1 bg-white hover:bg-slate-100 rounded-lg border border-slate-200 font-mono text-slate-600">(2&times;3) &times; (3&times;2)</button>
+          <button onclick="applyDimPreset(3,2,3)" class="px-2.5 py-1 bg-white hover:bg-slate-100 rounded-lg border border-slate-200 font-mono text-slate-600">(3&times;2) &times; (2&times;3)</button>
+          <button onclick="applyDimPreset(1,3,1)" class="px-2.5 py-1 bg-white hover:bg-slate-100 rounded-lg border border-slate-200 font-mono text-slate-600">เวกเตอร์ (1&times;3) &times; (3&times;1)</button>
+        </div>
+      </div>
+
+      <!-- Main Visual Workspace: Matrix 1 x Matrix 2 = Result Matrix -->
+      <div class="space-y-6">
+        <div class="flex flex-col xl:flex-row items-center justify-center gap-4 py-4 overflow-x-auto">
+          
+          <!-- First Matrix (Left) -->
+          <div class="flex flex-col items-center">
+            <span id="title-mat-1" class="text-xs font-bold text-blue-700 mb-2 flex items-center gap-1.5">
+              <span class="w-2.5 h-2.5 rounded-full bg-blue-500"></span> เมทริกซ์ A ($m \times k$)
+            </span>
+            <div class="flex items-center text-blue-600">
+              <div class="matrix-bracket-left self-stretch"></div>
+              <div id="grid-mat-1" class="grid gap-1.5 sm:gap-2 p-2"></div>
+              <div class="matrix-bracket-right self-stretch"></div>
+            </div>
+          </div>
+
+          <!-- Times Sign -->
+          <div class="text-2xl font-bold font-mono text-slate-400 px-2">
+            &times;
+          </div>
+
+          <!-- Second Matrix (Right) -->
+          <div class="flex flex-col items-center">
+            <span id="title-mat-2" class="text-xs font-bold text-emerald-700 mb-2 flex items-center gap-1.5">
+              <span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span> เมทริกซ์ B ($k \times n$)
+            </span>
+            <div class="flex items-center text-emerald-600">
+              <div class="matrix-bracket-left self-stretch"></div>
+              <div id="grid-mat-2" class="grid gap-1.5 sm:gap-2 p-2"></div>
+              <div class="matrix-bracket-right self-stretch"></div>
+            </div>
+          </div>
+
+          <!-- Equal Sign -->
+          <div class="text-2xl font-bold font-mono text-slate-400 px-2">
+            =
+          </div>
+
+          <!-- Result Matrix -->
+          <div class="flex flex-col items-center">
+            <span id="title-mat-result" class="text-xs font-bold text-purple-700 mb-2 flex items-center gap-1.5">
+              <span class="w-2.5 h-2.5 rounded-full bg-purple-500"></span> ผลลัพธ์ C = AB ($m \times n$)
+            </span>
+            <div class="flex items-center text-purple-700">
+              <div class="matrix-bracket-left self-stretch"></div>
+              <div id="grid-mat-result" class="grid gap-1.5 sm:gap-2 p-2 bg-purple-50/50 rounded-2xl border border-purple-100"></div>
+              <div class="matrix-bracket-right self-stretch"></div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Dynamic Calculation Step Breakdown (Live Inspector) -->
+        <div id="step-inspector-box" class="bg-gradient-to-r from-slate-900 to-slate-800 text-white rounded-2xl p-5 shadow-md space-y-3">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-700/80 pb-3">
+            <div class="flex items-center gap-2">
+              <span class="w-6 h-6 rounded-lg bg-purple-500 text-white flex items-center justify-center text-xs font-bold">
+                <i class="fa-solid fa-calculator"></i>
+              </span>
+              <h4 class="font-display font-bold text-sm text-slate-100" id="step-title">
+                ขั้นตอนการคำนวณตำแหน่ง $c_{11}$ (แถวที่ 1 &times; หลักที่ 1)
+              </h4>
+            </div>
+            <span class="text-xs text-purple-300 font-mono">Dot Product Breakdown</span>
+          </div>
+
+          <!-- Live Step Calculation display -->
+          <div class="space-y-2 py-1">
+            <div class="font-mono text-base sm:text-lg text-emerald-300 font-bold tracking-wide" id="step-formula">
+              <!-- Rendered via JS -->
+            </div>
+            <div class="text-xs text-slate-300 leading-relaxed" id="step-explanation">
+              <!-- Rendered via JS -->
+            </div>
+          </div>
+        </div>
+
+        <!-- Side-by-Side Commutative Check (AB vs BA) -->
+        <div class="bg-indigo-50/60 rounded-2xl p-4 sm:p-5 border border-indigo-100 flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div class="space-y-1">
+            <div class="flex items-center gap-2 text-indigo-900 font-bold text-sm">
+              <i class="fa-solid fa-scale-balanced text-brand-600"></i> การเปรียบเทียบผลลัพธ์ $AB$ กับ $BA$ (Commutativity Check)
+            </div>
+            <p class="text-xs text-indigo-700/80" id="comm-comparison-text">
+              ระบบตรวจสอบผลคูณทั้งสองลำดับอย่างต่อเนื่อง
+            </p>
+          </div>
+          <button onclick="compareBothOrders()" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-xl transition shadow-xs flex items-center justify-center gap-2 flex-shrink-0">
+            <i class="fa-solid fa-arrows-left-right-to-line"></i> เปรียบเทียบ $AB$ และ $BA$ แบบเคียงข้าง
+          </button>
+        </div>
+
+        <!-- Modal/Area for Side-by-side comparison -->
+        <div id="side-by-side-box" class="hidden bg-white p-5 rounded-2xl border border-indigo-200 shadow-md space-y-4">
+          <div class="flex justify-between items-center border-b border-slate-100 pb-2">
+            <h5 class="font-bold text-slate-800 text-sm">ผลการเปรียบเทียบ $AB$ กับ $BA$ จากค่าปัจจุบัน</h5>
+            <button onclick="document.getElementById('side-by-side-box').classList.add('hidden')" class="text-slate-400 hover:text-slate-600 text-sm">
+              <i class="fa-solid fa-xmark"></i>
+            </button>
+          </div>
+          <div id="side-by-side-content" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
+        </div>
+
+      </div>
+
+    </section>
+
+    <!-- 4. Inquiry Questions (คำถามนำเพื่อค้นพบ) -->
+    <section class="space-y-6">
+      <div class="border-b border-slate-200 pb-3">
+        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-100 mb-1">
+          <i class="fa-solid fa-lightbulb"></i> Discovery & Inquiry
+        </div>
+        <h3 class="text-2xl font-display font-bold text-slate-900">คำถามนำเพื่อค้นพบ (Inquiry Questions)</h3>
+        <p class="text-slate-500 text-sm">ตั้งข้อสังเกตจากการทดลอง ปรับค่าในแบบจำลอง แล้วกดดูแนวคิดคำตอบ</p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        
+        <!-- Q1 -->
+        <div class="bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden flex flex-col">
+          <div class="p-5 flex-1">
+            <div class="flex items-start gap-3">
+              <span class="w-7 h-7 rounded-lg bg-brand-100 text-brand-700 font-bold text-sm flex items-center justify-center flex-shrink-0">1</span>
+              <div>
+                <h4 class="font-display font-bold text-slate-800 text-base">ขนาดของเมทริกซ์สองเมทริกซ์ต้องสัมพันธ์กันอย่างไรจึงคูณกันได้?</h4>
+                <p class="text-xs text-slate-500 mt-1">ทำไมจึงไม่จำเป็นที่เมทริกซ์ทั้งสองต้องมีมิติเท่ากันทุกประการเหมือนการบวก?</p>
+              </div>
+            </div>
+          </div>
+          <div class="px-5 pb-4">
+            <button onclick="toggleAnswer('ans-1')" class="w-full py-2.5 px-4 text-xs font-semibold text-brand-700 bg-brand-50 hover:bg-brand-100 rounded-xl transition flex items-center justify-between">
+              <span><i class="fa-solid fa-key mr-1.5"></i> ดูแนวคิดคำตอบ</span>
+              <i id="icon-ans-1" class="fa-solid fa-chevron-down text-xs transition-transform"></i>
+            </button>
+            <div id="ans-1" class="hidden mt-3 p-4 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-700 space-y-2 leading-relaxed">
+              <p>
+                <strong>เงื่อนไขหลัก:</strong> <strong>"จำนวนหลักของเมทริกซ์ตัวหน้าต้องเท่ากับจำนวนแถวของเมทริกซ์ตัวหลัง"</strong> กล่าวคือ หาก $A$ มีขนาด $m \times k$ แล้ว $B$ ต้องมีขนาด $k \times n$
+              </p>
+              <p class="text-slate-600">
+                <strong>เหตุผล:</strong> การคำนวณแต่ละเซลล์ใช้วิธีนำสมาชิกของแถวใน $A$ จับคู่คูณตัวต่อตัวกับสมาชิกของหลักใน $B$ ถ้าจำนวนสมาชิกในแนวนอนของ $A$ ไม่เท่ากับจำนวนสมาชิกในแนวตั้งของ $B$ จะมีตัวเลขที่ไม่มีคู่ให้จับคูณ ทำให้ไม่นิยามการคูณ
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Q2 -->
+        <div class="bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden flex flex-col">
+          <div class="p-5 flex-1">
+            <div class="flex items-start gap-3">
+              <span class="w-7 h-7 rounded-lg bg-brand-100 text-brand-700 font-bold text-sm flex items-center justify-center flex-shrink-0">2</span>
+              <div>
+                <h4 class="font-display font-bold text-slate-800 text-base">ผลคูณ $AB$ และ $BA$ มีขนาดเท่ากันเสมอหรือไม่?</h4>
+                <p class="text-xs text-slate-500 mt-1">ทดลองใช้ขนาด $2 \times 3$ กับ $3 \times 2$ ในห้องทดลอง</p>
+              </div>
+            </div>
+          </div>
+          <div class="px-5 pb-4">
+            <button onclick="toggleAnswer('ans-2')" class="w-full py-2.5 px-4 text-xs font-semibold text-brand-700 bg-brand-50 hover:bg-brand-100 rounded-xl transition flex items-center justify-between">
+              <span><i class="fa-solid fa-key mr-1.5"></i> ดูแนวคิดคำตอบ</span>
+              <i id="icon-ans-2" class="fa-solid fa-chevron-down text-xs transition-transform"></i>
+            </button>
+            <div id="ans-2" class="hidden mt-3 p-4 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-700 space-y-2 leading-relaxed">
+              <p class="font-bold text-rose-600">
+                <i class="fa-solid fa-xmark"></i> ไม่เท่ากันเสมอ!
+              </p>
+              <p class="text-slate-600">
+                <strong>ตัวอย่าง:</strong> ถ้า $A$ ขนาด $2 \times 3$ และ $B$ ขนาด $3 \times 2$:
+              </p>
+              <ul class="list-disc list-inside space-y-1 text-slate-600">
+                <li>$AB$ จะมีขนาด $(2 \times \mathbf{3}) \times (\mathbf{3} \times 2) \to \mathbf{2 \times 2}$</li>
+                <li>$BA$ จะมีขนาด $(3 \times \mathbf{2}) \times (\mathbf{2} \times 3) \to \mathbf{3 \times 3}$</li>
+              </ul>
+              <p class="text-slate-600">
+                เห็นได้ชัดว่า $AB$ มี 4 สมาชิก แต่ $BA$ มีถึง 9 สมาชิก ขนาดจึงไม่จำเป็นต้องเท่ากัน (ยกเว้นเมื่อทั้งสองเป็นเมทริกซ์จัตุรัสขนาดเท่ากันตั้งแต่แรก)
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Q3 -->
+        <div class="bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden flex flex-col">
+          <div class="p-5 flex-1">
+            <div class="flex items-start gap-3">
+              <span class="w-7 h-7 rounded-lg bg-brand-100 text-brand-700 font-bold text-sm flex items-center justify-center flex-shrink-0">3</span>
+              <div>
+                <h4 class="font-display font-bold text-slate-800 text-base">การคูณด้วยเมทริกซ์เอกลักษณ์ ($I$) เปลี่ยนเมทริกซ์เดิมหรือไม่?</h4>
+                <p class="text-xs text-slate-500 mt-1">เปรียบเทียบกับเอกลักษณ์การคูณของจำนวนจริง</p>
+              </div>
+            </div>
+          </div>
+          <div class="px-5 pb-4">
+            <button onclick="toggleAnswer('ans-3')" class="w-full py-2.5 px-4 text-xs font-semibold text-brand-700 bg-brand-50 hover:bg-brand-100 rounded-xl transition flex items-center justify-between">
+              <span><i class="fa-solid fa-key mr-1.5"></i> ดูแนวคิดคำตอบ</span>
+              <i id="icon-ans-3" class="fa-solid fa-chevron-down text-xs transition-transform"></i>
+            </button>
+            <div id="ans-3" class="hidden mt-3 p-4 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-700 space-y-2 leading-relaxed">
+              <p class="font-bold text-emerald-700">
+                <i class="fa-solid fa-circle-check"></i> ไม่เปลี่ยนค่าเดิม ($AI = IA = A$)
+              </p>
+              <p class="text-slate-600">
+                เมทริกซ์เอกลักษณ์ $I$ มีสมาชิกในแนวทแยงมุมหลักเป็น $1$ และสมาชิกตำแหน่งอื่นเป็น $0$ เมื่อนำไปคูณแบบแถวคูณหลัก สมาชิกตำแหน่ง $1$ จะไปดึงค่าเดิมออกมา ส่วนตำแหน่ง $0$ จะตัดสมาชิกอื่นทิ้ง ผลลัพธ์จึงยังคงเป็นเมทริกซ์เดิมเสมอ
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Q4 -->
+        <div class="bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden flex flex-col">
+          <div class="p-5 flex-1">
+            <div class="flex items-start gap-3">
+              <span class="w-7 h-7 rounded-lg bg-brand-100 text-brand-700 font-bold text-sm flex items-center justify-center flex-shrink-0">4</span>
+              <div>
+                <h4 class="font-display font-bold text-slate-800 text-base">มีกรณีใดบ้างที่ $AB = BA$ และพอสรุปว่าสลับที่ได้เสมอหรือไม่?</h4>
+                <p class="text-xs text-slate-500 mt-1">การมีตัวอย่างที่จริง 1 กรณี เพียงพอที่จะเป็นกฎทั่วไปหรือไม่?</p>
+              </div>
+            </div>
+          </div>
+          <div class="px-5 pb-4">
+            <button onclick="toggleAnswer('ans-4')" class="w-full py-2.5 px-4 text-xs font-semibold text-brand-700 bg-brand-50 hover:bg-brand-100 rounded-xl transition flex items-center justify-between">
+              <span><i class="fa-solid fa-key mr-1.5"></i> ดูแนวคิดคำตอบ</span>
+              <i id="icon-ans-4" class="fa-solid fa-chevron-down text-xs transition-transform"></i>
+            </button>
+            <div id="ans-4" class="hidden mt-3 p-4 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-700 space-y-2 leading-relaxed">
+              <p>
+                <strong>กรณีที่ $AB = BA$ เกิดขึ้นได้จริงในกรณีเฉพาะ เช่น:</strong>
+              </p>
+              <ul class="list-disc list-inside space-y-1 text-slate-600">
+                <li>เมื่อเมทริกซ์ตัวใดตัวหนึ่งคือเมทริกซ์เอกลักษณ์ ($I$) หรือเมทริกซ์ศูนย์ ($0$)</li>
+                <li>เมื่อ $B$ คือเมทริกซ์ผกผัน (Inverse) ของ $A$ ($AB = BA = I$)</li>
+                <li>เมื่อ $A$ และ $B$ เป็นเมทริกซ์ทแยงมุมที่มีมิติเท่ากัน</li>
+              </ul>
+              <p class="text-rose-700 font-bold pt-1">
+                แต่ไม่สามารถสรุปได้ว่าการคูณสลับที่ได้เสมอ!
+              </p>
+              <p class="text-slate-600">
+                ในหลักคณิตศาสตร์ หากมีกรณีขัดแย้ง (Counterexample) แม้แต่เพียงกรณีเดียว จะถือว่าสมบัตินั้น <strong>ไม่เป็นจริงทั่วไป</strong>
+              </p>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- 5. Student Practice Exercises -->
+    <section class="space-y-6">
+      <div class="border-b border-slate-200 pb-3 flex items-center justify-between">
+        <div>
+          <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold bg-purple-50 text-purple-700 border border-purple-100 mb-1">
+            <i class="fa-solid fa-pen-nib"></i> Practice & Application
+          </div>
+          <h3 class="text-2xl font-display font-bold text-slate-900">แบบฝึกหัดสำหรับนักศึกษา</h3>
+          <p class="text-slate-500 text-sm">ทดลองคำนวณด้วยตนเอง และใช้แบบจำลองด้านบนช่วยตรวจคำตอบ</p>
+        </div>
+      </div>
+
+      <div class="space-y-4">
+        
+        <!-- Exercise 1 -->
+        <div class="bg-white rounded-2xl border border-slate-200 shadow-xs p-6 space-y-4">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div class="space-y-1">
+              <span class="text-xs font-bold text-brand-600 uppercase">ข้อที่ 1 (การหาผลคูณพื้นฐาน)</span>
+              <h4 class="font-bold text-slate-900 text-base">
+                กำหนด $A = \begin{bmatrix} 1 & 2 \\ 3 & 1 \end{bmatrix}$ และ $B = \begin{bmatrix} 2 & 0 \\ -1 & 4 \end{bmatrix}$ จงหาผลคูณ $AB$ และ $BA$
+              </h4>
+            </div>
+            <button onclick="loadExercise1(); document.getElementById('simulator').scrollIntoView({behavior:'smooth'});"
+              class="self-start sm:self-auto px-3.5 py-1.5 bg-blue-50 hover:bg-blue-100 text-brand-700 border border-blue-200 rounded-xl text-xs font-semibold transition flex items-center gap-1.5 flex-shrink-0">
+              <i class="fa-solid fa-arrow-up-right-from-square"></i> โหลดเข้าห้องทดลอง
+            </button>
+          </div>
+
+          <div>
+            <button onclick="toggleAnswer('ex-ans-1')" class="text-xs font-semibold text-brand-600 hover:text-brand-800 flex items-center gap-1">
+              <span>แสดงเฉลยวิธีทำข้อ 1</span>
+              <i id="icon-ex-ans-1" class="fa-solid fa-chevron-down text-[10px] transition-transform"></i>
+            </button>
+            <div id="ex-ans-1" class="hidden mt-3 p-4 bg-slate-50 rounded-xl border border-slate-200 text-xs text-slate-700 space-y-3">
+              <div>
+                <strong>1. หา $AB$:</strong>
+                <div class="font-mono mt-1 text-slate-800 bg-white p-2.5 rounded border border-slate-200 text-center">
+                  $$AB = \begin{bmatrix} (1)(2) + (2)(-1) & (1)(0) + (2)(4) \\ (3)(2) + (1)(-1) & (3)(0) + (1)(4) \end{bmatrix} = \begin{bmatrix} 0 & 8 \\ 5 & 4 \end{bmatrix}$$
+                </div>
+              </div>
+              <div>
+                <strong>2. หา $BA$:</strong>
+                <div class="font-mono mt-1 text-slate-800 bg-white p-2.5 rounded border border-slate-200 text-center">
+                  $$BA = \begin{bmatrix} (2)(1) + (0)(3) & (2)(2) + (0)(1) \\ (-1)(1) + (4)(3) & (-1)(2) + (4)(1) \end{bmatrix} = \begin{bmatrix} 2 & 4 \\ 11 & 2 \end{bmatrix}$$
+                </div>
+              </div>
+              <p class="font-semibold text-rose-700">ข้อสังเกต: $AB \neq BA$ อย่างชัดเจนทั้งที่เป็นเมทริกซ์ขนาด $2 \times 2$ เท่ากัน</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Exercise 2 -->
+        <div class="bg-white rounded-2xl border border-slate-200 shadow-xs p-6 space-y-4">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div class="space-y-1">
+              <span class="text-xs font-bold text-brand-600 uppercase">ข้อที่ 2 (การคูณต่างมิติ)</span>
+              <h4 class="font-bold text-slate-900 text-base">
+                กำหนดเมทริกซ์ขนาด $2 \times 3$ และ $3 \times 2$ ด้วยตนเอง แล้วหาผลคูณทั้งสองลำดับ พร้อมระบุขนาดของผลลัพธ์
+              </h4>
+            </div>
+            <button onclick="loadExercise2(); document.getElementById('simulator').scrollIntoView({behavior:'smooth'});"
+              class="self-start sm:self-auto px-3.5 py-1.5 bg-blue-50 hover:bg-blue-100 text-brand-700 border border-blue-200 rounded-xl text-xs font-semibold transition flex items-center gap-1.5 flex-shrink-0">
+              <i class="fa-solid fa-arrow-up-right-from-square"></i> โหลดตัวอย่างเข้าห้องทดลอง
+            </button>
+          </div>
+
+          <div>
+            <button onclick="toggleAnswer('ex-ans-2')" class="text-xs font-semibold text-brand-600 hover:text-brand-800 flex items-center gap-1">
+              <span>แสดงตัวอย่างแนวคิดและคำตอบ</span>
+              <i id="icon-ex-ans-2" class="fa-solid fa-chevron-down text-[10px] transition-transform"></i>
+            </button>
+            <div id="ex-ans-2" class="hidden mt-3 p-4 bg-slate-50 rounded-xl border border-slate-200 text-xs text-slate-700 space-y-2">
+              <p><strong>ตัวอย่าง:</strong> ให้ $A = \begin{bmatrix} 1 & 2 & 3 \\ 4 & 5 & 6 \end{bmatrix}_{2 \times 3}$ และ $B = \begin{bmatrix} 1 & 0 \\ 0 & 1 \\ 1 & 1 \end{bmatrix}_{3 \times 2}$</p>
+              <div class="bg-white p-3 rounded border border-slate-200 font-mono text-center space-y-1">
+                <div>$AB$ จะได้ขนาด <strong>$2 \times 2$</strong>: $\begin{bmatrix} 4 & 5 \\ 10 & 11 \end{bmatrix}$</div>
+                <div>$BA$ จะได้ขนาด <strong>$3 \times 3$</strong>: $\begin{bmatrix} 1 & 2 & 3 \\ 4 & 5 & 6 \\ 5 & 7 & 9 \end{bmatrix}$</div>
+              </div>
+              <p><strong>สรุป:</strong> ผลคูณทั้งสองลำดับสามารถหาค่าได้ทั้งคู่ แต่มิติของผลลัพธ์ต่างกันโดยสิ้นเชิง ($2 \times 2 \neq 3 \times 3$)</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Exercise 3 -->
+        <div class="bg-white rounded-2xl border border-slate-200 shadow-xs p-6 space-y-4">
+          <div class="space-y-1">
+            <span class="text-xs font-bold text-brand-600 uppercase">ข้อที่ 3 (สมบัติการแจกแจง)</span>
+            <h4 class="font-bold text-slate-900 text-base">
+              ตรวจสอบสมบัติ $A(B + C) = AB + AC$ ด้วยตัวอย่างที่สร้างเอง
+            </h4>
+          </div>
+
+          <div>
+            <button onclick="toggleAnswer('ex-ans-3')" class="text-xs font-semibold text-brand-600 hover:text-brand-800 flex items-center gap-1">
+              <span>แสดงตัวอย่างการตรวจสอบ</span>
+              <i id="icon-ex-ans-3" class="fa-solid fa-chevron-down text-[10px] transition-transform"></i>
+            </button>
+            <div id="ex-ans-3" class="hidden mt-3 p-4 bg-slate-50 rounded-xl border border-slate-200 text-xs text-slate-700 space-y-2">
+              <p>กำหนด $A = \begin{bmatrix} 1 & 0 \\ 2 & 1 \end{bmatrix}, B = \begin{bmatrix} 2 & 1 \\ 0 & 1 \end{bmatrix}, C = \begin{bmatrix} 1 & 1 \\ 3 & 0 \end{bmatrix}$</p>
+              <ul class="list-disc list-inside space-y-1 text-slate-600">
+                <li>ฝั่งซ้าย: $B + C = \begin{bmatrix} 3 & 2 \\ 3 & 1 \end{bmatrix} \implies A(B+C) = \begin{bmatrix} 3 & 2 \\ 9 & 5 \end{bmatrix}$</li>
+                <li>ฝั่งขวา: $AB = \begin{bmatrix} 2 & 1 \\ 4 & 3 \end{bmatrix}$ และ $AC = \begin{bmatrix} 1 & 1 \\ 5 & 2 \end{bmatrix} \implies AB + AC = \begin{bmatrix} 3 & 2 \\ 9 & 5 \end{bmatrix}$</li>
+              </ul>
+              <p class="font-semibold text-emerald-700">ผลลัพธ์ทั้งสองฝั่งเท่ากันทุกประการ ยืนยันว่าสมบัติการแจกแจงเป็นจริง</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Exercise 4 -->
+        <div class="bg-white rounded-2xl border border-slate-200 shadow-xs p-6 space-y-4">
+          <div class="space-y-1">
+            <span class="text-xs font-bold text-brand-600 uppercase">ข้อที่ 4 (การสังเคราะห์ข้อสรุป)</span>
+            <h4 class="font-bold text-slate-900 text-base">
+              เขียนข้อสรุปเกี่ยวกับเงื่อนไขและสมบัติของการคูณเมทริกซ์ โดยใช้ผลจากแบบจำลองเป็นหลักฐาน
+            </h4>
+          </div>
+
+          <div>
+            <button onclick="toggleAnswer('ex-ans-4')" class="text-xs font-semibold text-brand-600 hover:text-brand-800 flex items-center gap-1">
+              <span>แสดงโครงสร้างแนวทางการเขียนข้อสรุป</span>
+              <i id="icon-ex-ans-4" class="fa-solid fa-chevron-down text-[10px] transition-transform"></i>
+            </button>
+            <div id="ex-ans-4" class="hidden mt-3 p-4 bg-slate-50 rounded-xl border border-slate-200 text-xs text-slate-700 space-y-2">
+              <p class="font-semibold text-slate-900">ประเด็นสำคัญที่ควรระบุในข้อสรุป:</p>
+              <ol class="list-decimal list-inside space-y-1.5 text-slate-600">
+                <li><strong>เงื่อนไขมิติ:</strong> จะคูณกันได้เมื่อหลักของตัวหน้าเท่ากับแถวของตัวหลังเสมอ โดยขนาดผลลัพธ์จะเป็น (แถวตัวหน้า &times; หลักตัวหลัง)</li>
+                <li><strong>หลักการคูณ:</strong> เป็นแบบ Dot product แถวคูณหลัก ไม่ใช่การคูณสมาชิกตำแหน่งเดียวกันเหมือนการบวก</li>
+                <li><strong>การสลับที่:</strong> โดยทั่วไป $AB \neq BA$ เนื่องจากมิติอาจไม่เข้ากัน หรือผลคูณแถวกับหลักสลับทิศทาง</li>
+                <li><strong>เอกลักษณ์:</strong> $I$ ทำหน้าที่เสมือนเลข 1 โดยคงค่าเดิม และ $\mathbf{0}$ ทำหน้าที่เสมือนเลข 0</li>
+              </ol>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Interactive Logic Script -->
+  <script>
+    // State management
+    let state = {
+      m: 2, // Rows of A
+      k: 2, // Cols of A / Rows of B
+      n: 2, // Cols of B
+      isReversed: false, // If true, calculating B * A instead
+      matrixA: [
+        [1, 2],
+        [3, 1]
+      ],
+      matrixB: [
+        [2, 0],
+        [-1, 4]
+      ],
+      selectedCell: { r: 0, c: 0 } // highlighted result cell
+    };
+
+    // Tab Navigation for lessons
+    function switchTab(tabId) {
+      document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+      document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.classList.remove('bg-brand-600', 'text-white', 'shadow-sm');
+        btn.classList.add('bg-slate-100', 'text-slate-600');
+      });
+
+      const targetTab = document.getElementById(tabId);
+      const targetBtn = document.getElementById('btn-' + tabId);
+      if (targetTab) targetTab.classList.remove('hidden');
+      if (targetBtn) {
+        targetBtn.classList.add('bg-brand-600', 'text-white', 'shadow-sm');
+        targetBtn.classList.remove('bg-slate-100', 'text-slate-600');
+      }
+
+      if (window.renderMathInElement) {
+        renderMathInElement(targetTab, {
+          delimiters: [{left: '$$', right: '$$', display: true}, {left: '$', right: '$', display: false}]
+        });
+      }
+    }
+
+    // Toggle discovery / exercise accordions
+    function toggleAnswer(id) {
+      const el = document.getElementById(id);
+      const icon = document.getElementById('icon-' + id);
+      if (!el) return;
+      if (el.classList.contains('hidden')) {
+        el.classList.remove('hidden');
+        if (icon) icon.classList.add('rotate-180');
+        if (window.renderMathInElement) {
+          renderMathInElement(el, {
+            delimiters: [{left: '$$', right: '$$', display: true}, {left: '$', right: '$', display: false}]
+          });
+        }
+      } else {
+        el.classList.add('hidden');
+        if (icon) icon.classList.remove('rotate-180');
+      }
+    }
+
+    // Dimension Sliders Handler
+    function updateDimensions() {
+      state.m = parseInt(document.getElementById('slider-m').value, 10);
+      state.k = parseInt(document.getElementById('slider-k').value, 10);
+      state.n = parseInt(document.getElementById('slider-n').value, 10);
+
+      document.getElementById('label-m').innerText = state.m;
+      document.getElementById('label-k').innerText = state.k;
+      document.getElementById('label-n').innerText = state.n;
+
+      // Resize A (m x k) and B (k x n)
+      state.matrixA = resizeMatrix(state.matrixA, state.m, state.k);
+      state.matrixB = resizeMatrix(state.matrixB, state.k, state.n);
+
+      // Reset selected cell within bound
+      state.selectedCell = { r: 0, c: 0 };
+
+      renderSimulator();
+    }
+
+    function applyDimPreset(m, k, n) {
+      document.getElementById('slider-m').value = m;
+      document.getElementById('slider-k').value = k;
+      document.getElementById('slider-n').value = n;
+      state.isReversed = false;
+      updateSwapButtonUI();
+      updateDimensions();
+    }
+
+    function resizeMatrix(mat, targetRows, targetCols) {
+      const res = [];
+      for (let r = 0; r < targetRows; r++) {
+        const row = [];
+        for (let c = 0; c < targetCols; c++) {
+          if (mat && mat[r] && mat[r][c] !== undefined) {
+            row.push(mat[r][c]);
+          } else {
+            row.push(Math.floor(Math.random() * 9) - 3);
+          }
+        }
+        res.push(row);
+      }
+      return res;
+    }
+
+    // Toggle Multiplicaton Order: A * B <-> B * A
+    function toggleOrder() {
+      // To multiply B * A, B is (k x n) and A is (m x k)
+      // For B * A to be valid, inner dimension of B (n) must equal rows of A (m)
+      if (state.matrixB[0].length !== state.matrixA.length) {
+        // Automatically reconcile dimensions if square or provide feedback
+        const temp = state.m;
+        state.m = state.n;
+        state.n = temp;
+        document.getElementById('slider-m').value = state.m;
+        document.getElementById('slider-n').value = state.n;
+        document.getElementById('label-m').innerText = state.m;
+        document.getElementById('label-n').innerText = state.n;
+      }
+
+      state.isReversed = !state.isReversed;
+      updateSwapButtonUI();
+      renderSimulator();
+    }
+
+    function updateSwapButtonUI() {
+      const btn = document.getElementById('btn-swap-order');
+      if (state.isReversed) {
+        btn.innerHTML = '<i class="fa-solid fa-repeat"></i> สลับกลับเป็น A &times; B';
+        btn.classList.add('bg-amber-100', 'text-amber-800', 'border-amber-300');
+        btn.classList.remove('bg-brand-50', 'text-brand-700', 'border-brand-200');
+      } else {
+        btn.innerHTML = '<i class="fa-solid fa-repeat"></i> สลับลำดับเป็น B &times; A';
+        btn.classList.remove('bg-amber-100', 'text-amber-800', 'border-amber-300');
+        btn.classList.add('bg-brand-50', 'text-brand-700', 'border-brand-200');
+      }
+    }
+
+    function randomizeMatrices() {
+      const rA = state.matrixA.length;
+      const cA = state.matrixA[0].length;
+      const rB = state.matrixB.length;
+      const cB = state.matrixB[0].length;
+
+      for (let r = 0; r < rA; r++) {
+        for (let c = 0; c < cA; c++) {
+          state.matrixA[r][c] = Math.floor(Math.random() * 11) - 4;
+        }
+      }
+      for (let r = 0; r < rB; r++) {
+        for (let c = 0; c < cB; c++) {
+          state.matrixB[r][c] = Math.floor(Math.random() * 11) - 4;
+        }
+      }
+      renderSimulator();
+    }
+
+    function loadExercise1() {
+      state.isReversed = false;
+      updateSwapButtonUI();
+      applyDimPreset(2, 2, 2);
+      state.matrixA = [
+        [1, 2],
+        [3, 1]
+      ];
+      state.matrixB = [
+        [2, 0],
+        [-1, 4]
+      ];
+      renderSimulator();
+    }
+
+    function loadExercise2() {
+      state.isReversed = false;
+      updateSwapButtonUI();
+      applyDimPreset(2, 3, 2);
+      state.matrixA = [
+        [1, 2, 3],
+        [4, 5, 6]
+      ];
+      state.matrixB = [
+        [1, 0],
+        [0, 1],
+        [1, 1]
+      ];
+      renderSimulator();
+    }
+
+    function onCellEdit(matType, r, c, val) {
+      let num = parseFloat(val);
+      if (isNaN(num)) num = 0;
+      if (matType === 'A') state.matrixA[r][c] = num;
+      if (matType === 'B') state.matrixB[r][c] = num;
+      renderSimulator(true); // skip re-rendering input elements to avoid losing focus
+    }
+
+    // Calculate Matrix Multiplication: M1 x M2
+    function multiply(M1, M2) {
+      const rows1 = M1.length;
+      const cols1 = M1[0].length;
+      const rows2 = M2.length;
+      const cols2 = M2[0].length;
+
+      if (cols1 !== rows2) return null; // Incompatible
+
+      const result = [];
+      for (let i = 0; i < rows1; i++) {
+        const row = [];
+        for (let j = 0; j < cols2; j++) {
+          let sum = 0;
+          const terms = [];
+          for (let k = 0; k < cols1; k++) {
+            const v1 = M1[i][k];
+            const v2 = M2[k][j];
+            sum += v1 * v2;
+            terms.push({ v1, v2, prod: v1 * v2 });
+          }
+          row.push({ sum, terms });
+        }
+        result.push(row);
+      }
+      return result;
+    }
+
+    // Main Render Function
+    function renderSimulator(skipInputs = false) {
+      // Determine Left & Right matrix based on order
+      const leftMat = state.isReversed ? state.matrixB : state.matrixA;
+      const rightMat = state.isReversed ? state.matrixA : state.matrixB;
+      const leftName = state.isReversed ? 'B' : 'A';
+      const rightName = state.isReversed ? 'A' : 'B';
+
+      const rows1 = leftMat.length;
+      const cols1 = leftMat[0].length;
+      const rows2 = rightMat.length;
+      const cols2 = rightMat[0].length;
+
+      const titleMat1 = document.getElementById('title-mat-1');
+      const titleMat2 = document.getElementById('title-mat-2');
+      const titleMatResult = document.getElementById('title-mat-result');
+      const statusBadge = document.getElementById('dim-status-badge');
+
+      titleMat1.innerHTML = `<span class="w-2.5 h-2.5 rounded-full bg-blue-500"></span> เมทริกซ์ ${leftName} (${rows1} &times; ${cols1})`;
+      titleMat2.innerHTML = `<span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span> เมทริกซ์ ${rightName} (${rows2} &times; ${cols2})`;
+
+      // Compatibility Check
+      const canMultiply = (cols1 === rows2);
+
+      if (!canMultiply) {
+        statusBadge.className = 'px-3 py-1 rounded-full text-xs font-bold bg-rose-100 text-rose-800 flex items-center gap-1.5';
+        statusBadge.innerHTML = `<i class="fa-solid fa-triangle-exclamation"></i> ไม่สามารถคูณกันได้: หลักของ ${leftName} (${cols1}) &ne; แถวของ ${rightName} (${rows2})`;
+        document.getElementById('grid-mat-result').innerHTML = `<div class="p-6 text-xs text-rose-600 font-bold text-center">ไม่นิยามผลคูณ (Undefined)<br>เนื่องจากมิติด้านในไม่เท่ากัน</div>`;
+        document.getElementById('step-formula').innerText = 'ไม่สามารถคำนวณผลคูณได้';
+        document.getElementById('step-explanation').innerText = `หลักของ ${leftName} มี ${cols1} ตัว แต่แถวของ ${rightName} มี ${rows2} ตัว สมาชิกไม่สามารถจับคู่กันได้พอดี`;
+        return;
+      }
+
+      statusBadge.className = 'px-3 py-1 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800 flex items-center gap-1.5';
+      statusBadge.innerHTML = `<i class="fa-solid fa-circle-check"></i> คูณกันได้: ขนาดผลลัพธ์ ${rows1} &times; ${cols2}`;
+      titleMatResult.innerHTML = `<span class="w-2.5 h-2.5 rounded-full bg-purple-500"></span> ผลลัพธ์ ${leftName}${rightName} (${rows1} &times; ${cols2})`;
+
+      // Compute Result
+      const resultMat = multiply(leftMat, rightMat);
+
+      // Render Matrix Grids
+      if (!skipInputs) {
+        renderInputGrid('grid-mat-1', leftMat, leftName, rows1, cols1);
+        renderInputGrid('grid-mat-2', rightMat, rightName, rows2, cols2);
+      }
+
+      // Check selected bounds
+      if (state.selectedCell.r >= rows1) state.selectedCell.r = 0;
+      if (state.selectedCell.c >= cols2) state.selectedCell.c = 0;
+
+      renderResultGrid(resultMat, rows1, cols2);
+      highlightActiveElements();
+      updateCalculationStepBox(resultMat, leftName, rightName);
+    }
+
+    function renderInputGrid(containerId, data, matType, rCount, cCount) {
+      const container = document.getElementById(containerId);
+      container.innerHTML = '';
+      container.style.gridTemplateColumns = `repeat(${cCount}, minmax(0, 1fr))`;
+
+      const colorClasses = matType === 'A' 
+        ? 'border-blue-200 text-blue-900 focus:border-blue-500' 
+        : 'border-emerald-200 text-emerald-900 focus:border-emerald-500';
+
+      for (let r = 0; r < rCount; r++) {
+        for (let c = 0; c < cCount; c++) {
+          const wrapper = document.createElement('div');
+          wrapper.className = 'relative flex flex-col items-center';
+
+          const tag = document.createElement('span');
+          tag.className = 'text-[9px] text-slate-400 font-mono mb-0.5';
+          tag.innerHTML = `${matType.toLowerCase()}<sub>${r+1}${c+1}</sub>`;
+
+          const input = document.createElement('input');
+          input.id = `input-${matType}-${r}-${c}`;
+          input.type = 'number';
+          input.value = data[r][c];
+          input.className = `mat-cell-${matType} w-10 h-10 sm:w-12 sm:h-11 text-center font-mono font-bold text-sm bg-white rounded-lg border shadow-2xs focus:outline-none transition ${colorClasses}`;
+          input.addEventListener('input', (e) => onCellEdit(matType, r, c, e.target.value));
+
+          wrapper.appendChild(tag);
+          wrapper.appendChild(input);
+          container.appendChild(wrapper);
+        }
+      }
+    }
+
+    function renderResultGrid(resultMat, rCount, cCount) {
+      const container = document.getElementById('grid-mat-result');
+      container.innerHTML = '';
+      container.style.gridTemplateColumns = `repeat(${cCount}, minmax(0, 1fr))`;
+
+      for (let r = 0; r < rCount; r++) {
+        for (let c = 0; c < cCount; c++) {
+          const cellData = resultMat[r][c];
+          const wrapper = document.createElement('div');
+          wrapper.className = 'relative flex flex-col items-center';
+
+          const tag = document.createElement('span');
+          tag.className = 'text-[9px] text-purple-400 font-mono mb-0.5';
+          tag.innerHTML = `c<sub>${r+1}${c+1}</sub>`;
+
+          const cell = document.createElement('button');
+          cell.id = `res-cell-${r}-${c}`;
+          cell.className = 'w-10 h-10 sm:w-12 sm:h-11 flex items-center justify-center font-mono font-bold text-sm rounded-lg shadow-xs transition duration-150 cursor-pointer';
+          cell.innerText = cellData.sum;
+
+          // Event triggers for live inspector
+          cell.addEventListener('click', () => {
+            state.selectedCell = { r, c };
+            highlightActiveElements();
+            updateCalculationStepBox(resultMat, state.isReversed ? 'B' : 'A', state.isReversed ? 'A' : 'B');
+          });
+          cell.addEventListener('mouseenter', () => {
+            state.selectedCell = { r, c };
+            highlightActiveElements();
+            updateCalculationStepBox(resultMat, state.isReversed ? 'B' : 'A', state.isReversed ? 'A' : 'B');
+          });
+
+          wrapper.appendChild(tag);
+          wrapper.appendChild(cell);
+          container.appendChild(wrapper);
+        }
+      }
+    }
+
+    // Visual highlighting of Row i and Column j
+    function highlightActiveElements() {
+      const selR = state.selectedCell.r;
+      const selC = state.selectedCell.c;
+
+      const leftName = state.isReversed ? 'B' : 'A';
+      const rightName = state.isReversed ? 'A' : 'B';
+
+      // 1. Reset all inputs
+      document.querySelectorAll(`.mat-cell-${leftName}`).forEach(el => {
+        el.classList.remove('bg-blue-100', 'ring-2', 'ring-blue-500', 'border-blue-500');
+      });
+      document.querySelectorAll(`.mat-cell-${rightName}`).forEach(el => {
+        el.classList.remove('bg-emerald-100', 'ring-2', 'ring-emerald-500', 'border-emerald-500');
+      });
+
+      // 2. Highlight Row selR of Left Matrix
+      const cols1 = state.isReversed ? state.matrixB[0].length : state.matrixA[0].length;
+      for (let c = 0; c < cols1; c++) {
+        const el = document.getElementById(`input-${leftName}-${selR}-${c}`);
+        if (el) el.classList.add('bg-blue-100', 'ring-2', 'ring-blue-500', 'border-blue-500');
+      }
+
+      // 3. Highlight Column selC of Right Matrix
+      const rows2 = state.isReversed ? state.matrixA.length : state.matrixB.length;
+      for (let r = 0; r < rows2; r++) {
+        const el = document.getElementById(`input-${rightName}-${r}-${selC}`);
+        if (el) el.classList.add('bg-emerald-100', 'ring-2', 'ring-emerald-500', 'border-emerald-500');
+      }
+
+      // 4. Highlight Selected Cell in Result Matrix
+      document.querySelectorAll('#grid-mat-result button').forEach(b => {
+        b.className = 'w-10 h-10 sm:w-12 sm:h-11 flex items-center justify-center font-mono font-bold text-sm rounded-lg shadow-xs transition duration-150 cursor-pointer bg-white text-purple-900 border border-purple-200 hover:bg-purple-100';
+      });
+      const activeCell = document.getElementById(`res-cell-${selR}-${selC}`);
+      if (activeCell) {
+        activeCell.className = 'w-10 h-10 sm:w-12 sm:h-11 flex items-center justify-center font-mono font-bold text-sm rounded-lg shadow-md transition duration-150 cursor-pointer bg-purple-600 text-white ring-2 ring-purple-400 scale-105';
+      }
+    }
+
+    // Update Step Explanation Breakdown box
+    function updateCalculationStepBox(resultMat, leftName, rightName) {
+      const selR = state.selectedCell.r;
+      const selC = state.selectedCell.c;
+      const cellData = resultMat[selR][selC];
+
+      const titleEl = document.getElementById('step-title');
+      const formulaEl = document.getElementById('step-formula');
+      const expEl = document.getElementById('step-explanation');
+
+      titleEl.innerHTML = `ขั้นตอนการหาผลคูณตำแหน่ง <span class="text-purple-300 font-mono font-bold">c<sub>${selR+1}${selC+1}</sub></span> (แถวที่ ${selR+1} ของ ${leftName} &times; หลักที่ ${selC+1} ของ ${rightName})`;
+
+      // Build step formula: (a1 * b1) + (a2 * b2) = sum
+      const formulaParts = cellData.terms.map(t => {
+        const v1Str = t.v1 < 0 ? `(${t.v1})` : t.v1;
+        const v2Str = t.v2 < 0 ? `(${t.v2})` : t.v2;
+        return `[${v1Str} &times; ${v2Str}]`;
+      });
+
+      const prodParts = cellData.terms.map(t => t.prod < 0 ? `(${t.prod})` : `${t.prod}`);
+
+      formulaEl.innerHTML = `c<sub>${selR+1}${selC+1}</sub> = ${formulaParts.join(' + ')} = ${prodParts.join(' + ')} = <span class="text-white underline font-extrabold">${cellData.sum}</span>`;
+
+      expEl.innerHTML = `นำสมาชิกแนวนอนในแถวที่ ${selR+1} ของ <strong>${leftName}</strong> คูณจับคู่กับสมาชิกแนวตั้งในหลักที่ ${selC+1} ของ <strong>${rightName}</strong> ตามลำดับทีละตัว แล้วนำผลลัพธ์ย่อยทั้งหมดมารวมกัน`;
+    }
+
+    // Side-by-side comparison AB vs BA
+    function compareBothOrders() {
+      const box = document.getElementById('side-by-side-box');
+      const content = document.getElementById('side-by-side-content');
+      box.classList.remove('hidden');
+
+      const matAB = multiply(state.matrixA, state.matrixB);
+      const matBA = multiply(state.matrixB, state.matrixA);
+
+      let htmlAB = '';
+      if (matAB) {
+        const r = matAB.length;
+        const c = matAB[0].length;
+        const rowsStr = matAB.map(row => row.map(cell => cell.sum).join(' & ')).join(' \\\\ ');
+        htmlAB = `
+          <div class="p-4 bg-blue-50/50 rounded-xl border border-blue-200 space-y-2">
+            <div class="flex justify-between items-center text-xs font-bold text-blue-900">
+              <span>ผลคูณ A &times; B</span>
+              <span class="font-mono bg-white px-2 py-0.5 rounded border border-blue-100">${r} &times; ${c}</span>
+            </div>
+            <div class="font-mono text-center text-slate-800 text-sm py-2">
+              $$\\begin{bmatrix} ${rowsStr} \\end{bmatrix}$$
+            </div>
+          </div>
+        `;
+      } else {
+        htmlAB = `
+          <div class="p-4 bg-rose-50 rounded-xl border border-rose-200 text-rose-700 text-xs">
+            <strong>A &times; B:</strong> ไม่สามารถคูณกันได้ (มิติด้านในไม่สอดคล้อง)
+          </div>
+        `;
+      }
+
+      let htmlBA = '';
+      if (matBA) {
+        const r = matBA.length;
+        const c = matBA[0].length;
+        const rowsStr = matBA.map(row => row.map(cell => cell.sum).join(' & ')).join(' \\\\ ');
+        htmlBA = `
+          <div class="p-4 bg-emerald-50/50 rounded-xl border border-emerald-200 space-y-2">
+            <div class="flex justify-between items-center text-xs font-bold text-emerald-900">
+              <span>ผลคูณ B &times; A</span>
+              <span class="font-mono bg-white px-2 py-0.5 rounded border border-emerald-100">${r} &times; ${c}</span>
+            </div>
+            <div class="font-mono text-center text-slate-800 text-sm py-2">
+              $$\\begin{bmatrix} ${rowsStr} \\end{bmatrix}$$
+            </div>
+          </div>
+        `;
+      } else {
+        htmlBA = `
+          <div class="p-4 bg-rose-50 rounded-xl border border-rose-200 text-rose-700 text-xs">
+            <strong>B &times; A:</strong> ไม่สามารถคูณกันได้ (มิติด้านในไม่สอดคล้อง)
+          </div>
+        `;
+      }
+
+      content.innerHTML = htmlAB + htmlBA;
+
+      if (window.renderMathInElement) {
+        renderMathInElement(content, {
+          delimiters: [{left: '$$', right: '$$', display: true}, {left: '$', right: '$', display: false}]
+        });
+      }
+    }
+
+    // Initialize application
+    window.onload = function() {
+      renderSimulator();
+    };
+  </script>
+</body>
+</html>

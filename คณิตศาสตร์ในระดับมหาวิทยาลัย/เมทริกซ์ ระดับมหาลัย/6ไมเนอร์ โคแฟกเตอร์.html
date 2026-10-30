@@ -1,0 +1,1183 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ไมเนอร์ โคแฟกเตอร์ และการขยายดีเทอร์มิแนนต์</title>
+  
+  <!-- Google Fonts: Sarabun & Prompt -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@400;500;600;700&family=Sarabun:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+  
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Sarabun', 'sans-serif'],
+            heading: ['Prompt', 'sans-serif'],
+          },
+          colors: {
+            brand: {
+              50: '#eef2ff',
+              100: '#e0e7ff',
+              200: '#c7d2fe',
+              500: '#6366f1',
+              600: '#4f46e5',
+              700: '#4338ca',
+              900: '#312e81',
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- MathJax for rendering LaTeX mathematical equations -->
+  <script>
+    window.MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']],
+        displayMath: [['$$', '$$'], ['\\[', '\\]']]
+      },
+      svg: {
+        fontCache: 'global'
+      }
+    };
+  </script>
+  <script type="text/javascript" id="MathJax-script" async
+    src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+  </script>
+
+  <style>
+    /* Custom styling for matrix visual crossing */
+    .crossed-cell {
+      position: relative;
+      background-color: #f1f5f9 !important;
+      opacity: 0.45;
+      text-decoration: line-through;
+      color: #94a3b8 !important;
+    }
+    .selected-pivot {
+      outline: 3px solid #4f46e5 !important;
+      outline-offset: 2px;
+      background-color: #e0e7ff !important;
+      font-weight: 700 !important;
+      color: #4338ca !important;
+      transform: scale(1.05);
+      z-index: 10;
+    }
+    .kept-cell {
+      background-color: #ecfdf5 !important;
+      border-color: #10b981 !important;
+      color: #065f46 !important;
+      font-weight: 600;
+    }
+    input[type=number]::-webkit-inner-spin-button, 
+    input[type=number]::-webkit-outer-spin-button { 
+      -webkit-appearance: none; 
+      margin: 0; 
+    }
+    input[type=number] {
+      -moz-appearance: textfield;
+    }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-800 font-sans antialiased selection:bg-indigo-100 selection:text-indigo-900 min-h-screen">
+
+  <!-- Main Container: max-w-6xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 -->
+  <main class="max-w-6xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 space-y-10">
+
+    <!-- Header & Hero Section -->
+    <header class="bg-gradient-to-r from-indigo-900 via-indigo-800 to-slate-900 text-white rounded-3xl p-6 sm:p-10 shadow-xl border border-indigo-700/30 relative overflow-hidden">
+      <div class="absolute -right-16 -top-16 w-64 h-64 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none"></div>
+      <div class="max-w-3xl relative z-10 space-y-3">
+        <h1 class="text-2xl sm:text-3xl lg:text-4xl font-heading font-bold tracking-tight text-white leading-tight">
+          ไมเนอร์ โคแฟกเตอร์ <br class="hidden sm:inline"/>และการขยายดีเทอร์มิแนนต์
+        </h1>
+        <p class="text-slate-300 text-sm sm:text-base leading-relaxed pt-1">
+          เรียนรู้แนวคิดพื้นฐานการหาดีเทอร์มิแนนต์ด้วยการขยายลาปลาส (Laplace Expansion) พร้อมเครื่องคิดเลขจำลองโต้ตอบ 
+          สัมผัสวิธีตัดแถว-หลัก และสังเกตเทคนิคการเลือกเลขศูนย์เพื่อคำนวณได้เร็วขึ้น
+        </p>
+      </div>
+
+      <!-- วัตถุประสงค์การเรียนรู้ -->
+      <div class="mt-8 pt-6 border-t border-indigo-700/40 grid grid-cols-1 md:grid-cols-3 gap-4 text-xs sm:text-sm text-indigo-100">
+        <div class="flex items-start gap-3 bg-white/5 p-3.5 rounded-xl border border-white/10 backdrop-blur-sm">
+          <span class="flex-shrink-0 w-6 h-6 rounded-full bg-emerald-500/20 text-emerald-300 flex items-center justify-center font-bold text-xs">1</span>
+          <span>หาค่า<strong>ไมเนอร์ ($M_{ij}$)</strong> และ<strong>โคแฟกเตอร์ ($C_{ij}$)</strong> ของสมาชิกในเมทริกซ์ได้อย่างถูกต้อง</span>
+        </div>
+        <div class="flex items-start gap-3 bg-white/5 p-3.5 rounded-xl border border-white/10 backdrop-blur-sm">
+          <span class="flex-shrink-0 w-6 h-6 rounded-full bg-emerald-500/20 text-emerald-300 flex items-center justify-center font-bold text-xs">2</span>
+          <span><strong>ขยายดีเทอร์มิแนนต์</strong>ตามแถวหรือหลักใดก็ได้ และได้ผลลัพธ์สุดท้ายที่เท่าเทียมกันเสมอ</span>
+        </div>
+        <div class="flex items-start gap-3 bg-white/5 p-3.5 rounded-xl border border-white/10 backdrop-blur-sm">
+          <span class="flex-shrink-0 w-6 h-6 rounded-full bg-emerald-500/20 text-emerald-300 flex items-center justify-center font-bold text-xs">3</span>
+          <span>อธิบายความสัมพันธ์ระหว่าง<strong>ตำแหน่งสมาชิกกับเครื่องหมาย</strong> และเลือกแถว/หลักที่มีศูนย์เพื่อลดทอนขั้นตอน</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- เนื้อหาทฤษฎี (Theory & Concepts) -->
+    <section class="space-y-6">
+      <div class="border-b border-slate-200 pb-3 flex items-center justify-between">
+        <h2 class="text-xl sm:text-2xl font-heading font-bold text-slate-900 flex items-center gap-2">
+          <span class="w-2.5 h-6 bg-indigo-600 rounded-full inline-block"></span>
+          สรุปเนื้อหาและทฤษฎีสำคัญ
+        </h2>
+        <span class="text-xs text-slate-500 hidden sm:inline">ทฤษฎีบทการกระจายโคแฟกเตอร์ (Laplace Expansion)</span>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        
+        <!-- ไมเนอร์ และ โคแฟกเตอร์ -->
+        <article class="bg-white p-5 sm:p-6 rounded-2xl shadow-sm border border-slate-200 flex flex-col justify-between">
+          <div>
+            <div class="w-10 h-10 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center font-bold mb-4">
+              M & C
+            </div>
+            <h3 class="text-lg font-heading font-semibold text-slate-800 mb-2">1. ไมเนอร์ และ โคแฟกเตอร์</h3>
+            <p class="text-sm text-slate-600 leading-relaxed mb-4">
+              กำหนดให้ $A$ เป็นเมทริกซ์จัตุรัสขนาด $n \times n$:
+            </p>
+            <ul class="text-xs sm:text-sm text-slate-600 space-y-3">
+              <li class="bg-slate-50 p-3 rounded-xl border border-slate-100">
+                <span class="font-bold text-indigo-700 block mb-1">ไมเนอร์ ($M_{ij}$)</span>
+                คือ ดีเทอร์มิแนนต์ของเมทริกซ์ย่อยขนาด $(n-1)\times(n-1)$ ที่ได้จากการ<strong>ตัดแถวที่ $i$ และหลักที่ $j$</strong> ทิ้ง
+              </li>
+              <li class="bg-indigo-50/50 p-3 rounded-xl border border-indigo-100">
+                <span class="font-bold text-indigo-700 block mb-1">โคแฟกเตอร์ ($C_{ij}$)</span>
+                คือ ไมเนอร์ที่ถูกคูณด้วยน้ำหนักเครื่องหมายตามดัชนีตำแหน่ง:
+                <div class="my-2 text-center text-sm font-medium text-indigo-900">
+                  $$C_{ij} = (-1)^{i+j} M_{ij}$$
+                </div>
+              </li>
+            </ul>
+          </div>
+        </article>
+
+        <!-- รูปแบบเครื่องหมายของโคแฟกเตอร์ -->
+        <article class="bg-white p-5 sm:p-6 rounded-2xl shadow-sm border border-slate-200 flex flex-col justify-between">
+          <div>
+            <div class="w-10 h-10 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center font-bold mb-4">
+              &plusmn;
+            </div>
+            <h3 class="text-lg font-heading font-semibold text-slate-800 mb-2">2. รูปแบบเครื่องหมายโคแฟกเตอร์</h3>
+            <p class="text-sm text-slate-600 leading-relaxed mb-3">
+              พจน์ $(-1)^{i+j}$ ทำให้เกิดเครื่องหมายสลับกันเป็นรูปแบบ <strong>"ตารางหมากรุก" (Checkerboard Pattern)</strong> โดยตำแหน่งมุมซ้ายบน $(1,1)$ จะเริ่มต้นเป็นบวกเสมอ:
+            </p>
+            
+            <div class="grid grid-cols-2 gap-3 text-center my-3">
+              <div class="bg-slate-50 p-2.5 rounded-xl border border-slate-100">
+                <span class="text-xs text-slate-500 font-semibold block mb-1">ขนาด $3\times3$</span>
+                <span class="font-mono text-sm tracking-wider font-bold text-slate-700">
+                  $\begin{bmatrix} + & - & + \\ - & + & - \\ + & - & + \end{bmatrix}$
+                </span>
+              </div>
+              <div class="bg-slate-50 p-2.5 rounded-xl border border-slate-100">
+                <span class="text-xs text-slate-500 font-semibold block mb-1">ขนาด $4\times4$</span>
+                <span class="font-mono text-xs tracking-wider font-bold text-slate-700">
+                  $\begin{bmatrix} + & - & + & - \\ - & + & - & + \\ + & - & + & - \\ - & + & - & + \end{bmatrix}$
+                </span>
+              </div>
+            </div>
+          </div>
+          <p class="text-xs text-slate-500 mt-2 bg-amber-50/50 p-2 rounded-lg border border-amber-200/50">
+            💡 สังเกต: ถ้า $i+j$ เป็นเลขคู่ จะได้ $+1$ หากเป็นเลขคี่ จะได้ $-1$
+          </p>
+        </article>
+
+        <!-- การขยายดีเทอร์มิแนนต์ & กลยุทธ์เลขศูนย์ -->
+        <article class="bg-white p-5 sm:p-6 rounded-2xl shadow-sm border border-slate-200 flex flex-col justify-between">
+          <div>
+            <div class="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center font-bold mb-4">
+              det
+            </div>
+            <h3 class="text-lg font-heading font-semibold text-slate-800 mb-2">3. การขยายดีเทอร์มิแนนต์ & ทริคเลขศูนย์</h3>
+            <p class="text-sm text-slate-600 leading-relaxed mb-2">
+              เราสามารถกระจายหา $\det(A)$ ตามแถวหรือหลักใดก็ได้ 1 แถว/หลัก:
+            </p>
+            <div class="bg-slate-50 p-2.5 rounded-xl border border-slate-100 text-xs sm:text-sm text-slate-700 my-2 space-y-1">
+              <div><strong>ตามแถวที่ $i$:</strong> $\det(A) = \sum_{j=1}^n a_{ij} C_{ij}$</div>
+              <div><strong>ตามหลักที่ $j$:</strong> $\det(A) = \sum_{i=1}^n a_{ij} C_{ij}$</div>
+            </div>
+            <div class="mt-3 p-3 bg-emerald-50 rounded-xl border border-emerald-200 text-xs text-emerald-800 space-y-1">
+              <span class="font-bold flex items-center gap-1 text-emerald-900">
+                🎯 เทคนิคสำคัญ: เลือกแถว/หลักที่มี "0" มากที่สุด!
+              </span>
+              <p>เพราะหาก $a_{ij} = 0$ พจน์ $a_{ij} C_{ij}$ จะกลายเป็น $0$ ทันที โดยที่เรา<strong>ไม่ต้องเสียเวลาคำนวณไมเนอร์ของตำแหน่งนั้น</strong></p>
+            </div>
+          </div>
+        </article>
+
+      </div>
+    </section>
+
+    <!-- แบบจำลองโต้ตอบ (Interactive Matrix Simulator) -->
+    <section class="bg-white rounded-3xl shadow-sm border border-slate-200 p-5 sm:p-8 space-y-6">
+      
+      <!-- Section Title & Controls -->
+      <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 border-b border-slate-200 pb-5">
+        <div>
+          <div class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-md text-xs font-semibold bg-indigo-100 text-indigo-700 mb-1">
+            LABORATORY
+          </div>
+          <h2 class="text-xl sm:text-2xl font-heading font-bold text-slate-900">
+            แบบจำลองโต้ตอบ (Interactive Simulator)
+          </h2>
+          <p class="text-xs sm:text-sm text-slate-500">
+            ทดลองเปลี่ยนค่าสมาชิก เลือกดูไมเนอร์เฉพาะตัว หรือเลือกแถว/หลักเพื่อขยายดีเทอร์มิแนนต์
+          </p>
+        </div>
+
+        <div class="flex flex-wrap items-center gap-3">
+          <!-- Size Selector -->
+          <div class="inline-flex rounded-xl bg-slate-100 p-1 border border-slate-200 text-xs sm:text-sm">
+            <button id="btn-size-3" onclick="setMatrixSize(3)" class="px-3.5 py-1.5 rounded-lg font-semibold transition-all bg-white text-indigo-700 shadow-sm">
+              ขนาด 3 × 3
+            </button>
+            <button id="btn-size-4" onclick="setMatrixSize(4)" class="px-3.5 py-1.5 rounded-lg font-semibold transition-all text-slate-600 hover:text-slate-900">
+              ขนาด 4 × 4
+            </button>
+          </div>
+
+          <!-- Presets -->
+          <div class="relative">
+            <select id="preset-select" onchange="applyPreset(this.value)" class="text-xs sm:text-sm bg-slate-50 border border-slate-300 rounded-xl px-3 py-1.5 focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+              <option value="exercise1">ตัวอย่างแบบฝึกหัดที่ 1 (3x3)</option>
+              <option value="zeros">เมทริกซ์ที่มีเลข 0 เยอะ (เพื่อทดสอบความเร็ว)</option>
+              <option value="identity">เมทริกซ์เอกลักษณ์ (Identity Matrix)</option>
+              <option value="custom">ค่าสุ่มกำหนดเอง</option>
+            </select>
+          </div>
+
+          <!-- Reset Button -->
+          <button onclick="randomizeMatrix()" class="text-xs sm:text-sm px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium rounded-xl border border-slate-200 transition-colors flex items-center gap-1.5">
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+            สุ่มค่าใหม่
+          </button>
+        </div>
+      </div>
+
+      <!-- Mode Selector Tabs -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 bg-slate-100 p-1.5 rounded-2xl max-w-lg mx-auto text-center">
+        <button id="tab-inspect" onclick="setMode('inspect')" class="py-2 px-4 rounded-xl font-heading text-sm font-semibold transition-all shadow-sm bg-white text-indigo-700">
+          โหมด 1: คลิกดูไมเนอร์ & โคแฟกเตอร์ ($M_{ij}, C_{ij}$)
+        </button>
+        <button id="tab-expand" onclick="setMode('expand')" class="py-2 px-4 rounded-xl font-heading text-sm font-semibold transition-all text-slate-600 hover:text-slate-900">
+          โหมด 2: เลือกแถว/หลักเพื่อขยายดีเทอร์มิแนนต์
+        </button>
+      </div>
+
+      <!-- Simulator Workspace Grid -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+        
+        <!-- Left: Interactive Matrix Input & Visualizer -->
+        <div class="lg:col-span-5 bg-slate-50 p-4 sm:p-6 rounded-2xl border border-slate-200 flex flex-col items-center">
+          <div class="w-full flex items-center justify-between mb-4">
+            <span class="text-xs sm:text-sm font-semibold text-slate-700">
+              เมทริกซ์ $A$ <span class="text-xs text-slate-400 font-normal">(คลิกในช่องเพื่อแก้ไขตัวเลขได้)</span>
+            </span>
+            <span id="instruction-badge" class="text-xs bg-indigo-100 text-indigo-800 px-2.5 py-0.5 rounded-full font-medium">
+              คลิกที่ช่องเพื่อตรวจสอบ
+            </span>
+          </div>
+
+          <!-- Matrix Table Display with Bracket Borders -->
+          <div class="relative py-2 px-4">
+            <!-- Left Bracket -->
+            <div class="absolute left-0 top-0 bottom-0 w-2.5 border-l-4 border-t-4 border-b-4 border-slate-700 rounded-l-md pointer-events-none"></div>
+            <!-- Right Bracket -->
+            <div class="absolute right-0 top-0 bottom-0 w-2.5 border-r-4 border-t-4 border-b-4 border-slate-700 rounded-r-md pointer-events-none"></div>
+
+            <div id="matrix-container" class="grid gap-2 sm:gap-2.5 transition-all">
+              <!-- Dynamically populated -->
+            </div>
+          </div>
+
+          <!-- Quick Row/Col Selectors for Mode 2 -->
+          <div id="expansion-controllers" class="w-full mt-6 space-y-3 pt-4 border-t border-slate-200 hidden">
+            <div class="text-xs font-semibold text-slate-600 uppercase tracking-wider">เลือกแนวการขยายดีเทอร์มิแนนต์:</div>
+            
+            <div class="flex flex-col sm:flex-row gap-2">
+              <div class="flex-1 bg-white p-2.5 rounded-xl border border-slate-200">
+                <span class="text-xs font-medium text-slate-500 block mb-1.5">ขยายตามแถว (Row)</span>
+                <div id="row-buttons-container" class="flex gap-1.5 flex-wrap">
+                  <!-- Row buttons -->
+                </div>
+              </div>
+
+              <div class="flex-1 bg-white p-2.5 rounded-xl border border-slate-200">
+                <span class="text-xs font-medium text-slate-500 block mb-1.5">ขยายตามหลัก (Column)</span>
+                <div id="col-buttons-container" class="flex gap-1.5 flex-wrap">
+                  <!-- Col buttons -->
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="w-full mt-4 flex items-center justify-between text-xs text-slate-500 pt-3 border-t border-slate-200">
+            <span>💡 สีเขียว = เมทริกซ์ย่อยที่คงเหลือ</span>
+            <span>เส้นขีดฆ่า = แถว/หลักที่ถูกตัด</span>
+          </div>
+        </div>
+
+        <!-- Right: Step-by-Step Mathematical Computation View -->
+        <div class="lg:col-span-7 bg-white p-4 sm:p-6 rounded-2xl border border-slate-200 min-h-[380px] flex flex-col justify-between shadow-sm">
+          
+          <div id="calculation-output" class="space-y-4">
+            <!-- Will be dynamically filled by JS -->
+          </div>
+
+          <!-- Bottom Summary Stat -->
+          <div id="determinant-summary-card" class="mt-6 pt-4 border-t border-slate-200 bg-indigo-50/60 p-4 rounded-xl flex items-center justify-between">
+            <div>
+              <span class="text-xs text-indigo-700 font-semibold uppercase tracking-wider block">ดีเทอร์มิแนนต์สุทธิ $\det(A)$</span>
+              <span class="text-xs text-slate-500">คำนวณจากทุกวิธีจะมีค่าเท่ากันเสมอ</span>
+            </div>
+            <div class="text-2xl sm:text-3xl font-heading font-extrabold text-indigo-900" id="total-det-value">
+              0
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+
+    </section>
+
+    <!-- คำถามนำเพื่อค้นพบ (Guided Discovery Questions) -->
+    <section class="space-y-4">
+      <div class="border-b border-slate-200 pb-3">
+        <h2 class="text-xl sm:text-2xl font-heading font-bold text-slate-900 flex items-center gap-2">
+          <span class="w-2.5 h-6 bg-amber-500 rounded-full inline-block"></span>
+          คำถามนำเพื่อค้นพบ (Guided Discovery Questions)
+        </h2>
+        <p class="text-xs sm:text-sm text-slate-500">
+          ลองสังเกต คิด และทำความเข้าใจแบบแผนเบื้องหลังคณิตศาสตร์ แล้วคลิกดูแนวคิดเพื่อตรวจสอบ
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        
+        <!-- Question 1 -->
+        <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm hover:border-amber-300 transition-colors">
+          <div class="flex items-start gap-3">
+            <span class="w-7 h-7 rounded-xl bg-amber-100 text-amber-800 flex items-center justify-center font-bold text-sm shrink-0">1</span>
+            <div class="space-y-2 flex-1">
+              <h3 class="text-base font-semibold text-slate-800">
+                ไมเนอร์ของสมาชิกแต่ละตำแหน่งหาได้อย่างไร?
+              </h3>
+              <p class="text-xs sm:text-sm text-slate-600">
+                หากเราต้องการหา $M_{23}$ ของเมทริกซ์ขนาด $3\times3$ เราต้องทำกระบวนการใดบ้างในทางปฏิบัติ?
+              </p>
+              <details class="group mt-2">
+                <summary class="cursor-pointer text-xs font-semibold text-indigo-600 hover:text-indigo-800 flex items-center gap-1 select-none py-1">
+                  <span>💡 คลิกดูแนวคิดคำตอบ</span>
+                </summary>
+                <div class="mt-2 text-xs sm:text-sm text-slate-600 bg-amber-50/60 p-3 rounded-xl border border-amber-200 space-y-1">
+                  <p><strong>ขั้นตอน:</strong> ตัด <em>"แถวที่ $i$"</em> และ <em>"หลักที่ $j$"</em> ออกจากเมทริกซ์เดิม เช่น $M_{23}$ คือการขีดฆ่าแถว 2 และหลัก 3 ทิ้ง</p>
+                  <p>นำสมาชิกที่เหลือมาประกอบเป็นเมทริกซ์ย่อยขนาดลดลง 1 ขั้น (ถ้าเดิมเป็น $3\times3$ จะเหลือ $2\times2$) แล้วหาค่าดีเทอร์มิแนนต์ของเมทริกซ์ย่อยนั้น (คูณลงลบคูณขึ้น)</p>
+                </div>
+              </details>
+            </div>
+          </div>
+        </div>
+
+        <!-- Question 2 -->
+        <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm hover:border-amber-300 transition-colors">
+          <div class="flex items-start gap-3">
+            <span class="w-7 h-7 rounded-xl bg-amber-100 text-amber-800 flex items-center justify-center font-bold text-sm shrink-0">2</span>
+            <div class="space-y-2 flex-1">
+              <h3 class="text-base font-semibold text-slate-800">
+                เพราะเหตุใดเครื่องหมายของโคแฟกเตอร์จึงสลับกันตามตำแหน่ง?
+              </h3>
+              <p class="text-xs sm:text-sm text-slate-600">
+                ทำไมเครื่องหมายจึงไม่เป็นบวกทั้งหมด ทำไมต้องมีสูตร $(-1)^{i+j}$ เข้ามาควบคุม?
+              </p>
+              <details class="group mt-2">
+                <summary class="cursor-pointer text-xs font-semibold text-indigo-600 hover:text-indigo-800 flex items-center gap-1 select-none py-1">
+                  <span>💡 คลิกดูแนวคิดคำตอบ</span>
+                </summary>
+                <div class="mt-2 text-xs sm:text-sm text-slate-600 bg-amber-50/60 p-3 rounded-xl border border-amber-200 space-y-1">
+                  <p>พจน์ <strong>$(-1)^{i+j}$</strong> ขึ้นอยู่กับผลบวกของเลขแถว ($i$) และเลขหลัก ($j$):</p>
+                  <ul class="list-disc list-inside space-y-0.5 ml-1">
+                    <li>ถ้า $i+j$ เป็นจำนวนคู่ เช่น ตำแหน่ง $(1,1) \rightarrow 1+1=2 \implies (-1)^2 = +1$</li>
+                    <li>ถ้า $i+j$ เป็นจำนวนคี่ เช่น ตำแหน่ง $(1,2) \rightarrow 1+2=3 \implies (-1)^3 = -1$</li>
+                  </ul>
+                  <p class="pt-1">เมื่อขยับไปยังตำแหน่งข้างเคียง 1 ก้าว ไม่ว่าจะแนวนอนหรือแนวตั้ง ผลรวม $i+j$ จะสลับระหว่างคู่กับคี่เสมอ จึงเกิดเป็นรูปแบบกระดานหมากรุก</p>
+                </div>
+              </details>
+            </div>
+          </div>
+        </div>
+
+        <!-- Question 3 -->
+        <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm hover:border-amber-300 transition-colors">
+          <div class="flex items-start gap-3">
+            <span class="w-7 h-7 rounded-xl bg-amber-100 text-amber-800 flex items-center justify-center font-bold text-sm shrink-0">3</span>
+            <div class="space-y-2 flex-1">
+              <h3 class="text-base font-semibold text-slate-800">
+                การขยายตามแถวต่างกันให้ผลลัพธ์เหมือนกันหรือไม่?
+              </h3>
+              <p class="text-xs sm:text-sm text-slate-600">
+                หากเพื่อนคนหนึ่งขยายตามแถว 1 ส่วนอีกคนขยายตามหลัก 3 ค่าดีเทอร์มิแนนต์จะเท่ากันจริงหรือ?
+              </p>
+              <details class="group mt-2">
+                <summary class="cursor-pointer text-xs font-semibold text-indigo-600 hover:text-indigo-800 flex items-center gap-1 select-none py-1">
+                  <span>💡 คลิกดูแนวคิดคำตอบ</span>
+                </summary>
+                <div class="mt-2 text-xs sm:text-sm text-slate-600 bg-amber-50/60 p-3 rounded-xl border border-amber-200 space-y-1">
+                  <p><strong>ได้ผลลัพธ์เท่ากันเสมอ 100%!</strong></p>
+                  <p>นี่คือหลักการสำคัญของ <em>ทฤษฎีบทการขยายลาปลาส (Laplace Expansion Theorem)</em> ซึ่งระบุว่าค่าดีเทอร์มิแนนต์เป็นคุณสมบัติเฉพาะของเมทริกซ์จัตุรัสนั้นๆ ไม่ว่าจะกระจายตามแถวใดหรือหลักใดก็ตาม ผลลัพธ์สุดท้ายจะลู่เข้าสู่ค่าเดียวกันเสมอ</p>
+                </div>
+              </details>
+            </div>
+          </div>
+        </div>
+
+        <!-- Question 4 -->
+        <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm hover:border-amber-300 transition-colors">
+          <div class="flex items-start gap-3">
+            <span class="w-7 h-7 rounded-xl bg-amber-100 text-amber-800 flex items-center justify-center font-bold text-sm shrink-0">4</span>
+            <div class="space-y-2 flex-1">
+              <h3 class="text-base font-semibold text-slate-800">
+                หากเลือกแถวที่มีศูนย์หลายตำแหน่ง จะช่วยลดการคำนวณอย่างไร?
+              </h3>
+              <p class="text-xs sm:text-sm text-slate-600">
+                การขยายเมทริกซ์ขนาด $4\times4$ ต้องคิด $3\times3$ ถึง 4 รูป แต่ถ้ามีศูนย์จะเกิดอะไรขึ้น?
+              </p>
+              <details class="group mt-2">
+                <summary class="cursor-pointer text-xs font-semibold text-indigo-600 hover:text-indigo-800 flex items-center gap-1 select-none py-1">
+                  <span>💡 คลิกดูแนวคิดคำตอบ</span>
+                </summary>
+                <div class="mt-2 text-xs sm:text-sm text-slate-600 bg-amber-50/60 p-3 rounded-xl border border-amber-200 space-y-1">
+                  <p>จากสูตร $\det(A) = a_{i1}C_{i1} + a_{i2}C_{i2} + a_{i3}C_{i3} + \dots$</p>
+                  <p>หากตำแหน่งใดมี $a_{ij} = 0$ พจน์ $0 \times C_{ij} = 0$ ทันที ส่งผลให้เรา<strong>ข้ามขั้นตอนการหาค่าไมเนอร์ย่อยและโคแฟกเตอร์ของตำแหน่งนั้นไปได้เลย</strong></p>
+                  <p class="text-emerald-700 font-medium">ตัวอย่าง: ถ้าในแถวมีเลข 0 อยู่ 3 ตัวในเมทริกซ์ $4\times4$ เราจะต้องคำนวณไมเนอร์เพียง 1 ตัวเท่านั้น แทนที่จะเป็น 4 ตัว!</p>
+                </div>
+              </details>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- แบบฝึกหัดสำหรับนักศึกษา (Exercises with Step-by-Step Solutions) -->
+    <section class="space-y-6">
+      <div class="border-b border-slate-200 pb-3 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+        <div>
+          <h2 class="text-xl sm:text-2xl font-heading font-bold text-slate-900 flex items-center gap-2">
+            <span class="w-2.5 h-6 bg-emerald-600 rounded-full inline-block"></span>
+            แบบฝึกหัดสำหรับนักศึกษา
+          </h2>
+          <p class="text-xs sm:text-sm text-slate-500">
+            ฝึกฝนทักษะการคำนวณ พร้อมเฉลยและวิธีทำอย่างละเอียดทุกขั้นตอน
+          </p>
+        </div>
+        <span class="text-xs bg-emerald-50 text-emerald-700 border border-emerald-200 px-3 py-1 rounded-full font-medium">
+          4 ข้อทดสอบความเข้าใจ
+        </span>
+      </div>
+
+      <div class="space-y-4">
+        
+        <!-- ข้อ 1 -->
+        <div class="bg-white rounded-2xl border border-slate-200 p-5 sm:p-6 shadow-sm">
+          <div class="flex items-start justify-between gap-4">
+            <div class="space-y-2">
+              <div class="inline-block px-2.5 py-0.5 rounded text-xs font-bold bg-slate-100 text-slate-700">ข้อที่ 1</div>
+              <h3 class="text-base sm:text-lg font-heading font-semibold text-slate-800">
+                จงหาไมเนอร์และโคแฟกเตอร์ของสมาชิกทุกตำแหน่งในเมทริกซ์:
+              </h3>
+              <div class="text-slate-700 my-2">
+                $$A = \begin{bmatrix} 1 & 2 & 3 \\ 0 & 4 & 5 \\ 2 & 1 & 3 \end{bmatrix}$$
+              </div>
+            </div>
+            <button onclick="toggleExercise('ex1')" class="shrink-0 text-xs sm:text-sm bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-semibold px-4 py-2 rounded-xl transition-colors border border-indigo-200">
+              <span id="ex1-btn-text">ดูเฉลยละเอียด</span>
+            </button>
+          </div>
+
+          <div id="ex1-solution" class="hidden mt-6 pt-5 border-t border-slate-200 space-y-4 text-xs sm:text-sm">
+            <div class="bg-indigo-50/50 p-4 rounded-xl border border-indigo-100">
+              <h4 class="font-heading font-bold text-indigo-900 mb-2">วิธีทำอย่างละเอียด:</h4>
+              <p class="text-slate-600 mb-3">คำนวณไมเนอร์ $M_{ij} = \det(\text{submatrix})$ แล้วนำเครื่องหมาย $(-1)^{i+j}$ ไปคูณจะได้ $C_{ij}$:</p>
+              
+              <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+                <!-- Row 1 -->
+                <div class="bg-white p-3 rounded-lg border border-slate-200 space-y-2">
+                  <div class="font-semibold text-indigo-800 border-b pb-1">แถวที่ 1</div>
+                  <div>
+                    $M_{11} = \det\begin{bmatrix}4&5\\1&3\end{bmatrix} = 12-5 = 7$<br>
+                    <strong class="text-indigo-600">$C_{11} = (+1)(7) = 7$</strong>
+                  </div>
+                  <div>
+                    $M_{12} = \det\begin{bmatrix}0&5\\2&3\end{bmatrix} = 0-10 = -10$<br>
+                    <strong class="text-indigo-600">$C_{12} = (-1)(-10) = 10$</strong>
+                  </div>
+                  <div>
+                    $M_{13} = \det\begin{bmatrix}0&4\\2&1\end{bmatrix} = 0-8 = -8$<br>
+                    <strong class="text-indigo-600">$C_{13} = (+1)(-8) = -8$</strong>
+                  </div>
+                </div>
+
+                <!-- Row 2 -->
+                <div class="bg-white p-3 rounded-lg border border-slate-200 space-y-2">
+                  <div class="font-semibold text-indigo-800 border-b pb-1">แถวที่ 2</div>
+                  <div>
+                    $M_{21} = \det\begin{bmatrix}2&3\\1&3\end{bmatrix} = 6-3 = 3$<br>
+                    <strong class="text-indigo-600">$C_{21} = (-1)(3) = -3$</strong>
+                  </div>
+                  <div>
+                    $M_{22} = \det\begin{bmatrix}1&3\\2&3\end{bmatrix} = 3-6 = -3$<br>
+                    <strong class="text-indigo-600">$C_{22} = (+1)(-3) = -3$</strong>
+                  </div>
+                  <div>
+                    $M_{23} = \det\begin{bmatrix}1&2\\2&1\end{bmatrix} = 1-4 = -3$<br>
+                    <strong class="text-indigo-600">$C_{23} = (-1)(-3) = 3$</strong>
+                  </div>
+                </div>
+
+                <!-- Row 3 -->
+                <div class="bg-white p-3 rounded-lg border border-slate-200 space-y-2">
+                  <div class="font-semibold text-indigo-800 border-b pb-1">แถวที่ 3</div>
+                  <div>
+                    $M_{31} = \det\begin{bmatrix}2&3\\4&5\end{bmatrix} = 10-12 = -2$<br>
+                    <strong class="text-indigo-600">$C_{31} = (+1)(-2) = -2$</strong>
+                  </div>
+                  <div>
+                    $M_{32} = \det\begin{bmatrix}1&3\\0&5\end{bmatrix} = 5-0 = 5$<br>
+                    <strong class="text-indigo-600">$C_{32} = (-1)(5) = -5$</strong>
+                  </div>
+                  <div>
+                    $M_{33} = \det\begin{bmatrix}1&2\\0&4\end{bmatrix} = 4-0 = 4$<br>
+                    <strong class="text-indigo-600">$C_{33} = (+1)(4) = 4$</strong>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Summary Matrix -->
+              <div class="mt-4 pt-3 border-t border-indigo-100 flex flex-wrap gap-6 items-center justify-center">
+                <div class="text-center">
+                  <span class="block text-xs font-semibold text-slate-500 mb-1">เมทริกซ์ไมเนอร์ $M$</span>
+                  $\begin{bmatrix} 7 & -10 & -8 \\ 3 & -3 & -3 \\ -2 & 5 & 4 \end{bmatrix}$
+                </div>
+                <div class="text-center">
+                  <span class="block text-xs font-semibold text-indigo-600 mb-1">เมทริกซ์โคแฟกเตอร์ $C$</span>
+                  $\begin{bmatrix} 7 & 10 & -8 \\ -3 & -3 & 3 \\ -2 & -5 & 4 \end{bmatrix}$
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ข้อ 2 -->
+        <div class="bg-white rounded-2xl border border-slate-200 p-5 sm:p-6 shadow-sm">
+          <div class="flex items-start justify-between gap-4">
+            <div class="space-y-2">
+              <div class="inline-block px-2.5 py-0.5 rounded text-xs font-bold bg-slate-100 text-slate-700">ข้อที่ 2</div>
+              <h3 class="text-base sm:text-lg font-heading font-semibold text-slate-800">
+                คำนวณดีเทอร์มิแนนต์ของเมทริกซ์ในข้อที่ 1 โดยขยายตามแถวที่ 1 และหลักที่ 1 แล้วเปรียบเทียบผลลัพธ์
+              </h3>
+              <p class="text-xs sm:text-sm text-slate-600">
+                ทดสอบคุณสมบัติการขยายเพื่อพิสูจน์ว่าทั้งสองวิธีให้คำตอบเท่ากัน
+              </p>
+            </div>
+            <button onclick="toggleExercise('ex2')" class="shrink-0 text-xs sm:text-sm bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-semibold px-4 py-2 rounded-xl transition-colors border border-indigo-200">
+              <span id="ex2-btn-text">ดูเฉลยละเอียด</span>
+            </button>
+          </div>
+
+          <div id="ex2-solution" class="hidden mt-6 pt-5 border-t border-slate-200 space-y-4 text-xs sm:text-sm">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <!-- ขยายตามแถวที่ 1 -->
+              <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-2">
+                <span class="font-bold text-indigo-700 block text-sm">ก) ขยายตามแถวที่ 1 ($i = 1$)</span>
+                <p>สูตร: $\det(A) = a_{11}C_{11} + a_{12}C_{12} + a_{13}C_{13}$</p>
+                <div class="bg-white p-3 rounded-lg border border-slate-200 font-mono text-xs sm:text-sm">
+                  $\det(A) = (1)(7) + (2)(10) + (3)(-8)$<br>
+                  $\det(A) = 7 + 20 - 24$<br>
+                  $\mathbf{\det(A) = 3}$
+                </div>
+              </div>
+
+              <!-- ขยายตามหลักที่ 1 -->
+              <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-2">
+                <span class="font-bold text-indigo-700 block text-sm">ข) ขยายตามหลักที่ 1 ($j = 1$)</span>
+                <p>สูตร: $\det(A) = a_{11}C_{11} + a_{21}C_{21} + a_{31}C_{31}$</p>
+                <div class="bg-white p-3 rounded-lg border border-slate-200 font-mono text-xs sm:text-sm">
+                  $\det(A) = (1)(7) + (0)(-3) + (2)(-2)$<br>
+                  $\det(A) = 7 + 0 - 4$<br>
+                  $\mathbf{\det(A) = 3}$
+                </div>
+              </div>
+            </div>
+
+            <!-- ข้อสรุปเปรียบเทียบ -->
+            <div class="p-4 bg-emerald-50 rounded-xl border border-emerald-200 text-emerald-900">
+              <strong class="font-bold">สรุปผลการเปรียบเทียบ:</strong>
+              <p class="mt-1">
+                ผลลัพธ์ทั้งสองวิธีได้ $\det(A) = 3$ เท่ากันทุกประการ! 
+                แต่สังเกตว่าการขยายตามหลักที่ 1 ทำได้รวดเร็วกว่ามาก เพราะสมาชิก $a_{21} = 0$ ส่งผลให้พจน์กลางกลายเป็น $0$ ทันทีโดยไม่ต้องสนใจค่าโคแฟกเตอร์
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- ข้อ 3 -->
+        <div class="bg-white rounded-2xl border border-slate-200 p-5 sm:p-6 shadow-sm">
+          <div class="flex items-start justify-between gap-4">
+            <div class="space-y-2">
+              <div class="inline-block px-2.5 py-0.5 rounded text-xs font-bold bg-slate-100 text-slate-700">ข้อที่ 3</div>
+              <h3 class="text-base sm:text-lg font-heading font-semibold text-slate-800">
+                สร้างเมทริกซ์ขนาด $4\times4$ ที่มีสมาชิกเป็นศูนย์อย่างน้อย 2 ตำแหน่งในแถวเดียวกัน แล้วเลือกวิธีขยายที่เหมาะสมที่สุด พร้อมให้เหตุผล
+              </h3>
+            </div>
+            <button onclick="toggleExercise('ex3')" class="shrink-0 text-xs sm:text-sm bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-semibold px-4 py-2 rounded-xl transition-colors border border-indigo-200">
+              <span id="ex3-btn-text">ดูเฉลยละเอียด</span>
+            </button>
+          </div>
+
+          <div id="ex3-solution" class="hidden mt-6 pt-5 border-t border-slate-200 space-y-4 text-xs sm:text-sm">
+            <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-3">
+              <div>
+                <strong>ตัวอย่างการสร้างเมทริกซ์ $B$:</strong> กำหนดให้แถวที่ 2 มีสมาชิกเป็นศูนย์ถึง 3 ตำแหน่ง
+                $$B = \begin{bmatrix} 2 & 1 & 0 & 3 \\ 0 & 0 & 4 & 0 \\ 1 & -2 & 3 & 1 \\ 0 & 1 & 2 & -1 \end{bmatrix}$$
+              </div>
+
+              <div class="bg-indigo-50 p-3.5 rounded-lg border border-indigo-200 text-indigo-900 space-y-1.5">
+                <span class="font-bold">การเลือกวิธีขยายที่เหมาะสมที่สุด:</span>
+                <p>ควรเลือกขยายตาม <strong>แถวที่ 2 (Row 2)</strong></p>
+                <p class="text-slate-600">
+                  <strong>เหตุผล:</strong> ในแถวที่ 2 สมาชิกคือ $b_{21}=0, b_{22}=0, b_{23}=4, b_{24}=0$ มีศูนย์อยู่ถึง 3 ตำแหน่ง 
+                  ทำให้การขยาย $\det(B)$ ลดรูปเหลือเพียงการคำนวณโคแฟกเตอร์ $C_{23}$ เพียงตัวเดียว:
+                </p>
+                <div class="font-mono text-xs sm:text-sm text-indigo-800 pt-1">
+                  $\det(B) = 0\cdot C_{21} + 0\cdot C_{22} + 4\cdot C_{23} + 0\cdot C_{24} = 4 \cdot C_{23}$
+                </div>
+                <p class="text-xs text-slate-500 pt-1">
+                  ทำให้จากเดิมที่ต้องคำนวณดีเทอร์มิแนนต์ขนาด $3\times3$ ถึง 4 รูป เหลือเพียงการหาดีเทอร์มิแนนต์ $3\times3$ เพียงรูปเดียวเท่านั้น!
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ข้อ 4 -->
+        <div class="bg-white rounded-2xl border border-slate-200 p-5 sm:p-6 shadow-sm">
+          <div class="flex items-start justify-between gap-4">
+            <div class="space-y-2">
+              <div class="inline-block px-2.5 py-0.5 rounded text-xs font-bold bg-slate-100 text-slate-700">ข้อที่ 4</div>
+              <h3 class="text-base sm:text-lg font-heading font-semibold text-slate-800">
+                อธิบายว่าการเลือกแถวหรือหลักที่เหมาะสมช่วยลดภาระการคำนวณได้อย่างไร
+              </h3>
+            </div>
+            <button onclick="toggleExercise('ex4')" class="shrink-0 text-xs sm:text-sm bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-semibold px-4 py-2 rounded-xl transition-colors border border-indigo-200">
+              <span id="ex4-btn-text">ดูเฉลยละเอียด</span>
+            </button>
+          </div>
+
+          <div id="ex4-solution" class="hidden mt-6 pt-5 border-t border-slate-200 space-y-4 text-xs sm:text-sm">
+            <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 text-slate-700 space-y-3">
+              <p>
+                การคำนวณดีเทอร์มิแนนต์ของเมทริกซ์ขนาด $n \times n$ โดยการขยายโคแฟกเตอร์มีความซับซ้อนเชิงคำนวณแบบแฟกทอเรียล $O(n!)$ ในกรณีทั่วไป:
+              </p>
+              <ul class="list-disc list-inside space-y-2 ml-2">
+                <li>
+                  <strong>การคูณด้วยศูนย์ (Multiplication by Zero):</strong> ในสูตร $\sum a_{ij} C_{ij}$ หาก $a_{ij}=0$ ค่าผลคูณจะเป็นศูนย์เสมอ เราจึงไม่จำเป็นต้องเสียเวลาไปสร้าง Submatrix และคำนวณหาค่า $M_{ij}$ ของตำแหน่งนั้น
+                </li>
+                <li>
+                  <strong>ลดทอนระดับชั้นการคำนวณ (Recursive Reduction):</strong> 
+                  สำหรับเมทริกซ์ขนาดใหญ่ เช่น $4\times4$ ทุกๆ ไมเนอร์ 1 ตัวต้องอาศัยการคำนวณ $3\times3$ เต็มรูปแบบ หากเราเลือกแถวที่มีศูนย์ 2 ตัว จะลดจำนวน Submatrix $3\times3$ จาก 4 ตัวเหลือเพียง 2 ตัว (ลดภาระงานลงไปได้ถึง 50%)
+                </li>
+                <li>
+                  <strong>ลดโอกาสการคำนวณเลขผิดพลาด (Error Reduction):</strong> 
+                  การคำนวณหลายขั้นตอนมักมีโอกาสผิดพลาดเรื่องเครื่องหมายบวก-ลบ การลดจำนวนพจน์จึงช่วยเพิ่มความแม่นยำและประหยัดเวลาอย่างยิ่ง
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+
+  </main>
+
+  <!-- Interactive Simulator Logic (Vanilla JavaScript) -->
+  <script>
+    // State management
+    let matrixSize = 3;
+    let matrixData = [
+      [1, 2, 3],
+      [0, 4, 5],
+      [2, 1, 3]
+    ];
+    let currentMode = 'inspect'; // 'inspect' or 'expand'
+    let selectedCell = { row: 0, col: 0 };
+    let expansionTarget = { type: 'row', index: 0 }; // type: 'row'|'col', index: 0-indexed
+
+    // Presets
+    const PRESETS = {
+      exercise1: {
+        size: 3,
+        matrix: [
+          [1, 2, 3],
+          [0, 4, 5],
+          [2, 1, 3]
+        ]
+      },
+      zeros: {
+        size: 4,
+        matrix: [
+          [2, 0, 1, 3],
+          [0, 0, 4, 0],
+          [1, -2, 3, 1],
+          [0, 1, 2, -1]
+        ]
+      },
+      identity: {
+        size: 3,
+        matrix: [
+          [1, 0, 0],
+          [0, 1, 0],
+          [0, 0, 1]
+        ]
+      }
+    };
+
+    // Initialize
+    window.addEventListener('DOMContentLoaded', () => {
+      renderAll();
+    });
+
+    function setMatrixSize(size) {
+      if (matrixSize === size) return;
+      matrixSize = size;
+      
+      // Update toggle buttons styling
+      document.getElementById('btn-size-3').className = size === 3 
+        ? 'px-3.5 py-1.5 rounded-lg font-semibold transition-all bg-white text-indigo-700 shadow-sm'
+        : 'px-3.5 py-1.5 rounded-lg font-semibold transition-all text-slate-600 hover:text-slate-900';
+      document.getElementById('btn-size-4').className = size === 4 
+        ? 'px-3.5 py-1.5 rounded-lg font-semibold transition-all bg-white text-indigo-700 shadow-sm'
+        : 'px-3.5 py-1.5 rounded-lg font-semibold transition-all text-slate-600 hover:text-slate-900';
+
+      // Re-dimension matrix data
+      let newMat = [];
+      for (let r = 0; r < size; r++) {
+        let row = [];
+        for (let c = 0; c < size; c++) {
+          if (matrixData[r] && matrixData[r][c] !== undefined) {
+            row.push(matrixData[r][c]);
+          } else {
+            row.push(r === c ? 1 : 0);
+          }
+        }
+        newMat.push(row);
+      }
+      matrixData = newMat;
+      selectedCell = { row: 0, col: 0 };
+      expansionTarget = { type: 'row', index: 0 };
+      
+      renderAll();
+    }
+
+    function setMode(mode) {
+      currentMode = mode;
+      
+      const tabInspect = document.getElementById('tab-inspect');
+      const tabExpand = document.getElementById('tab-expand');
+      const expansionControls = document.getElementById('expansion-controllers');
+      const instructionBadge = document.getElementById('instruction-badge');
+
+      if (mode === 'inspect') {
+        tabInspect.className = 'py-2 px-4 rounded-xl font-heading text-sm font-semibold transition-all shadow-sm bg-white text-indigo-700';
+        tabExpand.className = 'py-2 px-4 rounded-xl font-heading text-sm font-semibold transition-all text-slate-600 hover:text-slate-900';
+        expansionControls.classList.add('hidden');
+        instructionBadge.textContent = 'คลิกสมาชิกที่ต้องการดูค่าไมเนอร์';
+      } else {
+        tabExpand.className = 'py-2 px-4 rounded-xl font-heading text-sm font-semibold transition-all shadow-sm bg-white text-indigo-700';
+        tabInspect.className = 'py-2 px-4 rounded-xl font-heading text-sm font-semibold transition-all text-slate-600 hover:text-slate-900';
+        expansionControls.classList.remove('hidden');
+        instructionBadge.textContent = 'เลือกแถวหรือหลักด้านล่างเพื่อกระจาย';
+      }
+
+      renderAll();
+    }
+
+    function applyPreset(presetKey) {
+      if (presetKey === 'custom') return;
+      const preset = PRESETS[presetKey];
+      if (!preset) return;
+
+      matrixSize = preset.size;
+      matrixData = JSON.parse(JSON.stringify(preset.matrix));
+      selectedCell = { row: 0, col: 0 };
+      expansionTarget = { type: 'row', index: 0 };
+
+      // Update size button visuals
+      document.getElementById('btn-size-3').className = matrixSize === 3 
+        ? 'px-3.5 py-1.5 rounded-lg font-semibold transition-all bg-white text-indigo-700 shadow-sm'
+        : 'px-3.5 py-1.5 rounded-lg font-semibold transition-all text-slate-600 hover:text-slate-900';
+      document.getElementById('btn-size-4').className = matrixSize === 4 
+        ? 'px-3.5 py-1.5 rounded-lg font-semibold transition-all bg-white text-indigo-700 shadow-sm'
+        : 'px-3.5 py-1.5 rounded-lg font-semibold transition-all text-slate-600 hover:text-slate-900';
+
+      renderAll();
+    }
+
+    function randomizeMatrix() {
+      for (let r = 0; r < matrixSize; r++) {
+        for (let c = 0; c < matrixSize; c++) {
+          // generate integer between -3 and 6, with slightly higher probability of 0
+          let rand = Math.floor(Math.random() * 8) - 2;
+          matrixData[r][c] = rand;
+        }
+      }
+      document.getElementById('preset-select').value = 'custom';
+      renderAll();
+    }
+
+    function handleCellInput(r, c, val) {
+      const parsed = parseInt(val, 10);
+      matrixData[r][c] = isNaN(parsed) ? 0 : parsed;
+      document.getElementById('preset-select').value = 'custom';
+      updateCalculation();
+    }
+
+    function selectCell(r, c) {
+      selectedCell = { row: r, col: c };
+      if (currentMode === 'inspect') {
+        renderAll();
+      }
+    }
+
+    function selectExpansionTarget(type, index) {
+      expansionTarget = { type, index };
+      renderAll();
+    }
+
+    // --- Math Engine ---
+    function getSubmatrix(mat, cutRow, cutCol) {
+      let sub = [];
+      for (let r = 0; r < mat.length; r++) {
+        if (r === cutRow) continue;
+        let row = [];
+        for (let c = 0; c < mat[r].length; c++) {
+          if (c === cutCol) continue;
+          row.push(mat[r][c]);
+        }
+        sub.push(row);
+      }
+      return sub;
+    }
+
+    function computeDeterminant(mat) {
+      const n = mat.length;
+      if (n === 1) return mat[0][0];
+      if (n === 2) {
+        return mat[0][0] * mat[1][1] - mat[0][1] * mat[1][0];
+      }
+      if (n === 3) {
+        return mat[0][0]*(mat[1][1]*mat[2][2] - mat[1][2]*mat[2][1])
+             - mat[0][1]*(mat[1][0]*mat[2][2] - mat[1][2]*mat[2][0])
+             + mat[0][2]*(mat[1][0]*mat[2][1] - mat[1][1]*mat[2][0]);
+      }
+      // General recursive for 4x4
+      let det = 0;
+      for (let j = 0; j < n; j++) {
+        if (mat[0][j] !== 0) {
+          const sign = (j % 2 === 0) ? 1 : -1;
+          const sub = getSubmatrix(mat, 0, j);
+          det += sign * mat[0][j] * computeDeterminant(sub);
+        }
+      }
+      return det;
+    }
+
+    // --- Rendering Functions ---
+    function renderMatrixGrid() {
+      const container = document.getElementById('matrix-container');
+      container.style.gridTemplateColumns = `repeat(${matrixSize}, minmax(48px, 64px))`;
+      container.innerHTML = '';
+
+      for (let r = 0; r < matrixSize; r++) {
+        for (let c = 0; c < matrixSize; c++) {
+          const cellVal = matrixData[r][c];
+          const cellWrapper = document.createElement('div');
+          cellWrapper.className = 'relative flex items-center justify-center';
+
+          const input = document.createElement('input');
+          input.type = 'number';
+          input.value = cellVal;
+          input.className = 'w-12 h-12 sm:w-14 sm:h-14 text-center rounded-xl border font-mono text-base sm:text-lg transition-all focus:outline-none focus:ring-2 focus:ring-indigo-500 cursor-pointer ';
+
+          // Determine cell highlighting style
+          if (currentMode === 'inspect') {
+            const isPivot = (r === selectedCell.row && c === selectedCell.col);
+            const isCrossed = (r === selectedCell.row || c === selectedCell.col);
+
+            if (isPivot) {
+              input.classList.add('selected-pivot', 'border-indigo-600', 'bg-indigo-100');
+            } else if (isCrossed) {
+              input.classList.add('crossed-cell', 'border-slate-200');
+            } else {
+              input.classList.add('kept-cell', 'border-emerald-300', 'bg-emerald-50');
+            }
+          } else {
+            // Expansion Mode
+            const isTargeted = (expansionTarget.type === 'row' && r === expansionTarget.index) ||
+                               (expansionTarget.type === 'col' && c === expansionTarget.index);
+
+            if (isTargeted) {
+              if (cellVal === 0) {
+                input.classList.add('bg-amber-100', 'border-amber-400', 'text-amber-900', 'font-bold');
+              } else {
+                input.classList.add('bg-indigo-50', 'border-indigo-400', 'text-indigo-900', 'font-bold');
+              }
+            } else {
+              input.classList.add('bg-white', 'border-slate-200', 'text-slate-700');
+            }
+          }
+
+          input.addEventListener('focus', () => selectCell(r, c));
+          input.addEventListener('input', (e) => handleCellInput(r, c, e.target.value));
+
+          // Label subscript preview
+          const subLabel = document.createElement('span');
+          subLabel.className = 'absolute bottom-1 right-1.5 text-[9px] font-mono text-slate-400 pointer-events-none select-none';
+          subLabel.textContent = `a${r+1}${c+1}`;
+
+          cellWrapper.appendChild(input);
+          cellWrapper.appendChild(subLabel);
+          container.appendChild(cellWrapper);
+        }
+      }
+
+      renderExpansionButtons();
+    }
+
+    function renderExpansionButtons() {
+      const rowContainer = document.getElementById('row-buttons-container');
+      const colContainer = document.getElementById('col-buttons-container');
+      rowContainer.innerHTML = '';
+      colContainer.innerHTML = '';
+
+      for (let i = 0; i < matrixSize; i++) {
+        // Count zeros in this row
+        const rowZeros = matrixData[i].filter(v => v === 0).length;
+        const rowBtn = document.createElement('button');
+        const isRowActive = expansionTarget.type === 'row' && expansionTarget.index === i;
+        rowBtn.className = `px-2.5 py-1 text-xs rounded-lg font-semibold transition-all border ${
+          isRowActive 
+            ? 'bg-indigo-600 text-white border-indigo-700 shadow-sm' 
+            : 'bg-slate-50 hover:bg-slate-100 text-slate-700 border-slate-200'
+        }`;
+        rowBtn.innerHTML = `แถว ${i+1} ${rowZeros > 0 ? `<span class="ml-1 px-1 py-0.2 rounded text-[10px] ${isRowActive ? 'bg-indigo-800 text-indigo-200' : 'bg-amber-100 text-amber-800'}">${rowZeros} ศูนย์</span>` : ''}`;
+        rowBtn.onclick = () => selectExpansionTarget('row', i);
+        rowContainer.appendChild(rowBtn);
+
+        // Count zeros in this col
+        let colZeros = 0;
+        for (let r = 0; r < matrixSize; r++) if (matrixData[r][i] === 0) colZeros++;
+        const colBtn = document.createElement('button');
+        const isColActive = expansionTarget.type === 'col' && expansionTarget.index === i;
+        colBtn.className = `px-2.5 py-1 text-xs rounded-lg font-semibold transition-all border ${
+          isColActive 
+            ? 'bg-indigo-600 text-white border-indigo-700 shadow-sm' 
+            : 'bg-slate-50 hover:bg-slate-100 text-slate-700 border-slate-200'
+        }`;
+        colBtn.innerHTML = `หลัก ${i+1} ${colZeros > 0 ? `<span class="ml-1 px-1 py-0.2 rounded text-[10px] ${isColActive ? 'bg-indigo-800 text-indigo-200' : 'bg-amber-100 text-amber-800'}">${colZeros} ศูนย์</span>` : ''}`;
+        colBtn.onclick = () => selectExpansionTarget('col', i);
+        colContainer.appendChild(colBtn);
+      }
+    }
+
+    function formatSubmatrixLatex(sub) {
+      let rows = sub.map(row => row.join(' & ')).join(' \\\\ ');
+      return `\\begin{bmatrix} ${rows} \\end{bmatrix}`;
+    }
+
+    function updateCalculation() {
+      const output = document.getElementById('calculation-output');
+      const totalDetSpan = document.getElementById('total-det-value');
+      const detA = computeDeterminant(matrixData);
+      totalDetSpan.textContent = detA;
+
+      if (currentMode === 'inspect') {
+        const { row, col } = selectedCell;
+        const val = matrixData[row][col];
+        const sub = getSubmatrix(matrixData, row, col);
+        const minorDet = computeDeterminant(sub);
+        const signPower = row + 1 + col + 1;
+        const signVal = Math.pow(-1, signPower);
+        const cofactor = signVal * minorDet;
+
+        output.innerHTML = `
+          <div class="space-y-4">
+            <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+              <div>
+                <span class="text-xs uppercase font-bold text-indigo-600 tracking-wider">ตำแหน่งที่เลือกตรวจสอบ</span>
+                <h3 class="text-lg font-heading font-bold text-slate-900">
+                  สมาชิก $a_{${row+1}${col+1}} = ${val}$
+                </h3>
+              </div>
+              <div class="text-right">
+                <span class="inline-block px-3 py-1 rounded-full text-xs font-semibold ${signVal > 0 ? 'bg-emerald-100 text-emerald-800 border border-emerald-200' : 'bg-rose-100 text-rose-800 border border-rose-200'}">
+                  เครื่องหมายประจำตำแหน่ง: ${signVal > 0 ? '+ (บวก)' : '- (ลบ)'}
+                </span>
+              </div>
+            </div>
+
+            <!-- Submatrix & Minor calculation -->
+            <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-3">
+              <div class="text-xs font-semibold text-slate-700 flex items-center gap-1.5">
+                <span class="w-2 h-2 rounded-full bg-indigo-600"></span>
+                ขั้นที่ 1: ตัดแถวที่ ${row+1} และหลักที่ ${col+1} เพื่อสร้าง Submatrix ย่อย
+              </div>
+              <div class="overflow-x-auto text-sm py-1">
+                $$M_{${row+1}${col+1}} = \\det ${formatSubmatrixLatex(sub)} = ${minorDet}$$
+              </div>
+              <p class="text-xs text-slate-500">
+                ${matrixSize === 4 ? '* เมทริกซ์ย่อยขนาด 3×3 คำนวณด้วยวิธีคูณทแยงหรือกระจายโคแฟกเตอร์' : '* เมทริกซ์ย่อยขนาด 2×2 คำนวณจาก (คูณลงลบคูณขึ้น)'}
+              </p>
+            </div>
+
+            <!-- Cofactor Formula & Result -->
+            <div class="bg-indigo-50/50 p-4 rounded-xl border border-indigo-100 space-y-2">
+              <div class="text-xs font-semibold text-indigo-900 flex items-center gap-1.5">
+                <span class="w-2 h-2 rounded-full bg-emerald-600"></span>
+                ขั้นที่ 2: คำนวณโคแฟกเตอร์ $C_{${row+1}${col+1}}$ ด้วยสูตร $(-1)^{i+j} M_{ij}$
+              </div>
+              <div class="overflow-x-auto text-sm sm:text-base py-1 text-indigo-950 font-medium">
+                $$C_{${row+1}${col+1}} = (-1)^{${row+1}+${col+1}} \\times M_{${row+1}${col+1}} = (${signVal > 0 ? '+1' : '-1'}) \\times (${minorDet}) = ${cofactor}$$
+              </div>
+            </div>
+
+            <div class="text-xs text-slate-600 bg-slate-100/70 p-3 rounded-lg flex items-center justify-between">
+              <span>พจน์ผลคูณเมื่อนำไปกระจายในดีเทอร์มิแนนต์:</span>
+              <span class="font-mono font-bold text-slate-800">$a_{${row+1}${col+1}} \\cdot C_{${row+1}${col+1}} = (${val}) \\times (${cofactor}) = ${val * cofactor}$</span>
+            </div>
+          </div>
+        `;
+      } else {
+        // Expand Mode
+        const isRow = expansionTarget.type === 'row';
+        const idx = expansionTarget.index;
+        const targetLabel = isRow ? `แถวที่ ${idx+1}` : `หลักที่ ${idx+1}`;
+
+        let termsMath = [];
+        let termsExpanded = [];
+        let totalSum = 0;
+        let zeroCount = 0;
+
+        let stepsHtml = '';
+
+        for (let k = 0; k < matrixSize; k++) {
+          const r = isRow ? idx : k;
+          const c = isRow ? k : idx;
+          const aVal = matrixData[r][c];
+          const sub = getSubmatrix(matrixData, r, c);
+          const minorVal = computeDeterminant(sub);
+          const signVal = Math.pow(-1, (r + 1) + (c + 1));
+          const cofactorVal = signVal * minorVal;
+          const termProduct = aVal * cofactorVal;
+          totalSum += termProduct;
+
+          const isZero = aVal === 0;
+          if (isZero) zeroCount++;
+
+          termsMath.push(`a_{${r+1}${c+1}} C_{${r+1}${c+1}}`);
+          termsExpanded.push(`(${aVal})(${cofactorVal})`);
+
+          stepsHtml += `
+            <div class="p-3 rounded-xl border ${isZero ? 'bg-amber-50/70 border-amber-200' : 'bg-slate-50 border-slate-200'} space-y-1.5">
+              <div class="flex items-center justify-between text-xs">
+                <span class="font-bold ${isZero ? 'text-amber-800' : 'text-slate-800'}">
+                  พจน์ที่ ${k+1}: สมาชิก $a_{${r+1}${c+1}} = ${aVal}$
+                </span>
+                ${isZero 
+                  ? '<span class="px-2 py-0.5 rounded-full text-[11px] font-bold bg-amber-200 text-amber-900">เป็น 0 (ลดทอนได้ทันที 🚀)</span>' 
+                  : `<span class="text-slate-500 font-mono text-[11px]">เครื่องหมาย: ${signVal > 0 ? '+1' : '-1'}</span>`}
+              </div>
+              <div class="text-xs sm:text-sm text-slate-700">
+                ${isZero ? `
+                  <p class="text-amber-900">เนื่องจากสมาชิก $a_{${r+1}${c+1}} = 0$ ดังนั้น $0 \\times C_{${r+1}${c+1}} = 0$ <strong>(ไม่ต้องคำนวณไมเนอร์!)</strong></p>
+                ` : `
+                  $$C_{${r+1}${c+1}} = (${signVal > 0 ? '+1' : '-1'}) \\times (${minorVal}) = ${cofactorVal}$$
+                  <div class="text-right text-xs font-mono font-semibold text-indigo-700 pt-0.5">
+                    ผลคูณ = $(${aVal}) \\times (${cofactorVal}) = ${termProduct}$
+                  </div>
+                `}
+              </div>
+            </div>
+          `;
+        }
+
+        output.innerHTML = `
+          <div class="space-y-4">
+            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between border-b border-slate-100 pb-3 gap-2">
+              <div>
+                <span class="text-xs uppercase font-bold text-indigo-600 tracking-wider">โหมดการขยายดีเทอร์มิแนนต์</span>
+                <h3 class="text-lg font-heading font-bold text-slate-900">
+                  ขยายตาม${targetLabel}
+                </h3>
+              </div>
+              <div>
+                <span class="inline-block px-3 py-1 rounded-full text-xs font-semibold ${zeroCount > 0 ? 'bg-emerald-100 text-emerald-800 border border-emerald-200' : 'bg-slate-100 text-slate-700'}">
+                  พบศูนย์ทั้งหมด: ${zeroCount} ตำแหน่ง
+                </span>
+              </div>
+            </div>
+
+            <!-- Formula Summary -->
+            <div class="bg-indigo-50/60 p-3.5 rounded-xl border border-indigo-100 text-xs sm:text-sm text-indigo-950 overflow-x-auto">
+              <div class="font-semibold mb-1">สูตรผลรวม:</div>
+              $$\\det(A) = ${termsMath.join(' + ')}$$
+              $$= ${termsExpanded.join(' + ')} = ${totalSum}$$
+            </div>
+
+            <!-- Step by step accordion list -->
+            <div class="space-y-2 max-h-[260px] overflow-y-auto pr-1">
+              ${stepsHtml}
+            </div>
+          </div>
+        `;
+      }
+
+      // Re-render LaTeX math equations via MathJax
+      if (window.MathJax && MathJax.typesetPromise) {
+        MathJax.typesetPromise([output, totalDetSpan]).catch((err) => console.log(err));
+      }
+    }
+
+    function renderAll() {
+      renderMatrixGrid();
+      updateCalculation();
+    }
+
+    // Toggle exercise solutions
+    function toggleExercise(id) {
+      const sol = document.getElementById(`${id}-solution`);
+      const btnText = document.getElementById(`${id}-btn-text`);
+      if (sol.classList.contains('hidden')) {
+        sol.classList.remove('hidden');
+        btnText.textContent = 'ซ่อนเฉลย';
+        if (window.MathJax && MathJax.typesetPromise) {
+          MathJax.typesetPromise([sol]).catch(err => console.log(err));
+        }
+      } else {
+        sol.classList.add('hidden');
+        btnText.textContent = 'ดูเฉลยละเอียด';
+      }
+    }
+  </script>
+</body>
+</html>
