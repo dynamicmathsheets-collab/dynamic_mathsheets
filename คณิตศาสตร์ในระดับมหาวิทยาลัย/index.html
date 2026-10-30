@@ -1,0 +1,591 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>คณิตศาสตร์ในระดับมหาวิทยาลัย - Dynamic Mathsheets</title>
+  <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #2563eb;
+      --primary-hover: #1d4ed8;
+      --bg-color: #f8fafc;
+      --card-bg: #ffffff;
+      --text-main: #0f172a;
+      --text-sub: #475569;
+      --border: #e2e8f0;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Prompt', sans-serif;
+    }
+
+    body {
+      background-color: var(--bg-color);
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .app-wrapper {
+      flex: 1;
+      max-width: 1100px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 24px 20px 40px;
+    }
+
+    /* แถบเมนูด้านบน */
+    .top-action-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 14px;
+      margin-bottom: 28px;
+    }
+
+    .btn-back {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 9px 18px;
+      background: #ffffff;
+      color: var(--text-sub);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      text-decoration: none;
+      font-size: 0.95rem;
+      font-weight: 500;
+      transition: all 0.2s ease;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+    }
+
+    .btn-back:hover {
+      background: #f1f5f9;
+      color: var(--primary);
+    }
+
+    .nav-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .user-profile-badge {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: #ffffff;
+      padding: 6px 16px 6px 8px;
+      border-radius: 20px;
+      border: 1px solid var(--border);
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+    }
+
+    .user-avatar {
+      width: 28px;
+      height: 28px;
+      background: #eff6ff;
+      color: var(--primary);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .user-avatar svg {
+      width: 17px;
+      height: 17px;
+    }
+
+    .user-name {
+      font-size: 0.9rem;
+      font-weight: 500;
+      color: var(--text-main);
+      max-width: 160px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .lang-switcher {
+      display: flex;
+      background: #e2e8f0;
+      padding: 4px;
+      border-radius: 12px;
+      gap: 4px;
+    }
+
+    .btn-lang {
+      border: none;
+      padding: 6px 12px;
+      border-radius: 8px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--text-sub);
+      background: transparent;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .btn-lang.active {
+      background: #ffffff;
+      color: var(--primary);
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+    }
+
+    .btn-logout {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: #fee2e2;
+      color: #dc2626;
+      border: 1px solid #fecaca;
+      padding: 8px 16px;
+      border-radius: 12px;
+      font-size: 0.9rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .btn-logout:hover {
+      background: #dc2626;
+      color: #ffffff;
+    }
+
+    /* แบนเนอร์หัวเรื่อง */
+    .hero-banner {
+      background: linear-gradient(135deg, #1e3a8a, #2563eb, #38bdf8);
+      border-radius: 20px;
+      padding: 40px 32px;
+      color: #ffffff;
+      box-shadow: 0 8px 24px rgba(37, 99, 235, 0.2);
+      margin-bottom: 28px;
+    }
+
+    .hero-banner h1 {
+      font-size: 1.85rem;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    .hero-banner p {
+      font-size: 1rem;
+      opacity: 0.92;
+      font-weight: 300;
+    }
+
+    /* กรอบแสดงรายวิชา */
+    .course-frame {
+      background: #ffffff;
+      border-radius: 20px;
+      border: 1px solid var(--border);
+      padding: 30px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03);
+    }
+
+    .frame-title {
+      font-size: 1.35rem;
+      font-weight: 700;
+      color: var(--text-main);
+      margin-bottom: 24px;
+    }
+
+    .course-desc-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(290px, 1fr));
+      gap: 22px;
+    }
+
+    /* กล่องรายวิชา (รูปแบบการ์ดแบบมนด้านบน) */
+    .course-box {
+      background: #ffffff;
+      border-radius: 18px;
+      border: 1px solid var(--border);
+      padding: 26px 22px;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.04);
+      overflow: hidden;
+    }
+
+    .course-box::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 6px;
+    }
+
+    .course-box.b-blue::before { background: #3b82f6; }
+    .course-box.b-purple::before { background: #7c3aed; }
+    .course-box.b-teal::before { background: #06b6d4; }
+
+    .course-badge {
+      display: inline-block;
+      font-size: 0.8rem;
+      font-weight: 700;
+      padding: 4px 10px;
+      border-radius: 8px;
+      margin-bottom: 14px;
+      width: fit-content;
+    }
+
+    .b-blue .course-badge { background: #eff6ff; color: #2563eb; }
+    .b-purple .course-badge { background: #f5f3ff; color: #7c3aed; }
+    .b-teal .course-badge { background: #ecfeff; color: #0891b2; }
+
+    .course-name {
+      font-size: 1.35rem;
+      font-weight: 700;
+      color: #0f172a;
+      margin-bottom: 14px;
+    }
+
+    .course-text {
+      font-size: 0.92rem;
+      color: var(--text-sub);
+      line-height: 1.75;
+      text-align: justify;
+      flex-grow: 1;
+    }
+
+    /* โซนหัวข้อย่อยด้านล่างคำอธิบาย (แสดงเฉพาะเรื่องที่เปิดสอน) */
+    .topic-container {
+      margin-top: 20px;
+      padding-top: 16px;
+      border-top: 1px dashed #e2e8f0;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .topic-label {
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: #94a3b8;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    /* ปุ่มเรื่อง เมทริกซ์ (Matrix) */
+    .btn-topic {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: #f5f3ff;
+      border: 1px solid #ddd6fe;
+      padding: 12px 16px;
+      border-radius: 12px;
+      text-decoration: none;
+      color: #6d28d9;
+      font-weight: 600;
+      font-size: 0.95rem;
+      transition: all 0.2s ease;
+    }
+
+    .btn-topic:hover {
+      background: #7c3aed;
+      color: #ffffff;
+      border-color: #7c3aed;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(124, 58, 237, 0.25);
+    }
+
+    .btn-topic svg {
+      width: 18px;
+      height: 18px;
+      transition: transform 0.2s;
+    }
+
+    .btn-topic:hover svg {
+      transform: translateX(4px);
+    }
+
+    /* Footer */
+    footer {
+      background: #ffffff;
+      border-top: 1px solid var(--border);
+      padding: 22px 20px;
+      margin-top: auto;
+    }
+
+    .footer-inner {
+      max-width: 1100px;
+      margin: 0 auto;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      font-size: 0.95rem;
+      color: var(--text-sub);
+    }
+
+    .footer-inner a {
+      color: var(--primary);
+      text-decoration: none;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="app-wrapper">
+
+    <!-- แถบด้านบน -->
+    <div class="top-action-bar">
+      <div>
+        <a href="../index.html" class="btn-back">
+          <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+          </svg>
+          <span data-i18n="btn_back">กลับหน้าหลัก</span>
+        </a>
+      </div>
+
+      <div class="nav-actions">
+        <div id="userProfileBadge" class="user-profile-badge">
+          <div class="user-avatar">
+            <svg fill="currentColor" viewBox="0 0 24 24">
+              <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+            </svg>
+          </div>
+          <span id="txtUserName" class="user-name">ศุภชัย ราชอาจ</span>
+        </div>
+
+        <div class="lang-switcher">
+          <button class="btn-lang" id="btnTh" onclick="setLanguage('th')">TH</button>
+          <button class="btn-lang" id="btnEn" onclick="setLanguage('en')">EN</button>
+        </div>
+
+        <button class="btn-logout" onclick="handleLogout()">
+          <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
+          </svg>
+          <span data-i18n="btn_logout">ออกจากระบบ</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- แบนเนอร์ -->
+    <div class="hero-banner">
+      <h1 data-i18n="hero_title">คณิตศาสตร์ในระดับมหาวิทยาลัย</h1>
+      <p data-i18n="hero_sub">เลือกสื่อและกิจกรรมการเรียนรู้ที่ต้องการทดลองใช้งานในชั้นเรียน</p>
+    </div>
+
+    <!-- กล่องรายวิชา -->
+    <section class="course-frame">
+      <h2 class="frame-title" data-i18n="section_title">รายวิชาที่เปิดให้ศึกษา</h2>
+      <div class="course-desc-grid">
+        
+        <!-- รายวิชาที่ 1: แคลคูลัส 1 -->
+        <div class="course-box b-blue">
+          <span class="course-badge" data-i18n="badge_course1">รายวิชาที่ 1</span>
+          <h3 class="course-name" data-i18n="course1_title">แคลคูลัส 1</h3>
+          <p class="course-text" data-i18n="course1_desc">
+            ลิมิตและความต่อเนื่องของฟังก์ชัน อนุพันธ์ของฟังก์ชันหนึ่งตัวแปร อนุพันธ์ของฟังก์ชันปริยาย การประยุกต์อนุพันธ์ หลักเกณฑ์ของโลปิตาล ปริพันธ์ เทคนิคการหาปริพันธ์ ปริพันธ์ไม่ตรงแบบ การประยุกต์ของปริพันธ์
+          </p>
+        </div>
+
+        <!-- รายวิชาที่ 2: พีชคณิตเชิงเส้น (มีหัวข้อ เมทริกซ์ อยู่ด้านล่าง) -->
+        <div class="course-box b-purple">
+          <span class="course-badge" data-i18n="badge_course2">รายวิชาที่ 2</span>
+          <h3 class="course-name" data-i18n="course2_title">พีชคณิตเชิงเส้น</h3>
+          <p class="course-text" data-i18n="course2_desc">
+            เมทริกซ์ ตัวกำหนด ระบบสมการเชิงเส้น การดำเนินการขั้นมูลฐาน ปริภูมิเวกเตอร์ ปริภูมิย่อย ฐานหลัก การแปลงเชิงเส้น ค่าลักษณะเฉพาะและเวกเตอร์ลักษณะเฉพาะ
+          </p>
+          
+          <!-- หัวข้อย่อยที่พัฒนาเสร็จแล้ว -->
+          <div class="topic-container">
+            <span class="topic-label" data-i18n="topic_label">บทเรียนที่พร้อมใช้งาน:</span>
+            <a href="เมทริกซ์ ระดับมหาลัย/index.html" class="btn-topic">
+              <span data-i18n="topic_matrix">เมทริกซ์ (Matrix)</span>
+              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
+              </svg>
+            </a>
+          </div>
+        </div>
+
+        <!-- รายวิชาที่ 3: ทฤษฏีสมการ -->
+        <div class="course-box b-teal">
+          <span class="course-badge" data-i18n="badge_course3">รายวิชาที่ 3</span>
+          <h3 class="course-name" data-i18n="course3_title">ทฤษฏีสมการ</h3>
+          <p class="course-text" data-i18n="course3_desc">
+            พหุนามตัวแปรเดียว กระบวนการของฮอร์เนอร์ สูตรของเทย์เลอร์ สมการพหุนาม ความสัมพันธ์ระหว่างค่ารากและสัมประสิทธิ์ สมการกำลังสอง สมการกำลังสาม สมการกำลังสี่ รากตรรกยะ กฎของเดการ์ต การประมาณค่าราก
+          </p>
+        </div>
+
+      </div>
+    </section>
+
+  </div>
+
+  <footer>
+    <div class="footer-inner">
+      <div><strong data-i18n="footer_contact">ติดต่อเรา Email :</strong> dynamic.mathsheets@gmail.com</div>
+      <div><strong data-i18n="footer_page">เพจ :</strong> <a href="https://www.facebook.com/profile.php?id=61577190162363" target="_blank" rel="noopener noreferrer">Dynamic Mathsheets Facebook Page</a></div>
+    </div>
+  </footer>
+
+  <script>
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycby1xfgp5uhHnlB5spDJRrpRGWdaNnYOXc4yBIb3p12uMpAxEnNCk4E2u9AlmRtRg_Pz/exec";
+
+    const translations = {
+      th: {
+        btn_back: "กลับหน้าหลัก",
+        btn_logout: "ออกจากระบบ",
+        hero_title: "คณิตศาสตร์ในระดับมหาวิทยาลัย",
+        hero_sub: "เลือกสื่อและกิจกรรมการเรียนรู้ที่ต้องการทดลองใช้งานในชั้นเรียน",
+        section_title: "รายวิชาที่เปิดให้ศึกษา",
+        badge_course1: "รายวิชาที่ 1",
+        course1_title: "แคลคูลัส 1",
+        course1_desc: "ลิมิตและความต่อเนื่องของฟังก์ชัน อนุพันธ์ของฟังก์ชันหนึ่งตัวแปร อนุพันธ์ของฟังก์ชันปริยาย การประยุกต์อนุพันธ์ หลักเกณฑ์ของโลปิตาล ปริพันธ์ เทคนิคการหาปริพันธ์ ปริพันธ์ไม่ตรงแบบ การประยุกต์ของปริพันธ์",
+        badge_course2: "รายวิชาที่ 2",
+        course2_title: "พีชคณิตเชิงเส้น",
+        course2_desc: "เมทริกซ์ ตัวกำหนด ระบบสมการเชิงเส้น การดำเนินการขั้นมูลฐาน ปริภูมิเวกเตอร์ ปริภูมิย่อย ฐานหลัก การแปลงเชิงเส้น ค่าลักษณะเฉพาะและเวกเตอร์ลักษณะเฉพาะ",
+        badge_course3: "รายวิชาที่ 3",
+        course3_title: "ทฤษฏีสมการ",
+        course3_desc: "พหุนามตัวแปรเดียว กระบวนการของฮอร์เนอร์ สูตรของเทย์เลอร์ สมการพหุนาม ความสัมพันธ์ระหว่างค่ารากและสัมประสิทธิ์ สมการกำลังสอง สมการกำลังสาม สมการกำลังสี่ รากตรรกยะ กฎของเดการ์ต การประมาณค่าราก",
+        topic_label: "บทเรียนที่พร้อมใช้งาน:",
+        topic_matrix: "เมทริกซ์ (Matrix)",
+        footer_contact: "ติดต่อเรา Email :",
+        footer_page: "เพจ :",
+        confirm_logout: "คุณต้องการออกจากระบบหรือไม่?"
+      },
+      en: {
+        btn_back: "Back to Home",
+        btn_logout: "Sign Out",
+        hero_title: "University Mathematics",
+        hero_sub: "Explore learning materials and trial modules for classroom instruction",
+        section_title: "Available Courses",
+        badge_course1: "Course 1",
+        course1_title: "Calculus 1",
+        course1_desc: "Limits and continuity of functions, derivatives of single-variable functions, implicit differentiation, applications of derivatives, L'Hôpital's rule, integrals, integration techniques, improper integrals, applications of integration.",
+        badge_course2: "Course 2",
+        course2_title: "Linear Algebra",
+        course2_desc: "Matrices, determinants, systems of linear equations, elementary row operations, vector spaces, subspaces, bases, linear transformations, eigenvalues and eigenvectors.",
+        badge_course3: "Course 3",
+        course3_title: "Theory of Equations",
+        course3_desc: "Single-variable polynomials, Horner's method, Taylor's formula, polynomial equations, relationships between roots and coefficients, quadratic, cubic, and quartic equations, rational roots, Descartes' rule of signs, root approximation.",
+        topic_label: "Available Topics:",
+        topic_matrix: "Matrix",
+        footer_contact: "Contact us Email :",
+        footer_page: "Facebook Page :",
+        confirm_logout: "Do you want to log out?"
+      }
+    };
+
+    let currentLang = "th";
+
+    function detectInitialLanguage() {
+      const savedLang = localStorage.getItem("dms_lang");
+      if (savedLang) return savedLang;
+
+      try {
+        const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+        if (timeZone === "Asia/Bangkok" || timeZone.includes("Bangkok")) {
+          return "th";
+        }
+      } catch (e) {}
+
+      const offset = new Date().getTimezoneOffset();
+      if (offset === -420) return "th";
+
+      const userLang = (navigator.language || navigator.userLanguage || "").toLowerCase();
+      if (userLang.startsWith("th")) return "th";
+
+      return "en";
+    }
+
+    function setLanguage(lang) {
+      currentLang = lang;
+      localStorage.setItem("dms_lang", lang);
+
+      document.querySelectorAll("[data-i18n]").forEach(el => {
+        const key = el.getAttribute("data-i18n");
+        if (translations[lang] && translations[lang][key]) {
+          el.textContent = translations[lang][key];
+        }
+      });
+
+      document.getElementById("btnTh").classList.toggle("active", lang === "th");
+      document.getElementById("btnEn").classList.toggle("active", lang === "en");
+    }
+
+    function callAppsScriptJSONP(params) {
+      return new Promise((resolve) => {
+        const callbackName = "jsonp_cb_" + Math.round(100000 * Math.random());
+        const script = document.createElement("script");
+
+        const timer = setTimeout(() => {
+          cleanup();
+          resolve({});
+        }, 8000);
+
+        function cleanup() {
+          if (window[callbackName]) delete window[callbackName];
+          if (script.parentNode) script.parentNode.removeChild(script);
+          clearTimeout(timer);
+        }
+
+        window[callbackName] = function(data) {
+          cleanup();
+          resolve(data);
+        };
+
+        const query = Object.keys(params)
+          .map(k => `${encodeURIComponent(k)}=${encodeURIComponent(params[k])}`)
+          .join("&");
+
+        script.src = `${SCRIPT_URL}?${query}&callback=${callbackName}`;
+        script.onerror = function() {
+          cleanup();
+          resolve({});
+        };
+
+        document.body.appendChild(script);
+      });
+    }
+
+    async function handleLogout() {
+      const confirmText = translations[currentLang].confirm_logout;
+      if (!confirm(confirmText)) return;
+
+      const userEmail = localStorage.getItem("dms_user_email") || sessionStorage.getItem("dms_current_user");
+
+      try {
+        if (userEmail) {
+          await callAppsScriptJSONP({ action: "logout", email: userEmail });
+        }
+      } catch (err) {
+        console.error("Logout error:", err);
+      } finally {
+        localStorage.removeItem("dms_user_name");
+        localStorage.removeItem("dms_user_email");
+        localStorage.removeItem("dms_is_logged_in");
+        localStorage.removeItem("dms_is_student");
+        localStorage.removeItem("dms_is_researcher");
+        sessionStorage.removeItem("dms_current_user");
+
+        window.location.href = "../index.html";
+      }
+    }
+
+    const savedName = localStorage.getItem("dms_user_name");
+    if (savedName) {
+      document.getElementById("txtUserName").textContent = savedName;
+    }
+    setLanguage(detectInitialLanguage());
+  </script>
+</body>
+</html>
+```[cite: 1, 3, 6]
