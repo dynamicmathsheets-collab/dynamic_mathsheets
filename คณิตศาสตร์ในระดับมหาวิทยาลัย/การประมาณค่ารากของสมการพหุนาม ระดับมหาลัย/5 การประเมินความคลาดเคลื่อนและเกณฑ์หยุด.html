@@ -1,0 +1,1013 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>เรื่องที่ 5: การประเมินความคลาดเคลื่อนและเกณฑ์หยุด</title>
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Google Fonts: Sarabun & Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <!-- KaTeX for math rendering -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js"></script>
+
+  <!-- Chart.js for Error Convergence visualization -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Sarabun', 'Inter', 'sans-serif'],
+          },
+          colors: {
+            brand: {
+              50: '#f0fdfa',
+              100: '#ccfbf1',
+              500: '#14b8a6',
+              600: '#0d9488',
+              700: '#0f766e',
+              800: '#115e59',
+              900: '#134e4a',
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    html { scroll-behavior: smooth; }
+    .katex-display { margin: 0.5em 0; overflow-x: auto; overflow-y: hidden; padding-bottom: 2px; }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-800 font-sans antialiased selection:bg-teal-100 selection:text-teal-900 min-h-screen">
+
+  <!-- Header Banner -->
+  <header class="bg-gradient-to-r from-slate-900 via-teal-950 to-slate-900 text-white border-b border-teal-800/40 shadow-sm">
+    <div class="max-w-6xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
+
+      <h1 class="text-2xl sm:text-3xl md:text-4xl font-bold tracking-tight text-white flex items-center gap-3">
+        <span>เรื่องที่ 5: การประเมินความคลาดเคลื่อนและเกณฑ์หยุด</span>
+      </h1>
+      <p class="mt-2 text-slate-300 text-base sm:text-lg max-w-3xl">
+        Error Estimation & Stopping Criteria — ศึกษาการวัดความแม่นยำด้วยผลต่างสเต็ป ($E_n$), ค่าตกค้าง ($R_n$), ขอบเขตค่าผิดพลาด และการเปรียบเทียบประสิทธิภาพของวิธีเชิงตัวเลข
+      </p>
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <main class="max-w-6xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 space-y-10">
+
+    <!-- Section 1: Learning Objectives -->
+    <section class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 sm:p-7 relative overflow-hidden">
+      <div class="absolute top-0 left-0 w-2 h-full bg-teal-600"></div>
+      <div class="flex items-center gap-3 mb-4">
+        <div class="p-2.5 bg-teal-50 text-teal-700 rounded-xl">
+          <i class="fa-solid fa-bullseye text-xl"></i>
+        </div>
+        <h2 class="text-xl sm:text-2xl font-bold text-slate-900">1. วัตถุประสงค์การเรียนรู้</h2>
+      </div>
+      <p class="text-slate-600 mb-4 text-base leading-relaxed">
+        เมื่อเสร็จสิ้นการศึกษาชุดการเรียนรู้นี้แล้ว นักศึกษาจะมีความรู้ความสามารถดังต่อไปนี้:
+      </p>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div class="bg-slate-50 border border-slate-100 rounded-xl p-4 transition-all hover:border-teal-200 hover:bg-teal-50/40">
+          <div class="text-teal-700 font-semibold mb-1 flex items-center gap-2">
+            <span class="w-6 h-6 rounded-full bg-teal-100 text-teal-700 text-xs flex items-center justify-center font-bold">1</span>
+            คำนวณค่าคลาดเคลื่อน
+          </div>
+          <p class="text-slate-600 text-sm">คำนวณและประเมินค่าคลาดเคลื่อนของค่าประมาณราก ทั้งในรูปผลต่างระหว่างรอบ ($E_n$) และค่าตกค้างของฟังก์ชัน ($R_n$)</p>
+        </div>
+        <div class="bg-slate-50 border border-slate-100 rounded-xl p-4 transition-all hover:border-teal-200 hover:bg-teal-50/40">
+          <div class="text-teal-700 font-semibold mb-1 flex items-center gap-2">
+            <span class="w-6 h-6 rounded-full bg-teal-100 text-teal-700 text-xs flex items-center justify-center font-bold">2</span>
+            กำหนดเกณฑ์หยุดที่รัดกุม
+          </div>
+          <p class="text-slate-600 text-sm">เลือกและกำหนดเกณฑ์หยุดการทำซ้ำ (Stopping Criteria) ได้อย่างเหมาะสมตามข้อกำหนดและธรรมชาติของสมการ</p>
+        </div>
+        <div class="bg-slate-50 border border-slate-100 rounded-xl p-4 transition-all hover:border-teal-200 hover:bg-teal-50/40">
+          <div class="text-teal-700 font-semibold mb-1 flex items-center gap-2">
+            <span class="w-6 h-6 rounded-full bg-teal-100 text-teal-700 text-xs flex items-center justify-center font-bold">3</span>
+            แยกแยะ Residual vs Error
+          </div>
+          <p class="text-slate-600 text-sm">อธิบายความแตกต่างและแยกแยะกรณีที่ค่าฟังก์ชันใกล้ศูนย์ ($|f(x_n)| \approx 0$) แต่ค่าประมาณยังมีคลาดเคลื่อนสูงได้</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Section 2: Core Concepts -->
+    <section class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 sm:p-7 space-y-6">
+      <div class="flex items-center gap-3">
+        <div class="p-2.5 bg-teal-50 text-teal-700 rounded-xl">
+          <i class="fa-solid fa-book-bookmark text-xl"></i>
+        </div>
+        <h2 class="text-xl sm:text-2xl font-bold text-slate-900">2. เนื้อหาหลัก</h2>
+      </div>
+
+      <p class="text-slate-700 leading-relaxed text-sm sm:text-base">
+        ในการคำนวณเชิงตัวเลขเพื่อประมาณค่ารากของสมการ $f(x) = 0$ เราไม่สามารถทำซ้ำไปได้เรื่อยๆ โดยไม่มีที่สิ้นสุด และไม่ควรตัดสินความแม่นยำจากเพียง <em>"จำนวนรอบที่คำนวณ"</em> แต่ต้องมีเกณฑ์วัดทางคณิตศาสตร์ที่ชัดเจนในการตรวจสอบความถูกต้องและหยุดการทำซ้ำ:
+      </p>
+
+      <!-- 3 Metrics Grid -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <!-- Metric 1: Step Difference -->
+        <div class="bg-slate-50 border border-slate-200 rounded-xl p-4.5 space-y-2">
+          <div class="font-bold text-slate-900 flex items-center gap-2 text-sm sm:text-base">
+            <span class="w-6 h-6 rounded-full bg-teal-600 text-white text-xs flex items-center justify-center font-bold">1</span>
+            ผลต่างระหว่างรอบ (Step Difference)
+          </div>
+          <div class="text-center py-2 bg-white rounded-lg border border-slate-200 font-semibold text-slate-900">
+            \[ E_n = |x_n - x_{n-1}| \]
+          </div>
+          <p class="text-slate-600 text-xs leading-relaxed">
+            วัดระยะการเคลื่อนที่ของค่าประมาณระหว่างสองรอบติดกัน เมื่อค่าประมาณเริ่มนิ่ง $E_n$ จะมีค่าน้อยลง นิยมใช้ทั้งในวิธีนิวตันและวิธีเส้นตัด
+          </p>
+        </div>
+
+        <!-- Metric 2: Residual -->
+        <div class="bg-slate-50 border border-slate-200 rounded-xl p-4.5 space-y-2">
+          <div class="font-bold text-slate-900 flex items-center gap-2 text-sm sm:text-base">
+            <span class="w-6 h-6 rounded-full bg-teal-600 text-white text-xs flex items-center justify-center font-bold">2</span>
+            ค่าตกค้างฟังก์ชัน (Residual)
+          </div>
+          <div class="text-center py-2 bg-white rounded-lg border border-slate-200 font-semibold text-slate-900">
+            \[ R_n = |f(x_n)| \]
+          </div>
+          <p class="text-slate-600 text-xs leading-relaxed">
+            วัดว่าค่าประมาณ $x_n$ นำไปแทนในสมการแล้วให้ผลลัพธ์ใกล้ศูนย์มากเพียงใด หาก $R_n$ น้อย แสดงว่าใกล้เคียงกับการเป็นคำตอบของสมการ
+          </p>
+        </div>
+
+        <!-- Metric 3: Error Bound -->
+        <div class="bg-slate-50 border border-slate-200 rounded-xl p-4.5 space-y-2">
+          <div class="font-bold text-slate-900 flex items-center gap-2 text-sm sm:text-base">
+            <span class="w-6 h-6 rounded-full bg-teal-600 text-white text-xs flex items-center justify-center font-bold">3</span>
+            ขอบเขตวิธีแบ่งครึ่งช่วง (Error Bound)
+          </div>
+          <div class="text-center py-2 bg-white rounded-lg border border-slate-200 font-semibold text-slate-900">
+            \[ |x_n - r| \le \frac{b_n - a_n}{2} \]
+          </div>
+          <p class="text-slate-600 text-xs leading-relaxed">
+            เมื่อรากจริง $r$ อยู่ในช่วง $[a_n, b_n]$ ค่าคลาดเคลื่อนสัมบูรณ์ของจุดกึ่งกลาง $x_n$ จะไม่เกินครึ่งหนึ่งของความยาวช่วงเสมอ เป็นวิธีเดียวที่การันตีขอบเขตแท้จริง
+          </p>
+        </div>
+      </div>
+
+      <!-- Critical Caution: Residual vs Error -->
+      <div class="bg-amber-50/90 border-l-4 border-amber-500 rounded-r-xl p-5 text-amber-950 space-y-2">
+        <div class="flex items-start gap-3">
+          <i class="fa-solid fa-triangle-exclamation text-amber-600 mt-1 text-lg"></i>
+          <div>
+            <h4 class="font-bold text-base text-amber-900 mb-1">
+              ข้อควรระวังสำคัญ: ค่า $R_n = |f(x_n)|$ น้อย ไม่ได้แปลว่าค่าคลาดเคลื่อนของราก $|x_n - r|$ จะน้อยเสมอไป!
+            </h4>
+            <p class="text-sm leading-relaxed text-amber-900/90">
+              พิจารณาสมการที่มีความแบนราบใกล้ราก เช่น <strong>$f(x) = x^{10} = 0$</strong> (มีรากจริงคือ $r = 0$):
+            </p>
+            <ul class="list-disc list-inside text-xs sm:text-sm mt-1 space-y-1 text-amber-900/90">
+              <li>หากทดลองแทนค่า $x = 0.5$ จะได้ค่าฟังก์ชัน $f(0.5) = (0.5)^{10} \approx 0.000976 < 10^{-3}$ (ค่า $R_n$ น้อยมากจนเกือบเป็นศูนย์)</li>
+              <li>แต่ค่าคลาดเคลื่อนที่แท้จริงคือ $|0.5 - 0| = 0.5$ ซึ่งยังคลาดเคลื่อนสูงมากถึง $50\%$!</li>
+              <li>ในทางกลับกัน หากฟังก์ชันมีความชันสูงมาก ($|f'(r)| \gg 1$) การขยับ $x$ เพียงเล็กน้อยอาจทำให้ค่าฟังก์ชันเปลี่ยนไปอย่างมหาศาล</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- Combined Stopping Criteria -->
+      <div class="bg-gradient-to-br from-teal-50/60 via-slate-50 to-white border border-teal-200 rounded-xl p-5 space-y-3">
+        <h3 class="font-bold text-teal-950 text-base flex items-center gap-2">
+          <i class="fa-solid fa-circle-check text-teal-600"></i>
+          เกณฑ์หยุดที่ใช้ได้จริงและเกณฑ์ผสม (Combined Stopping Criteria)
+        </h3>
+        <p class="text-slate-700 text-sm leading-relaxed">
+          ในทางปฏิบัติ วิศวกรและนักวิทยาศาสตร์คำนวณนิยมกำหนดพิกัดความเผื่อ (Tolerance: $\varepsilon$) เช่น $10^{-2}, 10^{-4}, 10^{-6}$ โดยมีรูปแบบเกณฑ์หยุดดังนี้:
+        </p>
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs sm:text-sm">
+          <div class="bg-white p-3 rounded-lg border border-slate-200 shadow-xs">
+            <span class="font-bold text-slate-800 block mb-1">1. เกณฑ์สเต็ปการเปลี่ยน</span>
+            <div class="text-center font-mono font-bold text-teal-800 my-1">\[ |x_n - x_{n-1}| < \varepsilon \]</div>
+            <p class="text-slate-500 text-xs">หยุดเมื่อค่าประมาณไม่เปลี่ยนตำแหน่งอย่างมีนัยสำคัญ</p>
+          </div>
+          <div class="bg-white p-3 rounded-lg border border-slate-200 shadow-xs">
+            <span class="font-bold text-slate-800 block mb-1">2. เกณฑ์ค่าตกค้าง</span>
+            <div class="text-center font-mono font-bold text-teal-800 my-1">\[ |f(x_n)| < \varepsilon \]</div>
+            <p class="text-slate-500 text-xs">หยุดเมื่อสมการมีความสมดุลใกล้เคียงศูนย์ตามเกณฑ์</p>
+          </div>
+          <div class="bg-white p-3 rounded-lg border border-teal-300 shadow-xs ring-1 ring-teal-200">
+            <span class="font-bold text-teal-900 block mb-1">3. เกณฑ์ผสม (แนะนำ)</span>
+            <div class="text-center font-mono font-bold text-teal-700 my-1 text-xs">\[ |x_n - x_{n-1}| < \varepsilon \text{ AND } |f(x_n)| < \varepsilon \]</div>
+            <p class="text-slate-600 text-xs">ปลอดภัยสูงสุด ป้องกันทั้งกรณีฟังก์ชันแบนราบและฟังก์ชันชันจัด</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Section 3: Interactive Simulator & Comparison Tool -->
+    <section class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 sm:p-7 space-y-6">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-slate-100 gap-3">
+        <div class="flex items-center gap-3">
+          <div class="p-2.5 bg-teal-50 text-teal-700 rounded-xl">
+            <i class="fa-solid fa-sliders text-xl"></i>
+          </div>
+          <div>
+            <h2 class="text-xl sm:text-2xl font-bold text-slate-900">3. แบบจำลองโต้ตอบและการเปรียบเทียบ (Interactive Benchmark)</h2>
+            <p class="text-xs sm:text-sm text-slate-500">
+              กำหนดค่าความคลาดเคลื่อนที่ยอมรับได้ ($\varepsilon$) เลือกเกณฑ์หยุด แล้วเปรียบเทียบประสิทธิภาพ 3 วิธีพร้อมกัน
+            </p>
+          </div>
+        </div>
+        <button onclick="runBenchmark()" class="px-4 py-2 bg-teal-600 hover:bg-teal-700 text-white text-xs sm:text-sm font-semibold rounded-lg shadow-sm flex items-center gap-2 transition-all shrink-0">
+          <i class="fa-solid fa-play"></i> ประมวลผลการทดสอบ
+        </button>
+      </div>
+
+      <!-- Simulator Settings Toolbar -->
+      <div class="bg-slate-50 border border-slate-200 rounded-xl p-4 sm:p-5 space-y-4">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <!-- Equation Selector -->
+          <div>
+            <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">สมการทดสอบ $f(x) = 0$</label>
+            <select id="simEq" onchange="runBenchmark()" class="w-full bg-white border border-slate-300 rounded-lg px-3 py-2 text-xs sm:text-sm text-slate-800 font-medium focus:ring-2 focus:ring-teal-500 focus:outline-none">
+              <option value="eq1">f(x) = x³ - x - 2 (รากจริง ≈ 1.5214)</option>
+              <option value="eq2">f(x) = x² - 3 (รากจริง = √3 ≈ 1.7321)</option>
+              <option value="eq3">f(x) = x¹⁰ (ทดสอบ Residual vs Error, ราก = 0)</option>
+            </select>
+          </div>
+
+          <!-- Tolerance Selector -->
+          <div>
+            <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">ค่าพิกัดความเผื่อ ($\varepsilon$)</label>
+            <div class="flex items-center gap-1.5">
+              <button type="button" onclick="setTol(0.01)" class="tol-btn text-xs bg-white px-2.5 py-2 rounded-lg border border-slate-200 hover:bg-teal-50 font-mono">10⁻²</button>
+              <button type="button" onclick="setTol(0.0001)" class="tol-btn text-xs bg-teal-600 text-white px-2.5 py-2 rounded-lg border border-teal-600 font-mono font-bold">10⁻⁴</button>
+              <button type="button" onclick="setTol(0.000001)" class="tol-btn text-xs bg-white px-2.5 py-2 rounded-lg border border-slate-200 hover:bg-teal-50 font-mono">10⁻⁶</button>
+              <input type="number" step="any" id="customTol" value="0.0001" onchange="runBenchmark()" class="w-24 text-center px-2 py-1.5 border border-slate-300 rounded-lg text-xs font-mono focus:outline-none focus:ring-2 focus:ring-teal-500">
+            </div>
+          </div>
+
+          <!-- Stopping Criterion Mode -->
+          <div>
+            <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">เกณฑ์หยุด (Stopping Criteria)</label>
+            <select id="simCrit" onchange="runBenchmark()" class="w-full bg-white border border-slate-300 rounded-lg px-3 py-2 text-xs sm:text-sm text-slate-800 font-medium focus:ring-2 focus:ring-teal-500 focus:outline-none">
+              <option value="diff">1. |xₙ - xₙ₋₁| < ε (Step Difference)</option>
+              <option value="res">2. |f(xₙ)| < ε (Residual)</option>
+              <option value="both" selected>3. ทั้งคู่ (Both: |Δx| < ε AND |f(x)| < ε)</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- Benchmark Summary Comparison Cards -->
+      <div>
+        <h3 class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-3">สรุปผลการประเมินเปรียบเทียบ (Performance Summary)</h3>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4" id="summaryCardsContainer">
+          <!-- Bisection Card -->
+          <div class="bg-white border border-slate-200 rounded-xl p-4 shadow-xs relative overflow-hidden">
+            <div class="text-xs font-bold text-emerald-700 uppercase tracking-wider flex items-center justify-between mb-2">
+              <span>วิธีแบ่งครึ่งช่วง (Bisection)</span>
+              <span id="badgeBisec" class="px-2 py-0.5 rounded text-[11px] bg-emerald-100 text-emerald-800">ลู่เข้า</span>
+            </div>
+            <div class="text-3xl font-extrabold font-mono text-slate-900 mb-1" id="iterBisec">-</div>
+            <div class="text-xs text-slate-500 mb-3">รอบการทำซ้ำ (Iterations)</div>
+            <div class="space-y-1.5 text-xs font-mono border-t border-slate-100 pt-2.5 text-slate-600">
+              <div class="flex justify-between"><span>ค่าประมาณ x*:</span><span id="xBisec" class="font-bold text-slate-800">-</span></div>
+              <div class="flex justify-between"><span>ค่าตกค้าง |f(x*)|:</span><span id="resBisec">-</span></div>
+              <div class="flex justify-between"><span>ผลต่างสเต็ป E_final:</span><span id="diffBisec">-</span></div>
+            </div>
+          </div>
+
+          <!-- Newton-Raphson Card -->
+          <div class="bg-white border border-slate-200 rounded-xl p-4 shadow-xs relative overflow-hidden">
+            <div class="text-xs font-bold text-sky-700 uppercase tracking-wider flex items-center justify-between mb-2">
+              <span>วิธีนิวตัน–ราฟสัน (Newton)</span>
+              <span id="badgeNewton" class="px-2 py-0.5 rounded text-[11px] bg-sky-100 text-sky-800">ลู่เข้าเร็ว</span>
+            </div>
+            <div class="text-3xl font-extrabold font-mono text-slate-900 mb-1" id="iterNewton">-</div>
+            <div class="text-xs text-slate-500 mb-3">รอบการทำซ้ำ (Iterations)</div>
+            <div class="space-y-1.5 text-xs font-mono border-t border-slate-100 pt-2.5 text-slate-600">
+              <div class="flex justify-between"><span>ค่าประมาณ x*:</span><span id="xNewton" class="font-bold text-slate-800">-</span></div>
+              <div class="flex justify-between"><span>ค่าตกค้าง |f(x*)|:</span><span id="resNewton">-</span></div>
+              <div class="flex justify-between"><span>ผลต่างสเต็ป E_final:</span><span id="diffNewton">-</span></div>
+            </div>
+          </div>
+
+          <!-- Secant Method Card -->
+          <div class="bg-white border border-slate-200 rounded-xl p-4 shadow-xs relative overflow-hidden">
+            <div class="text-xs font-bold text-purple-700 uppercase tracking-wider flex items-center justify-between mb-2">
+              <span>วิธีเส้นตัด (Secant)</span>
+              <span id="badgeSecant" class="px-2 py-0.5 rounded text-[11px] bg-purple-100 text-purple-800">ลู่เข้าเร็ว</span>
+            </div>
+            <div class="text-3xl font-extrabold font-mono text-slate-900 mb-1" id="iterSecant">-</div>
+            <div class="text-xs text-slate-500 mb-3">รอบการทำซ้ำ (Iterations)</div>
+            <div class="space-y-1.5 text-xs font-mono border-t border-slate-100 pt-2.5 text-slate-600">
+              <div class="flex justify-between"><span>ค่าประมาณ x*:</span><span id="xSecant" class="font-bold text-slate-800">-</span></div>
+              <div class="flex justify-between"><span>ค่าตกค้าง |f(x*)|:</span><span id="resSecant">-</span></div>
+              <div class="flex justify-between"><span>ผลต่างสเต็ป E_final:</span><span id="diffSecant">-</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Convergence Rate Chart (Log Scale) -->
+      <div class="bg-white border border-slate-200 rounded-xl p-4 sm:p-5 shadow-inner space-y-2">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between text-xs gap-1">
+          <span class="font-bold text-slate-700 flex items-center gap-1.5">
+            <i class="fa-solid fa-chart-line text-teal-600"></i>
+            กราฟเปรียบเทียบอัตราการลดลงของความคลาดเคลื่อน (Logarithmic Error Decay)
+          </span>
+          <span class="text-slate-400">แกน Y แสดงค่าในรูป Log₁₀(Error)</span>
+        </div>
+        <div class="h-64 sm:h-72 w-full">
+          <canvas id="errorChart"></canvas>
+        </div>
+      </div>
+
+      <!-- Iteration History Table Tabs -->
+      <div class="space-y-3">
+        <div class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-200 pb-2">
+          <h3 class="text-xs font-bold text-slate-700 uppercase tracking-wider">
+            ตารางแสดงผลการทำซ้ำทีละรอบ (Step-by-Step Iteration Table)
+          </h3>
+          <!-- Method Tabs -->
+          <div class="flex items-center gap-1 bg-slate-100 p-1 rounded-lg">
+            <button onclick="switchTableTab('bisec')" id="tabBtnBisec" class="text-xs font-semibold px-3 py-1 rounded-md transition-colors bg-white shadow-xs text-teal-800">แบ่งครึ่งช่วง</button>
+            <button onclick="switchTableTab('newton')" id="tabBtnNewton" class="text-xs font-semibold px-3 py-1 rounded-md transition-colors text-slate-600 hover:text-slate-900">นิวตัน–ราฟสัน</button>
+            <button onclick="switchTableTab('secant')" id="tabBtnSecant" class="text-xs font-semibold px-3 py-1 rounded-md transition-colors text-slate-600 hover:text-slate-900">เส้นตัด</button>
+          </div>
+        </div>
+
+        <div class="overflow-x-auto border border-slate-200 rounded-xl shadow-xs">
+          <table class="w-full text-xs sm:text-sm text-left">
+            <thead class="bg-slate-100 text-slate-700 uppercase font-semibold text-[11px] sm:text-xs border-b border-slate-200">
+              <tr>
+                <th class="px-3 py-2.5 text-center">รอบที่ (n)</th>
+                <th class="px-3 py-2.5 font-mono">ค่าประมาณ xₙ</th>
+                <th class="px-3 py-2.5 font-mono">ค่าตกค้าง |f(xₙ)| (Rₙ)</th>
+                <th class="px-3 py-2.5 font-mono">ผลต่างสเต็ป |xₙ - xₙ₋₁| (Eₙ)</th>
+                <th class="px-3 py-2.5 font-mono">ขอบเขตความคลาดเคลื่อน</th>
+                <th class="px-3 py-2.5 text-center">สถานะเกณฑ์หยุด</th>
+              </tr>
+            </thead>
+            <tbody id="simTableBody" class="divide-y divide-slate-200 bg-white font-mono text-slate-700">
+              <!-- Dynamically Populated Rows -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- Section 4: Guided Discovery Questions -->
+    <section class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 sm:p-7 space-y-6">
+      <div class="flex items-center gap-3">
+        <div class="p-2.5 bg-amber-50 text-amber-700 rounded-xl">
+          <i class="fa-solid fa-lightbulb text-xl"></i>
+        </div>
+        <div>
+          <h2 class="text-xl sm:text-2xl font-bold text-slate-900">4. คำถามนำเพื่อค้นพบ (Guided Inquiry)</h2>
+          <p class="text-xs sm:text-sm text-slate-500">คิดไตร่ตรองคำถามเหล่านี้ก่อนกดเปิดดูการวิเคราะห์เชิงลึก</p>
+        </div>
+      </div>
+
+      <div class="space-y-4">
+        <!-- Question 1 -->
+        <div class="border border-slate-200 rounded-xl p-4 sm:p-5 transition hover:shadow-sm">
+          <div class="flex items-start justify-between gap-3">
+            <div class="flex items-start gap-3">
+              <span class="w-7 h-7 rounded-full bg-teal-100 text-teal-800 text-sm font-bold flex items-center justify-center shrink-0 mt-0.5">1</span>
+              <div>
+                <h3 class="font-bold text-slate-900 text-base">เหตุใดผลต่างระหว่างค่าประมาณสองรอบ ($|x_n - x_{n-1}|$) จึงไม่ใช่หลักฐานเพียงพอว่าค่าประมาณใกล้รากจริง?</h3>
+                <p class="text-xs text-slate-500 mt-0.5">พิจารณากรณีที่กระบวนการลู่เข้าช้ามาก เช่น Harmonic Series หรือฟังก์ชันที่ลู่ออกช้าๆ</p>
+              </div>
+            </div>
+            <button onclick="toggleInquiry(1)" id="btnInq1" class="text-xs sm:text-sm font-semibold text-teal-700 hover:text-teal-900 bg-teal-50 px-3 py-1.5 rounded-lg border border-teal-200 shrink-0 transition-colors">
+              แสดงแนวคิด
+            </button>
+          </div>
+          <div id="ansInq1" class="hidden mt-4 pt-3 border-t border-slate-100 text-slate-700 text-sm leading-relaxed bg-slate-50/70 p-3.5 rounded-lg">
+            <strong class="text-slate-900">แนวคิด:</strong>
+            ค่า $|x_n - x_{n-1}|$ บอกเพียงว่า <strong>"การเปลี่ยนแปลงในแต่ละก้าวมีขนาดเล็กมาก"</strong> แต่ไม่ได้การันตีว่าผลรวมของก้าวที่เหลือจะเล็ก เช่นเดียวกับอนุกรมฮาร์มอนิก $\sum \frac{1}{n}$ ที่ผลต่างระหว่างพจน์ติดกันเข้าใกล้ 0 แต่ผลรวมกลับลู่ออกสู่อนันต์ หากอัลกอริทึมลู่เข้าอย่างช้ามากๆ (Stalling) ค่า $|x_n - x_{n-1}|$ อาจมีค่าน้อยกว่า $\varepsilon$ ทั้งที่ตำแหน่งปัจจุบันยังอยู่ห่างไกลจากรากจริง $r$ อย่างมีนัยสำคัญ
+          </div>
+        </div>
+
+        <!-- Question 2 -->
+        <div class="border border-slate-200 rounded-xl p-4 sm:p-5 transition hover:shadow-sm">
+          <div class="flex items-start justify-between gap-3">
+            <div class="flex items-start gap-3">
+              <span class="w-7 h-7 rounded-full bg-teal-100 text-teal-800 text-sm font-bold flex items-center justify-center shrink-0 mt-0.5">2</span>
+              <div>
+                <h3 class="font-bold text-slate-900 text-base">การลดค่าความคลาดเคลื่อนที่ยอมรับได้ (เช่น จาก $10^{-2}$ ไป $10^{-6}$) ส่งผลต่อจำนวนรอบอย่างไรในแต่ละวิธี?</h3>
+                <p class="text-xs text-slate-500 mt-0.5">วิเคราะห์เปรียบเทียบอันดับการลู่เข้า (Order of Convergence: Linear vs Quadratic)</p>
+              </div>
+            </div>
+            <button onclick="toggleInquiry(2)" id="btnInq2" class="text-xs sm:text-sm font-semibold text-teal-700 hover:text-teal-900 bg-teal-50 px-3 py-1.5 rounded-lg border border-teal-200 shrink-0 transition-colors">
+              แสดงแนวคิด
+            </button>
+          </div>
+          <div id="ansInq2" class="hidden mt-4 pt-3 border-t border-slate-100 text-slate-700 text-sm leading-relaxed bg-slate-50/70 p-3.5 rounded-lg">
+            <strong class="text-slate-900">แนวคิด:</strong>
+            <ul class="list-disc list-inside space-y-1">
+              <li><strong>วิธีแบ่งครึ่งช่วง (Linear):</strong> การลด $\varepsilon$ ลง 100 เท่า (ทศนิยม 2 ตำแหน่ง) จะต้องใช้รอบเพิ่มขึ้นคงที่ประมาณ $\log_2(100) \approx 6.64$ รอบ (หรือราว 7 รอบ) ส่งผลให้จำนวนรอบเพิ่มขึ้นเป็นเส้นตรงตามความละเอียด</li>
+              <li><strong>วิธีนิวตัน–ราฟสัน (Quadratic):</strong> ความแม่นยำจะ <em>เพิ่มขึ้นเป็นสองเท่าในทุกๆ รอบ</em> (เช่น ทศนิยมถูกต้องจาก 2 &rarr; 4 &rarr; 8 ตำแหน่ง) ดังนั้น การลด $\varepsilon$ จาก $10^{-2}$ ไป $10^{-6}$ มักใช้รอบคำนวณเพิ่มขึ้นเพียง <strong>1 ถึง 2 รอบเท่านั้น!</strong></li>
+              <li><strong>วิธีเส้นตัด (Superlinear):</strong> เพิ่มจำนวนรอบเพียงเล็กน้อยเช่นกัน (ประมาณ 2–3 รอบ)</li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- Question 3 -->
+        <div class="border border-slate-200 rounded-xl p-4 sm:p-5 transition hover:shadow-sm">
+          <div class="flex items-start justify-between gap-3">
+            <div class="flex items-start gap-3">
+              <span class="w-7 h-7 rounded-full bg-teal-100 text-teal-800 text-sm font-bold flex items-center justify-center shrink-0 mt-0.5">3</span>
+              <div>
+                <h3 class="font-bold text-slate-900 text-base">เหตุใดวิธีแบ่งครึ่งช่วงจึงให้ขอบเขตความคลาดเคลื่อนได้ชัดเจนกว่าวิธีนิวตัน–ราฟสันในหลายกรณี?</h3>
+                <p class="text-xs text-slate-500 mt-0.5">พิจารณาสมบัติการตีกรอบ (Bracketing) กับระเบียบวิธีแบบเปิด (Open Method)</p>
+              </div>
+            </div>
+            <button onclick="toggleInquiry(3)" id="btnInq3" class="text-xs sm:text-sm font-semibold text-teal-700 hover:text-teal-900 bg-teal-50 px-3 py-1.5 rounded-lg border border-teal-200 shrink-0 transition-colors">
+              แสดงแนวคิด
+            </button>
+          </div>
+          <div id="ansInq3" class="hidden mt-4 pt-3 border-t border-slate-100 text-slate-700 text-sm leading-relaxed bg-slate-50/70 p-3.5 rounded-lg">
+            <strong class="text-slate-900">แนวคิด:</strong>
+            เพราะวิธีแบ่งครึ่งช่วงเป็น <strong>Bracketing Method</strong> ที่การันตีว่ารากแท้จริง $r$ ต้องถูกกักขังอยู่ภายในช่วงปิด $[a_n, b_n]$ ตลอดเวลา ดังนั้น ระยะห่างจากจุดกึ่งกลาง $x_n$ ไปยังราก $r$ ย่อมไม่มีทางเกินครึ่งหนึ่งของช่วง นั่นคือ $|x_n - r| \le \frac{b_n - a_n}{2}$ ได้อย่างแน่นอน 100%<br>
+            ในทางตรงกันข้าม วิธีนิวตัน–ราฟสันเป็น <strong>Open Method</strong> ที่คำนวณจุดลอยๆ โดยไม่มีกรอบกำกับ จึงทำได้เพียง <em>ประมาณการ</em> ค่าคลาดเคลื่อนจาก $|x_n - x_{n-1}|$ หรืออาศัยทฤษฎีบทเทย์เลอร์ $\frac{|f(x_n)|}{|f'(x_n)|}$ ซึ่งอาจผิดพลาดได้หากอนุพันธ์ใกล้เคียงศูนย์
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Section 5: Student Exercises -->
+    <section class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 sm:p-7 space-y-6">
+      <div class="flex items-center gap-3">
+        <div class="p-2.5 bg-indigo-50 text-indigo-700 rounded-xl">
+          <i class="fa-solid fa-pen-to-square text-xl"></i>
+        </div>
+        <div>
+          <h2 class="text-xl sm:text-2xl font-bold text-slate-900">5. แบบฝึกหัดสำหรับนักศึกษา</h2>
+          <p class="text-xs sm:text-sm text-slate-500">ทดสอบการคำนวณและตรวจสอบผลลัพธ์เพื่อประเมินความเข้าใจ</p>
+        </div>
+      </div>
+
+      <div class="space-y-6">
+        <!-- Exercise 1 -->
+        <div class="bg-slate-50 border border-slate-200 rounded-xl p-5 space-y-3">
+          <div class="flex items-start justify-between gap-3">
+            <h3 class="font-bold text-slate-900 text-base">
+              ข้อ 1. กำหนดเกณฑ์หยุด $\varepsilon = 10^{-4}$ ($0.0001$) แล้วประมาณรากของ $x^3 - x - 2 = 0$ ด้วยวิธีแบ่งครึ่งช่วง เริ่มจากช่วง $[1, 2]$
+            </h3>
+            <span class="text-xs bg-teal-100 text-teal-800 font-semibold px-2.5 py-1 rounded">สูตรจำนวนรอบขั้นต่ำ</span>
+          </div>
+          <p class="text-sm text-slate-600">
+            โดยใช้เงื่อนไขขอบเขตความคลาดเคลื่อน $\frac{b - a}{2^{n+1}} \le 10^{-4}$ ต้องทำซ้ำอย่างน้อยกี่รอบ ($n$)?
+          </p>
+
+          <div class="flex flex-wrap items-center gap-3">
+            <div class="flex items-center gap-2">
+              <label class="text-xs font-semibold text-slate-700">จำนวนรอบ $n$ (จำนวนเต็ม):</label>
+              <input type="number" id="ex1_input" placeholder="เช่น 13 หรือ 14" class="w-28 px-3 py-1.5 border border-slate-300 rounded-lg text-sm font-mono text-center focus:ring-2 focus:ring-teal-500 focus:outline-none">
+            </div>
+            <button onclick="checkEx1()" class="bg-teal-600 hover:bg-teal-700 text-white text-xs font-semibold px-4 py-2 rounded-lg transition-colors">
+              ตรวจคำตอบ
+            </button>
+            <button onclick="toggleExSol(1)" class="text-xs font-semibold text-slate-600 hover:text-slate-900 underline px-2 py-1">
+              ดูวิธีคำนวณ
+            </button>
+          </div>
+          <div id="ex1_feedback" class="text-xs sm:text-sm font-medium hidden p-2.5 rounded-lg"></div>
+
+          <div id="ex1_solution" class="hidden pt-3 border-t border-slate-200 text-xs sm:text-sm text-slate-700 leading-relaxed bg-white p-3.5 rounded-lg border">
+            <div class="font-bold text-slate-900 mb-1">วิธีคำนวณ:</div>
+            จากสูตรขอบเขตความคลาดเคลื่อนของจุดกึ่งกลาง:
+            \[ \frac{b - a}{2^{n+1}} \le 10^{-4} \]
+            แทนค่าช่วง $[1, 2]$ จะได้ $b - a = 1$:
+            \[ \frac{1}{2^{n+1}} \le 10^{-4} \implies 2^{n+1} \ge 10000 \]
+            \[ n + 1 \ge \frac{\ln(10000)}{\ln(2)} \approx 13.2877 \implies n \ge 12.2877 \]
+            ดังนั้น จำนวนรอบการทำซ้ำขั้นต่ำคือ <strong>13 รอบ</strong> (หรือหากใช้เกณฑ์ความยาวช่วงย่อย $\frac{b-a}{2^n} \le 10^{-4}$ จะได้ $n \ge 14$ รอบ ทั้งสองคำตอบถูกต้องตามนิยามที่เลือกใช้)
+          </div>
+        </div>
+
+        <!-- Exercise 2 -->
+        <div class="bg-slate-50 border border-slate-200 rounded-xl p-5 space-y-3">
+          <div class="flex items-start justify-between gap-3">
+            <h3 class="font-bold text-slate-900 text-base">
+              ข้อ 2. ใช้วิธีนิวตัน–ราฟสันประมาณรากของ $x^2 - 3 = 0$ (หาค่า $\sqrt{3}$) โดยเริ่มจาก $x_0 = 2$ และบันทึกค่า $E_n$ กับ $R_n$
+            </h3>
+            <span class="text-xs bg-sky-100 text-sky-800 font-semibold px-2.5 py-1 rounded">การเปรียบเทียบในแต่ละรอบ</span>
+          </div>
+          <p class="text-sm text-slate-600">
+            ในรอบที่ 2 ($n = 2$) ค่าประมาณ $x_2$ มีค่าเท่าใด? (ตอบเป็นทศนิยม 6 ตำแหน่ง เช่น 1.732143)
+          </p>
+
+          <div class="flex flex-wrap items-center gap-3">
+            <div class="flex items-center gap-2">
+              <label class="text-xs font-semibold text-slate-700">ค่าประมาณ $x_2$:</label>
+              <input type="text" id="ex2_input" placeholder="เช่น 1.732143" class="w-36 px-3 py-1.5 border border-slate-300 rounded-lg text-sm font-mono text-center focus:ring-2 focus:ring-teal-500 focus:outline-none">
+            </div>
+            <button onclick="checkEx2()" class="bg-teal-600 hover:bg-teal-700 text-white text-xs font-semibold px-4 py-2 rounded-lg transition-colors">
+              ตรวจคำตอบ
+            </button>
+            <button onclick="toggleExSol(2)" class="text-xs font-semibold text-slate-600 hover:text-slate-900 underline px-2 py-1">
+              ดูตารางเปรียบเทียบ Eₙ และ Rₙ
+            </button>
+          </div>
+          <div id="ex2_feedback" class="text-xs sm:text-sm font-medium hidden p-2.5 rounded-lg"></div>
+
+          <div id="ex2_solution" class="hidden pt-3 border-t border-slate-200 text-xs sm:text-sm text-slate-700 bg-white p-3.5 rounded-lg border">
+            <div class="font-bold text-slate-900 mb-1">ตารางบันทึกการคำนวณแต่ละรอบ:</div>
+            สูตร: $x_{n+1} = \frac{1}{2}\left(x_n + \frac{3}{x_n}\right)$
+            <div class="overflow-x-auto mt-2">
+              <table class="w-full text-xs font-mono text-center border-collapse">
+                <thead class="bg-slate-100 border-b">
+                  <tr>
+                    <th class="p-1.5">n</th>
+                    <th class="p-1.5 font-bold text-sky-800">xₙ</th>
+                    <th class="p-1.5">Rₙ = |f(xₙ)| = |xₙ² - 3|</th>
+                    <th class="p-1.5">Eₙ = |xₙ - xₙ₋₁|</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-100">
+                  <tr><td>0</td><td>2.000000</td><td>1.000000</td><td>-</td></tr>
+                  <tr><td>1</td><td>1.750000</td><td>0.062500</td><td>0.250000</td></tr>
+                  <tr class="bg-teal-50 font-semibold"><td>2</td><td class="text-teal-900 font-bold">1.732143</td><td>0.000217</td><td>0.017857</td></tr>
+                  <tr><td>3</td><td>1.732051</td><td>0.000000</td><td>0.000092</td></tr>
+                </tbody>
+              </table>
+            </div>
+            <p class="mt-2 text-slate-600 text-xs">
+              คำตอบคือ <strong>$x_2 \approx 1.732143$</strong> (ซึ่งทำให้ $R_2 \approx 0.000217$ และ $E_2 \approx 0.017857$)
+            </p>
+          </div>
+        </div>
+
+        <!-- Exercise 3 -->
+        <div class="bg-slate-50 border border-slate-200 rounded-xl p-5 space-y-3">
+          <div class="flex items-start justify-between gap-3">
+            <h3 class="font-bold text-slate-900 text-base">
+              ข้อ 3. การรายงานเพียงค่าประมาณรากโดยไม่ระบุวิธีและเกณฑ์หยุด ทำให้ตรวจสอบความน่าเชื่อถือได้ยากอย่างไร?
+            </h3>
+            <span class="text-xs bg-amber-100 text-amber-800 font-semibold px-2.5 py-1 rounded">การสื่อสารผลเชิงตัวเลข</span>
+          </div>
+          <p class="text-sm text-slate-600">
+            พิจารณาข้อความต่อไปนี้ ข้อใดสรุปเหตุผลทางวิศวกรรมและการคำนวณได้อย่างครบถ้วนที่สุด?
+          </p>
+
+          <div class="space-y-2 text-sm text-slate-700">
+            <label class="flex items-center gap-2 cursor-pointer">
+              <input type="radio" name="ex3_opt" value="1" class="accent-teal-600">
+              <span>ผู้ประเมินไม่สามารถทราบได้ว่าค่าที่ได้มีความถูกต้องกี่ตำแหน่งทศนิยม</span>
+            </label>
+            <label class="flex items-center gap-2 cursor-pointer">
+              <input type="radio" name="ex3_opt" value="2" class="accent-teal-600">
+              <span>อาจเป็นค่าที่หยุดทำซ้ำเพราะรอบการคำนวณหมด ไม่ใช่เพราะลู่เข้าสู่รากจริง</span>
+            </label>
+            <label class="flex items-center gap-2 cursor-pointer">
+              <input type="radio" name="ex3_opt" value="3" class="accent-teal-600">
+              <span>หากไม่ระบุว่าใช้ $|f(x)|$ หรือ $|x_n - x_{n-1}|$ อาจเกิดความเข้าใจผิดในฟังก์ชันที่แบนราบหรือชันจัด</span>
+            </label>
+            <label class="flex items-center gap-2 cursor-pointer font-semibold text-slate-900">
+              <input type="radio" name="ex3_opt" value="4" class="accent-teal-600">
+              <span>ถูกต้องทุกข้อที่กล่าวมา</span>
+            </label>
+          </div>
+
+          <div class="flex items-center gap-3 pt-2">
+            <button onclick="checkEx3()" class="bg-teal-600 hover:bg-teal-700 text-white text-xs font-semibold px-4 py-2 rounded-lg transition-colors">
+              ตรวจคำตอบ
+            </button>
+            <button onclick="toggleExSol(3)" class="text-xs font-semibold text-slate-600 hover:text-slate-900 underline px-2 py-1">
+              ดูบทสรุป
+            </button>
+          </div>
+          <div id="ex3_feedback" class="text-xs sm:text-sm font-medium hidden p-2.5 rounded-lg"></div>
+
+          <div id="ex3_solution" class="hidden pt-3 border-t border-slate-200 text-xs sm:text-sm text-slate-700 leading-relaxed bg-white p-3.5 rounded-lg border">
+            <strong class="text-slate-900">คำตอบที่ถูกต้อง: ถูกต้องทุกข้อที่กล่าวมา</strong><br>
+            การรายงานผลเชิงตัวเลขทางวิทยาศาสตร์ที่ดี ต้องระบุเสมอว่า:
+            (1) ใช้วิธีใด (2) ค่าเริ่มต้นคืออะไร (3) ใช้เกณฑ์หยุดชนิดใด และ (4) พิกัดความเผื่อ $\varepsilon$ มีค่าเท่าใด เพื่อให้สามารถทำซ้ำผลลัพธ์ (Reproducibility) และรับประกันขอบเขตความคลาดเคลื่อนได้อย่างโปร่งใส
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+
+  <!-- Simulation Logic & Benchmarking Scripts -->
+  <script>
+    // Equations Definitions
+    const equations = {
+      eq1: {
+        f: (x) => Math.pow(x, 3) - x - 2,
+        df: (x) => 3 * Math.pow(x, 2) - 1,
+        bisectionInit: [1.0, 2.0],
+        newtonInit: 1.5,
+        secantInit: [1.0, 2.0],
+        trueRoot: 1.5213797068
+      },
+      eq2: {
+        f: (x) => Math.pow(x, 2) - 3,
+        df: (x) => 2 * x,
+        bisectionInit: [1.0, 2.0],
+        newtonInit: 2.0,
+        secantInit: [1.0, 2.0],
+        trueRoot: Math.sqrt(3)
+      },
+      eq3: {
+        f: (x) => Math.pow(x, 10),
+        df: (x) => 10 * Math.pow(x, 9),
+        bisectionInit: [-0.5, 0.8],
+        newtonInit: 0.5,
+        secantInit: [0.3, 0.5],
+        trueRoot: 0.0
+      }
+    };
+
+    let activeTableTab = 'bisec';
+    let benchmarkResults = {};
+    let errorChartInstance = null;
+
+    window.onload = function() {
+      if (typeof renderMathInElement === 'function') {
+        renderMathInElement(document.body, {
+          delimiters: [
+            {left: '$$', right: '$$', display: true},
+            {left: '\\[', right: '\\]', display: true},
+            {left: '\\(', right: '\\)', display: false},
+            {left: '$', right: '$', display: false}
+          ],
+          throwOnError: false
+        });
+      }
+
+      initErrorChart();
+      runBenchmark();
+    };
+
+    function setTol(val) {
+      document.getElementById('customTol').value = val;
+      // Update button styling
+      document.querySelectorAll('.tol-btn').forEach(btn => {
+        btn.className = 'tol-btn text-xs bg-white px-2.5 py-2 rounded-lg border border-slate-200 hover:bg-teal-50 font-mono';
+      });
+      event.target.className = 'tol-btn text-xs bg-teal-600 text-white px-2.5 py-2 rounded-lg border border-teal-600 font-mono font-bold';
+      runBenchmark();
+    }
+
+    function initErrorChart() {
+      const ctx = document.getElementById('errorChart').getContext('2d');
+      errorChartInstance = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: [],
+          datasets: [
+            {
+              label: 'วิธีแบ่งครึ่งช่วง (Bisection)',
+              data: [],
+              borderColor: '#059669',
+              backgroundColor: '#059669',
+              borderWidth: 2,
+              tension: 0.1,
+              pointRadius: 4
+            },
+            {
+              label: 'วิธีนิวตัน–ราฟสัน (Newton)',
+              data: [],
+              borderColor: '#0284c7',
+              backgroundColor: '#0284c7',
+              borderWidth: 2,
+              tension: 0.1,
+              pointRadius: 4
+            },
+            {
+              label: 'วิธีเส้นตัด (Secant)',
+              data: [],
+              borderColor: '#7c3aed',
+              backgroundColor: '#7c3aed',
+              borderWidth: 2,
+              tension: 0.1,
+              pointRadius: 4
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          scales: {
+            x: {
+              title: { display: true, text: 'รอบที่ (Iteration n)', font: { size: 11, weight: 'bold' } },
+              grid: { color: '#f1f5f9' }
+            },
+            y: {
+              type: 'logarithmic',
+              title: { display: true, text: 'ความคลาดเคลื่อน (Log Scale)', font: { size: 11, weight: 'bold' } },
+              grid: { color: '#e2e8f0' }
+            }
+          },
+          plugins: {
+            legend: { position: 'top', labels: { boxWidth: 12, font: { size: 11 } } },
+            tooltip: {
+              callbacks: {
+                label: (ctx) => ` ${ctx.dataset.label}: ${ctx.parsed.y.toExponential(4)}`
+              }
+            }
+          }
+        }
+      });
+    }
+
+    function isStoppingMet(crit, diff, res, tol, n) {
+      if (n === 0) return false;
+      if (crit === 'diff') return diff !== null && diff < tol;
+      if (crit === 'res') return res < tol;
+      if (crit === 'both') return (diff !== null && diff < tol) && (res < tol);
+      return false;
+    }
+
+    function runBenchmark() {
+      const eqKey = document.getElementById('simEq').value;
+      const tol = parseFloat(document.getElementById('customTol').value) || 0.0001;
+      const crit = document.getElementById('simCrit').value;
+      const eq = equations[eqKey];
+      const maxIter = 50;
+
+      // 1. Run Bisection
+      const bisecData = [];
+      let [a, b] = eq.bisectionInit;
+      let prevM = null;
+      for (let n = 1; n <= maxIter; n++) {
+        const m = (a + b) / 2.0;
+        const fm = eq.f(m);
+        const res = Math.abs(fm);
+        const diff = prevM !== null ? Math.abs(m - prevM) : Math.abs(b - a);
+        const bound = (b - a) / 2.0;
+        const stop = isStoppingMet(crit, diff, res, tol, n);
+
+        bisecData.push({ n, xn: m, res, diff, bound, stop });
+
+        if (stop) break;
+
+        const fa = eq.f(a);
+        if (fa * fm < 0) {
+          b = m;
+        } else {
+          a = m;
+        }
+        prevM = m;
+      }
+
+      // 2. Run Newton-Raphson
+      const newtonData = [];
+      let curX = eq.newtonInit;
+      for (let n = 0; n <= maxIter; n++) {
+        const fx = eq.f(curX);
+        const res = Math.abs(fx);
+        let diff = null;
+        let nextX = null;
+        const dfx = eq.df(curX);
+
+        if (n > 0) {
+          diff = Math.abs(curX - newtonData[n - 1].xn);
+        }
+
+        const stop = isStoppingMet(crit, diff, res, tol, n);
+        newtonData.push({ n, xn: curX, res, diff, bound: null, stop });
+
+        if (stop) break;
+        if (Math.abs(dfx) < 1e-14) break;
+
+        nextX = curX - (fx / dfx);
+        curX = nextX;
+      }
+
+      // 3. Run Secant Method
+      const secantData = [];
+      let [x0, x1] = eq.secantInit;
+      secantData.push({ n: 0, xn: x0, res: Math.abs(eq.f(x0)), diff: null, bound: null, stop: false });
+      secantData.push({ n: 1, xn: x1, res: Math.abs(eq.f(x1)), diff: Math.abs(x1 - x0), bound: null, stop: false });
+
+      for (let n = 2; n <= maxIter; n++) {
+        const prev1 = secantData[n - 1].xn;
+        const prev2 = secantData[n - 2].xn;
+        const f1 = eq.f(prev1);
+        const f2 = eq.f(prev2);
+        const denom = f1 - f2;
+
+        if (Math.abs(denom) < 1e-14) break;
+
+        const nextX = prev1 - (f1 * (prev1 - prev2)) / denom;
+        const res = Math.abs(eq.f(nextX));
+        const diff = Math.abs(nextX - prev1);
+        const stop = isStoppingMet(crit, diff, res, tol, n);
+
+        secantData.push({ n, xn: nextX, res, diff, bound: null, stop });
+        if (stop) break;
+      }
+
+      benchmarkResults = {
+        bisec: bisecData,
+        newton: newtonData,
+        secant: secantData
+      };
+
+      updateSummaryCards();
+      updateErrorChart();
+      renderActiveTable();
+    }
+
+    function updateSummaryCards() {
+      const bLast = benchmarkResults.bisec[benchmarkResults.bisec.length - 1];
+      const nLast = benchmarkResults.newton[benchmarkResults.newton.length - 1];
+      const sLast = benchmarkResults.secant[benchmarkResults.secant.length - 1];
+
+      // Bisection
+      document.getElementById('iterBisec').textContent = bLast.n;
+      document.getElementById('xBisec').textContent = bLast.xn.toFixed(6);
+      document.getElementById('resBisec').textContent = bLast.res.toExponential(3);
+      document.getElementById('diffBisec').textContent = bLast.diff !== null ? bLast.diff.toExponential(3) : '-';
+      document.getElementById('badgeBisec').textContent = bLast.stop ? 'ผ่านเกณฑ์' : 'ไม่ลู่เข้า';
+
+      // Newton
+      document.getElementById('iterNewton').textContent = nLast.n;
+      document.getElementById('xNewton').textContent = nLast.xn.toFixed(6);
+      document.getElementById('resNewton').textContent = nLast.res.toExponential(3);
+      document.getElementById('diffNewton').textContent = nLast.diff !== null ? nLast.diff.toExponential(3) : '-';
+      document.getElementById('badgeNewton').textContent = nLast.stop ? 'ผ่านเกณฑ์' : 'ไม่ลู่เข้า';
+
+      // Secant
+      document.getElementById('iterSecant').textContent = sLast.n;
+      document.getElementById('xSecant').textContent = sLast.xn.toFixed(6);
+      document.getElementById('resSecant').textContent = sLast.res.toExponential(3);
+      document.getElementById('diffSecant').textContent = sLast.diff !== null ? sLast.diff.toExponential(3) : '-';
+      document.getElementById('badgeSecant').textContent = sLast.stop ? 'ผ่านเกณฑ์' : 'ไม่ลู่เข้า';
+    }
+
+    function updateErrorChart() {
+      if (!errorChartInstance) return;
+
+      const maxIter = Math.max(
+        benchmarkResults.bisec.length,
+        benchmarkResults.newton.length,
+        benchmarkResults.secant.length
+      );
+
+      const labels = Array.from({ length: maxIter }, (_, i) => `รอบ ${i + 1}`);
+
+      const extractErrors = (arr) => {
+        return arr.map(item => Math.max(1e-15, item.diff !== null ? item.diff : item.res));
+      };
+
+      errorChartInstance.data.labels = labels;
+      errorChartInstance.data.datasets[0].data = extractErrors(benchmarkResults.bisec);
+      errorChartInstance.data.datasets[1].data = extractErrors(benchmarkResults.newton);
+      errorChartInstance.data.datasets[2].data = extractErrors(benchmarkResults.secant);
+      errorChartInstance.update();
+    }
+
+    function switchTableTab(tab) {
+      activeTableTab = tab;
+      const btns = {
+        bisec: document.getElementById('tabBtnBisec'),
+        newton: document.getElementById('tabBtnNewton'),
+        secant: document.getElementById('tabBtnSecant')
+      };
+
+      Object.keys(btns).forEach(key => {
+        if (key === tab) {
+          btns[key].className = 'text-xs font-semibold px-3 py-1 rounded-md transition-colors bg-white shadow-xs text-teal-800';
+        } else {
+          btns[key].className = 'text-xs font-semibold px-3 py-1 rounded-md transition-colors text-slate-600 hover:text-slate-900';
+        }
+      });
+
+      renderActiveTable();
+    }
+
+    function renderActiveTable() {
+      const data = benchmarkResults[activeTableTab] || [];
+      const tbody = document.getElementById('simTableBody');
+      tbody.innerHTML = '';
+
+      data.forEach(row => {
+        const tr = document.createElement('tr');
+        if (row.stop) {
+          tr.className = 'bg-teal-50/80 font-semibold border-l-4 border-teal-600';
+        } else {
+          tr.className = 'hover:bg-slate-50 transition-colors';
+        }
+
+        tr.innerHTML = `
+          <td class="px-3 py-2 text-center">${row.n}</td>
+          <td class="px-3 py-2 font-mono text-slate-900 font-bold">${row.xn.toFixed(6)}</td>
+          <td class="px-3 py-2 font-mono ${row.res < 1e-4 ? 'text-teal-700' : 'text-slate-600'}">${row.res.toExponential(4)}</td>
+          <td class="px-3 py-2 font-mono text-slate-600">${row.diff !== null ? row.diff.toExponential(4) : '-'}</td>
+          <td class="px-3 py-2 font-mono text-emerald-800">${row.bound !== null ? '≤ ' + row.bound.toExponential(4) : '-'}</td>
+          <td class="px-3 py-2 text-center">
+            ${row.stop
+              ? '<span class="inline-block px-2 py-0.5 rounded text-[11px] font-semibold bg-teal-100 text-teal-800">ผ่านเกณฑ์</span>'
+              : '<span class="inline-block px-2 py-0.5 rounded text-[11px] font-normal bg-slate-100 text-slate-500">กำลังคำนวณ</span>'}
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    // Toggle Discovery Question Hints
+    function toggleInquiry(id) {
+      const content = document.getElementById(`ansInq${id}`);
+      const btn = document.getElementById(`btnInq${id}`);
+      if (content.classList.contains('hidden')) {
+        content.classList.remove('hidden');
+        btn.textContent = 'ซ่อนแนวคิด';
+      } else {
+        content.classList.add('hidden');
+        btn.textContent = 'แสดงแนวคิด';
+      }
+    }
+
+    // Toggle Exercise Solutions
+    function toggleExSol(id) {
+      const el = document.getElementById(`ex${id}_solution`);
+      if (el.classList.contains('hidden')) {
+        el.classList.remove('hidden');
+      } else {
+        el.classList.add('hidden');
+      }
+    }
+
+    // Exercise 1 Check
+    function checkEx1() {
+      const val = parseInt(document.getElementById('ex1_input').value);
+      const fb = document.getElementById('ex1_feedback');
+      fb.classList.remove('hidden', 'bg-teal-100', 'text-teal-800', 'bg-rose-100', 'text-rose-800', 'bg-amber-100', 'text-amber-800');
+
+      if (isNaN(val)) {
+        fb.className = 'text-xs sm:text-sm font-medium p-2.5 rounded-lg bg-amber-100 text-amber-800';
+        fb.textContent = 'กรุณากรอกจำนวนเต็ม';
+        return;
+      }
+
+      if (val === 13 || val === 14) {
+        fb.className = 'text-xs sm:text-sm font-medium p-2.5 rounded-lg bg-teal-100 text-teal-800';
+        fb.innerHTML = `✓ ถูกต้องยอดเยี่ยม! ต้องทำซ้ำอย่างน้อย <strong>${val} รอบ</strong> (หากคำนวณจาก (b-a)/2^(n+1) ≤ 10⁻⁴ จะได้ n ≥ 13 หรือหากคำนวณจากความยาวช่วง (b-a)/2^n ≤ 10⁻⁴ จะได้ n ≥ 14)`;
+      } else {
+        fb.className = 'text-xs sm:text-sm font-medium p-2.5 rounded-lg bg-rose-100 text-rose-800';
+        fb.innerHTML = '✗ ยังไม่ถูกต้อง: ลองใช้อสมการ 2^(n+1) ≥ 10000 เพื่อหาค่า n ที่น้อยที่สุดดูอีกครั้ง';
+      }
+    }
+
+    // Exercise 2 Check
+    function checkEx2() {
+      const val = parseFloat(document.getElementById('ex2_input').value);
+      const fb = document.getElementById('ex2_feedback');
+      fb.classList.remove('hidden', 'bg-teal-100', 'text-teal-800', 'bg-rose-100', 'text-rose-800', 'bg-amber-100', 'text-amber-800');
+
+      if (isNaN(val)) {
+        fb.className = 'text-xs sm:text-sm font-medium p-2.5 rounded-lg bg-amber-100 text-amber-800';
+        fb.textContent = 'กรุณากรอกตัวเลขทศนิยม';
+        return;
+      }
+
+      if (Math.abs(val - 1.732142857) < 0.0001 || Math.abs(val - 1.732143) < 0.00005) {
+        fb.className = 'text-xs sm:text-sm font-medium p-2.5 rounded-lg bg-teal-100 text-teal-800';
+        fb.innerHTML = '✓ ถูกต้องแม่นยำ! ค่าประมาณรอบที่ 2 คือ x₂ ≈ <strong>1.732143</strong> ซึ่งทำให้ค่าตกค้าง |f(x₂)| ลดลงเหลือเพียง 0.000217';
+      } else {
+        fb.className = 'text-xs sm:text-sm font-medium p-2.5 rounded-lg bg-rose-100 text-rose-800';
+        fb.innerHTML = '✗ ยังไม่ถูกต้อง: ตรวจสอบการแทนค่ารอบที่ 1 ได้ x₁ = 1.75 แล้วหา x₂ = 0.5*(1.75 + 3/1.75)';
+      }
+    }
+
+    // Exercise 3 Check
+    function checkEx3() {
+      const selected = document.querySelector('input[name="ex3_opt"]:checked');
+      const fb = document.getElementById('ex3_feedback');
+      fb.classList.remove('hidden', 'bg-teal-100', 'text-teal-800', 'bg-rose-100', 'text-rose-800', 'bg-amber-100', 'text-amber-800');
+
+      if (!selected) {
+        fb.className = 'text-xs sm:text-sm font-medium p-2.5 rounded-lg bg-amber-100 text-amber-800';
+        fb.textContent = 'กรุณาเลือกตัวเลือกก่อนตรวจคำตอบ';
+        return;
+      }
+
+      if (selected.value === '4') {
+        fb.className = 'text-xs sm:text-sm font-medium p-2.5 rounded-lg bg-teal-100 text-teal-800';
+        fb.innerHTML = '✓ ถูกต้องครบถ้วนสมบูรณ์! การระบุทั้งวิธี เกณฑ์หยุด และพิกัดความเผื่อ เป็นหัวใจสำคัญของความโปร่งใสทางวิทยาศาสตร์การคำนวณ';
+      } else {
+        fb.className = 'text-xs sm:text-sm font-medium p-2.5 rounded-lg bg-rose-100 text-rose-800';
+        fb.innerHTML = '✗ แม้ข้อที่เลือกจะเป็นเหตุผลที่ถูกต้อง แต่ข้ออื่นๆ ก็เป็นเหตุผลที่จำเป็นเช่นกัน (ลองพิจารณาตัวเลือก "ถูกทุกข้อ")';
+      }
+    }
+  </script>
+</body>
+</html>

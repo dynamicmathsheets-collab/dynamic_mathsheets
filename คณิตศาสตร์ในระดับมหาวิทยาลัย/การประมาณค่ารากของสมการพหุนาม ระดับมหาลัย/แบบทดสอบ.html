@@ -1,0 +1,867 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>แบบทดสอบวัดผลสัมฤทธิ์ทางการเรียน: การประมาณค่ารากสมการพหุนาม</title>
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Google Fonts: Sarabun & Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <!-- KaTeX for math rendering -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js"></script>
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Sarabun', 'Inter', 'sans-serif'],
+          },
+          colors: {
+            brand: {
+              50: '#eef2ff',
+              100: '#e0e7ff',
+              500: '#6366f1',
+              600: '#4f46e5',
+              700: '#4338ca',
+              800: '#3730a3',
+              900: '#312e81',
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    html { scroll-behavior: smooth; }
+    .katex-display { margin: 0.4em 0; overflow-x: auto; overflow-y: hidden; }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-800 font-sans antialiased selection:bg-indigo-100 selection:text-indigo-900 min-h-screen">
+
+  <!-- Header Banner -->
+  <header class="bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 text-white border-b border-indigo-800/40 shadow-sm">
+    <div class="max-w-6xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-5 sm:py-6">
+      <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div>
+
+          <h1 class="text-xl sm:text-2xl md:text-3xl font-bold tracking-tight text-white">
+            แบบทดสอบ: การประมาณค่ารากสมการพหุนาม (30 ข้อ)
+          </h1>
+          <p class="text-slate-300 text-xs sm:text-sm mt-1">
+            ครอบคลุม 6 ผลลัพธ์การเรียนรู้ • วัดระดับความรู้ (K), ทักษะกระบวนการ (P), และเจตคติ/การตระหนักรู้ (A)
+          </p>
+        </div>
+
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <main class="max-w-6xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 space-y-8">
+
+    <!-- Score Summary Dashboard (Hidden until submitted or toggled) -->
+    <section id="scoreDashboard" class="hidden bg-white border border-slate-200 rounded-2xl p-6 shadow-sm space-y-6 transition-all duration-300">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-slate-100 gap-3">
+        <div>
+          <span class="text-xs font-bold text-indigo-600 uppercase tracking-wider">รายงานผลสัมฤทธิ์ทางการเรียน</span>
+          <h2 class="text-2xl font-bold text-slate-900">สรุปคะแนนการประเมิน</h2>
+        </div>
+        <div class="flex items-center gap-3">
+          <div class="text-right">
+            <span class="text-xs text-slate-500 block">คะแนนรวมสุทธิ</span>
+            <span id="totalScoreText" class="text-3xl font-extrabold text-indigo-700">0 / 30</span>
+          </div>
+          <div id="gradeBadge" class="px-3 py-1.5 rounded-xl font-bold text-sm bg-indigo-100 text-indigo-800">
+            0%
+          </div>
+        </div>
+      </div>
+
+      <!-- Breakdown by Domain (K, P, A) and Difficulty -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-3">
+        <!-- K -->
+        <div class="bg-indigo-50/60 border border-indigo-100 rounded-xl p-3 text-center">
+          <span class="text-xs font-semibold text-indigo-800 block">ด้านความรู้ (K)</span>
+          <span id="scoreK" class="text-xl font-bold text-indigo-950">0 / 10</span>
+        </div>
+        <!-- P -->
+        <div class="bg-emerald-50/60 border border-emerald-100 rounded-xl p-3 text-center">
+          <span class="text-xs font-semibold text-emerald-800 block">กระบวนการ/ทักษะ (P)</span>
+          <span id="scoreP" class="text-xl font-bold text-emerald-950">0 / 10</span>
+        </div>
+        <!-- A -->
+        <div class="bg-amber-50/60 border border-amber-100 rounded-xl p-3 text-center">
+          <span class="text-xs font-semibold text-amber-800 block">เจตคติ/ตระหนักรู้ (A)</span>
+          <span id="scoreA" class="text-xl font-bold text-amber-950">0 / 10</span>
+        </div>
+        <!-- Easy -->
+        <div class="bg-slate-50 border border-slate-200 rounded-xl p-3 text-center">
+          <span class="text-xs font-semibold text-slate-600 block">ระดับง่าย</span>
+          <span id="scoreEasy" class="text-xl font-bold text-slate-800">0 / 10</span>
+        </div>
+        <!-- Medium -->
+        <div class="bg-slate-50 border border-slate-200 rounded-xl p-3 text-center">
+          <span class="text-xs font-semibold text-slate-600 block">ระดับปานกลาง</span>
+          <span id="scoreMed" class="text-xl font-bold text-slate-800">0 / 10</span>
+        </div>
+        <!-- Hard -->
+        <div class="bg-slate-50 border border-slate-200 rounded-xl p-3 text-center">
+          <span class="text-xs font-semibold text-slate-600 block">ระดับยาก</span>
+          <span id="scoreHard" class="text-xl font-bold text-slate-800">0 / 10</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Test Meta Info & Instruction Box -->
+    <section class="bg-gradient-to-br from-indigo-50/70 via-slate-50 to-white border border-indigo-100 rounded-2xl p-5 sm:p-6 text-sm text-slate-700 leading-relaxed space-y-2">
+      <div class="font-bold text-slate-900 text-base flex items-center gap-2">
+        <i class="fa-solid fa-circle-info text-indigo-600"></i>
+        คำชี้แจงในการทำแบบทดสอบ
+      </div>
+      <p>
+        1. แบบทดสอบฉบับนี้มีทั้งหมด <strong>30 ข้อ</strong> เป็นแบบเลือกตอบ 4 ตัวเลือก (ก, ข, ค, ง) โดยมีคำตอบที่ถูกต้องที่สุดเพียงตัวเลือกเดียว
+      </p>
+      <p>
+        2. ทุกข้อแสดงข้อมูลจำแนกไว้เหนือข้อคำถามอย่างชัดเจน: <strong>ผลลัพธ์การเรียนรู้ (หัวข้อ 1-6)</strong>, <strong>ระดับความยาก (ง่าย / ปานกลาง / ยาก)</strong> และ <strong>ด้านที่วัด (K: ความรู้ / P: กระบวนการ / A: เจตคติ)</strong>
+      </p>
+      <p>
+        3. สามารถคลิกปุ่ม <strong>"เปิด/ปิดเฉลยและวิธีทำ"</strong> ใต้แต่ละข้อเพื่อศึกษาขั้นตอนวิธีได้ตลอดเวลา หรือกด <strong>"ตรวจคำตอบและตัดเกรด"</strong> ที่แถบด้านบนเพื่อดูสรุปคะแนนรวม
+      </p>
+    </section>
+
+    <!-- Questions Container -->
+    <div id="questionsContainer" class="space-y-6">
+      <!-- Generated Dynamically via JS for optimal maintainability and clean KaTeX math loading -->
+    </div>
+
+    <!-- Bottom Submit Bar -->
+    <div class="bg-white border border-slate-200 rounded-2xl p-6 text-center shadow-xs">
+      <p class="text-slate-600 text-sm mb-4">เมื่อทำแบบทดสอบครบทุกข้อแล้ว กรุณากดปุ่มด้านล่างเพื่อประมวลผลคะแนน</p>
+      <button onclick="submitExam()" class="px-8 py-3 text-base font-bold rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white shadow-md transition transform active:scale-95">
+        <i class="fa-solid fa-check-double mr-2"></i> ตรวจผลคะแนนทั้งหมด
+      </button>
+    </div>
+
+  </main>
+
+
+  <!-- Questions Database & Logic Script -->
+  <script>
+    const questionsData = [
+      // ข้อ 1 (เรื่อง 1, ง่าย, K)
+      {
+        id: 1,
+        topic: "เรื่องที่ 1: การแยกช่วงและการมีอยู่ของรากสมการ",
+        difficulty: "ง่าย",
+        domain: "K (ด้านความรู้ความเข้าใจ)",
+        stem: "ตามทฤษฎีบทค่าระหว่างกลาง (Intermediate Value Theorem) สำหรับฟังก์ชันพหุนาม \\(f(x)\\) ที่ต่อเนื่องบนช่วง \\([a, b]\\) เงื่อนไขใดที่รับประกันว่าจะมีจำนวนจริง \\(c \\in (a, b)\\) ซึ่งทำให้ \\(f(c) = 0\\) อย่างน้อย 1 ค่า?",
+        choices: [
+          { key: "ก", text: "\\(f(a) + f(b) = 0\\)" },
+          { key: "ข", text: "\\(f(a) \\cdot f(b) < 0\\)" },
+          { key: "ค", text: "\\(f(a) \\cdot f(b) > 0\\)" },
+          { key: "ง", text: "\\(f'(a) \\cdot f'(b) < 0\\)" }
+        ],
+        ans: "ข",
+        explanation: "ทฤษฎีบท IVT ระบุว่าหาก \\(f\\) เป็นฟังก์ชันต่อเนื่องบน \\([a, b]\\) และค่าที่ปลายช่วงมีเครื่องหมายตรงข้ามกัน คือ \\(f(a)f(b) < 0\\) กราฟจะต้องตัดแกน \\(x\\) อย่างน้อยหนึ่งครั้งบนช่วงเปิด \\((a, b)\\)"
+      },
+      // ข้อ 2 (เรื่อง 1, ปานกลาง, P)
+      {
+        id: 2,
+        topic: "เรื่องที่ 1: การแยกช่วงและการมีอยู่ของรากสมการ",
+        difficulty: "ปานกลาง",
+        domain: "P (ทักษะกระบวนการและการคำนวณ)",
+        stem: "กำหนดสมการ \\(f(x) = x^3 - 4x + 1 = 0\\) จงพิจารณาว่าช่วงคู่จำนวนเต็มใดต่อไปนี้มีรากจริงอยู่อย่างน้อย 1 ค่าอย่างแน่นอนตามทฤษฎีบท IVT?",
+        choices: [
+          { key: "ก", text: "\\([0, 1]\\)" },
+          { key: "ข", text: "\\([2, 3]\\)" },
+          { key: "ค", text: "\\([-1, 0]\\)" },
+          { key: "ง", text: "\\([-3, -2.5]\\)" }
+        ],
+        ans: "ก",
+        explanation: "คำนวณ: \\(f(0) = 0 - 0 + 1 = 1 > 0\\) และ \\(f(1) = 1 - 4 + 1 = -2 < 0\\) จะได้ \\(f(0)f(1) = (1)(-2) = -2 < 0\\) เครื่องหมายต่างกันจึงรับประกันว่ามีรากจริงในช่วง \\((0, 1)\\)"
+      },
+      // ข้อ 3 (เรื่อง 1, ยาก, A)
+      {
+        id: 3,
+        topic: "เรื่องที่ 1: การแยกช่วงและการมีอยู่ของรากสมการ",
+        difficulty: "ยาก",
+        domain: "A (เจตคติและการตระหนักรู้)",
+        stem: "นักศึกษาคนหนึ่งคำนวณได้ว่า \\(f(a)f(b) > 0\\) จึงด่วนสรุปในรายงานวิศวกรรมทันทีว่า 'สมการนี้ไม่มีรากจริงอยู่ในช่วง \\([a, b]\\)' การกระทำและข้อสรุปนี้สะท้อนข้อบกพร่องด้านการตระหนักรู้ทางคณิตศาสตร์อย่างไร?",
+        choices: [
+          { key: "ก", text: "ถูกต้องแล้ว เพราะตามทฤษฎีบท IVT ค่าเครื่องหมายเหมือนกันหมายความว่าไม่มีรากแน่นอน" },
+          { key: "ข", text: "ขาดความรอบคอบ เพราะ \\(f(a)f(b) > 0\\) เป็น Inconclusive โดยภายในช่วงอาจมีรากจริงจำนวนคู่ราก หรือเป็นรากซ้ำอันดับคู่" },
+          { key: "ค", text: "ขาดความรอบคอบเฉพาะกรณีที่ฟังก์ชันเป็นฟังก์ชันขั้นบันไดเท่านั้น" },
+          { key: "ง", text: "ถูกต้องในแง่คอมพิวเตอร์ เพราะโปรแกรมจะไม่สามารถรันวิธี Bracketing ต่อได้" }
+        ],
+        ans: "ข",
+        explanation: "ผู้คำนวณที่ดีต้องตระหนักว่า \\(f(a)f(b) > 0\\) มิได้แปลว่าไม่มีรากเสมอไป กราฟอาจตัดแกน \\(x\\) 2 ครั้งแล้ววกกลับ หรือแตะสัมผัสแกน \\(x\\) เช่น \\(f(x) = (x-1)^2\\) บน \\([0, 2]\\)"
+      },
+      // ข้อ 4 (เรื่อง 1, ง่าย, K)
+      {
+        id: 4,
+        topic: "เรื่องที่ 1: การแยกช่วงและการมีอยู่ของรากสมการ",
+        difficulty: "ง่าย",
+        domain: "K (ด้านความรู้ความเข้าใจ)",
+        stem: "สมการพหุนาม \\(f(x) = (x - 2)^2 = 0\\) มีรากจริง \\(x = 2\\) บนช่วง \\([1, 3]\\) เหตุใดการตรวจสอบเครื่องหมายด้วย \\(f(1)f(3)\\) จึงตรวจไม่พบการมีอยู่ของรากนี้?",
+        choices: [
+          { key: "ก", text: "เพราะ \\(f(x)\\) ไม่เป็นฟังก์ชันต่อเนื่องบนช่วง \\([1, 3]\\)" },
+          { key: "ข", text: "เพราะรากเป็นรากซ้ำอันดับคู่ (Double Root) ทำให้เส้นกราฟเพียงสัมผัสแกน \\(x\\) โดยไม่เปลี่ยนเครื่องหมายข้ามฝั่ง" },
+          { key: "ค", text: "เพราะค่าของ \\(f(1)\\) และ \\(f(3)\\) เป็นลบทั้งคู่" },
+          { key: "ง", text: "เพราะทฤษฎีบท IVT ใช้ได้กับสมการกำลังสามขึ้นไปเท่านั้น" }
+        ],
+        ans: "ข",
+        explanation: "\\(f(1) = (1-2)^2 = 1 > 0\\) และ \\(f(3) = (3-2)^2 = 1 > 0\\) ผลคูณ \\(f(1)f(3) = 1 > 0\\) เนื่องจากรากอันดับคู่ กราฟจะแตะสัมผัสแกน \\(x\\) แล้ววกกลับ ทำให้ฟังก์ชันมีค่าเป็นบวกตลอดทั้งสองฝั่ง"
+      },
+      // ข้อ 5 (เรื่อง 1, ปานกลาง, P)
+      {
+        id: 5,
+        topic: "เรื่องที่ 1: การแยกช่วงและการมีอยู่ของรากสมการ",
+        difficulty: "ปานกลาง",
+        domain: "P (ทักษะกระบวนการและการคำนวณ)",
+        stem: "พิจารณาสมการ \\(x^2 - 1 = 0\\) บนช่วง \\([-1, 1]\\) ข้อใดอธิบายการนำทฤษฎีบท IVT ไปใช้กับช่วงนี้ได้ถูกต้องที่สุด?",
+        choices: [
+          { key: "ก", text: "ยืนยันว่ามีรากอยู่ภายในช่วงเปิด \\((-1, 1)\\) ได้ เพราะ \\(f(-1) = 0\\)" },
+          { key: "ข", text: "ไม่สามารถใช้ยืนยันการมีรากภายในช่วงเปิด \\((-1, 1)\\) ได้ เพราะ \\(f(-1)f(1) = 0\\) และภายในช่วงเปิดมีค่าเป็นลบตลอด" },
+          { key: "ค", text: "ยืนยันได้เพราะ \\(f(-1)f(1) < 0\\)" },
+          { key: "ง", text: "ทำให้เกิดการลู่ออกสู่อนันต์ทันที" }
+        ],
+        ans: "ข",
+        explanation: "\\(f(-1) = 0\\) และ \\(f(1) = 0\\) รากของสมการอยู่ที่จุดปลายพอดี ส่วนภายในช่วงเปิด \\((-1, 1)\\) ฟังก์ชันมีค่า \\(f(x) < 0\\) ทั้งหมด จึงไม่มีรากอยู่ *ภายใน* ช่วงเปิดนี้"
+      },
+      // ข้อ 6 (เรื่อง 2, ง่าย, K)
+      {
+        id: 6,
+        topic: "เรื่องที่ 2: วิธีแบ่งครึ่งช่วง (Bisection Method)",
+        difficulty: "ง่าย",
+        domain: "K (ด้านความรู้ความเข้าใจ)",
+        stem: "ในวิธีแบ่งครึ่งช่วงบนช่วง \\([a, b]\\) เมื่อคำนวณจุดกึ่งกลาง \\(m = \\frac{a+b}{2}\\) หากพบว่า \\(f(a) \\cdot f(m) < 0\\) จะต้องเลือกช่วงใหม่สำหรับรอบถัดไปเป็นช่วงใด?",
+        choices: [
+          { key: "ก", text: "\\([m, b]\\)" },
+          { key: "ข", text: "\\([a, m]\\)" },
+          { key: "ค", text: "\\([a, b]\\) เช่นเดิม" },
+          { key: "ง", text: "\\([0, m]\\)" }
+        ],
+        ans: "ข",
+        explanation: "หาก \\(f(a)f(m) < 0\\) แสดงว่ารากถูกกักขังอยู่ในช่วงครึ่งซ้าย คือระหว่าง \\(a\\) ถึง \\(m\\) จึงตั้งช่วงใหม่เป็น \\([a, m]\\) โดยกำหนดให้ \\(b = m\\)"
+      },
+      // ข้อ 7 (เรื่อง 2, ปานกลาง, P)
+      {
+        id: 7,
+        topic: "เรื่องที่ 2: วิธีแบ่งครึ่งช่วง (Bisection Method)",
+        difficulty: "ปานกลาง",
+        domain: "P (ทักษะกระบวนการและการคำนวณ)",
+        stem: "กำหนดสมการ \\(x^3 - x - 2 = 0\\) เริ่มต้นจากช่วง \\([1, 2]\\) จงหาค่าประมาณจุดกึ่งกลางในรอบที่ 2 (\\(m_2\\))?",
+        choices: [
+          { key: "ก", text: "\\(1.25\\)" },
+          { key: "ข", text: "\\(1.50\\)" },
+          { key: "ค", text: "\\(1.75\\)" },
+          { key: "ง", text: "\\(1.625\\)" }
+        ],
+        ans: "ค",
+        explanation: "รอบ 1: \\(m_1 = (1+2)/2 = 1.5\\) คำนวณ \\(f(1.5) = 1.5^3 - 1.5 - 2 = -0.125 < 0\\) เนื่องจาก \\(f(1) < 0\\) และ \\(f(2) > 0\\) ช่วงใหม่คือ \\([1.5, 2]\\)<br>รอบ 2: \\(m_2 = (1.5 + 2)/2 = 1.75\\)"
+      },
+      // ข้อ 8 (เรื่อง 2, ปานกลาง, P)
+      {
+        id: 8,
+        topic: "เรื่องที่ 2: วิธีแบ่งครึ่งช่วง (Bisection Method)",
+        difficulty: "ปานกลาง",
+        domain: "P (ทักษะกระบวนการและการคำนวณ)",
+        stem: "หากช่วงเริ่มต้นคือ \\([0, 8]\\) หลังทำการแบ่งครึ่งช่วงเป็นจำนวน 5 ครั้ง (\\(n = 5\\)) ความยาวของช่วงย่อยที่ได้จะเท่ากับเท่าใด?",
+        choices: [
+          { key: "ก", text: "\\(0.5\\)" },
+          { key: "ข", text: "\\(0.25\\)" },
+          { key: "ค", text: "\\(0.125\\)" },
+          { key: "ง", text: "\\(0.0625\\)" }
+        ],
+        ans: "ข",
+        explanation: "จากสูตรความยาวช่วงย่อย \\(L_n = \\frac{b-a}{2^n}\\) แทนค่า \\(L_5 = \\frac{8 - 0}{2^5} = \\frac{8}{32} = 0.25\\)"
+      },
+      // ข้อ 9 (เรื่อง 2, ยาก, A)
+      {
+        id: 9,
+        topic: "เรื่องที่ 2: วิธีแบ่งครึ่งช่วง (Bisection Method)",
+        difficulty: "ยาก",
+        domain: "A (เจตคติและการตระหนักรู้)",
+        stem: "ในการคำนวณจริงทางคอมพิวเตอร์ การเขียนโปรแกรมหาจุดกึ่งกลางด้วยสูตร \\(m = \\frac{a+b}{2}\\) อาจเกิดปัญหาคณิตศาสตร์คอมพิวเตอร์เรื่อง Overflow หาก \\(a, b\\) เป็นจำนวนบวกขนาดใหญ่มาก การตระหนักรู้เชิงตัวเลขที่ดีควรปรับสูตรเป็นข้อใดเพื่อเสถียรภาพสูงสุด?",
+        choices: [
+          { key: "ก", text: "\\(m = a + \\frac{b - a}{2}\\)" },
+          { key: "ข", text: "\\(m = \\sqrt{a \\cdot b}\\)" },
+          { key: "ค", text: "\\(m = b - \\frac{a}{2}\\)" },
+          { key: "ง", text: "\\(m = \\frac{a}{2} + \\frac{b}{4}\\)" }
+        ],
+        ans: "ก",
+        explanation: "การเขียน \\(m = a + \\frac{b - a}{2}\\) ช่วยป้องกันไม่ให้เกิดผลบวก \\(a + b\\) ที่อาจล้นขีดจำกัดหน่วยความจำ (Arithmetic Overflow) สะท้อนถึงการคำนึงถึงความถูกต้องเชิงตัวเลขในระบบจริง"
+      },
+      // ข้อ 10 (เรื่อง 2, ยาก, P)
+      {
+        id: 10,
+        topic: "เรื่องที่ 2: วิธีแบ่งครึ่งช่วง (Bisection Method)",
+        difficulty: "ยาก",
+        domain: "P (ทักษะกระบวนการและการคำนวณ)",
+        stem: "หากต้องการประมาณรากบนช่วงเริ่มต้น \\([1, 2]\\) ให้มีขอบเขตความคลาดเคลื่อนสัมบูรณ์ของจุดกึ่งกลางไม่เกิน \\(10^{-3}\\) (กล่าวคือ \\(|m_n - r| \\le 0.001\\)) จะต้องแบ่งครึ่งช่วงอย่างน้อยกี่รอบ?",
+        choices: [
+          { key: "ก", text: "7 รอบ" },
+          { key: "ข", text: "8 รอบ" },
+          { key: "ค", text: "9 รอบ" },
+          { key: "ง", text: "12 รอบ" }
+        ],
+        ans: "ค",
+        explanation: "จากสูตรขอบเขตคลาดเคลื่อนจุดกึ่งกลาง: \\(\\frac{b-a}{2^{n+1}} \\le 0.001 \\implies \\frac{1}{2^{n+1}} \\le \\frac{1}{1000} \\implies 2^{n+1} \\ge 1000\\)<br>เนื่องจาก \\(2^{10} = 1024 \\ge 1000\\) จะได้ \\(n + 1 \\ge 10 \\implies n \\ge 9\\) รอบ"
+      },
+      // ข้อ 11 (เรื่อง 3, ง่าย, K)
+      {
+        id: 11,
+        topic: "เรื่องที่ 3: วิธีนิวตัน–ราฟสัน (Newton–Raphson Method)",
+        difficulty: "ง่าย",
+        domain: "K (ด้านความรู้ความเข้าใจ)",
+        stem: "สูตรการทำซ้ำของวิธีนิวตัน–ราฟสัน (Newton–Raphson Method) มีที่มาจากแนวคิดทางเรขาคณิตข้อใด?",
+        choices: [
+          { key: "ก", text: "การหาจุดตัดแกน \\(x\\) ของเส้นสัมผัสกราฟที่จุด \\((x_n, f(x_n))\\)" },
+          { key: "ข", text: "การหาจุดตัดแกน \\(x\\) ของเส้นตัดที่ผ่านจุดสองจุดบนเส้นโค้ง" },
+          { key: "ค", text: "การเฉลี่ยเลขคณิตของจุดปลายช่วงทั้งสองข้าง" },
+          { key: "ง", text: "การหาจุดกึ่งกลางความโค้งของอนุพันธ์อันดับสอง" }
+        ],
+        ans: "ก",
+        explanation: "วิธีนิวตัน–ราฟสันสร้างสมการเส้นสัมผัส \\(y - f(x_n) = f'(x_n)(x - x_n)\\) แล้วหาจุดที่เส้นตรงนี้ตัดแกน \\(x\\) (แทน \\(y=0\\)) จะได้สูตร \\(x_{n+1} = x_n - \\frac{f(x_n)}{f'(x_n)}\\)"
+      },
+      // ข้อ 12 (เรื่อง 3, ปานกลาง, P)
+      {
+        id: 12,
+        topic: "เรื่องที่ 3: วิธีนิวตัน–ราฟสัน (Newton–Raphson Method)",
+        difficulty: "ปานกลาง",
+        domain: "P (ทักษะกระบวนการและการคำนวณ)",
+        stem: "กำหนด \\(f(x) = x^2 - 5 = 0\\) และเริ่มต้นด้วย \\(x_0 = 2\\) จงคำนวณหาค่าประมาณรอบถัดไป \\(x_1\\) ด้วยวิธีนิวตัน–ราฟสัน?",
+        choices: [
+          { key: "ก", text: "\\(2.150\\)" },
+          { key: "ข", text: "\\(2.250\\)" },
+          { key: "ค", text: "\\(2.333\\)" },
+          { key: "ง", text: "\\(2.500\\)" }
+        ],
+        ans: "ข",
+        explanation: "\\(f(x) = x^2 - 5 \\implies f'(x) = 2x\\)<br>\\(f(2) = 4 - 5 = -1\\) และ \\(f'(2) = 2(2) = 4\\)<br>\\(x_1 = 2 - \\frac{-1}{4} = 2 + 0.25 = 2.25\\)"
+      },
+      // ข้อ 13 (เรื่อง 3, ปานกลาง, P)
+      {
+        id: 13,
+        topic: "เรื่องที่ 3: วิธีนิวตัน–ราฟสัน (Newton–Raphson Method)",
+        difficulty: "ปานกลาง",
+        domain: "P (ทักษะกระบวนการและการคำนวณ)",
+        stem: "สำหรับสมการ \\(f(x) = x^3 - x - 2 = 0\\) หากกำหนดค่าเริ่มต้น \\(x_0 = 1.5\\) จงหาค่าอนุพันธ์ \\(f'(x_0)\\) ที่ต้องใช้ในสูตร?",
+        choices: [
+          { key: "ก", text: "\\(3.50\\)" },
+          { key: "ข", text: "\\(4.75\\)" },
+          { key: "ค", text: "\\(5.75\\)" },
+          { key: "ง", text: "\\(6.25\\)" }
+        ],
+        ans: "ค",
+        explanation: "\\(f'(x) = 3x^2 - 1\\) แทนค่า \\(x = 1.5\\):<br>\\(f'(1.5) = 3(1.5)^2 - 1 = 3(2.25) - 1 = 6.75 - 1 = 5.75\\)"
+      },
+      // ข้อ 14 (เรื่อง 3, ยาก, A)
+      {
+        id: 14,
+        topic: "เรื่องที่ 3: วิธีนิวตัน–ราฟสัน (Newton–Raphson Method)",
+        difficulty: "ยาก",
+        domain: "A (เจตคติและการตระหนักรู้)",
+        stem: "วิศวกรออกแบบระบบควบคุมอัตโนมัติพบว่าบางครั้งอัลกอริทึมนิวตันเกิดอาการ Crash เพราะค่า \\(x_n\\) ไปตกใกล้จุด \\(f'(x_n) \\approx 0\\) ในแง่จริยธรรมและความปลอดภัยของซอฟต์แวร์ ควรมีมาตรการจัดการอย่างไร?",
+        choices: [
+          { key: "ก", text: "ปล่อยให้ทำงานต่อไปเพราะเดี๋ยวมันจะลู่เข้าเองตามธรรมชาติ" },
+          { key: "ข", text: "ใส่เงื่อนไขตรวจสอบ Guard: หาก \\(|f'(x_n)| < \\epsilon_{safe}\\) ให้สลับไปใช้วิธีแบ่งครึ่งช่วงชั่วคราว เพื่อความปลอดภัยของระบบ" },
+          { key: "ค", text: "ปิดฟังก์ชันแจ้งเตือน Error ทิ้ง เพื่อให้โปรแกรมส่งค่าตัวเลขเดิมกลับไป" },
+          { key: "ง", text: "ยกเลิกการใช้วิธีเชิงตัวเลขทั้งหมดและใช้การเดาสุ่มแทน" }
+        ],
+        ans: "ข",
+        explanation: "จริยธรรมและความตระหนักรู้ในการพัฒนาระบบที่มีผลต่อชีวิตและทรัพย์สิน จำเป็นต้องมีกลไก Fail-Safe เสมอ เมื่ออนุพันธ์ใกล้ศูนย์จะต้องมี Bracketing Method สำรองเพื่อความปลอดภัย"
+      },
+      // ข้อ 15 (เรื่อง 3, ยาก, K)
+      {
+        id: 15,
+        topic: "เรื่องที่ 3: วิธีนิวตัน–ราฟสัน (Newton–Raphson Method)",
+        difficulty: "ยาก",
+        domain: "K (ด้านความรู้ความเข้าใจ)",
+        stem: "อัตราการลู่เข้าของวิธีนิวตัน–ราฟสันเมื่อเข้าใกล้รากเชิงเดี่ยว (Simple Root) จัดเป็นแบบใด และมีความหมายเชิงตัวเลขอย่างไร?",
+        choices: [
+          { key: "ก", text: "Linear Convergence: ค่าคลาดเคลื่อนลดลงครึ่งหนึ่งในแต่ละรอบ" },
+          { key: "ข", text: "Quadratic Convergence: จำนวนทศนิยมที่ถูกต้องจะเพิ่มขึ้นประมาณสองเท่าในแต่ละรอบ" },
+          { key: "ค", text: "Superlinear Convergence: ค่าคลาดเคลื่อนลดลงตามอัตราส่วนทองคำ" },
+          { key: "ง", text: "Cubic Convergence: ค่าคลาดเคลื่อนลดลงยกกำลังสามเสมอ" }
+        ],
+        ans: "ข",
+        explanation: "วิธีนิวตันมี Quadratic Convergence (Order \\(p=2\\)) ในบริเวณใกล้เคียงรากเดี่ยว ทำให้ความคลาดเคลื่อนถูกยกกำลังสอง ส่งผลให้ทศนิยมที่แม่นยำเพิ่มขึ้นเป็นเท่าตัวในแต่ละก้าว เช่น จาก 2 ตำแหน่งเป็น 4 และ 8 ตำแหน่ง"
+      },
+      // ข้อ 16 (เรื่อง 4, ง่าย, K)
+      {
+        id: 16,
+        topic: "เรื่องที่ 4: วิธีเส้นตัด (Secant Method)",
+        difficulty: "ง่าย",
+        domain: "K (ด้านความรู้ความเข้าใจ)",
+        stem: "ข้อได้เปรียบหลักของวิธีเส้นตัด (Secant Method) เมื่อเปรียบเทียบกับวิธีนิวตัน–ราฟสัน (Newton–Raphson Method) คือข้อใด?",
+        choices: [
+          { key: "ก", text: "ไม่ต้องคำนวณอนุพันธ์ \\(f'(x)\\) โดยตรง" },
+          { key: "ข", text: "รับประกันการลู่เข้า 100% เสมอ" },
+          { key: "ค", text: "ใช้ค่าเริ่มต้นเพียงค่าเดียว" },
+          { key: "ง", text: "มีอัตราการลู่เข้าสูงกว่าวิธีนิวตันเสมอ" }
+        ],
+        ans: "ก",
+        explanation: "จุดเด่นหลักของวิธีเส้นตัดคือการประมาณอนุพันธ์ด้วยเส้นตัด ทำให้ไม่ต้องหาอนุพันธ์เชิงวิเคราะห์ เหมาะกับฟังก์ชันที่ซับซ้อนหรือไม่มีสมการในรูปปิด"
+      },
+      // ข้อ 17 (เรื่อง 4, ปานกลาง, P)
+      {
+        id: 17,
+        topic: "เรื่องที่ 4: วิธีเส้นตัด (Secant Method)",
+        difficulty: "ปานกลาง",
+        domain: "P (ทักษะกระบวนการและการคำนวณ)",
+        stem: "กำหนดสมการ \\(f(x) = x^2 - 4 = 0\\) โดยมีค่าเริ่มต้น \\(x_0 = 1\\) (\\(f(1) = -3\\)) และ \\(x_1 = 3\\) (\\(f(3) = 5\\)) จงหาค่าประมาณ \\(x_2\\) ด้วยวิธีเส้นตัด?",
+        choices: [
+          { key: "ก", text: "\\(1.75\\)" },
+          { key: "ข", text: "\\(2.00\\)" },
+          { key: "ค", text: "\\(1.65\\)" },
+          { key: "ง", text: "\\(2.25\\)" }
+        ],
+        ans: "ก",
+        explanation: "สูตรเส้นตัด: \\(x_{n+1} = x_n - \\frac{f(x_n)(x_n - x_{n-1})}{f(x_n) - f(x_{n-1})}\\)<br>\\(x_2 = 3 - \\frac{5(3 - 1)}{5 - (-3)} = 3 - \\frac{10}{8} = 3 - 1.25 = 1.75\\)"
+      },
+      // ข้อ 18 (เรื่อง 4, ปานกลาง, K)
+      {
+        id: 18,
+        topic: "เรื่องที่ 4: วิธีเส้นตัด (Secant Method)",
+        difficulty: "ปานกลาง",
+        domain: "K (ด้านความรู้ความเข้าใจ)",
+        stem: "อัตราการลู่เข้า (Order of Convergence) ตามทฤษฎีของวิธีเส้นตัดมีค่าประมาณเท่าใด?",
+        choices: [
+          { key: "ก", text: "\\(p = 1.000\\) (เชิงเส้น)" },
+          { key: "ข", text: "\\(p \\approx 1.618\\) (ซูเปอร์ลิเนียร์ ตามอัตราส่วนทองคำ)" },
+          { key: "ค", text: "\\(p = 2.000\\) (กำลังสอง)" },
+          { key: "ง", text: "\\(p = 3.000\\) (กำลังสาม)" }
+        ],
+        ans: "ข",
+        explanation: "วิธีเส้นตัดมีอันดับการลู่เข้าเท่ากับ \\(p = \\frac{1+\\sqrt{5}}{2} \\approx 1.618\\) ซึ่งเร็วกว่าเชิงเส้นของแบ่งครึ่งช่วง และใกล้เคียงกับวิธีนิวตันโดยไม่ต้องคำนวณอนุพันธ์"
+      },
+      // ข้อ 19 (เรื่อง 4, ยาก, A)
+      {
+        id: 19,
+        topic: "เรื่องที่ 4: วิธีเส้นตัด (Secant Method)",
+        difficulty: "ยาก",
+        domain: "A (เจตคติและการตระหนักรู้)",
+        stem: "ในการเขียนโปรแกรมใช้วิธีเส้นตัด หากในรอบการคำนวณพบว่า \\(f(x_n) - f(x_{n-1}) = 0\\) ในฐานะผู้พัฒนาแบบจำลอง ควรตระหนักถึงเหตุการณ์นี้และจัดการอย่างไรจึงจะเหมาะสมที่สุด?",
+        choices: [
+          { key: "ก", text: "กำหนดให้โปรแกรมแทนค่าส่วนหารด้วย 0 เพื่อให้ผลลัพธ์เป็นอนันต์" },
+          { key: "ข", text: "ตระหนักว่าเป็นสภาวะเส้นตัดขนานแกน x (หารด้วยศูนย์) ต้องหยุดทำซ้ำและแจ้งเตือนผู้ใช้ให้เปลี่ยนค่าเริ่มต้น" },
+          { key: "ค", text: "ปล่อยให้ตัวหารเป็นศูนย์ต่อไปเพราะระบบปฏิบัติการจะปัดเศษให้อัตโนมัติ" },
+          { key: "ง", text: "บังคับให้ค่า \\(x_{n+1} = 0\\) ทันที" }
+        ],
+        ans: "ข",
+        explanation: "ความตระหนักรู้ในข้อจำกัดทางคณิตศาสตร์และคอมพิวเตอร์: เมื่อส่วนหารเป็นศูนย์ เส้นตัดจะขนานแกน \\(x\\) ไม่เกิดจุดตัด ต้องตรวจจับ (Exception Handling) และแจ้งให้เปลี่ยนค่าเริ่มต้น"
+      },
+      // ข้อ 20 (เรื่อง 4, ปานกลาง, P)
+      {
+        id: 20,
+        topic: "เรื่องที่ 4: วิธีเส้นตัด (Secant Method)",
+        difficulty: "ปานกลาง",
+        domain: "P (ทักษะกระบวนการและการคำนวณ)",
+        stem: "ในรอบที่ \\(n\\) ของวิธีเส้นตัด หากมี \\(x_{n-1} = 1.0\\), \\(x_n = 2.0\\), \\(f(x_{n-1}) = -2.0\\) และ \\(f(x_n) = 4.0\\) ค่าประมาณ \\(x_{n+1}\\) มีค่าเท่ากับเท่าใด?",
+        choices: [
+          { key: "ก", text: "\\(1.3333\\)" },
+          { key: "ข", text: "\\(1.5000\\)" },
+          { key: "ค", text: "\\(1.6667\\)" },
+          { key: "ง", text: "\\(1.2500\\)" }
+        ],
+        ans: "ก",
+        explanation: "\\(x_{n+1} = 2.0 - \\frac{4.0(2.0 - 1.0)}{4.0 - (-2.0)} = 2.0 - \\frac{4.0}{6.0} = 2.0 - 0.6667 = 1.3333\\)"
+      },
+      // ข้อ 21 (เรื่อง 5, ง่าย, K)
+      {
+        id: 21,
+        topic: "เรื่องที่ 5: การประเมินความคลาดเคลื่อนและเกณฑ์หยุด",
+        difficulty: "ง่าย",
+        domain: "K (ด้านความรู้ความเข้าใจ)",
+        stem: "เกณฑ์หยุดแบบค่าตกค้างของฟังก์ชัน (Residual Stopping Criterion) มักเขียนอยู่ในรูปอสมการใดเมื่อกำหนดพิกัดความเผื่อเป็น \\(\\varepsilon\\)?",
+        choices: [
+          { key: "ก", text: "\\(|x_n - x_{n-1}| < \\varepsilon\\)" },
+          { key: "ข", text: "\\(|f(x_n)| < \\varepsilon\\)" },
+          { key: "ค", text: "\\(\\frac{|x_n - x_{n-1}|}{|x_n|} < \\varepsilon\\)" },
+          { key: "ง", text: "\\(f'(x_n) < \\varepsilon\\)" }
+        ],
+        ans: "ข",
+        explanation: "ค่าตกค้าง (Residual) คือการนำค่าประมาณไปแทนในฟังก์ชันเพื่อดูว่าใกล้เคียงศูนย์เพียงใด วัดโดย \\(|f(x_n)| < \\varepsilon\\)"
+      },
+      // ข้อ 22 (เรื่อง 5, ปานกลาง, P)
+      {
+        id: 22,
+        topic: "เรื่องที่ 5: การประเมินความคลาดเคลื่อนและเกณฑ์หยุด",
+        difficulty: "ปานกลาง",
+        domain: "P (ทักษะกระบวนการและการคำนวณ)",
+        stem: "กำหนดเกณฑ์หยุด \\(|x_n - x_{n-1}| < 10^{-3}\\) หากรอบที่ 3 คำนวณได้ \\(x_2 = 1.521739\\) และ \\(x_3 = 1.521380\\) ผลต่างสเต็ป \\(E_3\\) มีค่าเท่าใด และถือว่าผ่านเกณฑ์หยุดแล้วหรือไม่?",
+        choices: [
+          { key: "ก", text: "\\(E_3 = 0.000359\\) และผ่านเกณฑ์หยุดแล้ว" },
+          { key: "ข", text: "\\(E_3 = 0.003590\\) และยังไม่ผ่านเกณฑ์" },
+          { key: "ค", text: "\\(E_3 = 0.000035\\) และยังไม่ผ่านเกณฑ์" },
+          { key: "ง", text: "\\(E_3 = 0.001380\\) และผ่านเกณฑ์หยุดแล้ว" }
+        ],
+        ans: "ก",
+        explanation: "\\(E_3 = |1.521380 - 1.521739| = 0.000359\\) ซึ่งมีค่าน้อยกว่า \\(10^{-3} = 0.001\\) จึงถือว่าผ่านเกณฑ์หยุดรอบนี้แล้ว"
+      },
+      // ข้อ 23 (เรื่อง 5, ยาก, A)
+      {
+        id: 23,
+        topic: "เรื่องที่ 5: การประเมินความคลาดเคลื่อนและเกณฑ์หยุด",
+        difficulty: "ยาก",
+        domain: "A (เจตคติและการตระหนักรู้)",
+        stem: "สำหรับสมการ \\(f(x) = x^{10} = 0\\) เมื่อแทน \\(x = 0.5\\) จะได้ \\(|f(0.5)| \\approx 0.000976 < 10^{-3}\\) ซึ่งผ่านเกณฑ์ตกค้าง แต่ค่าคลาดเคลื่อนแท้จริงจากราก (0) คือ 0.5 เหตุการณ์นี้สร้างความตระหนักแก่นักคำนวณอย่างไร?",
+        choices: [
+          { key: "ก", text: "เกณฑ์ค่าตกค้าง \\(|f(x)| < \\varepsilon\\) เพียงอย่างเดียวไม่น่าเชื่อถือสำหรับฟังก์ชันที่แบนราบใกล้ราก ควรใช้เกณฑ์ร่วมกับ \\(|x_n - x_{n-1}|\\)" },
+          { key: "ข", text: "แสดงว่าสมการพหุนามกำลังสิบไม่สามารถหารากด้วยระเบียบวิธีเชิงตัวเลขได้เลย" },
+          { key: "ค", text: "แสดงว่าเกณฑ์ \\(|f(x)| < \\varepsilon\\) เป็นเกณฑ์ที่สมบูรณ์แบบที่สุดเสมอ" },
+          { key: "ง", text: "แสดงว่าคอมพิวเตอร์เกิดข้อผิดพลาดในการคำนวณยกกำลัง" }
+        ],
+        ans: "ก",
+        explanation: "นี่คือกรณีศึกษาสำคัญ (Ill-conditioned Problem) เมื่อฟังก์ชันแบนราบ ค่าตกค้างจะเล็กมากแม้ว่าเรายังอยู่ห่างจากรากจริง การใช้ Stopping Criteria จึงควรผสานทั้งผลต่างการเคลื่อนที่และค่าฟังก์ชันร่วมกัน"
+      },
+      // ข้อ 24 (เรื่อง 5, ปานกลาง, K)
+      {
+        id: 24,
+        topic: "เรื่องที่ 5: การประเมินความคลาดเคลื่อนและเกณฑ์หยุด",
+        difficulty: "ปานกลาง",
+        domain: "K (ด้านความรู้ความเข้าใจ)",
+        stem: "เหตุใดวิธีแบ่งครึ่งช่วงจึงสามารถระบุ 'ขอบเขตความคลาดเคลื่อนสัมบูรณ์สูงสุด' ได้อย่างแน่นอน แตกต่างจากวิธีนิวตันและวิธีเส้นตัด?",
+        choices: [
+          { key: "ก", text: "เพราะวิธีแบ่งครึ่งช่วงใช้อนุพันธ์อันดับสูงสุด" },
+          { key: "ข", text: "เพราะเป็น Bracketing Method ที่การันตีว่ารากแท้จริงถูกตีกรอบอยู่ในช่วงปิด \\([a_n, b_n]\\) เสมอ" },
+          { key: "ค", text: "เพราะความยาวช่วงของวิธีแบ่งครึ่งช่วงเป็นศูนย์เสมอหลังทำซ้ำ" },
+          { key: "ง", text: "เพราะค่าฟังก์ชันที่ปลายช่วงมีค่าเท่ากันเสมอ" }
+        ],
+        ans: "ข",
+        explanation: "เนื่องจากราก \\(r\\) การันตีว่าอยู่ในช่วง \\([a_n, b_n]\\) ดังนั้นจุดกึ่งกลาง \\(x_n\\) จึงไม่มีทางห่างจากรากเกินครึ่งหนึ่งของความยาวช่วง นั่นคือ \\(|x_n - r| \\le \\frac{b_n - a_n}{2}\\) อย่างแน่นอน"
+      },
+      // ข้อ 25 (เรื่อง 5, ยาก, A)
+      {
+        id: 25,
+        topic: "เรื่องที่ 5: การประเมินความคลาดเคลื่อนและเกณฑ์หยุด",
+        difficulty: "ยาก",
+        domain: "A (เจตคติและการตระหนักรู้)",
+        stem: "ในการนำเสนอผลงานวิจัย หากผู้เขียนรายงานเพียงว่า 'รากของสมการคือ \\(x = 1.5214\\)' โดยไม่ระบุวิธีการคำนวณ ค่าเริ่มต้น เกณฑ์หยุด และพิกัดความเผื่อ (Tolerance) การรายงานนี้บกพร่องตามหลักวิทยาศาสตร์อย่างไร?",
+        choices: [
+          { key: "ก", text: "ไม่ผิดพลาดอะไร เพราะผู้อ่านสนใจเฉพาะตัวเลขคำตอบสุดท้าย" },
+          { key: "ข", text: "ขาดความโปร่งใสทางวิชาการและไม่สามารถทำซ้ำผลลัพธ์ (Reproducibility) ได้อย่างน่าเชื่อถือ" },
+          { key: "ค", text: "ผิดพลาดเพราะต้องเขียนทศนิยม 16 ตำแหน่งเสมอ" },
+          { key: "ง", text: "ผิดพลาดเพราะต้องแนบโค้ดภาษา Assembly เสมอ" }
+        ],
+        ans: "ข",
+        explanation: "จรรยาบรรณและการสื่อสารผลลัพธ์เชิงตัวเลขทางวิทยาศาสตร์ ต้องระบุพิกัดความเผื่อ เกณฑ์หยุด และวิธีการเสมอ เพื่อให้สามารถตรวจสอบความน่าเชื่อถือและทำซ้ำผลลัพธ์ได้"
+      },
+      // ข้อ 26 (เรื่อง 6, ง่าย, K)
+      {
+        id: 26,
+        topic: "เรื่องที่ 6: การเปรียบเทียบวิธีและการเลือกวิธีประมาณค่าราก",
+        difficulty: "ง่าย",
+        domain: "K (ด้านความรู้ความเข้าใจ)",
+        stem: "หากจัดอันดับความเร็วในการลู่เข้า (Convergence Speed) จาก 'เร็วที่สุด' ไปหา 'ช้าที่สุด' ภายใต้เงื่อนไขเริ่มต้นที่เหมาะสม ข้อใดถูกต้อง?",
+        choices: [
+          { key: "ก", text: "วิธีนิวตัน–ราฟสัน > วิธีเส้นตัด > วิธีแบ่งครึ่งช่วง" },
+          { key: "ข", text: "วิธีแบ่งครึ่งช่วง > วิธีเส้นตัด > วิธีนิวตัน–ราฟสัน" },
+          { key: "ค", text: "วิธีเส้นตัด > วิธีนิวตัน–ราฟสัน > วิธีแบ่งครึ่งช่วง" },
+          { key: "ง", text: "วิธีนิวตัน–ราฟสัน > วิธีแบ่งครึ่งช่วง > วิธีเส้นตัด" }
+        ],
+        ans: "ก",
+        explanation: "อันดับความเร็ว: นิวตัน (Quadratic, \\(p=2\\)) > เส้นตัด (Superlinear, \\(p \\approx 1.618\\)) > แบ่งครึ่งช่วง (Linear, \\(p=1\\))"
+      },
+      // ข้อ 27 (เรื่อง 6, ปานกลาง, P)
+      {
+        id: 27,
+        topic: "เรื่องที่ 6: การเปรียบเทียบวิธีและการเลือกวิธีประมาณค่าราก",
+        difficulty: "ปานกลาง",
+        domain: "P (ทักษะกระบวนการและการคำนวณ)",
+        stem: "ต้องการหารากของ \\(f(x) = x^3 - x - 2 = 0\\) ให้ได้ความถูกต้อง \\(\\varepsilon = 10^{-4}\\) เริ่มต้นที่ \\([1, 2]\\) วิธีแบ่งครึ่งช่วงต้องใช้ประมาณ 13–14 รอบ แต่วิธีนิวตัน (เริ่มที่ 1.5) ใช้กี่รอบโดยประมาณ?",
+        choices: [
+          { key: "ก", text: "3 ถึง 4 รอบ" },
+          { key: "ข", text: "10 ถึง 12 รอบ" },
+          { key: "ค", text: "20 รอบขึ้นไป" },
+          { key: "ง", text: "1 รอบเท่านั้น" }
+        ],
+        ans: "ก",
+        explanation: "เนื่องจากวิธีนิวตันลู่เข้าแบบกำลังสอง เมื่อเริ่มต้นใกล้รากจะใช้การทำซ้ำเพียง 3–4 รอบก็สามารถบรรลุความแม่นยำระดับ \\(10^{-4}\\) ได้อย่างรวดเร็ว"
+      },
+      // ข้อ 28 (เรื่อง 6, ยาก, A)
+      {
+        id: 28,
+        topic: "เรื่องที่ 6: การเปรียบเทียบวิธีและการเลือกวิธีประมาณค่าราก",
+        difficulty: "ยาก",
+        domain: "A (เจตคติและการตระหนักรู้)",
+        stem: "แนวคิด 'Hybrid Method' (เช่น Brent's Method) ที่นำวิธีแบ่งครึ่งช่วงมาผสานกับวิธีนิวตันหรือเส้นตัด สะท้อนปรัชญาการแก้ปัญหาเชิงวิศวกรรมข้อใด?",
+        choices: [
+          { key: "ก", text: "การยึดติดกับทฤษฎีบทโบราณเพียงวิธีเดียวเพื่อความเรียบง่าย" },
+          { key: "ข", text: "การผสานข้อดีระหว่างความมั่นคงปลอดภัย (Robustness) ของวิธีแบ่งครึ่งช่วง เข้ากับความเร็วสูง (Efficiency) ของวิธีแบบเปิด" },
+          { key: "ค", text: "การสุ่มเปลี่ยนวิธีเมื่อคอมพิวเตอร์ประมวลผลช้า" },
+          { key: "ง", text: "การลดทอนความแม่นยำเพื่อประหยัดหน่วยความจำ" }
+        ],
+        ans: "ข",
+        explanation: "กลยุทธ์วิธีผสมสะท้อนถึงการแก้ปัญหาเชิงวิศวกรรมขั้นสูง ที่ไม่ประนีประนอมความปลอดภัย (ใช้ Bisection คุมกรอบ) แต่ก็ไม่ยอมสูญเสียประสิทธิภาพความเร็ว (ใช้ Newton/Secant เร่งผล)"
+      },
+      // ข้อ 29 (เรื่อง 6, ปานกลาง, P)
+      {
+        id: 29,
+        topic: "เรื่องที่ 6: การเปรียบเทียบวิธีและการเลือกวิธีประมาณค่าราก",
+        difficulty: "ปานกลาง",
+        domain: "P (ทักษะกระบวนการและการคำนวณ)",
+        stem: "หากท่านต้องเขียนฟังก์ชันคำนวณรากสมการที่รับข้อมูลจากเซนเซอร์ตรวจวัด ซึ่งไม่มีสูตรสมการเชิงวิเคราะห์และไม่สามารถหาอนุพันธ์ได้ วิธีใดต่อไปนี้เหมาะสมที่สุด?",
+        choices: [
+          { key: "ก", text: "วิธีนิวตัน–ราฟสัน" },
+          { key: "ข", text: "วิธีเส้นตัด หรือวิธีแบ่งครึ่งช่วง" },
+          { key: "ค", text: "การกระจายอนุกรมเทย์เลอร์อันดับ 5" },
+          { key: "ง", text: "วิธีสัมผัสพาราโบลาอนุพันธ์ตรง" }
+        ],
+        ans: "ข",
+        explanation: "เมื่อไม่มีสูตรอนุพันธ์ \\(f'(x)\\) จะไม่สามารถใช้วิธีนิวตันได้ จึงต้องเลือกวิธีที่ไม่ต้องใช้อนุพันธ์ตรง เช่น วิธีเส้นตัด หรือวิธีแบ่งครึ่งช่วง"
+      },
+      // ข้อ 30 (เรื่อง 6, ยาก, A)
+      {
+        id: 30,
+        topic: "เรื่องที่ 6: การเปรียบเทียบวิธีและการเลือกวิธีประมาณค่าราก",
+        difficulty: "ยาก",
+        domain: "A (เจตคติและการตระหนักรู้)",
+        stem: "ข้อความใดสรุปหัวใจสำคัญของการเลือกวิธีประมาณค่ารากในวิชาการวิเคราะห์เชิงตัวเลขได้อย่างถูกต้องและสมบูรณ์ที่สุด?",
+        choices: [
+          { key: "ก", text: "วิธีนิวตัน–ราฟสันเป็นวิธีที่ดีที่สุดในทุกสถานการณ์และควรใช้เสมอโดยไม่ต้องพิจารณาเงื่อนไขอื่น" },
+          { key: "ข", text: "ไม่มีวิธีใดดีที่สุดสำหรับทุกปัญหา ต้องเลือกให้เหมาะกับข้อมูลเริ่มต้น ความต่อเนื่องของฟังก์ชัน ต้นทุนการคำนวณ และระดับความปลอดภัยที่ต้องการ" },
+          { key: "ค", text: "วิธีแบ่งครึ่งช่วงเป็นวิธีที่ล้าสมัยและไม่ควรนำมาใช้อีกต่อไปในปัจจุบัน" },
+          { key: "ง", text: "ความแม่นยำขึ้นอยู่กับความเร็วของสัญญาณนาฬิกาของซีพียู ไม่เกี่ยวกับอัลกอริทึม" }
+        ],
+        ans: "ข",
+        explanation: "หัวใจหลักของวิชาการวิเคราะห์เชิงตัวเลข (No Free Lunch Theorem) คือการตระหนักว่าไม่มีวิธีใดสมบูรณ์แบบในทุกมิติ วิศวกรต้องวิเคราะห์บริบท เงื่อนไขเริ่มต้น และข้อจำกัดเพื่อเลือกเครื่องมือที่เหมาะสมที่สุด"
+      }
+    ];
+
+    // User's selected answers: { questionId: "ก" | "ข" | "ค" | "ง" }
+    let userSelections = {};
+
+    window.onload = function() {
+      renderQuestions();
+      renderMath();
+    };
+
+    function renderMath() {
+      if (typeof renderMathInElement === 'function') {
+        renderMathInElement(document.body, {
+          delimiters: [
+            {left: '$$', right: '$$', display: true},
+            {left: '\\[', right: '\\]', display: true},
+            {left: '\\(', right: '\\)', display: false},
+            {left: '$', right: '$', display: false}
+          ],
+          throwOnError: false
+        });
+      }
+    }
+
+    function renderQuestions() {
+      const container = document.getElementById('questionsContainer');
+      container.innerHTML = '';
+
+      questionsData.forEach((q, idx) => {
+        // Badges Styling based on metadata
+        let diffColor = 'bg-slate-100 text-slate-700 border-slate-300';
+        if (q.difficulty === 'ง่าย') diffColor = 'bg-emerald-50 text-emerald-800 border-emerald-200';
+        else if (q.difficulty === 'ปานกลาง') diffColor = 'bg-sky-50 text-sky-800 border-sky-200';
+        else if (q.difficulty === 'ยาก') diffColor = 'bg-rose-50 text-rose-800 border-rose-200';
+
+        let domainColor = 'bg-indigo-50 text-indigo-800 border-indigo-200';
+        if (q.domain.startsWith('K')) domainColor = 'bg-indigo-50 text-indigo-800 border-indigo-200';
+        else if (q.domain.startsWith('P')) domainColor = 'bg-emerald-50 text-emerald-800 border-emerald-200';
+        else if (q.domain.startsWith('A')) domainColor = 'bg-amber-50 text-amber-800 border-amber-200';
+
+        const qCard = document.createElement('div');
+        qCard.id = `qCard_${q.id}`;
+        qCard.className = 'bg-white rounded-2xl border border-slate-200 shadow-xs p-5 sm:p-6 transition-all hover:border-indigo-200';
+
+        qCard.innerHTML = `
+          <!-- Meta Header Badges -->
+          <div class="flex flex-wrap items-center gap-1.5 sm:gap-2 mb-3.5 pb-2.5 border-b border-slate-100">
+            <span class="px-2.5 py-1 rounded-md text-[11px] sm:text-xs font-bold bg-slate-100 text-slate-800 border border-slate-200">
+              ข้อที่ ${q.id} / 30
+            </span>
+            <span class="px-2.5 py-1 rounded-md text-[11px] sm:text-xs font-semibold bg-indigo-50 text-indigo-900 border border-indigo-200">
+              <i class="fa-solid fa-bookmark text-[10px] mr-1 text-indigo-600"></i>${q.topic}
+            </span>
+            <span class="px-2.5 py-1 rounded-md text-[11px] sm:text-xs font-semibold border ${diffColor}">
+              <i class="fa-solid fa-gauge-high text-[10px] mr-1"></i>ระดับ: ${q.difficulty}
+            </span>
+            <span class="px-2.5 py-1 rounded-md text-[11px] sm:text-xs font-semibold border ${domainColor}">
+              <i class="fa-solid fa-brain text-[10px] mr-1"></i>ด้านที่วัด: ${q.domain}
+            </span>
+          </div>
+
+          <!-- Question Stem -->
+          <div class="text-sm sm:text-base font-semibold text-slate-900 leading-relaxed mb-4">
+            ${q.stem}
+          </div>
+
+          <!-- Choices Grid -->
+          <div class="grid grid-cols-1 gap-2.5 mb-4">
+            ${q.choices.map(c => `
+              <label class="choice-label flex items-start gap-3 p-3 rounded-xl border border-slate-200 hover:bg-slate-50 cursor-pointer transition text-xs sm:text-sm text-slate-700" id="label_${q.id}_${c.key}">
+                <input type="radio" name="question_${q.id}" value="${c.key}" onchange="selectChoice(${q.id}, '${c.key}')" class="mt-0.5 w-4 h-4 text-indigo-600 focus:ring-indigo-500">
+                <span class="font-bold text-slate-900 shrink-0">${c.key}.</span>
+                <span class="leading-relaxed">${c.text}</span>
+              </label>
+            `).join('')}
+          </div>
+
+          <!-- Single Question Actions & Solution Area -->
+          <div class="flex items-center justify-between pt-2">
+            <button onclick="toggleSingleExplanation(${q.id})" id="btnToggle_${q.id}" class="text-xs font-semibold text-indigo-600 hover:text-indigo-800 bg-indigo-50 hover:bg-indigo-100/70 px-3 py-1.5 rounded-lg border border-indigo-200 transition">
+              <i class="fa-solid fa-lightbulb mr-1"></i> เปิดเฉลยและวิธีทำ
+            </button>
+            <span id="resultBadge_${q.id}" class="hidden text-xs font-bold px-2.5 py-1 rounded-md"></span>
+          </div>
+
+          <!-- Hidden Explanation Box -->
+          <div id="explanation_${q.id}" class="hidden mt-3.5 pt-3.5 border-t border-slate-100 text-xs sm:text-sm bg-slate-50/80 p-4 rounded-xl border border-slate-200 text-slate-700 leading-relaxed">
+            <div class="font-bold text-slate-900 flex items-center gap-1.5 mb-1.5">
+              <i class="fa-solid fa-circle-check text-emerald-600"></i>
+              เฉลยคำตอบ: <span class="text-emerald-700 font-extrabold text-base ml-1">ข้อ ${q.ans}</span>
+            </div>
+            <div class="text-slate-600">
+              <strong class="text-slate-800">คำอธิบายละเอียด:</strong> ${q.explanation}
+            </div>
+          </div>
+        `;
+
+        container.appendChild(qCard);
+      });
+    }
+
+    function selectChoice(qid, choiceKey) {
+      userSelections[qid] = choiceKey;
+    }
+
+    function toggleSingleExplanation(qid) {
+      const exp = document.getElementById(`explanation_${qid}`);
+      const btn = document.getElementById(`btnToggle_${qid}`);
+      if (exp.classList.contains('hidden')) {
+        exp.classList.remove('hidden');
+        btn.innerHTML = '<i class="fa-solid fa-eye-slash mr-1"></i> ซ่อนเฉลย';
+        btn.className = 'text-xs font-semibold text-slate-600 hover:text-slate-800 bg-slate-100 px-3 py-1.5 rounded-lg border border-slate-300 transition';
+        renderMath();
+      } else {
+        exp.classList.add('hidden');
+        btn.innerHTML = '<i class="fa-solid fa-lightbulb mr-1"></i> เปิดเฉลยและวิธีทำ';
+        btn.className = 'text-xs font-semibold text-indigo-600 hover:text-indigo-800 bg-indigo-50 hover:bg-indigo-100/70 px-3 py-1.5 rounded-lg border border-indigo-200 transition';
+      }
+    }
+
+    function toggleAllExplanations(show) {
+      questionsData.forEach(q => {
+        const exp = document.getElementById(`explanation_${q.id}`);
+        const btn = document.getElementById(`btnToggle_${q.id}`);
+        if (show) {
+          exp.classList.remove('hidden');
+          btn.innerHTML = '<i class="fa-solid fa-eye-slash mr-1"></i> ซ่อนเฉลย';
+          btn.className = 'text-xs font-semibold text-slate-600 hover:text-slate-800 bg-slate-100 px-3 py-1.5 rounded-lg border border-slate-300 transition';
+        } else {
+          exp.classList.add('hidden');
+          btn.innerHTML = '<i class="fa-solid fa-lightbulb mr-1"></i> เปิดเฉลยและวิธีทำ';
+          btn.className = 'text-xs font-semibold text-indigo-600 hover:text-indigo-800 bg-indigo-50 hover:bg-indigo-100/70 px-3 py-1.5 rounded-lg border border-indigo-200 transition';
+        }
+      });
+      if (show) renderMath();
+    }
+
+    function resetAllChoices() {
+      userSelections = {};
+      document.querySelectorAll('input[type="radio"]').forEach(r => r.checked = false);
+      document.querySelectorAll('.choice-label').forEach(l => {
+        l.className = 'choice-label flex items-start gap-3 p-3 rounded-xl border border-slate-200 hover:bg-slate-50 cursor-pointer transition text-xs sm:text-sm text-slate-700';
+      });
+      document.querySelectorAll('[id^="resultBadge_"]').forEach(b => {
+        b.className = 'hidden';
+      });
+      document.getElementById('scoreDashboard').classList.add('hidden');
+    }
+
+    function submitExam() {
+      let totalCorrect = 0;
+      let countK = 0, correctK = 0;
+      let countP = 0, correctP = 0;
+      let countA = 0, correctA = 0;
+      let countEasy = 0, correctEasy = 0;
+      let countMed = 0, correctMed = 0;
+      let countHard = 0, correctHard = 0;
+
+      questionsData.forEach(q => {
+        const userAns = userSelections[q.id];
+        const isCorrect = (userAns === q.ans);
+
+        // Update statistics
+        if (q.domain.startsWith('K')) { countK++; if (isCorrect) correctK++; }
+        else if (q.domain.startsWith('P')) { countP++; if (isCorrect) correctP++; }
+        else if (q.domain.startsWith('A')) { countA++; if (isCorrect) correctA++; }
+
+        if (q.difficulty === 'ง่าย') { countEasy++; if (isCorrect) correctEasy++; }
+        else if (q.difficulty === 'ปานกลาง') { countMed++; if (isCorrect) correctMed++; }
+        else if (q.difficulty === 'ยาก') { countHard++; if (isCorrect) correctHard++; }
+
+        if (isCorrect) totalCorrect++;
+
+        // Visual feedback per card
+        const resultBadge = document.getElementById(`resultBadge_${q.id}`);
+        resultBadge.classList.remove('hidden', 'bg-emerald-100', 'text-emerald-800', 'bg-rose-100', 'text-rose-800', 'bg-amber-100', 'text-amber-800');
+
+        if (!userAns) {
+          resultBadge.className = 'text-xs font-bold px-2.5 py-1 rounded-md bg-amber-100 text-amber-800';
+          resultBadge.textContent = 'ยังไม่ได้ตอบ';
+        } else if (isCorrect) {
+          resultBadge.className = 'text-xs font-bold px-2.5 py-1 rounded-md bg-emerald-100 text-emerald-800';
+          resultBadge.textContent = '✓ ตอบถูกต้อง';
+        } else {
+          resultBadge.className = 'text-xs font-bold px-2.5 py-1 rounded-md bg-rose-100 text-rose-800';
+          resultBadge.textContent = `✗ ตอบผิด (ตอบ ${userAns})`;
+        }
+
+        // Highlight choices
+        q.choices.forEach(c => {
+          const lbl = document.getElementById(`label_${q.id}_${c.key}`);
+          lbl.className = 'choice-label flex items-start gap-3 p-3 rounded-xl border cursor-pointer transition text-xs sm:text-sm';
+          if (c.key === q.ans) {
+            lbl.className += ' bg-emerald-50 border-emerald-400 text-emerald-950 font-semibold';
+          } else if (userAns === c.key && !isCorrect) {
+            lbl.className += ' bg-rose-50 border-rose-300 text-rose-950';
+          } else {
+            lbl.className += ' border-slate-200 text-slate-700 opacity-80';
+          }
+        });
+      });
+
+      // Update Dashboard view
+      document.getElementById('totalScoreText').textContent = `${totalCorrect} / 30`;
+      const pct = Math.round((totalCorrect / 30) * 100);
+      const gradeBadge = document.getElementById('gradeBadge');
+      gradeBadge.textContent = `${pct}% ${pct >= 80 ? '(ดีเยี่ยม)' : pct >= 60 ? '(ผ่านเกณฑ์)' : '(ควรปรับปรุง)'}`;
+      gradeBadge.className = `px-3 py-1.5 rounded-xl font-bold text-sm ${pct >= 80 ? 'bg-emerald-100 text-emerald-800' : pct >= 60 ? 'bg-indigo-100 text-indigo-800' : 'bg-rose-100 text-rose-800'}`;
+
+      document.getElementById('scoreK').textContent = `${correctK} / ${countK}`;
+      document.getElementById('scoreP').textContent = `${correctP} / ${countP}`;
+      document.getElementById('scoreA').textContent = `${correctA} / ${countA}`;
+
+      document.getElementById('scoreEasy').textContent = `${correctEasy} / ${countEasy}`;
+      document.getElementById('scoreMed').textContent = `${correctMed} / ${countMed}`;
+      document.getElementById('scoreHard').textContent = `${correctHard} / ${countHard}`;
+
+      const dash = document.getElementById('scoreDashboard');
+      dash.classList.remove('hidden');
+      dash.scrollIntoView({ behavior: 'smooth' });
+    }
+  </script>
+</body>
+</html>

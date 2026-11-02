@@ -1,0 +1,995 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>เรื่องที่ 3: วิธีนิวตัน–ราฟสัน (Newton–Raphson Method)</title>
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- Google Fonts: Sarabun & Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- Font Awesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <!-- KaTeX for math rendering -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js"></script>
+
+  <!-- Chart.js for real-time visualization -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Sarabun', 'Inter', 'sans-serif'],
+          },
+          colors: {
+            primary: {
+              50: '#f0f9ff',
+              100: '#e0f2fe',
+              500: '#0ea5e9',
+              600: '#0284c7',
+              700: '#0369a1',
+              800: '#075985',
+              900: '#0c4a6e',
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    html { scroll-behavior: smooth; }
+    .katex-display { margin: 0.5em 0; overflow-x: auto; overflow-y: hidden; padding-bottom: 2px; }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-800 font-sans antialiased selection:bg-sky-100 selection:text-sky-900 min-h-screen">
+
+  <!-- Header Banner -->
+  <header class="bg-gradient-to-r from-slate-900 via-sky-950 to-indigo-950 text-white border-b border-sky-800/40 shadow-sm">
+    <div class="max-w-6xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
+
+      <h1 class="text-2xl sm:text-3xl md:text-4xl font-bold tracking-tight text-white flex items-center gap-3">
+        <span>เรื่องที่ 3: วิธีนิวตัน–ราฟสัน (Newton–Raphson Method)</span>
+      </h1>
+      <p class="mt-2 text-slate-300 text-base sm:text-lg max-w-3xl">
+        ระเบียบวิธีแบบเปิด (Open Method) ที่ใช้อนุพันธ์และสมการเส้นสัมผัสเพื่อประมาณค่ารากอย่างรวดเร็ว — การวิเคราะห์การลู่เข้าและเงื่อนไขความล้มเหลว
+      </p>
+    </div>
+  </header>
+
+  <!-- Main Container with strictly required width -->
+  <main class="max-w-6xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 space-y-10">
+
+    <!-- Section 1: Learning Objectives -->
+    <section class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 sm:p-7 relative overflow-hidden">
+      <div class="absolute top-0 left-0 w-2 h-full bg-sky-600"></div>
+      <div class="flex items-center gap-3 mb-4">
+        <div class="p-2.5 bg-sky-50 text-sky-700 rounded-xl">
+          <i class="fa-solid fa-bullseye text-xl"></i>
+        </div>
+        <h2 class="text-xl sm:text-2xl font-bold text-slate-900">1. วัตถุประสงค์การเรียนรู้</h2>
+      </div>
+      <p class="text-slate-600 mb-4 text-base leading-relaxed">
+        เมื่อเสร็จสิ้นการศึกษาชุดการเรียนรู้นี้แล้ว นักศึกษาจะมีความสามารถดังต่อไปนี้:
+      </p>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div class="bg-slate-50 border border-slate-100 rounded-xl p-4 transition-all hover:border-sky-200 hover:bg-sky-50/40">
+          <div class="text-sky-700 font-semibold mb-1 flex items-center gap-2">
+            <span class="w-6 h-6 rounded-full bg-sky-100 text-sky-700 text-xs flex items-center justify-center font-bold">1</span>
+            เข้าใจที่มาของสูตร
+          </div>
+          <p class="text-slate-600 text-sm">อธิบายที่มาของสูตรนิวตัน–ราฟสันจากสมการเส้นสัมผัสเส้นโค้งและจุดตัดแกน \(x\) ได้อย่างถูกต้อง</p>
+        </div>
+        <div class="bg-slate-50 border border-slate-100 rounded-xl p-4 transition-all hover:border-sky-200 hover:bg-sky-50/40">
+          <div class="text-sky-700 font-semibold mb-1 flex items-center gap-2">
+            <span class="w-6 h-6 rounded-full bg-sky-100 text-sky-700 text-xs flex items-center justify-center font-bold">2</span>
+            คำนวณการวนซ้ำ
+          </div>
+          <p class="text-slate-600 text-sm">ใช้อนุพันธ์สร้างลำดับค่าประมาณราก \(x_{n+1}\) และตรวจสอบเกณฑ์การหยุดทำซ้ำตามที่กำหนดได้</p>
+        </div>
+        <div class="bg-slate-50 border border-slate-100 rounded-xl p-4 transition-all hover:border-sky-200 hover:bg-sky-50/40">
+          <div class="text-sky-700 font-semibold mb-1 flex items-center gap-2">
+            <span class="w-6 h-6 rounded-full bg-sky-100 text-sky-700 text-xs flex items-center justify-center font-bold">3</span>
+            วิเคราะห์ความล้มเหลว
+          </div>
+          <p class="text-slate-600 text-sm">วิเคราะห์เงื่อนไขที่อาจทำให้วิธีนี้ไม่ลู่เข้า เช่น เมื่อ \(f'(x_n) \approx 0\) หรือเกิดการแกว่งวนรอบ</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Section 2: Core Concepts -->
+    <section class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 sm:p-7 space-y-6">
+      <div class="flex items-center gap-3">
+        <div class="p-2.5 bg-indigo-50 text-indigo-700 rounded-xl">
+          <i class="fa-solid fa-square-root-variable text-xl"></i>
+        </div>
+        <h2 class="text-xl sm:text-2xl font-bold text-slate-900">2. เนื้อหาหลัก</h2>
+      </div>
+
+      <!-- Theory Box -->
+      <div class="bg-gradient-to-br from-sky-50/60 via-indigo-50/30 to-white border border-sky-100 rounded-xl p-5 space-y-4">
+        <h3 class="font-bold text-slate-900 text-lg flex items-center gap-2">
+          <span>ที่มาของสูตรทำซ้ำ (Derivation via Tangent Line)</span>
+        </h3>
+        <p class="text-slate-700 leading-relaxed text-sm sm:text-base">
+          วิธีนิวตัน–ราฟสันอาศัยแนวคิดเชิงเรขาคณิต โดยพิจารณาเส้นสัมผัสของกราฟ \(y = f(x)\) ที่จุด \((x_n, f(x_n))\) ซึ่งมีความชันเท่ากับอนุพันธ์ \(f'(x_n)\) สมการของเส้นสัมผัสเขียนได้เป็น:
+        </p>
+        <div class="text-center my-2 text-base sm:text-lg font-medium text-slate-800">
+          \[ y = f(x_n) + f'(x_n)(x - x_n) \]
+        </div>
+        <p class="text-slate-700 leading-relaxed text-sm sm:text-base">
+          กำหนดให้ \(x_{n+1}\) เป็นจุดที่เส้นสัมผัสนี้ตัดแกน \(x\) ซึ่งมีค่า \(y = 0\):
+        </p>
+        <div class="text-center my-2 text-base sm:text-lg font-medium text-slate-800">
+          \[ 0 = f(x_n) + f'(x_n)(x_{n+1} - x_n) \]
+        </div>
+        <p class="text-slate-700 leading-relaxed text-sm sm:text-base">
+          จัดรูปสมการเพื่อหาค่าประมาณในรอบถัดไป จะได้สูตรการทำซ้ำของนิวตัน–ราฟสัน:
+        </p>
+        <div class="py-3 text-center text-xl sm:text-2xl font-bold text-sky-900 bg-white rounded-xl border border-sky-200 shadow-xs max-w-md mx-auto">
+          \[ \boxed{x_{n+1} = x_n - \frac{f(x_n)}{f'(x_n)}} \]
+        </div>
+        <p class="text-xs sm:text-sm text-slate-600 text-center font-medium">
+          (โดยมีเงื่อนไขจำเป็นคือ \(f'(x_n) \ne 0\))
+        </p>
+      </div>
+
+      <!-- Example Card -->
+      <div class="bg-slate-50 border border-slate-200 rounded-xl p-5 space-y-3">
+        <h3 class="font-bold text-slate-900 text-base flex items-center gap-2">
+          <span class="inline-block px-2.5 py-0.5 rounded text-xs bg-slate-800 text-white font-semibold uppercase">ตัวอย่าง</span>
+          การประมาณรากของพหุนาม
+        </h3>
+        <p class="text-slate-700 text-sm">
+          กำหนดสมการ \(f(x) = x^3 - x - 2 = 0\) จะได้อนุพันธ์คือ:
+        </p>
+        <div class="text-center font-semibold text-slate-800 text-sm sm:text-base">
+          \[ f'(x) = 3x^2 - 1 \]
+        </div>
+        <p class="text-slate-700 text-sm">
+          ดังนั้น สูตรทำซ้ำของสมการนี้คือ:
+        </p>
+        <div class="text-center font-semibold text-sky-800 text-sm sm:text-base">
+          \[ x_{n+1} = x_n - \frac{x_n^3 - x_n - 2}{3x_n^2 - 1} \]
+        </div>
+        <p class="text-slate-700 text-sm leading-relaxed">
+          หากเริ่มต้นจาก \(x_0 = 1.5\) จะได้:
+          <br>รอบที่ 1: \(x_1 = 1.5 - \frac{(1.5)^3 - 1.5 - 2}{3(1.5)^2 - 1} = 1.5 - \frac{-0.125}{5.75} \approx 1.521739\)
+          <br>รอบที่ 2: \(x_2 \approx 1.5213798\) (ลู่เข้าสู่รากจริง \(r \approx 1.5213797\) อย่างรวดเร็วด้วยอัตรากำลังสอง หรือ Quadratic Convergence)
+        </p>
+      </div>
+
+      <!-- Caution Warning Box -->
+      <div class="bg-amber-50/90 border-l-4 border-amber-500 rounded-r-xl p-5 text-amber-950">
+        <div class="flex items-start gap-3">
+          <div class="text-amber-600 mt-0.5">
+            <i class="fa-solid fa-triangle-exclamation text-xl"></i>
+          </div>
+          <div>
+            <h4 class="font-bold text-base text-amber-900 mb-1">ข้อควรระวังและข้อจำกัดของการลู่เข้า (Convergence Pitfalls)</h4>
+            <p class="text-sm leading-relaxed text-amber-900/90">
+              แม้วิธีนี้จะลู่เข้าเร็วมากเมื่อเลือกค่าเริ่มต้นที่ใกล้เคียงราก แต่ <strong>ไม่รับประกันว่าจะลู่เข้าสำหรับทุกค่าเริ่มต้น</strong> โดยมีกรณีเสี่ยงดังนี้:
+            </p>
+            <ul class="list-disc list-inside text-sm mt-1.5 space-y-1 text-amber-900/90">
+              <li><strong>อนุพันธ์เป็นศูนย์หรือใกล้ศูนย์ (\(f'(x_n) \approx 0\)):</strong> เส้นสัมผัสจะเกือบขนานกับแกน \(x\) ทำให้ค่า \(x_{n+1}\) ถูกดีดกระเด็นออกไปไกลมาก หรือเกิดข้อผิดพลาด Division by Zero</li>
+              <li><strong>การแกว่งวนรอบ (Periodic Oscillations / Cycles):</strong> บางฟังก์ชันอาจเกิดการกระโดดสลับไปมาระหว่างจุดสองจุดโดยไม่ลู่เข้าหาค่าราก</li>
+              <li><strong>การลู่ออกสู่อนันต์ (Divergence):</strong> เส้นสัมผัสอาจพาค่าประมาณเดินห่างจากรากออกไปเรื่อยๆ</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Section 3: Interactive Simulation -->
+    <section class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 sm:p-7 space-y-6">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-slate-100 gap-3">
+        <div class="flex items-center gap-3">
+          <div class="p-2.5 bg-sky-50 text-sky-700 rounded-xl">
+            <i class="fa-solid fa-laptop-code text-xl"></i>
+          </div>
+          <div>
+            <h2 class="text-xl sm:text-2xl font-bold text-slate-900">3. แบบจำลองโต้ตอบ (Interactive Simulation)</h2>
+            <p class="text-xs sm:text-sm text-slate-500">
+              ฟังก์ชัน: <span class="font-semibold text-slate-800">\(f(x) = x^3 - x - 2 = 0\)</span> (รากจริง \(r \approx 1.52138\))
+            </p>
+          </div>
+        </div>
+
+        <!-- Simulation Buttons Toolbar -->
+        <div class="flex flex-wrap items-center gap-2">
+          <button id="btnPrev" onclick="stepBack()" class="px-3.5 py-2 text-xs sm:text-sm font-semibold rounded-lg border border-slate-300 text-slate-700 hover:bg-slate-100 disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-1.5 transition-colors">
+            <i class="fa-solid fa-rotate-left"></i> ย้อนกลับ
+          </button>
+          <button id="btnNext" onclick="stepForward()" class="px-4 py-2 text-xs sm:text-sm font-semibold rounded-lg bg-sky-600 hover:bg-sky-700 text-white shadow-sm flex items-center gap-2 transition-all">
+            <i class="fa-solid fa-play"></i> คำนวณรอบถัดไป
+          </button>
+          <button id="btnReset" onclick="resetSimulation()" class="px-3.5 py-2 text-xs sm:text-sm font-semibold rounded-lg border border-rose-200 text-rose-600 hover:bg-rose-50 transition-colors">
+            <i class="fa-solid fa-arrow-rotate-right"></i> เริ่มใหม่
+          </button>
+        </div>
+      </div>
+
+      <!-- Controls & Setup -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+        
+        <!-- Controls Column -->
+        <div class="lg:col-span-4 bg-slate-50 border border-slate-200 rounded-xl p-4 sm:p-5 space-y-4">
+          <div>
+            <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">กำหนดค่าเริ่มต้น \(x_0\)</label>
+            <div class="flex items-center gap-2">
+              <input type="number" step="0.01" id="inputX0" value="1.50" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm font-mono focus:ring-2 focus:ring-sky-500 focus:outline-none">
+              <button onclick="applyNewX0()" class="px-3 py-2 bg-slate-800 hover:bg-slate-900 text-white text-xs font-semibold rounded-lg transition-colors shrink-0">
+                ตั้งค่า
+              </button>
+            </div>
+          </div>
+
+          <!-- Preset Cases for Demonstration -->
+          <div>
+            <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">กรณีทดสอบที่น่าสนใจ</label>
+            <div class="grid grid-cols-2 gap-1.5">
+              <button onclick="setInitialX0(1.50)" class="text-xs bg-white hover:bg-sky-50 text-slate-700 hover:text-sky-800 font-medium p-2 rounded-lg border border-slate-200 text-left transition-colors">
+                <span class="block font-bold">x₀ = 1.50</span>
+                <span class="text-[11px] text-slate-500">ลู่เข้าปกติ รวดเร็ว</span>
+              </button>
+              <button onclick="setInitialX0(0.58)" class="text-xs bg-white hover:bg-amber-50 text-slate-700 hover:text-amber-800 font-medium p-2 rounded-lg border border-slate-200 text-left transition-colors">
+                <span class="block font-bold">x₀ = 0.58</span>
+                <span class="text-[11px] text-amber-600">f' ≈ 0 (จุดวกกลับ)</span>
+              </button>
+              <button onclick="setInitialX0(0.00)" class="text-xs bg-white hover:bg-sky-50 text-slate-700 hover:text-sky-800 font-medium p-2 rounded-lg border border-slate-200 text-left transition-colors">
+                <span class="block font-bold">x₀ = 0.00</span>
+                <span class="text-[11px] text-slate-500">f'(0) = -1 กราฟกระโดด</span>
+              </button>
+              <button onclick="setInitialX0(-1.00)" class="text-xs bg-white hover:bg-sky-50 text-slate-700 hover:text-sky-800 font-medium p-2 rounded-lg border border-slate-200 text-left transition-colors">
+                <span class="block font-bold">x₀ = -1.00</span>
+                <span class="text-[11px] text-slate-500">เริ่มจากฝั่งซ้าย</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Live Metrics Overview -->
+          <div class="bg-white border border-slate-200 rounded-xl p-3.5 space-y-2 text-xs">
+            <div class="flex justify-between">
+              <span class="text-slate-500">รอบที่ (Iteration):</span>
+              <span id="metricN" class="font-mono font-bold text-slate-900 text-sm">0</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-slate-500">ค่าปัจจุบัน \(x_n\):</span>
+              <span id="metricXn" class="font-mono font-bold text-sky-800 text-sm">1.500000</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-slate-500">ค่าฟังก์ชัน \(f(x_n)\):</span>
+              <span id="metricFx" class="font-mono font-semibold text-slate-700">-0.125000</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-slate-500">ค่าอนุพันธ์ \(f'(x_n)\):</span>
+              <span id="metricFpx" class="font-mono font-semibold text-slate-700">5.750000</span>
+            </div>
+            <div class="flex justify-between pt-1 border-t border-slate-100">
+              <span class="text-slate-500 font-medium">ค่ารอบถัดไป \(x_{n+1}\):</span>
+              <span id="metricNextX" class="font-mono font-bold text-emerald-700 text-sm">-</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-slate-500 font-medium">ผลต่าง \(|x_{n+1} - x_n|\):</span>
+              <span id="metricDiff" class="font-mono font-semibold text-slate-700">-</span>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Graph & Dynamic Alerts Column -->
+        <div class="lg:col-span-8 space-y-3">
+          
+          <!-- Alert Banner for Near-Zero Derivative or Divergence -->
+          <div id="simAlertBox" class="hidden rounded-xl p-3.5 text-xs sm:text-sm border transition-all">
+            <div class="flex items-start gap-2.5">
+              <i id="simAlertIcon" class="fa-solid fa-circle-exclamation mt-0.5 text-base"></i>
+              <div id="simAlertMsg" class="leading-relaxed"></div>
+            </div>
+          </div>
+
+          <!-- Canvas Container -->
+          <div class="bg-white border border-slate-200 rounded-xl p-3 sm:p-4 shadow-inner relative">
+            <div class="flex justify-between items-center text-xs font-semibold text-slate-600 px-1 mb-2">
+              <span class="flex items-center gap-1.5">
+                <span class="inline-block w-3 h-0.5 bg-sky-600"></span> กราฟ \(f(x)\)
+              </span>
+              <span class="flex items-center gap-1.5">
+                <span class="inline-block w-3 h-0.5 bg-amber-500"></span> เส้นสัมผัส (Tangent)
+              </span>
+              <span class="flex items-center gap-1.5">
+                <span class="inline-block w-2.5 h-2.5 rounded-full bg-emerald-600"></span> จุดตัดแกน \(x\)
+              </span>
+            </div>
+            <div class="h-72 sm:h-80 w-full">
+              <canvas id="nrCanvas"></canvas>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Iteration Table -->
+      <div class="mt-6">
+        <h3 class="text-sm font-bold text-slate-700 uppercase tracking-wider mb-2 flex items-center justify-between">
+          <span>ตารางสรุปการคำนวณแต่ละรอบ (Newton–Raphson Iteration Table)</span>
+          <span class="text-xs text-slate-500 font-normal lowercase">(อัปเดตอัตโนมัติ)</span>
+        </h3>
+        <div class="overflow-x-auto border border-slate-200 rounded-xl shadow-xs">
+          <table class="w-full text-xs sm:text-sm text-left">
+            <thead class="bg-slate-100 text-slate-700 uppercase font-semibold text-[11px] sm:text-xs border-b border-slate-200">
+              <tr>
+                <th class="px-3 py-2.5 text-center">รอบที่ (\(n\))</th>
+                <th class="px-3 py-2.5 font-mono text-sky-950">ค่าประมาณ \(x_n\)</th>
+                <th class="px-3 py-2.5 font-mono">\(f(x_n)\)</th>
+                <th class="px-3 py-2.5 font-mono">\(f'(x_n)\)</th>
+                <th class="px-3 py-2.5 font-mono text-emerald-800">ค่าถัดไป \(x_{n+1}\)</th>
+                <th class="px-3 py-2.5 font-mono">\(|x_{n+1} - x_n|\)</th>
+              </tr>
+            </thead>
+            <tbody id="nrHistoryTable" class="divide-y divide-slate-200 bg-white font-mono text-slate-700">
+              <!-- Dynamically Populated Rows -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- Section 4: Guided Discovery Questions -->
+    <section class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 sm:p-7 space-y-6">
+      <div class="flex items-center gap-3">
+        <div class="p-2.5 bg-amber-50 text-amber-700 rounded-xl">
+          <i class="fa-solid fa-lightbulb text-xl"></i>
+        </div>
+        <div>
+          <h2 class="text-xl sm:text-2xl font-bold text-slate-900">4. คำถามนำเพื่อค้นพบ (Guided Inquiry)</h2>
+          <p class="text-xs sm:text-sm text-slate-500">ทบทวนหลักการเชิงเรขาคณิตและข้อจำกัดก่อนเปิดดูคำตอบ</p>
+        </div>
+      </div>
+
+      <div class="space-y-4">
+        <!-- Question 1 -->
+        <div class="border border-slate-200 rounded-xl p-4 sm:p-5 transition hover:shadow-sm">
+          <div class="flex items-start justify-between gap-3">
+            <div class="flex items-start gap-3">
+              <span class="w-7 h-7 rounded-full bg-sky-100 text-sky-800 text-sm font-bold flex items-center justify-center shrink-0 mt-0.5">1</span>
+              <div>
+                <h3 class="font-bold text-slate-900 text-base">สูตรนิวตัน–ราฟสันเกิดจากสมการเส้นสัมผัสได้อย่างไร?</h3>
+                <p class="text-xs text-slate-500 mt-0.5">พิจารณาความสัมพันธ์ของความชัน จุดสัมผัส และจุดตัดแกน \(x\)</p>
+              </div>
+            </div>
+            <button onclick="toggleInquiry(1)" id="btnInq1" class="text-xs sm:text-sm font-semibold text-sky-700 hover:text-sky-900 bg-sky-50 px-3 py-1.5 rounded-lg border border-sky-200 shrink-0 transition-colors">
+              แสดงแนวคิด
+            </button>
+          </div>
+          <div id="ansInq1" class="hidden mt-4 pt-3 border-t border-slate-100 text-slate-700 text-sm leading-relaxed bg-slate-50/70 p-3.5 rounded-lg">
+            <strong class="text-slate-900">แนวคิด:</strong> 
+            จากนิยามความชันของเส้นสัมผัสกราฟที่จุด \((x_n, f(x_n))\) คืออนุพันธ์ \(m = f'(x_n)\) และสมการเส้นตรงคือ \(y - y_1 = m(x - x_1)\) จะได้ \(y - f(x_n) = f'(x_n)(x - x_n)\) เนื่องจากเป้าหมายคือการหารากที่ \(y=0\) เราจึงให้เส้นสัมผัสตัดแกน \(x\) ที่จุด \((x_{n+1}, 0)\) แทนค่า \(y=0\) จะได้ \(-f(x_n) = f'(x_n)(x_{n+1} - x_n)\) และเมื่อย้ายข้างจะได้ \(x_{n+1} = x_n - \frac{f(x_n)}{f'(x_n)}\)
+          </div>
+        </div>
+
+        <!-- Question 2 -->
+        <div class="border border-slate-200 rounded-xl p-4 sm:p-5 transition hover:shadow-sm">
+          <div class="flex items-start justify-between gap-3">
+            <div class="flex items-start gap-3">
+              <span class="w-7 h-7 rounded-full bg-sky-100 text-sky-800 text-sm font-bold flex items-center justify-center shrink-0 mt-0.5">2</span>
+              <div>
+                <h3 class="font-bold text-slate-900 text-base">เหตุใดการเลือกค่าเริ่มต้นจึงมีผลต่อการลู่เข้า?</h3>
+                <p class="text-xs text-slate-500 mt-0.5">พิจารณารูปทรงความโค้งของกราฟและจุดวิกฤต</p>
+              </div>
+            </div>
+            <button onclick="toggleInquiry(2)" id="btnInq2" class="text-xs sm:text-sm font-semibold text-sky-700 hover:text-sky-900 bg-sky-50 px-3 py-1.5 rounded-lg border border-sky-200 shrink-0 transition-colors">
+              แสดงแนวคิด
+            </button>
+          </div>
+          <div id="ansInq2" class="hidden mt-4 pt-3 border-t border-slate-100 text-slate-700 text-sm leading-relaxed bg-slate-50/70 p-3.5 rounded-lg">
+            <strong class="text-slate-900">แนวคิด:</strong> 
+            วิธีนิวตัน–ราฟสันเป็น <strong>วิธีเฉพาะที่ (Locally Convergent)</strong> ซึ่งจะการันตีการลู่เข้าก็ต่อเมื่อค่าเริ่มต้น \(x_0\) อยู่ในบริเวณใกล้เคียงรากมากพอ (Radius of Convergence) หากเลือก \(x_0\) ไปตกใกล้จุดวกกลับ (Local Extremum) ความชันจะราบเรียบ ทำให้เส้นสัมผัสตัดแกน \(x\) ไปไกลมากจนหลุดออกจากบริเวณราก หรืออาจทำให้เกิดการกระโดดสลับไปมาระหว่างแอ่งสองแอ่ง
+          </div>
+        </div>
+
+        <!-- Question 3 -->
+        <div class="border border-slate-200 rounded-xl p-4 sm:p-5 transition hover:shadow-sm">
+          <div class="flex items-start justify-between gap-3">
+            <div class="flex items-start gap-3">
+              <span class="w-7 h-7 rounded-full bg-sky-100 text-sky-800 text-sm font-bold flex items-center justify-center shrink-0 mt-0.5">3</span>
+              <div>
+                <h3 class="font-bold text-slate-900 text-base">ถ้า \(f'(x_n) = 0\) จะเกิดปัญหาใดกับสูตรทำซ้ำ?</h3>
+                <p class="text-xs text-slate-500 mt-0.5">พิจารณาทั้งมุมมองพีชคณิตและการตีความทางเรขาคณิต</p>
+              </div>
+            </div>
+            <button onclick="toggleInquiry(3)" id="btnInq3" class="text-xs sm:text-sm font-semibold text-sky-700 hover:text-sky-900 bg-sky-50 px-3 py-1.5 rounded-lg border border-sky-200 shrink-0 transition-colors">
+              แสดงแนวคิด
+            </button>
+          </div>
+          <div id="ansInq3" class="hidden mt-4 pt-3 border-t border-slate-100 text-slate-700 text-sm leading-relaxed bg-slate-50/70 p-3.5 rounded-lg">
+            <strong class="text-slate-900">แนวคิด:</strong> 
+            <ul class="list-disc list-inside space-y-1">
+              <li><strong>เชิงพีชคณิต:</strong> เกิดการหารด้วยศูนย์ (\(\frac{f(x_n)}{0}\)) ซึ่งไม่นิยามในทางคณิตศาสตร์ และโปรแกรมคอมพิวเตอร์จะเกิดข้อผิดพลาด Division by Zero</li>
+              <li><strong>เชิงเรขาคณิต:</strong> เส้นสัมผัสของกราฟจะขนานกับแกน \(x\) พอดี (ความชันเป็นศูนย์) ทำให้เส้นสัมผัสนั้น <strong>ไม่มีจุดตัดแกน \(x\)</strong> ส่งผลให้ไม่สามารถสร้างค่าประมาณ \(x_{n+1}\) สำหรับรอบถัดไปได้ และขั้นตอนวิธีจะล้มเหลวทันที</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Section 5: Student Exercises -->
+    <section class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 sm:p-7 space-y-6">
+      <div class="flex items-center gap-3">
+        <div class="p-2.5 bg-emerald-50 text-emerald-700 rounded-xl">
+          <i class="fa-solid fa-pen-to-square text-xl"></i>
+        </div>
+        <div>
+          <h2 class="text-xl sm:text-2xl font-bold text-slate-900">5. แบบฝึกหัดสำหรับนักศึกษา</h2>
+          <p class="text-xs sm:text-sm text-slate-500">ทดสอบการคำนวณและกรอกค่าประมาณเพื่อตรวจสอบความเข้าใจ</p>
+        </div>
+      </div>
+
+      <div class="space-y-6">
+        
+        <!-- Exercise 1 -->
+        <div class="bg-slate-50 border border-slate-200 rounded-xl p-5 space-y-3">
+          <div class="flex items-start justify-between gap-3">
+            <h3 class="font-bold text-slate-900 text-base">
+              ข้อ 1. ใช้วิธีนิวตัน–ราฟสันประมาณรากของ \(x^3 - x - 2 = 0\) โดยกำหนด \(x_0 = 1.5\) จำนวน 3 รอบ
+            </h3>
+            <span class="text-xs bg-sky-100 text-sky-800 font-semibold px-2.5 py-1 rounded">ประมาณค่า 3 รอบ</span>
+          </div>
+          <p class="text-sm text-slate-600">
+            จงหาค่าประมาณ \(x_3\) (ตอบเป็นทศนิยมอย่างน้อย 4 ตำแหน่ง เช่น 1.5214)
+          </p>
+
+          <div class="flex flex-wrap items-center gap-3">
+            <div class="flex items-center gap-2">
+              <label class="text-xs font-semibold text-slate-700">ค่า \(x_3\):</label>
+              <input type="text" id="ex1_input" placeholder="เช่น 1.5214" class="w-36 px-3 py-1.5 border border-slate-300 rounded-lg text-sm font-mono text-center focus:ring-2 focus:ring-sky-500 focus:outline-none">
+            </div>
+            <button onclick="checkEx1()" class="bg-sky-600 hover:bg-sky-700 text-white text-xs font-semibold px-4 py-2 rounded-lg transition-colors">
+              ตรวจคำตอบ
+            </button>
+            <button onclick="toggleExSol(1)" class="text-xs font-semibold text-slate-600 hover:text-slate-900 underline px-2 py-1">
+              ดูขั้นตอนการคำนวณ
+            </button>
+          </div>
+          <div id="ex1_feedback" class="text-xs sm:text-sm font-medium hidden p-2.5 rounded-lg"></div>
+
+          <div id="ex1_solution" class="hidden pt-3 border-t border-slate-200 text-xs sm:text-sm text-slate-700 bg-white p-3.5 rounded-lg border">
+            <div class="font-bold text-slate-900 mb-1">ขั้นตอนการคำนวณ:</div>
+            สูตร: \(x_{n+1} = x_n - \frac{x_n^3 - x_n - 2}{3x_n^2 - 1}\)
+            <ul class="list-disc list-inside space-y-1 mt-1 font-mono text-xs">
+              <li>x₀ = 1.5</li>
+              <li>x₁ = 1.5 - (-0.125 / 5.75) = 1.5217391</li>
+              <li>x₂ = 1.5217391 - (0.002133 / 5.946125) = 1.5213799</li>
+              <li>x₃ = 1.5213799 - (0.000000 / 5.942918) = <span class="text-emerald-700 font-bold">1.5213797 ≈ 1.5214</span></li>
+            </ul>
+            จะเห็นว่าหลังทำเพียง 3 รอบ ค่าประมาณมีความถูกต้องถึงทศนิยมตำแหน่งที่ 6 แล้ว
+          </div>
+        </div>
+
+        <!-- Exercise 2 -->
+        <div class="bg-slate-50 border border-slate-200 rounded-xl p-5 space-y-3">
+          <div class="flex items-start justify-between gap-3">
+            <h3 class="font-bold text-slate-900 text-base">
+              ข้อ 2. ใช้วิธีเดียวกันประมาณรากของ \(x^2 - 2 = 0\) (หาค่า \(\sqrt{2}\)) โดยเริ่มจาก \(x_0 = 1\) จำนวน 4 รอบ
+            </h3>
+            <span class="text-xs bg-sky-100 text-sky-800 font-semibold px-2.5 py-1 rounded">Babylonian Method</span>
+          </div>
+          <p class="text-sm text-slate-600">
+            จงหาค่าประมาณ \(x_4\) (ตอบเป็นทศนิยม 6 ตำแหน่ง เช่น 1.414214)
+          </p>
+
+          <div class="flex flex-wrap items-center gap-3">
+            <div class="flex items-center gap-2">
+              <label class="text-xs font-semibold text-slate-700">ค่า \(x_4\):</label>
+              <input type="text" id="ex2_input" placeholder="เช่น 1.414214" class="w-36 px-3 py-1.5 border border-slate-300 rounded-lg text-sm font-mono text-center focus:ring-2 focus:ring-sky-500 focus:outline-none">
+            </div>
+            <button onclick="checkEx2()" class="bg-sky-600 hover:bg-sky-700 text-white text-xs font-semibold px-4 py-2 rounded-lg transition-colors">
+              ตรวจคำตอบ
+            </button>
+            <button onclick="toggleExSol(2)" class="text-xs font-semibold text-slate-600 hover:text-slate-900 underline px-2 py-1">
+              ดูขั้นตอนการคำนวณ
+            </button>
+          </div>
+          <div id="ex2_feedback" class="text-xs sm:text-sm font-medium hidden p-2.5 rounded-lg"></div>
+
+          <div id="ex2_solution" class="hidden pt-3 border-t border-slate-200 text-xs sm:text-sm text-slate-700 bg-white p-3.5 rounded-lg border">
+            <div class="font-bold text-slate-900 mb-1">ขั้นตอนการคำนวณ (วิธีบาบิโลเนียน):</div>
+            \(f(x) = x^2 - 2 \implies f'(x) = 2x\) สูตรคือ \(x_{n+1} = \frac{1}{2}(x_n + \frac{2}{x_n})\)
+            <ul class="list-disc list-inside space-y-1 mt-1 font-mono text-xs">
+              <li>x₀ = 1.0</li>
+              <li>x₁ = (1 + 2/1)/2 = 1.5</li>
+              <li>x₂ = (1.5 + 2/1.5)/2 = 1.4166667</li>
+              <li>x₃ = (1.4166667 + 2/1.4166667)/2 = 1.4142157</li>
+              <li>x₄ = <span class="text-emerald-700 font-bold">1.4142136 ≈ 1.414214</span></li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- Exercise 3 -->
+        <div class="bg-slate-50 border border-slate-200 rounded-xl p-5 space-y-3">
+          <div class="flex items-start justify-between gap-3">
+            <h3 class="font-bold text-slate-900 text-base">
+              ข้อ 3. เหตุผลทางคณิตศาสตร์ที่ทำให้วิธีนิวตัน–ราฟสันอาจไม่เหมาะกับค่าเริ่มต้นบางค่า
+            </h3>
+            <span class="text-xs bg-amber-100 text-amber-800 font-semibold px-2.5 py-1 rounded">การวิเคราะห์เงื่อนไข</span>
+          </div>
+          <p class="text-sm text-slate-600">
+            พิจารณาข้อความต่อไปนี้ ข้อใดเป็นสาเหตุทางคณิตศาสตร์ที่ทำให้วิธีนิวตัน–ราฟสันล้มเหลว?
+          </p>
+
+          <div class="space-y-2 text-sm text-slate-700">
+            <label class="flex items-center gap-2 cursor-pointer">
+              <input type="radio" name="ex3_opt" value="1" class="accent-sky-600">
+              <span>อนุพันธ์ \(f'(x_n) = 0\) ทำให้เส้นสัมผัสขนานกับแกน \(x\) ไม่เกิดจุดตัด</span>
+            </label>
+            <label class="flex items-center gap-2 cursor-pointer">
+              <input type="radio" name="ex3_opt" value="2" class="accent-sky-600">
+              <span>เกิดการวนรอบแบบวัฏจักร (Cycle/Oscillation) สลับไปมา เช่น ฟังก์ชันที่มีความสมมาตร</span>
+            </label>
+            <label class="flex items-center gap-2 cursor-pointer">
+              <input type="radio" name="ex3_opt" value="3" class="accent-sky-600">
+              <span>ค่าประมาณกระโดดออกห่างจากรากไปสู่อนันต์ (Divergence)</span>
+            </label>
+            <label class="flex items-center gap-2 cursor-pointer font-semibold text-slate-900">
+              <input type="radio" name="ex3_opt" value="4" class="accent-sky-600">
+              <span>ถูกทุกข้อที่กล่าวมา</span>
+            </label>
+          </div>
+
+          <div class="flex items-center gap-3 pt-2">
+            <button onclick="checkEx3()" class="bg-sky-600 hover:bg-sky-700 text-white text-xs font-semibold px-4 py-2 rounded-lg transition-colors">
+              ตรวจคำตอบ
+            </button>
+            <button onclick="toggleExSol(3)" class="text-xs font-semibold text-slate-600 hover:text-slate-900 underline px-2 py-1">
+              ดูคำอธิบายสรุป
+            </button>
+          </div>
+          <div id="ex3_feedback" class="text-xs sm:text-sm font-medium hidden p-2.5 rounded-lg"></div>
+
+          <div id="ex3_solution" class="hidden pt-3 border-t border-slate-200 text-xs sm:text-sm text-slate-700 leading-relaxed bg-white p-3.5 rounded-lg border">
+            <strong class="text-slate-900">คำตอบที่ถูกต้อง: ถูกทุกข้อที่กล่าวมา</strong><br>
+            วิธีนิวตัน–ราฟสันเป็น Open Method ซึ่งไม่มีการตีกรอบราก (No Bracketing) หากค่าเริ่มต้น \(x_0\) อยู่ไกลเกินไป หรือเจอบริเวณที่อนุพันธ์เข้าใกล้ศูนย์ เส้นสัมผัสสามารถพาตัวแปรลู่ออกสู่อนันต์ หรือตกเข้าไปในวงวนซ้ำ (Cycle) ได้เสมอ จึงจำเป็นต้องระมัดระวังในการเลือกค่าเริ่มต้น
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+  </main>
+
+
+
+  <!-- Simulation Logic & Visualizer Script -->
+  <script>
+    // Target Polynomial Function: f(x) = x^3 - x - 2
+    function f(x) {
+      return Math.pow(x, 3) - x - 2;
+    }
+
+    // Derivative: f'(x) = 3x^2 - 1
+    function df(x) {
+      return 3 * Math.pow(x, 2) - 1;
+    }
+
+    let history = [];
+    let currentStepIndex = 0;
+    let nrChart = null;
+
+    window.onload = function() {
+      // Render KaTeX Formulas
+      if (typeof renderMathInElement === 'function') {
+        renderMathInElement(document.body, {
+          delimiters: [
+            {left: '$$', right: '$$', display: true},
+            {left: '\\[', right: '\\]', display: true},
+            {left: '\\(', right: '\\)', display: false},
+            {left: '$', right: '$', display: false}
+          ],
+          throwOnError: false
+        });
+      }
+
+      initChart();
+      resetSimulation();
+    };
+
+    function initChart() {
+      const ctx = document.getElementById('nrCanvas').getContext('2d');
+      nrChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+          datasets: [
+            {
+              label: 'f(x) = x³ - x - 2',
+              data: generateFunctionCurve(-2.5, 2.8),
+              borderColor: '#0284c7',
+              borderWidth: 2.5,
+              pointRadius: 0,
+              tension: 0.15,
+              fill: false
+            },
+            {
+              label: 'เส้นสัมผัส (Tangent Line)',
+              data: [],
+              borderColor: '#f59e0b',
+              borderWidth: 2,
+              borderDash: [5, 5],
+              pointRadius: 0,
+              fill: false
+            },
+            {
+              label: 'เส้นประตั้ง (Projection)',
+              data: [],
+              borderColor: '#94a3b8',
+              borderWidth: 1.5,
+              borderDash: [3, 3],
+              pointRadius: 0,
+              fill: false
+            },
+            {
+              label: 'จุดบนเส้นโค้ง (x_n, f(x_n))',
+              data: [],
+              borderColor: '#0c4a6e',
+              backgroundColor: '#0284c7',
+              borderWidth: 2,
+              pointRadius: 6,
+              pointHoverRadius: 8,
+              showLine: false
+            },
+            {
+              label: 'จุดตัดแกน x (x_{n+1}, 0)',
+              data: [],
+              borderColor: '#064e3b',
+              backgroundColor: '#10b981',
+              borderWidth: 2,
+              pointRadius: 6,
+              pointHoverRadius: 8,
+              showLine: false
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          interaction: { intersect: false, mode: 'nearest' },
+          scales: {
+            x: {
+              type: 'linear',
+              min: -2.5,
+              max: 2.8,
+              grid: {
+                color: (ctx) => ctx.tick.value === 0 ? '#334155' : '#f1f5f9',
+                lineWidth: (ctx) => ctx.tick.value === 0 ? 1.5 : 1
+              },
+              title: { display: true, text: 'แกน x', font: { size: 12, weight: 'bold' } }
+            },
+            y: {
+              min: -8,
+              max: 12,
+              grid: {
+                color: (ctx) => ctx.tick.value === 0 ? '#334155' : '#e2e8f0',
+                lineWidth: (ctx) => ctx.tick.value === 0 ? 1.5 : 1
+              },
+              title: { display: true, text: 'f(x)', font: { size: 12, weight: 'bold' } }
+            }
+          },
+          plugins: {
+            legend: { display: false },
+            tooltip: {
+              callbacks: {
+                label: (ctx) => ` (${ctx.parsed.x.toFixed(4)}, ${ctx.parsed.y.toFixed(4)})`
+              }
+            }
+          }
+        }
+      });
+    }
+
+    function generateFunctionCurve(minX, maxX) {
+      const pts = [];
+      for (let x = minX; x <= maxX + 0.01; x += 0.05) {
+        pts.push({ x: Number(x.toFixed(3)), y: f(x) });
+      }
+      return pts;
+    }
+
+    function applyNewX0() {
+      const val = parseFloat(document.getElementById('inputX0').value);
+      if (isNaN(val)) return;
+      setInitialX0(val);
+    }
+
+    function setInitialX0(val) {
+      document.getElementById('inputX0').value = val.toFixed(2);
+      resetSimulation();
+    }
+
+    function resetSimulation() {
+      const x0 = parseFloat(document.getElementById('inputX0').value) || 1.5;
+      const fx0 = f(x0);
+      const fpx0 = df(x0);
+      let nextX = null;
+      let diff = null;
+
+      if (Math.abs(fpx0) > 1e-12) {
+        nextX = x0 - (fx0 / fpx0);
+        diff = Math.abs(nextX - x0);
+      }
+
+      history = [{
+        n: 0,
+        xn: x0,
+        fx: fx0,
+        fpx: fpx0,
+        nextX: nextX,
+        diff: diff,
+        status: evaluateStatus(fpx0, fx0)
+      }];
+
+      currentStepIndex = 0;
+      updateUI();
+    }
+
+    function evaluateStatus(fpx, fx) {
+      if (Math.abs(fpx) < 1e-4) {
+        return {
+          type: 'danger',
+          msg: `คำเตือนวิกฤต: ค่าอนุพันธ์ f'(x) = ${fpx.toFixed(6)} ใกล้ศูนย์มาก! เส้นสัมผัสเกือบขนานแกน x ทำให้ผลลัพธ์อาจกระเด็นออกนอกขอบเขต หรือเกิดข้อผิดพลาดทางตัวเลข`
+        };
+      }
+      if (Math.abs(fx) < 1e-6) {
+        return {
+          type: 'success',
+          msg: `ลู่เข้าสู่รากสมการสำเร็จ! ค่า f(x) ≈ 0 แล้ว (ความคลาดเคลื่อนอยู่ในเกณฑ์ต่ำมาก)`
+        };
+      }
+      return { type: 'normal', msg: '' };
+    }
+
+    function stepForward() {
+      const prev = history[currentStepIndex];
+      if (prev.nextX === null || isNaN(prev.nextX) || !isFinite(prev.nextX)) {
+        return;
+      }
+      if (Math.abs(prev.fpx) < 1e-12) return;
+
+      const nextN = prev.n + 1;
+      const xn = prev.nextX;
+      const fx = f(xn);
+      const fpx = df(xn);
+
+      let nextX = null;
+      let diff = null;
+
+      if (Math.abs(fpx) > 1e-12) {
+        nextX = xn - (fx / fpx);
+        diff = Math.abs(nextX - xn);
+      }
+
+      const status = evaluateStatus(fpx, fx);
+
+      const newState = {
+        n: nextN,
+        xn: xn,
+        fx: fx,
+        fpx: fpx,
+        nextX: nextX,
+        diff: diff,
+        status: status
+      };
+
+      if (currentStepIndex < history.length - 1) {
+        history = history.slice(0, currentStepIndex + 1);
+      }
+      history.push(newState);
+      currentStepIndex++;
+      updateUI();
+    }
+
+    function stepBack() {
+      if (currentStepIndex > 0) {
+        currentStepIndex--;
+        updateUI();
+      }
+    }
+
+    function updateUI() {
+      const state = history[currentStepIndex];
+
+      // Update control buttons
+      document.getElementById('btnPrev').disabled = (currentStepIndex === 0);
+      document.getElementById('btnNext').disabled = (state.nextX === null || !isFinite(state.nextX) || Math.abs(state.fx) < 1e-8 || state.n >= 15);
+
+      // Metrics Dashboard
+      document.getElementById('metricN').textContent = state.n;
+      document.getElementById('metricXn').textContent = isFinite(state.xn) ? state.xn.toFixed(6) : 'Overflow';
+      document.getElementById('metricFx').textContent = isFinite(state.fx) ? state.fx.toFixed(6) : '-';
+      document.getElementById('metricFpx').textContent = isFinite(state.fpx) ? state.fpx.toFixed(6) : '-';
+      document.getElementById('metricNextX').textContent = (state.nextX !== null && isFinite(state.nextX)) ? state.nextX.toFixed(6) : 'ไม่นิยาม (Undefined)';
+      document.getElementById('metricDiff').textContent = (state.diff !== null && isFinite(state.diff)) ? state.diff.toFixed(6) : '-';
+
+      // Alert Box
+      const alertBox = document.getElementById('simAlertBox');
+      const alertMsg = document.getElementById('simAlertMsg');
+      const alertIcon = document.getElementById('simAlertIcon');
+
+      if (state.status.type === 'danger') {
+        alertBox.className = 'rounded-xl p-3.5 text-xs sm:text-sm border bg-rose-50 border-rose-300 text-rose-900 shadow-xs block';
+        alertIcon.className = 'fa-solid fa-triangle-exclamation text-rose-600 mt-0.5 text-base';
+        alertMsg.textContent = state.status.msg;
+      } else if (state.status.type === 'success') {
+        alertBox.className = 'rounded-xl p-3.5 text-xs sm:text-sm border bg-emerald-50 border-emerald-300 text-emerald-900 shadow-xs block';
+        alertIcon.className = 'fa-solid fa-circle-check text-emerald-600 mt-0.5 text-base';
+        alertMsg.textContent = state.status.msg;
+      } else {
+        alertBox.className = 'hidden';
+      }
+
+      // Update Chart Visual Elements
+      if (nrChart) {
+        const xn = state.xn;
+        const fx = state.fx;
+        const fpx = state.fpx;
+        const nextX = state.nextX;
+
+        // Current point on curve
+        nrChart.data.datasets[3].data = [{ x: xn, y: fx }];
+
+        if (nextX !== null && isFinite(nextX) && Math.abs(fpx) > 1e-6) {
+          // Tangent line passing through (xn, fx) and (nextX, 0)
+          const minT = Math.min(xn, nextX) - 0.3;
+          const maxT = Math.max(xn, nextX) + 0.3;
+          const tangentData = [
+            { x: minT, y: fx + fpx * (minT - xn) },
+            { x: maxT, y: fx + fpx * (maxT - xn) }
+          ];
+          nrChart.data.datasets[1].data = tangentData;
+
+          // Next projected point on x-axis
+          nrChart.data.datasets[4].data = [{ x: nextX, y: 0 }];
+
+          // Vertical projection line from (nextX, 0) up/down to (nextX, f(nextX))
+          nrChart.data.datasets[2].data = [
+            { x: nextX, y: 0 },
+            { x: nextX, y: f(nextX) }
+          ];
+
+          // Dynamically adjust scale window if point jumps
+          const spanMin = Math.min(-2.5, xn - 1, nextX - 1);
+          const spanMax = Math.max(2.8, xn + 1, nextX + 1);
+          nrChart.options.scales.x.min = Math.max(-15, spanMin);
+          nrChart.options.scales.x.max = Math.min(15, spanMax);
+        } else {
+          nrChart.data.datasets[1].data = [];
+          nrChart.data.datasets[2].data = [];
+          nrChart.data.datasets[4].data = [];
+        }
+
+        nrChart.update();
+      }
+
+      renderHistoryTable();
+    }
+
+    function renderHistoryTable() {
+      const tbody = document.getElementById('nrHistoryTable');
+      tbody.innerHTML = '';
+
+      history.forEach((row, idx) => {
+        const tr = document.createElement('tr');
+        if (idx === currentStepIndex) {
+          tr.className = 'bg-sky-50/70 font-semibold border-l-4 border-sky-600';
+        } else {
+          tr.className = 'hover:bg-slate-50 transition-colors';
+        }
+
+        tr.innerHTML = `
+          <td class="px-3 py-2 text-center">${row.n}</td>
+          <td class="px-3 py-2 font-mono text-sky-950 font-bold">${isFinite(row.xn) ? row.xn.toFixed(6) : 'Overflow'}</td>
+          <td class="px-3 py-2 font-mono ${row.fx < 0 ? 'text-rose-600' : 'text-slate-700'}">${isFinite(row.fx) ? row.fx.toFixed(6) : '-'}</td>
+          <td class="px-3 py-2 font-mono ${Math.abs(row.fpx) < 1e-4 ? 'text-amber-600 font-bold' : 'text-slate-700'}">${isFinite(row.fpx) ? row.fpx.toFixed(6) : '-'}</td>
+          <td class="px-3 py-2 font-mono text-emerald-800 font-semibold">${row.nextX !== null && isFinite(row.nextX) ? row.nextX.toFixed(6) : '-'}</td>
+          <td class="px-3 py-2 font-mono text-slate-600">${row.diff !== null && isFinite(row.diff) ? row.diff.toFixed(6) : '-'}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    // Toggle Discovery Question Hints
+    function toggleInquiry(id) {
+      const content = document.getElementById(`ansInq${id}`);
+      const btn = document.getElementById(`btnInq${id}`);
+      if (content.classList.contains('hidden')) {
+        content.classList.remove('hidden');
+        btn.textContent = 'ซ่อนแนวคิด';
+      } else {
+        content.classList.add('hidden');
+        btn.textContent = 'แสดงแนวคิด';
+      }
+    }
+
+    // Toggle Exercise Solutions
+    function toggleExSol(id) {
+      const el = document.getElementById(`ex${id}_solution`);
+      if (el.classList.contains('hidden')) {
+        el.classList.remove('hidden');
+      } else {
+        el.classList.add('hidden');
+      }
+    }
+
+    // Exercise 1 Check
+    function checkEx1() {
+      const val = parseFloat(document.getElementById('ex1_input').value);
+      const fb = document.getElementById('ex1_feedback');
+      fb.classList.remove('hidden', 'bg-emerald-100', 'text-emerald-800', 'bg-rose-100', 'text-rose-800', 'bg-amber-100', 'text-amber-800');
+
+      if (isNaN(val)) {
+        fb.className = 'text-xs sm:text-sm font-medium p-2.5 rounded-lg bg-amber-100 text-amber-800';
+        fb.textContent = 'กรุณากรอกตัวเลขทศนิยม';
+        return;
+      }
+
+      if (Math.abs(val - 1.5213797) < 0.001 || Math.abs(val - 1.5214) < 0.0005) {
+        fb.className = 'text-xs sm:text-sm font-medium p-2.5 rounded-lg bg-emerald-100 text-emerald-800';
+        fb.innerHTML = '✓ ถูกต้องยอดเยี่ยม! ค่าประมาณหลังรอบที่ 3 คือ x₃ ≈ 1.52138 (หรือ 1.5214) ซึ่งให้ f(x₃) ≈ 0 อย่างแม่นยำ';
+      } else {
+        fb.className = 'text-xs sm:text-sm font-medium p-2.5 rounded-lg bg-rose-100 text-rose-800';
+        fb.innerHTML = '✗ ยังไม่ถูกต้อง: ตรวจสอบการแทนค่า x₁ ≈ 1.5217, x₂ ≈ 1.52138 และ x₃ หรือคลิกดูขั้นตอนการคำนวณ';
+      }
+    }
+
+    // Exercise 2 Check
+    function checkEx2() {
+      const val = parseFloat(document.getElementById('ex2_input').value);
+      const fb = document.getElementById('ex2_feedback');
+      fb.classList.remove('hidden', 'bg-emerald-100', 'text-emerald-800', 'bg-rose-100', 'text-rose-800', 'bg-amber-100', 'text-amber-800');
+
+      if (isNaN(val)) {
+        fb.className = 'text-xs sm:text-sm font-medium p-2.5 rounded-lg bg-amber-100 text-amber-800';
+        fb.textContent = 'กรุณากรอกตัวเลขทศนิยม';
+        return;
+      }
+
+      if (Math.abs(val - 1.41421356) < 0.0001 || Math.abs(val - 1.414214) < 0.00005) {
+        fb.className = 'text-xs sm:text-sm font-medium p-2.5 rounded-lg bg-emerald-100 text-emerald-800';
+        fb.innerHTML = '✓ ถูกต้อง! x₄ ≈ 1.414214 ซึ่งตรงกับค่า √2 ถึงทศนิยมตำแหน่งที่ 6';
+      } else {
+        fb.className = 'text-xs sm:text-sm font-medium p-2.5 rounded-lg bg-rose-100 text-rose-800';
+        fb.innerHTML = '✗ ยังไม่ถูกต้อง: ลองใช้สูตร Babylonian x_{n+1} = 0.5 * (x_n + 2/x_n) ดูอีกครั้ง';
+      }
+    }
+
+    // Exercise 3 Check
+    function checkEx3() {
+      const selected = document.querySelector('input[name="ex3_opt"]:checked');
+      const fb = document.getElementById('ex3_feedback');
+      fb.classList.remove('hidden', 'bg-emerald-100', 'text-emerald-800', 'bg-rose-100', 'text-rose-800', 'bg-amber-100', 'text-amber-800');
+
+      if (!selected) {
+        fb.className = 'text-xs sm:text-sm font-medium p-2.5 rounded-lg bg-amber-100 text-amber-800';
+        fb.textContent = 'กรุณาเลือกตัวเลือกก่อนตรวจคำตอบ';
+        return;
+      }
+
+      if (selected.value === '4') {
+        fb.className = 'text-xs sm:text-sm font-medium p-2.5 rounded-lg bg-emerald-100 text-emerald-800';
+        fb.innerHTML = '✓ ถูกต้องครบถ้วน! ทั้งกรณีอนุพันธ์เป็นศูนย์, การแกว่งวนรอบ, และการลู่ออกสู่อนันต์ ล้วนเป็นข้อจำกัดสำคัญของวิธีนิวตัน–ราฟสัน';
+      } else {
+        fb.className = 'text-xs sm:text-sm font-medium p-2.5 rounded-lg bg-rose-100 text-rose-800';
+        fb.innerHTML = '✗ แม้ข้อที่เลือกจะเป็นเหตุผลที่ถูกต้อง แต่ยังมีข้ออื่นที่ถูกต้องเช่นกัน (ลองพิจารณาตัวเลือก "ถูกทุกข้อ")';
+      }
+    }
+  </script>
+</body>
+</html>

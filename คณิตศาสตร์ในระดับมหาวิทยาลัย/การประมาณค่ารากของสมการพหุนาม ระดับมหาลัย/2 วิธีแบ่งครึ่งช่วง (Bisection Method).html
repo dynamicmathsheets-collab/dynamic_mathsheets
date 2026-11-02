@@ -1,0 +1,906 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>เรื่องที่ 2: วิธีแบ่งครึ่งช่วง (Bisection Method)</title>
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- Google Fonts: Sarabun & Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- Font Awesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <!-- KaTeX for math rendering -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js"></script>
+
+  <!-- Chart.js for real-time function visualization -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Sarabun', 'Inter', 'sans-serif'],
+          },
+          colors: {
+            brand: {
+              50: '#f0fdf4',
+              100: '#dcfce7',
+              500: '#22c55e',
+              600: '#16a34a',
+              700: '#15803d',
+              800: '#166534',
+              900: '#14532d',
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    html { scroll-behavior: smooth; }
+    .katex-display { margin: 0.5em 0; overflow-x: auto; overflow-y: hidden; padding-bottom: 2px; }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-800 font-sans antialiased selection:bg-emerald-100 selection:text-emerald-900 min-h-screen">
+
+  <!-- Header Banner -->
+  <header class="bg-gradient-to-r from-emerald-950 via-teal-900 to-slate-900 text-white border-b border-emerald-700/40 shadow-sm">
+    <div class="max-w-6xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
+
+      <h1 class="text-2xl sm:text-3xl md:text-4xl font-bold tracking-tight text-white flex items-center gap-3">
+        <span>เรื่องที่ 2: วิธีแบ่งครึ่งช่วง (Bisection Method)</span>
+      </h1>
+      <p class="mt-2 text-slate-300 text-base sm:text-lg max-w-3xl">
+        ระเบียบวิธีค้นหารากสมการแบบครอบช่วง (Bracketing Method) — ศึกษาขั้นตอนวิธี การตัดสินใจเลือกช่วงใหม่ และการวิเคราะห์ขอบเขตความคลาดเคลื่อนเชิงตัวเลข
+      </p>
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <main class="max-w-6xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 space-y-10">
+
+    <!-- Section 1: Learning Objectives -->
+    <section class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 sm:p-7 relative overflow-hidden">
+      <div class="absolute top-0 left-0 w-2 h-full bg-emerald-600"></div>
+      <div class="flex items-center gap-3 mb-4">
+        <div class="p-2.5 bg-emerald-50 text-emerald-700 rounded-xl">
+          <i class="fa-solid fa-bullseye text-xl"></i>
+        </div>
+        <h2 class="text-xl sm:text-2xl font-bold text-slate-900">1. วัตถุประสงค์การเรียนรู้</h2>
+      </div>
+      <p class="text-slate-600 mb-4 text-base leading-relaxed">
+        เมื่อเสร็จสิ้นการศึกษาชุดการเรียนรู้นี้แล้ว นักศึกษาจะมีความสามารถดังต่อไปนี้:
+      </p>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div class="bg-slate-50 border border-slate-100 rounded-xl p-4 transition-all hover:border-emerald-200 hover:bg-emerald-50/40">
+          <div class="text-emerald-700 font-semibold mb-1 flex items-center gap-2">
+            <span class="w-6 h-6 rounded-full bg-emerald-100 text-emerald-700 text-xs flex items-center justify-center font-bold">1</span>
+            เข้าใจขั้นตอนวิธี
+          </div>
+          <p class="text-slate-600 text-sm">อธิบายตรรกะและขั้นตอนการทำงานของวิธีแบ่งครึ่งช่วงตามทฤษฎีบทค่าระหว่างกลางได้อย่างแม่นยำ</p>
+        </div>
+        <div class="bg-slate-50 border border-slate-100 rounded-xl p-4 transition-all hover:border-emerald-200 hover:bg-emerald-50/40">
+          <div class="text-emerald-700 font-semibold mb-1 flex items-center gap-2">
+            <span class="w-6 h-6 rounded-full bg-emerald-100 text-emerald-700 text-xs flex items-center justify-center font-bold">2</span>
+            คำนวณการวนซ้ำ
+          </div>
+          <p class="text-slate-600 text-sm">คำนวณหาจุดกึ่งกลาง ทดสอบเครื่องหมาย และระบุช่วงใหม่ที่ครอบคลุมรากในแต่ละรอบการวนซ้ำได้ถูกต้อง</p>
+        </div>
+        <div class="bg-slate-50 border border-slate-100 rounded-xl p-4 transition-all hover:border-emerald-200 hover:bg-emerald-50/40">
+          <div class="text-emerald-700 font-semibold mb-1 flex items-center gap-2">
+            <span class="w-6 h-6 rounded-full bg-emerald-100 text-emerald-700 text-xs flex items-center justify-center font-bold">3</span>
+            วิเคราะห์ความคลาดเคลื่อน
+          </div>
+          <p class="text-slate-600 text-sm">คำนวณขอบเขตความคลาดเคลื่อน (Error Bound) และหาจำนวนรอบการทำซ้ำขั้นต่ำตามพิกัดความเผื่อที่กำหนดได้</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Section 2: Core Concepts -->
+    <section class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 sm:p-7 space-y-6">
+      <div class="flex items-center gap-3">
+        <div class="p-2.5 bg-teal-50 text-teal-700 rounded-xl">
+          <i class="fa-solid fa-book-open text-xl"></i>
+        </div>
+        <h2 class="text-xl sm:text-2xl font-bold text-slate-900">2. เนื้อหาหลัก</h2>
+      </div>
+
+      <div class="bg-gradient-to-br from-emerald-50/60 via-teal-50/30 to-white border border-emerald-100 rounded-xl p-5 space-y-4">
+        <h3 class="font-bold text-emerald-950 text-lg flex items-center gap-2">
+          <span>ขั้นตอนการทำงานของวิธีแบ่งครึ่งช่วง (Algorithm Steps)</span>
+        </h3>
+        <p class="text-slate-700 leading-relaxed text-sm sm:text-base">
+          สมมติให้ฟังก์ชัน \(f(x)\) มีความต่อเนื่องบนช่วงปิด \([a, b]\) และมีเครื่องหมายตรงข้ามกันที่ปลายช่วง กล่าวคือ \(f(a)f(b) < 0\) กระบวนการแบ่งครึ่งช่วงมีลำดับการคำนวณดังนี้:
+        </p>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm mt-3">
+          <div class="bg-white border border-emerald-200/80 rounded-xl p-4 shadow-sm">
+            <div class="font-bold text-emerald-800 mb-1 flex items-center gap-2">
+              <span class="w-5 h-5 rounded-full bg-emerald-600 text-white text-xs flex items-center justify-center">1</span>
+              หาจุดกึ่งกลางของช่วง
+            </div>
+            <p class="text-slate-600 text-xs sm:text-sm">
+              คำนวณจุดกึ่งกลาง \(m\) ของช่วง \([a, b]\) ปัจจุบัน:
+            </p>
+            <div class="text-center my-2 font-semibold text-slate-800">
+              \[ m = \frac{a+b}{2} \]
+            </div>
+          </div>
+
+          <div class="bg-white border border-emerald-200/80 rounded-xl p-4 shadow-sm">
+            <div class="font-bold text-emerald-800 mb-1 flex items-center gap-2">
+              <span class="w-5 h-5 rounded-full bg-emerald-600 text-white text-xs flex items-center justify-center">2</span>
+              ตรวจสอบเครื่องหมายของ \(f(m)\)
+            </div>
+            <ul class="text-xs sm:text-sm text-slate-600 space-y-1.5 mt-1.5">
+              <li>• ถ้า \(f(a)f(m) < 0\) ให้เลือกช่วงใหม่เป็น <strong>\([a, m]\)</strong> (ตั้ง \(b = m\))</li>
+              <li>• ถ้า \(f(m)f(b) < 0\) ให้เลือกช่วงใหม่เป็น <strong>\([m, b]\)</strong> (ตั้ง \(a = m\))</li>
+              <li>• ถ้า \(f(m) = 0\) แสดงว่า <strong>\(m\) คือรากที่แท้จริง</strong> ของสมการ</li>
+            </ul>
+          </div>
+        </div>
+
+        <p class="text-xs sm:text-sm text-slate-600 italic">
+          ทำซ้ำขั้นตอนดังกล่าวจนกระทั่งความยาวของช่วงหรือขอบเขตความคลาดเคลื่อนมีค่าน้อยกว่าเกณฑ์ความคลาดเคลื่อนที่ยอมรับได้ (Tolerance, \(\varepsilon\))
+        </p>
+      </div>
+
+      <!-- Error Analysis Card -->
+      <div class="bg-slate-50 border border-slate-200 rounded-xl p-5 space-y-3">
+        <h3 class="font-bold text-slate-900 text-base flex items-center gap-2">
+          <i class="fa-solid fa-chart-line text-blue-600"></i>
+          ขอบเขตความคลาดเคลื่อน (Error Bound & Convergence)
+        </h3>
+        <p class="text-slate-700 text-sm leading-relaxed">
+          หากช่วงเริ่มต้นมีความกว้างเท่ากับ \(b - a\) เมื่อทำการแบ่งครึ่งช่วงไปแล้วเป็นจำนวน \(n\) ครั้ง:
+        </p>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 my-2">
+          <div class="bg-white p-3.5 rounded-lg border border-slate-200">
+            <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider block mb-1">ความยาวช่วงหลังแบ่ง \(n\) ครั้ง:</span>
+            <div class="font-semibold text-indigo-900 text-center">
+              \[ L_n = \frac{b - a}{2^n} \]
+            </div>
+          </div>
+          <div class="bg-white p-3.5 rounded-lg border border-slate-200">
+            <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider block mb-1">ขอบเขตค่าคลาดเคลื่อนสัมบูรณ์ของจุด \(m\):</span>
+            <div class="font-semibold text-emerald-800 text-center">
+              \[ |m_n - r| \le \frac{b - a}{2^{n+1}} \]
+            </div>
+          </div>
+        </div>
+        <p class="text-xs sm:text-sm text-slate-600">
+          เมื่อกำหนดให้ \(r\) คือรากที่แท้จริง จะเห็นได้ว่าค่าคลาดเคลื่อนมีขอบเขตสูงสุดไม่เกิน <strong>ครึ่งหนึ่งของความยาวช่วงย่อยปัจจุบัน</strong> เสมอ ทำให้วิธีนี้รับประกันการลู่เข้าหาคำตอบอย่างแน่นอน (Guaranteed Convergence)
+        </p>
+      </div>
+    </section>
+
+    <!-- Section 3: Interactive Simulation -->
+    <section class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 sm:p-7 space-y-6">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-slate-100 gap-3">
+        <div class="flex items-center gap-3">
+          <div class="p-2.5 bg-emerald-50 text-emerald-700 rounded-xl">
+            <i class="fa-solid fa-laptop-code text-xl"></i>
+          </div>
+          <div>
+            <h2 class="text-xl sm:text-2xl font-bold text-slate-900">3. แบบจำลองโต้ตอบ (Interactive Simulation)</h2>
+            <p class="text-xs sm:text-sm text-slate-500">
+              สมการเป้าหมาย: <span class="font-semibold text-slate-800">\(f(x) = x^3 - x - 2 = 0\)</span> บนช่วงเริ่มต้น \([1.000, 2.000]\)
+            </p>
+          </div>
+        </div>
+        
+        <!-- Controls Buttons Toolbar -->
+        <div class="flex flex-wrap items-center gap-2">
+          <button id="btnPrev" onclick="stepBack()" class="px-3.5 py-2 text-xs sm:text-sm font-semibold rounded-lg border border-slate-300 text-slate-700 hover:bg-slate-100 disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-1.5 transition-colors">
+            <i class="fa-solid fa-rotate-left"></i> ย้อนกลับ
+          </button>
+          <button id="btnNext" onclick="stepForward()" class="px-4 py-2 text-xs sm:text-sm font-semibold rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white shadow-sm flex items-center gap-2 transition-all">
+            <i class="fa-solid fa-arrows-split-up-and-left"></i> แบ่งครึ่งช่วง (รอบถัดไป)
+          </button>
+          <button id="btnReset" onclick="resetSimulation()" class="px-3.5 py-2 text-xs sm:text-sm font-semibold rounded-lg border border-rose-200 text-rose-600 hover:bg-rose-50 transition-colors">
+            <i class="fa-solid fa-arrow-rotate-right"></i> เริ่มใหม่
+          </button>
+        </div>
+      </div>
+
+      <!-- Real-time Dashboard Grid -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+        
+        <!-- Graph Plot Column -->
+        <div class="lg:col-span-7 bg-white border border-slate-200 rounded-xl p-3 sm:p-4 shadow-inner space-y-3">
+          <div class="flex justify-between items-center text-xs font-semibold text-slate-600 px-1">
+            <span class="flex items-center gap-2">
+              <span class="inline-block w-3 h-3 bg-emerald-500 rounded"></span> พื้นที่ช่วงครอบราก \([a, b]\)
+            </span>
+            <span class="flex items-center gap-2">
+              <span class="inline-block w-3 h-3 bg-indigo-600 rounded-full"></span> จุดกึ่งกลาง \(m\)
+            </span>
+            <span class="text-slate-400">รากจริง \(r \approx 1.5214\)</span>
+          </div>
+          <div class="h-64 sm:h-80 w-full">
+            <canvas id="bisectionCanvas"></canvas>
+          </div>
+        </div>
+
+        <!-- Real-time Values & Step Decision Column -->
+        <div class="lg:col-span-5 space-y-4">
+          
+          <!-- Key Metrics Cards -->
+          <div class="grid grid-cols-2 gap-3 text-center">
+            <div class="bg-slate-50 border border-slate-200 rounded-xl p-3">
+              <span class="text-xs text-slate-500 block">รอบที่ (Iteration)</span>
+              <span id="metricN" class="text-2xl font-bold font-mono text-slate-900">0</span>
+            </div>
+            <div class="bg-indigo-50/70 border border-indigo-100 rounded-xl p-3">
+              <span class="text-xs text-indigo-700 font-semibold block">จุดกึ่งกลาง \(m\) ปัจจุบัน</span>
+              <span id="metricM" class="text-2xl font-bold font-mono text-indigo-900">-</span>
+            </div>
+          </div>
+
+          <!-- Step Details Card -->
+          <div class="bg-slate-50 border border-slate-200 rounded-xl p-4 text-xs sm:text-sm space-y-2.5">
+            <div class="flex justify-between pb-2 border-b border-slate-200">
+              <span class="text-slate-600">ช่วงปัจจุบัน \([a, b]\):</span>
+              <span id="dispInterval" class="font-mono font-bold text-slate-900">[1.0000, 2.0000]</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-slate-600">ค่า \(f(a)\):</span>
+              <span id="dispFa" class="font-mono font-semibold text-rose-600">-2.0000 (-)</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-slate-600">ค่า \(f(b)\):</span>
+              <span id="dispFb" class="font-mono font-semibold text-emerald-600">+4.0000 (+)</span>
+            </div>
+            <div class="flex justify-between pt-1 border-t border-slate-200">
+              <span class="text-indigo-900 font-semibold">ค่า \(f(m)\):</span>
+              <span id="dispFm" class="font-mono font-bold text-indigo-700">-</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-slate-600">ความยาวช่วง \((b - a)\):</span>
+              <span id="dispLen" class="font-mono font-semibold text-slate-800">1.0000</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-slate-600">ขอบเขตความคลาดเคลื่อน \(\le\):</span>
+              <span id="dispErrorBound" class="font-mono font-bold text-emerald-700">0.5000</span>
+            </div>
+          </div>
+
+          <!-- Decision Banner -->
+          <div id="stepDecisionBox" class="bg-emerald-50 border border-emerald-200 rounded-xl p-3.5 text-xs sm:text-sm text-emerald-950 flex items-start gap-2.5">
+            <i class="fa-solid fa-circle-info text-emerald-600 mt-0.5 text-base"></i>
+            <div id="stepDecisionText" class="leading-relaxed">
+              พร้อมเริ่มต้น: กดปุ่ม <strong>"แบ่งครึ่งช่วง"</strong> เพื่อเริ่มคำนวณรอบที่ 1 หาจุดกึ่งกลาง \(m_1 = \frac{1+2}{2} = 1.5\)
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Iteration History Table -->
+      <div class="mt-6">
+        <h3 class="text-sm font-bold text-slate-700 uppercase tracking-wider mb-2 flex items-center justify-between">
+          <span>ตารางสรุปการคำนวณแต่ละรอบ (Iteration Table)</span>
+          <span class="text-xs text-slate-500 lowercase font-normal">(อัปเดตอัตโนมัติ)</span>
+        </h3>
+        <div class="overflow-x-auto border border-slate-200 rounded-xl shadow-xs">
+          <table class="w-full text-xs sm:text-sm text-left">
+            <thead class="bg-slate-100 text-slate-700 uppercase font-semibold text-[11px] sm:text-xs border-b border-slate-200">
+              <tr>
+                <th class="px-3 py-2.5 text-center">รอบที่ (\(n\))</th>
+                <th class="px-3 py-2.5 font-mono">ปลายซ้าย \(a\)</th>
+                <th class="px-3 py-2.5 font-mono">ปลายขวา \(b\)</th>
+                <th class="px-3 py-2.5 font-mono bg-indigo-50/50 text-indigo-900">กึ่งกลาง \(m\)</th>
+                <th class="px-3 py-2.5 font-mono">\(f(a)\)</th>
+                <th class="px-3 py-2.5 font-mono">\(f(b)\)</th>
+                <th class="px-3 py-2.5 font-mono bg-indigo-50/50 text-indigo-900">\(f(m)\)</th>
+                <th class="px-3 py-2.5 font-mono text-emerald-800">Error Bound</th>
+              </tr>
+            </thead>
+            <tbody id="historyTableBody" class="divide-y divide-slate-200 bg-white font-mono text-slate-700">
+              <!-- Dynamically Populated Rows -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- Section 4: Guided Discovery Questions -->
+    <section class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 sm:p-7 space-y-6">
+      <div class="flex items-center gap-3">
+        <div class="p-2.5 bg-amber-50 text-amber-700 rounded-xl">
+          <i class="fa-solid fa-lightbulb text-xl"></i>
+        </div>
+        <div>
+          <h2 class="text-xl sm:text-2xl font-bold text-slate-900">4. คำถามนำเพื่อค้นพบ (Guided Inquiry)</h2>
+          <p class="text-xs sm:text-sm text-slate-500">พิจารณาเหตุผลทางคณิตศาสตร์เบื้องหลังวิธีแบ่งครึ่งช่วงก่อนกดดูแนวคิด</p>
+        </div>
+      </div>
+
+      <div class="space-y-4">
+        <!-- Question 1 -->
+        <div class="border border-slate-200 rounded-xl p-4 sm:p-5 transition hover:shadow-sm">
+          <div class="flex items-start justify-between gap-3">
+            <div class="flex items-start gap-3">
+              <span class="w-7 h-7 rounded-full bg-emerald-100 text-emerald-800 text-sm font-bold flex items-center justify-center shrink-0 mt-0.5">1</span>
+              <div>
+                <h3 class="font-bold text-slate-900 text-base">เหตุใดรากจึงยังคงอยู่ในช่วงใหม่หลังการแบ่งครึ่งแต่ละครั้ง?</h3>
+                <p class="text-xs text-slate-500 mt-0.5">พิจารณาจากเกณฑ์การเลือกช่วงย่อยตามทฤษฎีบทค่าระหว่างกลาง</p>
+              </div>
+            </div>
+            <button onclick="toggleInquiry(1)" id="btnInq1" class="text-xs sm:text-sm font-semibold text-emerald-700 hover:text-emerald-900 bg-emerald-50 px-3 py-1.5 rounded-lg border border-emerald-200 shrink-0 transition-colors">
+              แสดงแนวคิด
+            </button>
+          </div>
+          <div id="ansInq1" class="hidden mt-4 pt-3 border-t border-slate-100 text-slate-700 text-sm leading-relaxed bg-slate-50/70 p-3.5 rounded-lg">
+            <strong class="text-slate-900">แนวคิด:</strong> 
+            เนื่องจากเราเริ่มต้นจากช่วงที่มีเครื่องหมายฟังก์ชันต่างกัน (\(f(a)f(b) < 0\)) เมื่อประเมินค่าที่จุดกึ่งกลาง \(m\) จะเกิดเพียง 2 กรณี (ถ้า \(f(m) \ne 0\)): ค่า \(f(m)\) จะมีเครื่องหมายตรงข้ามกับ \(f(a)\) หรือตรงข้ามกับ \(f(b)\) อย่างใดอย่างหนึ่งเสมอ การเลือกช่วงย่อยที่ปลายทั้งสองยังคงมีเครื่องหมายคูณกันได้ค่าน้อยกว่าศูนย์ (\(< 0\)) จึงเป็นการการันตีตาม <strong>ทฤษฎีบทค่าระหว่างกลาง (IVT)</strong> ว่ารากของฟังก์ชันยังคงถูกกักขัง (bracketed) อยู่ภายในช่วงใหม่นั้นอย่างแน่นอน
+          </div>
+        </div>
+
+        <!-- Question 2 -->
+        <div class="border border-slate-200 rounded-xl p-4 sm:p-5 transition hover:shadow-sm">
+          <div class="flex items-start justify-between gap-3">
+            <div class="flex items-start gap-3">
+              <span class="w-7 h-7 rounded-full bg-emerald-100 text-emerald-800 text-sm font-bold flex items-center justify-center shrink-0 mt-0.5">2</span>
+              <div>
+                <h3 class="font-bold text-slate-900 text-base">หากต้องการความแม่นยำเพิ่มขึ้น 2 เท่า ต้องแบ่งครึ่งเพิ่มประมาณกี่ครั้ง?</h3>
+                <p class="text-xs text-slate-500 mt-0.5">วิเคราะห์จากความสัมพันธ์ของตัวหาร \(2^n\)</p>
+              </div>
+            </div>
+            <button onclick="toggleInquiry(2)" id="btnInq2" class="text-xs sm:text-sm font-semibold text-emerald-700 hover:text-emerald-900 bg-emerald-50 px-3 py-1.5 rounded-lg border border-emerald-200 shrink-0 transition-colors">
+              แสดงแนวคิด
+            </button>
+          </div>
+          <div id="ansInq2" class="hidden mt-4 pt-3 border-t border-slate-100 text-slate-700 text-sm leading-relaxed bg-slate-50/70 p-3.5 rounded-lg">
+            <strong class="text-slate-900">แนวคิด:</strong> 
+            ต้องการความแม่นยำเพิ่มขึ้น 2 เท่า หมายถึงต้องการให้ขอบเขตความคลาดเคลื่อนลดลงครึ่งหนึ่ง (\(1/2\)) ของเดิม เนื่องจากในแต่ละรอบการแบ่ง ความยาวช่วงจะลดลงเป็น \(\frac{1}{2}\) เท่าอยู่แล้ว ดังนั้น <strong>ต้องแบ่งครึ่งเพิ่มขึ้นเพียง 1 ครั้งเท่านั้น</strong> ในทางกลับกัน หากต้องการความแม่นยำเพิ่มขึ้น 10 เท่า (ทศนิยมถูกต้องเพิ่ม 1 ตำแหน่ง) จะต้องทำซ้ำเพิ่มประมาณ \(\log_2(10) \approx 3.32\) หรือประมาณ 3 ถึง 4 รอบ
+          </div>
+        </div>
+
+        <!-- Question 3 -->
+        <div class="border border-slate-200 rounded-xl p-4 sm:p-5 transition hover:shadow-sm">
+          <div class="flex items-start justify-between gap-3">
+            <div class="flex items-start gap-3">
+              <span class="w-7 h-7 rounded-full bg-emerald-100 text-emerald-800 text-sm font-bold flex items-center justify-center shrink-0 mt-0.5">3</span>
+              <div>
+                <h3 class="font-bold text-slate-900 text-base">วิธีแบ่งครึ่งช่วงมีข้อดีอย่างไรเมื่อเทียบกับวิธีที่ใช้อนุพันธ์ (เช่น วิธีนิวตัน-ราฟสัน)?</h3>
+                <p class="text-xs text-slate-500 mt-0.5">เปรียบเทียบในแง่เงื่อนไขเริ่มต้น ความเสถียร และความซับซ้อน</p>
+              </div>
+            </div>
+            <button onclick="toggleInquiry(3)" id="btnInq3" class="text-xs sm:text-sm font-semibold text-emerald-700 hover:text-emerald-900 bg-emerald-50 px-3 py-1.5 rounded-lg border border-emerald-200 shrink-0 transition-colors">
+              แสดงแนวคิด
+            </button>
+          </div>
+          <div id="ansInq3" class="hidden mt-4 pt-3 border-t border-slate-100 text-slate-700 text-sm leading-relaxed bg-slate-50/70 p-3.5 rounded-lg">
+            <strong class="text-slate-900">แนวคิด:</strong> 
+            <ul class="list-disc list-inside space-y-1">
+              <li><strong>ความเสถียรสูงสุด (Guaranteed Convergence):</strong> ตราบใดที่ฟังก์ชันต่อเนื่องและ \(f(a)f(b) < 0\) วิธีนี้รับประกันว่าจะลู่เข้าสู่รากเสมอ ไม่มีปัญหากราฟลู่ออก (Diverge)</li>
+              <li><strong>ไม่ต้องหาอนุพันธ์ \(f'(x)\):</strong> เหมาะอย่างยิ่งสำหรับฟังก์ชันที่ซับซ้อนมากจนดิฟยาก หรือฟังก์ชันที่ได้จากข้อมูลตารางการทดลอง</li>
+              <li><strong>ไม่มีปัญหาอนุพันธ์เป็นศูนย์:</strong> วิธีนิวตันจะล้มเหลวทันทีหาก \(f'(x) = 0\) แต่วิธีแบ่งครึ่งช่วงไม่ได้รับผลกระทบใดๆ (ข้อเสียเปรียบเพียงอย่างเดียวคืออัตราการลู่เข้าค่อนข้างช้าแบบเชิงเส้น)</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Section 5: Student Exercises -->
+    <section class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 sm:p-7 space-y-6">
+      <div class="flex items-center gap-3">
+        <div class="p-2.5 bg-indigo-50 text-indigo-700 rounded-xl">
+          <i class="fa-solid fa-pen-to-square text-xl"></i>
+        </div>
+        <div>
+          <h2 class="text-xl sm:text-2xl font-bold text-slate-900">5. แบบฝึกหัดสำหรับนักศึกษา</h2>
+          <p class="text-xs sm:text-sm text-slate-500">ทดสอบการคำนวณและตรวจสอบผลลัพธ์เพื่อประเมินความเข้าใจ</p>
+        </div>
+      </div>
+
+      <div class="space-y-6">
+        
+        <!-- Exercise 1 -->
+        <div class="bg-slate-50 border border-slate-200 rounded-xl p-5 space-y-3">
+          <div class="flex items-start justify-between gap-3">
+            <h3 class="font-bold text-slate-900 text-base">
+              ข้อ 1. ใช้วิธีแบ่งครึ่งช่วงประมาณรากของ \(x^3 - x - 2 = 0\) จำนวน 5 รอบ โดยเริ่มจากช่วง \([1, 2]\)
+            </h3>
+            <span class="text-xs bg-emerald-100 text-emerald-800 font-semibold px-2.5 py-1 rounded">การคำนวณซ้ำ</span>
+          </div>
+          <p class="text-sm text-slate-600">
+            หลังจากทำซ้ำครบ 5 รอบ ค่าประมาณจุดกึ่งกลาง \(m_5\) มีค่าเท่าใด? (ตอบทศนิยม 4 ตำแหน่ง เช่น 1.5313)
+          </p>
+
+          <div class="flex flex-wrap items-center gap-3">
+            <div class="flex items-center gap-2">
+              <label class="text-xs font-semibold text-slate-700">ค่า \(m_5\):</label>
+              <input type="text" id="ex1_input" placeholder="เช่น 1.5313" class="w-32 px-3 py-1.5 border border-slate-300 rounded-lg text-sm font-mono text-center focus:ring-2 focus:ring-emerald-500 focus:outline-none">
+            </div>
+            <button onclick="checkEx1()" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold px-4 py-2 rounded-lg transition-colors">
+              ตรวจคำตอบ
+            </button>
+            <button onclick="toggleExSol(1)" class="text-xs font-semibold text-slate-600 hover:text-slate-900 underline px-2 py-1">
+              ดูตารางเฉลย 5 รอบ
+            </button>
+          </div>
+          <div id="ex1_feedback" class="text-xs sm:text-sm font-medium hidden p-2.5 rounded-lg"></div>
+
+          <div id="ex1_solution" class="hidden pt-3 border-t border-slate-200 text-xs sm:text-sm text-slate-700 bg-white p-3.5 rounded-lg border">
+            <div class="font-bold text-slate-900 mb-2">ตารางเฉลยการคำนวณ 5 รอบ:</div>
+            <div class="overflow-x-auto">
+              <table class="w-full text-xs font-mono text-center border-collapse">
+                <thead class="bg-slate-100 border-b">
+                  <tr>
+                    <th class="p-1.5">รอบ (n)</th>
+                    <th class="p-1.5">a</th>
+                    <th class="p-1.5">b</th>
+                    <th class="p-1.5 font-bold text-indigo-700">m</th>
+                    <th class="p-1.5">f(m)</th>
+                    <th class="p-1.5">ช่วงใหม่</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-100">
+                  <tr><td>1</td><td>1.0000</td><td>2.0000</td><td class="font-bold">1.5000</td><td>-0.1250 (-)</td><td>[1.5000, 2.0000]</td></tr>
+                  <tr><td>2</td><td>1.5000</td><td>2.0000</td><td class="font-bold">1.7500</td><td>+1.6094 (+)</td><td>[1.5000, 1.7500]</td></tr>
+                  <tr><td>3</td><td>1.5000</td><td>1.7500</td><td class="font-bold">1.6250</td><td>+0.6660 (+)</td><td>[1.5000, 1.6250]</td></tr>
+                  <tr><td>4</td><td>1.5000</td><td>1.6250</td><td class="font-bold">1.5625</td><td>+0.2522 (+)</td><td>[1.5000, 1.5625]</td></tr>
+                  <tr class="bg-emerald-50"><td>5</td><td>1.5000</td><td>1.5625</td><td class="font-bold text-emerald-800">1.5313</td><td>+0.0591 (+)</td><td>[1.5000, 1.5313]</td></tr>
+                </tbody>
+              </table>
+            </div>
+            <p class="mt-2 text-slate-600">ดังนั้นค่าประมาณหลังรอบที่ 5 คือ <strong>\(m_5 = 1.5313\) (หรือ 1.53125)</strong></p>
+          </div>
+        </div>
+
+        <!-- Exercise 2 -->
+        <div class="bg-slate-50 border border-slate-200 rounded-xl p-5 space-y-3">
+          <div class="flex items-start justify-between gap-3">
+            <h3 class="font-bold text-slate-900 text-base">
+              ข้อ 2. จงหาความยาวของช่วงหลังแบ่งครึ่ง 6 รอบ เมื่อช่วงเริ่มต้นคือ \([0, 4]\)
+            </h3>
+            <span class="text-xs bg-emerald-100 text-emerald-800 font-semibold px-2.5 py-1 rounded">สูตรความยาวช่วง</span>
+          </div>
+          <p class="text-sm text-slate-600">
+            ใช้สูตร \(L_n = \frac{b - a}{2^n}\) โดยกำหนดให้ \(a = 0, b = 4, n = 6\)
+          </p>
+
+          <div class="flex flex-wrap items-center gap-3">
+            <div class="flex items-center gap-2">
+              <label class="text-xs font-semibold text-slate-700">ความยาวช่วง \(L_6\):</label>
+              <input type="text" id="ex2_input" placeholder="เช่น 0.0625" class="w-32 px-3 py-1.5 border border-slate-300 rounded-lg text-sm font-mono text-center focus:ring-2 focus:ring-emerald-500 focus:outline-none">
+            </div>
+            <button onclick="checkEx2()" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold px-4 py-2 rounded-lg transition-colors">
+              ตรวจคำตอบ
+            </button>
+            <button onclick="toggleExSol(2)" class="text-xs font-semibold text-slate-600 hover:text-slate-900 underline px-2 py-1">
+              ดูวิธีทำ
+            </button>
+          </div>
+          <div id="ex2_feedback" class="text-xs sm:text-sm font-medium hidden p-2.5 rounded-lg"></div>
+
+          <div id="ex2_solution" class="hidden pt-3 border-t border-slate-200 text-xs sm:text-sm text-slate-700 leading-relaxed bg-white p-3.5 rounded-lg border">
+            <div class="font-bold text-slate-900 mb-1">วิธีทำอย่างละเอียด:</div>
+            จากสูตรความยาวช่วงย่อยหลังการแบ่ง \(n\) ครั้ง:
+            \[ L_n = \frac{b - a}{2^n} \]
+            แทนค่า \(a = 0\), \(b = 4\) และ \(n = 6\):
+            \[ L_6 = \frac{4 - 0}{2^6} = \frac{4}{64} = \frac{1}{16} = 0.0625 \]
+            ดังนั้นความยาวของช่วงหลังการแบ่งครึ่ง 6 รอบมีค่าเท่ากับ <strong>0.0625</strong>
+          </div>
+        </div>
+
+        <!-- Exercise 3 -->
+        <div class="bg-slate-50 border border-slate-200 rounded-xl p-5 space-y-3">
+          <div class="flex items-start justify-between gap-3">
+            <h3 class="font-bold text-slate-900 text-base">
+              ข้อ 3. หากต้องการให้ค่าคลาดเคลื่อนของจุดกึ่งกลางไม่เกิน \(0.001\) สำหรับช่วงเริ่มต้น \([1, 2]\) ต้องแบ่งครึ่งอย่างน้อยกี่รอบ?
+            </h3>
+            <span class="text-xs bg-emerald-100 text-emerald-800 font-semibold px-2.5 py-1 rounded">การประมาณจำนวนรอบ n</span>
+          </div>
+          <p class="text-sm text-slate-600">
+            จากอสมการขอบเขตความคลาดเคลื่อน \(\frac{b - a}{2^{n+1}} \le 0.001\) (ใส่เฉพาะจำนวนเต็มของ \(n\))
+          </p>
+
+          <div class="flex flex-wrap items-center gap-3">
+            <div class="flex items-center gap-2">
+              <label class="text-xs font-semibold text-slate-700">จำนวนรอบอย่างน้อย \(n\):</label>
+              <input type="number" id="ex3_input" placeholder="เช่น 9 หรือ 10" class="w-32 px-3 py-1.5 border border-slate-300 rounded-lg text-sm font-mono text-center focus:ring-2 focus:ring-emerald-500 focus:outline-none">
+            </div>
+            <button onclick="checkEx3()" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold px-4 py-2 rounded-lg transition-colors">
+              ตรวจคำตอบ
+            </button>
+            <button onclick="toggleExSol(3)" class="text-xs font-semibold text-slate-600 hover:text-slate-900 underline px-2 py-1">
+              ดูวิธีแก้อสมการ
+            </button>
+          </div>
+          <div id="ex3_feedback" class="text-xs sm:text-sm font-medium hidden p-2.5 rounded-lg"></div>
+
+          <div id="ex3_solution" class="hidden pt-3 border-t border-slate-200 text-xs sm:text-sm text-slate-700 leading-relaxed bg-white p-3.5 rounded-lg border">
+            <div class="font-bold text-slate-900 mb-1">วิธีคำนวณแก้อสมการ:</div>
+            เงื่อนไขความคลาดเคลื่อนของจุดกึ่งกลาง:
+            \[ \frac{b - a}{2^{n+1}} \le 0.001 \]
+            แทนค่าช่วง \([1, 2]\) จะได้ \(b - a = 1\):
+            \[ \frac{1}{2^{n+1}} \le 10^{-3} \implies 2^{n+1} \ge 1000 \]
+            หาค่าลอการิทึม:
+            \[ n + 1 \ge \frac{\ln(1000)}{\ln(2)} \approx 9.9657 \implies n \ge 8.9657 \]
+            เนื่องจากจำนวนรอบ \(n\) ต้องเป็นจำนวนเต็ม จึงปัดขึ้นเป็น \(n = 9\) รอบ<br>
+            <span class="text-slate-500 text-xs">*(หมายเหตุ: หากใช้สูตรความยาวช่วง \(\frac{b-a}{2^n} \le 0.001\) จะได้ \(2^n \ge 1000 \implies n \ge 10\) รอบ ซึ่งทั้ง 9 และ 10 รอบยอมรับตามเกณฑ์ที่พิจารณา)*</span>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+  </main>
+
+
+  <!-- Simulation Logic & Visualizer Script -->
+  <script>
+    // Target Polynomial Function: f(x) = x^3 - x - 2
+    function f(x) {
+      return Math.pow(x, 3) - x - 2;
+    }
+
+    // State management for iterations
+    const initialState = {
+      n: 0,
+      a: 1.0,
+      b: 2.0,
+      m: null,
+      fa: f(1.0),
+      fb: f(2.0),
+      fm: null,
+      errBound: (2.0 - 1.0) / 2.0,
+      decisionText: 'พร้อมเริ่มต้น: กดปุ่ม "แบ่งครึ่งช่วง" เพื่อเริ่มคำนวณรอบที่ 1'
+    };
+
+    let history = [];
+    let currentStepIndex = 0;
+    let bisectionChart = null;
+
+    window.onload = function() {
+      // Render initial math formulas
+      if (typeof renderMathInElement === 'function') {
+        renderMathInElement(document.body, {
+          delimiters: [
+            {left: '$$', right: '$$', display: true},
+            {left: '\\[', right: '\\]', display: true},
+            {left: '\\(', right: '\\)', display: false},
+            {left: '$', right: '$', display: false}
+          ],
+          throwOnError: false
+        });
+      }
+
+      initChart();
+      resetSimulation();
+    };
+
+    function initChart() {
+      const ctx = document.getElementById('bisectionCanvas').getContext('2d');
+      bisectionChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+          datasets: [
+            {
+              label: 'f(x) = x³ - x - 2',
+              data: generateCurveData(0.5, 2.3),
+              borderColor: '#0284c7',
+              borderWidth: 2.5,
+              pointRadius: 0,
+              tension: 0.15,
+              fill: false
+            },
+            {
+              label: 'ช่วง [a, b] ปัจจุบัน',
+              data: [],
+              borderColor: 'transparent',
+              backgroundColor: 'rgba(16, 185, 129, 0.20)',
+              fill: true,
+              pointRadius: 0
+            },
+            {
+              label: 'จุดปลาย a และ b',
+              data: [],
+              borderColor: '#0f172a',
+              backgroundColor: ['#e11d48', '#059669'],
+              borderWidth: 2,
+              pointRadius: 6,
+              showLine: false
+            },
+            {
+              label: 'จุดกึ่งกลาง m',
+              data: [],
+              borderColor: '#312e81',
+              backgroundColor: '#4f46e5',
+              borderWidth: 2.5,
+              pointRadius: 8,
+              pointHoverRadius: 10,
+              showLine: false
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          interaction: { intersect: false, mode: 'index' },
+          scales: {
+            x: {
+              type: 'linear',
+              min: 0.7,
+              max: 2.2,
+              grid: {
+                color: (ctx) => ctx.tick.value === 0 ? '#334155' : '#f1f5f9',
+                lineWidth: (ctx) => ctx.tick.value === 0 ? 1.5 : 1
+              },
+              title: { display: true, text: 'แกน x', font: { size: 12, weight: 'bold' } }
+            },
+            y: {
+              min: -3,
+              max: 5,
+              grid: {
+                color: (ctx) => ctx.tick.value === 0 ? '#334155' : '#e2e8f0',
+                lineWidth: (ctx) => ctx.tick.value === 0 ? 1.5 : 1
+              },
+              title: { display: true, text: 'f(x)', font: { size: 12, weight: 'bold' } }
+            }
+          },
+          plugins: {
+            legend: { display: false },
+            tooltip: {
+              callbacks: {
+                label: (ctx) => ` (${ctx.parsed.x.toFixed(4)}, ${ctx.parsed.y.toFixed(4)})`
+              }
+            }
+          }
+        }
+      });
+    }
+
+    function generateCurveData(minX, maxX) {
+      const pts = [];
+      for (let x = minX; x <= maxX + 0.01; x += 0.05) {
+        pts.push({ x: Number(x.toFixed(3)), y: f(x) });
+      }
+      return pts;
+    }
+
+    function resetSimulation() {
+      history = [ { ...initialState } ];
+      currentStepIndex = 0;
+      updateUI();
+    }
+
+    function stepForward() {
+      const prev = history[currentStepIndex];
+      const nextN = prev.n + 1;
+      
+      let nextA, nextB;
+      if (prev.n === 0) {
+        nextA = prev.a;
+        nextB = prev.b;
+      } else {
+        // Evaluate previous decision
+        if (prev.fa * prev.fm < 0) {
+          nextA = prev.a;
+          nextB = prev.m;
+        } else {
+          nextA = prev.m;
+          nextB = prev.b;
+        }
+      }
+
+      const m = (nextA + nextB) / 2.0;
+      const fa = f(nextA);
+      const fb = f(nextB);
+      const fm = f(m);
+      const errBound = (nextB - nextA) / 2.0;
+
+      let decision = '';
+      if (Math.abs(fm) < 1e-9) {
+        decision = `รอบที่ ${nextN}: พบรากสมการที่แท้จริง ณ จุด m = ${m.toFixed(4)}`;
+      } else if (fa * fm < 0) {
+        decision = `รอบที่ ${nextN}: เนื่องจาก f(${nextA.toFixed(4)}) และ f(${m.toFixed(4)}) มีเครื่องหมายต่างกัน ช่วงใหม่คือ [${nextA.toFixed(4)}, ${m.toFixed(4)}]`;
+      } else {
+        decision = `รอบที่ ${nextN}: เนื่องจาก f(${m.toFixed(4)}) และ f(${nextB.toFixed(4)}) มีเครื่องหมายต่างกัน ช่วงใหม่คือ [${m.toFixed(4)}, ${nextB.toFixed(4)}]`;
+      }
+
+      const newState = {
+        n: nextN,
+        a: nextA,
+        b: nextB,
+        m: m,
+        fa: fa,
+        fb: fb,
+        fm: fm,
+        errBound: errBound,
+        decisionText: decision
+      };
+
+      if (currentStepIndex < history.length - 1) {
+        history = history.slice(0, currentStepIndex + 1);
+      }
+      history.push(newState);
+      currentStepIndex++;
+      updateUI();
+    }
+
+    function stepBack() {
+      if (currentStepIndex > 0) {
+        currentStepIndex--;
+        updateUI();
+      }
+    }
+
+    function updateUI() {
+      const state = history[currentStepIndex];
+
+      // Update control buttons
+      document.getElementById('btnPrev').disabled = (currentStepIndex === 0);
+      document.getElementById('btnNext').disabled = (state.fm !== null && Math.abs(state.fm) < 1e-7) || (state.n >= 15);
+
+      // Update text metrics
+      document.getElementById('metricN').textContent = state.n;
+      document.getElementById('metricM').textContent = state.m !== null ? state.m.toFixed(4) : '-';
+      document.getElementById('dispInterval').textContent = `[${state.a.toFixed(4)}, ${state.b.toFixed(4)}]`;
+      document.getElementById('dispFa').textContent = `${state.fa.toFixed(4)} (${state.fa >= 0 ? '+' : '-'})`;
+      document.getElementById('dispFb').textContent = `${state.fb.toFixed(4)} (${state.fb >= 0 ? '+' : '-'})`;
+      document.getElementById('dispFm').textContent = state.fm !== null ? `${state.fm.toFixed(4)} (${state.fm >= 0 ? '+' : '-'})` : '-';
+      document.getElementById('dispLen').textContent = (state.b - state.a).toFixed(4);
+      document.getElementById('dispErrorBound').textContent = `± ${state.errBound.toFixed(4)}`;
+      document.getElementById('stepDecisionText').textContent = state.decisionText;
+
+      // Update Chart View
+      if (bisectionChart) {
+        // Highlight interval band
+        const intervalPts = [];
+        const step = 0.02;
+        for (let x = state.a; x <= state.b + 0.001; x += step) {
+          intervalPts.push({ x: Number(x.toFixed(3)), y: f(x) });
+        }
+        intervalPts.unshift({ x: state.a, y: state.fa });
+        intervalPts.push({ x: state.b, y: state.fb });
+        intervalPts.sort((p1, p2) => p1.x - p2.x);
+
+        bisectionChart.data.datasets[1].data = intervalPts;
+        bisectionChart.data.datasets[2].data = [
+          { x: state.a, y: state.fa },
+          { x: state.b, y: state.fb }
+        ];
+
+        if (state.m !== null) {
+          bisectionChart.data.datasets[3].data = [{ x: state.m, y: state.fm }];
+        } else {
+          bisectionChart.data.datasets[3].data = [];
+        }
+
+        bisectionChart.update();
+      }
+
+      // Re-populate History Table
+      renderTable();
+    }
+
+    function renderTable() {
+      const tbody = document.getElementById('historyTableBody');
+      tbody.innerHTML = '';
+
+      history.forEach((row, idx) => {
+        if (row.n === 0) return; // Skip base configuration row
+        const tr = document.createElement('tr');
+        if (idx === currentStepIndex) {
+          tr.className = 'bg-emerald-50/70 font-semibold border-l-4 border-emerald-600';
+        } else {
+          tr.className = 'hover:bg-slate-50 transition-colors';
+        }
+
+        tr.innerHTML = `
+          <td class="px-3 py-2 text-center">${row.n}</td>
+          <td class="px-3 py-2 font-mono">${row.a.toFixed(4)}</td>
+          <td class="px-3 py-2 font-mono">${row.b.toFixed(4)}</td>
+          <td class="px-3 py-2 font-mono bg-indigo-50/30 text-indigo-900 font-bold">${row.m.toFixed(4)}</td>
+          <td class="px-3 py-2 font-mono ${row.fa < 0 ? 'text-rose-600' : 'text-emerald-600'}">${row.fa.toFixed(4)}</td>
+          <td class="px-3 py-2 font-mono ${row.fb < 0 ? 'text-rose-600' : 'text-emerald-600'}">${row.fb.toFixed(4)}</td>
+          <td class="px-3 py-2 font-mono bg-indigo-50/30 font-bold ${row.fm < 0 ? 'text-rose-600' : 'text-emerald-600'}">${row.fm.toFixed(4)}</td>
+          <td class="px-3 py-2 font-mono text-emerald-800">${row.errBound.toFixed(4)}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    // Toggle Discovery Question Hints
+    function toggleInquiry(id) {
+      const content = document.getElementById(`ansInq${id}`);
+      const btn = document.getElementById(`btnInq${id}`);
+      if (content.classList.contains('hidden')) {
+        content.classList.remove('hidden');
+        btn.textContent = 'ซ่อนแนวคิด';
+      } else {
+        content.classList.add('hidden');
+        btn.textContent = 'แสดงแนวคิด';
+      }
+    }
+
+    // Toggle Exercise Solutions
+    function toggleExSol(id) {
+      const el = document.getElementById(`ex${id}_solution`);
+      if (el.classList.contains('hidden')) {
+        el.classList.remove('hidden');
+      } else {
+        el.classList.add('hidden');
+      }
+    }
+
+    // Exercise 1 Check
+    function checkEx1() {
+      const val = parseFloat(document.getElementById('ex1_input').value);
+      const fb = document.getElementById('ex1_feedback');
+      fb.classList.remove('hidden', 'bg-emerald-100', 'text-emerald-800', 'bg-rose-100', 'text-rose-800', 'bg-amber-100', 'text-amber-800');
+
+      if (isNaN(val)) {
+        fb.className = 'text-xs sm:text-sm font-medium p-2.5 rounded-lg bg-amber-100 text-amber-800';
+        fb.textContent = 'กรุณากรอกตัวเลขทศนิยม';
+        return;
+      }
+
+      if (Math.abs(val - 1.53125) < 0.005 || Math.abs(val - 1.5313) < 0.005) {
+        fb.className = 'text-xs sm:text-sm font-medium p-2.5 rounded-lg bg-emerald-100 text-emerald-800';
+        fb.innerHTML = '✓ ถูกต้องยอดเยี่ยม! ค่าประมาณ m₅ = 1.5313 (หรือ 1.53125) ซึ่งให้ค่า f(1.5313) ≈ 0.0591 ใกล้เคียง 0 มากขึ้นเรื่อยๆ';
+      } else {
+        fb.className = 'text-xs sm:text-sm font-medium p-2.5 rounded-lg bg-rose-100 text-rose-800';
+        fb.innerHTML = '✗ ยังไม่ถูกต้อง ลองไล่ขั้นตอนหา m₁=1.5, m₂=1.75, m₃=1.625, m₄=1.5625 และ m₅ อีกครั้ง หรือคลิกดูตารางเฉลย';
+      }
+    }
+
+    // Exercise 2 Check
+    function checkEx2() {
+      const val = parseFloat(document.getElementById('ex2_input').value);
+      const fb = document.getElementById('ex2_feedback');
+      fb.classList.remove('hidden', 'bg-emerald-100', 'text-emerald-800', 'bg-rose-100', 'text-rose-800', 'bg-amber-100', 'text-amber-800');
+
+      if (isNaN(val)) {
+        fb.className = 'text-xs sm:text-sm font-medium p-2.5 rounded-lg bg-amber-100 text-amber-800';
+        fb.textContent = 'กรุณากรอกตัวเลข';
+        return;
+      }
+
+      if (Math.abs(val - 0.0625) < 1e-4) {
+        fb.className = 'text-xs sm:text-sm font-medium p-2.5 rounded-lg bg-emerald-100 text-emerald-800';
+        fb.innerHTML = '✓ ถูกต้อง! L₆ = (4 - 0) / 2⁶ = 4 / 64 = 0.0625';
+      } else {
+        fb.className = 'text-xs sm:text-sm font-medium p-2.5 rounded-lg bg-rose-100 text-rose-800';
+        fb.innerHTML = '✗ ยังไม่ถูกต้อง: ลองคำนวณจากสูตร (4 - 0) / 2⁶ ดูอีกครั้ง';
+      }
+    }
+
+    // Exercise 3 Check
+    function checkEx3() {
+      const val = parseInt(document.getElementById('ex3_input').value);
+      const fb = document.getElementById('ex3_feedback');
+      fb.classList.remove('hidden', 'bg-emerald-100', 'text-emerald-800', 'bg-rose-100', 'text-rose-800', 'bg-amber-100', 'text-amber-800');
+
+      if (isNaN(val)) {
+        fb.className = 'text-xs sm:text-sm font-medium p-2.5 rounded-lg bg-amber-100 text-amber-800';
+        fb.textContent = 'กรุณากรอกจำนวนเต็ม';
+        return;
+      }
+
+      if (val === 9 || val === 10) {
+        fb.className = 'text-xs sm:text-sm font-medium p-2.5 rounded-lg bg-emerald-100 text-emerald-800';
+        fb.innerHTML = `✓ ถูกต้อง! ต้องแบ่งอย่างน้อย <strong>${val} รอบ</strong> (หากใช้ขอบเขตความคลาดเคลื่อนของจุดกึ่งกลาง (b-a)/2^(n+1) ≤ 0.001 จะได้ n ≥ 9 รอบ หรือหากใช้ความยาวช่วงย่อย (b-a)/2^n ≤ 0.001 จะได้ n ≥ 10 รอบ)`;
+      } else {
+        fb.className = 'text-xs sm:text-sm font-medium p-2.5 rounded-lg bg-rose-100 text-rose-800';
+        fb.innerHTML = '✗ ยังไม่ถูกต้อง: ลองแก้อสมการ 2^(n+1) ≥ 1000 หรือ 2^n ≥ 1000 ดูอีกครั้ง';
+      }
+    }
+  </script>
+</body>
+</html>

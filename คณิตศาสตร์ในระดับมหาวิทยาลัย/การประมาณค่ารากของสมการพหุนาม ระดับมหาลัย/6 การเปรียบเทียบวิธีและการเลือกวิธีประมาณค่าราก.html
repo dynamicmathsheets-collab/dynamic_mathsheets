@@ -1,0 +1,1064 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>เรื่องที่ 6: การเปรียบเทียบวิธีและการเลือกวิธีประมาณค่าราก</title>
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Google Fonts: Sarabun & Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <!-- KaTeX for math rendering -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js"></script>
+
+  <!-- Chart.js for real-time visualization -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Sarabun', 'Inter', 'sans-serif'],
+          },
+          colors: {
+            brand: {
+              50: '#eef2ff',
+              100: '#e0e7ff',
+              500: '#6366f1',
+              600: '#4f46e5',
+              700: '#4338ca',
+              800: '#3730a3',
+              900: '#312e81',
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    html { scroll-behavior: smooth; }
+    .katex-display { margin: 0.5em 0; overflow-x: auto; overflow-y: hidden; padding-bottom: 2px; }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-800 font-sans antialiased selection:bg-indigo-100 selection:text-indigo-900 min-h-screen">
+
+  <!-- Header Banner -->
+  <header class="bg-gradient-to-r from-slate-950 via-indigo-950 to-slate-900 text-white border-b border-indigo-800/40 shadow-sm">
+    <div class="max-w-6xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
+
+      <h1 class="text-2xl sm:text-3xl md:text-4xl font-bold tracking-tight text-white flex items-center gap-3">
+        <span>เรื่องที่ 6: การเปรียบเทียบวิธีและการเลือกวิธีประมาณค่าราก</span>
+      </h1>
+      <p class="mt-2 text-slate-300 text-base sm:text-lg max-w-3xl">
+        Root-Finding Method Comparison & Selection — เปรียบเทียบวิธีแบ่งครึ่งช่วง วิธีนิวตัน–ราฟสัน และวิธีเส้นตัด ในแง่ความเร็ว ความน่าเชื่อถือ ต้นทุนการคำนวณ และกลยุทธ์วิธีผสม (Hybrid Method)
+      </p>
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <main class="max-w-6xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 space-y-10">
+
+    <!-- Section 1: Learning Objectives -->
+    <section class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 sm:p-7 relative overflow-hidden">
+      <div class="absolute top-0 left-0 w-2 h-full bg-indigo-600"></div>
+      <div class="flex items-center gap-3 mb-4">
+        <div class="p-2.5 bg-indigo-50 text-indigo-700 rounded-xl">
+          <i class="fa-solid fa-bullseye text-xl"></i>
+        </div>
+        <h2 class="text-xl sm:text-2xl font-bold text-slate-900">1. วัตถุประสงค์การเรียนรู้</h2>
+      </div>
+      <p class="text-slate-600 mb-4 text-base leading-relaxed">
+        เมื่อเสร็จสิ้นการศึกษาชุดการเรียนรู้นี้แล้ว นักศึกษาจะมีความรู้ความสามารถดังต่อไปนี้:
+      </p>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div class="bg-slate-50 border border-slate-100 rounded-xl p-4 transition-all hover:border-indigo-200 hover:bg-indigo-50/40">
+          <div class="text-indigo-700 font-semibold mb-1 flex items-center gap-2">
+            <span class="w-6 h-6 rounded-full bg-indigo-100 text-indigo-700 text-xs flex items-center justify-center font-bold">1</span>
+            เปรียบเทียบคุณสมบัติ
+          </div>
+          <p class="text-slate-600 text-sm">เปรียบเทียบวิธีแบ่งครึ่งช่วง วิธีนิวตัน–ราฟสัน และวิธีเส้นตัด โดยพิจารณาข้อมูลเริ่มต้น ความเร็วในการลู่เข้า และความน่าเชื่อถือ</p>
+        </div>
+        <div class="bg-slate-50 border border-slate-100 rounded-xl p-4 transition-all hover:border-indigo-200 hover:bg-indigo-50/40">
+          <div class="text-indigo-700 font-semibold mb-1 flex items-center gap-2">
+            <span class="w-6 h-6 rounded-full bg-indigo-100 text-indigo-700 text-xs flex items-center justify-center font-bold">2</span>
+            เลือกวิธีที่เหมาะสม
+          </div>
+          <p class="text-slate-600 text-sm">เลือกวิธีการประมาณค่ารากที่เหมาะสมกับสมการพหุนามและเงื่อนไขการคำนวณที่กำหนดได้อย่างมีหลักการ</p>
+        </div>
+        <div class="bg-slate-50 border border-slate-100 rounded-xl p-4 transition-all hover:border-indigo-200 hover:bg-indigo-50/40">
+          <div class="text-indigo-700 font-semibold mb-1 flex items-center gap-2">
+            <span class="w-6 h-6 rounded-full bg-indigo-100 text-indigo-700 text-xs flex items-center justify-center font-bold">3</span>
+            ประยุกต์กลยุทธ์วิธีผสม
+          </div>
+          <p class="text-slate-600 text-sm">อธิบายและประยุกต์ใช้แนวทาง Hybrid Method เพื่อผสานความแน่นอนของวิธีตีกรอบเข้ากับความเร็วของวิธีแบบเปิด</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Section 2: Core Content -->
+    <section class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 sm:p-7 space-y-6">
+      <div class="flex items-center gap-3">
+        <div class="p-2.5 bg-indigo-50 text-indigo-700 rounded-xl">
+          <i class="fa-solid fa-table-columns text-xl"></i>
+        </div>
+        <h2 class="text-xl sm:text-2xl font-bold text-slate-900">2. เนื้อหาหลัก</h2>
+      </div>
+
+      <!-- Comparative Table -->
+      <div class="overflow-x-auto border border-slate-200 rounded-xl shadow-xs">
+        <table class="w-full text-xs sm:text-sm text-left">
+          <thead class="bg-slate-100 text-slate-800 font-semibold border-b border-slate-200">
+            <tr>
+              <th class="px-4 py-3 text-slate-900 w-1/5">ประเด็นการเปรียบเทียบ</th>
+              <th class="px-4 py-3 text-emerald-800 bg-emerald-50/40 w-1/4">
+                <i class="fa-solid fa-arrows-split-up-and-left mr-1"></i> วิธีแบ่งครึ่งช่วง (Bisection)
+              </th>
+              <th class="px-4 py-3 text-sky-800 bg-sky-50/40 w-1/4">
+                <i class="fa-solid fa-square-root-variable mr-1"></i> วิธีนิวตัน–ราฟสัน (Newton–Raphson)
+              </th>
+              <th class="px-4 py-3 text-purple-800 bg-purple-50/40 w-1/4">
+                <i class="fa-solid fa-bezier-curve mr-1"></i> วิธีเส้นตัด (Secant)
+              </th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-slate-200 bg-white leading-relaxed">
+            <tr>
+              <td class="px-4 py-3 font-semibold text-slate-800 bg-slate-50/60">ค่าเริ่มต้น (Initial Data)</td>
+              <td class="px-4 py-3 text-slate-700 bg-emerald-50/10">ช่วงปิด $[a, b]$ ที่ปลายทั้งสองมีเครื่องหมายต่างกัน ($f(a)f(b) < 0$)</td>
+              <td class="px-4 py-3 text-slate-700 bg-sky-50/10">ค่าประมาณเพียงค่าเดียว $x_0$ ที่อยู่ใกล้เคียงราก</td>
+              <td class="px-4 py-3 text-slate-700 bg-purple-50/10">ค่าประมาณเริ่มต้นสองค่า $x_0$ และ $x_1$ (ไม่จำเป็นต้องคร่อมราก)</td>
+            </tr>
+            <tr>
+              <td class="px-4 py-3 font-semibold text-slate-800 bg-slate-50/60">การใช้อนุพันธ์ (Derivative)</td>
+              <td class="px-4 py-3 text-slate-700 bg-emerald-50/10"><strong>ไม่ใช้</strong> (ประเมินเฉพาะ $f(x)$)</td>
+              <td class="px-4 py-3 text-slate-700 bg-sky-50/10"><strong>ใช้โดยตรง</strong> ต้องคำนวณ $f'(x_n)$ ในทุกรอบ</td>
+              <td class="px-4 py-3 text-slate-700 bg-purple-50/10"><strong>ไม่ใช้โดยตรง</strong> (ประมาณความชันด้วยผลต่างสืบเนื่อง)</td>
+            </tr>
+            <tr>
+              <td class="px-4 py-3 font-semibold text-slate-800 bg-slate-50/60">ความน่าเชื่อถือ (Reliability)</td>
+              <td class="px-4 py-3 text-slate-700 bg-emerald-50/10"><strong>สูงสุด</strong> การันตีการลู่เข้าเสมอ มีขอบเขตช่วงที่ชัดเจน</td>
+              <td class="px-4 py-3 text-slate-700 bg-sky-50/10"><strong>ปานกลาง</strong> ขึ้นกับค่าเริ่มต้นและลักษณะความโค้งของกราฟ</td>
+              <td class="px-4 py-3 text-slate-700 bg-purple-50/10"><strong>ปานกลาง</strong> ขึ้นกับค่าเริ่มต้นทั้งสองค่า ไม่การันตีการลู่เข้า</td>
+            </tr>
+            <tr>
+              <td class="px-4 py-3 font-semibold text-slate-800 bg-slate-50/60">ความเร็วในการลู่เข้า (Convergence Rate)</td>
+              <td class="px-4 py-3 text-slate-700 bg-emerald-50/10">ค่อนข้างช้า แต่สม่ำเสมอ<br><span class="text-xs text-slate-500 font-mono">Linear ($p = 1$, ลดลง 0.5 เท่าต่อรอบ)</span></td>
+              <td class="px-4 py-3 text-slate-700 bg-sky-50/10">เร็วมากเมื่อใกล้ราก<br><span class="text-xs text-slate-500 font-mono">Quadratic ($p = 2$, ทศนิยมถูกเพิ่ม 2 เท่า)</span></td>
+              <td class="px-4 py-3 text-slate-700 bg-purple-50/10">เร็วกว่าแบ่งครึ่งช่วงอย่างมาก<br><span class="text-xs text-slate-500 font-mono">Superlinear ($p \approx 1.618$)</span></td>
+            </tr>
+            <tr>
+              <td class="px-4 py-3 font-semibold text-slate-800 bg-slate-50/60">ข้อควรระวัง (Caveats / Pitfalls)</td>
+              <td class="px-4 py-3 text-slate-700 bg-emerald-50/10">ต้องหาช่วงที่คร่อมรากให้ได้ และใช้ไม่ได้กับรากซ้ำอันดับคู่</td>
+              <td class="px-4 py-3 text-slate-700 bg-sky-50/10">อนุพันธ์ $f'(x_n) \approx 0$, การแกว่งวนรอบ, หรือลู่ออกสู่อนันต์</td>
+              <td class="px-4 py-3 text-slate-700 bg-purple-50/10">ตัวส่วน $f(x_n) - f(x_{n-1}) \approx 0$ เกิดการหารด้วยศูนย์</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Hybrid Strategy Card -->
+      <div class="bg-gradient-to-br from-indigo-50/80 via-purple-50/40 to-white border border-indigo-200 rounded-xl p-5 space-y-3">
+        <h3 class="font-bold text-indigo-950 text-base sm:text-lg flex items-center gap-2">
+          <i class="fa-solid fa-shuffle text-indigo-600"></i>
+          กลยุทธ์วิธีผสมในทางปฏิบัติ (Hybrid Method / Brent's Method Strategy)
+        </h3>
+        <p class="text-slate-700 text-sm leading-relaxed">
+          ในความเป็นจริง <strong>ไม่มีวิธีใดดีที่สุดสำหรับทุกสมการ</strong> การแก้ปัญหาเชิงวิศวกรรมและซอฟต์แวร์มาตรฐานทางคณิตศาสตร์ (เช่น ใน SciPy, MATLAB หรือ C++ Boost) จึงนิยมใช้ <strong>กลยุทธ์วิธีผสม (Hybrid Approach)</strong> ดังนี้:
+        </p>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs sm:text-sm mt-2">
+          <div class="bg-white p-3.5 rounded-lg border border-indigo-100 shadow-xs">
+            <span class="font-bold text-indigo-900 block mb-1">ขั้นที่ 1: ตีกรอบหยาบด้วยวิธีแบ่งครึ่งช่วง (Bracketing Phase)</span>
+            <p class="text-slate-600 leading-relaxed">
+              ใช้วิธีแบ่งครึ่งช่วงเพียง 3 ถึง 5 รอบ เพื่อบีบช่วงเริ่มต้นขนาดใหญ่ให้แคบลงและยืนยันตำแหน่งของรากอย่างปลอดภัย ป้องกันปัญหาค่าประมาณกระโดดออกนอกขอบเขต
+            </p>
+          </div>
+          <div class="bg-white p-3.5 rounded-lg border border-indigo-100 shadow-xs">
+            <span class="font-bold text-indigo-900 block mb-1">ขั้นที่ 2: เร่งการลู่เข้าด้วยนิวตันหรือเส้นตัด (Polishing Phase)</span>
+            <p class="text-slate-600 leading-relaxed">
+              เมื่อช่วงแคบลงมากพอแล้ว ให้เปลี่ยนไปใช้วิธีนิวตัน–ราฟสันหรือวิธีเส้นตัด เพื่อใช้ข้อได้เปรียบของการลู่เข้าแบบกำลังสองหรือซูเปอร์ลิเนียร์ ทำให้ได้คำตอบแม่นยำสูงในอีกเพียง 2–3 รอบ
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Section 3: Interactive Simulation -->
+    <section class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 sm:p-7 space-y-6">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-slate-100 gap-3">
+        <div class="flex items-center gap-3">
+          <div class="p-2.5 bg-indigo-50 text-indigo-700 rounded-xl">
+            <i class="fa-solid fa-laptop-code text-xl"></i>
+          </div>
+          <div>
+            <h2 class="text-xl sm:text-2xl font-bold text-slate-900">3. แบบจำลองโต้ตอบ (Interactive Multi-Method Benchmark)</h2>
+            <p class="text-xs sm:text-sm text-slate-500">เลือกสมการและกำหนดค่าเริ่มต้นเพื่อทดสอบการประมวลผลเปรียบเทียบทั้ง 3 วิธีพร้อมกัน</p>
+          </div>
+        </div>
+        <button onclick="runAllComparisons()" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs sm:text-sm font-semibold rounded-lg shadow-sm flex items-center gap-2 transition-all shrink-0">
+          <i class="fa-solid fa-bolt"></i> รันเปรียบเทียบทุกวิธี
+        </button>
+      </div>
+
+      <!-- Controls Panel -->
+      <div class="bg-slate-50 border border-slate-200 rounded-xl p-4 sm:p-5 space-y-4">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <!-- Polynomial Selector -->
+          <div>
+            <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">สมการพหุนาม $f(x) = 0$</label>
+            <select id="selPoly" onchange="onPolynomialChanged()" class="w-full bg-white border border-slate-300 rounded-lg px-3 py-2 text-xs sm:text-sm text-slate-800 font-medium focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+              <option value="p1">f(x) = x³ - x - 2 = 0 (รากจริง ≈ 1.5214)</option>
+              <option value="p2">f(x) = x³ - 4x + 1 = 0 (รากบวกเล็ก ≈ 0.2541)</option>
+              <option value="p3">f(x) = x² - 2 = 0 (√2 ≈ 1.4142)</option>
+              <option value="p4">f(x) = x³ - 2x² - 5 = 0 (รากจริง ≈ 2.6906)</option>
+            </select>
+          </div>
+
+          <!-- Tolerance Epsilon -->
+          <div>
+            <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">เกณฑ์หยุด (Tolerance $\varepsilon$)</label>
+            <div class="flex items-center gap-1.5">
+              <button type="button" onclick="setEpsilon(0.01)" class="eps-btn text-xs bg-white px-2.5 py-2 rounded-lg border border-slate-200 hover:bg-indigo-50 font-mono">10⁻²</button>
+              <button type="button" onclick="setEpsilon(0.0001)" class="eps-btn text-xs bg-indigo-600 text-white px-2.5 py-2 rounded-lg border border-indigo-600 font-mono font-bold">10⁻⁴</button>
+              <button type="button" onclick="setEpsilon(0.000001)" class="eps-btn text-xs bg-white px-2.5 py-2 rounded-lg border border-slate-200 hover:bg-indigo-50 font-mono">10⁻⁶</button>
+              <input type="number" step="any" id="inputEps" value="0.0001" onchange="runAllComparisons()" class="w-24 text-center px-2 py-1.5 border border-slate-300 rounded-lg text-xs font-mono focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+            </div>
+          </div>
+
+          <!-- Quick Scenario Selector -->
+          <div>
+            <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">พรีเซ็ตสถานการณ์</label>
+            <div class="grid grid-cols-2 gap-1.5 text-xs">
+              <button onclick="applyPreset('ideal')" class="p-2 bg-white hover:bg-indigo-50 border border-slate-200 rounded-lg text-left transition-colors">
+                <span class="block font-bold text-indigo-900">ค่าเริ่มต้นสมบูรณ์</span>
+                <span class="text-[10px] text-slate-500">ใกล้เคียงราก คร่อมราก</span>
+              </button>
+              <button onclick="applyPreset('challenging')" class="p-2 bg-white hover:bg-amber-50 border border-slate-200 rounded-lg text-left transition-colors">
+                <span class="block font-bold text-amber-900">ค่าเริ่มต้นท้าทาย</span>
+                <span class="text-[10px] text-slate-500">ช่วงกว้าง หรือ f' น้อย</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Custom Initial Inputs Accordion -->
+        <div class="pt-3 border-t border-slate-200/80">
+          <div class="text-xs font-bold text-slate-600 uppercase tracking-wider mb-2">กำหนดค่าเริ่มต้นแยกรายวิธี:</div>
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
+            <!-- Bisection inputs -->
+            <div class="bg-white p-2.5 rounded-lg border border-slate-200">
+              <span class="font-bold text-emerald-800 block mb-1">แบ่งครึ่งช่วง [a, b]:</span>
+              <div class="flex items-center gap-1.5">
+                <input type="number" step="0.1" id="inBisecA" value="1.0" class="w-16 px-2 py-1 border rounded font-mono text-center">
+                <span>ถึง</span>
+                <input type="number" step="0.1" id="inBisecB" value="2.0" class="w-16 px-2 py-1 border rounded font-mono text-center">
+              </div>
+            </div>
+            <!-- Newton inputs -->
+            <div class="bg-white p-2.5 rounded-lg border border-slate-200">
+              <span class="font-bold text-sky-800 block mb-1">นิวตัน–ราฟสัน x₀:</span>
+              <div class="flex items-center gap-1.5">
+                <input type="number" step="0.1" id="inNewtonX0" value="1.5" class="w-24 px-2 py-1 border rounded font-mono text-center">
+              </div>
+            </div>
+            <!-- Secant inputs -->
+            <div class="bg-white p-2.5 rounded-lg border border-slate-200">
+              <span class="font-bold text-purple-800 block mb-1">เส้นตัด x₀, x₁:</span>
+              <div class="flex items-center gap-1.5">
+                <input type="number" step="0.1" id="inSecantX0" value="1.0" class="w-16 px-2 py-1 border rounded font-mono text-center">
+                <span>และ</span>
+                <input type="number" step="0.1" id="inSecantX1" value="2.0" class="w-16 px-2 py-1 border rounded font-mono text-center">
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Performance Summary Cards -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4" id="cardsSummary">
+        <!-- Bisection Card -->
+        <div class="bg-white border border-slate-200 rounded-xl p-4.5 shadow-xs relative overflow-hidden flex flex-col justify-between">
+          <div>
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-xs font-bold text-emerald-800 uppercase tracking-wider flex items-center gap-1.5">
+                <i class="fa-solid fa-arrows-split-up-and-left text-emerald-600"></i> แบ่งครึ่งช่วง
+              </span>
+              <span id="cardBadgeBisec" class="px-2 py-0.5 rounded text-[11px] font-semibold bg-emerald-100 text-emerald-800">ลู่เข้า</span>
+            </div>
+            <div class="text-3xl font-extrabold font-mono text-slate-900" id="cardIterBisec">-</div>
+            <div class="text-xs text-slate-500 mb-3">รอบการทำซ้ำ (Iterations)</div>
+            <div class="space-y-1 text-xs font-mono border-t border-slate-100 pt-2 text-slate-600">
+              <div class="flex justify-between"><span>ค่าประมาณราก x*:</span><span id="cardRootBisec" class="font-bold text-slate-800">-</span></div>
+              <div class="flex justify-between"><span>ค่าฟังก์ชัน |f(x*)|:</span><span id="cardResBisec">-</span></div>
+              <div class="flex justify-between"><span>เกณฑ์หยุดที่ใช้:</span><span id="cardCritBisec">Δx < ε</span></div>
+            </div>
+          </div>
+          <div class="mt-3 pt-2 border-t border-slate-100 text-[11px] text-slate-500 leading-snug" id="cardNoteBisec">
+            มั่นคง ปลอดภัย มีขอบเขตช่วงชัดเจน
+          </div>
+        </div>
+
+        <!-- Newton Card -->
+        <div class="bg-white border border-slate-200 rounded-xl p-4.5 shadow-xs relative overflow-hidden flex flex-col justify-between">
+          <div>
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-xs font-bold text-sky-800 uppercase tracking-wider flex items-center gap-1.5">
+                <i class="fa-solid fa-square-root-variable text-sky-600"></i> นิวตัน–ราฟสัน
+              </span>
+              <span id="cardBadgeNewton" class="px-2 py-0.5 rounded text-[11px] font-semibold bg-sky-100 text-sky-800">เร็วที่สุด</span>
+            </div>
+            <div class="text-3xl font-extrabold font-mono text-slate-900" id="cardIterNewton">-</div>
+            <div class="text-xs text-slate-500 mb-3">รอบการทำซ้ำ (Iterations)</div>
+            <div class="space-y-1 text-xs font-mono border-t border-slate-100 pt-2 text-slate-600">
+              <div class="flex justify-between"><span>ค่าประมาณราก x*:</span><span id="cardRootNewton" class="font-bold text-slate-800">-</span></div>
+              <div class="flex justify-between"><span>ค่าฟังก์ชัน |f(x*)|:</span><span id="cardResNewton">-</span></div>
+              <div class="flex justify-between"><span>เกณฑ์หยุดที่ใช้:</span><span id="cardCritNewton">|f(x)| & Δx < ε</span></div>
+            </div>
+          </div>
+          <div class="mt-3 pt-2 border-t border-slate-100 text-[11px] text-slate-500 leading-snug" id="cardNoteNewton">
+            ลู่เข้าเร็วระดับกำลังสอง (Quadratic)
+          </div>
+        </div>
+
+        <!-- Secant Card -->
+        <div class="bg-white border border-slate-200 rounded-xl p-4.5 shadow-xs relative overflow-hidden flex flex-col justify-between">
+          <div>
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-xs font-bold text-purple-800 uppercase tracking-wider flex items-center gap-1.5">
+                <i class="fa-solid fa-bezier-curve text-purple-600"></i> วิธีเส้นตัด
+              </span>
+              <span id="cardBadgeSecant" class="px-2 py-0.5 rounded text-[11px] font-semibold bg-purple-100 text-purple-800">เร็วสูง</span>
+            </div>
+            <div class="text-3xl font-extrabold font-mono text-slate-900" id="cardIterSecant">-</div>
+            <div class="text-xs text-slate-500 mb-3">รอบการทำซ้ำ (Iterations)</div>
+            <div class="space-y-1 text-xs font-mono border-t border-slate-100 pt-2 text-slate-600">
+              <div class="flex justify-between"><span>ค่าประมาณราก x*:</span><span id="cardRootSecant" class="font-bold text-slate-800">-</span></div>
+              <div class="flex justify-between"><span>ค่าฟังก์ชัน |f(x*)|:</span><span id="cardResSecant">-</span></div>
+              <div class="flex justify-between"><span>เกณฑ์หยุดที่ใช้:</span><span id="cardCritSecant">|f(x)| & Δx < ε</span></div>
+            </div>
+          </div>
+          <div class="mt-3 pt-2 border-t border-slate-100 text-[11px] text-slate-500 leading-snug" id="cardNoteSecant">
+            ไม่ต้องใช้อนุพันธ์ตรง เร็วกว่าแบ่งครึ่งช่วงมาก
+          </div>
+        </div>
+      </div>
+
+      <!-- Chart Comparison -->
+      <div class="bg-white border border-slate-200 rounded-xl p-4 sm:p-5 shadow-inner space-y-2">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between text-xs gap-1">
+          <span class="font-bold text-slate-700 flex items-center gap-1.5">
+            <i class="fa-solid fa-chart-line text-indigo-600"></i>
+            เปรียบเทียบความเร็วของการลู่เข้าหาคำตอบ (Logarithmic Error Decay)
+          </span>
+          <span class="text-slate-400">แกน Y แสดง Log₁₀(Error) ยิ่งกราฟดิ่งชัน แปลว่าลู่เข้าเร็วกว่า</span>
+        </div>
+        <div class="h-64 sm:h-72 w-full">
+          <canvas id="comparisonChart"></canvas>
+        </div>
+      </div>
+
+      <!-- Step-by-Step History Table Tabs -->
+      <div class="space-y-3">
+        <div class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-200 pb-2">
+          <h3 class="text-xs font-bold text-slate-700 uppercase tracking-wider">
+            ตารางลำดับค่าประมาณในแต่ละรอบ (Iteration Log)
+          </h3>
+          <div class="flex items-center gap-1 bg-slate-100 p-1 rounded-lg">
+            <button onclick="setLogTab('bisec')" id="btnTabBisec" class="text-xs font-semibold px-3 py-1 rounded-md transition-colors bg-white shadow-xs text-indigo-800">แบ่งครึ่งช่วง</button>
+            <button onclick="setLogTab('newton')" id="btnTabNewton" class="text-xs font-semibold px-3 py-1 rounded-md transition-colors text-slate-600 hover:text-slate-900">นิวตัน–ราฟสัน</button>
+            <button onclick="setLogTab('secant')" id="btnTabSecant" class="text-xs font-semibold px-3 py-1 rounded-md transition-colors text-slate-600 hover:text-slate-900">เส้นตัด</button>
+          </div>
+        </div>
+
+        <div class="overflow-x-auto border border-slate-200 rounded-xl shadow-xs">
+          <table class="w-full text-xs sm:text-sm text-left">
+            <thead class="bg-slate-100 text-slate-700 uppercase font-semibold text-[11px] sm:text-xs border-b border-slate-200">
+              <tr>
+                <th class="px-3 py-2.5 text-center">รอบที่ (n)</th>
+                <th class="px-3 py-2.5 font-mono">ค่าประมาณ xₙ</th>
+                <th class="px-3 py-2.5 font-mono">ค่าฟังก์ชัน |f(xₙ)|</th>
+                <th class="px-3 py-2.5 font-mono">ผลต่างสเต็ป |xₙ - xₙ₋₁|</th>
+                <th class="px-3 py-2.5 font-mono">ขอบเขตคลาดเคลื่อน</th>
+                <th class="px-3 py-2.5 text-center">สถานะ</th>
+              </tr>
+            </thead>
+            <tbody id="logTableBody" class="divide-y divide-slate-200 bg-white font-mono text-slate-700">
+              <!-- Dynamically Populated Rows -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- Section 4: Guided Discovery Questions -->
+    <section class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 sm:p-7 space-y-6">
+      <div class="flex items-center gap-3">
+        <div class="p-2.5 bg-amber-50 text-amber-700 rounded-xl">
+          <i class="fa-solid fa-lightbulb text-xl"></i>
+        </div>
+        <div>
+          <h2 class="text-xl sm:text-2xl font-bold text-slate-900">4. คำถามนำเพื่อค้นพบ (Guided Inquiry)</h2>
+          <p class="text-xs sm:text-sm text-slate-500">ทดสอบการคิดเชิงกลยุทธ์และการตัดสินใจเลือกวิธีคำนวณ</p>
+        </div>
+      </div>
+
+      <div class="space-y-4">
+        <!-- Question 1 -->
+        <div class="border border-slate-200 rounded-xl p-4 sm:p-5 transition hover:shadow-sm">
+          <div class="flex items-start justify-between gap-3">
+            <div class="flex items-start gap-3">
+              <span class="w-7 h-7 rounded-full bg-indigo-100 text-indigo-800 text-sm font-bold flex items-center justify-center shrink-0 mt-0.5">1</span>
+              <div>
+                <h3 class="font-bold text-slate-900 text-base">หากต้องการวิธีที่มีขอบเขตความคลาดเคลื่อนชัดเจน ควรเลือกวิธีใด?</h3>
+                <p class="text-xs text-slate-500 mt-0.5">พิจารณาสมบัติการการันตีความคลาดเคลื่อนสูงสุดในแต่ละรอบ</p>
+              </div>
+            </div>
+            <button onclick="toggleInquiry(1)" id="btnInq1" class="text-xs sm:text-sm font-semibold text-indigo-700 hover:text-indigo-900 bg-indigo-50 px-3 py-1.5 rounded-lg border border-indigo-200 shrink-0 transition-colors">
+              แสดงแนวคิด
+            </button>
+          </div>
+          <div id="ansInq1" class="hidden mt-4 pt-3 border-t border-slate-100 text-slate-700 text-sm leading-relaxed bg-slate-50/70 p-3.5 rounded-lg">
+            <strong class="text-slate-900">แนวคิด:</strong> 
+            ควรเลือก <strong>วิธีแบ่งครึ่งช่วง (Bisection Method)</strong> เพราะเป็นวิธีเดียวที่การันตีขอบเขตความคลาดเคลื่อนสัมบูรณ์ได้แน่นอน 100% เสมอตามสูตร $|x_n - r| \le \frac{b_n - a_n}{2} = \frac{b - a}{2^{n+1}}$ ขณะที่วิธีนิวตันและเส้นตัดทำได้เพียงประมาณการค่าความคลาดเคลื่อนจาก $|x_n - x_{n-1}|$ ซึ่งไม่มีการการันตีขอบเขตแท้จริง
+          </div>
+        </div>
+
+        <!-- Question 2 -->
+        <div class="border border-slate-200 rounded-xl p-4 sm:p-5 transition hover:shadow-sm">
+          <div class="flex items-start justify-between gap-3">
+            <div class="flex items-start gap-3">
+              <span class="w-7 h-7 rounded-full bg-indigo-100 text-indigo-800 text-sm font-bold flex items-center justify-center shrink-0 mt-0.5">2</span>
+              <div>
+                <h3 class="font-bold text-slate-900 text-base">หากสามารถหาอนุพันธ์ได้ง่ายและมีค่าเริ่มต้นเหมาะสม วิธีใดอาจช่วยลดจำนวนรอบได้ดีที่สุด?</h3>
+                <p class="text-xs text-slate-500 mt-0.5">พิจารณาอัตราการลู่เข้าแบบ Quadratic</p>
+              </div>
+            </div>
+            <button onclick="toggleInquiry(2)" id="btnInq2" class="text-xs sm:text-sm font-semibold text-indigo-700 hover:text-indigo-900 bg-indigo-50 px-3 py-1.5 rounded-lg border border-indigo-200 shrink-0 transition-colors">
+              แสดงแนวคิด
+            </button>
+          </div>
+          <div id="ansInq2" class="hidden mt-4 pt-3 border-t border-slate-100 text-slate-700 text-sm leading-relaxed bg-slate-50/70 p-3.5 rounded-lg">
+            <strong class="text-slate-900">แนวคิด:</strong> 
+            ควรเลือก <strong>วิธีนิวตัน–ราฟสัน (Newton–Raphson Method)</strong> เนื่องจากมีอัตราการลู่เข้าอันดับสอง (Quadratic Convergence: $p = 2$) ซึ่งทำให้จำนวนทศนิยมที่ถูกต้องเพิ่มขึ้นเป็นเท่าตัวในทุกๆ รอบ เมื่อ $x_0$ อยู่ใกล้รากและ $f'(x_n) \ne 0$ จะใช้จำนวนรอบน้อยที่สุด (มักใช้เพียง 3 ถึง 5 รอบสำหรับความละเอียด $10^{-6}$)
+          </div>
+        </div>
+
+        <!-- Question 3 -->
+        <div class="border border-slate-200 rounded-xl p-4 sm:p-5 transition hover:shadow-sm">
+          <div class="flex items-start justify-between gap-3">
+            <div class="flex items-start gap-3">
+              <span class="w-7 h-7 rounded-full bg-indigo-100 text-indigo-800 text-sm font-bold flex items-center justify-center shrink-0 mt-0.5">3</span>
+              <div>
+                <h3 class="font-bold text-slate-900 text-base">ในสถานการณ์ใดควรใช้วิธีแบ่งครึ่งช่วงร่วมกับวิธีอื่น (Hybrid Approach) แทนการใช้วิธีเดียวตลอดกระบวนการ?</h3>
+                <p class="text-xs text-slate-500 mt-0.5">พิจารณากรณีที่ช่วงเริ่มต้นกว้างมาก หรือไม่ทราบตำแหน่งรากที่แม่นยำ</p>
+              </div>
+            </div>
+            <button onclick="toggleInquiry(3)" id="btnInq3" class="text-xs sm:text-sm font-semibold text-indigo-700 hover:text-indigo-900 bg-indigo-50 px-3 py-1.5 rounded-lg border border-indigo-200 shrink-0 transition-colors">
+              แสดงแนวคิด
+            </button>
+          </div>
+          <div id="ansInq3" class="hidden mt-4 pt-3 border-t border-slate-100 text-slate-700 text-sm leading-relaxed bg-slate-50/70 p-3.5 rounded-lg">
+            <strong class="text-slate-900">แนวคิด:</strong> 
+            ควรใช้วิธีผสมในกรณีที่ <strong>ช่วงเริ่มต้นมีขนาดกว้างมาก หรือกราฟมีจุดวิกฤต/จุดวกกลับอยู่ระหว่างทาง</strong> ซึ่งหากใช้วิธีนิวตันหรือเส้นตัดตั้งแต่แรก อาจเสี่ยงต่อการลู่ออกสู่อนันต์ (Divergence) หรือเกิดการแกว่งวนรอบ การใช้วิธีแบ่งครึ่งช่วงก่อนสัก 3–5 รอบ จะช่วยตีกรอบให้ช่วงแคบลงอย่างปลอดภัย จากนั้นจึงสลับไปใช้วิธีนิวตันหรือเส้นตัดเพื่อปิดจ๊อบอย่างรวดเร็ว
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Section 5: Student Exercises -->
+    <section class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 sm:p-7 space-y-6">
+      <div class="flex items-center gap-3">
+        <div class="p-2.5 bg-emerald-50 text-emerald-700 rounded-xl">
+          <i class="fa-solid fa-pen-to-square text-xl"></i>
+        </div>
+        <div>
+          <h2 class="text-xl sm:text-2xl font-bold text-slate-900">5. แบบฝึกหัดสำหรับนักศึกษา</h2>
+          <p class="text-xs sm:text-sm text-slate-500">ทดสอบการวิเคราะห์เปรียบเทียบผลลัพธ์เชิงตัวเลขและสร้างข้อสรุป</p>
+        </div>
+      </div>
+
+      <div class="space-y-6">
+        <!-- Exercise 1 -->
+        <div class="bg-slate-50 border border-slate-200 rounded-xl p-5 space-y-3">
+          <div class="flex items-start justify-between gap-3">
+            <h3 class="font-bold text-slate-900 text-base">
+              ข้อ 1. ประมาณรากของ $x^3 - x - 2 = 0$ ด้วยทั้งสามวิธี โดยกำหนดเกณฑ์หยุดเดียวกัน $\varepsilon = 10^{-4}$ ($0.0001$) แล้วเปรียบเทียบผลลัพธ์
+            </h3>
+            <span class="text-xs bg-indigo-100 text-indigo-800 font-semibold px-2.5 py-1 rounded">การทดสอบจริง</span>
+          </div>
+          <p class="text-sm text-slate-600">
+            จากแบบจำลองโต้ตอบด้านบน (ช่วง $[1, 2]$ สำหรับแบ่งครึ่ง, $x_0 = 1.5$ สำหรับนิวตัน, และ $x_0=1, x_1=2$ สำหรับเส้นตัด) เรียงลำดับวิธีที่ใช้จำนวนรอบ <strong>น้อยที่สุดไปหามากที่สุด</strong>:
+          </p>
+
+          <div class="space-y-2 text-sm text-slate-700">
+            <label class="flex items-center gap-2 cursor-pointer">
+              <input type="radio" name="ex1_opt" value="1" class="accent-indigo-600">
+              <span>นิวตัน–ราฟสัน (น้อยสุด) &rarr; เส้นตัด &rarr; แบ่งครึ่งช่วง (มากสุด)</span>
+            </label>
+            <label class="flex items-center gap-2 cursor-pointer">
+              <input type="radio" name="ex1_opt" value="2" class="accent-indigo-600">
+              <span>แบ่งครึ่งช่วง (น้อยสุด) &rarr; นิวตัน–ราฟสัน &rarr; เส้นตัด (มากสุด)</span>
+            </label>
+            <label class="flex items-center gap-2 cursor-pointer">
+              <input type="radio" name="ex1_opt" value="3" class="accent-indigo-600">
+              <span>เส้นตัด (น้อยสุด) &rarr; นิวตัน–ราฟสัน &rarr; แบ่งครึ่งช่วง (มากสุด)</span>
+            </label>
+          </div>
+
+          <div class="flex items-center gap-3 pt-2">
+            <button onclick="checkEx1()" class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold px-4 py-2 rounded-lg transition-colors">
+              ตรวจคำตอบ
+            </button>
+            <button onclick="toggleExSol(1)" class="text-xs font-semibold text-slate-600 hover:text-slate-900 underline px-2 py-1">
+              ดูตารางเปรียบเทียบผล
+            </button>
+          </div>
+          <div id="ex1_feedback" class="text-xs sm:text-sm font-medium hidden p-2.5 rounded-lg"></div>
+
+          <div id="ex1_solution" class="hidden pt-3 border-t border-slate-200 text-xs sm:text-sm text-slate-700 leading-relaxed bg-white p-3.5 rounded-lg border">
+            <div class="font-bold text-slate-900 mb-1">ผลการทดลองจากแบบจำลอง ($\varepsilon = 10^{-4}$):</div>
+            <ul class="list-disc list-inside space-y-1 font-mono text-xs">
+              <li><strong>วิธีนิวตัน–ราฟสัน:</strong> ใช้เพียง <strong>3–4 รอบ</strong> ($x^* \approx 1.521380$)</li>
+              <li><strong>วิธีเส้นตัด:</strong> ใช้ <strong>5–6 รอบ</strong> ($x^* \approx 1.521380$)</li>
+              <li><strong>วิธีแบ่งครึ่งช่วง:</strong> ใช้ถึง <strong>13–14 รอบ</strong> ($x^* \approx 1.521362$)</li>
+            </ul>
+            ดังนั้น ลำดับความเร็วจากรอบน้อยสุดไปมากสุดคือ <strong>นิวตัน &rarr; เส้นตัด &rarr; แบ่งครึ่งช่วง</strong>
+          </div>
+        </div>
+
+        <!-- Exercise 2 -->
+        <div class="bg-slate-50 border border-slate-200 rounded-xl p-5 space-y-3">
+          <div class="flex items-start justify-between gap-3">
+            <h3 class="font-bold text-slate-900 text-base">
+              ข้อ 2. เลือกสมการพหุนามและอธิบายเหตุผลในการเลือกวิธีประมาณค่าราก
+            </h3>
+            <span class="text-xs bg-indigo-100 text-indigo-800 font-semibold px-2.5 py-1 rounded">การเลือกเชิงวิศวกรรม</span>
+          </div>
+          <p class="text-sm text-slate-600">
+            หากท่านได้รับมอบหมายให้แก้สมการพหุนามดีกรีสูง $f(x) = x^7 - 3x^4 + 2x - 10 = 0$ ซึ่งไม่ทราบตำแหน่งรากเริ่มต้นที่แน่ชัด กลยุทธ์ใด <strong>มีประสิทธิภาพและปลอดภัยที่สุด</strong>?
+          </p>
+
+          <div class="space-y-2 text-sm text-slate-700">
+            <label class="flex items-center gap-2 cursor-pointer">
+              <input type="radio" name="ex2_opt" value="1" class="accent-indigo-600">
+              <span>สุ่มค่าเริ่มต้น $x_0 = 100$ แล้วใช้วิธีนิวตัน–ราฟสันทันที</span>
+            </label>
+            <label class="flex items-center gap-2 cursor-pointer">
+              <input type="radio" name="ex2_opt" value="2" class="accent-indigo-600">
+              <span>ใช้วิธีแบ่งครึ่งช่วงทำซ้ำ 100 รอบโดยไม่เปลี่ยนวิธี</span>
+            </label>
+            <label class="flex items-center gap-2 cursor-pointer font-semibold text-slate-900">
+              <input type="radio" name="ex2_opt" value="3" class="accent-indigo-600">
+              <span>ทดสอบหาช่วง $[a, b]$ ที่ $f(a)f(b) < 0$ แล้วใช้แบ่งครึ่งช่วง 4–5 รอบ ก่อนสลับไปใช้นิวตัน–ราฟสัน (Hybrid Strategy)</span>
+            </label>
+          </div>
+
+          <div class="flex items-center gap-3 pt-2">
+            <button onclick="checkEx2()" class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold px-4 py-2 rounded-lg transition-colors">
+              ตรวจคำตอบ
+            </button>
+            <button onclick="toggleExSol(2)" class="text-xs font-semibold text-slate-600 hover:text-slate-900 underline px-2 py-1">
+              ดูคำอธิบาย
+            </button>
+          </div>
+          <div id="ex2_feedback" class="text-xs sm:text-sm font-medium hidden p-2.5 rounded-lg"></div>
+
+          <div id="ex2_solution" class="hidden pt-3 border-t border-slate-200 text-xs sm:text-sm text-slate-700 leading-relaxed bg-white p-3.5 rounded-lg border">
+            <strong class="text-slate-900">คำตอบที่ถูกต้อง: ตัวเลือกที่ 3 (Hybrid Strategy)</strong><br>
+            เนื่องจากพหุนามดีกรี 7 มีความผันผวนสูง การสุ่มค่า $x_0$ อาจทำให้วิธีนิวตันลู่ออกสู่อนันต์ ขณะที่การใช้แบ่งครึ่งช่วง 100 รอบจะสิ้นเปลืองเวลาเกินจำเป็น การใช้กลยุทธ์ผสมโดยแบ่งครึ่งช่วงบีบกรอบรากก่อนแล้วต่อด้วยวิธีนิวตัน เป็นแนวปฏิบัติมาตรฐานสากลที่ทั้งปลอดภัยและรวดเร็วที่สุด
+          </div>
+        </div>
+
+        <!-- Exercise 3 -->
+        <div class="bg-slate-50 border border-slate-200 rounded-xl p-5 space-y-3">
+          <div class="flex items-start justify-between gap-3">
+            <h3 class="font-bold text-slate-900 text-base">
+              ข้อ 3. เขียนรายงานสั้น ๆ เปรียบเทียบความแม่นยำ จำนวนรอบ และข้อจำกัดของแต่ละวิธี
+            </h3>
+            <span class="text-xs bg-slate-200 text-slate-700 font-semibold px-2.5 py-1 rounded">การสังเคราะห์รายงาน</span>
+          </div>
+          <p class="text-sm text-slate-600">
+            ให้นักศึกษาสรุปผลการทดลองเปรียบเทียบทั้ง 3 วิธี โดยอ้างอิงข้อมูลจากแบบจำลองโต้ตอบ:
+          </p>
+
+          <button onclick="toggleExSol(3)" class="bg-slate-800 hover:bg-slate-900 text-white text-xs font-semibold px-4 py-2 rounded-lg transition-colors">
+            คลิกเพื่อดูโครงสร้างและตัวอย่างรายงานสรุปเชิงวิชาการ
+          </button>
+
+          <div id="ex3_solution" class="hidden pt-3 border-t border-slate-200 text-xs sm:text-sm text-slate-700 leading-relaxed bg-white p-3.5 rounded-lg border space-y-3">
+            <div class="font-bold text-slate-900 text-sm">ตัวอย่างรายงานสรุปผลการทดลองเชิงวิเคราะห์:</div>
+            
+            <div class="bg-slate-50 p-3 rounded-lg border border-slate-200 text-xs leading-relaxed space-y-2">
+              <p><strong>บทสรุปเชิงเปรียบเทียบ (Executive Summary):</strong></p>
+              <ul class="list-disc list-inside space-y-1">
+                <li><strong>ด้านจำนวนรอบและความเร็ว:</strong> วิธีนิวตัน–ราฟสันมีประสิทธิภาพความเร็วสูงสุดโดยเฉลี่ย ใช้รอบคำนวณน้อยกว่าวิธีแบ่งครึ่งช่วงราว 3 ถึง 4 เท่า รองลงมาคือวิธีเส้นตัด และวิธีแบ่งครึ่งช่วงใช้รอบมากที่สุด</li>
+                <li><strong>ด้านความต้องการข้อมูล:</strong> วิธีแบ่งครึ่งช่วงและวิธีเส้นตัดมีความสะดวกเมื่อไม่สามารถหาอนุพันธ์เชิงวิเคราะห์ $f'(x)$ ได้ แต่วิธีแบ่งครึ่งช่วงต้องมีเงื่อนไขการคร่อมราก $f(a)f(b) < 0$ อย่างเข้มงวด</li>
+                <li><strong>ด้านความมั่นคงของการคำนวณ (Robustness):</strong> วิธีแบ่งครึ่งช่วงมีความน่าเชื่อถือสูงสุดเนื่องจากไม่ลู่ออกสู่อนันต์ ขณะที่วิธีนิวตันและวิธีเส้นตัดมีความเสี่ยงต่อภาวะตัวส่วนเป็นศูนย์เมื่ออนุพันธ์ใกล้เคียงศูนย์</li>
+                <li><strong>ข้อเสนอแนะ:</strong> ควรใช้ <em>Hybrid Method</em> เป็นแนวทางหลักในการพัฒนาโปรแกรม โดยใช้ Bisection กำหนดขอบเขต แล้วเร่งความเร็วด้วย Newton หรือ Secant</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+
+  <!-- Simulation Logic & Benchmarking Engine -->
+  <script>
+    // Polynomial Definitions
+    const polyList = {
+      p1: {
+        name: 'x³ - x - 2',
+        f: (x) => Math.pow(x, 3) - x - 2,
+        df: (x) => 3 * Math.pow(x, 2) - 1,
+        defaults: { bisec: [1.0, 2.0], newton: 1.5, secant: [1.0, 2.0] },
+        challenging: { bisec: [0.0, 3.0], newton: 0.58, secant: [0.0, 0.5] },
+        trueRoot: 1.5213797
+      },
+      p2: {
+        name: 'x³ - 4x + 1',
+        f: (x) => Math.pow(x, 3) - 4 * x + 1,
+        df: (x) => 3 * Math.pow(x, 2) - 4,
+        defaults: { bisec: [0.0, 1.0], newton: 0.5, secant: [0.0, 1.0] },
+        challenging: { bisec: [-3.0, 3.0], newton: 1.15, secant: [1.0, 1.2] },
+        trueRoot: 0.2541017
+      },
+      p3: {
+        name: 'x² - 2',
+        f: (x) => Math.pow(x, 2) - 2,
+        df: (x) => 2 * x,
+        defaults: { bisec: [1.0, 2.0], newton: 1.0, secant: [1.0, 2.0] },
+        challenging: { bisec: [0.1, 5.0], newton: 0.05, secant: [0.05, 0.1] },
+        trueRoot: Math.SQRT2
+      },
+      p4: {
+        name: 'x³ - 2x² - 5',
+        f: (x) => Math.pow(x, 3) - 2 * Math.pow(x, 2) - 5,
+        df: (x) => 3 * Math.pow(x, 2) - 4 * x,
+        defaults: { bisec: [2.0, 3.0], newton: 3.0, secant: [2.0, 3.0] },
+        challenging: { bisec: [1.0, 4.0], newton: 1.33, secant: [1.2, 1.4] },
+        trueRoot: 2.6906474
+      }
+    };
+
+    let activeTab = 'bisec';
+    let simulationResults = { bisec: [], newton: [], secant: [] };
+    let chartInstance = null;
+
+    window.onload = function() {
+      if (typeof renderMathInElement === 'function') {
+        renderMathInElement(document.body, {
+          delimiters: [
+            {left: '$$', right: '$$', display: true},
+            {left: '\\[', right: '\\]', display: true},
+            {left: '\\(', right: '\\)', display: false},
+            {left: '$', right: '$', display: false}
+          ],
+          throwOnError: false
+        });
+      }
+
+      initChart();
+      onPolynomialChanged();
+    };
+
+    function onPolynomialChanged() {
+      const pKey = document.getElementById('selPoly').value;
+      const def = polyList[pKey].defaults;
+
+      document.getElementById('inBisecA').value = def.bisec[0];
+      document.getElementById('inBisecB').value = def.bisec[1];
+      document.getElementById('inNewtonX0').value = def.newton;
+      document.getElementById('inSecantX0').value = def.secant[0];
+      document.getElementById('inSecantX1').value = def.secant[1];
+
+      runAllComparisons();
+    }
+
+    function applyPreset(type) {
+      const pKey = document.getElementById('selPoly').value;
+      const config = (type === 'ideal') ? polyList[pKey].defaults : polyList[pKey].challenging;
+
+      document.getElementById('inBisecA').value = config.bisec[0];
+      document.getElementById('inBisecB').value = config.bisec[1];
+      document.getElementById('inNewtonX0').value = config.newton;
+      document.getElementById('inSecantX0').value = config.secant[0];
+      document.getElementById('inSecantX1').value = config.secant[1];
+
+      runAllComparisons();
+    }
+
+    function setEpsilon(val) {
+      document.getElementById('inputEps').value = val;
+      document.querySelectorAll('.eps-btn').forEach(btn => {
+        btn.className = 'eps-btn text-xs bg-white px-2.5 py-2 rounded-lg border border-slate-200 hover:bg-indigo-50 font-mono';
+      });
+      event.target.className = 'eps-btn text-xs bg-indigo-600 text-white px-2.5 py-2 rounded-lg border border-indigo-600 font-mono font-bold';
+      runAllComparisons();
+    }
+
+    function initChart() {
+      const ctx = document.getElementById('comparisonChart').getContext('2d');
+      chartInstance = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: [],
+          datasets: [
+            {
+              label: 'วิธีแบ่งครึ่งช่วง (Bisection)',
+              data: [],
+              borderColor: '#059669',
+              backgroundColor: '#059669',
+              borderWidth: 2,
+              pointRadius: 4,
+              tension: 0.1
+            },
+            {
+              label: 'วิธีนิวตัน–ราฟสัน (Newton)',
+              data: [],
+              borderColor: '#0284c7',
+              backgroundColor: '#0284c7',
+              borderWidth: 2,
+              pointRadius: 4,
+              tension: 0.1
+            },
+            {
+              label: 'วิธีเส้นตัด (Secant)',
+              data: [],
+              borderColor: '#7c3aed',
+              backgroundColor: '#7c3aed',
+              borderWidth: 2,
+              pointRadius: 4,
+              tension: 0.1
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          scales: {
+            x: {
+              title: { display: true, text: 'รอบที่ (Iteration n)', font: { size: 11, weight: 'bold' } },
+              grid: { color: '#f1f5f9' }
+            },
+            y: {
+              type: 'logarithmic',
+              title: { display: true, text: 'ความคลาดเคลื่อน (Log Scale)', font: { size: 11, weight: 'bold' } },
+              grid: { color: '#e2e8f0' }
+            }
+          },
+          plugins: {
+            legend: { position: 'top', labels: { boxWidth: 12, font: { size: 11 } } },
+            tooltip: {
+              callbacks: {
+                label: (ctx) => ` ${ctx.dataset.label}: ${ctx.parsed.y.toExponential(4)}`
+              }
+            }
+          }
+        }
+      });
+    }
+
+    function runAllComparisons() {
+      const pKey = document.getElementById('selPoly').value;
+      const poly = polyList[pKey];
+      const eps = parseFloat(document.getElementById('inputEps').value) || 0.0001;
+      const maxIter = 50;
+
+      // 1. Run Bisection
+      let a = parseFloat(document.getElementById('inBisecA').value);
+      let b = parseFloat(document.getElementById('inBisecB').value);
+      const bisecLogs = [];
+      let prevM = null;
+
+      const faInit = poly.f(a);
+      const fbInit = poly.f(b);
+      const validBracket = (faInit * fbInit < 0);
+
+      if (!validBracket) {
+        bisecLogs.push({
+          n: 1, xn: (a + b) / 2, res: Math.abs(poly.f((a + b) / 2)),
+          diff: Math.abs(b - a), bound: Math.abs(b - a) / 2,
+          stop: false, error: 'ปลายช่วงไม่มีเครื่องหมายต่างกัน f(a)f(b) >= 0'
+        });
+      } else {
+        for (let n = 1; n <= maxIter; n++) {
+          const m = (a + b) / 2.0;
+          const fm = poly.f(m);
+          const res = Math.abs(fm);
+          const diff = prevM !== null ? Math.abs(m - prevM) : Math.abs(b - a);
+          const bound = (b - a) / 2.0;
+          const stop = (diff < eps) || (res < eps);
+
+          bisecLogs.push({ n, xn: m, res, diff, bound, stop, error: null });
+          if (stop) break;
+
+          if (poly.f(a) * fm < 0) {
+            b = m;
+          } else {
+            a = m;
+          }
+          prevM = m;
+        }
+      }
+
+      // 2. Run Newton-Raphson
+      let xNewton = parseFloat(document.getElementById('inNewtonX0').value);
+      const newtonLogs = [];
+      for (let n = 0; n <= maxIter; n++) {
+        const fx = poly.f(xNewton);
+        const res = Math.abs(fx);
+        const dfx = poly.df(xNewton);
+        let diff = (n > 0) ? Math.abs(xNewton - newtonLogs[n - 1].xn) : null;
+        const stop = (n > 0) && (diff < eps && res < eps);
+
+        newtonLogs.push({ n, xn: xNewton, res, diff, bound: null, stop, error: null });
+        if (stop) break;
+
+        if (Math.abs(dfx) < 1e-12) {
+          newtonLogs[newtonLogs.length - 1].error = "อนุพันธ์ใกล้ศูนย์ f'(x) ≈ 0";
+          break;
+        }
+
+        const nextX = xNewton - (fx / dfx);
+        if (!isFinite(nextX) || Math.abs(nextX) > 1e6) {
+          newtonLogs[newtonLogs.length - 1].error = "เกิดการลู่ออกสู่อนันต์ (Divergence)";
+          break;
+        }
+        xNewton = nextX;
+      }
+
+      // 3. Run Secant Method
+      let sX0 = parseFloat(document.getElementById('inSecantX0').value);
+      let sX1 = parseFloat(document.getElementById('inSecantX1').value);
+      const secantLogs = [];
+      secantLogs.push({ n: 0, xn: sX0, res: Math.abs(poly.f(sX0)), diff: null, bound: null, stop: false, error: null });
+      secantLogs.push({ n: 1, xn: sX1, res: Math.abs(poly.f(sX1)), diff: Math.abs(sX1 - sX0), bound: null, stop: false, error: null });
+
+      for (let n = 2; n <= maxIter; n++) {
+        const x_prev = secantLogs[n - 1].xn;
+        const x_prev2 = secantLogs[n - 2].xn;
+        const f_prev = poly.f(x_prev);
+        const f_prev2 = poly.f(x_prev2);
+        const denom = f_prev - f_prev2;
+
+        if (Math.abs(denom) < 1e-12) {
+          secantLogs.push({ n, xn: x_prev, res: Math.abs(f_prev), diff: 0, bound: null, stop: false, error: "ตัวส่วนเป็นศูนย์ f(xₙ) - f(xₙ₋₁) ≈ 0" });
+          break;
+        }
+
+        const nextX = x_prev - (f_prev * (x_prev - x_prev2)) / denom;
+        const res = Math.abs(poly.f(nextX));
+        const diff = Math.abs(nextX - x_prev);
+        const stop = (diff < eps && res < eps);
+
+        secantLogs.push({ n, xn: nextX, res, diff, bound: null, stop, error: null });
+        if (stop) break;
+
+        if (!isFinite(nextX) || Math.abs(nextX) > 1e6) {
+          secantLogs[secantLogs.length - 1].error = "ลู่ออกสู่อนันต์ (Divergence)";
+          break;
+        }
+      }
+
+      simulationResults = { bisec: bisecLogs, newton: newtonLogs, secant: secantLogs };
+
+      updateSummaryView();
+      updateChartView();
+      renderLogTable();
+    }
+
+    function updateSummaryView() {
+      const bData = simulationResults.bisec;
+      const nData = simulationResults.newton;
+      const sData = simulationResults.secant;
+
+      const bLast = bData[bData.length - 1];
+      const nLast = nData[nData.length - 1];
+      const sLast = sData[sData.length - 1];
+
+      // Bisection summary
+      document.getElementById('cardIterBisec').textContent = bLast.error ? 'ล้มเหลว' : bLast.n;
+      document.getElementById('cardRootBisec').textContent = isFinite(bLast.xn) ? bLast.xn.toFixed(6) : '-';
+      document.getElementById('cardResBisec').textContent = bLast.res.toExponential(3);
+      document.getElementById('cardBadgeBisec').className = bLast.error
+        ? 'px-2 py-0.5 rounded text-[11px] font-semibold bg-rose-100 text-rose-800'
+        : 'px-2 py-0.5 rounded text-[11px] font-semibold bg-emerald-100 text-emerald-800';
+      document.getElementById('cardBadgeBisec').textContent = bLast.error ? 'ไม่ลู่เข้า' : 'ผ่านเกณฑ์';
+      document.getElementById('cardNoteBisec').textContent = bLast.error || 'ลู่เข้าสม่ำเสมอ ขอบเขตช่วงชัดเจน';
+
+      // Newton summary
+      document.getElementById('cardIterNewton').textContent = nLast.error ? 'ล้มเหลว' : nLast.n;
+      document.getElementById('cardRootNewton').textContent = isFinite(nLast.xn) ? nLast.xn.toFixed(6) : '-';
+      document.getElementById('cardResNewton').textContent = isFinite(nLast.res) ? nLast.res.toExponential(3) : '-';
+      document.getElementById('cardBadgeNewton').className = nLast.error
+        ? 'px-2 py-0.5 rounded text-[11px] font-semibold bg-rose-100 text-rose-800'
+        : 'px-2 py-0.5 rounded text-[11px] font-semibold bg-sky-100 text-sky-800';
+      document.getElementById('cardBadgeNewton').textContent = nLast.error ? 'ล้มเหลว' : (nLast.n <= 5 ? 'เร็วที่สุด' : 'ผ่านเกณฑ์');
+      document.getElementById('cardNoteNewton').textContent = nLast.error || 'ลู่เข้าเร็วระดับกำลังสอง (Quadratic)';
+
+      // Secant summary
+      document.getElementById('cardIterSecant').textContent = sLast.error ? 'ล้มเหลว' : sLast.n;
+      document.getElementById('cardRootSecant').textContent = isFinite(sLast.xn) ? sLast.xn.toFixed(6) : '-';
+      document.getElementById('cardResSecant').textContent = isFinite(sLast.res) ? sLast.res.toExponential(3) : '-';
+      document.getElementById('cardBadgeSecant').className = sLast.error
+        ? 'px-2 py-0.5 rounded text-[11px] font-semibold bg-rose-100 text-rose-800'
+        : 'px-2 py-0.5 rounded text-[11px] font-semibold bg-purple-100 text-purple-800';
+      document.getElementById('cardBadgeSecant').textContent = sLast.error ? 'ล้มเหลว' : 'เร็วสูง';
+      document.getElementById('cardNoteSecant').textContent = sLast.error || 'ไม่ต้องคำนวณอนุพันธ์ตรง เร็วกว่าแบ่งครึ่งช่วง';
+    }
+
+    function updateChartView() {
+      if (!chartInstance) return;
+
+      const maxIter = Math.max(
+        simulationResults.bisec.length,
+        simulationResults.newton.length,
+        simulationResults.secant.length
+      );
+
+      const labels = Array.from({ length: maxIter }, (_, i) => `รอบ ${i + 1}`);
+
+      const extractErrors = (logs) => {
+        return logs.map(item => Math.max(1e-15, item.diff !== null ? item.diff : item.res));
+      };
+
+      chartInstance.data.labels = labels;
+      chartInstance.data.datasets[0].data = extractErrors(simulationResults.bisec);
+      chartInstance.data.datasets[1].data = extractErrors(simulationResults.newton);
+      chartInstance.data.datasets[2].data = extractErrors(simulationResults.secant);
+      chartInstance.update();
+    }
+
+    function setLogTab(tab) {
+      activeTab = tab;
+      const btns = {
+        bisec: document.getElementById('btnTabBisec'),
+        newton: document.getElementById('btnTabNewton'),
+        secant: document.getElementById('btnTabSecant')
+      };
+
+      Object.keys(btns).forEach(k => {
+        if (k === tab) {
+          btns[k].className = 'text-xs font-semibold px-3 py-1 rounded-md transition-colors bg-white shadow-xs text-indigo-800';
+        } else {
+          btns[k].className = 'text-xs font-semibold px-3 py-1 rounded-md transition-colors text-slate-600 hover:text-slate-900';
+        }
+      });
+
+      renderLogTable();
+    }
+
+    function renderLogTable() {
+      const data = simulationResults[activeTab] || [];
+      const tbody = document.getElementById('logTableBody');
+      tbody.innerHTML = '';
+
+      data.forEach(row => {
+        const tr = document.createElement('tr');
+        if (row.stop) {
+          tr.className = 'bg-emerald-50/70 font-semibold border-l-4 border-emerald-600';
+        } else if (row.error) {
+          tr.className = 'bg-rose-50/70 font-semibold border-l-4 border-rose-600';
+        } else {
+          tr.className = 'hover:bg-slate-50 transition-colors';
+        }
+
+        tr.innerHTML = `
+          <td class="px-3 py-2 text-center">${row.n}</td>
+          <td class="px-3 py-2 font-mono font-bold text-slate-900">${isFinite(row.xn) ? row.xn.toFixed(6) : 'Overflow'}</td>
+          <td class="px-3 py-2 font-mono text-slate-700">${isFinite(row.res) ? row.res.toExponential(4) : '-'}</td>
+          <td class="px-3 py-2 font-mono text-slate-600">${row.diff !== null && isFinite(row.diff) ? row.diff.toExponential(4) : '-'}</td>
+          <td class="px-3 py-2 font-mono text-emerald-800">${row.bound !== null ? '≤ ' + row.bound.toExponential(4) : '-'}</td>
+          <td class="px-3 py-2 text-center">
+            ${row.error
+              ? `<span class="inline-block px-2 py-0.5 rounded text-[11px] font-semibold bg-rose-100 text-rose-800">${row.error}</span>`
+              : (row.stop
+                ? `<span class="inline-block px-2 py-0.5 rounded text-[11px] font-semibold bg-emerald-100 text-emerald-800">ผ่านเกณฑ์</span>`
+                : `<span class="inline-block px-2 py-0.5 rounded text-[11px] font-normal bg-slate-100 text-slate-500">กำลังทำซ้ำ</span>`)}
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    // Toggle Discovery Questions
+    function toggleInquiry(id) {
+      const content = document.getElementById(`ansInq${id}`);
+      const btn = document.getElementById(`btnInq${id}`);
+      if (content.classList.contains('hidden')) {
+        content.classList.remove('hidden');
+        btn.textContent = 'ซ่อนแนวคิด';
+      } else {
+        content.classList.add('hidden');
+        btn.textContent = 'แสดงแนวคิด';
+      }
+    }
+
+    // Toggle Exercise Solutions
+    function toggleExSol(id) {
+      const el = document.getElementById(`ex${id}_solution`);
+      if (el.classList.contains('hidden')) {
+        el.classList.remove('hidden');
+      } else {
+        el.classList.add('hidden');
+      }
+    }
+
+    // Exercise 1 Check
+    function checkEx1() {
+      const sel = document.querySelector('input[name="ex1_opt"]:checked');
+      const fb = document.getElementById('ex1_feedback');
+      fb.classList.remove('hidden', 'bg-emerald-100', 'text-emerald-800', 'bg-rose-100', 'text-rose-800', 'bg-amber-100', 'text-amber-800');
+
+      if (!sel) {
+        fb.className = 'text-xs sm:text-sm font-medium p-2.5 rounded-lg bg-amber-100 text-amber-800';
+        fb.textContent = 'กรุณาเลือกตัวเลือกก่อนตรวจคำตอบ';
+        return;
+      }
+
+      if (sel.value === '1') {
+        fb.className = 'text-xs sm:text-sm font-medium p-2.5 rounded-lg bg-emerald-100 text-emerald-800';
+        fb.innerHTML = '✓ ถูกต้องยอดเยี่ยม! นิวตัน–ราฟสันใช้รอบน้อยที่สุด (~3–4 รอบ) &rarr; เส้นตัด (~5–6 รอบ) &rarr; แบ่งครึ่งช่วง (~14 รอบ)';
+      } else {
+        fb.className = 'text-xs sm:text-sm font-medium p-2.5 rounded-lg bg-rose-100 text-rose-800';
+        fb.innerHTML = '✗ ยังไม่ถูกต้อง: ลองสังเกตจำนวนรอบบนแดชบอร์ดด้านบนที่กำหนดพิกัดความเผื่อ 10⁻⁴';
+      }
+    }
+
+    // Exercise 2 Check
+    function checkEx2() {
+      const sel = document.querySelector('input[name="ex2_opt"]:checked');
+      const fb = document.getElementById('ex2_feedback');
+      fb.classList.remove('hidden', 'bg-emerald-100', 'text-emerald-800', 'bg-rose-100', 'text-rose-800', 'bg-amber-100', 'text-amber-800');
+
+      if (!sel) {
+        fb.className = 'text-xs sm:text-sm font-medium p-2.5 rounded-lg bg-amber-100 text-amber-800';
+        fb.textContent = 'กรุณาเลือกตัวเลือกก่อนตรวจคำตอบ';
+        return;
+      }
+
+      if (sel.value === '3') {
+        fb.className = 'text-xs sm:text-sm font-medium p-2.5 rounded-lg bg-emerald-100 text-emerald-800';
+        fb.innerHTML = '✓ ถูกต้องตรงตามหลักการวิศวกรรม! กลยุทธ์ Hybrid Method (Bisection + Newton) ช่วยป้องกันการลู่ออกสู่อนันต์และให้ความเร็วสูงสุด';
+      } else {
+        fb.className = 'text-xs sm:text-sm font-medium p-2.5 rounded-lg bg-rose-100 text-rose-800';
+        fb.innerHTML = '✗ ยังไม่ปลอดภัยที่สุด: การสุ่มนิวตันอาจทำให้ลู่ออก ขณะที่การแบ่งครึ่ง 100 รอบจะช้าเกินไป ลองพิจารณากลยุทธ์วิธีผสม';
+      }
+    }
+  </script>
+</body>
+</html>

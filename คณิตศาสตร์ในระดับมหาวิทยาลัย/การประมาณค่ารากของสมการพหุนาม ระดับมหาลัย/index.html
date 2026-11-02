@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>บทเรียนออนไลน์: การหารากของสมการ (Root-Finding Methods)</title>
+  
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- Google Fonts: Prompt & Sarabun -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@400;500;600;700&family=Sarabun:wght@300;400;500;600&display=swap" rel="stylesheet">
+  
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<script>
+  // ตรวจสอบว่ามีสถานะล็อกอินและอีเมลบันทึกไว้หรือไม่
+  const isLoggedIn = localStorage.getItem("dms_is_logged_in") === "true";
+  const userEmail = localStorage.getItem("dms_user_email");
+
+  // หากไม่มี ให้ดีดกลับไปหน้าเข้าสู่ระบบทันที
+  if (!isLoggedIn || !userEmail) {
+    // ปรับ Path ให้ถอยกลับไปหาไฟล์ login.html ตามระดับโฟลเดอร์ (เช่น "../login.html" หากอยู่ในโฟลเดอร์ย่อย 1 ชั้น)
+    window.location.replace("../../login.html"); 
+  }
+</script>
+  <style>
+    body {
+      font-family: 'Sarabun', sans-serif;
+    }
+    h1, h2, h3, h4, .font-heading, button {
+      font-family: 'Prompt', sans-serif;
+    }
+    .custom-scroll::-webkit-scrollbar {
+      height: 6px;
+    }
+    .custom-scroll::-webkit-scrollbar-thumb {
+      background-color: #cbd5e1;
+      border-radius: 9999px;
+    }
+    .nav-btn.active {
+      background-color: #0284c7; /* Sky/Blue */
+      color: #ffffff;
+      box-shadow: 0 4px 6px -1px rgba(2, 132, 199, 0.25);
+    }
+  </style>
+</head>
+<body class="bg-slate-100 flex flex-col h-screen overflow-hidden">
+
+  <!-- Top Navigation Header -->
+  <header class="bg-white border-b border-slate-200 shadow-sm shrink-0 z-30">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6">
+      
+      <!-- Top Brand Row -->
+      <div class="flex items-center justify-between py-3 border-b border-slate-100">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-sky-600 to-indigo-600 text-white flex items-center justify-center text-xl shadow-md">
+            <i class="fa-solid fa-square-root-variable"></i>
+          </div>
+          <div>
+            <h1 class="text-lg sm:text-xl font-bold text-slate-900 tracking-tight leading-tight">
+              ระเบียบวิธีเชิงตัวเลข: การหารากของสมการ
+            </h1>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Navigation Tabs (Horizontal Scrollable) -->
+      <nav class="flex items-center gap-2 py-2.5 overflow-x-auto custom-scroll text-xs sm:text-sm font-medium">
+        <button onclick="loadContent(1, '1 การแยกช่วงและการมีอยู่ของรากสมการ.html')" id="btn-1" class="nav-btn active px-3.5 py-1.5 rounded-xl whitespace-nowrap transition-all duration-200 flex items-center gap-1.5 bg-slate-100 text-slate-700 hover:bg-slate-200">
+          <span class="w-5 h-5 rounded-full bg-black/10 flex items-center justify-center text-[10px] font-bold">1</span>
+          <span>การแยกช่วง & การมีอยู่ของราก</span>
+        </button>
+
+        <button onclick="loadContent(2, '2 วิธีแบ่งครึ่งช่วง (Bisection Method).html')" id="btn-2" class="nav-btn px-3.5 py-1.5 rounded-xl whitespace-nowrap transition-all duration-200 flex items-center gap-1.5 bg-slate-100 text-slate-700 hover:bg-slate-200">
+          <span class="w-5 h-5 rounded-full bg-black/10 flex items-center justify-center text-[10px] font-bold">2</span>
+          <span>วิธีแบ่งครึ่งช่วง (Bisection)</span>
+        </button>
+
+        <button onclick="loadContent(3, '3 วิธีนิวตัน–ราฟสัน (Newton–Raphson Method).html')" id="btn-3" class="nav-btn px-3.5 py-1.5 rounded-xl whitespace-nowrap transition-all duration-200 flex items-center gap-1.5 bg-slate-100 text-slate-700 hover:bg-slate-200">
+          <span class="w-5 h-5 rounded-full bg-black/10 flex items-center justify-center text-[10px] font-bold">3</span>
+          <span>วิธีนิวตัน-ราฟสัน (Newton-Raphson)</span>
+        </button>
+
+        <button onclick="loadContent(4, '4 วิธีเส้นตัด (Secant Method).html')" id="btn-4" class="nav-btn px-3.5 py-1.5 rounded-xl whitespace-nowrap transition-all duration-200 flex items-center gap-1.5 bg-slate-100 text-slate-700 hover:bg-slate-200">
+          <span class="w-5 h-5 rounded-full bg-black/10 flex items-center justify-center text-[10px] font-bold">4</span>
+          <span>วิธีเส้นตัด (Secant)</span>
+        </button>
+
+        <button onclick="loadContent(5, '5 การประเมินความคลาดเคลื่อนและเกณฑ์หยุด.html')" id="btn-5" class="nav-btn px-3.5 py-1.5 rounded-xl whitespace-nowrap transition-all duration-200 flex items-center gap-1.5 bg-slate-100 text-slate-700 hover:bg-slate-200">
+          <span class="w-5 h-5 rounded-full bg-black/10 flex items-center justify-center text-[10px] font-bold">5</span>
+          <span>การประเมินความคลาดเคลื่อน</span>
+        </button>
+
+        <button onclick="loadContent(6, '6 การเปรียบเทียบวิธีและการเลือกวิธีประมาณค่าราก.html')" id="btn-6" class="nav-btn px-3.5 py-1.5 rounded-xl whitespace-nowrap transition-all duration-200 flex items-center gap-1.5 bg-slate-100 text-slate-700 hover:bg-slate-200">
+          <span class="w-5 h-5 rounded-full bg-black/10 flex items-center justify-center text-[10px] font-bold">6</span>
+          <span>การเปรียบเทียบ & เลือกวิธี</span>
+        </button>
+
+        <!-- Test Tab -->
+        <button onclick="loadContent(7, 'แบบทดสอบ.html')" id="btn-7" class="nav-btn px-4 py-1.5 rounded-xl whitespace-nowrap transition-all duration-200 flex items-center gap-1.5 bg-sky-50 text-sky-700 hover:bg-sky-100 border border-sky-200">
+          <i class="fa-solid fa-graduation-cap text-sky-600"></i>
+          <span class="font-bold">แบบทดสอบวัดผลสัมฤทธิ์</span>
+        </button>
+      </nav>
+
+    </div>
+  </header>
+
+  <!-- Main Content Viewer: iframe takes remaining height -->
+  <main class="flex-1 w-full relative bg-slate-50">
+    <!-- Loading spinner placeholder -->
+    <div id="loader" class="absolute inset-0 flex items-center justify-center bg-slate-50/80 z-10 transition-opacity duration-300 pointer-events-none opacity-0">
+      <div class="flex flex-col items-center gap-2">
+        <i class="fa-solid fa-circle-notch fa-spin text-3xl text-sky-600"></i>
+        <span class="text-xs text-slate-500 font-medium font-heading">กำลังโหลดเนื้อหา...</span>
+      </div>
+    </div>
+
+    <!-- The iframe directly loading matching HTML files -->
+    <iframe 
+      id="contentFrame" 
+      src="1 การแยกช่วงและการมีอยู่ของรากสมการ.html" 
+      class="w-full h-full border-none shadow-inner"
+      onload="hideLoader()"
+    ></iframe>
+  </main>
+
+  <!-- Script for Tab Navigation -->
+  <script>
+    let currentSrc = '1 การแยกช่วงและการมีอยู่ของรากสมการ.html';
+
+    function loadContent(tabIndex, fileName) {
+      currentSrc = fileName;
+      showLoader();
+      
+      const frame = document.getElementById('contentFrame');
+      frame.src = encodeURI(fileName);
+
+      // Update button styling
+      document.querySelectorAll('.nav-btn').forEach((btn, idx) => {
+        if (idx + 1 === tabIndex) {
+          btn.classList.add('active');
+          if (idx + 1 === 7) {
+            btn.classList.remove('bg-sky-50', 'text-sky-700');
+            btn.classList.add('bg-sky-600', 'text-white');
+          } else {
+            btn.classList.remove('bg-slate-100', 'text-slate-700');
+          }
+        } else {
+          btn.classList.remove('active');
+          if (idx + 1 === 7) {
+            btn.classList.remove('bg-sky-600', 'text-white');
+            btn.classList.add('bg-sky-50', 'text-sky-700');
+          } else {
+            btn.classList.add('bg-slate-100', 'text-slate-700');
+          }
+        }
+      });
+    }
+
+    function reloadFrame() {
+      showLoader();
+      const frame = document.getElementById('contentFrame');
+      frame.src = frame.src;
+    }
+
+    function openExternal() {
+      window.open(currentSrc, '_blank');
+    }
+
+    function showLoader() {
+      const loader = document.getElementById('loader');
+      loader.classList.remove('opacity-0');
+      loader.classList.add('opacity-100');
+    }
+
+    function hideLoader() {
+      const loader = document.getElementById('loader');
+      loader.classList.remove('opacity-100');
+      loader.classList.add('opacity-0');
+    }
+  </script>
+</body>
+</html>

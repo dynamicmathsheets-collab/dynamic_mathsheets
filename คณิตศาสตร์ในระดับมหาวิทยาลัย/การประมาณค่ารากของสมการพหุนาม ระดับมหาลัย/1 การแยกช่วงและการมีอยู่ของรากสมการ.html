@@ -1,0 +1,896 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>เรื่องที่ 1: การแยกช่วงและการมีอยู่ของรากสมการ</title>
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- Google Fonts: Sarabun & Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- KaTeX for crisp math rendering -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js"></script>
+  
+  <!-- Chart.js for interactive function visualization -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@2.2.1/dist/chartjs-plugin-annotation.min.js"></script>
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Sarabun', 'Inter', 'sans-serif'],
+          },
+          colors: {
+            brand: {
+              50: '#eff6ff',
+              100: '#dbeafe',
+              500: '#3b82f6',
+              600: '#2563eb',
+              700: '#1d4ed8',
+              800: '#1e40af',
+              900: '#1e3a8a',
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    /* Smooth transitions and custom scroll */
+    html { scroll-behavior: smooth; }
+    .katex-display { margin: 0.6em 0; overflow-x: auto; overflow-y: hidden; padding-bottom: 2px; }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-800 font-sans antialiased selection:bg-blue-100 selection:text-blue-900 min-h-screen">
+
+  <!-- Header Banner -->
+  <header class="bg-gradient-to-r from-blue-900 via-indigo-900 to-slate-900 text-white border-b border-indigo-700/40 shadow-sm">
+    <div class="max-w-6xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
+
+      <h1 class="text-2xl sm:text-3xl md:text-4xl font-bold tracking-tight text-white">
+        เรื่องที่ 1: การแยกช่วงและการมีอยู่ของรากสมการ
+      </h1>
+      <p class="mt-2 text-slate-300 text-base sm:text-lg max-w-3xl">
+        Root Bracketing & Intermediate Value Theorem (IVT) — ศึกษาทฤษฎีบทค่าระหว่างกลาง การตรวจสอบเครื่องหมาย และข้อควรระวังในการหาค่าราก
+      </p>
+    </div>
+  </header>
+
+  <!-- Main Content Container with strict dimensions -->
+  <main class="max-w-6xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 space-y-10">
+
+    <!-- Section 1: Learning Objectives -->
+    <section class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 sm:p-7 relative overflow-hidden">
+      <div class="absolute top-0 left-0 w-2 h-full bg-blue-600"></div>
+      <div class="flex items-center gap-3 mb-4">
+        <div class="p-2.5 bg-blue-50 text-blue-700 rounded-xl">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+        </div>
+        <h2 class="text-xl sm:text-2xl font-bold text-slate-900">1. วัตถุประสงค์การเรียนรู้</h2>
+      </div>
+      <p class="text-slate-600 mb-4 text-base leading-relaxed">
+        เมื่อสิ้นสุดการเรียนรู้ในหัวข้อนี้ นักศึกษาจะมีความรู้ความสามารถดังต่อไปนี้:
+      </p>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div class="bg-slate-50 border border-slate-100 rounded-xl p-4 transition-all hover:border-blue-200 hover:bg-blue-50/40">
+          <div class="text-blue-700 font-semibold mb-1 flex items-center gap-2">
+            <span class="w-6 h-6 rounded-full bg-blue-100 text-blue-700 text-xs flex items-center justify-center font-bold">1</span>
+            อธิบายเงื่อนไข
+          </div>
+          <p class="text-slate-600 text-sm">อธิบายเงื่อนไขทางคณิตศาสตร์ของการมีอยู่ของรากจริงในช่วงที่กำหนดได้อย่างถูกต้อง</p>
+        </div>
+        <div class="bg-slate-50 border border-slate-100 rounded-xl p-4 transition-all hover:border-blue-200 hover:bg-blue-50/40">
+          <div class="text-blue-700 font-semibold mb-1 flex items-center gap-2">
+            <span class="w-6 h-6 rounded-full bg-blue-100 text-blue-700 text-xs flex items-center justify-center font-bold">2</span>
+            ประยุกต์ใช้ IVT
+          </div>
+          <p class="text-slate-600 text-sm">ใช้ทฤษฎีบทค่าระหว่างกลาง (Intermediate Value Theorem) ในการทดสอบและระบุช่วงที่มีรากสมการ</p>
+        </div>
+        <div class="bg-slate-50 border border-slate-100 rounded-xl p-4 transition-all hover:border-blue-200 hover:bg-blue-50/40">
+          <div class="text-blue-700 font-semibold mb-1 flex items-center gap-2">
+            <span class="w-6 h-6 rounded-full bg-blue-100 text-blue-700 text-xs flex items-center justify-center font-bold">3</span>
+            เข้าใจข้อจำกัด
+          </div>
+          <p class="text-slate-600 text-sm">อธิบายข้อจำกัดของการตรวจสอบเครื่องหมายของฟังก์ชัน และวิเคราะห์กรณีรากซ้ำหรือรากหลายตัวได้</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Section 2: Core Concepts -->
+    <section class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 sm:p-7 space-y-6">
+      <div class="flex items-center gap-3">
+        <div class="p-2.5 bg-indigo-50 text-indigo-700 rounded-xl">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+          </svg>
+        </div>
+        <h2 class="text-xl sm:text-2xl font-bold text-slate-900">2. เนื้อหาหลัก</h2>
+      </div>
+
+      <div class="bg-gradient-to-br from-indigo-50/70 via-blue-50/40 to-white border border-indigo-100 rounded-xl p-5 text-slate-800 leading-relaxed">
+        <h3 class="font-bold text-indigo-900 text-lg mb-2 flex items-center gap-2">
+          <span>ทฤษฎีบทค่าระหว่างกลาง (Intermediate Value Theorem: IVT)</span>
+        </h3>
+        <p class="mb-3">
+          ให้ \(f(x)\) เป็นพหุนาม ซึ่งมีสมบัติเป็นฟังก์ชันต่อเนื่องบนจำนวนจริง หาก \(f(a)\) และ \(f(b)\) มีเครื่องหมายตรงข้ามกัน กล่าวคือ
+        </p>
+        <div class="py-2 text-center text-lg font-medium text-indigo-950">
+          \[ f(a)f(b) < 0 \]
+        </div>
+        <p class="mt-2">
+          จะมีจำนวนจริง \(c\) อย่างน้อยหนึ่งจำนวนในช่วง \((a, b)\) ซึ่งทำให้
+        </p>
+        <div class="py-2 text-center text-lg font-medium text-indigo-950">
+          \[ f(c) = 0 \]
+        </div>
+        <p class="text-slate-600 text-sm mt-2">
+          หลักการพื้นฐานนี้เป็นหัวใจสำคัญของระเบียบวิธีเชิงตัวเลขแบบครอบราก (Bracketing Methods) เช่น <em>วิธีแบ่งครึ่งช่วง (Bisection Method)</em> และ <em>วิธีระเบียบตำแหน่งผิด (False Position Method)</em>
+        </p>
+      </div>
+
+      <!-- Example Card -->
+      <div class="bg-slate-50 border border-slate-200 rounded-xl p-5">
+        <h3 class="font-bold text-slate-900 mb-2 flex items-center gap-2">
+          <span class="inline-block px-2.5 py-0.5 rounded text-xs bg-slate-800 text-white font-semibold uppercase">ตัวอย่าง</span>
+          การตรวจสอบช่วงที่มีรากของพหุนาม
+        </h3>
+        <p class="text-slate-700 mb-2">กำหนดสมการพหุนาม:</p>
+        <div class="my-2 text-center font-semibold text-slate-900">
+          \[ f(x) = x^3 - x - 2 = 0 \]
+        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 my-3 text-sm">
+          <div class="bg-white p-3 rounded-lg border border-slate-200">
+            เมื่อ \(x = 1\) จะได้:
+            <div class="font-semibold text-rose-600 mt-1">\[ f(1) = (1)^3 - (1) - 2 = -2 < 0 \]</div>
+          </div>
+          <div class="bg-white p-3 rounded-lg border border-slate-200">
+            เมื่อ \(x = 2\) จะได้:
+            <div class="font-semibold text-emerald-600 mt-1">\[ f(2) = (2)^3 - (2) - 2 = 4 > 0 \]</div>
+          </div>
+        </div>
+        <p class="text-slate-700 text-sm mt-2 leading-relaxed">
+          เนื่องจาก \(f(1)f(2) = (-2)(4) = -8 < 0\) ค่าฟังก์ชันมีเครื่องหมายตรงข้ามกัน จึงสรุปตามทฤษฎีบทค่าระหว่างกลางได้ว่า <strong>มีรากอย่างน้อยหนึ่งรากในช่วง \((1, 2)\)</strong> (ซึ่งในความเป็นจริง รากจริงคือ \(x \approx 1.5214\))
+        </p>
+      </div>
+
+      <!-- Caution Warning Box -->
+      <div class="bg-amber-50/90 border-l-4 border-amber-500 rounded-r-xl p-5 text-amber-950">
+        <div class="flex items-start gap-3">
+          <div class="text-amber-600 mt-0.5">
+            <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+            </svg>
+          </div>
+          <div>
+            <h4 class="font-bold text-base text-amber-900 mb-1">ข้อควรระวังสำคัญ (Critical Caution)</h4>
+            <p class="text-sm leading-relaxed text-amber-900/90">
+              การเปลี่ยนเครื่องหมาย \(f(a)f(b) < 0\) <strong>ช่วยยืนยันว่ามีรากอย่างน้อยหนึ่งราก</strong> ในช่วงเท่านั้น แต่:
+            </p>
+            <ul class="list-disc list-inside text-sm mt-1.5 space-y-1 text-amber-900/90">
+              <li><strong>ไม่ได้รับประกันว่าจะมีเพียงรากเดียว:</strong> ในช่วงดังกล่าวอาจมีรากจำนวนคี่ เช่น 3 ราก หรือ 5 ราก ก็ได้</li>
+              <li><strong>รากที่มีอันดับซ้ำเป็นจำนวนคู่ (Even Multiplicity):</strong> เช่น \((x-1)^2 = 0\) เส้นกราฟจะเพียงแค่แตะแกน \(x\) แล้ววกกลับ ทำให้ฟังก์ชันไม่เปลี่ยนเครื่องหมาย (\(f(a)f(b) > 0\)) ส่งผลให้เงื่อนไขนี้ตรวจจับไม่พบราก</li>
+              <li><strong>หาก \(f(a)f(b) > 0\):</strong> ไม่สามารถสรุปได้ว่า <em>"ไม่มีราก"</em> เสมอไป เพราะอาจมีรากจำนวนคู่ตัวอยู่ภายในช่วงนั้น</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Section 3: Interactive Simulation -->
+    <section class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 sm:p-7 space-y-6">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-slate-100 gap-3">
+        <div class="flex items-center gap-3">
+          <div class="p-2.5 bg-emerald-50 text-emerald-700 rounded-xl">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z" />
+            </svg>
+          </div>
+          <div>
+            <h2 class="text-xl sm:text-2xl font-bold text-slate-900">3. แบบจำลองโต้ตอบ (Interactive Simulation)</h2>
+            <p class="text-xs sm:text-sm text-slate-500">ปรับค่าปลายช่วง \(a\) และ \(b\) เพื่อสังเกตการณ์เปลี่ยนแปลงของค่าฟังก์ชันและข้อสรุป</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Controls Grid -->
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
+        <!-- Input & Configuration Box -->
+        <div class="bg-slate-50 border border-slate-200 rounded-xl p-5 space-y-5">
+          <!-- Preset Function Selection -->
+          <div>
+            <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">เลือกฟังก์ชันตัวอย่าง</label>
+            <select id="funcSelect" class="w-full bg-white border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-800 font-medium focus:ring-2 focus:ring-blue-500 focus:outline-none transition-shadow">
+              <option value="f1">f(x) = x³ - x - 2 (ตัวอย่างหลัก)</option>
+              <option value="f2">f(x) = x³ - 4x + 1 (แบบฝึกหัดข้อ 1)</option>
+              <option value="f3">f(x) = x² - 1 (แบบฝึกหัดข้อ 2)</option>
+              <option value="f4">f(x) = (x - 1)² (รากซ้ำอันดับคู่)</option>
+            </select>
+          </div>
+
+          <!-- Slider for a -->
+          <div>
+            <div class="flex justify-between items-center text-sm font-semibold mb-1">
+              <span class="text-indigo-700 flex items-center gap-1.5">
+                <span class="w-3 h-3 rounded-full bg-indigo-600 inline-block"></span> ปลายช่วงซ้าย \(a\)
+              </span>
+              <span id="labelA" class="font-mono bg-white px-2 py-0.5 rounded border border-slate-200 text-slate-800 text-xs font-bold">1.0</span>
+            </div>
+            <input type="range" id="sliderA" min="-3" max="3" step="0.1" value="1.0" class="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-indigo-600">
+            <div class="flex justify-between text-[11px] text-slate-400 mt-1">
+              <span>-3.0</span>
+              <span>0.0</span>
+              <span>+3.0</span>
+            </div>
+          </div>
+
+          <!-- Slider for b -->
+          <div>
+            <div class="flex justify-between items-center text-sm font-semibold mb-1">
+              <span class="text-amber-700 flex items-center gap-1.5">
+                <span class="w-3 h-3 rounded-full bg-amber-500 inline-block"></span> ปลายช่วงขวา \(b\)
+              </span>
+              <span id="labelB" class="font-mono bg-white px-2 py-0.5 rounded border border-slate-200 text-slate-800 text-xs font-bold">2.0</span>
+            </div>
+            <input type="range" id="sliderB" min="-3" max="3" step="0.1" value="2.0" class="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-amber-500">
+            <div class="flex justify-between text-[11px] text-slate-400 mt-1">
+              <span>-3.0</span>
+              <span>0.0</span>
+              <span>+3.0</span>
+            </div>
+          </div>
+
+          <!-- Quick Preset Buttons -->
+          <div>
+            <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">ชุดค่าทดสอบด่วน</label>
+            <div class="flex flex-wrap gap-1.5">
+              <button onclick="setRange(1.0, 2.0)" class="text-xs bg-white hover:bg-slate-100 text-slate-700 font-medium px-2.5 py-1.5 rounded border border-slate-200 transition-colors">[1.0, 2.0]</button>
+              <button onclick="setRange(-1.0, 1.0)" class="text-xs bg-white hover:bg-slate-100 text-slate-700 font-medium px-2.5 py-1.5 rounded border border-slate-200 transition-colors">[-1.0, 1.0]</button>
+              <button onclick="setRange(0.0, 1.0)" class="text-xs bg-white hover:bg-slate-100 text-slate-700 font-medium px-2.5 py-1.5 rounded border border-slate-200 transition-colors">[0.0, 1.0]</button>
+              <button onclick="setRange(1.5, 3.0)" class="text-xs bg-white hover:bg-slate-100 text-slate-700 font-medium px-2.5 py-1.5 rounded border border-slate-200 transition-colors">[1.5, 3.0]</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Live Results and Status Box -->
+        <div class="lg:col-span-2 space-y-4">
+          <!-- Canvas Plot Container -->
+          <div class="bg-white border border-slate-200 rounded-xl p-3 sm:p-4 shadow-inner relative">
+            <div class="h-64 sm:h-72 w-full">
+              <canvas id="functionCanvas"></canvas>
+            </div>
+          </div>
+
+          <!-- Dynamic Metrics Grid -->
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 text-center">
+            <div class="bg-indigo-50/60 border border-indigo-100 rounded-xl p-3">
+              <div class="text-xs text-indigo-700 font-semibold mb-1">ค่าฟังก์ชันที่จุดปลาย a</div>
+              <div class="text-xs text-slate-500">\(f(a)\)</div>
+              <div id="valFa" class="text-lg font-bold font-mono text-indigo-900 mt-1">-2.000</div>
+              <span id="badgeFa" class="inline-block mt-1 px-2 py-0.5 rounded text-[11px] font-semibold bg-rose-100 text-rose-700">ลบ (-)</span>
+            </div>
+
+            <div class="bg-amber-50/60 border border-amber-100 rounded-xl p-3">
+              <div class="text-xs text-amber-800 font-semibold mb-1">ค่าฟังก์ชันที่จุดปลาย b</div>
+              <div class="text-xs text-slate-500">\(f(b)\)</div>
+              <div id="valFb" class="text-lg font-bold font-mono text-amber-900 mt-1">4.000</div>
+              <span id="badgeFb" class="inline-block mt-1 px-2 py-0.5 rounded text-[11px] font-semibold bg-emerald-100 text-emerald-700">บวก (+)</span>
+            </div>
+
+            <div class="bg-slate-50 border border-slate-200 rounded-xl p-3">
+              <div class="text-xs text-slate-700 font-semibold mb-1">เครื่องหมายผลคูณ</div>
+              <div class="text-xs text-slate-500">\(f(a) \times f(b)\)</div>
+              <div id="valProduct" class="text-lg font-bold font-mono text-slate-800 mt-1">-8.000</div>
+              <span id="badgeProduct" class="inline-block mt-1 px-2 py-0.5 rounded text-[11px] font-semibold bg-rose-100 text-rose-700">น้อยกว่า 0 (&lt; 0)</span>
+            </div>
+          </div>
+
+          <!-- Real-Time Evaluation Conclusion Banner -->
+          <div id="conclusionCard" class="rounded-xl p-4 transition-all duration-200 border flex items-start gap-3 bg-emerald-50 border-emerald-200 text-emerald-900">
+            <div id="conclusionIcon" class="mt-0.5 shrink-0">
+              <svg class="w-6 h-6 text-emerald-600" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+              </svg>
+            </div>
+            <div>
+              <div id="conclusionTitle" class="font-bold text-base">
+                ช่วงที่มีเครื่องหมายตรงข้ามกัน: ยืนยันการมีอยู่ของรากจริง!
+              </div>
+              <div id="conclusionDesc" class="text-sm mt-0.5 leading-relaxed text-emerald-800">
+                เนื่องจาก \(f(a)\) และ \(f(b)\) มีเครื่องหมายต่างกัน (\(f(a)f(b) < 0\)) ตามทฤษฎีบทค่าระหว่างกลางจึงสรุปได้ว่ามีราก \(c\) อย่างน้อยหนึ่งค่าในช่วง \((a, b)\) ซึ่งทำให้ \(f(c) = 0\)
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- Section 4: Guided Discovery Questions -->
+    <section class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 sm:p-7 space-y-6">
+      <div class="flex items-center gap-3">
+        <div class="p-2.5 bg-amber-50 text-amber-700 rounded-xl">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+          </svg>
+        </div>
+        <div>
+          <h2 class="text-xl sm:text-2xl font-bold text-slate-900">4. คำถามนำเพื่อค้นพบ (Guided Inquiry)</h2>
+          <p class="text-xs sm:text-sm text-slate-500">คิดไตร่ตรองคำถามเหล่านี้ก่อนคลิกดูแนวคิดและการวิเคราะห์</p>
+        </div>
+      </div>
+
+      <div class="space-y-4">
+        <!-- Question 1 -->
+        <div class="border border-slate-200 rounded-xl p-4 sm:p-5 transition hover:shadow-sm">
+          <div class="flex items-start justify-between gap-3">
+            <div class="flex items-start gap-3">
+              <span class="w-7 h-7 rounded-full bg-blue-100 text-blue-800 text-sm font-bold flex items-center justify-center shrink-0 mt-0.5">1</span>
+              <div>
+                <h3 class="font-bold text-slate-900 text-base">เหตุใดการเปลี่ยนเครื่องหมายของฟังก์ชันจึงช่วยยืนยันการมีอยู่ของรากได้?</h3>
+                <p class="text-xs text-slate-500 mt-0.5">พิจารณาสมบัติทางเรขาคณิตและความต่อเนื่องของเส้นกราฟ</p>
+              </div>
+            </div>
+            <button onclick="toggleInquiry(1)" id="btnInquiry1" class="text-xs sm:text-sm font-semibold text-blue-600 hover:text-blue-800 bg-blue-50 px-3 py-1.5 rounded-lg border border-blue-200/60 shrink-0 transition-colors">
+              แสดงแนวคิด
+            </button>
+          </div>
+          <div id="ansInquiry1" class="hidden mt-4 pt-3 border-t border-slate-100 text-slate-700 text-sm leading-relaxed bg-slate-50/70 p-3.5 rounded-lg">
+            <strong class="text-slate-900">แนวคิด:</strong> เนื่องจากพหุนามเป็น <strong>ฟังก์ชันต่อเนื่อง (Continuous function)</strong> เส้นกราฟจึงลากผ่านได้โดยไม่ขาดตอน หากปลายด้านหนึ่งอยู่ต่ำกว่าแกน \(x\) (\(f(a) < 0\)) และอีกปลายหนึ่งอยู่สูงกว่าแกน \(x\) (\(f(b) > 0\)) ในการเดินทางเชื่อมจุดทั้งสอง เส้นกราฟ <em>ไม่มีทางเลือกอื่นนอกจากต้องตัดผ่านแกน \(x\) (\(y=0\)) อย่างน้อยหนึ่งครั้งเสมอ</em> จุดตัดดังกล่าวคือรากของสมการ (\(f(c) = 0\))
+          </div>
+        </div>
+
+        <!-- Question 2 -->
+        <div class="border border-slate-200 rounded-xl p-4 sm:p-5 transition hover:shadow-sm">
+          <div class="flex items-start justify-between gap-3">
+            <div class="flex items-start gap-3">
+              <span class="w-7 h-7 rounded-full bg-blue-100 text-blue-800 text-sm font-bold flex items-center justify-center shrink-0 mt-0.5">2</span>
+              <div>
+                <h3 class="font-bold text-slate-900 text-base">หาก \(f(a)f(b) > 0\) จะสรุปได้หรือไม่ว่าไม่มีรากในช่วงนั้น?</h3>
+                <p class="text-xs text-slate-500 mt-0.5">พิจารณากรณีที่กราฟวกกลับขึ้นมาหรือตัดแกนหลายครั้ง</p>
+              </div>
+            </div>
+            <button onclick="toggleInquiry(2)" id="btnInquiry2" class="text-xs sm:text-sm font-semibold text-blue-600 hover:text-blue-800 bg-blue-50 px-3 py-1.5 rounded-lg border border-blue-200/60 shrink-0 transition-colors">
+              แสดงแนวคิด
+            </button>
+          </div>
+          <div id="ansInquiry2" class="hidden mt-4 pt-3 border-t border-slate-100 text-slate-700 text-sm leading-relaxed bg-slate-50/70 p-3.5 rounded-lg">
+            <strong class="text-slate-900">แนวคิด:</strong> <strong>สรุปไม่ได้!</strong> หาก \(f(a)f(b) > 0\) ค่าฟังก์ชันที่ปลายทั้งสองมีเครื่องหมายเดียวกัน แต่ภายในช่วงนั้นกราฟอาจจะ:
+            <ul class="list-disc list-inside mt-1.5 space-y-1">
+              <li>ตัดแกน \(x\) เป็นจำนวน <strong>คู่ครั้ง</strong> เช่น ตัดลงแล้วตัดขึ้นกลับมา (ทำให้มี 2, 4, ... ราก)</li>
+              <li>หรือกราฟอาจจะสัมผัสแกน \(x\) ณ จุดรากซ้ำอันดับคู่ (เช่น \(x=1\) ในสมการ \((x-1)^2 = 0\))</li>
+            </ul>
+            ดังนั้น \(f(a)f(b) > 0\) หมายถึง <em>"ทฤษฎีบท IVT ไม่สามารถสรุปอะไรได้"</em> (Inconclusive) ไม่ได้แปลว่าไม่มีราก
+          </div>
+        </div>
+
+        <!-- Question 3 -->
+        <div class="border border-slate-200 rounded-xl p-4 sm:p-5 transition hover:shadow-sm">
+          <div class="flex items-start justify-between gap-3">
+            <div class="flex items-start gap-3">
+              <span class="w-7 h-7 rounded-full bg-blue-100 text-blue-800 text-sm font-bold flex items-center justify-center shrink-0 mt-0.5">3</span>
+              <div>
+                <h3 class="font-bold text-slate-900 text-base">การตรวจสอบเครื่องหมายเพียงอย่างเดียวสามารถยืนยันจำนวนรากทั้งหมดได้หรือไม่?</h3>
+                <p class="text-xs text-slate-500 mt-0.5">ข้อจำกัดด้านความละเอียดของช่วง (Resolution)</p>
+              </div>
+            </div>
+            <button onclick="toggleInquiry(3)" id="btnInquiry3" class="text-xs sm:text-sm font-semibold text-blue-600 hover:text-blue-800 bg-blue-50 px-3 py-1.5 rounded-lg border border-blue-200/60 shrink-0 transition-colors">
+              แสดงแนวคิด
+            </button>
+          </div>
+          <div id="ansInquiry3" class="hidden mt-4 pt-3 border-t border-slate-100 text-slate-700 text-sm leading-relaxed bg-slate-50/70 p-3.5 rounded-lg">
+            <strong class="text-slate-900">แนวคิด:</strong> <strong>ไม่สามารถยืนยันได้</strong> การตรวจสอบเครื่องหมายบอกได้เพียงว่ามีราก <em>"อย่างน้อย 1 ราก"</em> (หรือจำนวนคี่ของราก) เท่านั้น แต่ไม่สามารถบอกได้ว่ามี 1, 3 หรือ 5 ราก และไม่สามารถบอกตำแหน่งรากที่แน่นอนได้หากไม่ทำการแบ่งย่อยช่วงให้เล็กลงเรื่อยๆ (Bracketing refinement)
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Section 5: Student Exercises -->
+    <section class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 sm:p-7 space-y-6">
+      <div class="flex items-center gap-3">
+        <div class="p-2.5 bg-violet-50 text-violet-700 rounded-xl">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+          </svg>
+        </div>
+        <div>
+          <h2 class="text-xl sm:text-2xl font-bold text-slate-900">5. แบบฝึกหัดสำหรับนักศึกษา</h2>
+          <p class="text-xs sm:text-sm text-slate-500">ทดสอบความเข้าใจผ่านโจทย์และตรวจสอบคำตอบด้วยตนเอง</p>
+        </div>
+      </div>
+
+      <div class="space-y-6">
+        <!-- Exercise 1 -->
+        <div class="bg-slate-50/80 border border-slate-200 rounded-xl p-5">
+          <div class="flex items-start justify-between gap-3 mb-2">
+            <h3 class="font-bold text-slate-900 text-base">
+              ข้อ 1. จงหาช่วงที่มีรากอย่างน้อยหนึ่งรากของสมการ \(x^3 - 4x + 1 = 0\)
+            </h3>
+            <span class="text-xs bg-slate-200 text-slate-700 font-semibold px-2.5 py-1 rounded">ค้นหาช่วง</span>
+          </div>
+          <p class="text-sm text-slate-600 mb-3">
+            ให้ทดลองเลือกจำนวนเต็มที่เรียงติดกันเป็นปลายช่วง \([a, b]\) ที่ทำให้ \(f(a)f(b) < 0\)
+          </p>
+
+          <div class="flex flex-wrap items-center gap-3 mb-3">
+            <div class="flex items-center gap-2">
+              <label class="text-xs font-semibold text-slate-600">ค่า a (จำนวนเต็ม):</label>
+              <input type="number" id="ex1_a" value="0" class="w-20 px-2.5 py-1.5 border border-slate-300 rounded text-sm text-center font-mono">
+            </div>
+            <div class="flex items-center gap-2">
+              <label class="text-xs font-semibold text-slate-600">ค่า b (จำนวนเต็ม):</label>
+              <input type="number" id="ex1_b" value="1" class="w-20 px-2.5 py-1.5 border border-slate-300 rounded text-sm text-center font-mono">
+            </div>
+            <button onclick="checkExercise1()" class="bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold px-4 py-2 rounded-lg transition-colors">
+              ตรวจคำตอบ
+            </button>
+            <button onclick="toggleExSolution(1)" class="text-xs font-semibold text-slate-600 hover:text-slate-900 underline px-2 py-1">
+              ดูเฉลยละเอียด
+            </button>
+          </div>
+          <div id="ex1_feedback" class="text-xs sm:text-sm font-medium mt-2 hidden p-2.5 rounded-lg"></div>
+          
+          <div id="ex1_solution" class="hidden mt-3 pt-3 border-t border-slate-200 text-xs sm:text-sm text-slate-700 leading-relaxed bg-white p-3.5 rounded-lg border">
+            <div class="font-bold text-slate-900 mb-1">เฉลยละเอียด:</div>
+            คำนวณค่าพหุนามที่จำนวนเต็มต่างๆ:
+            <ul class="list-disc list-inside space-y-0.5 mt-1 font-mono text-xs">
+              <li>f(-3) = -27 + 12 + 1 = -14 (&lt; 0)</li>
+              <li>f(-2) = -8 + 8 + 1 = 1 (&gt; 0) &rarr; <span class="text-emerald-700 font-bold">มีรากในช่วง (-3, -2)</span></li>
+              <li>f(0) = 1 (&gt; 0)</li>
+              <li>f(1) = 1 - 4 + 1 = -2 (&lt; 0) &rarr; <span class="text-emerald-700 font-bold">มีรากในช่วง (0, 1)</span></li>
+              <li>f(2) = 8 - 8 + 1 = 1 (&gt; 0) &rarr; <span class="text-emerald-700 font-bold">มีรากในช่วง (1, 2)</span></li>
+            </ul>
+            สมการนี้มีรากจริง 3 ค่าอยู่ในช่วง \((-3, -2)\), \((0, 1)\), และ \((1, 2)\)
+          </div>
+        </div>
+
+        <!-- Exercise 2 -->
+        <div class="bg-slate-50/80 border border-slate-200 rounded-xl p-5">
+          <div class="flex items-start justify-between gap-3 mb-2">
+            <h3 class="font-bold text-slate-900 text-base">
+              ข้อ 2. จงตรวจสอบว่าช่วง \((-1, 1)\) สามารถใช้ยืนยันการมีอยู่ของรากของ \(x^2 - 1 = 0\) ได้หรือไม่?
+            </h3>
+            <span class="text-xs bg-slate-200 text-slate-700 font-semibold px-2.5 py-1 rounded">วิเคราะห์เงื่อนไข</span>
+          </div>
+          <p class="text-sm text-slate-600 mb-3">
+            พิจารณาค่า \(f(-1)\) และ \(f(1)\) แล้วเลือกว่าทฤษฎีบทนี้สามารถใช้ยืนยันราก <em>ภายใน</em> ช่วงเปิด \((-1, 1)\) ได้หรือไม่
+          </p>
+
+          <div class="space-y-2 mb-3">
+            <label class="flex items-center gap-2.5 text-sm text-slate-700 cursor-pointer">
+              <input type="radio" name="ex2_choice" value="yes" class="accent-blue-600">
+              <span>สามารถยืนยันได้ เพราะมีรากจริงคือ -1 และ 1 อยู่บนช่วงนี้</span>
+            </label>
+            <label class="flex items-center gap-2.5 text-sm text-slate-700 cursor-pointer">
+              <input type="radio" name="ex2_choice" value="no" class="accent-blue-600">
+              <span>ไม่สามารถยืนยันได้ เพราะ \(f(-1) = 0\) และ \(f(1) = 0\) ทำให้ผลคูณ \(f(a)f(b) = 0\) ซึ่งไม่สอดคล้องกับ \(f(a)f(b) < 0\) และไม่มีรากอยู่ *ภายใน* ช่วง (-1, 1)</span>
+            </label>
+          </div>
+
+          <div class="flex items-center gap-3">
+            <button onclick="checkExercise2()" class="bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold px-4 py-2 rounded-lg transition-colors">
+              ตรวจคำตอบ
+            </button>
+            <button onclick="toggleExSolution(2)" class="text-xs font-semibold text-slate-600 hover:text-slate-900 underline px-2 py-1">
+              ดูคำอธิบาย
+            </button>
+          </div>
+          <div id="ex2_feedback" class="text-xs sm:text-sm font-medium mt-2 hidden p-2.5 rounded-lg"></div>
+
+          <div id="ex2_solution" class="hidden mt-3 pt-3 border-t border-slate-200 text-xs sm:text-sm text-slate-700 leading-relaxed bg-white p-3.5 rounded-lg border">
+            <div class="font-bold text-slate-900 mb-1">คำอธิบายละเอียด:</div>
+            สำหรับสมการ \(f(x) = x^2 - 1 = 0\) ค่าที่ปลายช่วงคือ \(f(-1) = (-1)^2 - 1 = 0\) และ \(f(1) = (1)^2 - 1 = 0\)<br>
+            เนื่องจากรากของสมการอยู่ที่ปลายช่วงพอดิบพอดี (\(x = \pm 1\)) จึงไม่มีรากใดๆ อยู่ <strong>ภายในช่วงเปิด \((-1, 1)\)</strong> (เพราะตลอดช่วง \((-1, 1)\) ค่า \(f(x) < 0\) ทั้งหมด) ดังนั้นช่วงนี้จึง <strong>ไม่สามารถ</strong> ใช้ยืนยันการมีอยู่ของรากภายในช่วงตามเงื่อนไข \(f(a)f(b) < 0\) ได้
+          </div>
+        </div>
+
+        <!-- Exercise 3 -->
+        <div class="bg-slate-50/80 border border-slate-200 rounded-xl p-5">
+          <div class="flex items-start justify-between gap-3 mb-2">
+            <h3 class="font-bold text-slate-900 text-base">
+              ข้อ 3. ยกตัวอย่างสมการพหุนามที่มีรากในช่วงหนึ่ง แต่ค่าฟังก์ชันที่ปลายช่วงมีเครื่องหมายเดียวกัน
+            </h3>
+            <span class="text-xs bg-slate-200 text-slate-700 font-semibold px-2.5 py-1 rounded">การคิดเชิงวิพากษ์</span>
+          </div>
+          <p class="text-sm text-slate-600 mb-3">
+            สมมติสถานการณ์ที่เป็นไปได้สองกรณี: กรณีรากซ้ำ หรือกรณีที่มีราก 2 รากอยู่ในช่วงเดียวกัน
+          </p>
+
+          <button onclick="toggleExSolution(3)" class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold px-4 py-2 rounded-lg transition-colors">
+            คลิกเพื่อดูตัวอย่างสมการและการวิเคราะห์
+          </button>
+
+          <div id="ex3_solution" class="hidden mt-3 pt-3 border-t border-slate-200 text-xs sm:text-sm text-slate-700 leading-relaxed bg-white p-3.5 rounded-lg border space-y-2">
+            <div class="font-bold text-slate-900">ตัวอย่างคำตอบและแนวคิด:</div>
+            <div class="p-3 bg-slate-50 rounded-lg border border-slate-100">
+              <strong class="text-indigo-900">กรณีที่ 1: รากซ้ำอันดับคู่ (Double Root)</strong><br>
+              สมการ \(f(x) = (x-1)^2 = 0\) บนช่วง \([0, 2]\)<br>
+              คำนวณ: \(f(0) = (0-1)^2 = 1 > 0\) และ \(f(2) = (2-1)^2 = 1 > 0\)<br>
+              จะเห็นว่า \(f(0)f(2) = 1 > 0\) (เครื่องหมายบวกทั้งคู่) แต่มีรากจริง \(x = 1\) อยู่ในช่วง \((0, 2)\)
+            </div>
+            <div class="p-3 bg-slate-50 rounded-lg border border-slate-100">
+              <strong class="text-indigo-900">กรณีที่ 2: มีรากจำนวนคู่ตัวในช่วง</strong><br>
+              สมการ \(f(x) = x^2 - 1 = 0\) บนช่วง \([-2, 2]\)<br>
+              คำนวณ: \(f(-2) = (-2)^2 - 1 = 3 > 0\) และ \(f(2) = (2)^2 - 1 = 3 > 0\)<br>
+              จะเห็นว่า \(f(-2)f(2) = 9 > 0\) (เครื่องหมายบวกทั้งคู่) แต่มีรากจริงถึง 2 ราก คือ \(x = -1\) และ \(x = 1\) อยู่ภายในช่วง \((-2, 2)\)
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+
+
+  <!-- Interactive Logic & Chart Script -->
+  <script>
+    // Definition of candidate mathematical functions
+    const functions = {
+      f1: {
+        name: 'f(x) = x³ - x - 2',
+        fn: (x) => Math.pow(x, 3) - x - 2,
+        domain: [-2.5, 2.5]
+      },
+      f2: {
+        name: 'f(x) = x³ - 4x + 1',
+        fn: (x) => Math.pow(x, 3) - 4 * x + 1,
+        domain: [-3.0, 3.0]
+      },
+      f3: {
+        name: 'f(x) = x² - 1',
+        fn: (x) => Math.pow(x, 2) - 1,
+        domain: [-2.5, 2.5]
+      },
+      f4: {
+        name: 'f(x) = (x - 1)²',
+        fn: (x) => Math.pow(x - 1, 2),
+        domain: [-1.0, 3.0]
+      }
+    };
+
+    let currentFuncKey = 'f1';
+    let chartInstance = null;
+
+    // Initialize KaTeX and Canvas when page is ready
+    window.onload = function() {
+      // Render LaTeX formulas
+      if (typeof renderMathInElement === 'function') {
+        renderMathInElement(document.body, {
+          delimiters: [
+            {left: '$$', right: '$$', display: true},
+            {left: '\\[', right: '\\]', display: true},
+            {left: '\\(', right: '\\)', display: false},
+            {left: '$', right: '$', display: false}
+          ],
+          throwOnError: false
+        });
+      }
+
+      initChart();
+      updateSimulation();
+
+      // Setup event listeners for inputs
+      document.getElementById('funcSelect').addEventListener('change', function(e) {
+        currentFuncKey = e.target.value;
+        updateSimulation();
+      });
+
+      document.getElementById('sliderA').addEventListener('input', function(e) {
+        const valA = parseFloat(e.target.value);
+        const valB = parseFloat(document.getElementById('sliderB').value);
+        if (valA > valB) {
+          document.getElementById('sliderB').value = valA;
+        }
+        updateSimulation();
+      });
+
+      document.getElementById('sliderB').addEventListener('input', function(e) {
+        const valB = parseFloat(e.target.value);
+        const valA = parseFloat(document.getElementById('sliderA').value);
+        if (valB < valA) {
+          document.getElementById('sliderA').value = valB;
+        }
+        updateSimulation();
+      });
+    };
+
+    function setRange(a, b) {
+      document.getElementById('sliderA').value = a;
+      document.getElementById('sliderB').value = b;
+      updateSimulation();
+    }
+
+    function initChart() {
+      const ctx = document.getElementById('functionCanvas').getContext('2d');
+      chartInstance = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: [],
+          datasets: [
+            {
+              label: 'f(x)',
+              data: [],
+              borderColor: '#2563eb',
+              backgroundColor: 'rgba(37, 99, 235, 0.05)',
+              borderWidth: 2.5,
+              pointRadius: 0,
+              tension: 0.2,
+              fill: false
+            },
+            {
+              label: 'ช่วง [a, b]',
+              data: [],
+              borderColor: 'transparent',
+              backgroundColor: 'rgba(59, 130, 246, 0.15)',
+              fill: true,
+              pointRadius: 0
+            },
+            {
+              label: 'จุด (a, f(a)) & (b, f(b))',
+              data: [],
+              borderColor: '#1e1b4b',
+              backgroundColor: ['#4f46e5', '#f59e0b'],
+              borderWidth: 2,
+              pointRadius: 7,
+              pointHoverRadius: 9,
+              showLine: false
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          interaction: {
+            intersect: false,
+            mode: 'index',
+          },
+          scales: {
+            x: {
+              type: 'linear',
+              position: 'bottom',
+              grid: {
+                color: (context) => context.tick.value === 0 ? '#475569' : '#e2e8f0',
+                lineWidth: (context) => context.tick.value === 0 ? 1.5 : 1
+              },
+              title: {
+                display: true,
+                text: 'แกน x',
+                font: { size: 12, weight: 'bold' }
+              }
+            },
+            y: {
+              grid: {
+                color: (context) => context.tick.value === 0 ? '#475569' : '#e2e8f0',
+                lineWidth: (context) => context.tick.value === 0 ? 1.5 : 1
+              },
+              title: {
+                display: true,
+                text: 'แกน y: f(x)',
+                font: { size: 12, weight: 'bold' }
+              }
+            }
+          },
+          plugins: {
+            legend: {
+              display: false
+            },
+            tooltip: {
+              callbacks: {
+                label: function(context) {
+                  return ` (${context.parsed.x.toFixed(2)}, ${context.parsed.y.toFixed(3)})`;
+                }
+              }
+            }
+          }
+        }
+      });
+    }
+
+    function updateSimulation() {
+      const a = parseFloat(document.getElementById('sliderA').value);
+      const b = parseFloat(document.getElementById('sliderB').value);
+      
+      document.getElementById('labelA').textContent = a.toFixed(1);
+      document.getElementById('labelB').textContent = b.toFixed(1);
+
+      const currentFunc = functions[currentFuncKey];
+      const fa = currentFunc.fn(a);
+      const fb = currentFunc.fn(b);
+      const prod = fa * fb;
+
+      // Update text values
+      document.getElementById('valFa').textContent = fa.toFixed(3);
+      document.getElementById('valFb').textContent = fb.toFixed(3);
+      document.getElementById('valProduct').textContent = prod.toFixed(3);
+
+      // Set indicator badges
+      setBadge('badgeFa', fa);
+      setBadge('badgeFb', fb);
+
+      // Product Badge & Conclusion Styling
+      const badgeProd = document.getElementById('badgeProduct');
+      const conclusionCard = document.getElementById('conclusionCard');
+      const conclusionTitle = document.getElementById('conclusionTitle');
+      const conclusionDesc = document.getElementById('conclusionDesc');
+      const conclusionIcon = document.getElementById('conclusionIcon');
+
+      if (prod < 0) {
+        badgeProd.textContent = 'น้อยกว่า 0 (< 0)';
+        badgeProd.className = 'inline-block mt-1 px-2 py-0.5 rounded text-[11px] font-semibold bg-rose-100 text-rose-700';
+
+        conclusionCard.className = 'rounded-xl p-4 transition-all duration-200 border flex items-start gap-3 bg-emerald-50 border-emerald-300 text-emerald-950 shadow-sm';
+        conclusionIcon.innerHTML = `
+          <svg class="w-6 h-6 text-emerald-600" fill="currentColor" viewBox="0 0 20 20">
+            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+          </svg>`;
+        conclusionTitle.textContent = `ช่วงเครื่องหมายตรงข้าม: ยืนยันการมีอยู่ของรากจริงในช่วง [${a.toFixed(1)}, ${b.toFixed(1)}]`;
+        conclusionDesc.innerHTML = `เนื่องจาก \(f(a) = ${fa.toFixed(2)}\) และ \(f(b) = ${fb.toFixed(2)}\) มีเครื่องหมายตรงข้ามกัน (\(f(a)f(b) < 0\)) ตามทฤษฎีบทค่าระหว่างกลาง รับประกันว่า <strong>มีรากอย่างน้อย 1 ค่า</strong> ภายในช่วงนี้`;
+      } else if (prod > 0) {
+        badgeProd.textContent = 'มากกว่า 0 (> 0)';
+        badgeProd.className = 'inline-block mt-1 px-2 py-0.5 rounded text-[11px] font-semibold bg-blue-100 text-blue-700';
+
+        conclusionCard.className = 'rounded-xl p-4 transition-all duration-200 border flex items-start gap-3 bg-amber-50 border-amber-300 text-amber-950 shadow-sm';
+        conclusionIcon.innerHTML = `
+          <svg class="w-6 h-6 text-amber-600" fill="currentColor" viewBox="0 0 20 20">
+            <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
+          </svg>`;
+        conclusionTitle.textContent = `ช่วงเครื่องหมายเดียวกัน: ไม่สามารถสรุปได้ (Inconclusive)`;
+        conclusionDesc.innerHTML = `เนื่องจาก \(f(a) = ${fa.toFixed(2)}\) และ \(f(b) = ${fb.toFixed(2)}\) มีเครื่องหมายเหมือนกัน (\(f(a)f(b) > 0\)) ทฤษฎีบท IVT <strong>ไม่ได้รับประกันว่ามีรากหรือไม่</strong> (อาจไม่มีรากเลย หรืออาจมีรากจำนวนคู่ตัวซ่อนอยู่)`;
+      } else {
+        badgeProd.textContent = 'เท่ากับ 0 (= 0)';
+        badgeProd.className = 'inline-block mt-1 px-2 py-0.5 rounded text-[11px] font-semibold bg-emerald-100 text-emerald-700';
+
+        conclusionCard.className = 'rounded-xl p-4 transition-all duration-200 border flex items-start gap-3 bg-indigo-50 border-indigo-300 text-indigo-950 shadow-sm';
+        conclusionIcon.innerHTML = `
+          <svg class="w-6 h-6 text-indigo-600" fill="currentColor" viewBox="0 0 20 20">
+            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd" />
+          </svg>`;
+        conclusionTitle.textContent = `พบรากที่ปลายช่วงพอดี!`;
+        conclusionDesc.innerHTML = `ค่า \(f(a) = 0\) หรือ \(f(b) = 0\) แสดงว่าปลายช่วงจุดใดจุดหนึ่งเป็นรากของสมการโดยตรง`;
+      }
+
+      // Re-render LaTeX inside dynamically updated conclusion
+      if (typeof renderMathInElement === 'function') {
+        renderMathInElement(conclusionDesc, {
+          delimiters: [{left: '\\(', right: '\\)', display: false}],
+          throwOnError: false
+        });
+      }
+
+      // Update Chart points
+      updateChartData(currentFunc, a, b, fa, fb);
+    }
+
+    function setBadge(elementId, val) {
+      const el = document.getElementById(elementId);
+      if (Math.abs(val) < 1e-6) {
+        el.textContent = 'ศูนย์ (0)';
+        el.className = 'inline-block mt-1 px-2 py-0.5 rounded text-[11px] font-semibold bg-slate-200 text-slate-700';
+      } else if (val > 0) {
+        el.textContent = 'บวก (+)';
+        el.className = 'inline-block mt-1 px-2 py-0.5 rounded text-[11px] font-semibold bg-emerald-100 text-emerald-700';
+      } else {
+        el.textContent = 'ลบ (-)';
+        el.className = 'inline-block mt-1 px-2 py-0.5 rounded text-[11px] font-semibold bg-rose-100 text-rose-700';
+      }
+    }
+
+    function updateChartData(funcObj, a, b, fa, fb) {
+      if (!chartInstance) return;
+
+      const minX = -3.0;
+      const maxX = 3.0;
+      const step = 0.05;
+      const fullCurve = [];
+      const intervalBand = [];
+
+      for (let x = minX; x <= maxX + 0.001; x += step) {
+        const y = funcObj.fn(x);
+        fullCurve.push({ x: Number(x.toFixed(2)), y: y });
+
+        // Interval fill points
+        if (x >= Math.min(a, b) && x <= Math.max(a, b)) {
+          intervalBand.push({ x: Number(x.toFixed(2)), y: y });
+        }
+      }
+
+      // Ensure exact a and b are present in the interval points
+      intervalBand.unshift({ x: Math.min(a, b), y: funcObj.fn(Math.min(a, b)) });
+      intervalBand.push({ x: Math.max(a, b), y: funcObj.fn(Math.max(a, b)) });
+      intervalBand.sort((p1, p2) => p1.x - p2.x);
+
+      chartInstance.data.datasets[0].data = fullCurve;
+      chartInstance.data.datasets[1].data = intervalBand;
+      chartInstance.data.datasets[2].data = [
+        { x: a, y: fa },
+        { x: b, y: fb }
+      ];
+
+      chartInstance.update();
+    }
+
+    // Toggle Guided Question Hints
+    function toggleInquiry(id) {
+      const content = document.getElementById(`ansInquiry1`.replace('1', id));
+      const btn = document.getElementById(`btnInquiry1`.replace('1', id));
+      if (content.classList.contains('hidden')) {
+        content.classList.remove('hidden');
+        btn.textContent = 'ซ่อนแนวคิด';
+      } else {
+        content.classList.add('hidden');
+        btn.textContent = 'แสดงแนวคิด';
+      }
+    }
+
+    // Exercise 1 Check
+    function checkExercise1() {
+      const a = parseInt(document.getElementById('ex1_a').value);
+      const b = parseInt(document.getElementById('ex1_b').value);
+      const fb = document.getElementById('ex1_feedback');
+      fb.classList.remove('hidden', 'bg-emerald-100', 'text-emerald-800', 'bg-rose-100', 'text-rose-800', 'bg-amber-100', 'text-amber-800');
+
+      if (isNaN(a) || isNaN(b)) {
+        fb.className = 'text-xs sm:text-sm font-medium mt-2 p-2.5 rounded-lg bg-amber-100 text-amber-800';
+        fb.textContent = 'กรุณากรอกตัวเลขจำนวนเต็มทั้งสองค่า';
+        return;
+      }
+
+      const f = (x) => Math.pow(x, 3) - 4 * x + 1;
+      const faVal = f(a);
+      const fbVal = f(b);
+      const prod = faVal * fbVal;
+
+      if (prod < 0) {
+        fb.className = 'text-xs sm:text-sm font-medium mt-2 p-2.5 rounded-lg bg-emerald-100 text-emerald-800';
+        fb.innerHTML = `✓ ถูกต้อง! สำหรับช่วง [${a}, ${b}] จะได้ f(${a}) = ${faVal} และ f(${b}) = ${fbVal} ซึ่งผลคูณ f(${a})f(${b}) = ${prod} < 0 ยืนยันว่ามีรากอย่างน้อยหนึ่งค่าในช่วงนี้`;
+      } else {
+        fb.className = 'text-xs sm:text-sm font-medium mt-2 p-2.5 rounded-lg bg-rose-100 text-rose-800';
+        fb.innerHTML = `✗ ยังไม่ถูกต้อง: f(${a}) = ${faVal} และ f(${b}) = ${fbVal} ทำให้ผลคูณ f(${a})f(${b}) = ${prod} ${prod === 0 ? '= 0' : '> 0'} ไม่สามารถใช้ IVT ยืนยันการมีรากได้ ลองทดสอบคู่จำนวนเต็มเช่น (0, 1), (1, 2) หรือ (-3, -2)`;
+      }
+    }
+
+    // Exercise 2 Check
+    function checkExercise2() {
+      const selected = document.querySelector('input[name="ex2_choice"]:checked');
+      const fb = document.getElementById('ex2_feedback');
+      fb.classList.remove('hidden', 'bg-emerald-100', 'text-emerald-800', 'bg-rose-100', 'text-rose-800', 'bg-amber-100', 'text-amber-800');
+
+      if (!selected) {
+        fb.className = 'text-xs sm:text-sm font-medium mt-2 p-2.5 rounded-lg bg-amber-100 text-amber-800';
+        fb.textContent = 'กรุณาเลือกตัวเลือกก่อนตรวจคำตอบ';
+        return;
+      }
+
+      if (selected.value === 'no') {
+        fb.className = 'text-xs sm:text-sm font-medium mt-2 p-2.5 rounded-lg bg-emerald-100 text-emerald-800';
+        fb.textContent = '✓ ถูกต้องยอดเยี่ยม! เพราะ f(-1) = 0 และ f(1) = 0 ทำให้ f(-1)f(1) = 0 ซึ่งไม่ตรงตามเงื่อนไข f(a)f(b) < 0 และภายในช่วงเปิด (-1, 1) ฟังก์ชันมีค่าเป็นลบตลอด ไม่ได้ตัดแกน x ซ้ำอีก';
+      } else {
+        fb.className = 'text-xs sm:text-sm font-medium mt-2 p-2.5 rounded-lg bg-rose-100 text-rose-800';
+        fb.textContent = '✗ ยังไม่ถูกต้อง: ทฤษฎีบทระบุว่า f(a)f(b) < 0 เพื่อรับประกันราก "ภายในช่วงเปิด (a, b)" แต่ในกรณีนี้รากอยู่ที่จุดปลาย x = ±1 พอดี และภายในช่วงเปิดไม่มีรากอยู่เลย';
+      }
+    }
+
+    // Toggle Exercise Solutions
+    function toggleExSolution(id) {
+      const el = document.getElementById(`ex${id}_solution`);
+      if (el.classList.contains('hidden')) {
+        el.classList.remove('hidden');
+      } else {
+        el.classList.add('hidden');
+      }
+    }
+  </script>
+</body>
+</html>
