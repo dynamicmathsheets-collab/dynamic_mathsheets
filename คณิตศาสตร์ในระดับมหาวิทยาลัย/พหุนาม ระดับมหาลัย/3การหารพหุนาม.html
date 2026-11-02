@@ -1,0 +1,742 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>เรื่องที่ 3: การหารพหุนาม (รองรับ ax - c)</title>
+  
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- KaTeX CSS & JS -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js" 
+          onload="renderMathInElement(document.body, {delimiters: [{left: '$$', right: '$$', display: true}, {left: '$', right: '$', display: false}]});"></script>
+
+  <style>
+    input[type=range] {
+      accent-color: #0284c7;
+    }
+    .katex-display {
+      margin: 0.4em 0;
+      overflow-x: auto;
+      overflow-y: hidden;
+    }
+    /* สไตล์เครื่องหมายตั้งหารยาวแบบมาตรฐาน */
+    .division-box {
+      border-top: 2.5px solid #1e293b;
+      border-left: 2.5px solid #1e293b;
+      border-top-left-radius: 9px;
+      padding-left: 12px;
+      padding-top: 4px;
+    }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-800 font-sans antialiased min-h-screen">
+
+  <!-- Main Container: max-w-6xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 (ความกว้างสูงสุด 1,152px) -->
+  <main class="max-w-6xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 space-y-8">
+
+    <!-- Header Section -->
+    <header class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 sm:p-8">
+      <h1 class="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
+        เรื่องที่ 3: การหารพหุนาม
+      </h1>
+      <div class="mt-4 p-4 bg-sky-50 rounded-xl border border-sky-100">
+        <h2 class="text-sm font-bold text-sky-900 mb-1 flex items-center gap-2">
+          <span>🎯</span> วัตถุประสงค์การเรียนรู้
+        </h2>
+        <p class="text-sm text-sky-800">
+          นักศึกษาสามารถหารพหุนามด้วยวิธีการหารยาวและการหารสังเคราะห์ พร้อมตรวจสอบผลลัพธ์ได้
+        </p>
+      </div>
+    </header>
+
+    <!-- เนื้อหาหลัก (Core Content) -->
+    <section class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 sm:p-8 space-y-6">
+      <h2 class="text-xl font-bold text-slate-900 border-b pb-3 flex items-center gap-2">
+        <span>📖</span> เนื้อหาและขั้นตอนวิธีของการหารพหุนาม
+      </h2>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div class="p-5 bg-slate-50 rounded-xl border border-slate-200 space-y-3">
+          <h3 class="font-bold text-slate-900 text-base">1. วิธีการหารพหุนาม</h3>
+          <ul class="text-sm text-slate-700 space-y-2 list-disc list-inside">
+            <li><strong>การหารยาว (Polynomial Long Division):</strong> ตั้งหารตามแนวตั้งโดยจับคู่พจน์นำของตัวตั้งกับตัวหารทีละขั้น ใช้ได้กับตัวหารทุกรูปแบบ ทั้ง $x - c$ และ $ax - c$</li>
+            <li><strong>การหารสังเคราะห์ (Synthetic Division):</strong> ย่อรูปการหารโดยใช้เฉพาะแถวสัมประสิทธิ์ หากตัวหารเป็น $ax - c$ จะต้องนำผลหารจากตารางมาหารด้วย $a$ อีกครั้ง ในขณะที่เศษเหลือจะคงเดิม</li>
+            <li><strong>การหารด้วยพหุนามดีกรีมากกว่า 1:</strong> ต้องใช้วิธีหารยาวเป็นหลัก</li>
+          </ul>
+        </div>
+
+        <div class="p-5 bg-slate-50 rounded-xl border border-slate-200 space-y-3">
+          <h3 class="font-bold text-slate-900 text-base">2. ผลหาร เศษ และความเป็นเอกฐาน</h3>
+          <p class="text-sm text-slate-700 leading-relaxed">
+            เมื่อหาร $P(x)$ ด้วย $D(x) \neq 0$ จะได้ผลหาร $Q(x)$ และเศษเหลือ $R(x)$ เสมอ และคู่คำตอบนี้มี<strong>เพียงชุดเดียวเท่านั้น (Uniqueness)</strong>
+          </p>
+          <div class="text-xs text-slate-600 bg-white p-3 rounded-lg border border-slate-200">
+            <strong>เงื่อนไขของเศษเหลือ:</strong> $R(x) = 0$ (หารลงตัว) หรือ $\deg R < \deg D$ (ถ้า $\deg R \ge \deg D$ แสดงว่ายังหารต่อได้อีก)
+          </div>
+        </div>
+      </div>
+
+      <!-- กล่องทฤษฎีบทสำคัญ -->
+      <div class="p-5 bg-amber-50 rounded-xl border border-amber-200">
+        <h3 class="font-bold text-amber-900 text-base mb-1">📌 ขั้นตอนวิธีการหารสำหรับพหุนาม (Division Algorithm)</h3>
+        <p class="text-sm text-amber-900 mb-2 leading-relaxed">
+          สำหรับ $P(x), D(x) \in F[x]$ และ $D(x) \neq 0$ จะมีพหุนาม $Q(x), R(x) \in F[x]$ <strong>เพียงชุดเดียว</strong> ที่ทำให้
+        </p>
+        <div class="text-center py-2 text-amber-950 font-medium">
+          $$P(x) = D(x)Q(x) + R(x)$$
+        </div>
+        <p class="text-center text-xs sm:text-sm text-amber-900 font-semibold">
+          โดยที่ $R(x) = 0$ หรือ $\deg R < \deg D$
+        </p>
+      </div>
+    </section>
+
+    <!-- แบบจำลองโต้ตอบ (Interactive Model) -->
+    <section class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 sm:p-8 space-y-6">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between pb-3 border-b gap-2">
+        <div>
+          <h2 class="text-xl font-bold text-slate-900 flex items-center gap-2">
+            <span>🧪</span> แบบจำลองโต้ตอบ: ปรับสัมประสิทธิ์และสุ่มโจทย์หารพหุนาม
+          </h2>
+          <p class="text-xs text-slate-500 mt-1">
+            กำหนดตัวตั้ง $P(x) = a_3 x^3 + a_2 x^2 + a_1 x + a_0$ และตัวหาร $D(x) = ax - c$
+          </p>
+        </div>
+        <div class="flex flex-wrap gap-2">
+          <button onclick="randomizeProblem()" class="px-3.5 py-1.5 rounded-lg text-xs font-bold bg-indigo-600 hover:bg-indigo-700 text-white shadow-xs transition flex items-center gap-1.5">
+            <span>🎲</span> สุ่มโจทย์ใหม่
+          </button>
+          <button onclick="setExampleAxC()" class="px-3.5 py-1.5 rounded-lg text-xs font-semibold bg-sky-50 text-sky-700 border border-sky-200 hover:bg-sky-100 transition">
+            ตัวอย่าง $(2x - 1)$
+          </button>
+          <button onclick="setPerfectProblem()" class="px-3.5 py-1.5 rounded-lg text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200 hover:bg-emerald-100 transition">
+            ตัวอย่างหารลงตัว ($R=0$)
+          </button>
+        </div>
+      </div>
+
+      <!-- แผงสไลเดอร์ปรับสัมประสิทธิ์ -->
+      <div class="bg-slate-50 p-5 rounded-xl border border-slate-200 space-y-4">
+        <!-- ตัวตั้ง P(x) -->
+        <div>
+          <span class="text-xs font-bold text-slate-500 uppercase tracking-wider block mb-2">สัมประสิทธิ์ตัวตั้ง $P(x)$</span>
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+            <div class="bg-white p-3 rounded-lg border border-slate-200 shadow-2xs">
+              <div class="flex justify-between items-center text-xs mb-1">
+                <span class="font-bold text-slate-600">$a_3$ ($x^3$)</span>
+                <span id="val-a3" class="font-bold text-sky-700">2</span>
+              </div>
+              <input type="range" id="slider-a3" min="1" max="4" value="2" class="w-full h-1.5 bg-slate-200 rounded cursor-pointer">
+            </div>
+            <div class="bg-white p-3 rounded-lg border border-slate-200 shadow-2xs">
+              <div class="flex justify-between items-center text-xs mb-1">
+                <span class="font-bold text-slate-600">$a_2$ ($x^2$)</span>
+                <span id="val-a2" class="font-bold text-sky-700">-3</span>
+              </div>
+              <input type="range" id="slider-a2" min="-6" max="6" value="-3" class="w-full h-1.5 bg-slate-200 rounded cursor-pointer">
+            </div>
+            <div class="bg-white p-3 rounded-lg border border-slate-200 shadow-2xs">
+              <div class="flex justify-between items-center text-xs mb-1">
+                <span class="font-bold text-slate-600">$a_1$ ($x$)</span>
+                <span id="val-a1" class="font-bold text-sky-700">5</span>
+              </div>
+              <input type="range" id="slider-a1" min="-6" max="6" value="5" class="w-full h-1.5 bg-slate-200 rounded cursor-pointer">
+            </div>
+            <div class="bg-white p-3 rounded-lg border border-slate-200 shadow-2xs">
+              <div class="flex justify-between items-center text-xs mb-1">
+                <span class="font-bold text-slate-600">$a_0$ (คงตัว)</span>
+                <span id="val-a0" class="font-bold text-sky-700">-4</span>
+              </div>
+              <input type="range" id="slider-a0" min="-12" max="12" value="-4" class="w-full h-1.5 bg-slate-200 rounded cursor-pointer">
+            </div>
+          </div>
+        </div>
+
+        <!-- ตัวหาร D(x) = ax - c -->
+        <div class="pt-2 border-t border-slate-200">
+          <span class="text-xs font-bold text-slate-500 uppercase tracking-wider block mb-2">สัมประสิทธิ์ตัวหาร $D(x) = ax - c$</span>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div class="bg-sky-50 p-3 rounded-lg border border-sky-200 shadow-2xs">
+              <div class="flex justify-between items-center text-xs mb-1">
+                <span class="font-bold text-sky-900">ค่า $a$ หน้า $x$</span>
+                <span id="val-div-a" class="font-bold text-sky-700">2</span>
+              </div>
+              <input type="range" id="slider-div-a" min="1" max="3" value="2" class="w-full h-1.5 bg-sky-200 rounded cursor-pointer">
+            </div>
+            <div class="bg-emerald-50 p-3 rounded-lg border border-emerald-200 shadow-2xs">
+              <div class="flex justify-between items-center text-xs mb-1">
+                <span class="font-bold text-emerald-900">ค่า $c$ ใน $ax - c$</span>
+                <span id="val-div-c" class="font-bold text-emerald-700">1</span>
+              </div>
+              <input type="range" id="slider-div-c" min="-5" max="5" value="1" class="w-full h-1.5 bg-emerald-200 rounded cursor-pointer">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- กล่องแสดงตัวตั้งและตัวหารปัจจุบัน -->
+      <div class="bg-slate-900 text-white rounded-xl p-5 shadow-inner">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-center sm:text-left">
+          <div class="bg-slate-800/80 p-3 rounded-lg">
+            <span class="text-xs text-slate-400 block font-semibold mb-1">ตัวตั้ง $P(x)$</span>
+            <div id="sim-p" class="text-base sm:text-lg text-sky-300 font-mono"></div>
+          </div>
+          <div class="bg-slate-800/80 p-3 rounded-lg">
+            <span class="text-xs text-slate-400 block font-semibold mb-1">ตัวหาร $D(x) = ax - c$</span>
+            <div id="sim-d" class="text-base sm:text-lg text-emerald-300 font-mono"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- สลับแท็บ การหารยาว / การหารสังเคราะห์ -->
+      <div class="flex justify-center border-b border-slate-200 pb-3">
+        <div class="inline-flex rounded-lg bg-slate-100 p-1 border border-slate-200">
+          <button id="view-tab-long" onclick="switchTab('long')" class="px-4 py-1.5 rounded-md text-xs font-bold bg-white text-slate-900 shadow-sm transition">
+            📐 ฟอร์มการตั้งหารยาว (Long Division)
+          </button>
+          <button id="view-tab-syn" onclick="switchTab('syn')" class="px-4 py-1.5 rounded-md text-xs font-bold text-slate-600 hover:text-slate-900 transition">
+            ⚡ แถวการหารสังเคราะห์ (Synthetic Division)
+          </button>
+        </div>
+      </div>
+
+      <!-- พื้นที่แสดงรูปแบบการคำนวณ -->
+      <div class="bg-slate-50 p-6 rounded-xl border border-slate-200 min-h-[320px]">
+        
+        <!-- แท็บการหารยาวแบบมาตรฐาน -->
+        <div id="view-long" class="space-y-4">
+          <div class="flex items-center justify-between">
+            <h3 class="text-sm font-bold text-slate-800 flex items-center gap-2">
+              <span>📐</span> ตารางตั้งหารยาวแบบคณิตศาสตร์ (Long Division)
+            </h3>
+            <span class="text-xs text-slate-500 font-mono">เรนเดอร์รูปแบบตั้งหารจริงตามแบบเรียน</span>
+          </div>
+
+          <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 bg-white p-6 rounded-xl border border-slate-200 items-start">
+            <!-- ฝั่งซ้าย: รูปแบบตั้งหารยาวสมบูรณ์ (HTML / CSS Table) -->
+            <div class="lg:col-span-7 flex justify-center items-center overflow-x-auto py-3">
+              <div id="long-division-container" class="font-serif text-base sm:text-lg leading-loose select-none">
+                <!-- Render Dynamic Long Division Table -->
+              </div>
+            </div>
+
+            <!-- ฝั่งขวา: คำอธิบายขั้นตอนวิธีคิดทางขวา -->
+            <div class="lg:col-span-5 bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-3">
+              <h4 class="text-xs font-bold text-slate-700 uppercase tracking-wider flex items-center gap-1.5">
+                <span>💡</span> บันทึกวิธีคิดทีละขั้นตอน:
+              </h4>
+              <div id="long-division-notes" class="space-y-2 text-xs text-slate-600 leading-relaxed">
+                <!-- Render Notes via JS -->
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- แท็บการหารสังเคราะห์ -->
+        <div id="view-syn" class="hidden space-y-4">
+          <h3 class="text-sm font-bold text-slate-800 flex items-center gap-2">
+            <span>⚡</span> แถวการหารสังเคราะห์ (Synthetic Division กรณี $ax - c$)
+          </h3>
+          <div id="synthetic-content" class="overflow-x-auto p-6 bg-white rounded-xl border border-slate-200">
+            <!-- Render via JS -->
+          </div>
+        </div>
+      </div>
+
+      <!-- ตรวจสอบผลหารโดยการคูณกลับ -->
+      <div class="p-5 bg-emerald-50 rounded-xl border border-emerald-200 space-y-3">
+        <h3 class="text-sm font-bold text-emerald-950 flex items-center gap-2">
+          <span>✔️</span> ตรวจสอบผลหารโดยการคูณกลับ: $P(x) = D(x)Q(x) + R(x)$
+        </h3>
+        <div id="sim-verify" class="text-sm text-emerald-900 font-mono bg-white/80 p-3 rounded-lg border border-emerald-200 leading-relaxed overflow-x-auto">
+          <!-- Render via JS -->
+        </div>
+      </div>
+    </section>
+
+    <!-- คำถามนำเพื่อค้นพบ (Inquiry Questions) -->
+    <section class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 sm:p-8 space-y-4">
+      <h2 class="text-xl font-bold text-slate-900 border-b pb-3 flex items-center gap-2">
+        <span>💡</span> คำถามนำเพื่อการค้นพบ
+      </h2>
+      <div class="space-y-3">
+        <details class="group bg-slate-50 border border-slate-200 rounded-xl p-4 cursor-pointer">
+          <summary class="font-semibold text-slate-800 list-none flex justify-between items-center text-sm sm:text-base">
+            1. เหตุใดดีกรีของเศษจึงต้องน้อยกว่าดีกรีของตัวหาร?
+            <span class="text-sky-600 group-open:rotate-180 transition-transform">▼</span>
+          </summary>
+          <p class="mt-2 text-sm text-slate-600 pl-2 border-l-2 border-sky-400">
+            หากดีกรีของเศษยังมากกว่าหรือเท่ากับดีกรีของตัวหาร ($\deg R \ge \deg D$) แสดงว่าเรายังสามารถนำพจน์นำของเศษไปหารด้วยพจน์นำของตัวหารต่อได้อีก กระบวนการหารจะยุติลงก็ต่อเมื่อเศษเหลือเป็นพหุนามศูนย์ ($R=0$) หรือมีดีกรีน้อยกว่าตัวหารแล้วเท่านั้น
+          </p>
+        </details>
+
+        <details class="group bg-slate-50 border border-slate-200 rounded-xl p-4 cursor-pointer">
+          <summary class="font-semibold text-slate-800 list-none flex justify-between items-center text-sm sm:text-base">
+            2. การหารสังเคราะห์มีข้อจำกัดอย่างไร?
+            <span class="text-sky-600 group-open:rotate-180 transition-transform">▼</span>
+          </summary>
+          <p class="mt-2 text-sm text-slate-600 pl-2 border-l-2 border-sky-400">
+            โดยทั่วไปการหารสังเคราะห์ถูกออกแบบมาเพื่อตัวหารเชิงเส้นโมนิก ($x - k$) หากตัวหารอยู่ในรูป $ax - c$ โดยที่ $a \neq 1$ จะต้องใช้ค่า $k = \frac{c}{a}$ ในตาราง แล้วนำผลลัพธ์ที่ได้มา<strong>หารด้วย $a$ ทุกตัว</strong> (ยกเว้นเศษเหลือที่ไม่ต้องหาร) และหากตัวหารมีดีกรีตั้งแต่ $2$ ขึ้นไปจะไม่สามารถใช้วิธีนี้แบบปกติได้
+          </p>
+        </details>
+
+        <details class="group bg-slate-50 border border-slate-200 rounded-xl p-4 cursor-pointer">
+          <summary class="font-semibold text-slate-800 list-none flex justify-between items-center text-sm sm:text-base">
+            3. เมื่อเศษเป็นศูนย์ เราสรุปอะไรเกี่ยวกับตัวหารได้?
+            <span class="text-sky-600 group-open:rotate-180 transition-transform">▼</span>
+          </summary>
+          <p class="mt-2 text-sm text-slate-600 pl-2 border-l-2 border-sky-400">
+            เมื่อเศษเป็นศูนย์ ($R(x) = 0$) หมายความว่าตัวหาร $D(x)$ <strong>หาร $P(x)$ ได้ลงตัว</strong> และ $D(x)$ เป็น<strong>ตัวประกอบ (Factor)</strong> หนึ่งของ $P(x)$ ซึ่งสามารถเขียนในรูป $P(x) = D(x)Q(x)$ ได้โดยตรง
+          </p>
+        </details>
+
+        <details class="group bg-slate-50 border border-slate-200 rounded-xl p-4 cursor-pointer">
+          <summary class="font-semibold text-slate-800 list-none flex justify-between items-center text-sm sm:text-base">
+            4. เราสามารถตรวจสอบผลการหารพหุนามได้อย่างไร?
+            <span class="text-sky-600 group-open:rotate-180 transition-transform">▼</span>
+          </summary>
+          <p class="mt-2 text-sm text-slate-600 pl-2 border-l-2 border-sky-400">
+            ตรวจสอบได้โดยนำ<strong>(ตัวหาร $\times$ ผลหาร) $+$ เศษ</strong> แล้วดูว่าได้ผลลัพธ์กลับมาเท่ากับตัวตั้ง $P(x)$ หรือไม่ตามความสัมพันธ์ $P(x) = D(x)Q(x) + R(x)$
+          </p>
+        </details>
+      </div>
+    </section>
+
+    <!-- แบบฝึกหัดสำหรับนักศึกษา (Exercises - ซ่อนคำตอบไว้) -->
+    <section class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 sm:p-8 space-y-4">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between pb-3 border-b gap-2">
+        <h2 class="text-xl font-bold text-slate-900 flex items-center gap-2">
+          <span>✏️</span> แบบฝึกหัดสำหรับนักศึกษา
+        </h2>
+        <span class="text-xs bg-slate-100 text-slate-600 font-medium px-2.5 py-1 rounded-full w-fit">
+          ลองทำด้วยตนเองก่อนคลิกดูเฉลย
+        </span>
+      </div>
+
+      <div class="space-y-4">
+        <!-- ข้อ 1 -->
+        <div class="p-5 bg-slate-50 rounded-xl border border-slate-200 space-y-3">
+          <div class="font-medium text-slate-900 text-sm sm:text-base">
+            1. จงหาร $x^3 - 4x^2 + x + 6$ ด้วย $x - 2$
+          </div>
+          <details class="group">
+            <summary class="inline-flex items-center gap-1.5 text-xs font-semibold text-sky-700 hover:text-sky-800 cursor-pointer select-none bg-sky-50 hover:bg-sky-100 px-3 py-1.5 rounded-lg border border-sky-200 transition">
+              <span>🔍 แสดงคำตอบและวิธีทำ</span>
+            </summary>
+            <div class="mt-3 text-sm text-slate-700 bg-white p-3.5 rounded-lg border border-slate-200 pl-4 border-l-4 border-l-sky-500 space-y-2">
+              <p>ใช้วิธีการหารสังเคราะห์โดยใช้ค่า $c = 2$ กับสัมประสิทธิ์ $[1, -4, 1, 6]$:</p>
+              <div class="bg-slate-50 p-2.5 rounded font-mono text-xs">
+                2 |  1   -4    1    6<br>
+                  |       2   -4   -6<br>
+                ----------------------<br>
+                  |  1   -2   -3 |  0
+              </div>
+              <p>• <strong>ผลหาร $Q(x)$:</strong> $x^2 - 2x - 3$</p>
+              <p>• <strong>เศษ $R(x)$:</strong> $0$ (หารลงตัว)</p>
+              <p class="text-emerald-700 font-medium pt-1">ตรวจสอบ: $(x - 2)(x^2 - 2x - 3) = x^3 - 2x^2 - 3x - 2x^2 + 4x + 6 = x^3 - 4x^2 + x + 6$</p>
+            </div>
+          </details>
+        </div>
+
+        <!-- ข้อ 2 -->
+        <div class="p-5 bg-slate-50 rounded-xl border border-slate-200 space-y-3">
+          <div class="font-medium text-slate-900 text-sm sm:text-base">
+            2. จงหาร $2x^4 + x^3 - 3x + 5$ ด้วย $x + 1$
+          </div>
+          <details class="group">
+            <summary class="inline-flex items-center gap-1.5 text-xs font-semibold text-sky-700 hover:text-sky-800 cursor-pointer select-none bg-sky-50 hover:bg-sky-100 px-3 py-1.5 rounded-lg border border-sky-200 transition">
+              <span>🔍 แสดงคำตอบและวิธีทำ</span>
+            </summary>
+            <div class="mt-3 text-sm text-slate-700 bg-white p-3.5 rounded-lg border border-slate-200 pl-4 border-l-4 border-l-sky-500 space-y-2">
+              <p>เขียนสัมประสิทธิ์ของตัวตั้งโดยใส่ $0$ สำหรับพจน์กำลังสองที่หายไป: $[2, 1, 0, -3, 5]$ และตัวหาร $x + 1 = x - (-1)$ ใช้ $c = -1$:</p>
+              <div class="bg-slate-50 p-2.5 rounded font-mono text-xs">
+                -1 |  2    1    0   -3    5<br>
+                   |     -2    1   -1    4<br>
+                ---------------------------<br>
+                   |  2   -1    1   -4 |  9
+              </div>
+              <p>• <strong>ผลหาร $Q(x)$:</strong> $2x^3 - x^2 + x - 4$</p>
+              <p>• <strong>เศษ $R(x)$:</strong> $9$</p>
+              <p class="text-emerald-700 font-medium pt-1">ตรวจสอบ: $(x + 1)(2x^3 - x^2 + x - 4) + 9 = (2x^4 + x^3 - 3x - 4) + 9 = 2x^4 + x^3 - 3x + 5$</p>
+            </div>
+          </details>
+        </div>
+
+        <!-- ข้อ 3 -->
+        <div class="p-5 bg-slate-50 rounded-xl border border-slate-200 space-y-3">
+          <div class="font-medium text-slate-900 text-sm sm:text-base">
+            3. อธิบายความแตกต่างระหว่างการหารยาวและการหารสังเคราะห์
+          </div>
+          <details class="group">
+            <summary class="inline-flex items-center gap-1.5 text-xs font-semibold text-sky-700 hover:text-sky-800 cursor-pointer select-none bg-sky-50 hover:bg-sky-100 px-3 py-1.5 rounded-lg border border-sky-200 transition">
+              <span>🔍 แสดงคำตอบเปรียบเทียบ</span>
+            </summary>
+            <div class="mt-3 text-sm text-slate-700 bg-white p-3.5 rounded-lg border border-slate-200 pl-4 border-l-4 border-l-sky-500 space-y-2">
+              <div class="overflow-x-auto">
+                <table class="min-w-full text-xs text-left border border-slate-200">
+                  <thead class="bg-slate-100 text-slate-800">
+                    <tr>
+                      <th class="p-2 border">ประเด็นเปรียบเทียบ</th>
+                      <th class="p-2 border">การหารยาว (Long Division)</th>
+                      <th class="p-2 border">การหารสังเคราะห์ (Synthetic Division)</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td class="p-2 border font-semibold">การใช้งาน</td>
+                      <td class="p-2 border">ใช้ได้ทั่วไปกับตัวหารทุกรูปแบบและทุกดีกรี</td>
+                      <td class="p-2 border">เน้นเฉพาะตัวหารที่เป็นเชิงเส้น $ax - c$</td>
+                    </tr>
+                    <tr>
+                      <td class="p-2 border font-semibold">ขั้นตอนการคำนวณ</td>
+                      <td class="p-2 border">เขียนตัวแปรครบถ้วน ใช้การคูณแล้วนำมา<strong>ลบ</strong>กัน</td>
+                      <td class="p-2 border">เขียนเฉพาะสัมประสิทธิ์ ใช้การคูณแล้วนำมา<strong>บวก</strong>กัน และต้องหารด้วย $a$ หลังคิดเสร็จ</td>
+                    </tr>
+                    <tr>
+                      <td class="p-2 border font-semibold">ความรวดเร็วและพื้นที่</td>
+                      <td class="p-2 border">ใช้พื้นที่มาก มีขั้นตอนยาว</td>
+                      <td class="p-2 border">กะทัดรัด รวดเร็ว และลดโอกาสผิดพลาดเรื่องเครื่องหมาย</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </details>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- JavaScript คำนวณและสร้างฟอร์มตั้งหารยาวแบบสมบูรณ์รองรับ ax - c -->
+  <script>
+    const sliders = {
+      a3: document.getElementById('slider-a3'),
+      a2: document.getElementById('slider-a2'),
+      a1: document.getElementById('slider-a1'),
+      a0: document.getElementById('slider-a0'),
+      divA: document.getElementById('slider-div-a'),
+      divC: document.getElementById('slider-div-c')
+    };
+
+    const valDisplays = {
+      a3: document.getElementById('val-a3'),
+      a2: document.getElementById('val-a2'),
+      a1: document.getElementById('val-a1'),
+      a0: document.getElementById('val-a0'),
+      divA: document.getElementById('val-div-a'),
+      divC: document.getElementById('val-div-c')
+    };
+
+    function switchTab(tab) {
+      const btnLong = document.getElementById('view-tab-long');
+      const btnSyn = document.getElementById('view-tab-syn');
+      const viewLong = document.getElementById('view-long');
+      const viewSyn = document.getElementById('view-syn');
+
+      if (tab === 'long') {
+        btnLong.className = "px-4 py-1.5 rounded-md text-xs font-bold bg-white text-slate-900 shadow-sm transition";
+        btnSyn.className = "px-4 py-1.5 rounded-md text-xs font-bold text-slate-600 hover:text-slate-900 transition";
+        viewLong.classList.remove('hidden');
+        viewSyn.classList.add('hidden');
+      } else {
+        btnSyn.className = "px-4 py-1.5 rounded-md text-xs font-bold bg-white text-slate-900 shadow-sm transition";
+        btnLong.className = "px-4 py-1.5 rounded-md text-xs font-bold text-slate-600 hover:text-slate-900 transition";
+        viewSyn.classList.remove('hidden');
+        viewLong.classList.add('hidden');
+      }
+    }
+
+    // ฟังก์ชันจัดรูปเศษส่วนอย่างง่าย
+    function formatFraction(num, den = 1) {
+      if (den < 0) { num = -num; den = -den; }
+      if (num % den === 0) return `${num / den}`;
+      const gcd = (x, y) => (!y ? x : gcd(y, x % y));
+      const g = Math.abs(gcd(num, den));
+      return `\\frac{${num / g}}{${den / g}}`;
+    }
+
+    function formatTermFrac(num, den, power, isFirst = false) {
+      if (num === 0) return "";
+      let sign = num > 0 ? (isFirst ? "" : "+ ") : "- ";
+      let absNum = Math.abs(num);
+      let fracStr = formatFraction(absNum, den);
+      if (power === 0) return `${sign}${fracStr}`;
+      let coeffStr = (absNum === den && power > 0) ? "" : fracStr;
+      if (power === 1) return `${sign}${coeffStr}x`;
+      return `${sign}${coeffStr}x^${power}`;
+    }
+
+    function buildPolyStr(coeffs) {
+      let terms = [];
+      const deg = coeffs.length - 1;
+      for (let i = 0; i <= deg; i++) {
+        const c = coeffs[i];
+        const p = deg - i;
+        if (c === 0 && terms.length > 0 && i < deg) continue;
+        const t = formatTermFrac(c, 1, p, terms.length === 0);
+        if (t) terms.push(t);
+      }
+      return terms.length === 0 ? "0" : terms.join(" ");
+    }
+
+    function buildDivisorStr(a, c) {
+      let aStr = a === 1 ? "x" : `${a}x`;
+      if (c === 0) return aStr;
+      return c > 0 ? `${aStr} - ${c}` : `${aStr} + ${Math.abs(c)}`;
+    }
+
+    function updateCalculation() {
+      const a3 = parseInt(sliders.a3.value, 10);
+      const a2 = parseInt(sliders.a2.value, 10);
+      const a1 = parseInt(sliders.a1.value, 10);
+      const a0 = parseInt(sliders.a0.value, 10);
+      const a = parseInt(sliders.divA.value, 10);
+      let c = parseInt(sliders.divC.value, 10);
+      if (c === 0) c = 1;
+
+      valDisplays.a3.innerText = a3;
+      valDisplays.a2.innerText = a2;
+      valDisplays.a1.innerText = a1;
+      valDisplays.a0.innerText = a0;
+      valDisplays.divA.innerText = a;
+      valDisplays.divC.innerText = c;
+
+      const pStr = buildPolyStr([a3, a2, a1, a0]);
+      const dStr = buildDivisorStr(a, c);
+
+      // คำนวณเศษส่วนการหารยาว ax - c
+      // ขั้นที่ 1: q2 = a3 / a
+      const q2_n = a3, q2_d = a;
+      // พจน์ลบขั้นที่ 1: q2*(ax - c) = a3*x^3 - (q2*c)*x^2
+      // r1_x2 = a2 - (-q2*c) = a2 + (c*a3)/a = (a*a2 + c*a3)/a
+      const r1_n = a * a2 + c * a3;
+      const r1_d = a;
+
+      // ขั้นที่ 2: q1 = (r1_x2) / a = r1_n / (a^2)
+      const q1_n = r1_n;
+      const q1_d = a * a;
+      // r2_x1 = a1 - (-q1*c) = a1 + (c * q1_n) / (a^2) = (a^2 * a1 + c * q1_n) / a^2
+      const r2_n = a * a * a1 + c * q1_n;
+      const r2_d = a * a;
+
+      // ขั้นที่ 3: q0 = (r2_x1) / a = r2_n / (a^3)
+      const q0_n = r2_n;
+      const q0_d = a * a * a;
+      // rem = a0 - (-q0*c) = a0 + (c * q0_n) / (a^3) = (a^3 * a0 + c * q0_n) / a^3
+      const rem_n = a * a * a * a0 + c * q0_n;
+      const rem_d = a * a * a;
+
+      // สร้างข้อความพหุนามผลหาร
+      let qTerms = [];
+      const t2 = formatTermFrac(q2_n, q2_d, 2, true);
+      const t1 = formatTermFrac(q1_n, q1_d, 1, qTerms.length === 0 && !t2);
+      const t0 = formatTermFrac(q0_n, q0_d, 0, qTerms.length === 0 && !t2 && !t1);
+      if (t2) qTerms.push(t2);
+      if (t1) qTerms.push(t1);
+      if (t0) qTerms.push(t0);
+      const qStr = qTerms.join(" ") || "0";
+      const remStr = formatFraction(rem_n, rem_d);
+
+      // Render P and D
+      if (window.katex) {
+        katex.render(`P(x) = ${pStr}`, document.getElementById('sim-p'), { throwOnError: false });
+        katex.render(`D(x) = ${dStr}`, document.getElementById('sim-d'), { throwOnError: false });
+      }
+
+      // 2. Render Long Division Tableau
+      const container = document.getElementById('long-division-container');
+      const m1_x3_str = formatTermFrac(a3, 1, 3, true);
+      const m1_x2_str = formatTermFrac(-c * q2_n, q2_d, 2);
+
+      const r1_x2_str = formatTermFrac(r1_n, r1_d, 2, true);
+      const a1_x1_str = formatTermFrac(a1, 1, 1);
+
+      const m2_x2_str = formatTermFrac(r1_n, r1_d, 2, true);
+      const m2_x1_str = formatTermFrac(-c * q1_n, q1_d, 1);
+
+      const r2_x1_str = formatTermFrac(r2_n, r2_d, 1, true);
+      const a0_str = formatTermFrac(a0, 1, 0);
+
+      const m3_x1_str = formatTermFrac(r2_n, r2_d, 1, true);
+      const m3_c_str  = formatTermFrac(-c * q0_n, q0_d, 0);
+
+      container.innerHTML = `
+        <div class="inline-block text-left text-slate-800">
+          <div class="flex justify-end pb-1 pr-4 font-bold text-sky-700">
+            <span>ผลหาร: $${qStr}$</span>
+          </div>
+
+          <div class="flex items-start">
+            <div class="pr-3 pt-2 font-bold text-emerald-700 text-right whitespace-nowrap">
+              $${dStr}$
+            </div>
+            <div class="division-box pl-4 pr-6 pb-2 min-w-[300px]">
+              <div class="font-bold text-slate-900 pb-1">
+                $${pStr}$
+              </div>
+
+              <div class="text-slate-500 text-sm mt-1">
+                $\\underline{-(${m1_x3_str} ${m1_x2_str})}$
+              </div>
+              <div class="font-medium text-slate-800 pl-4 mt-0.5">
+                $${r1_x2_str} ${a1_x1_str}$
+              </div>
+
+              <div class="text-slate-500 text-sm mt-1 pl-4">
+                $\\underline{-(${m2_x2_str} ${m2_x1_str})}$
+              </div>
+              <div class="font-medium text-slate-800 pl-8 mt-0.5">
+                $${r2_x1_str} ${a0_str}$
+              </div>
+
+              <div class="text-slate-500 text-sm mt-1 pl-8">
+                $\\underline{-(${m3_x1_str} ${m3_c_str})}$
+              </div>
+              <div class="font-bold pl-12 mt-1 ${rem_n === 0 ? 'text-emerald-600' : 'text-amber-600'}">
+                เศษ: $${remStr}$
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+
+      // 3. Render Notes ทางขวา
+      const notesElem = document.getElementById('long-division-notes');
+      notesElem.innerHTML = `
+        <div class="p-2.5 bg-white rounded-lg border border-slate-200 shadow-2xs">
+          <span class="font-bold text-sky-700">ขั้นที่ 1:</span> ดูว่า $(${a === 1 ? 'x' : a + 'x'})$ คูณอะไรได้ $${formatTermFrac(a3, 1, 3, true)}$ ➔ ได้ $${formatTermFrac(q2_n, q2_d, 2, true)}$<br>
+          นำไปคูณตัวหารแล้วลบออก เหลือ $${r1_x2_str}$ แล้วดึง $${a1_x1_str}$ ลงมา
+        </div>
+        <div class="p-2.5 bg-white rounded-lg border border-slate-200 shadow-2xs">
+          <span class="font-bold text-sky-700">ขั้นที่ 2:</span> ดูว่า $(${a === 1 ? 'x' : a + 'x'})$ คูณอะไรได้ $${r1_x2_str}$ ➔ ได้ $${formatTermFrac(q1_n, q1_d, 1, true)}$<br>
+          นำไปคูณตัวหารแล้วลบออก เหลือ $${r2_x1_str}$ แล้วดึง $${a0_str}$ ลงมา
+        </div>
+        <div class="p-2.5 bg-white rounded-lg border border-slate-200 shadow-2xs">
+          <span class="font-bold text-sky-700">ขั้นที่ 3:</span> ดูว่า $(${a === 1 ? 'x' : a + 'x'})$ คูณอะไรได้ $${r2_x1_str}$ ➔ ได้ $${formatTermFrac(q0_n, q0_d, 0, true)}$<br>
+          นำไปคูณตัวหารแล้วลบออก เหลือเศษสุดท้ายคือ $${remStr}$
+        </div>
+      `;
+
+      // 4. Render Synthetic Division (2-Step)
+      const synDiv = document.getElementById('synthetic-content');
+      const rootStr = formatFraction(c, a);
+
+      // Synthetic row calculation with fraction
+      const s_q2 = a3;
+      const s_m1_n = c * s_q2, s_m1_d = a;
+      const s_q1_n = a * a2 + s_m1_n, s_q1_d = a;
+
+      const s_m2_n = c * s_q1_n, s_m2_d = a * a;
+      const s_q0_n = a * a * a1 + s_m2_n, s_q0_d = a * a;
+
+      const s_m3_n = c * s_q0_n, s_m3_d = a * a * a;
+      const s_rem_n = a * a * a * a0 + s_m3_n, s_rem_d = a * a * a;
+
+      synDiv.innerHTML = `
+        <div class="mb-3 text-xs text-slate-700 leading-relaxed bg-amber-50 p-3 rounded-lg border border-amber-200">
+          <strong>💡 เทคนิคการหารสังเคราะห์เมื่อตัวหารเป็น $${dStr}$ ($a = ${a}$):</strong><br>
+          1. ดึงตัวร่วม: $${dStr} = ${a}\\left(x - ${rootStr}\\right)$ จึงนำค่าวิกฤต $k = ${rootStr}$ มาตั้งหารตามปกติ<br>
+          2. เมื่อได้สัมประสิทธิ์แถวล่างสุด ($Q^*$) ต้องนำมา <strong>หารด้วย $a = ${a}$ ทุกตัว</strong> เพื่อให้ได้ผลหารจริง $Q(x)$<br>
+          3. เศษเหลือ $R$ จะมีค่าคงเดิม ไม่ต้องนำมาหารด้วย $a$
+        </div>
+
+        <table class="border-collapse font-mono text-sm mx-auto my-4">
+          <tr>
+            <td class="pr-5 py-2 text-emerald-700 font-bold border-r-2 border-b-2 border-slate-400">$${rootStr}$</td>
+            <td class="px-4 py-2 text-center font-semibold border-b-2 border-slate-400">${a3}</td>
+            <td class="px-4 py-2 text-center font-semibold border-b-2 border-slate-400">${a2}</td>
+            <td class="px-4 py-2 text-center font-semibold border-b-2 border-slate-400">${a1}</td>
+            <td class="px-4 py-2 text-center font-semibold border-b-2 border-slate-400">${a0}</td>
+          </tr>
+          <tr>
+            <td class="pr-5 py-2 border-r-2 border-slate-400"></td>
+            <td class="px-4 py-2 text-center text-slate-400">↓</td>
+            <td class="px-4 py-2 text-center text-emerald-600 font-medium">$${formatFraction(s_m1_n, s_m1_d)}$</td>
+            <td class="px-4 py-2 text-center text-emerald-600 font-medium">$${formatFraction(s_m2_n, s_m2_d)}$</td>
+            <td class="px-4 py-2 text-center text-amber-600 font-medium">$${formatFraction(s_m3_n, s_m3_d)}$</td>
+          </tr>
+          <tr class="border-t-2 border-slate-800">
+            <td class="pr-5 py-2 border-r-2 border-slate-400"></td>
+            <td class="px-4 py-2 text-center font-bold text-slate-700">$${formatFraction(s_q2, 1)}$</td>
+            <td class="px-4 py-2 text-center font-bold text-slate-700">$${formatFraction(s_q1_n, s_q1_d)}$</td>
+            <td class="px-4 py-2 text-center font-bold text-slate-700">$${formatFraction(s_q0_n, s_q0_d)}$</td>
+            <td class="px-4 py-2 text-center font-bold ${rem_n === 0 ? 'text-emerald-700 bg-emerald-50' : 'text-amber-700 bg-amber-50'} rounded">| $${remStr}$</td>
+          </tr>
+          ${a !== 1 ? `
+          <tr class="border-t border-dashed border-slate-300 bg-sky-50/50">
+            <td class="pr-3 py-2 text-xs font-bold text-sky-800 text-right">หารด้วย $a=${a}$ ➔</td>
+            <td class="px-4 py-2 text-center font-bold text-sky-800">$${formatFraction(q2_n, q2_d)}$</td>
+            <td class="px-4 py-2 text-center font-bold text-sky-800">$${formatFraction(q1_n, q1_d)}$</td>
+            <td class="px-4 py-2 text-center font-bold text-sky-800">$${formatFraction(q0_n, q0_d)}$</td>
+            <td class="px-4 py-2 text-center font-bold text-slate-400">(คงเดิม)</td>
+          </tr>
+          ` : ''}
+        </table>
+
+        <div class="mt-3 text-center text-xs text-slate-700 font-medium">
+          ผลหารจริง $Q(x) = ${qStr}$ และเศษเหลือ $R = ${remStr}$
+        </div>
+      `;
+
+      // 5. Render Verification
+      const verifyElem = document.getElementById('sim-verify');
+      const verifyText = `(${dStr})(${qStr}) + (${remStr}) = ${pStr} \\quad \\checkmark \\text{ ถูกต้องตามขั้นตอนวิธีการหาร}`;
+      if (window.katex) {
+        katex.render(verifyText, verifyElem, { throwOnError: false, displayMode: true });
+      }
+
+      // Re-render KaTeX in containers
+      if (window.renderMathInElement) {
+        renderMathInElement(container, { delimiters: [{left: '$', right: '$', display: false}] });
+        renderMathInElement(notesElem, { delimiters: [{left: '$', right: '$', display: false}] });
+        renderMathInElement(synDiv, { delimiters: [{left: '$', right: '$', display: false}] });
+      }
+    }
+
+    function randomizeProblem() {
+      sliders.a3.value = Math.floor(Math.random() * 3) + 1; // 1 to 3
+      sliders.a2.value = Math.floor(Math.random() * 9) - 4; // -4 to 4
+      sliders.a1.value = Math.floor(Math.random() * 9) - 4; // -4 to 4
+      sliders.a0.value = Math.floor(Math.random() * 15) - 7; // -7 to 7
+      sliders.divA.value = Math.floor(Math.random() * 3) + 1; // 1 to 3
+      let rc = Math.floor(Math.random() * 5) - 2;
+      if (rc === 0) rc = 1;
+      sliders.divC.value = rc;
+      updateCalculation();
+    }
+
+    function setExampleAxC() {
+      // (2x - 1)(x^2 - x + 2) - 2 = 2x^3 - 3x^2 + 5x - 4
+      sliders.a3.value = 2;
+      sliders.a2.value = -3;
+      sliders.a1.value = 5;
+      sliders.a0.value = -4;
+      sliders.divA.value = 2;
+      sliders.divC.value = 1;
+      updateCalculation();
+    }
+
+    function setPerfectProblem() {
+      // (2x - 3)(x^2 + 2x - 1) = 2x^3 + x^2 - 8x + 3 (จากแบบฝึกหัดเรื่องที่ 2)
+      sliders.a3.value = 2;
+      sliders.a2.value = 1;
+      sliders.a1.value = -8;
+      sliders.a0.value = 3;
+      sliders.divA.value = 2;
+      sliders.divC.value = 3;
+      updateCalculation();
+    }
+
+    Object.values(sliders).forEach(s => s.addEventListener('input', updateCalculation));
+
+    window.addEventListener('DOMContentLoaded', () => {
+      setExampleAxC();
+    });
+  </script>
+</body>
+</html>
