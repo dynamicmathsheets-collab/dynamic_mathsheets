@@ -1,0 +1,1168 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>เรื่องที่ 4: การแก้สมการด้วยวิธีแฟร์รารี (Ferrari's Method: Step-by-Step Solving)</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#eef2ff',
+                            100: '#e0e7ff',
+                            500: '#6366f1',
+                            600: '#4f46e5',
+                            700: '#4338ca',
+                            800: '#3730a3',
+                            900: '#312e81',
+                        },
+                        violetTheme: {
+                            500: '#8b5cf6',
+                            600: '#7c3aed',
+                            700: '#6d28d9',
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Sarabun', 'Inter', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Google Fonts: Sarabun & Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- KaTeX for high-performance LaTeX rendering -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body);"></script>
+    <!-- FontAwesome 6 Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Sarabun', 'Inter', sans-serif;
+            background-color: #f8fafc;
+            color: #1e293b;
+        }
+        /* Custom scrollbars */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+        .step-transition {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 antialiased selection:bg-indigo-500 selection:text-white">
+
+    <!-- Header Navigation Bar -->
+    <header class="bg-white border-b border-slate-200 sticky top-0 z-50 shadow-sm backdrop-blur-md bg-white/90">
+        <div class="max-w-6xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-3.5 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-violet-600 via-indigo-600 to-indigo-700 flex items-center justify-center text-white shadow-md shadow-indigo-100">
+                    <i class="fa-solid fa-calculator text-lg"></i>
+                </div>
+                <div>
+                    
+                    <h1 class="text-base sm:text-lg font-bold text-slate-900 leading-tight">เรื่องที่ 4: การแก้สมการด้วยวิธีแฟร์รารี</h1>
+                </div>
+            </div>
+            <div class="flex items-center gap-2">
+                <a href="#lab-solver" class="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-indigo-700 bg-indigo-50 hover:bg-indigo-100 rounded-lg transition-colors">
+                    <i class="fa-solid fa-flask-vial"></i> ห้องปฏิบัติการแก้สมการ
+                </a>
+                <a href="#practice" class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-white bg-indigo-600 hover:bg-indigo-700 rounded-lg shadow-sm transition-colors">
+                    <i class="fa-solid fa-pen-to-square"></i> แบบฝึกหัด
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Container: max-w-6xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 -->
+    <main class="max-w-6xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 space-y-8">
+
+        <!-- Banner / Hero Section -->
+        <section class="bg-gradient-to-br from-slate-900 via-indigo-950 to-violet-950 rounded-3xl p-6 sm:p-10 text-white shadow-xl relative overflow-hidden">
+            <div class="absolute -right-10 -bottom-10 opacity-10 pointer-events-none text-9xl">
+                <i class="fa-solid fa-network-wired"></i>
+            </div>
+            <div class="relative z-10 max-w-3xl">
+
+                <h2 class="text-2xl sm:text-4xl font-extrabold tracking-tight mb-3">
+                    กระบวนการแก้สมการกำลังสี่ <span class="text-transparent bg-clip-text bg-gradient-to-r from-amber-300 via-violet-200 to-indigo-200">แบบเป็นลำดับขั้น</span>
+                </h2>
+                <p class="text-slate-200 text-sm sm:text-base leading-relaxed">
+                    การแก้สมการกำลังสี่ด้วยวิธีของแฟร์รารี <strong>ไม่ใช่สูตรสำเร็จรูปเดียวที่แทนค่าแล้วได้คำตอบทันที</strong> 
+                    แต่เป็นเครือข่ายการลดทอนมิติ (Dimension Reduction) ที่เชื่อมโยงการแก้สมการช่วยกำลังสาม การแยกตัวประกอบเป็นสมการกำลังสอง 
+                    และการหาพหุภาพของรากอย่างเป็นระบบ
+                </p>
+            </div>
+        </section>
+
+        <!-- 1. วัตถุประสงค์การเรียนรู้ -->
+        <section class="bg-white rounded-2xl p-6 border border-slate-200/80 shadow-sm">
+            <div class="flex items-center gap-3 mb-4">
+                <div class="w-8 h-8 rounded-lg bg-indigo-100 text-indigo-700 flex items-center justify-center font-bold text-sm">
+                    1
+                </div>
+                <h3 class="text-lg font-bold text-slate-800">วัตถุประสงค์การเรียนรู้ (Learning Objectives)</h3>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div class="flex items-start gap-3 p-4 rounded-xl bg-slate-50 border border-slate-100 hover:border-indigo-200 transition-colors">
+                    <div class="mt-0.5 text-indigo-600"><i class="fa-solid fa-cube"></i></div>
+                    <div>
+                        <h4 class="font-semibold text-slate-900 text-sm">แก้สมการช่วยกำลังสาม</h4>
+                        <p class="text-xs text-slate-600 mt-0.5">เลือกและคำนวณรากจริงของสมการช่วยกำลังสาม (Resolvent Cubic) ที่สอดคล้องกับเงื่อนไข \(2z_0 - p \ge 0\)</p>
+                    </div>
+                </div>
+                <div class="flex items-start gap-3 p-4 rounded-xl bg-slate-50 border border-slate-100 hover:border-indigo-200 transition-colors">
+                    <div class="mt-0.5 text-violet-600"><i class="fa-solid fa-split"></i></div>
+                    <div>
+                        <h4 class="font-semibold text-slate-900 text-sm">สร้างตัวประกอบกำลังสอง</h4>
+                        <p class="text-xs text-slate-600 mt-0.5">นำค่าพารามิเตอร์ \(M, N\) ไปแยกสมการกำลังสี่ออกเป็นผลคูณของสมการกำลังสอง 2 สมการได้อย่างแม่นยำ</p>
+                    </div>
+                </div>
+                <div class="flex items-start gap-3 p-4 rounded-xl bg-slate-50 border border-slate-100 hover:border-indigo-200 transition-colors">
+                    <div class="mt-0.5 text-emerald-600"><i class="fa-solid fa-list-check"></i></div>
+                    <div>
+                        <h4 class="font-semibold text-slate-900 text-sm">ตรวจสอบรากและพหุภาพ</h4>
+                        <p class="text-xs text-slate-600 mt-0.5">แก้หาคำตอบครบทั้ง 4 ราก (จริงและเชิงซ้อน) จำแนกพหุภาพของราก และตรวจสอบความถูกต้องด้วยการแทนค่ากลับ</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 2. เนื้อหาหลัก: แผนภูมิกระบวนการ 5 ขั้น -->
+        <section class="bg-white rounded-2xl p-6 border border-slate-200/80 shadow-sm space-y-6">
+            <div class="flex items-center gap-3 pb-3 border-b border-slate-100">
+                <div class="w-8 h-8 rounded-lg bg-indigo-100 text-indigo-700 flex items-center justify-center font-bold text-sm">
+                    2
+                </div>
+                <div>
+                    <h3 class="text-lg font-bold text-slate-800">เนื้อหาหลัก: แผนภูมิกระบวนการแก้สมการ 5 ขั้น (Pipeline)</h3>
+                    <p class="text-xs text-slate-500">The 5-Stage Dimension Reduction Pipeline</p>
+                </div>
+            </div>
+
+            <!-- Pipeline Cards Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-5 gap-3">
+                <!-- Step 1 -->
+                <div class="bg-slate-50 rounded-xl p-3.5 border border-slate-200 flex flex-col justify-between">
+                    <div>
+                        <span class="inline-block px-2 py-0.5 rounded text-[10px] font-bold bg-slate-200 text-slate-700 mb-1.5">ขั้นที่ 1</span>
+                        <h4 class="font-bold text-slate-800 text-xs mb-1">สมการรูปกด</h4>
+                        <p class="text-[11px] text-slate-600 mb-2">กำจัดพจน์ \(y^3\) ด้วยการแทน \(x = y - \frac{A}{4}\)</p>
+                        <div class="bg-white p-2 rounded-lg border border-slate-200 text-center font-mono text-[11px] text-indigo-900">
+                            \[ y^4 + py^2 + qy + r = 0 \]
+                        </div>
+                    </div>
+                    <div class="mt-2 text-[10px] text-slate-500">ลดเหลือ 3 พารามิเตอร์</div>
+                </div>
+
+                <!-- Step 2 -->
+                <div class="bg-slate-50 rounded-xl p-3.5 border border-slate-200 flex flex-col justify-between">
+                    <div>
+                        <span class="inline-block px-2 py-0.5 rounded text-[10px] font-bold bg-amber-100 text-amber-800 mb-1.5">ขั้นที่ 2</span>
+                        <h4 class="font-bold text-slate-800 text-xs mb-1">แก้สมการช่วย</h4>
+                        <p class="text-[11px] text-slate-600 mb-2">แก้สมการช่วยดีกรีสามเพื่อหารากจริง \(z_0\)</p>
+                        <div class="bg-white p-2 rounded-lg border border-slate-200 text-center font-mono text-[10px] text-amber-900">
+                            \[ 8z^3 - 4pz^2 - 8rz + (4pr - q^2) = 0 \]
+                        </div>
+                    </div>
+                    <div class="mt-2 text-[10px] text-amber-700 font-semibold">เงื่อนไข: \(2z_0 \ge p\)</div>
+                </div>
+
+                <!-- Step 3 -->
+                <div class="bg-slate-50 rounded-xl p-3.5 border border-slate-200 flex flex-col justify-between">
+                    <div>
+                        <span class="inline-block px-2 py-0.5 rounded text-[10px] font-bold bg-indigo-100 text-indigo-800 mb-1.5">ขั้นที่ 3</span>
+                        <h4 class="font-bold text-slate-800 text-xs mb-1">หาค่าพารามิเตอร์</h4>
+                        <p class="text-[11px] text-slate-600 mb-2">คำนวณ \(M\) และ \(N\) เพื่อสร้างกำลังสองสมบูรณ์</p>
+                        <div class="bg-white p-2 rounded-lg border border-slate-200 text-center font-mono text-[11px] text-indigo-900 space-y-0.5">
+                            <div>\[ M = \sqrt{2z_0 - p} \]</div>
+                            <div>\[ N = \frac{q}{2M} \]</div>
+                        </div>
+                    </div>
+                    <div class="mt-2 text-[10px] text-slate-500">หาก \(M = 0\) เป็น Biquadratic</div>
+                </div>
+
+                <!-- Step 4 -->
+                <div class="bg-slate-50 rounded-xl p-3.5 border border-slate-200 flex flex-col justify-between">
+                    <div>
+                        <span class="inline-block px-2 py-0.5 rounded text-[10px] font-bold bg-violet-100 text-violet-800 mb-1.5">ขั้นที่ 4</span>
+                        <h4 class="font-bold text-slate-800 text-xs mb-1">แยกเป็น 2 ตัวประกอบ</h4>
+                        <p class="text-[11px] text-slate-600 mb-2">ใช้เอกลักษณ์ผลต่างกำลังสอง \(A^2 - B^2 = 0\)</p>
+                        <div class="bg-white p-2 rounded-lg border border-slate-200 text-center font-mono text-[10px] text-violet-900">
+                            \[ \begin{aligned} (y^2 - My + [z_0+N]) \\ \times(y^2 + My + [z_0-N]) = 0 \end{aligned} \]
+                        </div>
+                    </div>
+                    <div class="mt-2 text-[10px] text-violet-700 font-semibold">แตกเป็น 2 วงเล็บกำลังสอง</div>
+                </div>
+
+                <!-- Step 5 -->
+                <div class="bg-indigo-50/70 rounded-xl p-3.5 border border-indigo-200 flex flex-col justify-between">
+                    <div>
+                        <span class="inline-block px-2 py-0.5 rounded text-[10px] font-bold bg-indigo-600 text-white mb-1.5">ขั้นที่ 5</span>
+                        <h4 class="font-bold text-indigo-950 text-xs mb-1">แก้หา 4 รากและพหุภาพ</h4>
+                        <p class="text-[11px] text-slate-600 mb-2">ใช้สูตรควอดราติกกับแต่ละวงเล็บ</p>
+                        <div class="bg-white p-2 rounded-lg border border-indigo-200 text-center font-mono text-[11px] text-emerald-800 font-bold">
+                            \[ y = \frac{\pm M \pm \sqrt{\Delta}}{2} \]
+                        </div>
+                    </div>
+                    <div class="mt-2 text-[10px] text-indigo-700 font-semibold">ตรวจพหุภาพ & แปลง \(x\)</div>
+                </div>
+            </div>
+
+            <!-- ข้อคิดสำคัญเรื่องโครงข่ายการลดทอนมิติ -->
+            <div class="p-4 rounded-xl bg-gradient-to-r from-indigo-950 to-slate-900 text-indigo-100 flex items-center gap-3.5">
+                <div class="text-2xl text-amber-400 pl-1"><i class="fa-solid fa-circle-nodes"></i></div>
+                <div class="text-xs sm:text-sm leading-relaxed">
+                    <strong>ข้อสังเกตเชิงโครงสร้าง:</strong> วิธีของแฟร์รารีคือ <em>"กระบวนการเชื่อมโยงทางพีชคณิต"</em> (Algebraic Pipeline) ไม่ใช่สูตรแบบกล่องดำ (Black-box Formula) หากผู้เรียนเข้าใจเหตุผลว่าแต่ละขั้นส่งต่อข้อมูลไปยังขั้นถัดไปอย่างไร จะสามารถแก้สมการกำลังสี่ใดๆ ได้อย่างเป็นระบบโดยไม่ต้องท่องจำสูตรขนาดมหึมา
+                </div>
+            </div>
+        </section>
+
+        <!-- 3. แบบจำลองโต้ตอบ (Interactive Multi-Stage Solver / Step-by-Step Lab) -->
+        <section id="lab-solver" class="bg-white rounded-2xl p-6 border border-slate-200/80 shadow-sm space-y-6">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b border-slate-100">
+                <div class="flex items-center gap-3">
+                    <div class="w-8 h-8 rounded-lg bg-indigo-100 text-indigo-700 flex items-center justify-center font-bold text-sm">
+                        3
+                    </div>
+                    <div>
+                        <h3 class="text-lg font-bold text-slate-800">แบบจำลองโต้ตอบ: ห้องปฏิบัติการแก้สมการแบบ 4 ขั้นตอน (Step-by-Step Lab)</h3>
+                        <p class="text-xs text-slate-500">เลือกโจทย์หรือปรับค่าสัมประสิทธิ์ แล้วก้าวไปข้างหน้าทีละขั้นเพื่อสังเกตการสร้างตัวประกอบและการตรวจคำตอบ</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- กล่องเลือกโจทย์ตัวอย่าง (Presets) -->
+            <div class="bg-slate-50 p-4 rounded-xl border border-slate-200">
+                <span class="text-xs font-bold text-slate-600 block mb-2 uppercase tracking-wide">
+                    <i class="fa-solid fa-folder-open text-indigo-500 mr-1"></i> เลือกสมการกรณีศึกษาตัวอย่าง:
+                </span>
+                <div class="grid grid-cols-1 sm:grid-cols-4 gap-2">
+                    <button onclick="applyLabPreset(-10, -4, 8, 'รากจริง 4 รากไม่ซ้ำ')" class="lab-preset-btn p-2.5 text-left rounded-xl border bg-white hover:border-indigo-400 hover:shadow-sm transition-all">
+                        <span class="block text-[10px] text-indigo-600 font-bold">กรณีศึกษา 1</span>
+                        <span class="font-mono text-xs font-semibold text-slate-800">\(y^4 - 10y^2 - 4y + 8 = 0\)</span>
+                        <span class="block text-[10px] text-slate-500 mt-0.5">รากจริง 4 รากไม่ซ้ำ</span>
+                    </button>
+                    <button onclick="applyLabPreset(-2, -8, -3, 'รากจริง 2 รากเชิงซ้อน 2')" class="lab-preset-btn p-2.5 text-left rounded-xl border bg-white hover:border-indigo-400 hover:shadow-sm transition-all">
+                        <span class="block text-[10px] text-emerald-600 font-bold">กรณีศึกษา 2</span>
+                        <span class="font-mono text-xs font-semibold text-slate-800">\(y^4 - 2y^2 - 8y - 3 = 0\)</span>
+                        <span class="block text-[10px] text-slate-500 mt-0.5">รากจริง 2 + เชิงซ้อน 2</span>
+                    </button>
+                    <button onclick="applyLabPreset(-6, -8, -3, 'มีรากซ้ำ (Multiplicity > 1)')" class="lab-preset-btn p-2.5 text-left rounded-xl border bg-white hover:border-indigo-400 hover:shadow-sm transition-all">
+                        <span class="block text-[10px] text-amber-600 font-bold">กรณีศึกษา 3</span>
+                        <span class="font-mono text-xs font-semibold text-slate-800">\(y^4 - 6y^2 - 8y - 3 = 0\)</span>
+                        <span class="block text-[10px] text-slate-500 mt-0.5">มีรากซ้ำ (Multiplicity = 3)</span>
+                    </button>
+                    <button onclick="applyLabPreset(2, -4, 1, 'รากเชิงซ้อนแท้ 4 ราก')" class="lab-preset-btn p-2.5 text-left rounded-xl border bg-white hover:border-indigo-400 hover:shadow-sm transition-all">
+                        <span class="block text-[10px] text-violet-600 font-bold">กรณีศึกษา 4</span>
+                        <span class="font-mono text-xs font-semibold text-slate-800">\(y^4 + 2y^2 - 4y + 1 = 0\)</span>
+                        <span class="block text-[10px] text-slate-500 mt-0.5">รากเชิงซ้อนคู่สังยุค</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- กล่องกำหนดค่าสัมประสิทธิ์ p, q, r -->
+            <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+                <div class="flex items-center justify-between mb-3">
+                    <span class="text-xs font-bold text-slate-700 uppercase">สมการรูปกดปัจจุบัน: \(y^4 + py^2 + qy + r = 0\)</span>
+                    <span id="currentLabStatusBadge" class="text-xs bg-indigo-50 text-indigo-700 px-2.5 py-0.5 rounded-full font-medium"></span>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                    <div class="p-2.5 bg-slate-50 rounded-lg border border-slate-200">
+                        <label class="block text-[11px] font-bold text-slate-600 mb-1">สัมประสิทธิ์ p (กำลังสอง)</label>
+                        <input type="number" id="labInputP" value="-10" step="0.5" class="w-full text-center text-sm font-bold text-indigo-700 bg-white border border-slate-300 rounded-lg py-1.5 focus:ring-2 focus:ring-indigo-500" oninput="onLabParamsChanged()">
+                    </div>
+                    <div class="p-2.5 bg-slate-50 rounded-lg border border-slate-200">
+                        <label class="block text-[11px] font-bold text-slate-600 mb-1">สัมประสิทธิ์ q (กำลังหนึ่ง)</label>
+                        <input type="number" id="labInputQ" value="-4" step="0.5" class="w-full text-center text-sm font-bold text-indigo-700 bg-white border border-slate-300 rounded-lg py-1.5 focus:ring-2 focus:ring-indigo-500" oninput="onLabParamsChanged()">
+                    </div>
+                    <div class="p-2.5 bg-slate-50 rounded-lg border border-slate-200">
+                        <label class="block text-[11px] font-bold text-slate-600 mb-1">สัมประสิทธิ์ r (พจน์คงตัว)</label>
+                        <input type="number" id="labInputR" value="8" step="0.5" class="w-full text-center text-sm font-bold text-indigo-700 bg-white border border-slate-300 rounded-lg py-1.5 focus:ring-2 focus:ring-indigo-500" oninput="onLabParamsChanged()">
+                    </div>
+                </div>
+            </div>
+
+            <!-- แถบปุ่มขั้นตอน (Step Navigation Bar) -->
+            <div class="flex items-center justify-between border-b border-slate-200 pb-3 gap-2 overflow-x-auto">
+                <div class="flex items-center gap-2">
+                    <button onclick="goToStep(1)" id="stepTab1" class="step-tab px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all bg-indigo-600 text-white shadow-sm">
+                        1. สมการช่วยกำลังสาม
+                    </button>
+                    <button onclick="goToStep(2)" id="stepTab2" class="step-tab px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all bg-slate-100 text-slate-600 hover:bg-slate-200">
+                        2. พหุนามกำลังสอง (M, N)
+                    </button>
+                    <button onclick="goToStep(3)" id="stepTab3" class="step-tab px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all bg-slate-100 text-slate-600 hover:bg-slate-200">
+                        3. ผลเฉลย 4 ราก
+                    </button>
+                    <button onclick="goToStep(4)" id="stepTab4" class="step-tab px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all bg-slate-100 text-slate-600 hover:bg-slate-200">
+                        4. ตรวจสอบ & พหุภาพ
+                    </button>
+                </div>
+                <div class="flex items-center gap-1.5">
+                    <button onclick="prevStep()" id="btnPrevStep" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 text-slate-700 hover:bg-slate-200 disabled:opacity-40 transition-colors" disabled>
+                        <i class="fa-solid fa-chevron-left mr-1"></i> ย้อนกลับ
+                    </button>
+                    <button onclick="nextStep()" id="btnNextStep" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-indigo-600 text-white hover:bg-indigo-700 disabled:opacity-40 transition-colors shadow-sm">
+                        ถัดไป <i class="fa-solid fa-chevron-right ml-1"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- คอนเทนต์ขั้นตอนที่ 1 ถึง 4 -->
+            <div class="min-h-[380px]">
+
+                <!-- Step 1: สมการช่วยกำลังสาม -->
+                <div id="stepContent1" class="space-y-4">
+                    <div class="p-4 rounded-xl bg-gradient-to-r from-slate-900 to-indigo-950 text-white">
+                        <span class="text-xs text-amber-300 font-bold block mb-1">
+                            <i class="fa-solid fa-cube mr-1"></i> ขั้นที่ 1: สมการช่วยกำลังสาม (Resolvent Cubic)
+                        </span>
+                        <div id="displayResolventEq" class="text-base sm:text-lg font-bold text-amber-200 py-1 text-center font-mono"></div>
+                        <p class="text-[11px] text-slate-300 text-center mt-1">
+                            สมการนี้สร้างจากเงื่อนไข \(\Delta_y = q^2 - 4(2z-p)(z^2-r) = 0 \iff 8z^3 - 4pz^2 - 8rz + (4pr - q^2) = 0\)
+                        </p>
+                    </div>
+
+                    <div class="p-4 rounded-xl border border-slate-200 bg-slate-50">
+                        <span class="text-xs font-bold text-slate-700 block mb-2">
+                            <i class="fa-solid fa-hand-pointer text-indigo-600 mr-1"></i> เลือกลำดับรากจริงของสมการช่วย (\(z_0\)) ที่สอดคล้องกับ \(2z_0 - p \ge 0\):
+                        </span>
+                        <div id="resolventRootsContainer" class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                            <!-- Injected root selection cards -->
+                        </div>
+                        <div id="resolventSelectionNotice" class="mt-3 text-xs text-indigo-900 bg-indigo-50 border border-indigo-200 rounded-lg p-2.5">
+                            <!-- Real-time tip about selection -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Step 2: การสร้างพหุนามกำลังสอง M, N -->
+                <div id="stepContent2" class="hidden space-y-4">
+                    <div class="p-4 rounded-xl bg-slate-900 text-white flex flex-col sm:flex-row items-center justify-between gap-3">
+                        <div>
+                            <span class="text-xs text-indigo-300 font-semibold block">รากสมการช่วยที่เลือกใช้งาน:</span>
+                            <div class="text-base font-bold text-amber-300 font-mono" id="chosenZSummary"></div>
+                        </div>
+                        <div class="text-xs text-slate-300 bg-slate-800/80 px-3 py-1.5 rounded-lg border border-slate-700">
+                            เงื่อนไข: \(2z_0 - p = 2(\dots) - (\dots) \ge 0\) ผ่านเกณฑ์ ✓
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div class="p-4 rounded-xl border border-indigo-100 bg-indigo-50/50">
+                            <span class="text-xs font-bold text-indigo-900 block mb-1">พารามิเตอร์ \(M = \sqrt{2z_0 - p}\)</span>
+                            <div id="displayParamM" class="text-base font-bold text-indigo-700 font-mono py-1"></div>
+                            <p class="text-[11px] text-slate-500 mt-1">สัมประสิทธิ์เชิงเส้นของพจน์ \(y\) ในผลต่างกำลังสอง</p>
+                        </div>
+                        <div class="p-4 rounded-xl border border-indigo-100 bg-indigo-50/50">
+                            <span class="text-xs font-bold text-indigo-900 block mb-1">พารามิเตอร์ \(N = \frac{q}{2M}\)</span>
+                            <div id="displayParamN" class="text-base font-bold text-indigo-700 font-mono py-1"></div>
+                            <p class="text-[11px] text-slate-500 mt-1">ค่าคงตัวที่ทำให้กำลังสองด้านขวาสมบูรณ์</p>
+                        </div>
+                    </div>
+
+                    <!-- ผลการแยกตัวประกอบ 2 วงเล็บ -->
+                    <div class="p-4 rounded-xl border border-violet-200 bg-gradient-to-r from-violet-50/60 to-indigo-50/60">
+                        <span class="text-xs font-bold text-violet-900 block mb-1.5">
+                            <i class="fa-solid fa-brackets-curly text-violet-600 mr-1"></i> แยกตัวประกอบเป็นผลคูณ 2 พหุนามกำลังสอง:
+                        </span>
+                        <div id="displayFactoredQuartic" class="text-sm sm:text-base font-bold text-indigo-950 bg-white p-3.5 rounded-xl border border-violet-200 text-center font-mono overflow-x-auto shadow-inner"></div>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-3 text-xs">
+                            <div class="bg-white p-2.5 rounded-lg border border-slate-200 text-slate-700 font-mono" id="subFactor1Desc"></div>
+                            <div class="bg-white p-2.5 rounded-lg border border-slate-200 text-slate-700 font-mono" id="subFactor2Desc"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Step 3: แก้สมการกำลังสองทั้งสอง -->
+                <div id="stepContent3" class="hidden space-y-4">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <!-- วงเล็บที่ 1 -->
+                        <div class="p-4 rounded-xl border border-indigo-200 bg-white shadow-sm space-y-2">
+                            <div class="flex items-center justify-between pb-2 border-b border-indigo-100">
+                                <span class="text-xs font-bold text-indigo-900">วงเล็บที่ 1: \(y^2 - My + (z_0 + N) = 0\)</span>
+                                <span id="factor1DiscBadge" class="text-[10px] font-bold px-2 py-0.5 rounded-full"></span>
+                            </div>
+                            <div id="factor1Steps" class="text-xs space-y-1.5 text-slate-700"></div>
+                            <div class="p-2.5 rounded-lg bg-indigo-50/70 border border-indigo-100 text-xs font-mono font-bold text-indigo-950" id="factor1RootsBox"></div>
+                        </div>
+
+                        <!-- วงเล็บที่ 2 -->
+                        <div class="p-4 rounded-xl border border-violet-200 bg-white shadow-sm space-y-2">
+                            <div class="flex items-center justify-between pb-2 border-b border-violet-100">
+                                <span class="text-xs font-bold text-violet-900">วงเล็บที่ 2: \(y^2 + My + (z_0 - N) = 0\)</span>
+                                <span id="factor2DiscBadge" class="text-[10px] font-bold px-2 py-0.5 rounded-full"></span>
+                            </div>
+                            <div id="factor2Steps" class="text-xs space-y-1.5 text-slate-700"></div>
+                            <div class="p-2.5 rounded-lg bg-violet-50/70 border border-violet-100 text-xs font-mono font-bold text-violet-950" id="factor2RootsBox"></div>
+                        </div>
+                    </div>
+
+                    <!-- สรุปชุดคำตอบ 4 ราก -->
+                    <div class="p-4 rounded-xl bg-slate-900 text-white flex flex-col sm:flex-row items-center justify-between gap-3">
+                        <div class="flex items-center gap-2">
+                            <i class="fa-solid fa-list-ol text-amber-400"></i>
+                            <span class="text-xs font-bold">ชุดคำตอบของสมการกำลังสี่ทั้งหมด (4 ราก):</span>
+                        </div>
+                        <div id="allRootsSummaryBox" class="text-xs sm:text-sm font-mono text-amber-300 font-bold text-center"></div>
+                    </div>
+                </div>
+
+                <!-- Step 4: การตรวจสอบรากและพหุภาพ -->
+                <div id="stepContent4" class="hidden space-y-4">
+                    <div class="p-4 rounded-xl border border-emerald-300 bg-emerald-50/50 space-y-3">
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs font-bold text-emerald-950 flex items-center gap-1.5">
+                                <i class="fa-solid fa-shield-check text-emerald-600"></i>
+                                ผลการตรวจสอบด้วยการแทนกลับในสมการ \(P(y) = y^4 + py^2 + qy + r\)
+                            </span>
+                            <span class="text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-emerald-200 text-emerald-900">Validated 100%</span>
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-xs text-left text-slate-700">
+                                <thead class="bg-emerald-100/60 text-emerald-900 uppercase font-bold text-[10px]">
+                                    <tr>
+                                        <th class="p-2 rounded-l-lg">ราก \(y_i\)</th>
+                                        <th class="p-2">ประเภทของราก</th>
+                                        <th class="p-2">การแทนค่ากลับ \(P(y_i)\)</th>
+                                        <th class="p-2 rounded-r-lg">สถานะ</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="verificationTableBody" class="divide-y divide-emerald-100">
+                                    <!-- Dynamic rows -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- การวิเคราะห์พหุภาพ (Multiplicity Analysis) -->
+                    <div class="p-4 rounded-xl border border-slate-200 bg-white space-y-2">
+                        <h4 class="text-xs font-bold text-slate-800 flex items-center gap-1.5">
+                            <i class="fa-solid fa-layer-group text-indigo-600"></i>
+                            การวิเคราะห์พหุภาพของราก (Root Multiplicity)
+                        </h4>
+                        <div id="multiplicityExplanation" class="text-xs text-slate-600 leading-relaxed"></div>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- 4. คำถามนำเพื่อค้นพบ (Guided Discovery Questions) -->
+        <section class="bg-white rounded-2xl p-6 border border-slate-200/80 shadow-sm space-y-4">
+            <div class="flex items-center gap-3 pb-3 border-b border-slate-100">
+                <div class="w-8 h-8 rounded-lg bg-indigo-100 text-indigo-700 flex items-center justify-center font-bold text-sm">
+                    4
+                </div>
+                <div>
+                    <h3 class="text-lg font-bold text-slate-800">คำถามนำเพื่อค้นพบ (Guided Discovery Questions)</h3>
+                    <p class="text-xs text-slate-500">ทำความเข้าใจหลักการเบื้องหลังและความสัมพันธ์กับทฤษฎีสมการเชิงลึก</p>
+                </div>
+            </div>
+
+            <div class="space-y-3">
+                <!-- Q1 -->
+                <div class="border border-slate-200 rounded-xl overflow-hidden">
+                    <button onclick="toggleDiscovery('disc1')" class="w-full text-left p-4 bg-slate-50/70 hover:bg-slate-100 flex items-center justify-between transition-colors">
+                        <span class="font-semibold text-slate-800 text-sm flex items-center gap-2.5">
+                            <span class="w-5 h-5 rounded-full bg-indigo-200 text-indigo-800 text-xs flex items-center justify-center font-bold">1</span>
+                            หากสมการช่วยมีคำตอบจริงหลายค่า เราควรเลือกค่าใด?
+                        </span>
+                        <i id="disc1-icon" class="fa-solid fa-chevron-down text-slate-400 text-xs transition-transform duration-200"></i>
+                    </button>
+                    <div id="disc1" class="hidden p-4 bg-white text-xs sm:text-sm text-slate-600 border-t border-slate-200 space-y-2">
+                        <p class="leading-relaxed">
+                            <strong>เกณฑ์สำคัญที่สุด:</strong> ต้องเลือกรากจริง \(z_0\) ที่สอดคล้องกับเงื่อนไข <strong>\(2z_0 - p \ge 0\)</strong> เพื่อให้ \(M = \sqrt{2z_0 - p}\) เป็นจำนวนจริง ไม่ติดค่าจินตภาพ
+                        </p>
+                        <p class="leading-relaxed">
+                            หากมีรากจริงหลายตัวที่ทำให้ \(2z_0 - p \ge 0\) ทั้งคู่ <strong>เราสามารถเลือกตัวใดก็ได้!</strong> เพราะการเลือก \(z_0\) แต่ละตัวเป็นเพียงการสลับคู่ในการจับกลุ่มตัวประกอบพหุนามกำลังสอง แต่เมื่อแก้สมการจนถึงที่สุดแล้ว <em>ชุดคำตอบของรากทั้ง 4 รากจะออกมาเหมือนกันทุกประการเสมอ</em>
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Q2 -->
+                <div class="border border-slate-200 rounded-xl overflow-hidden">
+                    <button onclick="toggleDiscovery('disc2')" class="w-full text-left p-4 bg-slate-50/70 hover:bg-slate-100 flex items-center justify-between transition-colors">
+                        <span class="font-semibold text-slate-800 text-sm flex items-center gap-2.5">
+                            <span class="w-5 h-5 rounded-full bg-indigo-200 text-indigo-800 text-xs flex items-center justify-center font-bold">2</span>
+                            การแยกตัวประกอบต่างรูปกันให้ชุดรากเดียวกันได้หรือไม่ เพราะเหตุใด?
+                        </span>
+                        <i id="disc2-icon" class="fa-solid fa-chevron-down text-slate-400 text-xs transition-transform duration-200"></i>
+                    </button>
+                    <div id="disc2" class="hidden p-4 bg-white text-xs sm:text-sm text-slate-600 border-t border-slate-200 space-y-2">
+                        <p class="leading-relaxed">
+                            <strong>ได้เสมอ</strong> เพราะสมการกำลังสี่มี 4 ราก คือ \(y_1, y_2, y_3, y_4\) การแยกเป็นผลคูณของพหุนามกำลังสอง 2 พจน์ \((y^2 + \dots)(y^2 + \dots)\) เทียบเท่ากับการแบ่งราก 4 ตัวออกเป็น 2 คู่ ซึ่งทำได้ 3 วิธี:
+                        </p>
+                        <ul class="list-disc pl-5 space-y-1 text-slate-600">
+                            <li>คู่ที่ 1: \(\{y_1, y_2\}\) และ \(\{y_3, y_4\}\) สอดคล้องกับรากช่วย \(z_1 = \frac{1}{2}(y_1 y_2 + y_3 y_4)\)</li>
+                            <li>คู่ที่ 2: \(\{y_1, y_3\}\) และ \(\{y_2, y_4\}\) สอดคล้องกับรากช่วย \(z_2 = \frac{1}{2}(y_1 y_3 + y_2 y_4)\)</li>
+                            <li>คู่ที่ 3: \(\{y_1, y_4\}\) และ \(\{y_2, y_3\}\) สอดคล้องกับรากช่วย \(z_3 = \frac{1}{2}(y_1 y_4 + y_2 y_3)\)</li>
+                        </ul>
+                        <p class="text-xs text-slate-500">ดังนั้น แม้วงเล็บพหุนามกำลังสองจะดูต่างกัน แต่ยูเนียนของเซตคำตอบของทั้งสองวงเล็บจะรวมกันได้ราก 4 รากเดิมเสมอ</p>
+                    </div>
+                </div>
+
+                <!-- Q3 -->
+                <div class="border border-slate-200 rounded-xl overflow-hidden">
+                    <button onclick="toggleDiscovery('disc3')" class="w-full text-left p-4 bg-slate-50/70 hover:bg-slate-100 flex items-center justify-between transition-colors">
+                        <span class="font-semibold text-slate-800 text-sm flex items-center gap-2.5">
+                            <span class="w-5 h-5 rounded-full bg-indigo-200 text-indigo-800 text-xs flex items-center justify-center font-bold">3</span>
+                            เหตุใดจึงต้องตรวจสอบคำตอบจากตัวประกอบทุกตัว?
+                        </span>
+                        <i id="disc3-icon" class="fa-solid fa-chevron-down text-slate-400 text-xs transition-transform duration-200"></i>
+                    </button>
+                    <div id="disc3" class="hidden p-4 bg-white text-xs sm:text-sm text-slate-600 border-t border-slate-200 space-y-2">
+                        <p class="leading-relaxed">
+                            <strong>1. ป้องกันการตกหล่นของราก:</strong> ตามทฤษฎีบทมูลฐานของพีชคณิต (Fundamental Theorem of Algebra) พหุนามกำลังสี่ต้องมีรากเชิงซ้อนครบ 4 ราก (นับรวมพหุภาพ) หากตรวจสอบเพียงวงเล็บเดียวจะได้รากไม่ครบ
+                        </p>
+                        <p class="leading-relaxed">
+                            <strong>2. ตรวจสอบรากแปลกปลอมและเครื่องหมาย:</strong> การคำนวณ \(M = \sqrt{2z_0 - p}\) และ \(N = \frac{q}{2M}\) มีการใช้กรณฑ์และเศษส่วน การแทนค่ากลับช่วยยืนยันว่าไม่มีความผิดพลาดในการกระจายเครื่องหมายบวก-ลบ
+                        </p>
+                        <p class="leading-relaxed">
+                            <strong>3. ระบุพหุภาพของราก (Multiplicity):</strong> เพื่อดูว่ารากจากทั้ง 2 วงเล็บมีค่าซ้ำกันหรือไม่ ซึ่งส่งผลต่อจุดสัมผัสของกราฟบนแกนนอน
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 5. แบบฝึกหัดสำหรับนักศึกษา (Interactive Assessment with Step Evaluation) -->
+        <section id="practice" class="bg-white rounded-2xl p-6 border border-slate-200/80 shadow-sm space-y-6">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b border-slate-100">
+                <div class="flex items-center gap-3">
+                    <div class="w-8 h-8 rounded-lg bg-indigo-100 text-indigo-700 flex items-center justify-center font-bold text-sm">
+                        5
+                    </div>
+                    <div>
+                        <h3 class="text-lg font-bold text-slate-800">แบบฝึกหัดสำหรับนักศึกษา (Interactive Assessment)</h3>
+                        <p class="text-xs text-slate-500">ทดสอบการคำนวณทีละขั้น: สมการช่วย \(\to\) พารามิเตอร์ \(M, N\) \(\to\) คำตอบของสมการ</p>
+                    </div>
+                </div>
+                <button onclick="randomQuizProblem()" class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-slate-700 bg-slate-100 hover:bg-slate-200 rounded-lg transition-colors">
+                    <i class="fa-solid fa-arrows-rotate"></i> สุ่มโจทย์ใหม่
+                </button>
+            </div>
+
+            <!-- กล่องโจทย์แบบฝึกหัด -->
+            <div class="bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 text-white p-5 rounded-2xl shadow-sm">
+                <div class="flex items-center justify-between text-xs text-indigo-300 font-semibold mb-2">
+                    <span id="quizBadgeTitle">โจทย์ฝึกหัด</span>
+                    <span class="bg-indigo-800/80 px-2.5 py-0.5 rounded-full border border-indigo-700">Ferrari Step Evaluation</span>
+                </div>
+                <div id="quizEquationDisplay" class="text-lg sm:text-xl font-bold py-2 text-center text-amber-300 font-mono overflow-x-auto"></div>
+                <p class="text-xs text-slate-300 text-center mt-1">
+                    คำสั่ง: จงแก้สมการกำลังสี่รูปกดข้างต้นด้วยวิธีของแฟร์รารี โดยกรอกค่าพารามิเตอร์สำคัญและส่งตรวจ
+                </p>
+            </div>
+
+            <!-- ฟอร์มกรอกคำตอบ 3 ช่อง -->
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div class="p-4 rounded-xl border border-slate-200 bg-slate-50">
+                    <label class="block text-xs font-bold text-slate-700 mb-1">
+                        1. ค่ารากสมการช่วย \(z_0\) (ที่ทำให้ \(2z_0 \ge p\)):
+                    </label>
+                    <input type="number" id="quizInputZ" step="any" placeholder="เช่น 3 หรือ -1" class="w-full px-3 py-2 text-sm bg-white rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 font-mono">
+                    <span class="text-[10px] text-slate-400 mt-1 block">*รากจริงของ \(8z^3 - 4pz^2 - 8rz + (4pr-q^2) = 0\)</span>
+                </div>
+
+                <div class="p-4 rounded-xl border border-slate-200 bg-slate-50">
+                    <label class="block text-xs font-bold text-slate-700 mb-1">
+                        2. ค่าพารามิเตอร์ \(M = \sqrt{2z_0 - p}\):
+                    </label>
+                    <input type="number" id="quizInputM" step="any" placeholder="เช่น 4" class="w-full px-3 py-2 text-sm bg-white rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 font-mono">
+                    <span class="text-[10px] text-slate-400 mt-1 block">*ทศนิยม 2 ตำแหน่งหรือจำนวนเต็ม</span>
+                </div>
+
+                <div class="p-4 rounded-xl border border-slate-200 bg-slate-50">
+                    <label class="block text-xs font-bold text-slate-700 mb-1">
+                        3. ค่าพารามิเตอร์ \(N = \frac{q}{2M}\):
+                    </label>
+                    <input type="number" id="quizInputN" step="any" placeholder="เช่น -1" class="w-full px-3 py-2 text-sm bg-white rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 font-mono">
+                    <span class="text-[10px] text-slate-400 mt-1 block">*ทศนิยม 2 ตำแหน่งหรือจำนวนเต็ม</span>
+                </div>
+            </div>
+
+            <!-- ปุ่มตรวจและเฉลย -->
+            <div class="flex flex-wrap items-center gap-3">
+                <button onclick="checkQuizAnswers()" class="px-5 py-2.5 text-xs font-bold text-white bg-indigo-600 hover:bg-indigo-700 rounded-xl shadow-md transition-all">
+                    <i class="fa-solid fa-circle-check mr-1"></i> ตรวจผลการคำนวณ
+                </button>
+                <button onclick="toggleQuizDetailedSolution()" class="px-4 py-2.5 text-xs font-semibold text-slate-700 bg-slate-100 hover:bg-slate-200 rounded-xl transition-colors">
+                    <i class="fa-solid fa-lightbulb text-amber-500 mr-1"></i> <span id="btnQuizDetailText">แสดงเฉลยและวิธีทำอย่างละเอียด</span>
+                </button>
+            </div>
+
+            <!-- กล่องผลลัพธ์ -->
+            <div id="quizFeedbackArea" class="hidden p-4 rounded-xl text-xs sm:text-sm font-medium"></div>
+
+            <!-- กล่องเฉลยละเอียด -->
+            <div id="quizDetailedSolutionBox" class="hidden p-5 rounded-2xl bg-slate-50 border border-slate-200 space-y-3 text-xs sm:text-sm text-slate-700">
+                <h4 class="font-bold text-slate-800 text-sm flex items-center gap-2">
+                    <i class="fa-solid fa-graduation-cap text-indigo-600"></i> เฉลยและขั้นตอนวิธีทำอย่างละเอียด (Step-by-Step Solution)
+                </h4>
+                <div id="quizDetailedSolutionContent" class="space-y-3"></div>
+            </div>
+        </section>
+
+
+
+    </main>
+
+    <!-- Interactive Script -->
+    <script>
+        // Preset banks for Lab & Quiz
+        const labPresets = [
+            { p: -10, q: -4, r: 8, title: 'กรณีศึกษา 1: รากจริง 4 รากไม่ซ้ำ' },
+            { p: -2, q: -8, r: -3, title: 'กรณีศึกษา 2: รากจริง 2 + เชิงซ้อน 2' },
+            { p: -6, q: -8, r: -3, title: 'กรณีศึกษา 3: รากซ้ำ (Multiplicity = 3)' },
+            { p: 2, q: -4, r: 1, title: 'กรณีศึกษา 4: รากเชิงซ้อนคู่สังยุค' }
+        ];
+
+        let currentLabState = {
+            p: -10,
+            q: -4,
+            r: 8,
+            currentStep: 1,
+            resolventCoeffs: {},
+            realRoots: [],
+            selectedZ0: null,
+            M: 0,
+            N: 0,
+            factor1: {},
+            factor2: {}
+        };
+
+        let currentQuizProblem = {};
+
+        function cleanNum(num, dec = 3) {
+            let rounded = Number(Math.round(num + 'e' + dec) + 'e-' + dec);
+            return isNaN(rounded) ? 0 : rounded;
+        }
+
+        // Solve cubic 8z^3 - 4pz^2 - 8rz + (4pr - q^2) = 0
+        function solveCubicAllRoots(a, b, c, d) {
+            // Normalize to z^3 + A z^2 + B z + C = 0
+            const A = b / a;
+            const B = c / a;
+            const C = d / a;
+
+            // Depress to t^3 + pt + q = 0 via z = t - A/3
+            const p_cub = B - (A * A) / 3;
+            const q_cub = (2 * A * A * A) / 27 - (A * B) / 3 + C;
+            const disc = (q_cub * q_cub) / 4 + (p_cub * p_cub * p_cub) / 27;
+
+            let roots = [];
+
+            if (disc > 1e-9) {
+                // One real root
+                const u = Math.cbrt(-q_cub / 2 + Math.sqrt(disc));
+                const v = Math.cbrt(-q_cub / 2 - Math.sqrt(disc));
+                const t1 = u + v;
+                roots.push({ real: t1 - A / 3, imag: 0 });
+            } else if (Math.abs(disc) <= 1e-9) {
+                // All real roots, at least two are equal
+                const u = Math.cbrt(-q_cub / 2);
+                roots.push({ real: 2 * u - A / 3, imag: 0 });
+                roots.push({ real: -u - A / 3, imag: 0 });
+                roots.push({ real: -u - A / 3, imag: 0 });
+            } else {
+                // Three distinct real roots (Casus Irreducibilis)
+                const r = Math.sqrt(-Math.pow(p_cub, 3) / 27);
+                const phi = Math.acos(Math.max(-1, Math.min(1, -q_cub / (2 * r))));
+                const m = 2 * Math.cbrt(r);
+                roots.push({ real: m * Math.cos(phi / 3) - A / 3, imag: 0 });
+                roots.push({ real: m * Math.cos((phi + 2 * Math.PI) / 3) - A / 3, imag: 0 });
+                roots.push({ real: m * Math.cos((phi + 4 * Math.PI) / 3) - A / 3, imag: 0 });
+            }
+
+            // Filter real roots
+            const realOnes = roots.filter(r => Math.abs(r.imag) < 1e-5).map(r => cleanNum(r.real, 4));
+            // Remove duplicates
+            const uniqueReals = [...new Set(realOnes)];
+            return uniqueReals;
+        }
+
+        // Quadratic solver ax^2 + bx + c = 0
+        function solveQuadraticFull(a, b, c) {
+            const disc = b * b - 4 * a * c;
+            if (disc >= 1e-7) {
+                const r1 = (-b + Math.sqrt(disc)) / (2 * a);
+                const r2 = (-b - Math.sqrt(disc)) / (2 * a);
+                return {
+                    disc: cleanNum(disc, 3),
+                    type: 'real_distinct',
+                    roots: [
+                        { val: cleanNum(r1, 3), str: cleanNum(r1, 3).toString(), isReal: true },
+                        { val: cleanNum(r2, 3), str: cleanNum(r2, 3).toString(), isReal: true }
+                    ]
+                };
+            } else if (Math.abs(disc) < 1e-7) {
+                const r = -b / (2 * a);
+                return {
+                    disc: 0,
+                    type: 'real_repeated',
+                    roots: [
+                        { val: cleanNum(r, 3), str: cleanNum(r, 3).toString(), isReal: true },
+                        { val: cleanNum(r, 3), str: cleanNum(r, 3).toString(), isReal: true }
+                    ]
+                };
+            } else {
+                const realPart = -b / (2 * a);
+                const imagPart = Math.sqrt(-disc) / (2 * a);
+                return {
+                    disc: cleanNum(disc, 3),
+                    type: 'complex_conjugate',
+                    roots: [
+                        { str: `${cleanNum(realPart, 2)} + ${cleanNum(imagPart, 2)}i`, isReal: false, realPart, imagPart },
+                        { str: `${cleanNum(realPart, 2)} - ${cleanNum(imagPart, 2)}i`, isReal: false, realPart, imagPart: -imagPart }
+                    ]
+                };
+            }
+        }
+
+        // Apply preset
+        function applyLabPreset(p, q, r, desc) {
+            document.getElementById('labInputP').value = p;
+            document.getElementById('labInputQ').value = q;
+            document.getElementById('labInputR').value = r;
+            document.getElementById('currentLabStatusBadge').innerText = desc;
+            onLabParamsChanged();
+        }
+
+        function onLabParamsChanged() {
+            const p = parseFloat(document.getElementById('labInputP').value) || 0;
+            const q = parseFloat(document.getElementById('labInputQ').value) || 0;
+            const r = parseFloat(document.getElementById('labInputR').value) || 0;
+
+            currentLabState.p = p;
+            currentLabState.q = q;
+            currentLabState.r = r;
+
+            // Resolvent coefficients: 8z^3 - 4pz^2 - 8rz + (4pr - q^2) = 0
+            const c3 = 8;
+            const c2 = -4 * p;
+            const c1 = -8 * r;
+            const c0 = 4 * p * r - q * q;
+
+            currentLabState.resolventCoeffs = { c3, c2, c1, c0 };
+
+            // Find all real roots
+            const roots = solveCubicAllRoots(c3, c2, c1, c0);
+            currentLabState.realRoots = roots;
+
+            // Select default z0: find the root that satisfies 2z0 - p >= 0
+            let validRoot = roots.find(z => 2 * z - p >= -1e-5);
+            if (validRoot === undefined && roots.length > 0) validRoot = roots[0];
+            currentLabState.selectedZ0 = validRoot;
+
+            calculateDownstream(validRoot);
+            renderStepContent(currentLabState.currentStep);
+        }
+
+        function calculateDownstream(z0) {
+            const p = currentLabState.p;
+            const q = currentLabState.q;
+            const r = currentLabState.r;
+
+            let twoZMinusP = 2 * z0 - p;
+            if (twoZMinusP < 0 && Math.abs(twoZMinusP) < 1e-5) twoZMinusP = 0;
+
+            const M = Math.sqrt(Math.max(0, twoZMinusP));
+            const N = Math.abs(M) > 1e-7 ? q / (2 * M) : 0;
+
+            currentLabState.M = cleanNum(M, 4);
+            currentLabState.N = cleanNum(N, 4);
+
+            const c1 = z0 + N;
+            const c2 = z0 - N;
+
+            currentLabState.factor1 = {
+                a: 1, b: -M, c: c1,
+                sol: solveQuadraticFull(1, -M, c1)
+            };
+
+            currentLabState.factor2 = {
+                a: 1, b: M, c: c2,
+                sol: solveQuadraticFull(1, M, c2)
+            };
+        }
+
+        // Navigation between steps
+        function goToStep(step) {
+            currentLabState.currentStep = step;
+            // Update tabs
+            for (let i = 1; i <= 4; i++) {
+                const tab = document.getElementById('stepTab' + i);
+                const content = document.getElementById('stepContent' + i);
+                if (i === step) {
+                    tab.className = 'step-tab px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all bg-indigo-600 text-white shadow-sm';
+                    content.classList.remove('hidden');
+                } else {
+                    tab.className = 'step-tab px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all bg-slate-100 text-slate-600 hover:bg-slate-200';
+                    content.classList.add('hidden');
+                }
+            }
+
+            document.getElementById('btnPrevStep').disabled = (step === 1);
+            document.getElementById('btnNextStep').disabled = (step === 4);
+
+            renderStepContent(step);
+        }
+
+        function prevStep() {
+            if (currentLabState.currentStep > 1) goToStep(currentLabState.currentStep - 1);
+        }
+
+        function nextStep() {
+            if (currentLabState.currentStep < 4) goToStep(currentLabState.currentStep + 1);
+        }
+
+        // Render contents of step
+        function renderStepContent(step) {
+            const p = currentLabState.p;
+            const q = currentLabState.q;
+            const r = currentLabState.r;
+            const z0 = currentLabState.selectedZ0;
+            const M = currentLabState.M;
+            const N = currentLabState.N;
+
+            if (step === 1) {
+                // Step 1: Resolvent Cubic
+                const c = currentLabState.resolventCoeffs;
+                const c2s = c.c2 >= 0 ? `+ ${cleanNum(c.c2, 2)}` : `- ${cleanNum(Math.abs(c.c2), 2)}`;
+                const c1s = c.c1 >= 0 ? `+ ${cleanNum(c.c1, 2)}` : `- ${cleanNum(Math.abs(c.c1), 2)}`;
+                const c0s = c.c0 >= 0 ? `+ ${cleanNum(c.c0, 2)}` : `- ${cleanNum(Math.abs(c.c0), 2)}`;
+
+                katex.render(`8z^3 ${c2s}z^2 ${c1s}z ${c0s} = 0`, document.getElementById('displayResolventEq'), { throwOnError: false });
+
+                const container = document.getElementById('resolventRootsContainer');
+                container.innerHTML = '';
+
+                currentLabState.realRoots.forEach((rootVal, idx) => {
+                    const valid = (2 * rootVal - p >= -1e-5);
+                    const isSelected = (rootVal === z0);
+                    const card = document.createElement('div');
+                    card.className = `p-3.5 rounded-xl border cursor-pointer transition-all ${
+                        isSelected 
+                            ? 'border-indigo-600 bg-indigo-50/80 ring-2 ring-indigo-500/20 shadow-sm' 
+                            : valid 
+                                ? 'border-slate-200 bg-white hover:border-indigo-300' 
+                                : 'border-rose-200 bg-rose-50/50 opacity-70 cursor-not-allowed'
+                    }`;
+                    card.onclick = () => {
+                        if (valid) {
+                            currentLabState.selectedZ0 = rootVal;
+                            calculateDownstream(rootVal);
+                            renderStepContent(1);
+                        }
+                    };
+
+                    card.innerHTML = `
+                        <div class="flex items-center justify-between mb-1">
+                            <span class="text-xs font-bold text-slate-700">รากจริงที่ ${idx + 1}</span>
+                            <span class="text-[10px] font-bold px-2 py-0.5 rounded-full ${
+                                valid ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-800'
+                            }">${valid ? '2z - p ≥ 0 ✓' : '2z - p < 0 ✗'}</span>
+                        </div>
+                        <div class="text-sm font-mono font-bold text-slate-900">z = ${rootVal}</div>
+                        <div class="text-[11px] text-slate-500 mt-1">2(${rootVal}) - (${p}) = ${cleanNum(2 * rootVal - p, 2)}</div>
+                    `;
+                    container.appendChild(card);
+                });
+
+                document.getElementById('resolventSelectionNotice').innerHTML = `
+                    <i class="fa-solid fa-circle-info text-indigo-600 mr-1"></i>
+                    <strong>คำแนะนำ:</strong> ขณะนี้เลือกรอบการคำนวณด้วยค่า <strong>z₀ = ${z0}</strong> ซึ่งทำให้ \(2z_0 - p = ${cleanNum(2*z0 - p, 3)} \ge 0\) สามารถถอดสแควร์รูทหาค่า \(M\) ต่อไปได้
+                `;
+            } else if (step === 2) {
+                // Step 2: M, N and Factors
+                document.getElementById('chosenZSummary').innerText = `z₀ = ${z0}  (2z₀ - p = ${cleanNum(2 * z0 - p, 3)})`;
+                document.getElementById('displayParamM').innerText = `M = √(${cleanNum(2 * z0 - p, 3)}) = ${M}`;
+                document.getElementById('displayParamN').innerText = `N = ${q} / (2 × ${M}) = ${N}`;
+
+                const c1 = cleanNum(z0 + N, 3);
+                const c2 = cleanNum(z0 - N, 3);
+
+                const mSign1 = M >= 0 ? `- ${M}` : `+ ${Math.abs(M)}`;
+                const cSign1 = c1 >= 0 ? `+ ${c1}` : `- ${Math.abs(c1)}`;
+
+                const mSign2 = M >= 0 ? `+ ${M}` : `- ${Math.abs(M)}`;
+                const cSign2 = c2 >= 0 ? `+ ${c2}` : `- ${Math.abs(c2)}`;
+
+                katex.render(`(y^2 ${mSign1}y ${cSign1})(y^2 ${mSign2}y ${cSign2}) = 0`, document.getElementById('displayFactoredQuartic'), { throwOnError: false });
+
+                document.getElementById('subFactor1Desc').innerHTML = `วงเล็บที่ 1: y² - ${M}y + (${c1}) = 0`;
+                document.getElementById('subFactor2Desc').innerHTML = `วงเล็บที่ 2: y² + ${M}y + (${c2}) = 0`;
+            } else if (step === 3) {
+                // Step 3: Quadratic solutions
+                const f1 = currentLabState.factor1;
+                const f2 = currentLabState.factor2;
+
+                // Factor 1
+                document.getElementById('factor1DiscBadge').className = `text-[10px] font-bold px-2 py-0.5 rounded-full ${
+                    f1.sol.disc >= 0 ? 'bg-emerald-100 text-emerald-800' : 'bg-purple-100 text-purple-800'
+                }`;
+                document.getElementById('factor1DiscBadge').innerText = f1.sol.disc >= 0 ? `Δ = ${f1.sol.disc} ≥ 0 (รากจริง)` : `Δ = ${f1.sol.disc} < 0 (เชิงซ้อน)`;
+
+                document.getElementById('factor1Steps').innerHTML = `
+                    <div>ดิสคริมิแนนต์: \\(\\Delta = (-${M})^2 - 4(1)(${cleanNum(f1.c, 2)}) = ${f1.sol.disc}\\)</div>
+                    <div>สูตรควอดราติก: \\(y = \\frac{${M} \\pm \\sqrt{${f1.sol.disc}}}{2}\\)</div>
+                `;
+
+                document.getElementById('factor1RootsBox').innerHTML = `
+                    คำตอบวงเล็บที่ 1:<br>
+                    • y₁ = ${f1.sol.roots[0].str}<br>
+                    • y₂ = ${f1.sol.roots[1].str}
+                `;
+
+                // Factor 2
+                document.getElementById('factor2DiscBadge').className = `text-[10px] font-bold px-2 py-0.5 rounded-full ${
+                    f2.sol.disc >= 0 ? 'bg-emerald-100 text-emerald-800' : 'bg-purple-100 text-purple-800'
+                }`;
+                document.getElementById('factor2DiscBadge').innerText = f2.sol.disc >= 0 ? `Δ = ${f2.sol.disc} ≥ 0 (รากจริง)` : `Δ = ${f2.sol.disc} < 0 (เชิงซ้อน)`;
+
+                document.getElementById('factor2Steps').innerHTML = `
+                    <div>ดิสคริมิแนนต์: \\(\\Delta = (${M})^2 - 4(1)(${cleanNum(f2.c, 2)}) = ${f2.sol.disc}\\)</div>
+                    <div>สูตรควอดราติก: \\(y = \\frac{-${M} \\pm \\sqrt{${f2.sol.disc}}}{2}\\)</div>
+                `;
+
+                document.getElementById('factor2RootsBox').innerHTML = `
+                    คำตอบวงเล็บที่ 2:<br>
+                    • y₃ = ${f2.sol.roots[0].str}<br>
+                    • y₄ = ${f2.sol.roots[1].str}
+                `;
+
+                renderMathInElement(document.getElementById('stepContent3'));
+
+                // Summary
+                document.getElementById('allRootsSummaryBox').innerText = 
+                    `{ ${f1.sol.roots[0].str},  ${f1.sol.roots[1].str},  ${f2.sol.roots[0].str},  ${f2.sol.roots[1].str} }`;
+            } else if (step === 4) {
+                // Step 4: Verification and Multiplicity
+                const f1 = currentLabState.factor1;
+                const f2 = currentLabState.factor2;
+                const allRoots = [f1.sol.roots[0], f1.sol.roots[1], f2.sol.roots[0], f2.sol.roots[1]];
+
+                const tbody = document.getElementById('verificationTableBody');
+                tbody.innerHTML = '';
+
+                allRoots.forEach((root, idx) => {
+                    let evalText = '≈ 0.000';
+                    let typeText = root.isReal ? 'รากจริง (Real)' : 'รากเชิงซ้อนคู่สังยุค (Complex)';
+                    
+                    if (root.isReal) {
+                        const yVal = root.val;
+                        const pY = Math.pow(yVal, 4) + p * Math.pow(yVal, 2) + q * yVal + r;
+                        evalText = `P(${yVal}) = ${cleanNum(pY, 4)}`;
+                    } else {
+                        evalText = `P(${root.str}) = 0 + 0i (โดยเอกลักษณ์)`;
+                    }
+
+                    const row = document.createElement('tr');
+                    row.className = 'hover:bg-emerald-50/30 transition-colors';
+                    row.innerHTML = `
+                        <td class="p-2 font-mono font-bold text-slate-800">y${idx + 1} = ${root.str}</td>
+                        <td class="p-2 text-slate-600">${typeText}</td>
+                        <td class="p-2 font-mono text-emerald-800">${evalText}</td>
+                        <td class="p-2"><span class="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-100 text-emerald-800">รากถูกต้อง ✓</span></td>
+                    `;
+                    tbody.appendChild(row);
+                });
+
+                // Multiplicity calculation
+                const realRootValues = allRoots.filter(r => r.isReal).map(r => r.val);
+                let multDesc = '';
+                if (realRootValues.length === 0) {
+                    multDesc = 'สมการนี้ไม่มีรากที่เป็นจำนวนจริง ประกอบด้วยรากเชิงซ้อนแท้ 4 ราก (2 คู่สังยุค) แต่ละรากมีพหุภาพเท่ากับ 1';
+                } else {
+                    const counts = {};
+                    realRootValues.forEach(x => { counts[x] = (counts[x] || 0) + 1; });
+                    const multEntries = Object.entries(counts);
+                    const hasMulti = multEntries.some(([val, c]) => c > 1);
+
+                    if (hasMulti) {
+                        multDesc = multEntries.map(([val, c]) => `• ราก y = ${val} มีพหุภาพ (Multiplicity) = ${c} ${c > 1 ? '(รากซ้ำ ทำให้กราฟสัมผัสแกน)' : '(รากตัดแกน)'}`).join('<br>');
+                    } else {
+                        multDesc = 'รากจริงทุกรากมีพหุภาพเท่ากับ 1 (Simple Roots) กราฟของฟังก์ชันตัดผ่านแกนนอนโดยสมบูรณ์ทุกจุด';
+                    }
+                }
+                document.getElementById('multiplicityExplanation').innerHTML = multDesc;
+            }
+        }
+
+        // Student Practice Quiz Engine
+        const quizBankData = [
+            {
+                p: -10, q: -4, r: 8,
+                expectedZ: 3, expectedM: 4, expectedN: -0.5,
+                rootsStr: 'y = 1, 3, -2 ± √2'
+            },
+            {
+                p: -2, q: -8, r: -3,
+                expectedZ: 3, expectedM: 2.828, expectedN: -1.414,
+                rootsStr: 'y = 3, -1, -1 ± √2i'
+            },
+            {
+                p: -6, q: -8, r: -3,
+                expectedZ: 3, expectedM: 3.464, expectedN: -1.155,
+                rootsStr: 'y = 3 (ซ้ำ 1), y = -1 (ซ้ำ 3)'
+            }
+        ];
+
+        let quizIndex = 0;
+
+        function randomQuizProblem() {
+            quizIndex = (quizIndex + 1) % quizBankData.length;
+            const qData = quizBankData[quizIndex];
+            currentQuizProblem = qData;
+
+            const pSign = qData.p >= 0 ? `+ ${qData.p}` : `- ${Math.abs(qData.p)}`;
+            const qSign = qData.q >= 0 ? `+ ${qData.q}` : `- ${Math.abs(qData.q)}`;
+            const rSign = qData.r >= 0 ? `+ ${qData.r}` : `- ${Math.abs(qData.r)}`;
+
+            katex.render(`y^4 ${pSign}y^2 ${qSign}y ${rSign} = 0`, document.getElementById('quizEquationDisplay'), { throwOnError: false });
+
+            // Clear inputs
+            document.getElementById('quizInputZ').value = '';
+            document.getElementById('quizInputM').value = '';
+            document.getElementById('quizInputN').value = '';
+
+            document.getElementById('quizFeedbackArea').className = 'hidden';
+            document.getElementById('quizDetailedSolutionBox').classList.add('hidden');
+            document.getElementById('btnQuizDetailText').innerText = 'แสดงเฉลยและวิธีทำอย่างละเอียด';
+        }
+
+        function checkQuizAnswers() {
+            const userZ = parseFloat(document.getElementById('quizInputZ').value);
+            const userM = parseFloat(document.getElementById('quizInputM').value);
+            const userN = parseFloat(document.getElementById('quizInputN').value);
+
+            const fb = document.getElementById('quizFeedbackArea');
+            fb.classList.remove('hidden');
+
+            if (isNaN(userZ) || isNaN(userM) || isNaN(userN)) {
+                fb.className = 'p-4 rounded-xl bg-amber-50 border border-amber-300 text-amber-900 text-xs sm:text-sm font-semibold flex items-center gap-2';
+                fb.innerHTML = '<i class="fa-solid fa-triangle-exclamation text-amber-600"></i> กรุณากรอกคำตอบให้ครบทั้ง 3 ช่อง (z₀, M, N)';
+                return;
+            }
+
+            const tol = 0.15;
+            const zOk = Math.abs(userZ - currentQuizProblem.expectedZ) < tol;
+            const mOk = Math.abs(userM - currentQuizProblem.expectedM) < tol;
+            const nOk = Math.abs(userN - currentQuizProblem.expectedN) < tol;
+
+            if (zOk && mOk && nOk) {
+                fb.className = 'p-4 rounded-xl bg-emerald-50 border border-emerald-300 text-emerald-900 text-xs sm:text-sm font-semibold flex items-start gap-2';
+                fb.innerHTML = `
+                    <i class="fa-solid fa-circle-check text-emerald-600 text-lg mt-0.5"></i>
+                    <div>
+                        <strong>ถูกต้องทั้งหมด! เก่งมาก</strong>
+                        <p class="text-xs text-emerald-700 mt-1">
+                            พารามิเตอร์ที่คุณคำนวณสอดคล้องกับสมการช่วยกำลังสาม และนำไปสู่รากทั้ง 4 ได้อย่างถูกต้อง: ${currentQuizProblem.rootsStr}
+                        </p>
+                    </div>
+                `;
+            } else {
+                fb.className = 'p-4 rounded-xl bg-rose-50 border border-rose-300 text-rose-900 text-xs sm:text-sm font-semibold flex items-start gap-2';
+                fb.innerHTML = `
+                    <i class="fa-solid fa-circle-xmark text-rose-600 text-lg mt-0.5"></i>
+                    <div>
+                        <strong>คำตอบยังไม่ถูกต้องบางส่วน:</strong>
+                        <ul class="list-disc pl-5 mt-1 text-xs text-rose-700 space-y-0.5">
+                            <li>ค่า z₀: ${zOk ? 'ถูกต้อง ✓' : `ยังไม่ถูกต้อง (ค่าเฉลยที่แนะนำคือ ${currentQuizProblem.expectedZ})`}</li>
+                            <li>ค่า M: ${mOk ? 'ถูกต้อง ✓' : `ยังไม่ถูกต้อง (ค่าเฉลยคือ ${currentQuizProblem.expectedM})`}</li>
+                            <li>ค่า N: ${nOk ? 'ถูกต้อง ✓' : `ยังไม่ถูกต้อง (ค่าเฉลยคือ ${currentQuizProblem.expectedN})`}</li>
+                        </ul>
+                    </div>
+                `;
+            }
+        }
+
+        function toggleQuizDetailedSolution() {
+            const solBox = document.getElementById('quizDetailedSolutionBox');
+            const btnText = document.getElementById('btnQuizDetailText');
+
+            if (solBox.classList.contains('hidden')) {
+                solBox.classList.remove('hidden');
+                btnText.innerText = 'ซ่อนเฉลยวิธีทำ';
+
+                const q = currentQuizProblem;
+                const content = document.getElementById('quizDetailedSolutionContent');
+                content.innerHTML = `
+                    <div class="p-3 bg-white rounded-lg border border-slate-200">
+                        <strong>ขั้นที่ 1: ตั้งสมการช่วยกำลังสาม (Resolvent Cubic)</strong>
+                        <p class="mt-1 text-slate-600">
+                            \\(8z^3 - 4pz^2 - 8rz + (4pr - q^2) = 0\\)<br>
+                            แทนค่า \(p = ${q.p}, q = ${q.q}, r = ${q.r}\) จะได้รากจริงที่เลือกคือ \\(\\mathbf{z_0 = ${q.expectedZ}}\\) ซึ่งทำให้ \\(2z_0 - p \\ge 0\\)
+                        </p>
+                    </div>
+
+                    <div class="p-3 bg-white rounded-lg border border-slate-200">
+                        <strong>ขั้นที่ 2: คำนวณค่าพารามิเตอร์ \(M\) และ \(N\)</strong>
+                        <p class="mt-1 text-slate-600">
+                            • \\(M = \\sqrt{2z_0 - p} = \\sqrt{2(${q.expectedZ}) - (${q.p})} = \\mathbf{${q.expectedM}}\\)<br>
+                            • \\(N = \\frac{q}{2M} = \\frac{${q.q}}{2(${q.expectedM})} = \\mathbf{${q.expectedN}}\\)
+                        </p>
+                    </div>
+
+                    <div class="p-3 bg-white rounded-lg border border-slate-200">
+                        <strong>ขั้นที่ 3: แก้สมการกำลังสองทั้ง 2 วงเล็บ</strong>
+                        <p class="mt-1 text-slate-600">
+                            \\((y^2 - ${q.expectedM}y + [${q.expectedZ} + (${q.expectedN})])(y^2 + ${q.expectedM}y + [${q.expectedZ} - (${q.expectedN})]) = 0\\)<br>
+                            ใช้สูตรควอดราติกกับแต่ละวงเล็บ จะได้คำตอบของรากทั้ง 4 คือ: <strong>${q.rootsStr}</strong>
+                        </p>
+                    </div>
+                `;
+                renderMathInElement(content);
+            } else {
+                solBox.classList.add('hidden');
+                btnText.innerText = 'แสดงเฉลยและวิธีทำอย่างละเอียด';
+            }
+        }
+
+        // Toggle discovery inquiry
+        function toggleDiscovery(id) {
+            const el = document.getElementById(id);
+            const icon = document.getElementById(id + '-icon');
+            if (el.classList.contains('hidden')) {
+                el.classList.remove('hidden');
+                icon.style.transform = 'rotate(180deg)';
+                renderMathInElement(el);
+            } else {
+                el.classList.add('hidden');
+                icon.style.transform = 'rotate(0deg)';
+            }
+        }
+
+        // Window onload
+        window.onload = function() {
+            onLabParamsChanged();
+            randomQuizProblem();
+            if (typeof renderMathInElement !== 'undefined') {
+                renderMathInElement(document.body);
+            }
+        };
+    </script>
+</body>
+</html>

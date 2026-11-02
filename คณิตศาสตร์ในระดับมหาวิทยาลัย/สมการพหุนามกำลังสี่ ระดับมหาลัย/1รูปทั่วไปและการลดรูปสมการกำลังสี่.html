@@ -1,0 +1,971 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>รูปทั่วไปและการลดรูปสมการกำลังสี่ (Depressed Quartic Equation)</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#eef2ff',
+                            100: '#e0e7ff',
+                            500: '#6366f1',
+                            600: '#4f46e5',
+                            700: '#4338ca',
+                            800: '#3730a3',
+                            900: '#312e81',
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'Sarabun', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Google Fonts: Sarabun & Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- KaTeX for high-performance LaTeX rendering -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body);"></script>
+    <!-- Chart.js for Interactive Curve Visualization -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Sarabun', 'Inter', sans-serif;
+            background-color: #f8fafc;
+            color: #1e293b;
+        }
+        .math-font {
+            font-family: 'KaTeX_Math', 'Times New Roman', serif;
+        }
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 antialiased selection:bg-indigo-500 selection:text-white">
+
+    <!-- Header Navigation Bar -->
+    <header class="bg-white border-b border-slate-200 sticky top-0 z-50 shadow-sm backdrop-blur-md bg-white/90">
+        <div class="max-w-6xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-3.5 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-600 to-indigo-500 flex items-center justify-center text-white shadow-md shadow-indigo-100">
+                    <i class="fa-solid fa-square-root-variable text-lg"></i>
+                </div>
+                <div>
+                    
+                    <h1 class="text-base sm:text-lg font-bold text-slate-900 leading-tight">เรื่องที่ 1: รูปทั่วไปและการลดรูปสมการกำลังสี่</h1>
+                </div>
+            </div>
+            <div class="flex items-center gap-2">
+                <a href="#simulator" class="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-indigo-700 bg-indigo-50 hover:bg-indigo-100 rounded-lg transition-colors">
+                    <i class="fa-solid fa-sliders"></i> จำลองเชิงกราฟ
+                </a>
+                <a href="#practice" class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-white bg-indigo-600 hover:bg-indigo-700 rounded-lg shadow-sm transition-colors">
+                    <i class="fa-solid fa-pen-to-square"></i> แบบฝึกหัด
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <main class="max-w-6xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 space-y-8">
+
+        <!-- Banner / Hero Section -->
+        <section class="bg-gradient-to-br from-indigo-900 via-indigo-800 to-slate-900 rounded-3xl p-6 sm:p-10 text-white shadow-xl relative overflow-hidden">
+            <div class="absolute -right-10 -bottom-10 opacity-10 pointer-events-none text-9xl">
+                <i class="fa-solid fa-function"></i>
+            </div>
+            <div class="relative z-10 max-w-3xl">
+
+                <h2 class="text-2xl sm:text-4xl font-extrabold tracking-tight mb-3">
+                    การลดรูปสมการกำลังสี่เป็น <span class="text-transparent bg-clip-text bg-gradient-to-r from-amber-300 to-indigo-200">Depressed Quartic</span>
+                </h2>
+                <p class="text-slate-200 text-sm sm:text-base leading-relaxed">
+                    ขั้นตอนสำคัญในการแก้สมการกำลังสี่ตามวิธีของโลโดวีโก แฟร์รารี (Lodovico Ferrari) 
+                    โดยกำจัดพจน์กำลังสามผ่านการเลื่อนแกนตัวแปร ทำให้สมการอยู่ในรูปอย่างง่ายพร้อมเข้าสู่กระบวนการแยกตัวประกอบ
+                </p>
+            </div>
+        </section>
+
+        <!-- 1. วัตถุประสงค์การเรียนรู้ -->
+        <section class="bg-white rounded-2xl p-6 border border-slate-200/80 shadow-sm">
+            <div class="flex items-center gap-3 mb-4">
+                <div class="w-8 h-8 rounded-lg bg-indigo-100 text-indigo-700 flex items-center justify-center font-bold text-sm">
+                    1
+                </div>
+                <h3 class="text-lg font-bold text-slate-800">วัตถุประสงค์การเรียนรู้ (Learning Objectives)</h3>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="flex items-start gap-3 p-4 rounded-xl bg-slate-50 border border-slate-100 hover:border-indigo-200 transition-colors">
+                    <div class="mt-0.5 text-indigo-600"><i class="fa-solid fa-circle-check"></i></div>
+                    <div>
+                        <h4 class="font-semibold text-slate-900 text-sm">อธิบายรูปทั่วไปและรูปโมนิก</h4>
+                        <p class="text-xs text-slate-600 mt-0.5">นักศึกษาสามารถอธิบายความแตกต่างระหว่างรูปทั่วไป (General Quartic) และรูปโมนิก (Monic Form) ของสมการพหุนามกำลังสี่ได้ถูกต้อง</p>
+                    </div>
+                </div>
+                <div class="flex items-start gap-3 p-4 rounded-xl bg-slate-50 border border-slate-100 hover:border-indigo-200 transition-colors">
+                    <div class="mt-0.5 text-indigo-600"><i class="fa-solid fa-circle-check"></i></div>
+                    <div>
+                        <h4 class="font-semibold text-slate-900 text-sm">ลดรูปและกำจัดพจน์กำลังสาม</h4>
+                        <p class="text-xs text-slate-600 mt-0.5">นักศึกษาสามารถคำนวณการแทนตัวแปร \(x = y - \frac{A}{4}\) เพื่อกำจัดพจน์กำลังสามให้กลายเป็นสมการรูปกด (Depressed Quartic) ได้อย่างแม่นยำทุกขั้นตอน</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 2. เนื้อหาหลักและการคำนวณ -->
+        <section class="bg-white rounded-2xl p-6 border border-slate-200/80 shadow-sm space-y-6">
+            <div class="flex items-center gap-3 pb-3 border-b border-slate-100">
+                <div class="w-8 h-8 rounded-lg bg-indigo-100 text-indigo-700 flex items-center justify-center font-bold text-sm">
+                    2
+                </div>
+                <div>
+                    <h3 class="text-lg font-bold text-slate-800">เนื้อหาหลักและทฤษฎีการแปลงตัวแปร</h3>
+                    <p class="text-xs text-slate-500">Tschirnhaus Transformation for Quartic Polynomial</p>
+                </div>
+            </div>
+
+            <!-- ทฤษฎี: สเต็ป 1 ถึง 3 -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-5">
+                <!-- สเต็ป 1: รูปทั่วไป -->
+                <div class="bg-slate-50/70 border border-slate-200 rounded-xl p-5 flex flex-col justify-between">
+                    <div>
+                        <span class="inline-block px-2.5 py-0.5 rounded-full text-xs font-semibold bg-slate-200 text-slate-700 mb-2">ขั้นที่ 1</span>
+                        <h4 class="font-bold text-slate-800 text-sm mb-2">สมการพหุนามกำลังสี่รูปทั่วไป</h4>
+                        <p class="text-xs text-slate-600 mb-3">เมื่อ \(a \ne 0\) เป็นสัมประสิทธิ์นำ:</p>
+                        <div class="bg-white p-3 rounded-lg border border-slate-200 text-center overflow-x-auto shadow-inner text-sm">
+                            \[ ax^4 + bx^3 + cx^2 + dx + e = 0 \]
+                        </div>
+                    </div>
+                    <div class="mt-4 pt-3 border-t border-slate-200 text-xs text-slate-500">
+                        หารทั้งสองข้างด้วย \(a\) เพื่อแปลงเป็น <b>รูปโมนิก (Monic Form)</b>
+                    </div>
+                </div>
+
+                <!-- สเต็ป 2: รูปโมนิก -->
+                <div class="bg-slate-50/70 border border-slate-200 rounded-xl p-5 flex flex-col justify-between">
+                    <div>
+                        <span class="inline-block px-2.5 py-0.5 rounded-full text-xs font-semibold bg-indigo-100 text-indigo-700 mb-2">ขั้นที่ 2</span>
+                        <h4 class="font-bold text-slate-800 text-sm mb-2">รูปโมนิก (Monic Polynomial)</h4>
+                        <p class="text-xs text-slate-600 mb-3">โดยที่ \(A=\frac{b}{a}, B=\frac{c}{a}, C=\frac{d}{a}, D=\frac{e}{a}\):</p>
+                        <div class="bg-white p-3 rounded-lg border border-slate-200 text-center overflow-x-auto shadow-inner text-sm">
+                            \[ x^4 + Ax^3 + Bx^2 + Cx + D = 0 \]
+                        </div>
+                    </div>
+                    <div class="mt-4 pt-3 border-t border-slate-200 text-xs text-slate-500">
+                        สังเกตว่าพจน์ \(Ax^3\) ยังคงปรากฏอยู่
+                    </div>
+                </div>
+
+                <!-- สเต็ป 3: รูปกด -->
+                <div class="bg-indigo-50/40 border border-indigo-200 rounded-xl p-5 flex flex-col justify-between">
+                    <div>
+                        <span class="inline-block px-2.5 py-0.5 rounded-full text-xs font-semibold bg-indigo-600 text-white mb-2">ขั้นที่ 3</span>
+                        <h4 class="font-bold text-indigo-950 text-sm mb-2">สมการรูปกด (Depressed Quartic)</h4>
+                        <p class="text-xs text-slate-600 mb-3">แทนตัวแปร \(x = y - \frac{A}{4}\) ได้รูป:</p>
+                        <div class="bg-white p-3 rounded-lg border border-indigo-200 text-center overflow-x-auto shadow-inner text-sm font-semibold text-indigo-900">
+                            \[ y^4 + py^2 + qy + r = 0 \]
+                        </div>
+                    </div>
+                    <div class="mt-4 pt-3 border-t border-indigo-100 text-xs text-indigo-700 font-medium">
+                        <i class="fa-solid fa-sparkles text-amber-500 mr-1"></i> พจน์กำลังสาม (\(y^3\)) หายไปอย่างสมบูรณ์!
+                    </div>
+                </div>
+            </div>
+
+            <!-- สูตรคำนวณสัมประสิทธิ์ใหม่ p, q, r อย่างละเอียด -->
+            <div class="bg-slate-900 text-slate-100 rounded-2xl p-6 shadow-inner">
+                <div class="flex items-center justify-between mb-4 flex-wrap gap-2">
+                    <h4 class="text-sm sm:text-base font-bold text-white flex items-center gap-2">
+                        <i class="fa-solid fa-calculator text-indigo-400"></i>
+                        สูตรสำเร็จการคำนวณสัมประสิทธิ์ใหม่ \(p, q, r\)
+                    </h4>
+                    <span class="text-xs bg-slate-800 text-slate-300 px-3 py-1 rounded-full border border-slate-700">
+                        เกิดจากการกระจายทวินามและจัดกลุ่มพจน์
+                    </span>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div class="bg-slate-800/80 rounded-xl p-4 border border-slate-700/80">
+                        <span class="text-xs font-bold text-indigo-300 block mb-1">สัมประสิทธิ์กำลังสอง (\(p\)):</span>
+                        <div class="text-center py-2 text-sm text-amber-300">
+                            \[ p = B - \frac{3A^2}{8} \]
+                        </div>
+                        <p class="text-[11px] text-slate-400 mt-1">ขึ้นอยู่กับสัมประสิทธิ์ลำดับที่หนึ่งและสอง (\(A, B\))</p>
+                    </div>
+
+                    <div class="bg-slate-800/80 rounded-xl p-4 border border-slate-700/80">
+                        <span class="text-xs font-bold text-indigo-300 block mb-1">สัมประสิทธิ์กำลังหนึ่ง (\(q\)):</span>
+                        <div class="text-center py-2 text-sm text-amber-300">
+                            \[ q = C - \frac{AB}{2} + \frac{A^3}{8} \]
+                        </div>
+                        <p class="text-[11px] text-slate-400 mt-1">หาก \(q = 0\) สมการจะเป็น Biquadratic แก้ได้โดยทันที</p>
+                    </div>
+
+                    <div class="bg-slate-800/80 rounded-xl p-4 border border-slate-700/80">
+                        <span class="text-xs font-bold text-indigo-300 block mb-1">พจน์คงตัว (\(r\)):</span>
+                        <div class="text-center py-2 text-sm text-amber-300">
+                            \[ r = D - \frac{AC}{4} + \frac{A^2 B}{16} - \frac{3A^4}{256} \]
+                        </div>
+                        <p class="text-[11px] text-slate-400 mt-1">เป็นการรวมพจน์คงตัวทั้งหมดหลังจากการเลื่อนแกน</p>
+                    </div>
+                </div>
+
+                <!-- ความสัมพันธ์ระหว่างราก -->
+                <div class="mt-4 pt-4 border-t border-slate-800 flex flex-col sm:flex-row items-center justify-between text-xs sm:text-sm text-slate-300 gap-2">
+                    <div class="flex items-center gap-2">
+                        <i class="fa-solid fa-arrow-right-arrow-left text-indigo-400"></i>
+                        <span>ความสัมพันธ์ระหว่างรากเดิม (\(x_i\)) และรากรูปกด (\(y_i\)):</span>
+                    </div>
+                    <div class="bg-indigo-950/80 px-4 py-1.5 rounded-lg border border-indigo-500/40 text-amber-200 font-mono">
+                        \(x_i = y_i - \dfrac{A}{4} \iff y_i = x_i + \dfrac{A}{4}\)
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 3. แบบจำลองโต้ตอบ (Interactive Simulator & Graph) -->
+        <section id="simulator" class="bg-white rounded-2xl p-6 border border-slate-200/80 shadow-sm space-y-6">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b border-slate-100">
+                <div class="flex items-center gap-3">
+                    <div class="w-8 h-8 rounded-lg bg-indigo-100 text-indigo-700 flex items-center justify-center font-bold text-sm">
+                        3
+                    </div>
+                    <div>
+                        <h3 class="text-lg font-bold text-slate-800">แบบจำลองโต้ตอบและการทดลองเชิงกราฟ</h3>
+                        <p class="text-xs text-slate-500">ปรับสัมประสิทธิ์เพื่อสังเกตการคำนวณและการเลื่อนแกนราก (Translation of Roots)</p>
+                    </div>
+                </div>
+                <button onclick="resetDefaults()" class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-lg transition-colors self-start sm:self-auto">
+                    <i class="fa-solid fa-rotate-left"></i> คืนค่าเริ่มต้น
+                </button>
+            </div>
+
+            <!-- กล่องเตือน a = 0 -->
+            <div id="aZeroAlert" class="hidden bg-rose-50 border-l-4 border-rose-500 p-4 rounded-r-xl">
+                <div class="flex items-center gap-3">
+                    <i class="fa-solid fa-triangle-exclamation text-rose-500 text-lg"></i>
+                    <div>
+                        <h4 class="text-rose-800 font-bold text-sm">ไม่สามารถกำหนดค่า \(a = 0\) ได้</h4>
+                        <p class="text-rose-700 text-xs">หากสัมประสิทธิ์นำ \(a = 0\) พหุนามจะไม่ใช่สมการกำลังสี่ กรุณาระบุค่า \(a \ne 0\)</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ส่วนควบคุมสัมประสิทธิ์ -->
+            <div class="bg-slate-50 p-5 rounded-2xl border border-slate-200">
+                <span class="text-xs font-bold uppercase tracking-wider text-slate-500 block mb-3">ปรับสัมประสิทธิ์สมการเดิม: \(ax^4 + bx^3 + cx^2 + dx + e = 0\)</span>
+                <div class="grid grid-cols-2 sm:grid-cols-5 gap-3">
+                    <!-- a -->
+                    <div class="bg-white p-3 rounded-xl border border-slate-200 shadow-sm">
+                        <div class="flex justify-between items-center mb-1">
+                            <label for="inputA" class="text-xs font-bold text-slate-700">สัมประสิทธิ์ a</label>
+                            <span class="text-[10px] text-rose-500 font-semibold">*a ≠ 0</span>
+                        </div>
+                        <input type="number" id="inputA" value="1" step="0.5" class="w-full text-center font-bold text-indigo-600 bg-slate-50 rounded-lg py-1.5 border border-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500" oninput="updateCalculation()">
+                    </div>
+                    <!-- b -->
+                    <div class="bg-white p-3 rounded-xl border border-slate-200 shadow-sm">
+                        <label for="inputB" class="block text-xs font-bold text-slate-700 mb-1">สัมประสิทธิ์ b</label>
+                        <input type="number" id="inputB" value="-4" step="0.5" class="w-full text-center font-bold text-indigo-600 bg-slate-50 rounded-lg py-1.5 border border-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500" oninput="updateCalculation()">
+                    </div>
+                    <!-- c -->
+                    <div class="bg-white p-3 rounded-xl border border-slate-200 shadow-sm">
+                        <label for="inputC" class="block text-xs font-bold text-slate-700 mb-1">สัมประสิทธิ์ c</label>
+                        <input type="number" id="inputC" value="2" step="0.5" class="w-full text-center font-bold text-indigo-600 bg-slate-50 rounded-lg py-1.5 border border-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500" oninput="updateCalculation()">
+                    </div>
+                    <!-- d -->
+                    <div class="bg-white p-3 rounded-xl border border-slate-200 shadow-sm">
+                        <label for="inputD" class="block text-xs font-bold text-slate-700 mb-1">สัมประสิทธิ์ d</label>
+                        <input type="number" id="inputD" value="4" step="0.5" class="w-full text-center font-bold text-indigo-600 bg-slate-50 rounded-lg py-1.5 border border-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500" oninput="updateCalculation()">
+                    </div>
+                    <!-- e -->
+                    <div class="bg-white p-3 rounded-xl border border-slate-200 shadow-sm col-span-2 sm:col-span-1">
+                        <label for="inputE" class="block text-xs font-bold text-slate-700 mb-1">สัมประสิทธิ์ e</label>
+                        <input type="number" id="inputE" value="-3" step="0.5" class="w-full text-center font-bold text-indigo-600 bg-slate-50 rounded-lg py-1.5 border border-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500" oninput="updateCalculation()">
+                    </div>
+                </div>
+            </div>
+
+            <!-- กล่องแสดงผลสมการเปรียบเทียบ -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="p-4 rounded-xl border border-slate-200 bg-gradient-to-b from-white to-slate-50">
+                    <span class="text-xs font-semibold text-slate-500 block mb-1">สมการเดิม \(f(x) = 0\)</span>
+                    <div id="originalEqDisplay" class="text-sm sm:text-base font-semibold text-slate-800 min-h-[36px] flex items-center">
+                        <!-- Render via JS -->
+                    </div>
+                    <div id="monicEqDisplay" class="text-xs text-slate-500 mt-2 pt-2 border-t border-slate-200">
+                        <!-- Monic equation -->
+                    </div>
+                </div>
+                <div class="p-4 rounded-xl border border-indigo-200 bg-gradient-to-b from-indigo-50/50 to-white">
+                    <span class="text-xs font-semibold text-indigo-600 block mb-1">สมการรูปกด (Depressed Quartic) \(g(y) = 0\)</span>
+                    <div id="depressedEqDisplay" class="text-sm sm:text-base font-bold text-indigo-950 min-h-[36px] flex items-center">
+                        <!-- Render via JS -->
+                    </div>
+                    <div id="shiftFormulaDisplay" class="text-xs text-indigo-600 mt-2 pt-2 border-t border-indigo-100">
+                        <!-- Shift details -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- กราฟการเปรียบเทียบและการเลื่อนแกน -->
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                <!-- กราฟแสดงผล -->
+                <div class="lg:col-span-7 bg-white rounded-xl border border-slate-200 p-4 shadow-sm flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-center justify-between mb-2">
+                            <h4 class="text-sm font-bold text-slate-800 flex items-center gap-2">
+                                <i class="fa-solid fa-chart-line text-indigo-500"></i>
+                                กราฟฟังก์ชัน \(f(t)\) เปรียบเทียบกับ \(g(t)\)
+                            </h4>
+                            <div class="flex items-center gap-3 text-xs">
+                                <span class="inline-flex items-center gap-1.5"><span class="w-3 h-3 rounded-full bg-blue-500 inline-block"></span> เดิม \(f(x)\)</span>
+                                <span class="inline-flex items-center gap-1.5"><span class="w-3 h-3 rounded-full bg-purple-600 inline-block"></span> รูปกด \(g(y)\)</span>
+                            </div>
+                        </div>
+                        <p class="text-[11px] text-slate-500 mb-3">
+                            สังเกตกราฟ: กราฟรูปกด \(g(y)\) มีรูปร่างเหมือนกราฟ \(f(x)\) ทุกประการ แต่ถูกเลื่อนขนานแนวนอน (Horizontal Translation) ด้วยระยะ \(h = \frac{A}{4}\)
+                        </p>
+                    </div>
+                    <div class="relative w-full h-72 sm:h-80">
+                        <canvas id="quarticChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- แสดงขั้นตอนการคำนวณแบบ Step-by-Step -->
+                <div class="lg:col-span-5 bg-slate-50 rounded-xl border border-slate-200 p-4 overflow-y-auto max-h-[420px] text-xs">
+                    <h4 class="font-bold text-slate-800 text-sm mb-3 flex items-center gap-2 sticky top-0 bg-slate-50 pb-2 border-b border-slate-200">
+                        <i class="fa-solid fa-list-ol text-indigo-600"></i> ขั้นตอนการคำนวณสัมประสิทธิ์
+                    </h4>
+                    <div id="stepCalculations" class="space-y-3 text-slate-700">
+                        <!-- Steps injected by JavaScript -->
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 4. คำถามนำเพื่อค้นพบ (Guided Inquiry) -->
+        <section class="bg-white rounded-2xl p-6 border border-slate-200/80 shadow-sm space-y-4">
+            <div class="flex items-center gap-3 pb-3 border-b border-slate-100">
+                <div class="w-8 h-8 rounded-lg bg-indigo-100 text-indigo-700 flex items-center justify-center font-bold text-sm">
+                    4
+                </div>
+                <div>
+                    <h3 class="text-lg font-bold text-slate-800">คำถามนำเพื่อค้นพบ (Guided Inquiry)</h3>
+                    <p class="text-xs text-slate-500">คลิกที่คำถามเพื่อดูคำอธิบายและแนวคิดทางคณิตศาสตร์เชิงลึก</p>
+                </div>
+            </div>
+
+            <div class="space-y-3">
+                <!-- Q1 -->
+                <div class="border border-slate-200 rounded-xl overflow-hidden transition-all duration-200">
+                    <button onclick="toggleInquiry('inquiry1')" class="w-full text-left p-4 bg-slate-50/70 hover:bg-slate-100 flex items-center justify-between transition-colors">
+                        <span class="font-semibold text-slate-800 text-sm flex items-center gap-2.5">
+                            <span class="w-5 h-5 rounded-full bg-indigo-200 text-indigo-800 text-xs flex items-center justify-center font-bold">1</span>
+                            เหตุใดการแทนตัวแปร \(x = y - \frac{A}{4}\) จึงกำจัดพจน์กำลังสามได้เสมอ?
+                        </span>
+                        <i id="inquiry1-icon" class="fa-solid fa-chevron-down text-slate-400 text-xs transition-transform duration-200"></i>
+                    </button>
+                    <div id="inquiry1" class="hidden p-4 bg-white text-xs sm:text-sm text-slate-600 border-t border-slate-200 space-y-2">
+                        <p>พิจารณาการกระจายทวินาม (Binomial Expansion) เมื่อแทน \(x = y - h\):</p>
+                        <div class="p-3 bg-slate-50 rounded-lg font-mono text-xs overflow-x-auto">
+                            \((y - h)^4 = y^4 - 4hy^3 + 6h^2 y^2 - 4h^3 y + h^4\)<br>
+                            \(A(y - h)^3 = Ay^3 - 3Ahy^2 + 3Ah^2 y - Ah^3\)
+                        </div>
+                        <p>เมื่อรวมสัมประสิทธิ์ของพจน์ \(y^3\) จากทั้งสองพจน์ จะได้:</p>
+                        <div class="text-center font-semibold text-indigo-900 py-1">
+                            \[ \text{สัมประสิทธิ์ของ } y^3 = -4h + A \]
+                        </div>
+                        <p>ต้องการให้พจน์ \(y^3\) หายไป นั่นคือ \(-4h + A = 0 \implies h = \dfrac{A}{4}\)</p>
+                        <p class="text-slate-500 text-xs">ดังนั้น การเลือกค่า \(h = \frac{A}{4}\) จึงทำให้สัมประสิทธิ์ของ \(y^3\) กลายเป็นศูนย์พอดีในทุกกรณี</p>
+                    </div>
+                </div>
+
+                <!-- Q2 -->
+                <div class="border border-slate-200 rounded-xl overflow-hidden transition-all duration-200">
+                    <button onclick="toggleInquiry('inquiry2')" class="w-full text-left p-4 bg-slate-50/70 hover:bg-slate-100 flex items-center justify-between transition-colors">
+                        <span class="font-semibold text-slate-800 text-sm flex items-center gap-2.5">
+                            <span class="w-5 h-5 rounded-full bg-indigo-200 text-indigo-800 text-xs flex items-center justify-center font-bold">2</span>
+                            การแปลงนี้ทำให้สมการง่ายขึ้นในแง่ใด?
+                        </span>
+                        <i id="inquiry2-icon" class="fa-solid fa-chevron-down text-slate-400 text-xs transition-transform duration-200"></i>
+                    </button>
+                    <div id="inquiry2" class="hidden p-4 bg-white text-xs sm:text-sm text-slate-600 border-t border-slate-200 space-y-2">
+                        <p class="leading-relaxed">
+                            <strong>1. ลดความซับซ้อนของตัวแปร:</strong> การกำจัดพจน์กำลังสาม (\(y^3\)) ทำให้จำนวนพจน์ตัวแปรลดลงจาก 4 พจน์ เหลือเพียง 3 พจน์ คือ \(y^4, y^2, y\)
+                        </p>
+                        <p class="leading-relaxed">
+                            <strong>2. นำไปสู่วิธีของแฟร์รารี (Ferrari's Method):</strong> รูปแบบ \(y^4 + py^2 = -qy - r\) ทำให้เราสามารถเติมพจน์ \(2zy^2 + z^2\) ทั้งสองข้างเพื่อทำเป็นกำลังสองสมบูรณ์ และสร้างสมการแก้ช่วย (Resolvent Cubic) เพื่อหารากได้อย่างเป็นระบบ
+                        </p>
+                        <p class="leading-relaxed">
+                            <strong>3. กรณีพิเศษ Biquadratic:</strong> หาก \(q = 0\) สมการจะกลายเป็น \(y^4 + py^2 + r = 0\) ซึ่งสามารถมองเป็นสมการกำลังสองของ \(u = y^2\) และแก้ได้ทันทีด้วยสูตรกำลังสอง
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Q3 -->
+                <div class="border border-slate-200 rounded-xl overflow-hidden transition-all duration-200">
+                    <button onclick="toggleInquiry('inquiry3')" class="w-full text-left p-4 bg-slate-50/70 hover:bg-slate-100 flex items-center justify-between transition-colors">
+                        <span class="font-semibold text-slate-800 text-sm flex items-center gap-2.5">
+                            <span class="w-5 h-5 rounded-full bg-indigo-200 text-indigo-800 text-xs flex items-center justify-center font-bold">3</span>
+                            รากของสมการเปลี่ยนแปลงอย่างไรเมื่อเปลี่ยนตัวแปรทางเรขาคณิต?
+                        </span>
+                        <i id="inquiry3-icon" class="fa-solid fa-chevron-down text-slate-400 text-xs transition-transform duration-200"></i>
+                    </button>
+                    <div id="inquiry3" class="hidden p-4 bg-white text-xs sm:text-sm text-slate-600 border-t border-slate-200 space-y-2">
+                        <p class="leading-relaxed">
+                            ในทางเรขาคณิต การแปลง \(x = y - \frac{A}{4}\) เปรียบเสมือนการ <strong>เลื่อนแกนพิกัด (Translation of Axes)</strong>
+                        </p>
+                        <ul class="list-disc pl-5 space-y-1 text-slate-600">
+                            <li>รากเดิม \(x_i\) ทั้ง 4 ราก จะถูกเลื่อนไปทางบวกด้วยระยะคงที่ \(\frac{A}{4}\) นั่นคือ \(y_i = x_i + \frac{A}{4}\)</li>
+                            <li><strong>จุดศูนย์ถ่วงของราก (Center of Mass):</strong> ผลรวมของรากในสมการโมนิกคือ \(\sum x_i = -A\) แต่ในสมการรูปกด ผลรวมของรากคือ \(\sum y_i = 0\) เสมอ (เนื่องจากไม่มีพจน์ \(y^3\))</li>
+                            <li>กราฟของฟังก์ชันไม่ได้เปลี่ยนรูปร่าง เพียงแค่ถูกเลื่อนขนานแนวนอนเพื่อให้แกนสมมาตร/จุดสมดุลของพหุนามมาอยู่ที่แกนตั้ง \(y = 0\)</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 5. แบบฝึกหัดสำหรับนักศึกษา (Interactive Practice & Quiz) -->
+        <section id="practice" class="bg-white rounded-2xl p-6 border border-slate-200/80 shadow-sm space-y-6">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b border-slate-100">
+                <div class="flex items-center gap-3">
+                    <div class="w-8 h-8 rounded-lg bg-indigo-100 text-indigo-700 flex items-center justify-center font-bold text-sm">
+                        5
+                    </div>
+                    <div>
+                        <h3 class="text-lg font-bold text-slate-800">แบบฝึกหัดสำหรับนักศึกษา (Practice Quiz)</h3>
+                        <p class="text-xs text-slate-500">ทดสอบการคำนวณสัมประสิทธิ์รูปกด \(p, q, r\) และตรวจผลลัพธ์ทันที</p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-2">
+                    <button onclick="generateRandomExercise()" class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-slate-700 bg-slate-100 hover:bg-slate-200 rounded-lg transition-colors">
+                        <i class="fa-solid fa-dice"></i> สุ่มโจทย์ใหม่
+                    </button>
+                </div>
+            </div>
+
+            <!-- กล่องโจทย์ -->
+            <div class="bg-gradient-to-r from-slate-900 to-indigo-950 text-white p-5 rounded-2xl shadow-sm">
+                <div class="flex items-center justify-between text-xs text-indigo-300 font-semibold mb-2">
+                    <span>โจทย์ข้อที่กำหนด:</span>
+                    <span id="quizBadge" class="bg-indigo-800/80 px-2.5 py-0.5 rounded-full border border-indigo-700">จงหาค่าสัมประสิทธิ์ p, q, r</span>
+                </div>
+                <div id="quizEquationText" class="text-base sm:text-lg font-bold py-2 text-center text-amber-300 overflow-x-auto">
+                    <!-- Latex of Quiz -->
+                </div>
+                <p class="text-[11px] text-slate-400 text-center mt-1">
+                    คำสั่ง: จงลดรูปสมการกำลังสี่นี้ให้อยู่ในรูปกด \(y^4 + py^2 + qy + r = 0\) ผ่านการแปลง \(x = y - \frac{A}{4}\)
+                </p>
+            </div>
+
+            <!-- ฟอร์มกรอกคำตอบ -->
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div class="p-4 rounded-xl border border-slate-200 bg-slate-50">
+                    <label for="ansP" class="block text-xs font-bold text-slate-700 mb-1">ค่าของ \(p\) (ทศนิยม 2 ตำแหน่งหรือเศษส่วน):</label>
+                    <input type="number" id="ansP" step="any" placeholder="เช่น -6" class="w-full px-3 py-2 text-sm bg-white rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 font-medium">
+                </div>
+                <div class="p-4 rounded-xl border border-slate-200 bg-slate-50">
+                    <label for="ansQ" class="block text-xs font-bold text-slate-700 mb-1">ค่าของ \(q\) (ทศนิยม 2 ตำแหน่งหรือเศษส่วน):</label>
+                    <input type="number" id="ansQ" step="any" placeholder="เช่น 8" class="w-full px-3 py-2 text-sm bg-white rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 font-medium">
+                </div>
+                <div class="p-4 rounded-xl border border-slate-200 bg-slate-50">
+                    <label for="ansR" class="block text-xs font-bold text-slate-700 mb-1">ค่าของ \(r\) (ทศนิยม 2 ตำแหน่งหรือเศษส่วน):</label>
+                    <input type="number" id="ansR" step="any" placeholder="เช่น -3" class="w-full px-3 py-2 text-sm bg-white rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 font-medium">
+                </div>
+            </div>
+
+            <!-- ปุ่มตรวจคำตอบ และ เฉลย -->
+            <div class="flex flex-wrap items-center gap-3">
+                <button onclick="checkQuizAnswer()" class="px-5 py-2.5 text-xs font-bold text-white bg-indigo-600 hover:bg-indigo-700 rounded-xl shadow-md transition-all">
+                    <i class="fa-solid fa-check-circle mr-1"></i> ส่งตรวจคำตอบ
+                </button>
+                <button onclick="toggleQuizSolution()" class="px-4 py-2.5 text-xs font-semibold text-slate-700 bg-slate-100 hover:bg-slate-200 rounded-xl transition-colors">
+                    <i class="fa-solid fa-lightbulb text-amber-500 mr-1"></i> <span id="btnSolText">แสดงวิธีทำเฉลยละเอียด</span>
+                </button>
+            </div>
+
+            <!-- ผลการตรวจ -->
+            <div id="quizResultBox" class="hidden p-4 rounded-xl text-xs sm:text-sm font-medium">
+                <!-- Injected via JS -->
+            </div>
+
+            <!-- เฉลยวิธีทำแบบละเอียด -->
+            <div id="quizSolutionBox" class="hidden p-5 rounded-2xl bg-slate-50 border border-slate-200 space-y-3 text-xs sm:text-sm text-slate-700">
+                <h4 class="font-bold text-slate-800 text-sm flex items-center gap-2">
+                    <i class="fa-solid fa-book-open text-indigo-600"></i> เฉลยวิธีทำและขั้นตอนการคำนวณอย่างละเอียด
+                </h4>
+                <div id="quizSolutionContent" class="space-y-2">
+                    <!-- Solution detailed steps -->
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Interactive Script -->
+    <script>
+        // Global variables for Chart and State
+        let quarticChartInstance = null;
+        let currentQuizData = {};
+
+        // Helper: Format polynomial string nicely
+        function formatPoly(coeffs, varName = 'x') {
+            // coeffs = [c4, c3, c2, c1, c0]
+            let str = '';
+            const powers = [4, 3, 2, 1, 0];
+            
+            for (let i = 0; i < coeffs.length; i++) {
+                const c = coeffs[i];
+                const p = powers[i];
+                if (Math.abs(c) < 1e-9) continue;
+
+                let sign = c > 0 ? (str === '' ? '' : ' + ') : (str === '' ? '-' : ' - ');
+                let absVal = Math.abs(c);
+                let roundedVal = Math.round(absVal * 1000) / 1000;
+                let valStr = (roundedVal === 1 && p > 0) ? '' : roundedVal.toString();
+
+                let termStr = '';
+                if (p > 1) termStr = `${varName}^${p}`;
+                else if (p === 1) termStr = `${varName}`;
+                else termStr = roundedVal.toString();
+
+                if (p > 0) {
+                    str += sign + valStr + termStr;
+                } else {
+                    str += sign + absVal;
+                }
+            }
+            if (str === '') str = '0';
+            return str;
+        }
+
+        // Format float to clean decimal or integer
+        function numClean(val, precision = 4) {
+            let rounded = Number(Math.round(val + 'e' + precision) + 'e-' + precision);
+            return isNaN(rounded) ? 0 : rounded;
+        }
+
+        // Initialize and Update Calculation
+        function updateCalculation() {
+            const a = parseFloat(document.getElementById('inputA').value) || 0;
+            const b = parseFloat(document.getElementById('inputB').value) || 0;
+            const c = parseFloat(document.getElementById('inputC').value) || 0;
+            const d = parseFloat(document.getElementById('inputD').value) || 0;
+            const e = parseFloat(document.getElementById('inputE').value) || 0;
+
+            const aZeroAlert = document.getElementById('aZeroAlert');
+            if (Math.abs(a) < 1e-9) {
+                aZeroAlert.classList.remove('hidden');
+                return;
+            } else {
+                aZeroAlert.classList.add('hidden');
+            }
+
+            // 1. Monic Form: x^4 + A x^3 + B x^2 + C x + D = 0
+            const A = b / a;
+            const B = c / a;
+            const C_coef = d / a;
+            const D = e / a;
+
+            // 2. Shift h = A / 4 => x = y - A/4
+            const h = A / 4;
+
+            // 3. Depressed Form coefficients
+            // p = B - 3*A^2 / 8
+            const p = B - (3 * Math.pow(A, 2)) / 8;
+            // q = C - A*B/2 + A^3/8
+            const q = C_coef - (A * B) / 2 + Math.pow(A, 3) / 8;
+            // r = D - A*C/4 + A^2*B/16 - 3*A^4/256
+            const r = D - (A * C_coef) / 4 + (Math.pow(A, 2) * B) / 16 - (3 * Math.pow(A, 4)) / 256;
+
+            // Display Equations in LaTeX
+            const origPolyStr = formatPoly([a, b, c, d, e], 'x');
+            katex.render(`f(x) = ${origPolyStr} = 0`, document.getElementById('originalEqDisplay'), { throwOnError: false });
+
+            const monicPolyStr = formatPoly([1, A, B, C_coef, D], 'x');
+            katex.render(`\\text{รูปโมนิก: } ${monicPolyStr} = 0`, document.getElementById('monicEqDisplay'), { throwOnError: false });
+
+            const depPolyStr = formatPoly([1, 0, p, q, r], 'y');
+            katex.render(`g(y) = ${depPolyStr} = 0`, document.getElementById('depressedEqDisplay'), { throwOnError: false });
+
+            const shiftSign = h >= 0 ? `- ${numClean(h, 3)}` : `+ ${numClean(Math.abs(h), 3)}`;
+            katex.render(`\\text{แทนตัวแปร: } x = y - \\frac{A}{4} = y ${shiftSign}`, document.getElementById('shiftFormulaDisplay'), { throwOnError: false });
+
+            // Render Steps detail
+            renderStepByStep(a, b, c, d, e, A, B, C_coef, D, h, p, q, r);
+
+            // Update Graph
+            renderChart(a, b, c, d, e, p, q, r, h);
+        }
+
+        // Render Step-by-Step explanation with real values
+        function renderStepByStep(a, b, c, d, e, A, B, C_coef, D, h, p, q, r) {
+            const container = document.getElementById('stepCalculations');
+            container.innerHTML = `
+                <div class="p-3 bg-white rounded-lg border border-slate-200">
+                    <span class="font-bold text-slate-800">1. แปลงเป็นรูปโมนิก (หารด้วย a = ${a}):</span>
+                    <div class="mt-1 text-slate-600">
+                        \(A = \\frac{${b}}{${a}} = ${numClean(A, 3)}\)<br>
+                        \(B = \\frac{${c}}{${a}} = ${numClean(B, 3)}\)<br>
+                        \(C = \\frac{${d}}{${a}} = ${numClean(C_coef, 3)}\)<br>
+                        \(D = \\frac{${e}}{${a}} = ${numClean(D, 3)}\)
+                    </div>
+                </div>
+
+                <div class="p-3 bg-white rounded-lg border border-slate-200">
+                    <span class="font-bold text-slate-800">2. หาค่าการเลื่อนแกน \(h = \\frac{A}{4}\):</span>
+                    <div class="mt-1 text-slate-600">
+                        \(h = \\frac{${numClean(A, 3)}}{4} = ${numClean(h, 4)}\)<br>
+                        สมการแทนที่คือ: \(x = y - (${numClean(h, 4)})\)
+                    </div>
+                </div>
+
+                <div class="p-3 bg-white rounded-lg border border-slate-200">
+                    <span class="font-bold text-slate-800">3. คำนวณสัมประสิทธิ์ใหม่ \(p, q, r\):</span>
+                    <div class="mt-2 space-y-2 text-slate-600">
+                        <div>
+                            <b>หาค่า \(p\):</b>
+                            <div class="bg-slate-50 p-1.5 rounded">
+                                \(p = B - \\frac{3A^2}{8} = ${numClean(B, 3)} - \\frac{3(${numClean(A, 3)})^2}{8} = \\mathbf{${numClean(p, 4)}}\)
+                            </div>
+                        </div>
+                        <div>
+                            <b>หาค่า \(q\):</b>
+                            <div class="bg-slate-50 p-1.5 rounded">
+                                \(q = C - \\frac{AB}{2} + \\frac{A^3}{8} = ${numClean(C_coef, 3)} - \\frac{(${numClean(A, 3)})(${numClean(B, 3)})}{2} + \\frac{(${numClean(A, 3)})^3}{8} = \\mathbf{${numClean(q, 4)}}\)
+                            </div>
+                        </div>
+                        <div>
+                            <b>หาค่า \(r\):</b>
+                            <div class="bg-slate-50 p-1.5 rounded">
+                                \(r = D - \\frac{AC}{4} + \\frac{A^2B}{16} - \\frac{3A^4}{256} = \\mathbf{${numClean(r, 4)}}\)
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            // Re-render math inside stepCalculations
+            renderMathInElement(container);
+        }
+
+        // Render Chart.js
+        function renderChart(a, b, c, d, e, p, q, r, h) {
+            const ctx = document.getElementById('quarticChart').getContext('2d');
+            
+            // Generate data points
+            const pointsCount = 100;
+            const xRange = 4;
+            const center = h;
+            const step = (2 * xRange) / pointsCount;
+
+            const labels = [];
+            const dataF = [];
+            const dataG = [];
+
+            // We plot along a common t axis [-xRange, xRange]
+            for (let i = 0; i <= pointsCount; i++) {
+                const t = -xRange + i * step;
+                labels.push(t.toFixed(2));
+
+                // f(t) = a*t^4 + b*t^3 + c*t^2 + d*t + e (normalized to monic for visual comparison or raw)
+                // เพื่อให้เห็นการ shift อย่างชัดเจน เทียบ monic f_monic(t) กับ g(t)
+                const A = b / a, B = c / a, C_val = d / a, D = e / a;
+                const fVal = Math.pow(t, 4) + A * Math.pow(t, 3) + B * Math.pow(t, 2) + C_val * t + D;
+                const gVal = Math.pow(t, 4) + p * Math.pow(t, 2) + q * t + r;
+
+                // Clamping extreme values for aesthetic visualization
+                dataF.push(Math.max(-40, Math.min(40, fVal)));
+                dataG.push(Math.max(-40, Math.min(40, gVal)));
+            }
+
+            if (quarticChartInstance) {
+                quarticChartInstance.destroy();
+            }
+
+            quarticChartInstance = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        {
+                            label: 'สมการเดิม f(t) [Monic]',
+                            data: dataF,
+                            borderColor: '#3b82f6',
+                            backgroundColor: 'rgba(59, 130, 246, 0.05)',
+                            borderWidth: 2.5,
+                            pointRadius: 0,
+                            tension: 0.3,
+                            fill: true,
+                        },
+                        {
+                            label: 'สมการรูปกด g(t) (แกนสมมาตรที่ 0)',
+                            data: dataG,
+                            borderColor: '#9333ea',
+                            borderWidth: 2.5,
+                            borderDash: [5, 5],
+                            pointRadius: 0,
+                            tension: 0.3,
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    interaction: {
+                        mode: 'index',
+                        intersect: false,
+                    },
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                boxWidth: 12,
+                                font: { family: 'Sarabun', size: 11 }
+                            }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return `${context.dataset.label}: ${context.parsed.y.toFixed(2)}`;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            grid: { color: '#f1f5f9' },
+                            ticks: {
+                                maxTicksLimit: 9,
+                                font: { size: 10 }
+                            },
+                            title: {
+                                display: true,
+                                text: 'ค่าของตัวแปร (t)',
+                                font: { family: 'Sarabun', size: 11 }
+                            }
+                        },
+                        y: {
+                            grid: { color: '#f1f5f9' },
+                            min: -30,
+                            max: 30,
+                            ticks: {
+                                font: { size: 10 }
+                            },
+                            title: {
+                                display: true,
+                                text: 'ค่าฟังก์ชัน',
+                                font: { family: 'Sarabun', size: 11 }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Reset inputs to default
+        function resetDefaults() {
+            document.getElementById('inputA').value = 1;
+            document.getElementById('inputB').value = -4;
+            document.getElementById('inputC').value = 2;
+            document.getElementById('inputD').value = 4;
+            document.getElementById('inputE').value = -3;
+            updateCalculation();
+        }
+
+        // Guided Inquiry Accordion Toggle
+        function toggleInquiry(id) {
+            const element = document.getElementById(id);
+            const icon = document.getElementById(id + '-icon');
+            if (element.classList.contains('hidden')) {
+                element.classList.remove('hidden');
+                icon.style.transform = 'rotate(180deg)';
+                renderMathInElement(element);
+            } else {
+                element.classList.add('hidden');
+                icon.style.transform = 'rotate(0deg)';
+            }
+        }
+
+        // Practice Quiz Generation & Logic
+        const presetQuizzes = [
+            { a: 1, b: -4, c: 6, d: -4, e: 1, p: 0, q: 0, r: 0, title: 'ข้อที่ 1' },
+            { a: 1, b: -8, c: 22, d: -24, e: 9, p: -2, q: 0, r: 1, title: 'ข้อที่ 2' },
+            { a: 2, b: -8, c: 14, d: -10, e: 4, p: 1, q: 1, r: 0.5, title: 'ข้อที่ 3 (a ≠ 1)' },
+            { a: 1, b: 4, c: -2, d: -12, e: -7, p: -8, q: 0, r: 9, title: 'ข้อที่ 4' },
+            { a: 1, b: -4, c: 1, d: 6, e: 0, p: -5, q: 0, r: 4, title: 'ข้อที่ 5' },
+        ];
+
+        let quizIndex = 0;
+
+        function generateRandomExercise() {
+            // Select next or random preset
+            quizIndex = (quizIndex + 1) % presetQuizzes.length;
+            const q = presetQuizzes[quizIndex];
+
+            // Re-calculate p, q, r precisely
+            const A = q.b / q.a;
+            const B = q.c / q.a;
+            const C_val = q.d / q.a;
+            const D = q.e / q.a;
+
+            const p = B - (3 * Math.pow(A, 2)) / 8;
+            const q_val = C_val - (A * B) / 2 + Math.pow(A, 3) / 8;
+            const r = D - (A * C_val) / 4 + (Math.pow(A, 2) * B) / 16 - (3 * Math.pow(A, 4)) / 256;
+
+            currentQuizData = {
+                a: q.a, b: q.b, c: q.c, d: q.d, e: q.e,
+                A: A, B: B, C: C_val, D: D,
+                p: numClean(p, 4),
+                q: numClean(q_val, 4),
+                r: numClean(r, 4),
+                h: numClean(A / 4, 4)
+            };
+
+            // Display Latex
+            const eqStr = formatPoly([q.a, q.b, q.c, q.d, q.e], 'x');
+            katex.render(`${eqStr} = 0`, document.getElementById('quizEquationText'), { throwOnError: false });
+
+            // Clear inputs and results
+            document.getElementById('ansP').value = '';
+            document.getElementById('ansQ').value = '';
+            document.getElementById('ansR').value = '';
+            
+            const resultBox = document.getElementById('quizResultBox');
+            resultBox.className = 'hidden p-4 rounded-xl text-xs sm:text-sm font-medium';
+            resultBox.innerHTML = '';
+
+            const solBox = document.getElementById('quizSolutionBox');
+            solBox.classList.add('hidden');
+            document.getElementById('btnSolText').innerText = 'แสดงวิธีทำเฉลยละเอียด';
+        }
+
+        function checkQuizAnswer() {
+            const userP = parseFloat(document.getElementById('ansP').value);
+            const userQ = parseFloat(document.getElementById('ansQ').value);
+            const userR = parseFloat(document.getElementById('ansR').value);
+
+            const resultBox = document.getElementById('quizResultBox');
+            resultBox.classList.remove('hidden');
+
+            if (isNaN(userP) || isNaN(userQ) || isNaN(userR)) {
+                resultBox.className = 'p-4 rounded-xl bg-amber-50 border border-amber-200 text-amber-800 text-xs sm:text-sm';
+                resultBox.innerHTML = '<i class="fa-solid fa-circle-exclamation mr-1"></i> กรุณากรอกคำตอบให้ครบทั้ง 3 ช่อง (p, q, r)';
+                return;
+            }
+
+            const tolerance = 0.05;
+            const pCorrect = Math.abs(userP - currentQuizData.p) < tolerance;
+            const qCorrect = Math.abs(userQ - currentQuizData.q) < tolerance;
+            const rCorrect = Math.abs(userR - currentQuizData.r) < tolerance;
+
+            if (pCorrect && qCorrect && rCorrect) {
+                resultBox.className = 'p-4 rounded-xl bg-emerald-50 border border-emerald-300 text-emerald-800 text-xs sm:text-sm';
+                resultBox.innerHTML = `
+                    <div class="flex items-center gap-2">
+                        <i class="fa-solid fa-circle-check text-emerald-600 text-lg"></i>
+                        <div>
+                            <strong>ยอดเยี่ยมมาก! คำตอบถูกต้องทั้งหมด</strong>
+                            <p class="text-xs text-emerald-700 mt-0.5">สมการรูปกดที่ถูกต้องคือ: \\(y^4 + (${currentQuizData.p})y^2 + (${currentQuizData.q})y + (${currentQuizData.r}) = 0\\)</p>
+                        </div>
+                    </div>
+                `;
+            } else {
+                resultBox.className = 'p-4 rounded-xl bg-rose-50 border border-rose-300 text-rose-800 text-xs sm:text-sm';
+                resultBox.innerHTML = `
+                    <div class="flex items-start gap-2">
+                        <i class="fa-solid fa-circle-xmark text-rose-600 text-lg mt-0.5"></i>
+                        <div>
+                            <strong>คำตอบยังไม่ถูกต้อง กรุณาตรวจสอบอีกครั้ง:</strong>
+                            <ul class="list-disc pl-5 mt-1 space-y-0.5 text-xs text-rose-700">
+                                <li>ค่า p: ${pCorrect ? 'ถูกต้อง ✓' : `ยังไม่ถูกต้อง (คำตอบที่ถูกคือ ${currentQuizData.p})`}</li>
+                                <li>ค่า q: ${qCorrect ? 'ถูกต้อง ✓' : `ยังไม่ถูกต้อง (คำตอบที่ถูกคือ ${currentQuizData.q})`}</li>
+                                <li>ค่า r: ${rCorrect ? 'ถูกต้อง ✓' : `ยังไม่ถูกต้อง (คำตอบที่ถูกคือ ${currentQuizData.r})`}</li>
+                            </ul>
+                        </div>
+                    </div>
+                `;
+            }
+            renderMathInElement(resultBox);
+        }
+
+        function toggleQuizSolution() {
+            const solBox = document.getElementById('quizSolutionBox');
+            const btnText = document.getElementById('btnSolText');
+            
+            if (solBox.classList.contains('hidden')) {
+                solBox.classList.remove('hidden');
+                btnText.innerText = 'ซ่อนเฉลยวิธีทำ';
+
+                const c = currentQuizData;
+                const content = document.getElementById('quizSolutionContent');
+                content.innerHTML = `
+                    <div class="space-y-3">
+                        <div class="p-3 bg-white rounded-lg border border-slate-200">
+                            <strong>ขั้นที่ 1: ตรวจสอบและแปลงเป็นรูปโมนิก</strong><br>
+                            ${c.a !== 1 ? `สมการเดิมมี \(a = ${c.a}\) จึงต้องนำ ${c.a} ไปหารตลอดทั้งสมการ:<br>` : 'สมการอยู่ในรูปโมนิกแล้ว (\(a = 1\)):<br>'}
+                            \(A = \\frac{${c.b}}{${c.a}} = ${c.A}, \\quad B = \\frac{${c.c}}{${c.a}} = ${c.B}, \\quad C = \\frac{${c.d}}{${c.a}} = ${c.C}, \\quad D = \\frac{${c.e}}{${c.a}} = ${c.D}\)
+                        </div>
+
+                        <div class="p-3 bg-white rounded-lg border border-slate-200">
+                            <strong>ขั้นที่ 2: การแทนตัวแปรเพื่อกำจัดพจน์กำลังสาม</strong><br>
+                            ใช้การแทนค่า \(x = y - \\frac{A}{4} = y - \\frac{${c.A}}{4} = y - (${c.h})\)
+                        </div>
+
+                        <div class="p-3 bg-white rounded-lg border border-slate-200">
+                            <strong>ขั้นที่ 3: คำนวณสัมประสิทธิ์ใหม่ \(p, q, r\)</strong><br>
+                            <div class="mt-1 space-y-1.5 text-slate-700">
+                                <p>• \(p = B - \\frac{3A^2}{8} = ${c.B} - \\frac{3(${c.A})^2}{8} = \\mathbf{${c.p}}\)</p>
+                                <p>• \(q = C - \\frac{AB}{2} + \\frac{A^3}{8} = ${c.C} - \\frac{(${c.A})(${c.B})}{2} + \\frac{(${c.A})^3}{8} = \\mathbf{${c.q}}\)</p>
+                                <p>• \(r = D - \\frac{AC}{4} + \\frac{A^2B}{16} - \\frac{3A^4}{256} = \\mathbf{${c.r}}\)</p>
+                            </div>
+                        </div>
+
+                        <div class="p-3 bg-indigo-50 border border-indigo-200 rounded-lg text-indigo-900 font-semibold text-center">
+                            สมการรูปกดที่ได้คือ: \(y^4 ${c.p >= 0 ? '+ ' + c.p : c.p}y^2 ${c.q >= 0 ? '+ ' + c.q : c.q}y ${c.r >= 0 ? '+ ' + c.r : c.r} = 0\)
+                        </div>
+                    </div>
+                `;
+                renderMathInElement(content);
+            } else {
+                solBox.classList.add('hidden');
+                btnText.innerText = 'แสดงวิธีทำเฉลยละเอียด';
+            }
+        }
+
+        // Window onload initialization
+        window.onload = function() {
+            updateCalculation();
+            generateRandomExercise();
+            // KaTeX auto-render across the entire page
+            if (typeof renderMathInElement !== 'undefined') {
+                renderMathInElement(document.body);
+            }
+        };
+    </script>
+</body>
+</html>
