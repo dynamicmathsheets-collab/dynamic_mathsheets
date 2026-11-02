@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>เรื่องที่ 7: พีชคณิตขั้นสูงในการแก้สมการกำลังสาม (แสดงครบ 3 ราก)</title>
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- MathJax Configuration -->
+  <script>
+    window.MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']],
+        displayMath: [['$$', '$$'], ['\\[', '\\]']]
+      },
+      chtml: {
+        matchFontHeight: false
+      }
+    };
+  </script>
+  <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@400;500;600;700&family=Sarabun:wght@300;400;500;600&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+
+  <style>
+    body {
+      font-family: 'Sarabun', sans-serif;
+      word-break: break-word;
+    }
+    h1, h2, h3, h4, .font-heading {
+      font-family: 'Prompt', sans-serif;
+    }
+    .math-inline {
+      white-space: nowrap;
+      display: inline-block;
+    }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-800 antialiased min-h-screen">
+
+  <!-- Container ขนาดกว้างคงที่ 1,152px (max-w-6xl) -->
+  <div class="max-w-6xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 space-y-8">
+    
+    <!-- Header -->
+    <header class="bg-white rounded-2xl shadow-sm border border-slate-200/80 p-6 sm:p-8">
+      <h1 class="text-2xl sm:text-3xl lg:text-4xl font-bold text-slate-900 tracking-tight">
+        พีชคณิตขั้นสูง: การหาผลเฉลยครบทั้ง 3 ราก ($y_1, y_2, y_3$)
+      </h1>
+      <p class="mt-2 text-slate-600 text-sm sm:text-base leading-relaxed">
+        ศึกษากลวิธีทางพีชคณิตของ Euler, Lagrange และ Hudde โดยแจกแจงที่มาและแสดงคำตอบครบทั้ง 3 รากตามทฤษฎีบทหลักมูลของพีชคณิต
+      </p>
+    </header>
+
+    <!-- 1. วัตถุประสงค์การเรียนรู้ -->
+    <section class="bg-white rounded-2xl shadow-sm border border-slate-200/80 p-6 sm:p-8">
+      <div class="flex items-center gap-3 mb-4 border-b border-slate-100 pb-3">
+        <div class="w-8 h-8 rounded-lg bg-amber-100 text-amber-700 flex items-center justify-center font-bold text-base">
+          1
+        </div>
+        <h2 class="text-xl font-bold text-slate-900">วัตถุประสงค์การเรียนรู้</h2>
+      </div>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div class="p-4 rounded-xl bg-slate-50 border border-slate-200">
+          <p class="text-sm text-slate-700 leading-relaxed font-medium">
+            1. ใช้การจับคู่รากที่สามของเอกลักษณ์ $\omega$ ในวิธีของออยเลอร์เพื่อหารากครบทั้ง 3 ค่า ($y_1, y_2, y_3$)
+          </p>
+        </div>
+        <div class="p-4 rounded-xl bg-slate-50 border border-slate-200">
+          <p class="text-sm text-slate-700 leading-relaxed font-medium">
+            2. แก้ระบบสมการผกผันของ Lagrange Resolvent แจกแจงผลเฉลยทั้ง 3 รากผ่านการหมุนของเวกเตอร์ $\omega$
+          </p>
+        </div>
+        <div class="p-4 rounded-xl bg-slate-50 border border-slate-200">
+          <p class="text-sm text-slate-700 leading-relaxed font-medium">
+            3. ใช้กฎฮัดเดอตรวจหารากซ้ำ ดึงตัวประกอบ $(y-r)^2$ และคำนวณรากที่สาม $y_3 = -2r$ ให้ครบถ้วน
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 2. แบบจำลองโต้ตอบ (Interactive Simulator แสดงครบ 3 ราก) -->
+    <section class="bg-white rounded-2xl shadow-sm border border-slate-200/80 p-6 sm:p-8 space-y-6">
+      <div class="flex items-center gap-3 border-b border-slate-100 pb-3">
+        <div class="w-8 h-8 rounded-lg bg-amber-100 text-amber-700 flex items-center justify-center font-bold text-base">
+          2
+        </div>
+        <div>
+          <h2 class="text-xl font-bold text-slate-900">แบบจำลองโต้ตอบ: เลือกสัมประสิทธิ์แล้วแสดงวิธีทำและคำตอบทั้ง 3 ราก</h2>
+          <p class="text-xs sm:text-sm text-slate-500">ปรับแถบบาร์สัมประสิทธิ์ $p, q$ เพื่อดูขั้นตอนการแจกแจงผลเฉลย $y_1, y_2, y_3$ แบบเรียลไทม์</p>
+        </div>
+      </div>
+
+      <!-- ปุ่ม Preset ตัวอย่าง -->
+      <div class="flex flex-wrap items-center gap-2 text-xs">
+        <span class="font-bold text-slate-600">โจทย์ตัวอย่าง:</span>
+        <button onclick="setParams(-2, -7)" class="px-3 py-1.5 rounded-lg bg-amber-100 text-amber-900 font-semibold border border-amber-300 hover:bg-amber-200 transition">
+          ตัวอย่างเดิม: $y^3 - 2y - 7 = 0$ (1 รากจริง + 2 เชิงซ้อน)
+        </button>
+        <button onclick="setParams(-6, -9)" class="px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-800 font-semibold border border-slate-200 transition">
+          รากจริงตัวเลขลงตัว: $y^3 - 6y - 9 = 0$
+        </button>
+        <button onclick="setParams(-3, 2)" class="px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-800 font-semibold border border-slate-200 transition">
+          กรณีมีรากซ้ำ: $y^3 - 3y + 2 = 0$
+        </button>
+        <button onclick="setParams(-7, -6)" class="px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-800 font-semibold border border-slate-200 transition">
+          3 รากจริงต่างกัน: $y^3 - 7y - 6 = 0$
+        </button>
+      </div>
+
+      <!-- บาร์เลื่อนปรับตัวเลข -->
+      <div class="bg-slate-50 p-6 rounded-2xl border border-slate-200 space-y-6">
+        <div>
+          <div class="flex justify-between items-center mb-2">
+            <span class="text-sm font-bold text-slate-800">ค่าสัมประสิทธิ์ $p$:</span>
+            <span id="pValText" class="font-mono text-base font-bold bg-white px-3 py-0.5 rounded-lg border border-slate-200 text-amber-700">-2</span>
+          </div>
+          <input type="range" id="pRange" min="-12" max="6" step="1" value="-2" class="w-full h-2.5 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-amber-600">
+          <div class="flex justify-between text-xs text-slate-400 mt-1 font-mono">
+            <span>-12</span>
+            <span>-6</span>
+            <span>-2</span>
+            <span>0</span>
+            <span>+6</span>
+          </div>
+        </div>
+
+        <div>
+          <div class="flex justify-between items-center mb-2">
+            <span class="text-sm font-bold text-slate-800">ค่าคงตัว $q$:</span>
+            <span id="qValText" class="font-mono text-base font-bold bg-white px-3 py-0.5 rounded-lg border border-slate-200 text-amber-700">-7</span>
+          </div>
+          <input type="range" id="qRange" min="-15" max="15" step="1" value="-7" class="w-full h-2.5 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-amber-600">
+          <div class="flex justify-between text-xs text-slate-400 mt-1 font-mono">
+            <span>-15</span>
+            <span>-7</span>
+            <span>0</span>
+            <span>+7</span>
+            <span>+15</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- แท็บเลือกวิธี -->
+      <div class="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm">
+        <div class="flex border-b border-slate-200 bg-slate-100/70 p-1.5 gap-1.5">
+          <button id="tabEuler" onclick="switchMethod('euler')" class="flex-1 py-2.5 px-3 rounded-xl font-bold text-xs sm:text-sm transition bg-white shadow-sm text-amber-800">
+            วิธีของออยเลอร์ (Euler)
+          </button>
+          <button id="tabLagrange" onclick="switchMethod('lagrange')" class="flex-1 py-2.5 px-3 rounded-xl font-bold text-xs sm:text-sm transition text-slate-600 hover:text-slate-900">
+            วิธีของลากร็องฌ์ (Lagrange)
+          </button>
+          <button id="tabHudde" onclick="switchMethod('hudde')" class="flex-1 py-2.5 px-3 rounded-xl font-bold text-xs sm:text-sm transition text-slate-600 hover:text-slate-900">
+            วิธีของฮัดเดอ (Hudde)
+          </button>
+        </div>
+
+        <!-- บริเวณแสดงผลวิธีทำ -->
+        <div id="methodOutput" class="p-6 space-y-6 text-sm sm:text-base text-slate-800 leading-relaxed">
+          <!-- Render via JS -->
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- JavaScript คำนวณและแสดงคำตอบครบทั้ง 3 ราก -->
+  <script>
+    let currentMethod = 'euler';
+
+    function setParams(p, q) {
+      document.getElementById('pRange').value = p;
+      document.getElementById('qRange').value = q;
+      renderActiveMethod();
+    }
+
+    function switchMethod(method) {
+      currentMethod = method;
+      ['euler', 'lagrange', 'hudde'].forEach(t => {
+        const btn = document.getElementById('tab' + t.charAt(0).toUpperCase() + t.slice(1));
+        if (t === method) {
+          btn.className = "flex-1 py-2.5 px-3 rounded-xl font-bold text-xs sm:text-sm transition bg-white shadow-sm text-amber-800";
+        } else {
+          btn.className = "flex-1 py-2.5 px-3 rounded-xl font-bold text-xs sm:text-sm transition text-slate-600 hover:text-slate-900";
+        }
+      });
+      renderActiveMethod();
+    }
+
+    // คำนวณรากทั้งสามค่าที่แท้จริง
+    function calculateExactRoots(p, q) {
+      const halfQ = q / 2;
+      const thirdP = p / 3;
+      const delta = Math.pow(halfQ, 2) + Math.pow(thirdP, 3);
+      
+      let roots = [];
+
+      if (Math.abs(delta) < 1e-7) {
+        // Delta = 0 (รากซ้ำ)
+        if (p === 0 && q === 0) {
+          roots = [
+            { text: "y_1 = 0", isReal: true },
+            { text: "y_2 = 0", isReal: true },
+            { text: "y_3 = 0", isReal: true }
+          ];
+        } else {
+          const rDouble = (3 * q) / p;
+          const rSingle = (-6 * q) / p;
+          roots = [
+            { text: `y_1 = ${rDouble.toFixed(3)} \\quad (\\text{รากซ้ำ})`, isReal: true },
+            { text: `y_2 = ${rDouble.toFixed(3)} \\quad (\\text{รากซ้ำ})`, isReal: true },
+            { text: `y_3 = ${rSingle.toFixed(3)}`, isReal: true }
+          ];
+        }
+      } else if (delta > 0) {
+        // Delta > 0 (1 รากจริง + 2 รากเชิงซ้อนคู่สังยุค)
+        const sqrtDelta = Math.sqrt(delta);
+        const u = Math.cbrt(-halfQ + sqrtDelta);
+        const v = Math.cbrt(-halfQ - sqrtDelta);
+        const y1 = u + v;
+        const realPart = -(u + v) / 2;
+        const imagPart = (Math.sqrt(3) / 2) * Math.abs(u - v);
+
+        roots = [
+          { text: `y_1 = ${y1.toFixed(3)} \\quad (\\text{รากจริง})`, isReal: true },
+          { text: `y_2 = ${realPart.toFixed(3)} + ${imagPart.toFixed(3)}i \\quad (\\text{รากเชิงซ้อน})`, isReal: false },
+          { text: `y_3 = ${realPart.toFixed(3)} - ${imagPart.toFixed(3)}i \\quad (\\text{รากเชิงซ้อน})`, isReal: false }
+        ];
+      } else {
+        // Delta < 0 (3 รากจริงแตกต่างกัน)
+        const r = Math.sqrt(-Math.pow(thirdP, 3));
+        const theta = Math.acos(-halfQ / r);
+        const y1 = 2 * Math.sqrt(-thirdP) * Math.cos(theta / 3);
+        const y2 = 2 * Math.sqrt(-thirdP) * Math.cos((theta + 2 * Math.PI) / 3);
+        const y3 = 2 * Math.sqrt(-thirdP) * Math.cos((theta + 4 * Math.PI) / 3);
+
+        roots = [
+          { text: `y_1 = ${y1.toFixed(3)} \\quad (\\text{รากจริง})`, isReal: true },
+          { text: `y_2 = ${y2.toFixed(3)} \\quad (\\text{รากจริง})`, isReal: true },
+          { text: `y_3 = ${y3.toFixed(3)} \\quad (\\text{รากจริง})`, isReal: true }
+        ];
+      }
+      return { delta, roots };
+    }
+
+    function renderActiveMethod() {
+      const p = parseFloat(document.getElementById('pRange').value);
+      const q = parseFloat(document.getElementById('qRange').value);
+
+      document.getElementById('pValText').textContent = p;
+      document.getElementById('qValText').textContent = q;
+
+      const outEl = document.getElementById('methodOutput');
+      const pSign = p >= 0 ? `+ ${p}` : `- ${Math.abs(p)}`;
+      const qSign = q >= 0 ? `+ ${q}` : `- ${Math.abs(q)}`;
+      const thirdP = p / 3;
+      const halfQ = q / 2;
+      const pPart = Math.pow(thirdP, 3);
+      const uvProduct = -pPart;
+
+      const { delta, roots } = calculateExactRoots(p, q);
+
+      let html = `
+        <div class="border-b border-slate-200 pb-3">
+          <span class="text-xs font-bold text-amber-800 block mb-1">สมการกำลังสามที่กำลังวิเคราะห์:</span>
+          <div class="text-center font-bold text-xl py-1 text-slate-900">
+            $$y^3 ${pSign}y ${qSign} = 0$$
+          </div>
+          <div class="text-center text-xs text-slate-500 font-mono mt-1">
+            สัมประสิทธิ์: $p = ${p}$, ค่าคงตัว: $q = ${q}$, ตัวจำแนก $\\Delta = (${halfQ.toFixed(2)})^2 + (${thirdP.toFixed(2)})^3 = ${delta.toFixed(3)}$
+          </div>
+        </div>
+      `;
+
+      if (currentMethod === 'euler') {
+        html += `
+          <div class="space-y-3">
+            <div class="flex items-center gap-2">
+              <span class="w-6 h-6 rounded-full bg-amber-100 text-amber-800 text-xs font-bold flex items-center justify-center">1</span>
+              <h3 class="font-bold text-slate-900 text-sm sm:text-base">สมมติรูปแบบรากตามแนวคิดของออยเลอร์: $y = \\sqrt[3]{u} + \\sqrt[3]{v}$</h3>
+            </div>
+            <p class="text-xs sm:text-sm text-slate-600 pl-8">
+              เมื่อกระจายกำลังสามสมบูรณ์ $(A+B)^3 = A^3 + B^3 + 3AB(A+B)$ จะได้:
+            </p>
+            <div class="ml-8 p-3 bg-slate-50 rounded-xl border border-slate-200 text-xs sm:text-sm font-mono text-center">
+              $$y^3 - 3\\sqrt[3]{uv} \\cdot y - (u + v) = 0$$
+            </div>
+
+            <div class="flex items-center gap-2 pt-2">
+              <span class="w-6 h-6 rounded-full bg-amber-100 text-amber-800 text-xs font-bold flex items-center justify-center">2</span>
+              <h3 class="font-bold text-slate-900 text-sm sm:text-base">เทียบสัมประสิทธิ์ตรงๆ บรรทัดต่อบรรทัด</h3>
+            </div>
+            <div class="ml-8 p-3.5 bg-amber-50/70 border border-amber-200 rounded-xl text-xs sm:text-sm font-mono text-amber-950 space-y-2">
+              <div class="text-center">
+                $$\\begin{aligned}
+                y^3 &+ (${p})y &+ (${q}) &= 0 \\\\[4pt]
+                y^3 &\\mathbf{- 3\\sqrt[3]{uv}}y &\\mathbf{- (u + v)} &= 0
+                \\end{aligned}$$
+              </div>
+              <div class="border-t border-amber-200 pt-2 grid grid-cols-1 sm:grid-cols-2 gap-2">
+                <div>• ผลบวก: $u + v = -q = \\mathbf{${-q}}$</div>
+                <div>• ผลคูณ: $uv = -\\left(\\frac{p}{3}\\right)^3 = -(${thirdP.toFixed(2)})^3 = \\mathbf{${uvProduct.toFixed(3)}}$</div>
+              </div>
+            </div>
+
+            <div class="flex items-center gap-2 pt-2">
+              <span class="w-6 h-6 rounded-full bg-amber-100 text-amber-800 text-xs font-bold flex items-center justify-center">3</span>
+              <h3 class="font-bold text-slate-900 text-sm sm:text-base">แก้สมการช่วยกำลังสอง (Euler Resolvent)</h3>
+            </div>
+            <div class="ml-8 p-3.5 bg-slate-900 text-slate-100 rounded-xl text-xs sm:text-sm font-mono text-center space-y-1">
+              <div>$$t^2 - (u+v)t + uv = 0 \\implies t^2 ${q >= 0 ? '+ ' + q : '- ' + Math.abs(q)}t ${uvProduct >= 0 ? '+ ' + uvProduct.toFixed(3) : '- ' + Math.abs(uvProduct).toFixed(3)} = 0$$</div>
+              <div class="text-amber-300">
+                $$t = -\\frac{q}{2} \\pm \\sqrt{\\Delta} = ${(-halfQ).toFixed(2)} \\pm \\sqrt{${delta.toFixed(3)}}$$
+              </div>
+            </div>
+
+            <div class="flex items-center gap-2 pt-2">
+              <span class="w-6 h-6 rounded-full bg-emerald-100 text-emerald-800 text-xs font-bold flex items-center justify-center">4</span>
+              <h3 class="font-bold text-slate-900 text-sm sm:text-base">ผลเฉลยสมบูรณ์ครบทั้ง 3 ราก (Euler Roots)</h3>
+            </div>
+            <p class="text-xs sm:text-sm text-slate-600 pl-8">
+              รากที่สามของ $u$ และ $v$ มี 3 ค่าเสมอ โดยเชื่อมด้วย $\\omega = -\\frac{1}{2} + i\\frac{\\sqrt{3}}{2}$:
+            </p>
+            <div class="ml-8 p-4 bg-emerald-50 border border-emerald-200 rounded-xl text-xs sm:text-sm font-mono text-emerald-950 space-y-2">
+              <div class="border-b border-emerald-200 pb-2">
+                $$y_1 = \\sqrt[3]{u} + \\sqrt[3]{v} \\implies \\mathbf{${roots[0].text}}$$
+              </div>
+              <div class="border-b border-emerald-200 pb-2">
+                $$y_2 = \\omega\\sqrt[3]{u} + \\omega^2\\sqrt[3]{v} \\implies \\mathbf{${roots[1].text}}$$
+              </div>
+              <div>
+                $$y_3 = \\omega^2\\sqrt[3]{u} + \\omega\\sqrt[3]{v} \\implies \\mathbf{${roots[2].text}}$$
+              </div>
+            </div>
+          </div>
+        `;
+      } else if (currentMethod === 'lagrange') {
+        const bCoeff = 27 * q;
+        const cCoeff = -27 * Math.pow(p, 3);
+
+        html += `
+          <div class="space-y-3">
+            <div class="flex items-center gap-2">
+              <span class="w-6 h-6 rounded-full bg-indigo-100 text-indigo-800 text-xs font-bold flex items-center justify-center">1</span>
+              <h3 class="font-bold text-slate-900 text-sm sm:text-base">ตั้งระบบสมการเชิงเส้น 3 ตัวแปรด้วยรากของเอกลักษณ์ $\\omega$</h3>
+            </div>
+            <p class="text-xs sm:text-sm text-slate-600 pl-8">
+              กำหนด $\\omega = e^{i2\\pi/3} = -\\frac{1}{2} + i\\frac{\\sqrt{3}}{2}$ (ซึ่ง $\\omega^3 = 1$ และ $1 + \\omega + \\omega^2 = 0$):
+            </p>
+            <div class="ml-8 p-3 bg-slate-50 rounded-xl border border-slate-200 text-xs sm:text-sm font-mono text-center">
+              $$\\begin{aligned}
+              y_1 + y_2 + y_3 &= 0 & \\text{--- (1: ผลบวกรากเป็น 0)} \\\\[2pt]
+              y_1 + \\omega y_2 + \\omega^2 y_3 &= \\theta_1 & \\text{--- (2: Lagrange Resolvent 1)} \\\\[2pt]
+              y_1 + \\omega^2 y_2 + \\omega y_3 &= \\theta_2 & \\text{--- (3: Lagrange Resolvent 2)}
+              \\end{aligned}$$
+            </div>
+
+            <div class="flex items-center gap-2 pt-2">
+              <span class="w-6 h-6 rounded-full bg-indigo-100 text-indigo-800 text-xs font-bold flex items-center justify-center">2</span>
+              <h3 class="font-bold text-slate-900 text-sm sm:text-base">แก้สมการช่วยหาค่า $\\theta_1^3$ และ $\\theta_2^3$</h3>
+            </div>
+            <p class="text-xs sm:text-sm text-slate-600 pl-8">
+              ค่ายกกำลังสาม $\\theta_1^3, \\theta_2^3$ เป็นรากของสมการกำลังสองช่วย: <strong>$z^2 + 27qz - 27p^3 = 0$</strong>
+            </p>
+            <div class="ml-8 p-3.5 bg-indigo-50/70 border border-indigo-200 rounded-xl text-xs sm:text-sm font-mono text-indigo-950 text-center">
+              $$z^2 ${bCoeff >= 0 ? '+ ' + bCoeff.toFixed(1) : '- ' + Math.abs(bCoeff).toFixed(1)}z ${cCoeff >= 0 ? '+ ' + cCoeff.toFixed(1) : '- ' + Math.abs(cCoeff).toFixed(1)} = 0$$
+              $$\\theta_1, \\theta_2 = \\sqrt[3]{-\\frac{27q}{2} \\pm 27\\sqrt{\\Delta}}$$
+            </div>
+
+            <div class="flex items-center gap-2 pt-2">
+              <span class="w-6 h-6 rounded-full bg-emerald-100 text-emerald-800 text-xs font-bold flex items-center justify-center">3</span>
+              <h3 class="font-bold text-slate-900 text-sm sm:text-base">แก้ระบบสมการผกผันหาคำตอบครบทั้ง 3 ราก (Lagrange Inversion)</h3>
+            </div>
+            <p class="text-xs sm:text-sm text-slate-600 pl-8">
+              นำสมการ (1), (2), (3) มาแก้หาตัวแปรทีละตัว จะได้รากครบทั้ง 3 ค่าอย่างแม่นยำ:
+            </p>
+            <div class="ml-8 p-4 bg-emerald-50 border border-emerald-200 rounded-xl text-xs sm:text-sm font-mono text-emerald-950 space-y-2">
+              <div class="border-b border-emerald-200 pb-2">
+                $$y_1 = \\frac{\\theta_1 + \\theta_2}{3} \\implies \\mathbf{${roots[0].text}}$$
+              </div>
+              <div class="border-b border-emerald-200 pb-2">
+                $$y_2 = \\frac{\\omega^2\\theta_1 + \\omega\\theta_2}{3} \\implies \\mathbf{${roots[1].text}}$$
+              </div>
+              <div>
+                $$y_3 = \\frac{\\omega\\theta_1 + \\omega^2\\theta_2}{3} \\implies \\mathbf{${roots[2].text}}$$
+              </div>
+            </div>
+          </div>
+        `;
+      } else {
+        const huddeY2 = p < 0 ? -p / 3 : 0;
+        const huddeRoot = Math.sqrt(huddeY2);
+
+        html += `
+          <div class="space-y-3">
+            <div class="flex items-center gap-2">
+              <span class="w-6 h-6 rounded-full bg-emerald-100 text-emerald-800 text-xs font-bold flex items-center justify-center">1</span>
+              <h3 class="font-bold text-slate-900 text-sm sm:text-base">คูณด้วยลำดับเลขคณิต $\{3, 1, 0\}$ ตามกฎของฮัดเดอ</h3>
+            </div>
+            <div class="ml-8 p-3 bg-slate-50 rounded-xl border border-slate-200 text-xs sm:text-sm font-mono text-center">
+              $$3(y^3) + 1(${p}y) + 0(${q}) = 0 \\implies 3y^3 ${pSign}y = 0 \\implies y(3y^2 ${pSign}) = 0$$
+            </div>
+
+            <div class="flex items-center gap-2 pt-2">
+              <span class="w-6 h-6 rounded-full bg-emerald-100 text-emerald-800 text-xs font-bold flex items-center justify-center">2</span>
+              <h3 class="font-bold text-slate-900 text-sm sm:text-base">ตรวจหาตำแหน่งวิกฤตที่อาจเป็นรากซ้ำ</h3>
+            </div>
+            <div class="ml-8 p-3.5 bg-emerald-50/70 border border-emerald-200 rounded-xl text-xs sm:text-sm font-mono text-emerald-950 text-center">
+              $$y = 0 \\quad \\text{หรือ} \\quad y^2 = -\\frac{p}{3} = ${huddeY2.toFixed(3)} ${p < 0 ? `\\implies y = \\pm ${(huddeRoot).toFixed(3)}` : ''}$$
+            </div>
+
+            <div class="flex items-center gap-2 pt-2">
+              <span class="w-6 h-6 rounded-full bg-emerald-100 text-emerald-800 text-xs font-bold flex items-center justify-center">3</span>
+              <h3 class="font-bold text-slate-900 text-sm sm:text-base">ลดทอนพหุนามและสรุปผลเฉลยครบทั้ง 3 ราก</h3>
+            </div>
+            <div class="ml-8 p-4 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm font-mono space-y-3">
+              ${Math.abs(delta) < 1e-4 ? `
+                <div class="p-2.5 bg-emerald-100 border border-emerald-300 rounded-lg text-emerald-900 font-sans text-xs">
+                  <strong>✓ ตรวจพบรากซ้ำ:</strong> ค่าวิกฤตของฮัดเดอแทนกลับแล้วได้ 0 พอดี จึงดึงตัวประกอบ $(y - r)^2$ ออกมาได้รากที่สามทันที
+                </div>
+              ` : `
+                <div class="p-2.5 bg-amber-50 border border-amber-200 rounded-lg text-amber-900 font-sans text-xs">
+                  <strong>• ข้อมูลจากฮัดเดอ:</strong> สมการนี้ไม่มีรากซ้ำ ($\\Delta \\ne 0$) เมื่อนำรากจริงแรกมาหารสังเคราะห์ จะได้สมการกำลังสอง $Q(y) = 0$ เพื่อหารากที่สองและสามจนครบ
+                </div>
+              `}
+
+              <div class="p-3.5 bg-white border border-slate-200 rounded-xl text-slate-900 space-y-2">
+                <span class="font-sans font-bold text-xs text-slate-600 block">สรุปคำตอบครบทั้งสามรากของสมการ:</span>
+                <div class="border-b border-slate-100 pb-1.5">
+                  • $\\mathbf{${roots[0].text}}$
+                </div>
+                <div class="border-b border-slate-100 pb-1.5">
+                  • $\\mathbf{${roots[1].text}}$
+                </div>
+                <div>
+                  • $\\mathbf{${roots[2].text}}$
+                </div>
+              </div>
+            </div>
+          </div>
+        `;
+      }
+
+      outEl.innerHTML = html;
+      if (window.MathJax && MathJax.typesetPromise) {
+        MathJax.typesetPromise([outEl]);
+      }
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      document.getElementById('pRange').addEventListener('input', renderActiveMethod);
+      document.getElementById('qRange').addEventListener('input', renderActiveMethod);
+      renderActiveMethod();
+    });
+  </script>
+</body>
+</html>

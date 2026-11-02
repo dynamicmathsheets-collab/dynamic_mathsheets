@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>เรื่องที่ 3: สูตรของคาร์ดาโน</title>
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- MathJax for rendering TeX -->
+  <script>
+    window.MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']],
+        displayMath: [['$$', '$$'], ['\\[', '\\]']]
+      },
+      chtml: {
+        matchFontHeight: false
+      },
+      startup: {
+        pageReady: () => {
+          return MathJax.startup.defaultPageReady();
+        }
+      }
+    };
+  </script>
+  <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@400;500;600;700&family=Sarabun:wght@300;400;500;600&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+
+  <style>
+    body {
+      font-family: 'Sarabun', sans-serif;
+      word-break: break-word;
+    }
+    h1, h2, h3, h4, .font-heading {
+      font-family: 'Prompt', sans-serif;
+    }
+    .font-mono-code {
+      font-family: 'Fira Code', monospace;
+    }
+    /* ป้องกันตัวอักษรและวงเล็บตัดบรรทัดแปลกๆ */
+    .math-inline {
+      white-space: nowrap;
+      display: inline-block;
+    }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-800 antialiased min-h-screen">
+
+  <!-- Container ขนาดกว้างคงที่มาตรฐาน max-w-6xl (1,152px) -->
+  <div class="max-w-6xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 space-y-8">
+    
+    <!-- ส่วนหัว (Header) -->
+    <header class="bg-white rounded-2xl shadow-sm border border-slate-200/80 p-6 sm:p-8">
+      <h1 class="text-2xl sm:text-3xl lg:text-4xl font-bold text-slate-900 tracking-tight">
+        สูตรของคาร์ดาโน (Cardano's Formula)
+      </h1>
+      <p class="mt-2 text-slate-600 text-sm sm:text-base leading-relaxed">
+        การแก้สมการกำลังสามรูปกด <span class="math-inline">$y^3 + py + q = 0$</span> ด้วยเทคนิคการแยกตัวแปร <span class="math-inline">$y = u + v$</span> และการสร้างสมการช่วยกำลังสอง
+      </p>
+    </header>
+
+    <!-- 1. วัตถุประสงค์การเรียนรู้ -->
+    <section class="bg-white rounded-2xl shadow-sm border border-slate-200/80 p-6 sm:p-8">
+      <div class="flex items-center gap-3 mb-4 border-b border-slate-100 pb-3">
+        <div class="w-8 h-8 rounded-lg bg-indigo-100 text-indigo-700 flex items-center justify-center font-bold text-base">
+          1
+        </div>
+        <h2 class="text-xl font-bold text-slate-900">วัตถุประสงค์การเรียนรู้</h2>
+      </div>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div class="p-4 rounded-xl bg-slate-50 border border-slate-200">
+          <p class="text-sm text-slate-700 leading-relaxed font-medium">
+            1. อธิบายที่มา ขั้นตอนการแทนตัวแปร และการกำจัดพจน์ผสมในสูตรของคาร์ดาโนได้
+          </p>
+        </div>
+        <div class="p-4 rounded-xl bg-slate-50 border border-slate-200">
+          <p class="text-sm text-slate-700 leading-relaxed font-medium">
+            2. เชื่อมโยงระบบสมการไม่เชิงเส้นไปสู่สมการกำลังสองในตัวแปร <span class="math-inline">$u^3, v^3$</span> ได้
+          </p>
+        </div>
+        <div class="p-4 rounded-xl bg-slate-50 border border-slate-200">
+          <p class="text-sm text-slate-700 leading-relaxed font-medium">
+            3. ประยุกต์ใช้สูตรแก้สมการกำลังสามรูปกด พร้อมตรวจสอบเงื่อนไข <span class="math-inline">$uv = -p/3$</span> ในจำนวนเชิงซ้อนได้
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 2. เนื้อหาหลักและขั้นตอนทางคณิตศาสตร์ -->
+    <section class="bg-white rounded-2xl shadow-sm border border-slate-200/80 p-6 sm:p-8 space-y-6">
+      <div class="flex items-center gap-3 border-b border-slate-100 pb-3">
+        <div class="w-8 h-8 rounded-lg bg-indigo-100 text-indigo-700 flex items-center justify-center font-bold text-base">
+          2
+        </div>
+        <h2 class="text-xl font-bold text-slate-900">เนื้อหาหลัก (Mathematical Derivation)</h2>
+      </div>
+
+      <!-- ขั้นที่ 1 -->
+      <div class="space-y-2">
+        <h3 class="font-bold text-slate-800 text-base flex items-center gap-2">
+          <span class="w-2 h-2 rounded-full bg-indigo-600"></span>
+          ขั้นตอนที่ 1: การแทนตัวแปร $y = u + v$
+        </h3>
+        <p class="text-sm text-slate-600">
+          กระจาย $(u+v)^3$ ลงในสมการรูปกด $y^3 + py + q = 0$:
+        </p>
+        <div class="bg-slate-50 p-3 rounded-xl border border-slate-200 text-center text-sm sm:text-base">
+          $$(u+v)^3 + p(u+v) + q = 0 \implies u^3 + v^3 + (3uv + p)(u + v) + q = 0$$
+        </div>
+      </div>
+
+      <!-- ขั้นที่ 2 -->
+      <div class="space-y-2">
+        <h3 class="font-bold text-slate-800 text-base flex items-center gap-2">
+          <span class="w-2 h-2 rounded-full bg-indigo-600"></span>
+          ขั้นตอนที่ 2: การกำหนดเงื่อนไขกำจัดพจน์ผสม
+        </h3>
+        <p class="text-sm text-slate-600">
+          กำหนดให้สัมประสิทธิ์หน้า $(u+v)$ เป็นศูนย์ เพื่อให้สมการกลายเป็นเชิงเส้น:
+        </p>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-center">
+          <div class="bg-indigo-50/60 p-3 rounded-xl border border-indigo-100 text-sm font-semibold text-indigo-900">
+            $$3uv + p = 0 \implies uv = -\frac{p}{3} \implies u^3v^3 = -\frac{p^3}{27}$$
+          </div>
+          <div class="bg-indigo-50/60 p-3 rounded-xl border border-indigo-100 text-sm font-semibold text-indigo-900">
+            $$u^3 + v^3 + q = 0 \implies u^3 + v^3 = -q$$
+          </div>
+        </div>
+      </div>
+
+      <!-- ขั้นที่ 3 -->
+      <div class="space-y-2">
+        <h3 class="font-bold text-slate-800 text-base flex items-center gap-2">
+          <span class="w-2 h-2 rounded-full bg-indigo-600"></span>
+          ขั้นตอนที่ 3: สมการช่วยกำลังสอง (Resolvent Equation)
+        </h3>
+        <p class="text-sm text-slate-600">
+          จากทฤษฎีบทของวีเอตา ค่า $u^3$ และ $v^3$ เป็นรากของสมการกำลังสอง $t^2 - (u^3+v^3)t + u^3v^3 = 0$:
+        </p>
+        <div class="bg-slate-50 p-3 rounded-xl border border-slate-200 text-center text-sm sm:text-base">
+          $$t^2 + qt - \left(\frac{p}{3}\right)^3 = 0$$
+        </div>
+        <p class="text-sm text-slate-600">
+          ใช้สูตรกำลังสองจะได้ค่า $u^3$ และ $v^3$:
+        </p>
+        <div class="bg-amber-50/60 border border-amber-200 p-3.5 rounded-xl text-center text-sm sm:text-base text-amber-900 font-semibold">
+          $$u^3, v^3 = -\frac{q}{2} \pm \sqrt{\left(\frac{q}{2}\right)^2 + \left(\frac{p}{3}\right)^3} = -\frac{q}{2} \pm \sqrt{\Delta}$$
+        </div>
+      </div>
+
+      <!-- ขั้นที่ 4 -->
+      <div class="space-y-2">
+        <h3 class="font-bold text-slate-800 text-base flex items-center gap-2">
+          <span class="w-2 h-2 rounded-full bg-indigo-600"></span>
+          ขั้นตอนที่ 4: สูตรสำเร็จของคาร์ดาโน
+        </h3>
+        <div class="bg-slate-900 text-slate-100 p-4 rounded-xl text-center text-sm sm:text-base font-mono">
+          $$y = \sqrt[3]{-\frac{q}{2} + \sqrt{\Delta}} + \sqrt[3]{-\frac{q}{2} - \sqrt{\Delta}}$$
+        </div>
+        <p class="text-xs text-slate-500 text-center">
+          * โดยเลือกรากที่สามของ $u$ และ $v$ ที่สอดคล้องกับเงื่อนไข $u \cdot v = -\frac{p}{3}$ เสมอ
+        </p>
+      </div>
+    </section>
+
+    <!-- 3. แบบจำลองโต้ตอบ (Interactive Slider & Step-by-Step Generator) -->
+    <section class="bg-white rounded-2xl shadow-sm border border-slate-200/80 p-6 sm:p-8 space-y-6">
+      <div class="flex items-center gap-3 border-b border-slate-100 pb-3">
+        <div class="w-8 h-8 rounded-lg bg-indigo-100 text-indigo-700 flex items-center justify-center font-bold text-base">
+          3
+        </div>
+        <div>
+          <h2 class="text-xl font-bold text-slate-900">แบบจำลองโต้ตอบ: เลือกตัวเลขแล้วแสดงวิธีทำทันที</h2>
+          <p class="text-xs sm:text-sm text-slate-500">ปรับแถบบาร์เลื่อน $p$ และ $q$ เพื่อดูขั้นตอนการคำนวณแบบ Step-by-Step สดทันที</p>
+        </div>
+      </div>
+
+      <!-- ปุ่ม Preset -->
+      <div class="flex flex-wrap items-center gap-2 text-xs">
+        <span class="font-bold text-slate-600">ตัวอย่างลัด:</span>
+        <button onclick="setParams(-6, -9)" class="px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-800 font-semibold border border-slate-200 transition">
+          $y^3 - 6y - 9 = 0$ ($\Delta > 0$)
+        </button>
+        <button onclick="setParams(-3, 2)" class="px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-800 font-semibold border border-slate-200 transition">
+          $y^3 - 3y + 2 = 0$ ($\Delta = 0$)
+        </button>
+        <button onclick="setParams(-7, -6)" class="px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-800 font-semibold border border-slate-200 transition">
+          $y^3 - 7y - 6 = 0$ ($\Delta < 0$)
+        </button>
+        <button onclick="setParams(6, -2)" class="px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-800 font-semibold border border-slate-200 transition">
+          $y^3 + 6y - 2 = 0$ ($\Delta > 0$)
+        </button>
+      </div>
+
+      <!-- Sliders Control Panel -->
+      <div class="bg-slate-50 p-6 rounded-2xl border border-slate-200 space-y-6">
+        <!-- Slider p -->
+        <div>
+          <div class="flex justify-between items-center mb-2">
+            <span class="text-sm font-bold text-slate-800">ค่าสัมประสิทธิ์ $p$:</span>
+            <span id="pValText" class="font-mono text-base font-bold bg-white px-3 py-0.5 rounded-lg border border-slate-200 text-indigo-600">-6</span>
+          </div>
+          <input type="range" id="pRange" min="-12" max="12" step="1" value="-6" class="w-full h-2.5 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-indigo-600">
+          <div class="flex justify-between text-xs text-slate-400 mt-1 font-mono">
+            <span>-12</span>
+            <span>-6</span>
+            <span>0</span>
+            <span>+6</span>
+            <span>+12</span>
+          </div>
+        </div>
+
+        <!-- Slider q -->
+        <div>
+          <div class="flex justify-between items-center mb-2">
+            <span class="text-sm font-bold text-slate-800">ค่าคงตัว $q$:</span>
+            <span id="qValText" class="font-mono text-base font-bold bg-white px-3 py-0.5 rounded-lg border border-slate-200 text-indigo-600">-9</span>
+          </div>
+          <input type="range" id="qRange" min="-12" max="12" step="1" value="-9" class="w-full h-2.5 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-indigo-600">
+          <div class="flex justify-between text-xs text-slate-400 mt-1 font-mono">
+            <span>-12</span>
+            <span>-6</span>
+            <span>0</span>
+            <span>+6</span>
+            <span>+12</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- แสดงวิธีทำทีละขั้น (Step Output) -->
+      <div class="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm">
+        <div class="bg-slate-900 px-5 py-3.5 flex justify-between items-center text-white">
+          <span class="font-bold text-sm tracking-wide">การแจกแจงวิธีทำเชิงคณิตศาสตร์</span>
+          <span id="deltaBadge" class="text-xs px-2.5 py-0.5 rounded-full font-bold"></span>
+        </div>
+        
+        <div id="stepOutput" class="p-6 space-y-5 text-sm sm:text-base text-slate-800 leading-relaxed">
+          <!-- ข้อมูลจะถูก render ผ่าน JavaScript -->
+        </div>
+      </div>
+    </section>
+
+    <!-- 4. คำถามนำเพื่อค้นพบ -->
+    <section class="bg-white rounded-2xl shadow-sm border border-slate-200/80 p-6 sm:p-8 space-y-4">
+      <div class="flex items-center gap-3 border-b border-slate-100 pb-3">
+        <div class="w-8 h-8 rounded-lg bg-indigo-100 text-indigo-700 flex items-center justify-center font-bold text-base">
+          4
+        </div>
+        <h2 class="text-xl font-bold text-slate-900">คำถามนำเพื่อค้นพบ</h2>
+      </div>
+
+      <div class="space-y-3">
+        <div class="p-4 rounded-xl bg-slate-50 border border-slate-200">
+          <p class="font-bold text-slate-800 mb-1 text-sm sm:text-base">
+            1. เหตุใดการแทน $y = u + v$ จึงช่วยให้สมการกำลังสามแก้ได้?
+          </p>
+          <p class="text-xs sm:text-sm text-slate-600">
+            เนื่องจากการเพิ่มตัวแปรทำให้เกิดระดับความเป็นอิสระ (Degree of Freedom) ส่งผลให้เราสามารถตั้งเงื่อนไขบังคับ $3uv + p = 0$ เพื่อหักล้างพจน์กำลังหนึ่งได้ และแปลงความสัมพันธ์ให้อยู่ในรูปผลรวมและผลคูณของ $u^3$ และ $v^3$
+          </p>
+        </div>
+
+        <div class="p-4 rounded-xl bg-slate-50 border border-slate-200">
+          <p class="font-bold text-slate-800 mb-1 text-sm sm:text-base">
+            2. เงื่อนไข $3uv = -p$ มีบทบาทอย่างไรในการกำจัดพจน์ผสม?
+          </p>
+          <p class="text-xs sm:text-sm text-slate-600">
+            เมื่อกระจายกำลังสามสมบูรณ์ $(u+v)^3 = u^3 + v^3 + 3uv(u+v)$ พจน์ $3uv(u+v)$ จะรวมกับ $p(u+v)$ ได้ $(3uv+p)(u+v)$ การกำหนดให้ $3uv + p = 0$ จึงตัดพจน์ $(u+v)$ ออกไปได้อย่างสมบูรณ์
+          </p>
+        </div>
+
+        <div class="p-4 rounded-xl bg-slate-50 border border-slate-200">
+          <p class="font-bold text-slate-800 mb-1 text-sm sm:text-base">
+            3. เหตุใดสูตรคาร์ดาโนจึงต้องระวังการเลือกรากที่สามในจำนวนเชิงซ้อน?
+          </p>
+          <p class="text-xs sm:text-sm text-slate-600">
+            เนื่องจากรากที่สามของ $u^3$ มี 3 ค่า และ $v^3$ มี 3 ค่า ซึ่งจับคู่รวมกันได้ถึง 9 คู่ แต่จะมีเพียง 3 คู่เท่านั้นที่สอดคล้องกับข้อกำหนดเริ่มต้นคือ $uv = -p/3$ หากเลือกคู่ผิด คำตอบที่ได้จะไม่ใช่รากของสมการเดิม
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 5. แบบฝึกหัดสำหรับนักศึกษา -->
+    <section class="bg-white rounded-2xl shadow-sm border border-slate-200/80 p-6 sm:p-8 space-y-6">
+      <div class="flex items-center gap-3 border-b border-slate-100 pb-3">
+        <div class="w-8 h-8 rounded-lg bg-indigo-100 text-indigo-700 flex items-center justify-center font-bold text-base">
+          5
+        </div>
+        <h2 class="text-xl font-bold text-slate-900">แบบฝึกหัดสำหรับนักศึกษา</h2>
+      </div>
+
+      <div class="bg-slate-50 p-5 rounded-xl border border-slate-200 space-y-4">
+        <div>
+          <span class="text-xs font-bold px-2 py-0.5 bg-indigo-100 text-indigo-700 rounded">โจทย์แบบฝึกหัด</span>
+          <p class="mt-2 text-sm sm:text-base font-semibold text-slate-800">
+            จงใช้สูตรของคาร์ดาโนแก้สมการ $y^3 - 6y - 9 = 0$ พร้อมแสดงค่า $\Delta$ และรากจริง
+          </p>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs sm:text-sm">
+          <div>
+            <label class="block font-medium text-slate-700 mb-1">ค่า $\Delta$ ที่คำนวณได้:</label>
+            <input type="number" id="exDelta" placeholder="กรอกตัวเลขทศนิยมหรือจำนวนเต็ม" class="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none">
+          </div>
+          <div>
+            <label class="block font-medium text-slate-700 mb-1">รากจริง $y$ ของสมการ:</label>
+            <input type="number" id="exRoot" placeholder="กรอกรากที่เป็นจำนวนจริง" class="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none">
+          </div>
+        </div>
+
+        <button onclick="checkExercise()" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs sm:text-sm font-semibold rounded-lg transition">
+          ตรวจคำตอบ
+        </button>
+
+        <div id="exerciseResult" class="hidden text-xs sm:text-sm mt-3"></div>
+      </div>
+    </section>
+
+  </div>
+
+  <!-- JavaScript คำนวณและแสดงวิธีทำสด -->
+  <script>
+    function setParams(p, q) {
+      document.getElementById('pRange').value = p;
+      document.getElementById('qRange').value = q;
+      calculateCardano();
+    }
+
+    function calculateCardano() {
+      const p = parseFloat(document.getElementById('pRange').value);
+      const q = parseFloat(document.getElementById('qRange').value);
+
+      document.getElementById('pValText').textContent = p;
+      document.getElementById('qValText').textContent = q;
+
+      const halfQ = q / 2;
+      const thirdP = p / 3;
+      const qPart = Math.pow(halfQ, 2);
+      const pPart = Math.pow(thirdP, 3);
+      const delta = qPart + pPart;
+
+      const badge = document.getElementById('deltaBadge');
+      if (Math.abs(delta) < 1e-6) {
+        badge.className = "text-xs px-2.5 py-0.5 rounded-full font-bold bg-amber-400 text-amber-950";
+        badge.textContent = "Δ = 0 (มีรากจริงซ้ำ)";
+      } else if (delta > 0) {
+        badge.className = "text-xs px-2.5 py-0.5 rounded-full font-bold bg-emerald-400 text-emerald-950";
+        badge.textContent = "Δ > 0 (1 รากจริง, 2 รากเชิงซ้อน)";
+      } else {
+        badge.className = "text-xs px-2.5 py-0.5 rounded-full font-bold bg-blue-400 text-blue-950";
+        badge.textContent = "Δ < 0 (3 รากจริงต่างกัน - Casus Irreducibilis)";
+      }
+
+      // สร้าง HTML วิธีทำเป็นขั้นตอน
+      let html = `
+        <div class="border-b border-slate-100 pb-3">
+          <div class="text-xs font-bold text-indigo-600 mb-1">สมการตั้งต้น:</div>
+          <div class="text-center font-semibold text-base py-1">
+            $$y^3 ${p >= 0 ? '+ ' + p : '- ' + Math.abs(p)}y ${q >= 0 ? '+ ' + q : '- ' + Math.abs(q)} = 0$$
+          </div>
+        </div>
+
+        <div class="space-y-1">
+          <div class="text-xs font-bold text-slate-700">ขั้นที่ 1: คำนวณตัวจำแนก $\\Delta$</div>
+          <div class="p-3 bg-slate-50 rounded-xl border border-slate-200 text-center font-mono text-sm">
+            $$\\Delta = \\left(\\frac{${q}}{2}\\right)^2 + \\left(\\frac{${p}}{3}\\right)^3 = (${halfQ.toFixed(2)})^2 + (${thirdP.toFixed(2)})^3 = ${qPart.toFixed(3)} + (${pPart.toFixed(3)}) = ${delta.toFixed(3)}$$
+          </div>
+        </div>
+
+        <div class="space-y-1">
+          <div class="text-xs font-bold text-slate-700">ขั้นที่ 2: ตั้งสมการช่วยกำลังสอง Resolvent ($t^2 + qt - (p/3)^3 = 0$)</div>
+          <div class="p-3 bg-slate-50 rounded-xl border border-slate-200 text-center font-mono text-sm">
+            $$t^2 ${q >= 0 ? '+ ' + q : '- ' + Math.abs(q)}t - (${pPart.toFixed(3)}) = 0$$
+            $$u^3, v^3 = -\\frac{${q}}{2} \\pm \\sqrt{${delta.toFixed(3)}} = ${(-halfQ).toFixed(3)} \\pm \\sqrt{${delta.toFixed(3)}}$$
+          </div>
+        </div>
+      `;
+
+      // คำนวณรากตามกรณี Delta
+      let rootsText = '';
+      if (Math.abs(delta) < 1e-6) {
+        // Delta = 0
+        if (p === 0 && q === 0) {
+          rootsText = `$$y_1 = y_2 = y_3 = 0$$`;
+        } else {
+          const r1 = (3 * q) / p;
+          const r2 = (-6 * q) / p;
+          rootsText = `
+            $$u = v = \\sqrt[3]{${(-halfQ).toFixed(3)}} = ${(Math.cbrt(-halfQ)).toFixed(3)}$$
+            $$y_1 = y_2 = 2u = ${(r1).toFixed(3)} \\quad \\text{(รากซ้ำ)}$$
+            $$y_3 = -4u = ${(r2).toFixed(3)}$$
+          `;
+        }
+      } else if (delta > 0) {
+        // Delta > 0
+        const sqrtDelta = Math.sqrt(delta);
+        const uCube = -halfQ + sqrtDelta;
+        const vCube = -halfQ - sqrtDelta;
+        const u = Math.cbrt(uCube);
+        const v = Math.cbrt(vCube);
+        const y1 = u + v;
+        const realPart = -0.5 * (u + v);
+        const imagPart = (Math.sqrt(3) / 2) * Math.abs(u - v);
+
+        rootsText = `
+          $$u = \\sqrt[3]{${uCube.toFixed(3)}} = ${u.toFixed(3)}, \\quad v = \\sqrt[3]{${vCube.toFixed(3)}} = ${v.toFixed(3)}$$
+          $$y_1 = u + v = ${y1.toFixed(3)} \\quad \\text{(รากจริง)}$$
+          $$y_2, y_3 = ${realPart.toFixed(3)} \\pm ${imagPart.toFixed(3)}i \\quad \\text{(รากเชิงซ้อน)}$$
+        `;
+      } else {
+        // Delta < 0
+        const r = Math.sqrt(-Math.pow(thirdP, 3));
+        const theta = Math.acos(-halfQ / r);
+        const y1 = 2 * Math.sqrt(-thirdP) * Math.cos(theta / 3);
+        const y2 = 2 * Math.sqrt(-thirdP) * Math.cos((theta + 2 * Math.PI) / 3);
+        const y3 = 2 * Math.sqrt(-thirdP) * Math.cos((theta + 4 * Math.PI) / 3);
+
+        rootsText = `
+          $$\\text{เนื่องจาก } \\Delta < 0 \\text{ แปลงด้วยพิกัดเชิงขั้ว } r = \\sqrt{-(\\frac{p}{3})^3} = ${r.toFixed(3)}, \\; \\theta = \\arccos\\left(-\\frac{q/2}{r}\\right) = ${(theta * 180 / Math.PI).toFixed(2)}^\\circ$$
+          $$y_1 = 2\\sqrt{-\\frac{p}{3}}\\cos\\left(\\frac{\\theta}{3}\\right) = ${y1.toFixed(3)}$$
+          $$y_2 = 2\\sqrt{-\\frac{p}{3}}\\cos\\left(\\frac{\\theta + 2\\pi}{3}\\right) = ${y2.toFixed(3)}$$
+          $$y_3 = 2\\sqrt{-\\frac{p}{3}}\\cos\\left(\\frac{\\theta + 4\\pi}{3}\\right) = ${y3.toFixed(3)}$$
+        `;
+      }
+
+      html += `
+        <div class="space-y-1">
+          <div class="text-xs font-bold text-slate-700">ขั้นที่ 3: ถอดรากที่สามและคำตอบของสมการ ($y = u + v$)</div>
+          <div class="p-4 bg-indigo-50/70 border border-indigo-200 rounded-xl text-center text-sm font-mono text-indigo-950">
+            ${rootsText}
+          </div>
+        </div>
+      `;
+
+      const outEl = document.getElementById('stepOutput');
+      outEl.innerHTML = html;
+
+      // เรนเดอร์ MathJax ใหม่
+      if (window.MathJax && MathJax.typesetPromise) {
+        MathJax.typesetPromise([outEl]);
+      }
+    }
+
+    function checkExercise() {
+      const d = parseFloat(document.getElementById('exDelta').value);
+      const r = parseFloat(document.getElementById('exRoot').value);
+      const res = document.getElementById('exerciseResult');
+      res.classList.remove('hidden');
+
+      // y^3 - 6y - 9 = 0
+      // p = -6, q = -9
+      // q/2 = -4.5 => (q/2)^2 = 20.25
+      // p/3 = -2 => (p/3)^3 = -8
+      // Delta = 20.25 - 8 = 12.25
+      // Root: y = 3
+      const isDeltaOk = Math.abs(d - 12.25) < 0.1;
+      const isRootOk = Math.abs(r - 3) < 0.05;
+
+      if (isDeltaOk && isRootOk) {
+        res.innerHTML = `
+          <div class="p-3 bg-emerald-50 border border-emerald-200 rounded-lg text-emerald-800">
+            <strong>✓ คำตอบถูกต้องสมบูรณ์!</strong><br>
+            $\\Delta = (-9/2)^2 + (-6/3)^3 = 20.25 - 8 = 12.25$<br>
+            $u = \\sqrt[3]{4.5 + \\sqrt{12.25}} = \\sqrt[3]{4.5 + 3.5} = \\sqrt[3]{8} = 2$<br>
+            $v = \\sqrt[3]{4.5 - \\sqrt{12.25}} = \\sqrt[3]{4.5 - 3.5} = \\sqrt[3]{1} = 1$<br>
+            ดังนั้นรากจริงคือ $y = u + v = 2 + 1 = 3$
+          </div>
+        `;
+      } else {
+        res.innerHTML = `
+          <div class="p-3 bg-rose-50 border border-rose-200 rounded-lg text-rose-800">
+            <strong>✗ ยังไม่ถูกต้อง:</strong> ตรวจสอบว่า $\\Delta = (-4.5)^2 + (-2)^3$ และหาค่า $u+v$ อีกครั้งครับ
+          </div>
+        `;
+      }
+
+      if (window.MathJax && MathJax.typesetPromise) {
+        MathJax.typesetPromise([res]);
+      }
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      document.getElementById('pRange').addEventListener('input', calculateCardano);
+      document.getElementById('qRange').addEventListener('input', calculateCardano);
+      calculateCardano();
+    });
+  </script>
+</body>
+</html>

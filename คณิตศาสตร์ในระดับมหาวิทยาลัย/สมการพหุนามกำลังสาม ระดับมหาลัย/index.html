@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="th" class="h-full">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>บทเรียนและแบบทดสอบ: ทฤษฎีสมการกำลังสาม</title>
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- Google Fonts: Prompt & Sarabun -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@400;500;600;700&family=Sarabun:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+  <style>
+    body {
+      font-family: 'Sarabun', sans-serif;
+    }
+    h1, h2, h3, button, .font-heading {
+      font-family: 'Prompt', sans-serif;
+    }
+    /* Smooth scroll for nav container */
+    #navMenu {
+      scroll-behavior: smooth;
+    }
+    /* Sleek visible scrollbar so users know it scrolls */
+    #navMenu::-webkit-scrollbar {
+      height: 5px;
+    }
+    #navMenu::-webkit-scrollbar-track {
+      background: #f1f5f9;
+      border-radius: 9999px;
+    }
+    #navMenu::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 9999px;
+    }
+    #navMenu::-webkit-scrollbar-thumb:hover {
+      background: #94a3b8;
+    }
+  </style>
+<script>
+  // ตรวจสอบว่ามีสถานะล็อกอินและอีเมลบันทึกไว้หรือไม่
+  const isLoggedIn = localStorage.getItem("dms_is_logged_in") === "true";
+  const userEmail = localStorage.getItem("dms_user_email");
+
+  // หากไม่มี ให้ดีดกลับไปหน้าเข้าสู่ระบบทันที
+  if (!isLoggedIn || !userEmail) {
+    // ปรับ Path ให้ถอยกลับไปหาไฟล์ login.html ตามระดับโฟลเดอร์ (เช่น "../login.html" หากอยู่ในโฟลเดอร์ย่อย 1 ชั้น)
+    window.location.replace("../../login.html"); 
+  }
+</script>
+</head>
+<body class="h-full flex flex-col bg-slate-100 text-slate-800 antialiased overflow-hidden">
+
+  <!-- แถบเมนูด้านบน (Top Navigation Bar) -->
+  <header class="bg-white border-b border-slate-200/90 shadow-sm z-20 shrink-0">
+    <div class="max-w-6xl w-full mx-auto px-3 sm:px-6 lg:px-8 py-2.5 sm:py-3 space-y-2.5">
+      
+      <!-- แถวหัวข้อและปุ่มเครื่องมือ -->
+      <div class="flex items-center justify-between gap-3">
+        <div class="flex items-center gap-2.5">
+          <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-tr from-indigo-600 to-violet-600 text-white flex items-center justify-center font-bold text-base sm:text-lg shadow-sm shrink-0">
+            x³
+          </div>
+          <div>
+            <h1 class="text-sm sm:text-base md:text-lg font-bold text-slate-900 leading-tight">
+              ชุดการเรียนรู้: ทฤษฎีและวิธีแก้สมการกำลังสาม
+            </h1>
+            <p class="text-[11px] sm:text-xs text-slate-500 hidden sm:block">
+              เนื้อหา 7 เรื่อง พร้อมแบบทดสอบวัดผลสัมฤทธิ์ทางการเรียน
+            </p>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- แถบเมนูพร้อมปุ่มลูกศรเลื่อนซ้าย-ขวา -->
+      <div class="relative flex items-center group">
+        <!-- ปุ่มเลื่อนไปทางซ้าย -->
+        <button onclick="scrollNav(-220)" aria-label="เลื่อนซ้าย" class="hidden sm:flex absolute left-0 z-10 w-7 h-7 -ml-2 items-center justify-center rounded-full bg-white/95 border border-slate-300 shadow-md text-slate-600 hover:text-indigo-600 hover:scale-105 transition">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7"/>
+          </svg>
+        </button>
+
+        <!-- รายการปุ่มเมนูทั้ง 8 ปุ่ม (Scrollable) -->
+        <nav id="navMenu" class="w-full flex items-center gap-1.5 overflow-x-auto pb-2 text-xs font-medium px-1 sm:px-4">
+          <button id="btn-1" onclick="loadTopic(1)" class="nav-btn px-3 py-1.5 rounded-lg shrink-0 transition bg-indigo-600 text-white shadow-sm font-semibold">
+            1. รูปทั่วไป & ลดรูป
+          </button>
+          <button id="btn-2" onclick="loadTopic(2)" class="nav-btn px-3 py-1.5 rounded-lg shrink-0 transition bg-slate-100 hover:bg-slate-200 text-slate-700">
+            2. ฮอร์เนอร์ & แยกตัวประกอบ
+          </button>
+          <button id="btn-3" onclick="loadTopic(3)" class="nav-btn px-3 py-1.5 rounded-lg shrink-0 transition bg-slate-100 hover:bg-slate-200 text-slate-700">
+            3. สูตรของคาร์ดาโน
+          </button>
+          <button id="btn-4" onclick="loadTopic(4)" class="nav-btn px-3 py-1.5 rounded-lg shrink-0 transition bg-slate-100 hover:bg-slate-200 text-slate-700">
+            4. วิเคราะห์ชนิดราก
+          </button>
+          <button id="btn-5" onclick="loadTopic(5)" class="nav-btn px-3 py-1.5 rounded-lg shrink-0 transition bg-slate-100 hover:bg-slate-200 text-slate-700">
+            5. รูปตรีโกณมิติ
+          </button>
+          <button id="btn-6" onclick="loadTopic(6)" class="nav-btn px-3 py-1.5 rounded-lg shrink-0 transition bg-slate-100 hover:bg-slate-200 text-slate-700">
+            6. สูตรของวีเอตา
+          </button>
+          <button id="btn-7" onclick="loadTopic(7)" class="nav-btn px-3 py-1.5 rounded-lg shrink-0 transition bg-slate-100 hover:bg-slate-200 text-slate-700">
+            7. พีชคณิตขั้นสูง
+          </button>
+          <button id="btn-8" onclick="loadTopic(8)" class="nav-btn px-3.5 py-1.5 rounded-lg shrink-0 transition bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border-2 border-emerald-400 font-bold shadow-sm">
+            📝 แบบทดสอบ (30 ข้อ)
+          </button>
+        </nav>
+
+        <!-- ปุ่มเลื่อนไปทางขวา -->
+        <button onclick="scrollNav(220)" aria-label="เลื่อนขวา" class="hidden sm:flex absolute right-0 z-10 w-7 h-7 -mr-2 items-center justify-center rounded-full bg-white/95 border border-slate-300 shadow-md text-slate-600 hover:text-indigo-600 hover:scale-105 transition">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/>
+          </svg>
+        </button>
+      </div>
+
+    </div>
+  </header>
+
+  <!-- พื้นที่แสดงผลด้านล่าง (iframe Container) -->
+  <main class="flex-1 w-full relative bg-slate-100 flex flex-col items-center">
+    <iframe 
+      id="contentFrame" 
+      src="1รูปทั่วไปและการลดรูปสมการกำลังสาม.html" 
+      class="w-full h-full border-0 bg-slate-50 transition-opacity duration-200"
+      title="เนื้อหาบทเรียน">
+    </iframe>
+  </main>
+
+  <!-- JavaScript ควบคุมการเลื่อนและโหลดเนื้อหา -->
+  <script>
+    const topics = {
+      1: { file: "1รูปทั่วไปและการลดรูปสมการกำลังสาม.html" },
+      2: { file: "2การหารากและการแยกตัวประกอบสมการกำลังสาม.html" },
+      3: { file: "3สูตรของคาร์ดาโน.html" },
+      4: { file: "4การวิเคราะห์จำนวนและชนิดของราก.html" },
+      5: { file: "5กรณีรากจริงสามรากและรูปตรีโกณมิติ.html" },
+      6: { file: "6การประยุกต์สูตรของวีเอตาและการสร้างสมการ.html" },
+      7: { file: "7พีชคณิตขั้นสูงในการแก้สมการกำลังสาม.html" },
+      8: { file: "แบบทดสอบ.html" }
+    };
+
+    let currentTopicId = 1;
+
+    function scrollNav(distance) {
+      const menu = document.getElementById('navMenu');
+      menu.scrollBy({ left: distance, behavior: 'smooth' });
+    }
+
+    function loadTopic(id) {
+      if (!topics[id]) return;
+      currentTopicId = id;
+
+      const frame = document.getElementById('contentFrame');
+      frame.style.opacity = '0.5';
+      frame.src = encodeURI(topics[id].file);
+
+      frame.onload = () => {
+        frame.style.opacity = '1';
+      };
+
+      // รีเซ็ตปุ่มทั้งหมด
+      const buttons = document.querySelectorAll('.nav-btn');
+      buttons.forEach(btn => {
+        if (btn.id === 'btn-8') {
+          btn.className = "nav-btn px-3.5 py-1.5 rounded-lg shrink-0 transition bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border-2 border-emerald-400 font-bold shadow-sm";
+        } else {
+          btn.className = "nav-btn px-3 py-1.5 rounded-lg shrink-0 transition bg-slate-100 hover:bg-slate-200 text-slate-700";
+        }
+      });
+
+      // ไฮไลต์ปุ่มที่เลือก
+      const activeBtn = document.getElementById(`btn-${id}`);
+      if (id === 8) {
+        activeBtn.className = "nav-btn px-3.5 py-1.5 rounded-lg shrink-0 transition bg-emerald-600 text-white font-bold shadow-md border-2 border-emerald-600";
+      } else {
+        activeBtn.className = "nav-btn px-3 py-1.5 rounded-lg shrink-0 transition bg-indigo-600 text-white font-semibold shadow-sm";
+      }
+
+      // เลื่อนเมนูให้อยู่ในมุมมองอัตโนมัติ (Scroll Into View)
+      activeBtn.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+    }
+
+    function openCurrentInNewTab() {
+      if (topics[currentTopicId]) {
+        window.open(encodeURI(topics[currentTopicId].file), '_blank');
+      }
+    }
+  </script>
+</body>
+</html>
