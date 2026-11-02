@@ -1,0 +1,917 @@
+<!DOCTYPE html>
+<html lang="th" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>เรื่องที่ 1: สมการพหุนามกำลังหนึ่ง | นวัตกรรมการเรียนรู้คณิตศาสตร์</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Sarabun & Prompt -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@400;500;600;700&family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- KaTeX for crisp LaTeX Math Rendering -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body);"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Sarabun', 'sans-serif'],
+                        heading: ['Prompt', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            50: '#f0f7ff',
+                            100: '#e0effe',
+                            200: '#bae0fd',
+                            500: '#0284c7',
+                            600: '#0369a1',
+                            700: '#075985',
+                            800: '#0c4a6e',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Sarabun', sans-serif;
+            background-color: #f8fafc;
+            color: #1e293b;
+        }
+        h1, h2, h3, h4, h5, h6 {
+            font-family: 'Prompt', sans-serif;
+        }
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+    </style>
+</head>
+<body class="min-h-screen antialiased selection:bg-sky-500 selection:text-white">
+
+    <!-- Primary Layout Container matching strictly the requested size -->
+    <main class="max-w-6xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 space-y-10">
+
+        <!-- HEADER SECTION -->
+        <header class="bg-gradient-to-br from-slate-900 via-sky-950 to-slate-900 text-white rounded-3xl p-6 sm:p-10 shadow-xl border border-sky-900/50 relative overflow-hidden">
+            <div class="absolute -right-12 -top-12 w-64 h-64 bg-sky-500/10 rounded-full blur-3xl pointer-events-none"></div>
+            <div class="relative z-10 space-y-3">
+                <h1 class="text-2xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-white font-heading">
+                    เรื่องที่ 1: สมการพหุนามกำลังหนึ่ง
+                </h1>
+                <p class="text-sky-200 text-sm sm:text-base font-light max-w-2xl">
+                    Linear Polynomial Equations in One Variable: ธรรมชาติของการมีคำตอบ รากของสมการ และการวิเคราะห์ภาวะคู่ควบเชิงเรขาคณิต
+                </p>
+            </div>
+        </header>
+
+        <!-- 1. วัตถุประสงค์การเรียนรู้ -->
+        <section class="bg-white rounded-2xl p-6 sm:p-8 shadow-sm border border-slate-200/80">
+            <div class="flex items-center gap-3 mb-4">
+                <div class="p-2.5 rounded-xl bg-sky-100 text-sky-700">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                </div>
+                <h2 class="text-xl sm:text-2xl font-bold text-slate-900 font-heading">1. วัตถุประสงค์การเรียนรู้ (Learning Objectives)</h2>
+            </div>
+            <div class="bg-sky-50/60 rounded-xl p-5 border-l-4 border-sky-600 text-slate-700 space-y-2">
+                <p class="font-medium text-slate-900 text-base sm:text-lg">เมื่อศึกษาหัวข้อนี้จบแล้ว ผู้เรียนสามารถ:</p>
+                <ul class="list-disc list-inside space-y-1.5 text-slate-700 leading-relaxed">
+                    <li>อธิบายรูปทั่วไปของสมการพหุนามกำลังหนึ่งและจำแนกเงื่อนไขของสัมประสิทธิ์ได้อย่างถูกต้อง</li>
+                    <li>แก้สมการในสนามจำนวนจริง (\(\mathbb{R}\)) และสนามจำนวนเชิงซ้อน (\(\mathbb{C}\)) ได้อย่างแม่นยำ</li>
+                    <li>วิเคราะห์และอธิบายเงื่อนไขทางพีชคณิตที่ส่งผลให้สมการ <em>มีคำตอบเดียว</em>, <em>ไม่มีคำตอบ</em>, หรือ <em>มีคำตอบนับไม่ถ้วน</em> ได้อย่างสมเหตุสมผลตามหลักตรรกศาสตร์</li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- 2. เนื้อหาหลัก -->
+        <section class="bg-white rounded-2xl p-6 sm:p-8 shadow-sm border border-slate-200/80 space-y-6">
+            <div class="flex items-center gap-3">
+                <div class="p-2.5 rounded-xl bg-indigo-100 text-indigo-700">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                    </svg>
+                </div>
+                <h2 class="text-xl sm:text-2xl font-bold text-slate-900 font-heading">2. เนื้อหาหลัก (Core Concepts)</h2>
+            </div>
+
+            <!-- Definition Box -->
+            <div class="grid grid-md md:grid-cols-2 gap-4">
+                <div class="p-5 rounded-xl bg-slate-50 border border-slate-200">
+                    <h3 class="text-sm font-semibold text-sky-700 uppercase tracking-wider mb-2">รูปทั่วไป (Standard Form)</h3>
+                    <p class="text-slate-700 leading-relaxed">
+                        สมการพหุนามกำลังหนึ่งในตัวแปรเดียว \(x\) คือสมการที่สามารถเขียนอยู่ในรูป:
+                    </p>
+                    <div class="my-3 py-3 px-4 bg-white rounded-lg border border-slate-200 text-center text-lg font-mono font-semibold text-slate-900 shadow-inner">
+                        $$ax + b = 0, \quad a \neq 0$$
+                    </div>
+                    <p class="text-xs text-slate-500">โดยที่ \(a, b \in \mathbb{R}\) (หรือ \(\mathbb{C}\)) และเรียก \(a\) ว่าสัมประสิทธิ์นำ (Leading Coefficient)</p>
+                </div>
+
+                <div class="p-5 rounded-xl bg-slate-50 border border-slate-200">
+                    <h3 class="text-sm font-semibold text-sky-700 uppercase tracking-wider mb-2">คำตอบทั่วไป (General Solution)</h3>
+                    <p class="text-slate-700 leading-relaxed">
+                        จากการใช้สมบัติการบวกและสมบัติการคูณด้วยอินเวอร์สของสนาม:
+                    </p>
+                    <div class="my-3 py-3 px-4 bg-white rounded-lg border border-slate-200 text-center text-lg font-mono font-semibold text-slate-900 shadow-inner">
+                        $$x = -\frac{b}{a}$$
+                    </div>
+                    <p class="text-xs text-slate-500">คำตอบนี้คงอยู่และเป็นค่าเดียวเสมอ ไม่ว่าจะเป็นในสนาม \(\mathbb{R}\) หรือ \(\mathbb{C}\)</p>
+                </div>
+            </div>
+
+            <!-- Rigorous Case Analysis Cards -->
+            <div class="space-y-3 pt-2">
+                <h3 class="text-lg font-semibold text-slate-900 font-heading">การวิเคราะห์เงื่อนไขการมีคำตอบของรูปพจน์ \(ax + b = 0\)</h3>
+                <div class="grid sm:grid-cols-3 gap-4">
+                    <!-- Case 1 -->
+                    <div class="p-4 rounded-xl border border-emerald-200 bg-emerald-50/50 hover:shadow-md transition">
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="text-xs font-bold px-2 py-0.5 rounded bg-emerald-200 text-emerald-800">กรณีที่ 1</span>
+                            <span class="text-xs text-emerald-700 font-medium">Unique Solution</span>
+                        </div>
+                        <h4 class="font-bold text-slate-900 mb-1">\(a \neq 0\)</h4>
+                        <p class="text-sm text-slate-600 mb-2">มีสัมประสิทธิ์ของตัวแปร</p>
+                        <div class="text-xs bg-white/80 p-2.5 rounded border border-emerald-100 text-slate-700">
+                            <strong>ผลลัพธ์:</strong> มีคำตอบเดียวเสมอคือ \(x = -\frac{b}{a}\)<br>
+                            กราฟ \(y = ax+b\) ตัดแกน \(x\) ที่จุด \((-\frac{b}{a}, 0)\) จุดเดียว
+                        </div>
+                    </div>
+
+                    <!-- Case 2 -->
+                    <div class="p-4 rounded-xl border border-rose-200 bg-rose-50/50 hover:shadow-md transition">
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="text-xs font-bold px-2 py-0.5 rounded bg-rose-200 text-rose-800">กรณีที่ 2</span>
+                            <span class="text-xs text-rose-700 font-medium">Inconsistent</span>
+                        </div>
+                        <h4 class="font-bold text-slate-900 mb-1">\(a = 0\) และ \(b \neq 0\)</h4>
+                        <p class="text-sm text-slate-600 mb-2">สมการกลายเป็น \(0 \cdot x + b = 0\)</p>
+                        <div class="text-xs bg-white/80 p-2.5 rounded border border-rose-100 text-slate-700">
+                            <strong>ผลลัพธ์:</strong> <span class="text-rose-600 font-semibold">ไม่มีคำตอบ (No Solution)</span> เนื่องจากได้ประโยค \(b = 0\) ซึ่งขัดแย้งกับสมมติฐาน กราฟขนานกับแกน \(x\) ไม่ตัดกันเลย
+                        </div>
+                    </div>
+
+                    <!-- Case 3 -->
+                    <div class="p-4 rounded-xl border border-amber-200 bg-amber-50/50 hover:shadow-md transition">
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="text-xs font-bold px-2 py-0.5 rounded bg-amber-200 text-amber-800">กรณีที่ 3</span>
+                            <span class="text-xs text-amber-700 font-medium">Identity / Dependent</span>
+                        </div>
+                        <h4 class="font-bold text-slate-900 mb-1">\(a = 0\) และ \(b = 0\)</h4>
+                        <p class="text-sm text-slate-600 mb-2">สมการกลายเป็น \(0 \cdot x + 0 = 0\)</p>
+                        <div class="text-xs bg-white/80 p-2.5 rounded border border-amber-100 text-slate-700">
+                            <strong>ผลลัพธ์:</strong> <span class="text-amber-700 font-semibold">มีคำตอบนับไม่ถ้วน (Infinitely Many)</span> เป็นเอกลักษณ์ทางพีชคณิต กราฟคือเส้นตรงทับแกน \(x\) ทุกจำนวนจึงเป็นคำตอบ
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 3. แบบจำลองโต้ตอบ (Interactive Model) -->
+        <section class="bg-white rounded-2xl p-6 sm:p-8 shadow-sm border border-slate-200/80 space-y-6">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 pb-4">
+                <div class="flex items-center gap-3">
+                    <div class="p-2.5 rounded-xl bg-sky-100 text-sky-700">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                        </svg>
+                    </div>
+                    <div>
+                        <h2 class="text-xl sm:text-2xl font-bold text-slate-900 font-heading">3. แบบจำลองโต้ตอบ (Interactive Model)</h2>
+                        <p class="text-xs sm:text-sm text-slate-500">ปรับค่าพารามิเตอร์ \(a\) และ \(b\) เพื่อวิเคราะห์ตำแหน่งรากและพฤติกรรมของสมการแบบเรียลไทม์</p>
+                    </div>
+                </div>
+                <div class="flex gap-2">
+                    <button onclick="setExample(2, -6)" class="px-3 py-1.5 text-xs font-medium rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 transition">ตัวอย่าง 1 (มีคำตอบเดียว)</button>
+                    <button onclick="setExample(0, 4)" class="px-3 py-1.5 text-xs font-medium rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 transition">ตัวอย่าง 2 (ไม่มีคำตอบ)</button>
+                    <button onclick="setExample(0, 0)" class="px-3 py-1.5 text-xs font-medium rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 transition">ตัวอย่าง 3 (คำตอบนับไม่ถ้วน)</button>
+                </div>
+            </div>
+
+            <div class="grid lg:grid-cols-12 gap-8 items-start">
+                <!-- Controls & Step Analysis Column -->
+                <div class="lg:col-span-6 space-y-6">
+                    <!-- Sliders & Inputs -->
+                    <div class="bg-slate-50 p-5 rounded-2xl border border-slate-200/80 space-y-5">
+                        <!-- a control -->
+                        <div>
+                            <div class="flex justify-between items-center mb-1">
+                                <label for="sliderA" class="text-sm font-semibold text-slate-800 flex items-center gap-2">
+                                    สัมประสิทธิ์ \(a\) :
+                                    <span id="labelA" class="font-mono text-sky-600 font-bold text-base">2</span>
+                                </label>
+                                <input type="number" id="numA" step="0.5" value="2" class="w-20 px-2 py-1 text-right text-sm rounded-lg border border-slate-300 focus:ring-2 focus:ring-sky-500 font-mono">
+                            </div>
+                            <input type="range" id="sliderA" min="-10" max="10" step="0.5" value="2" class="w-full accent-sky-600 h-2 bg-slate-200 rounded-lg cursor-pointer">
+                            <div class="flex justify-between text-[11px] text-slate-400 font-mono mt-1">
+                                <span>-10</span>
+                                <span class="text-rose-500 font-bold">0 (กรณีพิเศษ)</span>
+                                <span>+10</span>
+                            </div>
+                        </div>
+
+                        <!-- b control -->
+                        <div>
+                            <div class="flex justify-between items-center mb-1">
+                                <label for="sliderB" class="text-sm font-semibold text-slate-800 flex items-center gap-2">
+                                    ค่าคงตัว \(b\) :
+                                    <span id="labelB" class="font-mono text-sky-600 font-bold text-base">-6</span>
+                                </label>
+                                <input type="number" id="numB" step="0.5" value="-6" class="w-20 px-2 py-1 text-right text-sm rounded-lg border border-slate-300 focus:ring-2 focus:ring-sky-500 font-mono">
+                            </div>
+                            <input type="range" id="sliderB" min="-10" max="10" step="0.5" value="-6" class="w-full accent-sky-600 h-2 bg-slate-200 rounded-lg cursor-pointer">
+                            <div class="flex justify-between text-[11px] text-slate-400 font-mono mt-1">
+                                <span>-10</span>
+                                <span>0</span>
+                                <span>+10</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Current Equation Display Box -->
+                    <div class="p-4 rounded-xl bg-slate-900 text-white shadow-md">
+                        <div class="text-xs text-sky-300 font-medium uppercase tracking-wider mb-1">สมการปัจจุบัน</div>
+                        <div id="equationDisplay" class="text-xl sm:text-2xl font-mono text-center py-2 font-bold text-amber-300">
+                            2x - 6 = 0
+                        </div>
+                    </div>
+
+                    <!-- Mathematical Step-by-Step Breakdown -->
+                    <div class="p-5 rounded-2xl bg-white border border-slate-200 shadow-sm space-y-3">
+                        <h4 class="text-sm font-bold text-slate-800 uppercase tracking-wider border-b pb-2">ขั้นตอนการวิเคราะห์และการแก้ปัญหา</h4>
+                        <div id="stepBreakdown" class="space-y-2 text-sm text-slate-700 leading-relaxed font-sans">
+                            <!-- Populated dynamically via JavaScript -->
+                        </div>
+                        <!-- Status Badge -->
+                        <div id="statusBadge" class="pt-2">
+                            <!-- Injected dynamically -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Canvas Graph Column -->
+                <div class="lg:col-span-6 flex flex-col items-center">
+                    <div class="w-full bg-slate-900 rounded-2xl p-4 shadow-lg border border-slate-800">
+                        <div class="flex items-center justify-between text-xs text-slate-300 mb-2 px-1">
+                            <span class="font-semibold text-slate-200 flex items-center gap-1.5">
+                                <span class="w-2 h-2 rounded-full bg-sky-400"></span> ระนาบพิกัดฉาก \(y = ax + b\)
+                            </span>
+                            <span class="text-slate-400 text-[11px]">(รากของสมการคือจุดที่เส้นตรงตัดแกน \(x\))</span>
+                        </div>
+                        <div class="relative w-full aspect-square max-h-[380px] bg-slate-950 rounded-xl overflow-hidden border border-slate-800 flex items-center justify-center">
+                            <canvas id="graphCanvas" class="w-full h-full block cursor-crosshair"></canvas>
+                        </div>
+                        <div class="flex items-center justify-between mt-3 text-xs text-slate-400 px-1 font-mono">
+                            <div class="flex items-center gap-2">
+                                <span class="inline-block w-3 h-0.5 bg-sky-400"></span> กราฟฟังก์ชัน \(y = ax + b\)
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <span class="inline-block w-2.5 h-2.5 rounded-full bg-amber-400"></span> จุดตัดแกน \(x\) (รากคำตอบ)
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 4. คำถามนำเพื่อค้นพบ (Guiding Discovery Questions) -->
+        <section class="bg-white rounded-2xl p-6 sm:p-8 shadow-sm border border-slate-200/80 space-y-6">
+            <div class="flex items-center gap-3">
+                <div class="p-2.5 rounded-xl bg-amber-100 text-amber-700">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                </div>
+                <div>
+                    <h2 class="text-xl sm:text-2xl font-bold text-slate-900 font-heading">4. คำถามนำเพื่อค้นพบ (Guiding Discovery Questions)</h2>
+                    <p class="text-xs sm:text-sm text-slate-500">คลิกที่แต่ละคำถามเพื่อคิดวิเคราะห์และเปิดดูคำอธิบายทางคณิตศาสตร์</p>
+                </div>
+            </div>
+
+            <div class="space-y-4">
+                <!-- Question 1 -->
+                <div class="border border-slate-200 rounded-xl overflow-hidden transition-all bg-slate-50/50">
+                    <button onclick="toggleAccordion('q1')" class="w-full text-left p-4 sm:p-5 flex justify-between items-center gap-4 hover:bg-slate-100/70 transition">
+                        <span class="font-semibold text-slate-800 text-base sm:text-lg flex items-center gap-3">
+                            <span class="flex-shrink-0 w-7 h-7 rounded-full bg-sky-100 text-sky-700 text-sm font-bold flex items-center justify-center">1</span>
+                            เหตุใดสมการกำลังหนึ่งที่มี \(a \neq 0\) จึงมีคำตอบเพียงค่าเดียว?
+                        </span>
+                        <svg id="icon-q1" class="w-5 h-5 text-slate-500 transform transition-transform duration-200 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                        </svg>
+                    </button>
+                    <div id="content-q1" class="hidden px-5 pb-5 text-slate-600 text-sm sm:text-base border-t border-slate-200 bg-white pt-4 space-y-2">
+                        <p><strong>คำอธิบายเชิงพีชคณิตและเรขาคณิต:</strong></p>
+                        <p class="leading-relaxed">
+                            1. <strong>เชิงพีชคณิต (Field Axioms):</strong> เมื่อ \(a \neq 0\) ตามสัจพจน์ของระบบจำนวนจริง (หรือจำนวนเชิงซ้อน) จะมีตัวผกผันการคูณ \(a^{-1} = \frac{1}{a}\) เพียงหนึ่งเดียวเสมอ ทำให้เมื่อดำเนินการคูณตลอดสมการ \(x = a^{-1}(-b) = -\frac{b}{a}\) ซึ่งได้ผลลัพธ์ที่เป็นเอกลักษณ์และแน่นอนเพียงหนึ่งค่าเท่านั้น
+                        </p>
+                        <p class="leading-relaxed">
+                            2. <strong>เชิงเรขาคณิต (Geometric Interpretation):</strong> เส้นตรง \(y = ax + b\) ที่มีความชัน \(a \neq 0\) จะไม่ขนานกับแกน \(x\) (ซึ่งคือเส้นตรง \(y = 0\)) ตามสัจพจน์แบบยุคลิด เส้นตรงที่ไม่ขนานกันบนระนาบจะตัดกันได้เพียง <strong>จุดเดียวเท่านั้น</strong> พิกัด \(x\) ของจุดตัดนั้นจึงเป็นคำตอบเดียวของสมการ
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Question 2 -->
+                <div class="border border-slate-200 rounded-xl overflow-hidden transition-all bg-slate-50/50">
+                    <button onclick="toggleAccordion('q2')" class="w-full text-left p-4 sm:p-5 flex justify-between items-center gap-4 hover:bg-slate-100/70 transition">
+                        <span class="font-semibold text-slate-800 text-base sm:text-lg flex items-center gap-3">
+                            <span class="flex-shrink-0 w-7 h-7 rounded-full bg-sky-100 text-sky-700 text-sm font-bold flex items-center justify-center">2</span>
+                            การหารด้วยสัมประสิทธิ์ของตัวแปรมีเงื่อนไขอะไร?
+                        </span>
+                        <svg id="icon-q2" class="w-5 h-5 text-slate-500 transform transition-transform duration-200 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                        </svg>
+                    </button>
+                    <div id="content-q2" class="hidden px-5 pb-5 text-slate-600 text-sm sm:text-base border-t border-slate-200 bg-white pt-4 space-y-2">
+                        <p><strong>เงื่อนไขหลัก:</strong> สัมประสิทธิ์ตัวหารต้อง <em>ไม่เท่ากับศูนย์ (\(a \neq 0\))</em> เสมอ</p>
+                        <p class="leading-relaxed">
+                            ในการหารด้วยสัมประสิทธิ์ \(a\) เพื่อย้ายข้างหรือหาค่า \(x = -\frac{b}{a}\) นั้น กระทำได้ก็ต่อเมื่อ \(a \neq 0\) เนื่องจากการหารด้วยศูนย์ไม่มีนิยามในระบบจำนวน (Undefined) หาก \(a = 0\) เราไม่สามารถนำศูนย์ไปหารทั้งสองข้างได้ แต่ต้องวิเคราะห์พจน์เดิม \(0 \cdot x = -b\) แยกเป็นสองกรณีคือ:
+                        </p>
+                        <ul class="list-disc list-inside ml-4 space-y-1 text-slate-700">
+                            <li>ถ้า \(b \neq 0\): \(0 = -b\) เป็นข้อความที่เป็นเท็จ จึงไม่มีคำตอบ</li>
+                            <li>ถ้า \(b = 0\): \(0 = 0\) เป็นข้อความที่เป็นจริงสำหรับทุกจำนวน จึงมีคำตอบเป็นจำนวนใดๆ ก็ได้</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Question 3 -->
+                <div class="border border-slate-200 rounded-xl overflow-hidden transition-all bg-slate-50/50">
+                    <button onclick="toggleAccordion('q3')" class="w-full text-left p-4 sm:p-5 flex justify-between items-center gap-4 hover:bg-slate-100/70 transition">
+                        <span class="font-semibold text-slate-800 text-base sm:text-lg flex items-center gap-3">
+                            <span class="flex-shrink-0 w-7 h-7 rounded-full bg-sky-100 text-sky-700 text-sm font-bold flex items-center justify-center">3</span>
+                            สมการที่ไม่มีพจน์ตัวแปรยังจัดเป็นสมการที่มีคำตอบได้หรือไม่?
+                        </span>
+                        <svg id="icon-q3" class="w-5 h-5 text-slate-500 transform transition-transform duration-200 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                        </svg>
+                    </button>
+                    <div id="content-q3" class="hidden px-5 pb-5 text-slate-600 text-sm sm:text-base border-t border-slate-200 bg-white pt-4 space-y-2">
+                        <p class="leading-relaxed">
+                            <strong>คำตอบ:</strong> จัดเป็นสมการได้ และขึ้นอยู่กับค่าความจริงของความสัมพันธ์ทางตัวเลข:
+                        </p>
+                        <ul class="list-disc list-inside space-y-1.5 leading-relaxed">
+                            <li>
+                                <strong>กรณี \(0 = 0\) (หรือ \(b = 0\)):</strong> สมการถือว่ามี <em>เซตคำตอบเป็นสากล (Universal Set)</em> นั่นคือจำนวนใด ๆ ไม่ว่าจะเป็นจำนวนจริง (\(\mathbb{R}\)) หรือจำนวนเชิงซ้อน (\(\mathbb{C}\)) นำมาแทนค่าก็ทำให้สมการเป็นจริงเสมอ เรียกว่าเป็น <strong>เอกลักษณ์ (Identity Equation)</strong>
+                            </li>
+                            <li>
+                                <strong>กรณี \(5 = 0\) (เมื่อ \(b \neq 0\)):</strong> สมการนี้เป็นเท็จเสมอ เซตคำตอบคือเซตว่าง (\(\emptyset\)) จึงจัดว่าเป็นสมการที่ <strong>ไม่มีคำตอบ (Contradiction)</strong>
+                            </li>
+                        </ul>
+                        <p class="text-xs text-slate-500 mt-2">
+                            *หมายเหตุ: ตามนิยามเชิงพหุนาม หากสัมประสิทธิ์ของ \(x\) เป็น 0 จะไม่จัดว่าเป็นพหุนามดีกรี 1 (เพราะดีกรีคือ 0 หรือไม่มีดีกรีหากพหุนามเป็นศูนย์) แต่มักถูกพิจารณาเป็นกรณีสุดขั้ว (Degenerate Case) ของการแก้สมการ
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 5. แบบฝึกหัดสำหรับนักศึกษา (Exercises & Self-Check) -->
+        <section class="bg-white rounded-2xl p-6 sm:p-8 shadow-sm border border-slate-200/80 space-y-6">
+            <div class="flex items-center gap-3">
+                <div class="p-2.5 rounded-xl bg-emerald-100 text-emerald-700">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
+                    </svg>
+                </div>
+                <div>
+                    <h2 class="text-xl sm:text-2xl font-bold text-slate-900 font-heading">5. แบบฝึกหัดสำหรับนักศึกษา (Interactive Exercises)</h2>
+                    <p class="text-xs sm:text-sm text-slate-500">ทดสอบความเข้าใจโดยจำแนกลักษณะคำตอบและตรวจผลลัพธ์พร้อมเหตุผลทางคณิตศาสตร์</p>
+                </div>
+            </div>
+
+            <div class="grid md:grid-cols-2 gap-6">
+                <!-- Exercise 1 -->
+                <div class="p-5 rounded-2xl border border-slate-200 bg-slate-50/60 space-y-4">
+                    <div class="flex justify-between items-start">
+                        <span class="text-xs font-bold uppercase tracking-wider text-slate-500">ข้อที่ 1</span>
+                        <span class="text-xs font-medium px-2 py-0.5 rounded bg-sky-100 text-sky-800">โจทย์พื้นฐาน</span>
+                    </div>
+                    <div class="text-lg font-mono font-bold text-slate-900 py-2 bg-white px-4 rounded-xl border border-slate-200 text-center">
+                        \(3x - 9 = 0\)
+                    </div>
+                    <p class="text-xs sm:text-sm text-slate-600">จงเลือกชนิดของคำตอบ:</p>
+                    <div class="space-y-2 text-sm">
+                        <label class="flex items-center gap-3 p-2.5 rounded-lg bg-white border border-slate-200 cursor-pointer hover:bg-slate-50 transition">
+                            <input type="radio" name="ex1" value="one" class="accent-sky-600">
+                            <span>มีคำตอบเดียว (\(x = 3\))</span>
+                        </label>
+                        <label class="flex items-center gap-3 p-2.5 rounded-lg bg-white border border-slate-200 cursor-pointer hover:bg-slate-50 transition">
+                            <input type="radio" name="ex1" value="none" class="accent-sky-600">
+                            <span>ไม่มีคำตอบ</span>
+                        </label>
+                        <label class="flex items-center gap-3 p-2.5 rounded-lg bg-white border border-slate-200 cursor-pointer hover:bg-slate-50 transition">
+                            <input type="radio" name="ex1" value="inf" class="accent-sky-600">
+                            <span>มีคำตอบนับไม่ถ้วน</span>
+                        </label>
+                    </div>
+                    <button onclick="checkExercise(1, 'one', 'ถูกต้อง! เพราะ $a = 3 \\neq 0$ จึงย้ายข้างและหารได้ $x = \\frac{9}{3} = 3$ มีเพียงคำตอบเดียวอย่างแน่นอน')" class="w-full py-2.5 bg-slate-900 hover:bg-slate-800 text-white rounded-xl text-sm font-semibold transition shadow-sm">
+                        ตรวจคำตอบ
+                    </button>
+                    <div id="ex1-feedback" class="hidden text-xs sm:text-sm p-3 rounded-xl"></div>
+                </div>
+
+                <!-- Exercise 2 -->
+                <div class="p-5 rounded-2xl border border-slate-200 bg-slate-50/60 space-y-4">
+                    <div class="flex justify-between items-start">
+                        <span class="text-xs font-bold uppercase tracking-wider text-slate-500">ข้อที่ 2</span>
+                        <span class="text-xs font-medium px-2 py-0.5 rounded bg-rose-100 text-rose-800">กรณีสัมประสิทธิ์เป็นศูนย์</span>
+                    </div>
+                    <div class="text-lg font-mono font-bold text-slate-900 py-2 bg-white px-4 rounded-xl border border-slate-200 text-center">
+                        \(0x + 5 = 0\)
+                    </div>
+                    <p class="text-xs sm:text-sm text-slate-600">จงเลือกชนิดของคำตอบ:</p>
+                    <div class="space-y-2 text-sm">
+                        <label class="flex items-center gap-3 p-2.5 rounded-lg bg-white border border-slate-200 cursor-pointer hover:bg-slate-50 transition">
+                            <input type="radio" name="ex2" value="one" class="accent-sky-600">
+                            <span>มีคำตอบเดียว (\(x = -5\))</span>
+                        </label>
+                        <label class="flex items-center gap-3 p-2.5 rounded-lg bg-white border border-slate-200 cursor-pointer hover:bg-slate-50 transition">
+                            <input type="radio" name="ex2" value="none" class="accent-sky-600">
+                            <span>ไม่มีคำตอบ (No Solution)</span>
+                        </label>
+                        <label class="flex items-center gap-3 p-2.5 rounded-lg bg-white border border-slate-200 cursor-pointer hover:bg-slate-50 transition">
+                            <input type="radio" name="ex2" value="inf" class="accent-sky-600">
+                            <span>มีคำตอบนับไม่ถ้วน</span>
+                        </label>
+                    </div>
+                    <button onclick="checkExercise(2, 'none', 'ถูกต้อง! สมการลดทอนเหลือ $5 = 0$ ซึ่งเป็นประโยคที่เป็นเท็จเสมอ ไม่มีจำนวนจริงหรือเชิงซ้อนใดที่ทำให้ประโยคนี้เป็นจริง เซตคำตอบคือเซตว่าง $\\emptyset$')" class="w-full py-2.5 bg-slate-900 hover:bg-slate-800 text-white rounded-xl text-sm font-semibold transition shadow-sm">
+                        ตรวจคำตอบ
+                    </button>
+                    <div id="ex2-feedback" class="hidden text-xs sm:text-sm p-3 rounded-xl"></div>
+                </div>
+
+                <!-- Exercise 3 -->
+                <div class="p-5 rounded-2xl border border-slate-200 bg-slate-50/60 space-y-4">
+                    <div class="flex justify-between items-start">
+                        <span class="text-xs font-bold uppercase tracking-wider text-slate-500">ข้อที่ 3</span>
+                        <span class="text-xs font-medium px-2 py-0.5 rounded bg-amber-100 text-amber-800">รูปสมมูล</span>
+                    </div>
+                    <div class="text-lg font-mono font-bold text-slate-900 py-2 bg-white px-4 rounded-xl border border-slate-200 text-center">
+                        \(2(x + 1) = 2x + 2\)
+                    </div>
+                    <p class="text-xs sm:text-sm text-slate-600">จงเลือกชนิดของคำตอบ:</p>
+                    <div class="space-y-2 text-sm">
+                        <label class="flex items-center gap-3 p-2.5 rounded-lg bg-white border border-slate-200 cursor-pointer hover:bg-slate-50 transition">
+                            <input type="radio" name="ex3" value="one" class="accent-sky-600">
+                            <span>มีคำตอบเดียว (\(x = 0\))</span>
+                        </label>
+                        <label class="flex items-center gap-3 p-2.5 rounded-lg bg-white border border-slate-200 cursor-pointer hover:bg-slate-50 transition">
+                            <input type="radio" name="ex3" value="none" class="accent-sky-600">
+                            <span>ไม่มีคำตอบ</span>
+                        </label>
+                        <label class="flex items-center gap-3 p-2.5 rounded-lg bg-white border border-slate-200 cursor-pointer hover:bg-slate-50 transition">
+                            <input type="radio" name="ex3" value="inf" class="accent-sky-600">
+                            <span>มีคำตอบเป็นจำนวนจริงทุกจำนวน</span>
+                        </label>
+                    </div>
+                    <button onclick="checkExercise(3, 'inf', 'ถูกต้อง! กระจายพจน์ได้ $2x + 2 = 2x + 2$ เมื่อจัดรูปตามแบบทั่วไปได้ $0x + 0 = 0$ ซึ่งเป็นจริงสำหรับทุกค่า $x$ ในระบบจำนวน เรียกว่าเอกลักษณ์ (Identity)')" class="w-full py-2.5 bg-slate-900 hover:bg-slate-800 text-white rounded-xl text-sm font-semibold transition shadow-sm">
+                        ตรวจคำตอบ
+                    </button>
+                    <div id="ex3-feedback" class="hidden text-xs sm:text-sm p-3 rounded-xl"></div>
+                </div>
+
+                <!-- Exercise 4 -->
+                <div class="p-5 rounded-2xl border border-slate-200 bg-slate-50/60 space-y-4">
+                    <div class="flex justify-between items-start">
+                        <span class="text-xs font-bold uppercase tracking-wider text-slate-500">ข้อที่ 4</span>
+                        <span class="text-xs font-medium px-2 py-0.5 rounded bg-sky-100 text-sky-800">คำนวณราก</span>
+                    </div>
+                    <div class="text-lg font-mono font-bold text-slate-900 py-2 bg-white px-4 rounded-xl border border-slate-200 text-center">
+                        \(4x + 7 = 0\)
+                    </div>
+                    <p class="text-xs sm:text-sm text-slate-600">จงเลือกชนิดของคำตอบและค่าราก:</p>
+                    <div class="space-y-2 text-sm">
+                        <label class="flex items-center gap-3 p-2.5 rounded-lg bg-white border border-slate-200 cursor-pointer hover:bg-slate-50 transition">
+                            <input type="radio" name="ex4" value="one" class="accent-sky-600">
+                            <span>มีคำตอบเดียวคือ \(x = -\frac{7}{4}\) (หรือ \(-1.75\))</span>
+                        </label>
+                        <label class="flex items-center gap-3 p-2.5 rounded-lg bg-white border border-slate-200 cursor-pointer hover:bg-slate-50 transition">
+                            <input type="radio" name="ex4" value="wrong1" class="accent-sky-600">
+                            <span>มีคำตอบเดียวคือ \(x = \frac{7}{4}\)</span>
+                        </label>
+                        <label class="flex items-center gap-3 p-2.5 rounded-lg bg-white border border-slate-200 cursor-pointer hover:bg-slate-50 transition">
+                            <input type="radio" name="ex4" value="none" class="accent-sky-600">
+                            <span>ไม่มีคำตอบ</span>
+                        </label>
+                    </div>
+                    <button onclick="checkExercise(4, 'one', 'ถูกต้อง! ตามสูตร $x = -\\frac{b}{a} = -\\frac{7}{4} = -1.75$ โดยที่ $a = 4 \\neq 0$')" class="w-full py-2.5 bg-slate-900 hover:bg-slate-800 text-white rounded-xl text-sm font-semibold transition shadow-sm">
+                        ตรวจคำตอบ
+                    </button>
+                    <div id="ex4-feedback" class="hidden text-xs sm:text-sm p-3 rounded-xl"></div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- SCRIPT FOR SIMULATOR AND INTERACTIVITY -->
+    <script>
+        // DOM Elements
+        const sliderA = document.getElementById('sliderA');
+        const numA = document.getElementById('numA');
+        const labelA = document.getElementById('labelA');
+
+        const sliderB = document.getElementById('sliderB');
+        const numB = document.getElementById('numB');
+        const labelB = document.getElementById('labelB');
+
+        const equationDisplay = document.getElementById('equationDisplay');
+        const stepBreakdown = document.getElementById('stepBreakdown');
+        const statusBadge = document.getElementById('statusBadge');
+        const canvas = document.getElementById('graphCanvas');
+        const ctx = canvas.getContext('2d');
+
+        // Initial Values
+        let a = 2.0;
+        let b = -6.0;
+
+        function updateInputs(newA, newB) {
+            a = parseFloat(newA);
+            b = parseFloat(newB);
+
+            sliderA.value = a;
+            numA.value = a;
+            labelA.textContent = a;
+
+            sliderB.value = b;
+            numB.value = b;
+            labelB.textContent = b;
+
+            renderAll();
+        }
+
+        // Event listeners for A
+        sliderA.addEventListener('input', (e) => {
+            a = parseFloat(e.target.value);
+            numA.value = a;
+            labelA.textContent = a;
+            renderAll();
+        });
+        numA.addEventListener('input', (e) => {
+            a = parseFloat(e.target.value) || 0;
+            sliderA.value = a;
+            labelA.textContent = a;
+            renderAll();
+        });
+
+        // Event listeners for B
+        sliderB.addEventListener('input', (e) => {
+            b = parseFloat(e.target.value);
+            numB.value = b;
+            labelB.textContent = b;
+            renderAll();
+        });
+        numB.addEventListener('input', (e) => {
+            b = parseFloat(e.target.value) || 0;
+            sliderB.value = b;
+            labelB.textContent = b;
+            renderAll();
+        });
+
+        function setExample(exA, exB) {
+            updateInputs(exA, exB);
+        }
+
+        function formatNumber(num) {
+            return Number.isInteger(num) ? num.toString() : num.toFixed(2);
+        }
+
+        function renderAll() {
+            // 1. Format Equation String
+            let eqStr = "";
+            let bFormatted = "";
+
+            if (b > 0) bFormatted = `+ ${formatNumber(b)}`;
+            else if (b < 0) bFormatted = `- ${formatNumber(Math.abs(b))}`;
+            else bFormatted = "";
+
+            if (a === 0) {
+                if (b === 0) eqStr = "0 = 0";
+                else eqStr = `${formatNumber(b)} = 0`;
+            } else if (a === 1) {
+                eqStr = `x ${bFormatted} = 0`.trim();
+            } else if (a === -1) {
+                eqStr = `-x ${bFormatted} = 0`.trim();
+            } else {
+                eqStr = `${formatNumber(a)}x ${bFormatted} = 0`.trim();
+            }
+            if (a !== 0 && b === 0) {
+                eqStr = `${formatNumber(a)}x = 0`;
+            }
+
+            equationDisplay.textContent = eqStr;
+
+            // 2. Logic & Steps
+            let stepsHTML = "";
+            let badgeHTML = "";
+
+            if (a !== 0) {
+                const root = -b / a;
+                const formattedRoot = formatNumber(root);
+
+                stepsHTML = `
+                    <div class="flex items-center gap-2">
+                        <span class="w-1.5 h-1.5 rounded-full bg-sky-500"></span>
+                        <span>เนื่องจากสัมประสิทธิ์นำ <span class="font-bold text-sky-700 font-mono">a = ${formatNumber(a)} &ne; 0</span></span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <span class="w-1.5 h-1.5 rounded-full bg-sky-500"></span>
+                        <span>ย้ายพจน์ค่าคงตัว: <span class="font-mono font-semibold">${formatNumber(a)}x = ${formatNumber(-b)}</span></span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <span class="w-1.5 h-1.5 rounded-full bg-sky-500"></span>
+                        <span>หารทั้งสองข้างด้วย <span class="font-mono font-semibold">${formatNumber(a)}</span>: <span class="font-mono font-semibold">x = -(${formatNumber(b)}) / ${formatNumber(a)}</span></span>
+                    </div>
+                    <div class="p-3 bg-sky-50 rounded-xl border border-sky-200 mt-2 text-sky-950 font-medium">
+                        รากของสมการคือ <span class="font-bold font-mono text-base text-sky-700">x = ${formattedRoot}</span> (มีคำตอบเดียวเสมอทั้งใน &reals; และ &complexes;)
+                    </div>
+                `;
+
+                badgeHTML = `
+                    <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-emerald-100 text-emerald-800 text-xs sm:text-sm font-semibold border border-emerald-300">
+                        <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+                        สถานะ: มีคำตอบเดียวแน่นอน (Unique Solution)
+                    </div>
+                `;
+            } else {
+                // a == 0
+                if (b === 0) {
+                    stepsHTML = `
+                        <div class="flex items-center gap-2 text-amber-900">
+                            <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
+                            <span>สัมประสิทธิ์ <span class="font-bold font-mono">a = 0</span> และ <span class="font-bold font-mono">b = 0</span></span>
+                        </div>
+                        <div class="flex items-center gap-2 text-slate-700">
+                            <span class="w-1.5 h-1.5 rounded-full bg-slate-400"></span>
+                            <span>แทนค่าได้รูป: <span class="font-mono font-semibold">0 &middot; x + 0 = 0</span></span>
+                        </div>
+                        <div class="p-3 bg-amber-50 rounded-xl border border-amber-200 mt-2 text-amber-950 text-xs sm:text-sm">
+                            ข้อความ <span class="font-bold font-mono">0 = 0</span> เป็น <strong>สัจนิรันดร์/เอกลักษณ์ (Identity)</strong> ซึ่งเป็นจริงสำหรับทุกค่าของ \(x\) บนเส้นจำนวน
+                        </div>
+                    `;
+
+                    badgeHTML = `
+                        <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-amber-100 text-amber-800 text-xs sm:text-sm font-semibold border border-amber-300">
+                            <span class="w-2 h-2 rounded-full bg-amber-500"></span>
+                            สถานะ: มีคำตอบนับไม่ถ้วน (Infinitely Many Solutions / Identity)
+                        </div>
+                    `;
+                } else {
+                    stepsHTML = `
+                        <div class="flex items-center gap-2 text-rose-900">
+                            <span class="w-1.5 h-1.5 rounded-full bg-rose-500"></span>
+                            <span>สัมประสิทธิ์ <span class="font-bold font-mono">a = 0</span> แต่ค่าคงตัว <span class="font-bold font-mono">b = ${formatNumber(b)} &ne; 0</span></span>
+                        </div>
+                        <div class="flex items-center gap-2 text-slate-700">
+                            <span class="w-1.5 h-1.5 rounded-full bg-slate-400"></span>
+                            <span>แทนค่าได้รูป: <span class="font-mono font-semibold">0 &middot; x + (${formatNumber(b)}) = 0 &rArr; ${formatNumber(b)} = 0</span></span>
+                        </div>
+                        <div class="p-3 bg-rose-50 rounded-xl border border-rose-200 mt-2 text-rose-950 text-xs sm:text-sm">
+                            ข้อความนี้ <strong>เป็นเท็จอย่างสิ้นเชิง (Contradiction)</strong> ไม่ว่าจะเลือก \(x\) เป็นค่าใดก็ตาม ผลคูณ \(0 \cdot x\) ย่อมเป็น 0 เสมอ จึงไม่มีทางเท่ากับ \(-${formatNumber(b)}\)
+                        </div>
+                    `;
+
+                    badgeHTML = `
+                        <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-rose-100 text-rose-800 text-xs sm:text-sm font-semibold border border-rose-300">
+                            <span class="w-2 h-2 rounded-full bg-rose-500"></span>
+                            สถานะ: ไม่มีคำตอบ (No Solution / Inconsistent)
+                        </div>
+                    `;
+                }
+            }
+
+            stepBreakdown.innerHTML = stepsHTML;
+            statusBadge.innerHTML = badgeHTML;
+
+            // 3. Draw Graph
+            drawGraph();
+        }
+
+        function drawGraph() {
+            // Set canvas size for retina display support
+            const rect = canvas.getBoundingClientRect();
+            const width = rect.width;
+            const height = rect.height;
+
+            if (width === 0 || height === 0) return;
+
+            const dpr = window.devicePixelRatio || 1;
+            canvas.width = width * dpr;
+            canvas.height = height * dpr;
+            ctx.scale(dpr, dpr);
+
+            // Coordinates setup
+            const originX = width / 2;
+            const originY = height / 2;
+            const scale = width / 24; // 12 units on each side (-12 to +12)
+
+            // Clear Background
+            ctx.fillStyle = '#090d16';
+            ctx.fillRect(0, 0, width, height);
+
+            // Draw Grid
+            ctx.lineWidth = 1;
+            ctx.strokeStyle = '#1e293b';
+            ctx.font = '10px monospace';
+            ctx.fillStyle = '#64748b';
+
+            // Vertical Grid Lines
+            for (let xVal = -12; xVal <= 12; xVal += 2) {
+                const screenX = originX + xVal * scale;
+                ctx.beginPath();
+                ctx.moveTo(screenX, 0);
+                ctx.lineTo(screenX, height);
+                ctx.stroke();
+
+                if (xVal !== 0) {
+                    ctx.fillText(xVal, screenX - 6, originY + 14);
+                }
+            }
+
+            // Horizontal Grid Lines
+            for (let yVal = -12; yVal <= 12; yVal += 2) {
+                const screenY = originY - yVal * scale;
+                ctx.beginPath();
+                ctx.moveTo(0, screenY);
+                ctx.lineTo(width, screenY);
+                ctx.stroke();
+
+                if (yVal !== 0) {
+                    ctx.fillText(yVal, originX + 6, screenY + 3);
+                }
+            }
+
+            // Draw Main Axes
+            ctx.lineWidth = 1.75;
+            ctx.strokeStyle = '#94a3b8';
+            // X-Axis
+            ctx.beginPath();
+            ctx.moveTo(0, originY);
+            ctx.lineTo(width, originY);
+            ctx.stroke();
+
+            // Y-Axis
+            ctx.beginPath();
+            ctx.moveTo(originX, 0);
+            ctx.lineTo(originX, height);
+            ctx.stroke();
+
+            // Origin Label
+            ctx.fillText('0', originX - 10, originY + 12);
+            ctx.fillText('x', width - 12, originY - 6);
+            ctx.fillText('y', originX + 8, 14);
+
+            // Draw the Linear Function: y = ax + b
+            ctx.lineWidth = 2.5;
+            if (a === 0 && b === 0) {
+                // Identity line is exactly the x-axis
+                ctx.strokeStyle = '#f59e0b'; // Amber
+            } else if (a === 0) {
+                // Horizontal parallel line
+                ctx.strokeStyle = '#f43f5e'; // Rose
+            } else {
+                ctx.strokeStyle = '#38bdf8'; // Sky blue
+            }
+
+            const xStart = -13;
+            const xEnd = 13;
+            const yStart = a * xStart + b;
+            const yEnd = a * xEnd + b;
+
+            ctx.beginPath();
+            ctx.moveTo(originX + xStart * scale, originY - yStart * scale);
+            ctx.lineTo(originX + xEnd * scale, originY - yEnd * scale);
+            ctx.stroke();
+
+            // Highlight Root (X-intercept) if a != 0
+            if (a !== 0) {
+                const rootX = -b / a;
+                const rootScreenX = originX + rootX * scale;
+                const rootScreenY = originY;
+
+                // Glowing point
+                ctx.fillStyle = '#fbbf24';
+                ctx.beginPath();
+                ctx.arc(rootScreenX, rootScreenY, 6, 0, Math.PI * 2);
+                ctx.fill();
+
+                ctx.strokeStyle = '#ffffff';
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                ctx.arc(rootScreenX, rootScreenY, 6, 0, Math.PI * 2);
+                ctx.stroke();
+
+                // Coordinates text tooltip
+                ctx.fillStyle = '#f8fafc';
+                ctx.font = 'bold 11px monospace';
+                const label = `(${formatNumber(rootX)}, 0)`;
+                ctx.fillText(label, rootScreenX - 20, rootScreenY - 12);
+            } else if (a === 0 && b === 0) {
+                // Highlight along the x-axis that every point is a root
+                ctx.fillStyle = '#fbbf24';
+                ctx.font = '11px sans-serif';
+                ctx.fillText('เส้นตรงทับแกน x ทุกจุดคือคำตอบ', originX + 20, originY - 10);
+            } else if (a === 0 && b !== 0) {
+                // Inform parallel line
+                ctx.fillStyle = '#f43f5e';
+                ctx.font = '11px sans-serif';
+                ctx.fillText('เส้นตรงขนานแกน x (ไม่ตัดกันเลย)', originX + 20, originY - b * scale - 10);
+            }
+        }
+
+        // Accordion toggle helper
+        function toggleAccordion(id) {
+            const content = document.getElementById(`content-${id}`);
+            const icon = document.getElementById(`icon-${id}`);
+
+            if (content.classList.contains('hidden')) {
+                content.classList.remove('hidden');
+                icon.classList.add('rotate-180');
+            } else {
+                content.classList.add('hidden');
+                icon.classList.remove('rotate-180');
+            }
+        }
+
+        // Exercise evaluation
+        function checkExercise(exNum, correctVal, explanation) {
+            const radios = document.getElementsByName(`ex${exNum}`);
+            let selected = null;
+            for (let r of radios) {
+                if (r.checked) {
+                    selected = r.value;
+                    break;
+                }
+            }
+
+            const feedback = document.getElementById(`ex${exNum}-feedback`);
+            feedback.classList.remove('hidden', 'bg-emerald-50', 'text-emerald-800', 'border-emerald-300', 'bg-rose-50', 'text-rose-800', 'border-rose-300');
+            feedback.classList.add('border');
+
+            if (!selected) {
+                feedback.className = 'text-xs sm:text-sm p-3 rounded-xl border bg-amber-50 text-amber-800 border-amber-300';
+                feedback.textContent = 'กรุณาเลือกคำตอบก่อนทำการตรวจ';
+                return;
+            }
+
+            if (selected === correctVal) {
+                feedback.className = 'text-xs sm:text-sm p-3 rounded-xl border bg-emerald-50 text-emerald-900 border-emerald-300';
+                feedback.innerHTML = `<strong>ผลการประเมิน: ถูกต้อง!</strong><br>${explanation}`;
+            } else {
+                feedback.className = 'text-xs sm:text-sm p-3 rounded-xl border bg-rose-50 text-rose-900 border-rose-300';
+                feedback.innerHTML = `<strong>ผลการประเมิน: ยังไม่ถูกต้อง</strong><br>${explanation}`;
+            }
+
+            // Re-render math in newly injected feedback elements if Katex is ready
+            if (window.renderMathInElement) {
+                renderMathInElement(feedback, {
+                    delimiters: [
+                        {left: '$$', right: '$$', display: true},
+                        {left: '$', right: '$', display: false},
+                        {left: '\\(', right: '\\)', display: false},
+                        {left: '\\[', right: '\\]', display: true}
+                    ]
+                });
+            }
+        }
+
+        // Window resize responsive redrawing
+        window.addEventListener('resize', () => {
+            drawGraph();
+        });
+
+        // Initialize on load
+        window.onload = function () {
+            renderAll();
+            if (window.renderMathInElement) {
+                renderMathInElement(document.body, {
+                    delimiters: [
+                        {left: '$$', right: '$$', display: true},
+                        {left: '$', right: '$', display: false},
+                        {left: '\\(', right: '\\)', display: false},
+                        {left: '\\[', right: '\\]', display: true}
+                    ]
+                });
+            }
+        };
+    </script>
+</body>
+</html>

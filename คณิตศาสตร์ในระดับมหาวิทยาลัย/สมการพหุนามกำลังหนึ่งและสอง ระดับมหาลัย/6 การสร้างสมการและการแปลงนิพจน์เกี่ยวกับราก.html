@@ -1,0 +1,1221 @@
+<!DOCTYPE html>
+<html lang="th" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>เรื่องที่ 6: การสร้างสมการและการแปลงนิพจน์เกี่ยวกับราก | นวัตกรรมการเรียนรู้คณิตศาสตร์</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Prompt, Sarabun, JetBrains Mono -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Prompt:wght@400;500;600;700&family=Sarabun:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+    <!-- KaTeX CDN for LaTeX rendering -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Sarabun', 'sans-serif'],
+                        heading: ['Prompt', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Sarabun', sans-serif;
+            background-color: #f8fafc;
+            color: #0f172a;
+        }
+        h1, h2, h3, h4, h5, h6 {
+            font-family: 'Prompt', sans-serif;
+        }
+        .katex-display {
+            margin: 0.4em 0 !important;
+        }
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+    </style>
+</head>
+<body class="min-h-screen antialiased selection:bg-indigo-600 selection:text-white">
+
+    <!-- Primary Layout Container: max-w-6xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 (max 1,152px) -->
+    <main class="max-w-6xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 space-y-10">
+
+        <!-- HEADER SECTION -->
+        <header class="bg-gradient-to-br from-slate-900 via-indigo-950 to-slate-900 text-white rounded-3xl p-6 sm:p-10 shadow-xl border border-indigo-900/50 relative overflow-hidden">
+            <div class="absolute -right-20 -top-20 w-80 h-80 bg-indigo-500/15 rounded-full blur-3xl pointer-events-none"></div>
+            <div class="relative z-10 space-y-3">
+
+                <h1 class="text-2xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-white font-heading">
+                    เรื่องที่ 6: การสร้างสมการและการแปลงนิพจน์เกี่ยวกับราก
+                </h1>
+                <p class="text-indigo-200 text-sm sm:text-base font-light max-w-3xl leading-relaxed">
+                    Forming Equations, Root Transformation, and Symmetric Polynomials: เทคนิคการสร้างสมการใหม่ การคำนวณค่านิพจน์สมมาตรของราก เช่น $r_1^2 + r_2^2$ และ $(r_1 - r_2)^2$ โดยตรงจาก $S$ และ $P$ พร้อมการแทนที่ตัวแปรเชิงพีชคณิตเพื่อลดทอนขั้นตอนคำนวณ
+                </p>
+            </div>
+        </header>
+
+        <!-- 1. วัตถุประสงค์การเรียนรู้ -->
+        <section class="bg-white rounded-2xl p-6 sm:p-8 shadow-sm border border-slate-200/80">
+            <div class="flex items-center gap-3 mb-4">
+                <div class="p-2.5 rounded-xl bg-indigo-100 text-indigo-700">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                </div>
+                <h2 class="text-xl sm:text-2xl font-bold text-slate-900 font-heading">1. วัตถุประสงค์การเรียนรู้ (Learning Objectives)</h2>
+            </div>
+            <div class="bg-indigo-50/60 rounded-xl p-5 border-l-4 border-indigo-600 text-slate-700 space-y-2">
+                <p class="font-medium text-slate-900 text-base sm:text-lg">เมื่อศึกษาหัวข้อนี้จบแล้ว ผู้เรียนสามารถ:</p>
+                <ul class="list-disc list-inside space-y-2 text-slate-700 leading-relaxed">
+                    <li>สร้างสมการพหุนามกำลังสองจากข้อมูลที่กำหนด เช่น รากของสมการ ผลบวกและผลคูณของราก ได้อย่างถูกต้อง</li>
+                    <li>หาค่าของนิพจน์สมมาตรของราก เช่น \(r_1^2 + r_2^2\), \((r_1 - r_2)^2\), \(r_1^3 + r_2^3\) และ \(\frac{1}{r_1} + \frac{1}{r_2}\) โดยใช้ความสัมพันธ์ของวีเอตาโดยไม่จำเป็นต้องแก้หารากแต่ละตัวโดยตรง</li>
+                    <li>สร้างสมการใหม่เมื่อรากเดิมถูกแปลง เช่น เลื่อนค่าคงตัว (\(r_i + k\)) กลับเศษส่วน (\(1/r_i\)) หรือคูณด้วยสเกลาร์ (\(m \cdot r_i\)) ทั้งด้วยวิธีผลบวก-ผลคูณของรากใหม่และวิธีแทนที่ตัวแปร (\(x = g(y)\))</li>
+                    <li>อธิบายหลักการลดทอนขั้นตอนการคำนวณทางพีชคณิตได้อย่างสมเหตุสมผลตามหลักตรรกศาสตร์</li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- 2. เนื้อหาหลัก -->
+        <section class="bg-white rounded-2xl p-6 sm:p-8 shadow-sm border border-slate-200/80 space-y-8">
+            <div class="flex items-center gap-3">
+                <div class="p-2.5 rounded-xl bg-blue-100 text-blue-700">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                    </svg>
+                </div>
+                <div>
+                    <h2 class="text-xl sm:text-2xl font-bold text-slate-900 font-heading">2. เนื้อหาหลัก (Core Mathematical Concepts)</h2>
+                    <p class="text-xs sm:text-sm text-slate-500">มโนทัศน์นิพจน์สมมาตร การสร้างสมการ และกลวิธีการแปลงตัวแปร</p>
+                </div>
+            </div>
+
+            <!-- Conceptual Framework 2-Column Banner -->
+            <div class="grid md:grid-cols-2 gap-5">
+                <div class="p-5 rounded-2xl bg-slate-900 text-white space-y-2.5 shadow-md flex flex-col justify-between">
+                    <div>
+                        <span class="text-xs text-indigo-300 font-semibold uppercase tracking-wider block mb-1">การสร้างสมการจากผลบวกและผลคูณ</span>
+                        <h3 class="text-lg font-bold text-white mb-2">รูปทั่วไปของสมการโมนิก (Monic Form)</h3>
+                        <p class="text-xs text-slate-300 leading-relaxed">
+                            ถ้า \(r_1, r_2\) เป็นรากของสมการ และกำหนดให้ \(S = r_1 + r_2 = -\frac{b}{a}\) กับ \(P = r_1 r_2 = \frac{c}{a}\) สมการกำลังสองที่มีรากดังกล่าวคือ:
+                        </p>
+                        <div class="py-2.5 px-3 bg-slate-800/90 rounded-xl border border-slate-700 text-center font-mono text-xl font-bold text-amber-300 my-2">
+                            $$x^2 - Sx + P = 0$$
+                        </div>
+                    </div>
+                    <p class="text-[11px] text-slate-400">สำหรับตัวคูณร่วมใดๆ \(a \neq 0\): \(a(x^2 - Sx + P) = 0\)</p>
+                </div>
+
+                <div class="p-5 rounded-2xl bg-indigo-900 text-white space-y-2.5 shadow-md flex flex-col justify-between">
+                    <div>
+                        <span class="text-xs text-indigo-200 font-semibold uppercase tracking-wider block mb-1">นิยาม: นิพจน์สมมาตรของราก (Symmetric Expressions)</span>
+                        <h3 class="text-lg font-bold text-white mb-2">ความไม่แปรเปลี่ยนเมื่อสลับราก</h3>
+                        <p class="text-xs text-indigo-100 leading-relaxed">
+                            นิพจน์ \(f(r_1, r_2)\) เรียกว่า <em>นิพจน์สมมาตร</em> หากค่าของนิพจน์คงเดิมเมื่อสลับตำแหน่งของราก นั่นคือ \(f(r_1, r_2) = f(r_2, r_1)\)
+                        </p>
+                        <div class="py-2.5 px-3 bg-indigo-950/80 rounded-xl border border-indigo-700 text-center font-mono text-base font-bold text-emerald-300 my-2">
+                            $$f(r_1, r_2) = \Phi(S, P)$$
+                        </div>
+                    </div>
+                    <p class="text-[11px] text-indigo-200">ตามทฤษฎีบทมูลฐานของพหุนามสมมาตร ทุกนิพจน์สมมาตรสามารถเขียนแทนด้วย \(S\) และ \(P\) ได้เสมอ</p>
+                </div>
+            </div>
+
+            <!-- Key Symmetric Identities Cards (4 Items) -->
+            <div class="space-y-3">
+                <h3 class="text-base font-bold text-slate-900 font-heading flex items-center gap-2">
+                    <span class="w-2.5 h-2.5 rounded-full bg-indigo-600"></span>
+                    เอกลักษณ์นิพจน์สมมาตรพื้นฐานที่สำคัญ (Fundamental Symmetric Identities)
+                </h3>
+                <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <!-- Identity 1 -->
+                    <div class="p-4 rounded-xl bg-slate-50 border border-slate-200 space-y-1.5">
+                        <span class="text-xs font-bold text-indigo-700">1. ผลบวกกำลังสอง</span>
+                        <div class="font-mono text-base font-bold text-slate-900">\(r_1^2 + r_2^2\)</div>
+                        <div class="p-2 bg-white rounded-lg border border-slate-200 font-mono text-xs text-emerald-700 font-semibold text-center">
+                            \(= S^2 - 2P\)
+                        </div>
+                        <p class="text-[11px] text-slate-500 leading-relaxed">
+                            มาจาก \((r_1 + r_2)^2 = r_1^2 + 2r_1 r_2 + r_2^2\)
+                        </p>
+                    </div>
+
+                    <!-- Identity 2 -->
+                    <div class="p-4 rounded-xl bg-slate-50 border border-slate-200 space-y-1.5">
+                        <span class="text-xs font-bold text-indigo-700">2. กำลังสองของผลต่าง</span>
+                        <div class="font-mono text-base font-bold text-slate-900">\((r_1 - r_2)^2\)</div>
+                        <div class="p-2 bg-white rounded-lg border border-slate-200 font-mono text-xs text-emerald-700 font-semibold text-center">
+                            \(= S^2 - 4P = \frac{\Delta}{a^2}\)
+                        </div>
+                        <p class="text-[11px] text-slate-500 leading-relaxed">
+                            สอดคล้องโดยตรงกับดิสคริมิแนนต์ \(\Delta = b^2 - 4ac\)
+                        </p>
+                    </div>
+
+                    <!-- Identity 3 -->
+                    <div class="p-4 rounded-xl bg-slate-50 border border-slate-200 space-y-1.5">
+                        <span class="text-xs font-bold text-indigo-700">3. ผลบวกกำลังสาม</span>
+                        <div class="font-mono text-base font-bold text-slate-900">\(r_1^3 + r_2^3\)</div>
+                        <div class="p-2 bg-white rounded-lg border border-slate-200 font-mono text-xs text-emerald-700 font-semibold text-center">
+                            \(= S(S^2 - 3P)\)
+                        </div>
+                        <p class="text-[11px] text-slate-500 leading-relaxed">
+                            มาจาก \((r_1+r_2)(r_1^2 - r_1 r_2 + r_2^2)\)
+                        </p>
+                    </div>
+
+                    <!-- Identity 4 -->
+                    <div class="p-4 rounded-xl bg-slate-50 border border-slate-200 space-y-1.5">
+                        <span class="text-xs font-bold text-indigo-700">4. ผลบวกส่วนกลับ</span>
+                        <div class="font-mono text-base font-bold text-slate-900">\(\frac{1}{r_1} + \frac{1}{r_2}\)</div>
+                        <div class="p-2 bg-white rounded-lg border border-slate-200 font-mono text-xs text-emerald-700 font-semibold text-center">
+                            \(= \frac{S}{P} = -\frac{b}{c}\)
+                        </div>
+                        <p class="text-[11px] text-slate-500 leading-relaxed">
+                            หา ครน. ได้ \(\frac{r_1+r_2}{r_1 r_2}\) (เมื่อ \(r_1, r_2 \neq 0\))
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Root Transformation Mechanisms Breakdown -->
+            <div class="p-5 rounded-2xl bg-white border border-slate-200 shadow-sm space-y-4">
+                <h3 class="text-base font-bold text-slate-900 font-heading flex items-center gap-2">
+                    <span class="w-2.5 h-2.5 rounded-full bg-indigo-600"></span>
+                    กลวิธีการแปลงรากเพื่อสร้างสมการใหม่ (Root Transformation Techniques)
+                </h3>
+                <div class="grid md:grid-cols-3 gap-4 text-xs sm:text-sm">
+                    <!-- Method A: Shift -->
+                    <div class="p-4 rounded-xl bg-indigo-50/60 border border-indigo-200 space-y-2">
+                        <div class="font-bold text-indigo-950 flex items-center justify-between">
+                            <span>1. การเลื่อนค่าคงที่ (\(r_i \to r_i + k\))</span>
+                            <span class="text-[10px] px-2 py-0.5 rounded bg-indigo-200 text-indigo-800 font-mono">Shift</span>
+                        </div>
+                        <p class="text-slate-600 text-xs leading-relaxed">
+                            ให้ตัวแปรใหม่ \(y = x + k \iff x = y - k\) แทนค่าลงในสมการเดิม:
+                        </p>
+                        <div class="p-2.5 bg-white rounded-lg border border-indigo-200 font-mono text-center text-indigo-900 font-semibold text-xs">
+                            $$a(y - k)^2 + b(y - k) + c = 0$$
+                        </div>
+                        <p class="text-[11px] text-slate-500">กราฟของพาราโบลาจะเลื่อนขนานไปทางขวา \(k\) หน่วยบนแกนพิกัด</p>
+                    </div>
+
+                    <!-- Method B: Reciprocal -->
+                    <div class="p-4 rounded-xl bg-emerald-50/60 border border-emerald-200 space-y-2">
+                        <div class="font-bold text-emerald-950 flex items-center justify-between">
+                            <span>2. การกลับเศษส่วน (\(r_i \to 1/r_i\))</span>
+                            <span class="text-[10px] px-2 py-0.5 rounded bg-emerald-200 text-emerald-800 font-mono">Reciprocal</span>
+                        </div>
+                        <p class="text-slate-600 text-xs leading-relaxed">
+                            ให้ \(y = \frac{1}{x} \iff x = \frac{1}{y}\) แทนค่าลงในสมการแล้วคูณด้วย \(y^2\):
+                        </p>
+                        <div class="p-2.5 bg-white rounded-lg border border-emerald-200 font-mono text-center text-emerald-900 font-semibold text-xs">
+                            $$c y^2 + b y + a = 0$$
+                        </div>
+                        <p class="text-[11px] text-slate-500">สัมประสิทธิ์นำ \(a\) และค่าคงตัว \(c\) จะ <strong>สลับตำแหน่งกัน</strong> เสมอ</p>
+                    </div>
+
+                    <!-- Method C: Scaling -->
+                    <div class="p-4 rounded-xl bg-amber-50/60 border border-amber-200 space-y-2">
+                        <div class="font-bold text-amber-950 flex items-center justify-between">
+                            <span>3. การคูณด้วยสเกลาร์ (\(r_i \to m \cdot r_i\))</span>
+                            <span class="text-[10px] px-2 py-0.5 rounded bg-amber-200 text-amber-800 font-mono">Scale</span>
+                        </div>
+                        <p class="text-slate-600 text-xs leading-relaxed">
+                            ให้ \(y = mx \iff x = \frac{y}{m}\) แทนค่าลงในสมการแล้วคูณด้วย \(m^2\):
+                        </p>
+                        <div class="p-2.5 bg-white rounded-lg border border-amber-200 font-mono text-center text-amber-900 font-semibold text-xs">
+                            $$a y^2 + (bm) y + (c m^2) = 0$$
+                        </div>
+                        <p class="text-[11px] text-slate-500">ผลบวกของรากขยายเป็น \(mS\) และผลคูณขยายเป็น \(m^2 P\)</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 3. แบบจำลองโต้ตอบ (Interactive Simulator) -->
+        <section class="bg-white rounded-2xl p-6 sm:p-8 shadow-sm border border-slate-200/80 space-y-6">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 pb-4">
+                <div class="flex items-center gap-3">
+                    <div class="p-2.5 rounded-xl bg-indigo-100 text-indigo-700">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 4a2 2 0 114 0v1a1 1 0 001 1h3a1 1 0 011 1v3a1 1 0 01-1 1h-1a2 2 0 100 4h1a1 1 0 011 1v3a1 1 0 01-1 1h-3a1 1 0 01-1-1v-1a2 2 0 10-4 0v1a1 1 0 01-1 1H7a1 1 0 01-1-1v-3a1 1 0 00-1-1H4a2 2 0 110-4h1a1 1 0 001-1V7a1 1 0 011-1h3a1 1 0 001-1V4z" />
+                        </svg>
+                    </div>
+                    <div>
+                        <h2 class="text-xl sm:text-2xl font-bold text-slate-900 font-heading">3. แบบจำลองโต้ตอบ (Interactive Simulator)</h2>
+                        <p class="text-xs sm:text-sm text-slate-500">ปรับสมการเดิม เลือกรูปแบบการแปลงราก และสังเกตนิพจน์สมมาตรพร้อมการเปรียบเทียบกราฟพาราโบลา</p>
+                    </div>
+                </div>
+
+                <!-- Presets Buttons -->
+                <div class="flex flex-wrap gap-2">
+                    <button onclick="setBaseEquation(1, -5, 6)" class="px-3 py-1.5 text-xs font-medium rounded-lg bg-indigo-50 hover:bg-indigo-100 text-indigo-800 border border-indigo-200 transition">ตัวอย่าง 1: x² - 5x + 6 (ราก 2, 3)</button>
+                    <button onclick="setBaseEquation(1, -4, 1)" class="px-3 py-1.5 text-xs font-medium rounded-lg bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200 transition">ตัวอย่าง 2: x² - 4x + 1 (อตรรกยะ 2 &plusmn; &radic;3)</button>
+                    <button onclick="setBaseEquation(2, -6, 4)" class="px-3 py-1.5 text-xs font-medium rounded-lg bg-amber-50 hover:bg-amber-100 text-amber-800 border border-amber-200 transition">ตัวอย่าง 3: 2x² - 6x + 4 (ราก 1, 2)</button>
+                </div>
+            </div>
+
+            <div class="grid lg:grid-cols-12 gap-8 items-start">
+                <!-- Left Controls & Equation Transformation Panel (7 Cols) -->
+                <div class="lg:col-span-7 space-y-6">
+                    <!-- Base Equation Inputs -->
+                    <div class="bg-slate-50 p-5 rounded-2xl border border-slate-200 space-y-4">
+                        <div class="flex items-center justify-between border-b pb-2">
+                            <span class="text-xs font-bold text-slate-700 uppercase tracking-wider">1. กำหนดสมการพหุนามเดิม \(ax^2 + bx + c = 0\)</span>
+                            <span id="baseDeltaBadge" class="text-[11px] font-mono font-bold px-2 py-0.5 rounded-full"></span>
+                        </div>
+                        <div class="grid sm:grid-cols-3 gap-3">
+                            <div>
+                                <label for="inputA" class="text-xs font-semibold text-slate-700 block mb-1">สัมประสิทธิ์ \(a\)</label>
+                                <input type="number" id="inputA" step="0.5" value="1" class="w-full px-3 py-1.5 text-sm rounded-lg border border-slate-300 focus:ring-2 focus:ring-indigo-500 font-mono">
+                            </div>
+                            <div>
+                                <label for="inputB" class="text-xs font-semibold text-slate-700 block mb-1">สัมประสิทธิ์ \(b\)</label>
+                                <input type="number" id="inputB" step="0.5" value="-5" class="w-full px-3 py-1.5 text-sm rounded-lg border border-slate-300 focus:ring-2 focus:ring-indigo-500 font-mono">
+                            </div>
+                            <div>
+                                <label for="inputC" class="text-xs font-semibold text-slate-700 block mb-1">ค่าคงตัว \(c\)</label>
+                                <input type="number" id="inputC" step="0.5" value="6" class="w-full px-3 py-1.5 text-sm rounded-lg border border-slate-300 focus:ring-2 focus:ring-indigo-500 font-mono">
+                            </div>
+                        </div>
+
+                        <!-- Base Equation Overview -->
+                        <div class="p-3 bg-white rounded-xl border border-slate-200 flex flex-wrap items-center justify-between text-xs font-mono gap-2">
+                            <div>สมการเดิม: <span id="baseEquationText" class="font-bold text-indigo-900 text-sm">x² - 5x + 6 = 0</span></div>
+                            <div class="text-slate-600">S = <span id="baseSText" class="font-bold text-amber-600">5.00</span> | P = <span id="basePText" class="font-bold text-emerald-600">6.00</span></div>
+                            <div class="text-slate-500 text-[11px] w-full" id="baseRootsText">รากเดิม: r₁ = 2.00, r₂ = 3.00</div>
+                        </div>
+                    </div>
+
+                    <!-- Transformation Selection -->
+                    <div class="bg-indigo-50/60 p-5 rounded-2xl border border-indigo-200 space-y-4">
+                        <div class="flex items-center justify-between border-b border-indigo-200 pb-2">
+                            <span class="text-xs font-bold text-indigo-900 uppercase tracking-wider">2. เลือกรูปแบบการแปลงรากเพื่อสร้างสมการใหม่</span>
+                        </div>
+
+                        <div class="grid sm:grid-cols-2 gap-3 text-xs">
+                            <label class="flex items-start gap-2.5 p-3 rounded-xl bg-white border border-indigo-200 cursor-pointer hover:bg-indigo-50/50 transition">
+                                <input type="radio" name="transType" value="shift" checked class="mt-0.5 accent-indigo-600">
+                                <div>
+                                    <span class="font-bold text-slate-900 block">เลื่อนค่าคงตัว (\(r_i + k\))</span>
+                                    <span class="text-[11px] text-slate-500">รากใหม่เพิ่มขึ้น/ลดลงตามค่า \(k\)</span>
+                                </div>
+                            </label>
+
+                            <label class="flex items-start gap-2.5 p-3 rounded-xl bg-white border border-indigo-200 cursor-pointer hover:bg-indigo-50/50 transition">
+                                <input type="radio" name="transType" value="reciprocal" class="mt-0.5 accent-indigo-600">
+                                <div>
+                                    <span class="font-bold text-slate-900 block">กลับเศษส่วน (\(1/r_i\))</span>
+                                    <span class="text-[11px] text-slate-500">รากใหม่เป็นส่วนกลับของรากเดิม</span>
+                                </div>
+                            </label>
+
+                            <label class="flex items-start gap-2.5 p-3 rounded-xl bg-white border border-indigo-200 cursor-pointer hover:bg-indigo-50/50 transition">
+                                <input type="radio" name="transType" value="scale" class="mt-0.5 accent-indigo-600">
+                                <div>
+                                    <span class="font-bold text-slate-900 block">คูณด้วยสเกลาร์ (\(m \cdot r_i\))</span>
+                                    <span class="text-[11px] text-slate-500">ขยายหรือย่อรากเดิมด้วยตัวคูณ \(m\)</span>
+                                </div>
+                            </label>
+
+                            <label class="flex items-start gap-2.5 p-3 rounded-xl bg-white border border-indigo-200 cursor-pointer hover:bg-indigo-50/50 transition">
+                                <input type="radio" name="transType" value="square" class="mt-0.5 accent-indigo-600">
+                                <div>
+                                    <span class="font-bold text-slate-900 block">ยกกำลังสอง (\(r_i^2\))</span>
+                                    <span class="text-[11px] text-slate-500">รากใหม่เป็นกำลังสองของรากเดิม</span>
+                                </div>
+                            </label>
+                        </div>
+
+                        <!-- Dynamic Parameter Controls -->
+                        <div id="paramControlShift" class="space-y-2 pt-1">
+                            <div class="flex justify-between items-center text-xs">
+                                <label for="sliderK" class="font-semibold text-slate-800">ค่าคงตัวที่เลื่อน \(k\): <span id="labelK" class="font-mono font-bold text-indigo-700 text-sm">2</span></label>
+                                <input type="number" id="numK" value="2" step="0.5" class="w-16 px-2 py-0.5 text-right rounded border border-slate-300 font-mono text-xs">
+                            </div>
+                            <input type="range" id="sliderK" min="-5" max="5" step="0.5" value="2" class="w-full accent-indigo-600 h-2 bg-slate-200 rounded-lg cursor-pointer">
+                        </div>
+
+                        <div id="paramControlScale" class="space-y-2 pt-1 hidden">
+                            <div class="flex justify-between items-center text-xs">
+                                <label for="sliderM" class="font-semibold text-slate-800">ตัวคูณสเกลาร์ \(m\): <span id="labelM" class="font-mono font-bold text-indigo-700 text-sm">2</span></label>
+                                <input type="number" id="numM" value="2" step="0.5" class="w-16 px-2 py-0.5 text-right rounded border border-slate-300 font-mono text-xs">
+                            </div>
+                            <input type="range" id="sliderM" min="-4" max="4" step="0.5" value="2" class="w-full accent-indigo-600 h-2 bg-slate-200 rounded-lg cursor-pointer">
+                        </div>
+                    </div>
+
+                    <!-- Side-by-Side Method Synthesis Output -->
+                    <div class="p-5 rounded-2xl bg-slate-900 text-white space-y-3 shadow-md">
+                        <div class="flex items-center justify-between border-b border-slate-800 pb-2">
+                            <span class="text-xs text-indigo-300 font-bold uppercase tracking-wider">สมการใหม่ที่ได้หลังการแปลง</span>
+                            <span class="text-xs bg-emerald-500/20 text-emerald-300 px-2.5 py-0.5 rounded-full font-mono border border-emerald-500/30">Verified</span>
+                        </div>
+                        <div id="transformedEquationText" class="text-xl sm:text-2xl font-mono text-center font-bold text-amber-300 py-1">
+                            y² - 9y + 20 = 0
+                        </div>
+                        <div id="methodComparisonText" class="text-xs text-slate-300 space-y-1 pt-1 font-sans border-t border-slate-800">
+                            <!-- Populated dynamically -->
+                        </div>
+                    </div>
+
+                    <!-- Symmetric Expressions Calculator Table -->
+                    <div class="p-5 rounded-2xl bg-white border border-slate-200 shadow-sm space-y-3">
+                        <h4 class="text-sm font-bold text-slate-800 uppercase tracking-wider border-b pb-2">การคำนวณค่านิพจน์สมมาตรของรากสมการเดิม (โดยไม่หาราก)</h4>
+                        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-center">
+                            <div class="p-2.5 bg-slate-50 rounded-xl border border-slate-200">
+                                <span class="text-[11px] text-slate-500 block">\(r_1^2 + r_2^2\)</span>
+                                <span id="valSumSquares" class="text-sm font-mono font-bold text-indigo-700">13.00</span>
+                                <span class="text-[10px] text-slate-400 block mt-0.5 font-mono">S² - 2P</span>
+                            </div>
+                            <div class="p-2.5 bg-slate-50 rounded-xl border border-slate-200">
+                                <span class="text-[11px] text-slate-500 block">\((r_1 - r_2)^2\)</span>
+                                <span id="valDiffSquares" class="text-sm font-mono font-bold text-indigo-700">1.00</span>
+                                <span class="text-[10px] text-slate-400 block mt-0.5 font-mono">S² - 4P</span>
+                            </div>
+                            <div class="p-2.5 bg-slate-50 rounded-xl border border-slate-200">
+                                <span class="text-[11px] text-slate-500 block">\(\frac{1}{r_1} + \frac{1}{r_2}\)</span>
+                                <span id="valSumReciprocal" class="text-sm font-mono font-bold text-indigo-700">0.83</span>
+                                <span class="text-[10px] text-slate-400 block mt-0.5 font-mono">S / P</span>
+                            </div>
+                            <div class="p-2.5 bg-slate-50 rounded-xl border border-slate-200">
+                                <span class="text-[11px] text-slate-500 block">\(r_1^3 + r_2^3\)</span>
+                                <span id="valSumCubes" class="text-sm font-mono font-bold text-indigo-700">35.00</span>
+                                <span class="text-[10px] text-slate-400 block mt-0.5 font-mono">S(S² - 3P)</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Canvas & Geometric Dual-Plot Panel (5 Cols) -->
+                <div class="lg:col-span-5 flex flex-col items-center space-y-4">
+                    <div class="w-full bg-slate-900 rounded-2xl p-4 shadow-lg border border-slate-800">
+                        <div class="flex items-center justify-between text-xs text-slate-300 mb-2 px-1">
+                            <span class="font-semibold text-slate-200 flex items-center gap-1.5">
+                                <span class="w-2.5 h-2.5 rounded-full bg-indigo-400"></span> กราฟเปรียบเทียบพาราโบลา
+                            </span>
+                            <span class="text-slate-400 text-[11px] font-mono">เดิม vs ใหม่</span>
+                        </div>
+                        <div class="relative w-full aspect-square max-h-[380px] bg-slate-950 rounded-xl overflow-hidden border border-slate-800 flex items-center justify-center">
+                            <canvas id="graphCanvas" class="w-full h-full block cursor-crosshair"></canvas>
+                        </div>
+                        <div class="flex flex-wrap items-center justify-between mt-3 text-xs text-slate-400 px-1 font-mono gap-2">
+                            <div class="flex items-center gap-1.5">
+                                <span class="inline-block w-3 h-0.5 bg-indigo-400"></span> สมการเดิม \(f(x)\)
+                            </div>
+                            <div class="flex items-center gap-1.5">
+                                <span class="inline-block w-3 h-0.5 bg-amber-400"></span> สมการใหม่ \(g(y)\)
+                            </div>
+                            <div class="flex items-center gap-1.5">
+                                <span class="inline-block w-2.5 h-2.5 rounded-full bg-indigo-400"></span> รากเดิม
+                            </div>
+                            <div class="flex items-center gap-1.5">
+                                <span class="inline-block w-2.5 h-2.5 rounded-full bg-amber-400"></span> รากใหม่
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Explanatory Insight Card -->
+                    <div id="transformationInsightCard" class="w-full p-4 rounded-xl border bg-slate-50 border-slate-200 text-xs sm:text-sm text-slate-700 space-y-1.5 leading-relaxed">
+                        <!-- Populated dynamically -->
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 4. คำถามนำเพื่อค้นพบ (Guided Discovery Questions) -->
+        <section class="bg-white rounded-2xl p-6 sm:p-8 shadow-sm border border-slate-200/80 space-y-6">
+            <div class="flex items-center gap-3">
+                <div class="p-2.5 rounded-xl bg-amber-100 text-amber-700">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                </div>
+                <div>
+                    <h2 class="text-xl sm:text-2xl font-bold text-slate-900 font-heading">4. คำถามนำเพื่อค้นพบ (Guided Discovery Questions)</h2>
+                    <p class="text-xs sm:text-sm text-slate-500">คลิกที่แต่ละคำถามเพื่อคิดวิเคราะห์และเปิดดูคำอธิบายทางคณิตศาสตร์อย่างเป็นระบบ</p>
+                </div>
+            </div>
+
+            <div class="space-y-4">
+                <!-- Question 1 -->
+                <div class="border border-slate-200 rounded-xl overflow-hidden bg-slate-50/50">
+                    <button onclick="toggleAccordion('disc1')" class="w-full text-left p-4 sm:p-5 flex justify-between items-center gap-4 hover:bg-slate-100/70 transition">
+                        <span class="font-semibold text-slate-800 text-base sm:text-lg flex items-center gap-3">
+                            <span class="flex-shrink-0 w-7 h-7 rounded-full bg-indigo-100 text-indigo-700 text-sm font-bold flex items-center justify-center">1</span>
+                            หากทราบผลบวกและผลคูณของราก เราหาผลบวกกำลังสองของรากได้อย่างไร?
+                        </span>
+                        <svg id="icon-disc1" class="w-5 h-5 text-slate-500 transform transition-transform duration-200 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                        </svg>
+                    </button>
+                    <div id="content-disc1" class="hidden px-5 pb-5 text-slate-600 text-sm sm:text-base border-t border-slate-200 bg-white pt-4 space-y-2">
+                        <p class="font-bold text-slate-800">อาศัยเอกลักษณ์กำลังสองสมบูรณ์ของทวินาม:</p>
+                        <p class="leading-relaxed">
+                            เริ่มต้นจากสูตรกำลังสองสมบูรณ์ \((r_1 + r_2)^2 = r_1^2 + 2r_1 r_2 + r_2^2\) จากนั้นย้ายพจน์กลาง \(2r_1 r_2\) ไปฝั่งซ้าย:
+                        </p>
+                        <div class="py-2.5 px-4 bg-slate-50 rounded-lg font-mono text-center font-bold text-indigo-900">
+                            $$r_1^2 + r_2^2 = (r_1 + r_2)^2 - 2r_1 r_2 = S^2 - 2P$$
+                        </div>
+                        <p class="leading-relaxed text-xs sm:text-sm text-slate-600">
+                            วิธีนี้ทำให้เราได้ค่าผลบวกกำลังสองทันทีโดยไม่จำเป็นต้องถอดรากที่สองของดิสคริมิแนนต์ ซึ่งช่วยป้องกันความผิดพลาดจากการคำนวณติดกรณฑ์หรือจำนวนเชิงซ้อนได้อย่างดีเยี่ยม
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Question 2 -->
+                <div class="border border-slate-200 rounded-xl overflow-hidden bg-slate-50/50">
+                    <button onclick="toggleAccordion('disc2')" class="w-full text-left p-4 sm:p-5 flex justify-between items-center gap-4 hover:bg-slate-100/70 transition">
+                        <span class="font-semibold text-slate-800 text-base sm:text-lg flex items-center gap-3">
+                            <span class="flex-shrink-0 w-7 h-7 rounded-full bg-indigo-100 text-indigo-700 text-sm font-bold flex items-center justify-center">2</span>
+                            การเปลี่ยนรากแต่ละแบบส่งผลต่อสัมประสิทธิ์ของสมการใหม่อย่างไร?
+                        </span>
+                        <svg id="icon-disc2" class="w-5 h-5 text-slate-500 transform transition-transform duration-200 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                        </svg>
+                    </button>
+                    <div id="content-disc2" class="hidden px-5 pb-5 text-slate-600 text-sm sm:text-base border-t border-slate-200 bg-white pt-4 space-y-2">
+                        <p class="font-bold text-slate-800">ผลการแปลงเชิงโครงสร้างของสัมประสิทธิ์:</p>
+                        <ul class="list-disc list-inside space-y-1.5 leading-relaxed text-slate-700 ml-2">
+                            <li>
+                                <strong>รากกลับเศษส่วน (\(r_i \to 1/r_i\)):</strong> สัมประสิทธิ์กลับลำดับจากหน้าไปหลัง กล่าวคือ \(ax^2 + bx + c = 0 \to cy^2 + by + a = 0\) โดยสัมประสิทธิ์กลาง \(b\) ยังคงเดิม
+                            </li>
+                            <li>
+                                <strong>รากเลื่อนค่าคงตัว (\(r_i \to r_i + k\)):</strong> สัมประสิทธิ์นำ \(a\) จะมีค่าคงเดิมเสมอ แต่สัมประสิทธิ์กลางจะเปลี่ยนเป็น \(b' = b - 2ak\) และค่าคงตัวใหม่คือ \(c' = ak^2 - bk + c\)
+                            </li>
+                            <li>
+                                <strong>รากคูณสเกลาร์ (\(r_i \to m \cdot r_i\)):</strong> สัมประสิทธิ์แต่ละพจน์จะถูกถ่วงน้ำหนักด้วยกำลังของ \(m\) คือ \(a, bm, cm^2\)
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Question 3 -->
+                <div class="border border-slate-200 rounded-xl overflow-hidden bg-slate-50/50">
+                    <button onclick="toggleAccordion('disc3')" class="w-full text-left p-4 sm:p-5 flex justify-between items-center gap-4 hover:bg-slate-100/70 transition">
+                        <span class="font-semibold text-slate-800 text-base sm:text-lg flex items-center gap-3">
+                            <span class="flex-shrink-0 w-7 h-7 rounded-full bg-indigo-100 text-indigo-700 text-sm font-bold flex items-center justify-center">3</span>
+                            วิธีใดช่วยลดการคำนวณที่ไม่จำเป็นได้มากที่สุด?
+                        </span>
+                        <svg id="icon-disc3" class="w-5 h-5 text-slate-500 transform transition-transform duration-200 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                        </svg>
+                    </button>
+                    <div id="content-disc3" class="hidden px-5 pb-5 text-slate-600 text-sm sm:text-base border-t border-slate-200 bg-white pt-4 space-y-2">
+                        <p class="font-bold text-slate-800">การแทนที่ตัวแปรแบบย้อนกลับ (Algebraic Substitution \(x = g^{-1}(y)\)):</p>
+                        <p class="leading-relaxed">
+                            เมื่อต้องการสร้างสมการใหม่ การใช้ความสัมพันธ์ \(y = g(x) \iff x = g^{-1}(y)\) แล้วนำ \(x\) ไปแทนค่าลงในสมการเดิมโดยตรง เป็นวิธีที่ <strong>ทรงพลังและรวดเร็วที่สุด</strong> เพราะ:
+                        </p>
+                        <ol class="list-decimal list-inside space-y-1 ml-2 text-slate-700">
+                            <li>ไม่ต้องคำนวณค่าราก \(r_1, r_2\) ที่อาจติดจำนวนอตรรกยะหรือจำนวนเชิงซ้อน</li>
+                            <li>ไม่ต้องคำนวณหาผลบวกและผลคูณของรากใหม่แยกต่างหาก</li>
+                            <li>วิธีนี้ใช้ได้กับพหุนามกำลังสาม กำลังสี่ หรือกำลังใดๆ ได้เหมือนกันทั้งหมด</li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 5. แบบฝึกหัดสำหรับนักศึกษา (Interactive Exercises & Self-Assessment) -->
+        <section class="bg-white rounded-2xl p-6 sm:p-8 shadow-sm border border-slate-200/80 space-y-6">
+            <div class="flex items-center gap-3">
+                <div class="p-2.5 rounded-xl bg-emerald-100 text-emerald-700">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
+                    </svg>
+                </div>
+                <div>
+                    <h2 class="text-xl sm:text-2xl font-bold text-slate-900 font-heading">5. แบบฝึกหัดสำหรับนักศึกษา (Interactive Exercises & Self-Assessment)</h2>
+                    <p class="text-xs sm:text-sm text-slate-500">ทดสอบการสร้างสมการใหม่ การคำนวณค่านิพจน์สมมาตร และการประยุกต์ความสัมพันธ์ของราก</p>
+                </div>
+            </div>
+
+            <div class="grid md:grid-cols-2 gap-6">
+                <!-- Problem 1 -->
+                <div class="p-5 rounded-2xl border border-slate-200 bg-slate-50/60 flex flex-col justify-between space-y-4">
+                    <div class="space-y-3">
+                        <div class="flex justify-between items-center">
+                            <span class="text-xs font-bold uppercase tracking-wider text-indigo-700">ข้อที่ 1: ผลบวกและผลต่างกำลังสอง</span>
+                            <span class="text-xs bg-slate-200 text-slate-700 px-2 py-0.5 rounded font-mono">Symmetric Values</span>
+                        </div>
+                        <p class="text-sm text-slate-700">
+                            กำหนดสมการ \(2x^2 - 5x + 1 = 0\) มีรากคือ \(r_1, r_2\) จงหาค่าของ \(r_1^2 + r_2^2\) โดยไม่ต้องคำนวณหาราก:
+                        </p>
+                        <div class="space-y-2 text-sm pt-1">
+                            <label class="flex items-center gap-3 p-2.5 rounded-lg bg-white border border-slate-200 cursor-pointer hover:bg-slate-50 transition">
+                                <input type="radio" name="quiz1" value="opt1" class="accent-indigo-600">
+                                <span>\(\frac{21}{4}\) (หรือ \(5.25\))</span>
+                            </label>
+                            <label class="flex items-center gap-3 p-2.5 rounded-lg bg-white border border-slate-200 cursor-pointer hover:bg-slate-50 transition">
+                                <input type="radio" name="quiz1" value="opt2" class="accent-indigo-600">
+                                <span>\(\frac{25}{4}\)</span>
+                            </label>
+                            <label class="flex items-center gap-3 p-2.5 rounded-lg bg-white border border-slate-200 cursor-pointer hover:bg-slate-50 transition">
+                                <input type="radio" name="quiz1" value="opt3" class="accent-indigo-600">
+                                <span>\(\frac{29}{4}\)</span>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="pt-2">
+                        <button onclick="evaluateQuiz(1, 'opt1', 'ถูกต้อง! จากสมการได้ $S = r_1+r_2 = -\\frac{-5}{2} = \\frac{5}{2}$ และ $P = r_1 r_2 = \\frac{1}{2}$ ดังนั้น $r_1^2 + r_2^2 = S^2 - 2P = \\left(\\frac{5}{2}\\right)^2 - 2\\left(\\frac{1}{2}\\right) = \\frac{25}{4} - 1 = \\frac{21}{4}$')" class="w-full py-2 bg-slate-900 hover:bg-slate-800 text-white rounded-xl text-sm font-semibold transition">
+                            ตรวจคำตอบ
+                        </button>
+                        <div id="quiz1-result" class="hidden mt-3 text-xs sm:text-sm p-3 rounded-xl border"></div>
+                    </div>
+                </div>
+
+                <!-- Problem 2 -->
+                <div class="p-5 rounded-2xl border border-slate-200 bg-slate-50/60 flex flex-col justify-between space-y-4">
+                    <div class="space-y-3">
+                        <div class="flex justify-between items-center">
+                            <span class="text-xs font-bold uppercase tracking-wider text-emerald-700">ข้อที่ 2: รากส่วนกลับ</span>
+                            <span class="text-xs bg-slate-200 text-slate-700 px-2 py-0.5 rounded font-mono">Reciprocal Roots</span>
+                        </div>
+                        <p class="text-sm text-slate-700">
+                            สมการกำลังสองที่มีรากเป็น \(\frac{1}{r_1}\) และ \(\frac{1}{r_2}\) ของสมการ \(3x^2 + 7x - 2 = 0\) คือข้อใด?
+                        </p>
+                        <div class="space-y-2 text-sm pt-1">
+                            <label class="flex items-center gap-3 p-2.5 rounded-lg bg-white border border-slate-200 cursor-pointer hover:bg-slate-50 transition">
+                                <input type="radio" name="quiz2" value="opt1" class="accent-indigo-600">
+                                <span>\(-2y^2 + 7y + 3 = 0\) (หรือ \(2y^2 - 7y - 3 = 0\))</span>
+                            </label>
+                            <label class="flex items-center gap-3 p-2.5 rounded-lg bg-white border border-slate-200 cursor-pointer hover:bg-slate-50 transition">
+                                <input type="radio" name="quiz2" value="opt2" class="accent-indigo-600">
+                                <span>\(3y^2 - 7y - 2 = 0\)</span>
+                            </label>
+                            <label class="flex items-center gap-3 p-2.5 rounded-lg bg-white border border-slate-200 cursor-pointer hover:bg-slate-50 transition">
+                                <input type="radio" name="quiz2" value="opt3" class="accent-indigo-600">
+                                <span>\(2y^2 + 7y + 3 = 0\)</span>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="pt-2">
+                        <button onclick="evaluateQuiz(2, 'opt1', 'ถูกต้อง! ใช้วิธีแทนที่ตัวแปร $x = \\frac{1}{y}$ จะได้ $3\\left(\\frac{1}{y}\\right)^2 + 7\\left(\\frac{1}{y}\\right) - 2 = 0$ คูณด้วย $y^2$ ตลอดสมการได้ $3 + 7y - 2y^2 = 0$ หรือจัดรูปเป็น $2y^2 - 7y - 3 = 0$ ซึ่งตรงกับกฎการสลับสัมประสิทธิ์ $a$ และ $c$')" class="w-full py-2 bg-slate-900 hover:bg-slate-800 text-white rounded-xl text-sm font-semibold transition">
+                            ตรวจคำตอบ
+                        </button>
+                        <div id="quiz2-result" class="hidden mt-3 text-xs sm:text-sm p-3 rounded-xl border"></div>
+                    </div>
+                </div>
+
+                <!-- Problem 3 -->
+                <div class="p-5 rounded-2xl border border-slate-200 bg-slate-50/60 flex flex-col justify-between space-y-4">
+                    <div class="space-y-3">
+                        <div class="flex justify-between items-center">
+                            <span class="text-xs font-bold uppercase tracking-wider text-amber-700">ข้อที่ 3: การเลื่อนรากด้วยค่าคงที่</span>
+                            <span class="text-xs bg-slate-200 text-slate-700 px-2 py-0.5 rounded font-mono">Shift Transformation</span>
+                        </div>
+                        <p class="text-sm text-slate-700">
+                            กำหนดสมการ \(x^2 - 4x + 2 = 0\) มีราก \(r_1, r_2\) จงหาสมการที่มีรากเป็น \(r_1 + 3\) และ \(r_2 + 3\):
+                        </p>
+                        <div class="space-y-2 text-sm pt-1">
+                            <label class="flex items-center gap-3 p-2.5 rounded-lg bg-white border border-slate-200 cursor-pointer hover:bg-slate-50 transition">
+                                <input type="radio" name="quiz3" value="opt1" class="accent-indigo-600">
+                                <span>\(y^2 - 10y + 23 = 0\)</span>
+                            </label>
+                            <label class="flex items-center gap-3 p-2.5 rounded-lg bg-white border border-slate-200 cursor-pointer hover:bg-slate-50 transition">
+                                <input type="radio" name="quiz3" value="opt2" class="accent-indigo-600">
+                                <span>\(y^2 - 10y + 11 = 0\)</span>
+                            </label>
+                            <label class="flex items-center gap-3 p-2.5 rounded-lg bg-white border border-slate-200 cursor-pointer hover:bg-slate-50 transition">
+                                <input type="radio" name="quiz3" value="opt3" class="accent-indigo-600">
+                                <span>\(y^2 - 4y + 23 = 0\)</span>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="pt-2">
+                        <button onclick="evaluateQuiz(3, 'opt1', 'ถูกต้อง! ให้ $y = x + 3 \\implies x = y - 3$ แทนค่าลงในสมการเดิม: $(y - 3)^2 - 4(y - 3) + 2 = 0 \\implies (y^2 - 6y + 9) - 4y + 12 + 2 = 0 \\implies y^2 - 10y + 23 = 0$ หรือใช้ผลบวกใหม่ $S\' = (r_1+3)+(r_2+3) = S+6 = 4+6 = 10$ และ $P\' = (r_1+3)(r_2+3) = P + 3S + 9 = 2 + 3(4) + 9 = 23$')" class="w-full py-2 bg-slate-900 hover:bg-slate-800 text-white rounded-xl text-sm font-semibold transition">
+                            ตรวจคำตอบ
+                        </button>
+                        <div id="quiz3-result" class="hidden mt-3 text-xs sm:text-sm p-3 rounded-xl border"></div>
+                    </div>
+                </div>
+
+                <!-- Problem 4 -->
+                <div class="p-5 rounded-2xl border border-slate-200 bg-slate-50/60 flex flex-col justify-between space-y-4">
+                    <div class="space-y-3">
+                        <div class="flex justify-between items-center">
+                            <span class="text-xs font-bold uppercase tracking-wider text-rose-700">ข้อที่ 4: การจัดรูปนิพจน์เศษส่วน</span>
+                            <span class="text-xs bg-slate-200 text-slate-700 px-2 py-0.5 rounded font-mono">Rational Expression</span>
+                        </div>
+                        <p class="text-sm text-slate-700">
+                            กำหนดสมการ \(x^2 - 6x + 4 = 0\) จงหาค่าของ \(\frac{r_1}{r_2} + \frac{r_2}{r_1}\):
+                        </p>
+                        <div class="space-y-2 text-sm pt-1">
+                            <label class="flex items-center gap-3 p-2.5 rounded-lg bg-white border border-slate-200 cursor-pointer hover:bg-slate-50 transition">
+                                <input type="radio" name="quiz4" value="opt1" class="accent-indigo-600">
+                                <span>\(7\)</span>
+                            </label>
+                            <label class="flex items-center gap-3 p-2.5 rounded-lg bg-white border border-slate-200 cursor-pointer hover:bg-slate-50 transition">
+                                <input type="radio" name="quiz4" value="opt2" class="accent-indigo-600">
+                                <span>\(9\)</span>
+                            </label>
+                            <label class="flex items-center gap-3 p-2.5 rounded-lg bg-white border border-slate-200 cursor-pointer hover:bg-slate-50 transition">
+                                <input type="radio" name="quiz4" value="opt3" class="accent-indigo-600">
+                                <span>\(\frac{17}{2}\)</span>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="pt-2">
+                        <button onclick="evaluateQuiz(4, 'opt1', 'ถูกต้อง! รวมเศษส่วน: $\\frac{r_1}{r_2} + \\frac{r_2}{r_1} = \\frac{r_1^2 + r_2^2}{r_1 r_2} = \\frac{S^2 - 2P}{P}$ จากสมการ $S = 6$ และ $P = 4$ ดังนั้น $\\frac{6^2 - 2(4)}{4} = \\frac{36 - 8}{4} = \\frac{28}{4} = 7$')" class="w-full py-2 bg-slate-900 hover:bg-slate-800 text-white rounded-xl text-sm font-semibold transition">
+                            ตรวจคำตอบ
+                        </button>
+                        <div id="quiz4-result" class="hidden mt-3 text-xs sm:text-sm p-3 rounded-xl border"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- INTERACTIVE JAVASCRIPT LOGIC -->
+    <script>
+        // DOM Elements
+        const inputA = document.getElementById('inputA');
+        const inputB = document.getElementById('inputB');
+        const inputC = document.getElementById('inputC');
+
+        const baseDeltaBadge = document.getElementById('baseDeltaBadge');
+        const baseEquationText = document.getElementById('baseEquationText');
+        const baseSText = document.getElementById('baseSText');
+        const basePText = document.getElementById('basePText');
+        const baseRootsText = document.getElementById('baseRootsText');
+
+        const transTypeRadios = document.getElementsByName('transType');
+        const paramControlShift = document.getElementById('paramControlShift');
+        const paramControlScale = document.getElementById('paramControlScale');
+
+        const sliderK = document.getElementById('sliderK');
+        const numK = document.getElementById('numK');
+        const labelK = document.getElementById('labelK');
+
+        const sliderM = document.getElementById('sliderM');
+        const numM = document.getElementById('numM');
+        const labelM = document.getElementById('labelM');
+
+        const transformedEquationText = document.getElementById('transformedEquationText');
+        const methodComparisonText = document.getElementById('methodComparisonText');
+        const transformationInsightCard = document.getElementById('transformationInsightCard');
+
+        const valSumSquares = document.getElementById('valSumSquares');
+        const valDiffSquares = document.getElementById('valDiffSquares');
+        const valSumReciprocal = document.getElementById('valSumReciprocal');
+        const valSumCubes = document.getElementById('valSumCubes');
+
+        const canvas = document.getElementById('graphCanvas');
+        const ctx = canvas.getContext('2d');
+
+        // State parameters
+        let baseA = 1.0;
+        let baseB = -5.0;
+        let baseC = 6.0;
+
+        let kVal = 2.0;
+        let mVal = 2.0;
+
+        function setBaseEquation(a, b, c) {
+            baseA = parseFloat(a);
+            baseB = parseFloat(b);
+            baseC = parseFloat(c);
+
+            inputA.value = baseA;
+            inputB.value = baseB;
+            inputC.value = baseC;
+
+            renderAll();
+        }
+
+        // Listeners for Base Equation
+        inputA.addEventListener('input', (e) => {
+            let val = parseFloat(e.target.value) || 1;
+            if (val === 0) val = 1;
+            baseA = val;
+            renderAll();
+        });
+        inputB.addEventListener('input', (e) => {
+            baseB = parseFloat(e.target.value) || 0;
+            renderAll();
+        });
+        inputC.addEventListener('input', (e) => {
+            baseC = parseFloat(e.target.value) || 0;
+            renderAll();
+        });
+
+        // Listeners for Radio Buttons
+        transTypeRadios.forEach(radio => {
+            radio.addEventListener('change', () => {
+                updateParamControlVisibility();
+                renderAll();
+            });
+        });
+
+        function getSelectedTransType() {
+            for (let r of transTypeRadios) {
+                if (r.checked) return r.value;
+            }
+            return 'shift';
+        }
+
+        function updateParamControlVisibility() {
+            const currentType = getSelectedTransType();
+            paramControlShift.classList.toggle('hidden', currentType !== 'shift');
+            paramControlScale.classList.toggle('hidden', currentType !== 'scale');
+        }
+
+        // Shift K listeners
+        sliderK.addEventListener('input', (e) => {
+            kVal = parseFloat(e.target.value);
+            numK.value = kVal;
+            labelK.textContent = kVal;
+            renderAll();
+        });
+        numK.addEventListener('input', (e) => {
+            kVal = parseFloat(e.target.value) || 0;
+            sliderK.value = kVal;
+            labelK.textContent = kVal;
+            renderAll();
+        });
+
+        // Scale M listeners
+        sliderM.addEventListener('input', (e) => {
+            let val = parseFloat(e.target.value);
+            if (val === 0) val = 1;
+            mVal = val;
+            numM.value = mVal;
+            labelM.textContent = mVal;
+            renderAll();
+        });
+        numM.addEventListener('input', (e) => {
+            let val = parseFloat(e.target.value) || 1;
+            if (val === 0) val = 1;
+            mVal = val;
+            sliderM.value = mVal;
+            labelM.textContent = mVal;
+            renderAll();
+        });
+
+        function formatN(num) {
+            if (Number.isInteger(num)) return num.toString();
+            return num.toFixed(2);
+        }
+
+        function buildEquationString(a, b, c, varName = 'x') {
+            let str = "";
+            if (a === 1) str = `${varName}²`;
+            else if (a === -1) str = `-${varName}²`;
+            else str = `${formatN(a)}${varName}²`;
+
+            if (b > 0) str += ` + ${formatN(b)}${varName}`;
+            else if (b < 0) str += ` - ${formatN(Math.abs(b))}${varName}`;
+
+            if (c > 0) str += ` + ${formatN(c)}`;
+            else if (c < 0) str += ` - ${formatN(Math.abs(c))}`;
+
+            if (b === 0 && c === 0) str += " = 0";
+            else str += " = 0";
+
+            return str;
+        }
+
+        function renderAll() {
+            if (baseA === 0) baseA = 1;
+
+            const delta = (baseB * baseB) - (4 * baseA * baseC);
+            const S = -baseB / baseA;
+            const P = baseC / baseA;
+
+            // 1. Update Base Info
+            baseEquationText.textContent = buildEquationString(baseA, baseB, baseC, 'x');
+            baseSText.textContent = formatN(S);
+            basePText.textContent = formatN(P);
+
+            if (delta > 0) {
+                baseDeltaBadge.className = "text-[11px] font-mono font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 border border-emerald-300";
+                baseDeltaBadge.textContent = `Δ = ${formatN(delta)} > 0 (รากจริง 2 ค่า)`;
+
+                const r1 = (-baseB + Math.sqrt(delta)) / (2 * baseA);
+                const r2 = (-baseB - Math.sqrt(delta)) / (2 * baseA);
+                baseRootsText.textContent = `รากเดิม: r₁ = ${formatN(r1)}, r₂ = ${formatN(r2)}`;
+            } else if (delta === 0) {
+                baseDeltaBadge.className = "text-[11px] font-mono font-bold px-2 py-0.5 rounded-full bg-sky-100 text-sky-800 border border-sky-300";
+                baseDeltaBadge.textContent = `Δ = 0 (รากซ้ำ)`;
+
+                const r = -baseB / (2 * baseA);
+                baseRootsText.textContent = `รากเดิม (ซ้ำ): r₁ = r₂ = ${formatN(r)}`;
+            } else {
+                baseDeltaBadge.className = "text-[11px] font-mono font-bold px-2 py-0.5 rounded-full bg-purple-100 text-purple-800 border border-purple-300";
+                baseDeltaBadge.textContent = `Δ = ${formatN(delta)} < 0 (รากเชิงซ้อน)`;
+
+                const realPart = -baseB / (2 * baseA);
+                const imagPart = Math.sqrt(-delta) / (2 * Math.abs(baseA));
+                baseRootsText.textContent = `รากเดิม (เชิงซ้อน): ${formatN(realPart)} ± ${formatN(imagPart)}i`;
+            }
+
+            // 2. Calculate Symmetric Values of Original Roots
+            const sumSq = (S * S) - (2 * P);
+            const diffSq = (S * S) - (4 * P);
+            const sumRecip = P !== 0 ? (S / P) : NaN;
+            const sumCubes = S * ((S * S) - (3 * P));
+
+            valSumSquares.textContent = formatN(sumSq);
+            valDiffSquares.textContent = formatN(diffSq);
+            valSumReciprocal.textContent = isNaN(sumRecip) ? "หาค่าไม่ได้" : formatN(sumRecip);
+            valSumCubes.textContent = formatN(sumCubes);
+
+            // 3. Transformation Calculation
+            const transType = getSelectedTransType();
+            let newA = 1.0, newB = 0.0, newC = 0.0;
+            let methodText = "";
+            let insightText = "";
+
+            if (transType === 'shift') {
+                // y = x + k => x = y - k
+                // a(y - k)^2 + b(y - k) + c = a(y^2 - 2ky + k^2) + b y - bk + c
+                newA = baseA;
+                newB = baseB - (2 * baseA * kVal);
+                newC = (baseA * kVal * kVal) - (baseB * kVal) + baseC;
+
+                const newS = S + (2 * kVal);
+                const newP = P + (kVal * S) + (kVal * kVal);
+
+                methodText = `
+                    <div><strong>วิธีที่ 1 (ผลบวก-ผลคูณใหม่):</strong> S' = (r₁+k) + (r₂+k) = S + 2k = ${formatN(newS)}, &nbsp; P' = (r₁+k)(r₂+k) = P + kS + k² = ${formatN(newP)}</div>
+                    <div><strong>วิธีที่ 2 (แทนที่ตัวแปร):</strong> แทน x = y - (${formatN(kVal)}) ลงในสมการเดิม: ${formatN(baseA)}(y - ${formatN(kVal)})² + ${formatN(baseB)}(y - ${formatN(kVal)}) + ${formatN(baseC)} = 0</div>
+                `;
+
+                insightText = `
+                    <div class="font-bold text-indigo-950 flex items-center gap-1.5 mb-1">
+                        <span class="w-2 h-2 rounded-full bg-indigo-600"></span> การเลื่อนขนานบนระนาบพิกัด (Horizontal Translation):
+                    </div>
+                    กราฟใหม่ถูกเลื่อนขนานไปทาง${kVal >= 0 ? 'ขวา' : 'ซ้าย'}เป็นระยะทาง ${formatN(Math.abs(kVal))} หน่วย สัมประสิทธิ์นำ \\(a = ${formatN(newA)}\\) ยังคงเดิมไม่เปลี่ยนแปลง รูปทรงความกว้างของพาราโบลาจึงเหมือนเดิมทุกประการ
+                `;
+            } else if (transType === 'reciprocal') {
+                // y = 1/x => x = 1/y
+                // a(1/y)^2 + b(1/y) + c = 0 => c y^2 + b y + a = 0
+                newA = baseC;
+                newB = baseB;
+                newC = baseA;
+
+                if (newA === 0) {
+                    methodText = `<div class="text-rose-400 font-bold">ไม่สามารถหาได้เนื่องจากรากเดิมตัวหนึ่งเป็นศูนย์ (c = 0)</div>`;
+                    insightText = `เนื่องจากรากตัวหนึ่งมีค่าเป็นศูนย์ การกลับเศษส่วนจะทำให้เกิดการหารด้วยศูนย์`;
+                } else {
+                    const newS = P !== 0 ? (S / P) : 0;
+                    const newP = P !== 0 ? (1 / P) : 0;
+
+                    methodText = `
+                        <div><strong>วิธีที่ 1 (ผลบวก-ผลคูณใหม่):</strong> S' = 1/r₁ + 1/r₂ = S/P = ${formatN(newS)}, &nbsp; P' = (1/r₁)(1/r₂) = 1/P = ${formatN(newP)}</div>
+                        <div><strong>วิธีที่ 2 (แทนที่ตัวแปร):</strong> แทน x = 1/y ลงในสมการเดิมแล้วคูณ y² จะได้สมการสลับสัมประสิทธิ์: ${formatN(newA)}y² + ${formatN(newB)}y + ${formatN(newC)} = 0</div>
+                    `;
+
+                    insightText = `
+                        <div class="font-bold text-emerald-950 flex items-center gap-1.5 mb-1">
+                            <span class="w-2 h-2 rounded-full bg-emerald-600"></span> การสลับตำแหน่งสัมประสิทธิ์ (Reciprocal Reversal):
+                        </div>
+                        สังเกตว่าสัมประสิทธิ์นำและค่าคงตัวสลับตำแหน่งกันอย่างสมบูรณ์ (\(${formatN(baseA)} \leftrightarrow ${formatN(baseC)}\)) ส่วนสัมประสิทธิ์กลาง \(${formatN(baseB)}\) คงเดิม
+                    `;
+                }
+            } else if (transType === 'scale') {
+                // y = m*x => x = y/m
+                // a(y/m)^2 + b(y/m) + c = 0 => a y^2 + (bm) y + (c m^2) = 0
+                newA = baseA;
+                newB = baseB * mVal;
+                newC = baseC * mVal * mVal;
+
+                const newS = mVal * S;
+                const newP = (mVal * mVal) * P;
+
+                methodText = `
+                    <div><strong>วิธีที่ 1 (ผลบวก-ผลคูณใหม่):</strong> S' = m(r₁+r₂) = ${formatN(newS)}, &nbsp; P' = m²(r₁ r₂) = ${formatN(newP)}</div>
+                    <div><strong>วิธีที่ 2 (แทนที่ตัวแปร):</strong> แทน x = y/${formatN(mVal)} ลงในสมการเดิมแล้วคูณด้วย ${formatN(mVal*mVal)}</div>
+                `;
+
+                insightText = `
+                    <div class="font-bold text-amber-950 flex items-center gap-1.5 mb-1">
+                        <span class="w-2 h-2 rounded-full bg-amber-600"></span> การขยายพิกัดราก (Scaling Transformation):
+                    </div>
+                    รากทุกตัวถูกคูณขยายออกไปด้วยตัวคูณ \\(m = ${formatN(mVal)}\\) ทำให้ผลบวกขยายเป็น \\(mS\\) และผลคูณขยายเป็น \\(m^2 P\\)
+                `;
+            } else if (transType === 'square') {
+                // y = x^2 => roots are r1^2, r2^2
+                // newS = r1^2 + r2^2 = S^2 - 2P
+                // newP = (r1*r2)^2 = P^2
+                // y^2 - (S^2 - 2P)y + P^2 = 0
+                newA = 1.0;
+                newB = -(sumSq);
+                newC = P * P;
+
+                methodText = `
+                    <div><strong>วิธีที่ 1 (ผลบวก-ผลคูณใหม่):</strong> S' = r₁² + r₂² = S² - 2P = ${formatN(sumSq)}, &nbsp; P' = (r₁ r₂)² = P² = ${formatN(P * P)}</div>
+                    <div><strong>วิธีที่ 2 (การกำจัดเครื่องหมายกรณฑ์):</strong> จัดรูป ax² + c = -bx แล้วยกกำลังสองทั้งสองข้าง: (ax² + c)² = b²x² แล้วแทน x² = y</div>
+                `;
+
+                insightText = `
+                    <div class="font-bold text-indigo-950 flex items-center gap-1.5 mb-1">
+                        <span class="w-2 h-2 rounded-full bg-indigo-600"></span> การยกกำลังสองของราก (Root Squaring):
+                    </div>
+                    รากของสมการใหม่คือ \\(r_1^2\\) และ \\(r_2^2\\) เสมอ แม้ว่ารากเดิมจะเป็นจำนวนลบ รากใหม่ก็จะกลายเป็นจำนวนบวกทั้งหมด
+                `;
+            }
+
+            transformedEquationText.textContent = buildEquationString(newA, newB, newC, 'y');
+            methodComparisonText.innerHTML = methodText;
+            transformationInsightCard.innerHTML = insightText;
+
+            // 4. Draw Canvas Dual-Graph
+            drawDualGraph(baseA, baseB, baseC, newA, newB, newC, delta);
+
+            // Re-render KaTeX if available
+            if (window.renderMathInElement) {
+                renderMathInElement(transformationInsightCard, {
+                    delimiters: [{left: '\\(', right: '\\)', display: false}]
+                });
+            }
+        }
+
+        function drawDualGraph(a1, b1, c1, a2, b2, c2, delta1) {
+            const rect = canvas.getBoundingClientRect();
+            const width = rect.width;
+            const height = rect.height;
+
+            if (width === 0 || height === 0) return;
+
+            const dpr = window.devicePixelRatio || 1;
+            canvas.width = width * dpr;
+            canvas.height = height * dpr;
+            ctx.scale(dpr, dpr);
+
+            const originX = width / 2;
+            const originY = height / 2;
+            const scale = width / 22; // -11 to +11 range
+
+            // Clear Background
+            ctx.fillStyle = '#090d16';
+            ctx.fillRect(0, 0, width, height);
+
+            // Grid Lines
+            ctx.lineWidth = 1;
+            ctx.strokeStyle = '#1e293b';
+            ctx.font = '10px monospace';
+            ctx.fillStyle = '#64748b';
+
+            for (let xVal = -12; xVal <= 12; xVal += 2) {
+                const screenX = originX + xVal * scale;
+                ctx.beginPath();
+                ctx.moveTo(screenX, 0);
+                ctx.lineTo(screenX, height);
+                ctx.stroke();
+                if (xVal !== 0) ctx.fillText(xVal, screenX - 6, originY + 13);
+            }
+
+            for (let yVal = -12; yVal <= 12; yVal += 2) {
+                const screenY = originY - yVal * scale;
+                ctx.beginPath();
+                ctx.moveTo(0, screenY);
+                ctx.lineTo(width, screenY);
+                ctx.stroke();
+                if (yVal !== 0) ctx.fillText(yVal, originX + 5, screenY + 3);
+            }
+
+            // Main Axes
+            ctx.lineWidth = 1.75;
+            ctx.strokeStyle = '#94a3b8';
+
+            // X-Axis
+            ctx.beginPath();
+            ctx.moveTo(0, originY);
+            ctx.lineTo(width, originY);
+            ctx.stroke();
+
+            // Y-Axis
+            ctx.beginPath();
+            ctx.moveTo(originX, 0);
+            ctx.lineTo(originX, height);
+            ctx.stroke();
+
+            ctx.fillText('0', originX - 10, originY + 12);
+            ctx.fillText('x, y', width - 24, originY - 6);
+
+            // 1. Draw Original Parabola f(x)
+            ctx.lineWidth = 2.2;
+            ctx.strokeStyle = '#818cf8'; // Indigo
+            ctx.beginPath();
+
+            let first1 = true;
+            for (let px = 0; px <= width; px += 2) {
+                const gx = (px - originX) / scale;
+                const gy = a1 * gx * gx + b1 * gx + c1;
+                const py = originY - gy * scale;
+
+                if (first1) {
+                    ctx.moveTo(px, py);
+                    first1 = false;
+                } else {
+                    ctx.lineTo(px, py);
+                }
+            }
+            ctx.stroke();
+
+            // 2. Draw Transformed Parabola g(y)
+            ctx.lineWidth = 2.2;
+            ctx.strokeStyle = '#f59e0b'; // Amber
+            ctx.beginPath();
+
+            let first2 = true;
+            for (let px = 0; px <= width; px += 2) {
+                const gx = (px - originX) / scale;
+                const gy = a2 * gx * gx + b2 * gx + c2;
+                const py = originY - gy * scale;
+
+                if (first2) {
+                    ctx.moveTo(px, py);
+                    first2 = false;
+                } else {
+                    ctx.lineTo(px, py);
+                }
+            }
+            ctx.stroke();
+
+            // Highlight Real Roots on Original if delta >= 0
+            if (delta1 >= 0) {
+                const r1 = (-b1 + Math.sqrt(delta1)) / (2 * a1);
+                const r2 = (-b1 - Math.sqrt(delta1)) / (2 * a1);
+
+                [r1, r2].forEach(r => {
+                    const rx = originX + r * scale;
+                    const ry = originY;
+
+                    ctx.fillStyle = '#818cf8';
+                    ctx.beginPath();
+                    ctx.arc(rx, ry, 5, 0, Math.PI * 2);
+                    ctx.fill();
+
+                    ctx.strokeStyle = '#ffffff';
+                    ctx.lineWidth = 1.5;
+                    ctx.beginPath();
+                    ctx.arc(rx, ry, 5, 0, Math.PI * 2);
+                    ctx.stroke();
+                });
+            }
+
+            // Highlight Roots of Transformed Equation if delta2 >= 0
+            const delta2 = (b2 * b2) - (4 * a2 * c2);
+            if (delta2 >= 0 && a2 !== 0) {
+                const tr1 = (-b2 + Math.sqrt(delta2)) / (2 * a2);
+                const tr2 = (-b2 - Math.sqrt(delta2)) / (2 * a2);
+
+                [tr1, tr2].forEach(tr => {
+                    const rx = originX + tr * scale;
+                    const ry = originY;
+
+                    ctx.fillStyle = '#fbbf24';
+                    ctx.beginPath();
+                    ctx.arc(rx, ry, 5, 0, Math.PI * 2);
+                    ctx.fill();
+
+                    ctx.strokeStyle = '#ffffff';
+                    ctx.lineWidth = 1.5;
+                    ctx.beginPath();
+                    ctx.arc(rx, ry, 5, 0, Math.PI * 2);
+                    ctx.stroke();
+                });
+            }
+        }
+
+        // Accordion Controller
+        function toggleAccordion(id) {
+            const content = document.getElementById(`content-${id}`);
+            const icon = document.getElementById(`icon-${id}`);
+
+            if (content.classList.contains('hidden')) {
+                content.classList.remove('hidden');
+                icon.classList.add('rotate-180');
+            } else {
+                content.classList.add('hidden');
+                icon.classList.remove('rotate-180');
+            }
+        }
+
+        // Quiz Evaluation Handler
+        function evaluateQuiz(quizNum, correctOpt, explanation) {
+            const options = document.getElementsByName(`quiz${quizNum}`);
+            let chosen = null;
+            for (let opt of options) {
+                if (opt.checked) {
+                    chosen = opt.value;
+                    break;
+                }
+            }
+
+            const resBox = document.getElementById(`quiz${quizNum}-result`);
+            resBox.classList.remove('hidden', 'bg-emerald-50', 'text-emerald-900', 'border-emerald-300', 'bg-rose-50', 'text-rose-900', 'border-rose-300', 'bg-amber-50', 'text-amber-900', 'border-amber-300');
+
+            if (!chosen) {
+                resBox.className = 'mt-3 text-xs sm:text-sm p-3 rounded-xl border bg-amber-50 text-amber-900 border-amber-300';
+                resBox.innerHTML = '<strong>แจ้งเตือน:</strong> โปรดเลือกคำตอบก่อนทำการตรวจ';
+                return;
+            }
+
+            if (chosen === correctOpt) {
+                resBox.className = 'mt-3 text-xs sm:text-sm p-3 rounded-xl border bg-emerald-50 text-emerald-900 border-emerald-300';
+                resBox.innerHTML = `<strong>ผลการประเมิน: ถูกต้องยอดเยี่ยม!</strong><br><span class="leading-relaxed mt-1 block">${explanation}</span>`;
+            } else {
+                resBox.className = 'mt-3 text-xs sm:text-sm p-3 rounded-xl border bg-rose-50 text-rose-900 border-rose-300';
+                resBox.innerHTML = `<strong>ผลการประเมิน: ยังไม่ถูกต้อง</strong><br><span class="leading-relaxed mt-1 block">${explanation}</span>`;
+            }
+
+            if (window.renderMathInElement) {
+                renderMathInElement(resBox, {
+                    delimiters: [
+                        {left: '$$', right: '$$', display: true},
+                        {left: '$', right: '$', display: false},
+                        {left: '\\(', right: '\\)', display: false},
+                        {left: '\\[', right: '\\]', display: true}
+                    ]
+                });
+            }
+        }
+
+        // Window resize event
+        window.addEventListener('resize', () => {
+            renderAll();
+        });
+
+        // Window onload initialization
+        window.onload = function() {
+            updateParamControlVisibility();
+            renderAll();
+            if (window.renderMathInElement) {
+                renderMathInElement(document.body, {
+                    delimiters: [
+                        {left: '$$', right: '$$', display: true},
+                        {left: '$', right: '$', display: false},
+                        {left: '\\(', right: '\\)', display: false},
+                        {left: '\\[', right: '\\]', display: true}
+                    ]
+                });
+            }
+        };
+    </script>
+</body>
+</html>

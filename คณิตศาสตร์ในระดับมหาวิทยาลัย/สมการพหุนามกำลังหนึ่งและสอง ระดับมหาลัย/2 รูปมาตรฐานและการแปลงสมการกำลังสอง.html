@@ -1,0 +1,1087 @@
+<!DOCTYPE html>
+<html lang="th" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>เรื่องที่ 2: รูปมาตรฐานและการแปลงสมการกำลังสอง</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Sarabun & Prompt -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@400;500;600;700&family=Sarabun:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    <!-- KaTeX for crisp LaTeX Math Rendering -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body);"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Sarabun', 'sans-serif'],
+                        heading: ['Prompt', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    },
+                    colors: {
+                        brand: {
+                            50: '#eef2ff',
+                            100: '#e0e7ff',
+                            500: '#6366f1',
+                            600: '#4f46e5',
+                            700: '#4338ca',
+                            800: '#3730a3',
+                            900: '#312e81',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Sarabun', sans-serif;
+            background-color: #f8fafc;
+            color: #0f172a;
+        }
+        h1, h2, h3, h4, h5, h6 {
+            font-family: 'Prompt', sans-serif;
+        }
+        /* Custom scrollbars */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+    </style>
+</head>
+<body class="min-h-screen antialiased selection:bg-indigo-500 selection:text-white">
+
+    <!-- Container Layout strictly conforming to the requested size -->
+    <main class="max-w-6xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 space-y-10">
+
+        <!-- HEADER SECTION -->
+        <header class="bg-gradient-to-br from-slate-900 via-indigo-950 to-slate-900 text-white rounded-3xl p-6 sm:p-10 shadow-xl border border-indigo-900/50 relative overflow-hidden">
+            <div class="absolute -right-16 -top-16 w-80 h-80 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none"></div>
+            <div class="relative z-10 space-y-3">
+
+                <h1 class="text-2xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-white font-heading">
+                    เรื่องที่ 2: รูปมาตรฐานและการแปลงสมการกำลังสอง
+                </h1>
+                <p class="text-indigo-200 text-sm sm:text-base font-light max-w-3xl leading-relaxed">
+                    Standard Form, Factoring, and Completing the Square: ศึกษาการเปลี่ยนรูปทางพีชคณิตเพื่อคงสภาพชุดคำตอบ และการเชื่อมโยงระหว่างพหุนามกับรูปเรขาคณิตพาราโบลา
+                </p>
+            </div>
+        </header>
+
+        <!-- 1. วัตถุประสงค์การเรียนรู้ -->
+        <section class="bg-white rounded-2xl p-6 sm:p-8 shadow-sm border border-slate-200/80">
+            <div class="flex items-center gap-3 mb-4">
+                <div class="p-2.5 rounded-xl bg-indigo-100 text-indigo-700">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                </div>
+                <h2 class="text-xl sm:text-2xl font-bold text-slate-900 font-heading">1. วัตถุประสงค์การเรียนรู้ (Learning Objectives)</h2>
+            </div>
+            <div class="bg-indigo-50/60 rounded-xl p-5 border-l-4 border-indigo-600 text-slate-700 space-y-2">
+                <p class="font-medium text-slate-900 text-base sm:text-lg">เมื่อศึกษาหัวข้อนี้จบแล้ว ผู้เรียนสามารถ:</p>
+                <ul class="list-disc list-inside space-y-2 text-slate-700 leading-relaxed">
+                    <li>แปลงสมการพหุนามกำลังสองให้อยู่ในรูปมาตรฐาน \(ax^2 + bx + c = 0\) โดยที่ \(a \neq 0\) ได้อย่างเป็นระบบ</li>
+                    <li>ใช้เทคนิคการแยกตัวประกอบ (Factoring) และการทำเป็นกำลังสองสมบูรณ์ (Completing the Square) เพื่อหาคำตอบทั้งในสนามจำนวนจริง (\(\mathbb{R}\)) และจำนวนเชิงซ้อน (\(\mathbb{C}\))</li>
+                    <li>อธิบายความสัมพันธ์ระหว่างรูปทั่วไป รูปกำลังสองสมบูรณ์ (Vertex Form) และรูปแยกตัวประกอบ (Factored Form) พร้อมพิสูจน์การรักษาชุดคำตอบเดิม</li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- 2. เนื้อหาหลัก -->
+        <section class="bg-white rounded-2xl p-6 sm:p-8 shadow-sm border border-slate-200/80 space-y-8">
+            <div class="flex items-center gap-3">
+                <div class="p-2.5 rounded-xl bg-blue-100 text-blue-700">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                    </svg>
+                </div>
+                <div>
+                    <h2 class="text-xl sm:text-2xl font-bold text-slate-900 font-heading">2. เนื้อหาหลัก (Core Content)</h2>
+                    <p class="text-xs sm:text-sm text-slate-500">มโนทัศน์สำคัญและการจัดรูปพหุนามกำลังสอง</p>
+                </div>
+            </div>
+
+            <!-- Mathematical Forms 3-Grid -->
+            <div class="grid md:grid-cols-3 gap-5">
+                <!-- Form 1: General -->
+                <div class="p-5 rounded-2xl bg-slate-50 border border-slate-200 flex flex-col justify-between">
+                    <div>
+                        <div class="inline-block px-2.5 py-1 rounded bg-indigo-100 text-indigo-800 text-xs font-bold uppercase mb-2">1. รูปมาตรฐาน (Standard Form)</div>
+                        <h3 class="text-base font-bold text-slate-900 mb-2">พิจารณาสัมประสิทธิ์</h3>
+                        <div class="py-3 px-2 bg-white rounded-xl border border-slate-200 text-center text-base sm:text-lg font-mono font-bold text-slate-900 shadow-inner my-2">
+                            $$ax^2 + bx + c = 0, \quad a \neq 0$$
+                        </div>
+                        <p class="text-xs text-slate-600 leading-relaxed">
+                            แสดงพจน์เรียงตามดีกรีจากมากไปน้อย มีประโยชน์ในการหาค่าดิสคริมิแนนต์ \(D = b^2 - 4ac\) เพื่อจำแนกชนิดของรากทันที
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Form 2: Factored Form -->
+                <div class="p-5 rounded-2xl bg-slate-50 border border-slate-200 flex flex-col justify-between">
+                    <div>
+                        <div class="inline-block px-2.5 py-1 rounded bg-emerald-100 text-emerald-800 text-xs font-bold uppercase mb-2">2. รูปแยกตัวประกอบ (Factored Form)</div>
+                        <h3 class="text-base font-bold text-slate-900 mb-2">แสดงรากโดยตรง</h3>
+                        <div class="py-3 px-2 bg-white rounded-xl border border-slate-200 text-center text-base sm:text-lg font-mono font-bold text-slate-900 shadow-inner my-2">
+                            $$a(x - r_1)(x - r_2) = 0$$
+                        </div>
+                        <p class="text-xs text-slate-600 leading-relaxed">
+                            ใช้สมบัติผลคูณเป็นศูนย์ (\(uv = 0 \iff u=0 \lor v=0\)) ทำให้ได้ราก \(x = r_1\) หรือ \(x = r_2\) โดยไม่ต้องคำนวณซับซ้อน
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Form 3: Vertex Form -->
+                <div class="p-5 rounded-2xl bg-slate-50 border border-slate-200 flex flex-col justify-between">
+                    <div>
+                        <div class="inline-block px-2.5 py-1 rounded bg-amber-100 text-amber-800 text-xs font-bold uppercase mb-2">3. รูปกำลังสองสมบูรณ์ (Vertex Form)</div>
+                        <h3 class="text-base font-bold text-slate-900 mb-2">แสดงจุดยอดและแกนสมมาตร</h3>
+                        <div class="py-3 px-2 bg-white rounded-xl border border-slate-200 text-center text-base sm:text-lg font-mono font-bold text-slate-900 shadow-inner my-2">
+                            $$a(x - h)^2 + k = 0$$
+                        </div>
+                        <p class="text-xs text-slate-600 leading-relaxed">
+                            โดยที่ \(h = -\frac{b}{2a}\) และ \(k = c - \frac{b^2}{4a}\) ทำให้ยุบตัวแปร \(x\) จาก 2 ตำแหน่งเหลือเพียงตำแหน่งเดียว
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- In-depth Algebraic Transformation Walkthrough -->
+            <div class="p-6 rounded-2xl bg-slate-900 text-slate-100 space-y-4">
+                <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+                    <h3 class="text-lg font-bold text-indigo-300 font-heading">
+                        การพิสูจน์ที่มาของสูตรกำลังสอง (Derivation of Quadratic Formula)
+                    </h3>
+                    <span class="text-xs bg-indigo-500/30 text-indigo-200 px-3 py-1 rounded-full border border-indigo-400/30">
+                        Completing the Square
+                    </span>
+                </div>
+                <div class="grid md:grid-cols-2 gap-6 text-sm">
+                    <div class="space-y-3">
+                        <div class="flex items-start gap-3">
+                            <span class="w-6 h-6 rounded-full bg-indigo-600/60 text-indigo-200 flex items-center justify-center text-xs font-bold flex-shrink-0 mt-0.5">1</span>
+                            <div>
+                                <p class="text-slate-300">หารด้วยสัมประสิทธิ์นำ \(a \neq 0\) ตลอดทั้งสมการ:</p>
+                                <div class="font-mono text-emerald-400 mt-1">\(x^2 + \frac{b}{a}x + \frac{c}{a} = 0\)</div>
+                            </div>
+                        </div>
+                        <div class="flex items-start gap-3">
+                            <span class="w-6 h-6 rounded-full bg-indigo-600/60 text-indigo-200 flex items-center justify-center text-xs font-bold flex-shrink-0 mt-0.5">2</span>
+                            <div>
+                                <p class="text-slate-300">ย้ายค่าคงตัวไปยังฝั่งขวา:</p>
+                                <div class="font-mono text-emerald-400 mt-1">\(x^2 + \frac{b}{a}x = -\frac{c}{a}\)</div>
+                            </div>
+                        </div>
+                        <div class="flex items-start gap-3">
+                            <span class="w-6 h-6 rounded-full bg-indigo-600/60 text-indigo-200 flex items-center justify-center text-xs font-bold flex-shrink-0 mt-0.5">3</span>
+                            <div>
+                                <p class="text-slate-300">บวกทั้งสองข้างด้วยกำลังสองของครึ่งหนึ่งของสัมประสิทธิ์ \(x\) คือ \(\left(\frac{b}{2a}\right)^2\):</p>
+                                <div class="font-mono text-emerald-400 mt-1">\(x^2 + \frac{b}{a}x + \left(\frac{b}{2a}\right)^2 = \frac{b^2}{4a^2} - \frac{c}{a}\)</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="space-y-3">
+                        <div class="flex items-start gap-3">
+                            <span class="w-6 h-6 rounded-full bg-indigo-600/60 text-indigo-200 flex items-center justify-center text-xs font-bold flex-shrink-0 mt-0.5">4</span>
+                            <div>
+                                <p class="text-slate-300">ยุบฝั่งซ้ายเป็นกำลังสองสมบูรณ์ และรวมส่วนฝั่งขวา:</p>
+                                <div class="font-mono text-emerald-400 mt-1">\(\left(x + \frac{b}{2a}\right)^2 = \frac{b^2 - 4ac}{4a^2}\)</div>
+                            </div>
+                        </div>
+                        <div class="flex items-start gap-3">
+                            <span class="w-6 h-6 rounded-full bg-indigo-600/60 text-indigo-200 flex items-center justify-center text-xs font-bold flex-shrink-0 mt-0.5">5</span>
+                            <div>
+                                <p class="text-slate-300">ถอดรากที่สองทั้งสองข้าง (Extracting Roots):</p>
+                                <div class="font-mono text-amber-300 font-bold mt-1 text-base">\(x = \frac{-b \pm \sqrt{b^2 - 4ac}}{2a}\)</div>
+                            </div>
+                        </div>
+                        <div class="p-2.5 rounded-lg bg-slate-800/80 border border-slate-700 text-xs text-slate-400">
+                            <strong>ข้อสังเกต:</strong> พจน์ในเครื่องหมายกรณฑ์ \(b^2 - 4ac\) (เรียกว่า Discriminant) เป็นตัวชี้วัดว่ารากจะเป็นจำนวนจริง 2 ค่าต่างกัน (\(D > 0\)), จำนวนจริงซ้ำ (\(D = 0\)) หรือจำนวนเชิงซ้อนสังยุค (\(D < 0\))
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 3. แบบจำลองโต้ตอบ (Interactive Simulator) -->
+        <section class="bg-white rounded-2xl p-6 sm:p-8 shadow-sm border border-slate-200/80 space-y-6">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 pb-4">
+                <div class="flex items-center gap-3">
+                    <div class="p-2.5 rounded-xl bg-indigo-100 text-indigo-700">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 3.055A9.001 9.001 0 1020.945 13H11V3.055z" />
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.488 9H15V3.512A9.025 9.025 0 0120.488 9z" />
+                        </svg>
+                    </div>
+                    <div>
+                        <h2 class="text-xl sm:text-2xl font-bold text-slate-900 font-heading">3. แบบจำลองโต้ตอบ (Interactive Simulator)</h2>
+                        <p class="text-xs sm:text-sm text-slate-500">ปรับค่าสัมประสิทธิ์ \(a, b, c\) เพื่อสังเกตการแปลงเป็นรูปกำลังสองสมบูรณ์และตำแหน่งราก</p>
+                    </div>
+                </div>
+                <!-- Preset Buttons -->
+                <div class="flex flex-wrap gap-2">
+                    <button onclick="setCoefficients(1, -6, 8)" class="px-3 py-1.5 text-xs font-medium rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 transition">รากจริง 2 ค่า (1, -6, 8)</button>
+                    <button onclick="setCoefficients(1, -4, 4)" class="px-3 py-1.5 text-xs font-medium rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 transition">รากซ้ำ (1, -4, 4)</button>
+                    <button onclick="setCoefficients(1, 2, 5)" class="px-3 py-1.5 text-xs font-medium rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 transition">รากเชิงซ้อน (1, 2, 5)</button>
+                    <button onclick="setCoefficients(-2, 4, 6)" class="px-3 py-1.5 text-xs font-medium rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 transition">คว่ำหน้า (-2, 4, 6)</button>
+                </div>
+            </div>
+
+            <!-- Grid Layout for Controls and Dynamic Parabola Canvas -->
+            <div class="grid lg:grid-cols-12 gap-8 items-start">
+                <!-- Left Column: Controls & Step Transformation -->
+                <div class="lg:col-span-6 space-y-6">
+                    <!-- Coefficients Sliders -->
+                    <div class="bg-slate-50 p-5 rounded-2xl border border-slate-200 space-y-4">
+                        <!-- a -->
+                        <div>
+                            <div class="flex justify-between items-center mb-1">
+                                <label for="sliderA" class="text-sm font-semibold text-slate-800 flex items-center gap-2">
+                                    สัมประสิทธิ์ \(a\) :
+                                    <span id="labelA" class="font-mono text-indigo-600 font-bold text-base">1</span>
+                                </label>
+                                <input type="number" id="numA" step="0.5" value="1" class="w-20 px-2 py-1 text-right text-sm rounded-lg border border-slate-300 focus:ring-2 focus:ring-indigo-500 font-mono">
+                            </div>
+                            <input type="range" id="sliderA" min="-5" max="5" step="0.5" value="1" class="w-full accent-indigo-600 h-2 bg-slate-200 rounded-lg cursor-pointer">
+                            <div class="flex justify-between text-[11px] text-slate-400 font-mono mt-1">
+                                <span>-5 (พาราโบลาคว่ำ)</span>
+                                <span class="text-rose-500 font-bold">ห้ามเป็น 0</span>
+                                <span>+5 (พาราโบลาหงาย)</span>
+                            </div>
+                        </div>
+
+                        <!-- b -->
+                        <div>
+                            <div class="flex justify-between items-center mb-1">
+                                <label for="sliderB" class="text-sm font-semibold text-slate-800 flex items-center gap-2">
+                                    สัมประสิทธิ์ \(b\) :
+                                    <span id="labelB" class="font-mono text-indigo-600 font-bold text-base">-6</span>
+                                </label>
+                                <input type="number" id="numB" step="0.5" value="-6" class="w-20 px-2 py-1 text-right text-sm rounded-lg border border-slate-300 focus:ring-2 focus:ring-indigo-500 font-mono">
+                            </div>
+                            <input type="range" id="sliderB" min="-10" max="10" step="0.5" value="-6" class="w-full accent-indigo-600 h-2 bg-slate-200 rounded-lg cursor-pointer">
+                            <div class="flex justify-between text-[11px] text-slate-400 font-mono mt-1">
+                                <span>-10</span>
+                                <span>0</span>
+                                <span>+10</span>
+                            </div>
+                        </div>
+
+                        <!-- c -->
+                        <div>
+                            <div class="flex justify-between items-center mb-1">
+                                <label for="sliderC" class="text-sm font-semibold text-slate-800 flex items-center gap-2">
+                                    ค่าคงตัว \(c\) :
+                                    <span id="labelC" class="font-mono text-indigo-600 font-bold text-base">8</span>
+                                </label>
+                                <input type="number" id="numC" step="0.5" value="8" class="w-20 px-2 py-1 text-right text-sm rounded-lg border border-slate-300 focus:ring-2 focus:ring-indigo-500 font-mono">
+                            </div>
+                            <input type="range" id="sliderC" min="-10" max="10" step="0.5" value="8" class="w-full accent-indigo-600 h-2 bg-slate-200 rounded-lg cursor-pointer">
+                            <div class="flex justify-between text-[11px] text-slate-400 font-mono mt-1">
+                                <span>-10</span>
+                                <span>0</span>
+                                <span>+10</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Comparison of Equivalent Forms -->
+                    <div class="p-5 rounded-2xl bg-slate-900 text-white space-y-3">
+                        <div class="text-xs text-indigo-300 font-bold uppercase tracking-wider">การเปรียบเทียบรูปสมมูล (Equivalent Forms)</div>
+                        <div class="space-y-2 text-sm">
+                            <div class="flex justify-between items-center bg-slate-800/80 p-2.5 rounded-lg border border-slate-700">
+                                <span class="text-slate-400 text-xs">รูปมาตรฐาน:</span>
+                                <span id="displayStandard" class="font-mono font-bold text-amber-300">x² - 6x + 8 = 0</span>
+                            </div>
+                            <div class="flex justify-between items-center bg-slate-800/80 p-2.5 rounded-lg border border-slate-700">
+                                <span class="text-slate-400 text-xs">รูปกำลังสองสมบูรณ์:</span>
+                                <span id="displayVertex" class="font-mono font-bold text-emerald-300">1(x - 3)² - 1 = 0</span>
+                            </div>
+                            <div class="flex justify-between items-center bg-slate-800/80 p-2.5 rounded-lg border border-slate-700">
+                                <span class="text-slate-400 text-xs">จุดยอดพาราโบลา (h, k):</span>
+                                <span id="displayVertexPoint" class="font-mono font-semibold text-sky-300">(3.00, -1.00)</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Step-by-Step Completing the Square Box -->
+                    <div class="p-5 rounded-2xl bg-white border border-slate-200 shadow-sm space-y-3">
+                        <div class="flex items-center justify-between border-b pb-2">
+                            <h4 class="text-sm font-bold text-slate-800 uppercase tracking-wider">ขั้นตอนการแปลงรูปทางพีชคณิต</h4>
+                            <span id="discBadge" class="text-xs px-2.5 py-0.5 rounded-full font-mono font-bold"></span>
+                        </div>
+                        <div id="stepContainer" class="space-y-2.5 text-xs sm:text-sm text-slate-700 font-sans">
+                            <!-- Populated dynamically via JS -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Column: Interactive Graph & Root Inspection -->
+                <div class="lg:col-span-6 flex flex-col items-center space-y-4">
+                    <div class="w-full bg-slate-900 rounded-2xl p-4 shadow-lg border border-slate-800">
+                        <div class="flex items-center justify-between text-xs text-slate-300 mb-2 px-1">
+                            <span class="font-semibold text-slate-200 flex items-center gap-1.5">
+                                <span class="w-2.5 h-2.5 rounded-full bg-indigo-500"></span> พล็อตพาราโบลา \(y = ax^2 + bx + c\)
+                            </span>
+                            <span class="text-slate-400 text-[11px] font-mono" id="graphCoordsNote">จุดตัดแกน x = รากคำตอบ</span>
+                        </div>
+                        <div class="relative w-full aspect-square max-h-[380px] bg-slate-950 rounded-xl overflow-hidden border border-slate-800 flex items-center justify-center">
+                            <canvas id="parabolaCanvas" class="w-full h-full block cursor-crosshair"></canvas>
+                        </div>
+                        <div class="flex flex-wrap items-center justify-between mt-3 text-xs text-slate-400 px-1 font-mono gap-2">
+                            <div class="flex items-center gap-2">
+                                <span class="inline-block w-3 h-0.5 bg-indigo-400"></span> เส้นโค้งพาราโบลา
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <span class="inline-block w-3 h-0.5 border-t border-dashed border-sky-400"></span> แกนสมมาตร \(x = h\)
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <span class="inline-block w-2.5 h-2.5 rounded-full bg-amber-400"></span> จุดตัดแกน \(x\)
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <span class="inline-block w-2.5 h-2.5 rounded-full bg-emerald-400"></span> จุดยอด \((h, k)\)
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Equivalence Verification Card -->
+                    <div class="w-full p-4 rounded-xl bg-slate-50 border border-slate-200 text-xs sm:text-sm text-slate-600 space-y-2">
+                        <div class="flex items-center gap-2 font-bold text-slate-800">
+                            <svg class="w-4 h-4 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                            </svg>
+                            การตรวจสอบว่าการแปลงรักษาชุดคำตอบเดิม (Equivalence Check):
+                        </div>
+                        <p class="leading-relaxed" id="equivCheckText">
+                            การแปลงโดยการบวก/ลบด้วยพจน์เดียวกันทั้งสองข้าง และการคูณ/หารด้วย \(a \neq 0\) เป็นการดำเนินการที่ผันกลับได้ (Reversible Invertible Operations) ส่งผลให้ทุก \(x\) ที่ทำให้ \(a(x-h)^2 + k = 0\) จะทำให้ \(ax^2 + bx + c = 0\) เสมอ
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 4. คำถามนำเพื่อค้นพบ (Guiding Discovery Questions) -->
+        <section class="bg-white rounded-2xl p-6 sm:p-8 shadow-sm border border-slate-200/80 space-y-6">
+            <div class="flex items-center gap-3">
+                <div class="p-2.5 rounded-xl bg-amber-100 text-amber-700">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                </div>
+                <div>
+                    <h2 class="text-xl sm:text-2xl font-bold text-slate-900 font-heading">4. คำถามนำเพื่อค้นพบ (Guiding Discovery Questions)</h2>
+                    <p class="text-xs sm:text-sm text-slate-500">คลิกที่แต่ละคำถามเพื่อคิดวิเคราะห์และเปิดดูคำอธิบายเชิงทฤษฎี</p>
+                </div>
+            </div>
+
+            <div class="space-y-4">
+                <!-- Question 1 -->
+                <div class="border border-slate-200 rounded-xl overflow-hidden bg-slate-50/50">
+                    <button onclick="toggleAccordion('disc1')" class="w-full text-left p-4 sm:p-5 flex justify-between items-center gap-4 hover:bg-slate-100/70 transition">
+                        <span class="font-semibold text-slate-800 text-base sm:text-lg flex items-center gap-3">
+                            <span class="flex-shrink-0 w-7 h-7 rounded-full bg-indigo-100 text-indigo-700 text-sm font-bold flex items-center justify-center">1</span>
+                            เหตุใดการทำกำลังสองสมบูรณ์จึงช่วยให้แก้สมการได้?
+                        </span>
+                        <svg id="icon-disc1" class="w-5 h-5 text-slate-500 transform transition-transform duration-200 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                        </svg>
+                    </button>
+                    <div id="content-disc1" class="hidden px-5 pb-5 text-slate-600 text-sm sm:text-base border-t border-slate-200 bg-white pt-4 space-y-2">
+                        <p class="font-bold text-slate-800">หัวใจสำคัญคือ "การลดรูปตำแหน่งของตัวแปร (Isolating the Variable)":</p>
+                        <p class="leading-relaxed">
+                            ในรูปทั่วไป \(ax^2 + bx + c = 0\) ตัวแปร \(x\) ปรากฏอยู่สองตำแหน่งคือทั้งในพจน์กำลังสอง (\(x^2\)) และพจน์กำลังหนึ่ง (\(x\)) ซึ่งไม่สามารถรวมพจน์หรือย้ายข้างเพื่อถอดรากได้โดยตรง
+                        </p>
+                        <p class="leading-relaxed">
+                            การจัดรูปกำลังสองสมบูรณ์ \((x - h)^2 = M\) ช่วยยุบพจน์ของตัวแปรทั้งสองให้เหลือเพียงตำแหน่งเดียวในวงเล็บกำลังสอง ทำให้เราสามารถใช้ <strong>สมบัติการถอดรากที่สอง (Square Root Property)</strong> หาค่า \(x - h = \pm\sqrt{M}\) และได้คำตอบ \(x = h \pm \sqrt{M}\) ได้อย่างเบ็ดเสร็จ
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Question 2 -->
+                <div class="border border-slate-200 rounded-xl overflow-hidden bg-slate-50/50">
+                    <button onclick="toggleAccordion('disc2')" class="w-full text-left p-4 sm:p-5 flex justify-between items-center gap-4 hover:bg-slate-100/70 transition">
+                        <span class="font-semibold text-slate-800 text-base sm:text-lg flex items-center gap-3">
+                            <span class="flex-shrink-0 w-7 h-7 rounded-full bg-indigo-100 text-indigo-700 text-sm font-bold flex items-center justify-center">2</span>
+                            สมการสองรูปที่ต่างกันสามารถมีรากชุดเดียวกันได้อย่างไร?
+                        </span>
+                        <svg id="icon-disc2" class="w-5 h-5 text-slate-500 transform transition-transform duration-200 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                        </svg>
+                    </button>
+                    <div id="content-disc2" class="hidden px-5 pb-5 text-slate-600 text-sm sm:text-base border-t border-slate-200 bg-white pt-4 space-y-2">
+                        <p class="font-bold text-slate-800">หลักการสมมูลของการแปลงเชิงพีชคณิต (Equivalent Equations):</p>
+                        <p class="leading-relaxed">
+                            สมการสองสมการจะถือว่า <strong>สมมูลกัน (Equivalent)</strong> ก็ต่อเมื่อมีเซตคำตอบเดียวกัน การแปลงรูปจาก \(ax^2 + bx + c = 0\) ไปเป็น \(a(x-h)^2 + k = 0\) หรือ \(a(x-r_1)(x-r_2) = 0\) อาศัยเพียงสัจพจน์ของสนาม (Field Axioms):
+                        </p>
+                        <ul class="list-disc list-inside space-y-1 ml-2 text-slate-700">
+                            <li>การบวกหรือลบด้วยจำนวนเดียวกันทั้งสองข้าง (\(A = B \iff A + C = B + C\))</li>
+                            <li>การคูณหรือหารด้วยค่าคงตัวที่ไม่เป็นศูนย์ (\(A = B \iff kA = kB, \quad k \neq 0\))</li>
+                            <li>สมบัติการแจกแจงและการจัดกลุ่มของการบวกและการคูณ</li>
+                        </ul>
+                        <p class="text-xs text-slate-500 mt-2">
+                            การดำเนินการเหล่านี้เป็นฟังก์ชัน 1 ต่อ 1 (Bijective) จึงไม่มีการเพิ่มรากเทียม (Extraneous Roots) หรือทำคำตอบใดสูญหายไป
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Question 3 -->
+                <div class="border border-slate-200 rounded-xl overflow-hidden bg-slate-50/50">
+                    <button onclick="toggleAccordion('disc3')" class="w-full text-left p-4 sm:p-5 flex justify-between items-center gap-4 hover:bg-slate-100/70 transition">
+                        <span class="font-semibold text-slate-800 text-base sm:text-lg flex items-center gap-3">
+                            <span class="flex-shrink-0 w-7 h-7 rounded-full bg-indigo-100 text-indigo-700 text-sm font-bold flex items-center justify-center">3</span>
+                            เมื่อใดการแยกตัวประกอบจึงสะดวกกว่าการทำกำลังสองสมบูรณ์?
+                        </span>
+                        <svg id="icon-disc3" class="w-5 h-5 text-slate-500 transform transition-transform duration-200 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                        </svg>
+                    </button>
+                    <div id="content-disc3" class="hidden px-5 pb-5 text-slate-600 text-sm sm:text-base border-t border-slate-200 bg-white pt-4 space-y-2">
+                        <p class="font-bold text-slate-800">เกณฑ์การเลือกใช้วิธีตามลักษณะของสัมประสิทธิ์:</p>
+                        <div class="grid sm:grid-cols-2 gap-3 text-xs sm:text-sm mt-2">
+                            <div class="p-3 rounded-lg bg-emerald-50 border border-emerald-200 text-emerald-950">
+                                <strong>ควรใช้การแยกตัวประกอบเมื่อ:</strong>
+                                <ul class="list-disc list-inside mt-1 space-y-1">
+                                    <li>ค่าดิสคริมิแนนต์ \(D = b^2 - 4ac\) เป็นกำลังสองสมบูรณ์ (เช่น 0, 1, 4, 9, 16, 25, ...)</li>
+                                    <li>สามารถหาจำนวนเต็มสองตัวที่คูณกันได้ \(ac\) และบวกกันได้ \(b\) ได้ง่ายในใจ</li>
+                                    <li>หลีกเลี่ยงการคำนวณเศษส่วนซ้อน</li>
+                                </ul>
+                            </div>
+                            <div class="p-3 rounded-lg bg-indigo-50 border border-indigo-200 text-indigo-950">
+                                <strong>ควรใช้การทำกำลังสองสมบูรณ์ / สูตรเมื่อ:</strong>
+                                <ul class="list-disc list-inside mt-1 space-y-1">
+                                    <li>ค่า \(D\) ไม่เป็นกำลังสองสมบูรณ์ หรือ \(D < 0\) (รากติดเครื่องหมายกรณฑ์หรือเป็นจำนวนเชิงซ้อน)</li>
+                                    <li>สัมประสิทธิ์ \(b\) เป็นเลขคี่ หรือ \(a\) ไม่เป็น 1 ซึ่งทำให้การแยกตัวประกอบด้วยตาเปล่าทำได้ยากยิ่ง</li>
+                                    <li>ต้องการหาจุดยอด (Vertex) สูงสุด/ต่ำสุดของกราฟไปพร้อมกัน</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 5. แบบฝึกหัดสำหรับนักศึกษา (Exercises & Verification) -->
+        <section class="bg-white rounded-2xl p-6 sm:p-8 shadow-sm border border-slate-200/80 space-y-6">
+            <div class="flex items-center gap-3">
+                <div class="p-2.5 rounded-xl bg-emerald-100 text-emerald-700">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
+                    </svg>
+                </div>
+                <div>
+                    <h2 class="text-xl sm:text-2xl font-bold text-slate-900 font-heading">5. แบบฝึกหัดสำหรับนักศึกษา (Interactive Exercises & Self-Assessment)</h2>
+                    <p class="text-xs sm:text-sm text-slate-500">ทดสอบการจัดรูปมาตรฐาน การแก้สมการด้วยวิธีต่างๆ และการพิสูจน์ความถูกต้องของคำตอบ</p>
+                </div>
+            </div>
+
+            <div class="grid md:grid-cols-2 gap-6">
+                <!-- Exercise 1: Standard Form Conversion -->
+                <div class="p-5 rounded-2xl border border-slate-200 bg-slate-50/60 flex flex-col justify-between space-y-4">
+                    <div class="space-y-3">
+                        <div class="flex justify-between items-center">
+                            <span class="text-xs font-bold uppercase tracking-wider text-indigo-700">ข้อที่ 1: การจัดรูปมาตรฐาน</span>
+                            <span class="text-xs bg-slate-200 text-slate-700 px-2 py-0.5 rounded font-mono">Algebraic Form</span>
+                        </div>
+                        <p class="text-sm text-slate-700">
+                            จงแปลงสมการต่อไปนี้ให้อยู่ในรูปมาตรฐาน \(ax^2 + bx + c = 0\) (โดยที่ \(a > 0\)):
+                        </p>
+                        <div class="p-3 bg-white rounded-xl border border-slate-200 text-center font-mono font-bold text-slate-900">
+                            \(2x(x - 3) = 5 - x\)
+                        </div>
+
+                        <!-- Radio Options -->
+                        <div class="space-y-2 text-sm pt-2">
+                            <label class="flex items-center gap-3 p-2.5 rounded-lg bg-white border border-slate-200 cursor-pointer hover:bg-slate-50 transition">
+                                <input type="radio" name="quiz1" value="opt1" class="accent-indigo-600">
+                                <span>\(2x^2 - 5x - 5 = 0\)</span>
+                            </label>
+                            <label class="flex items-center gap-3 p-2.5 rounded-lg bg-white border border-slate-200 cursor-pointer hover:bg-slate-50 transition">
+                                <input type="radio" name="quiz1" value="opt2" class="accent-indigo-600">
+                                <span>\(2x^2 - 7x - 5 = 0\)</span>
+                            </label>
+                            <label class="flex items-center gap-3 p-2.5 rounded-lg bg-white border border-slate-200 cursor-pointer hover:bg-slate-50 transition">
+                                <input type="radio" name="quiz1" value="opt3" class="accent-indigo-600">
+                                <span>\(2x^2 - 5x + 5 = 0\)</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="pt-2">
+                        <button onclick="evaluateExercise(1, 'opt1', 'กระจายพจน์ซ้าย: $2x^2 - 6x$ แล้วย้ายข้างพจน์ขวา: $2x^2 - 6x + x - 5 = 0$ รวมพจน์คล้ายได้ $2x^2 - 5x - 5 = 0$ (โดย $a=2, b=-5, c=-5$)')" class="w-full py-2 bg-slate-900 hover:bg-slate-800 text-white rounded-xl text-sm font-semibold transition">
+                            ตรวจคำตอบ
+                        </button>
+                        <div id="quiz1-result" class="hidden mt-3 text-xs sm:text-sm p-3 rounded-xl border"></div>
+                    </div>
+                </div>
+
+                <!-- Exercise 2: Factoring Method -->
+                <div class="p-5 rounded-2xl border border-slate-200 bg-slate-50/60 flex flex-col justify-between space-y-4">
+                    <div class="space-y-3">
+                        <div class="flex justify-between items-center">
+                            <span class="text-xs font-bold uppercase tracking-wider text-emerald-700">ข้อที่ 2: การแก้ด้วยการแยกตัวประกอบ</span>
+                            <span class="text-xs bg-slate-200 text-slate-700 px-2 py-0.5 rounded font-mono">Factoring</span>
+                        </div>
+                        <p class="text-sm text-slate-700">
+                            จงหาเซตคำตอบของสมการ:
+                        </p>
+                        <div class="p-3 bg-white rounded-xl border border-slate-200 text-center font-mono font-bold text-slate-900">
+                            \(x^2 - 7x + 12 = 0\)
+                        </div>
+
+                        <!-- Radio Options -->
+                        <div class="space-y-2 text-sm pt-2">
+                            <label class="flex items-center gap-3 p-2.5 rounded-lg bg-white border border-slate-200 cursor-pointer hover:bg-slate-50 transition">
+                                <input type="radio" name="quiz2" value="opt1" class="accent-indigo-600">
+                                <span>\(\{-3, -4\}\)</span>
+                            </label>
+                            <label class="flex items-center gap-3 p-2.5 rounded-lg bg-white border border-slate-200 cursor-pointer hover:bg-slate-50 transition">
+                                <input type="radio" name="quiz2" value="opt2" class="accent-indigo-600">
+                                <span>\(\{3, 4\}\)</span>
+                            </label>
+                            <label class="flex items-center gap-3 p-2.5 rounded-lg bg-white border border-slate-200 cursor-pointer hover:bg-slate-50 transition">
+                                <input type="radio" name="quiz2" value="opt3" class="accent-indigo-600">
+                                <span>\(\{2, 6\}\)</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="pt-2">
+                        <button onclick="evaluateExercise(2, 'opt2', 'แยกตัวประกอบเป็น $(x - 3)(x - 4) = 0$ ตามสมบัติผลคูณเป็นศูนย์ จะได้ $x - 3 = 0 \\implies x = 3$ หรือ $x - 4 = 0 \\implies x = 4$ ดังนั้นเซตคำตอบคือ $\\{3, 4\\}$')" class="w-full py-2 bg-slate-900 hover:bg-slate-800 text-white rounded-xl text-sm font-semibold transition">
+                            ตรวจคำตอบ
+                        </button>
+                        <div id="quiz2-result" class="hidden mt-3 text-xs sm:text-sm p-3 rounded-xl border"></div>
+                    </div>
+                </div>
+
+                <!-- Exercise 3: Completing the Square Method -->
+                <div class="p-5 rounded-2xl border border-slate-200 bg-slate-50/60 flex flex-col justify-between space-y-4">
+                    <div class="space-y-3">
+                        <div class="flex justify-between items-center">
+                            <span class="text-xs font-bold uppercase tracking-wider text-amber-700">ข้อที่ 3: กำลังสองสมบูรณ์</span>
+                            <span class="text-xs bg-slate-200 text-slate-700 px-2 py-0.5 rounded font-mono">Square Method</span>
+                        </div>
+                        <p class="text-sm text-slate-700">
+                            จัดรูปสมการ \(x^2 + 6x - 7 = 0\) ให้อยู่ในรูปกำลังสองสมบูรณ์ \((x - h)^2 = M\)
+                        </p>
+                        <div class="p-3 bg-white rounded-xl border border-slate-200 text-center font-mono font-bold text-slate-900">
+                            \((x - h)^2 = M\) ค่า \(h\) และ \(M\) คือข้อใด?
+                        </div>
+
+                        <!-- Radio Options -->
+                        <div class="space-y-2 text-sm pt-2">
+                            <label class="flex items-center gap-3 p-2.5 rounded-lg bg-white border border-slate-200 cursor-pointer hover:bg-slate-50 transition">
+                                <input type="radio" name="quiz3" value="opt1" class="accent-indigo-600">
+                                <span>\(h = -3, \quad M = 16 \quad \text{กล่าวคือ } (x+3)^2 = 16\)</span>
+                            </label>
+                            <label class="flex items-center gap-3 p-2.5 rounded-lg bg-white border border-slate-200 cursor-pointer hover:bg-slate-50 transition">
+                                <input type="radio" name="quiz3" value="opt2" class="accent-indigo-600">
+                                <span>\(h = 3, \quad M = 16 \quad \text{กล่าวคือ } (x-3)^2 = 16\)</span>
+                            </label>
+                            <label class="flex items-center gap-3 p-2.5 rounded-lg bg-white border border-slate-200 cursor-pointer hover:bg-slate-50 transition">
+                                <input type="radio" name="quiz3" value="opt3" class="accent-indigo-600">
+                                <span>\(h = -3, \quad M = 2 \quad \text{กล่าวคือ } (x+3)^2 = 2\)</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="pt-2">
+                        <button onclick="evaluateExercise(3, 'opt1', 'ย้าย 7 ไปขวา: $x^2 + 6x = 7$ แล้วบวกด้วย $\\left(\\frac{6}{2}\\right)^2 = 9$ ทั้งสองข้าง จะได้ $x^2 + 6x + 9 = 7 + 9 \\implies (x + 3)^2 = 16$ ดังนั้น $h = -3$ และ $M = 16$ ซึ่งถอดรากได้ $x + 3 = \\pm 4 \\implies x = 1, -7$')" class="w-full py-2 bg-slate-900 hover:bg-slate-800 text-white rounded-xl text-sm font-semibold transition">
+                            ตรวจคำตอบ
+                        </button>
+                        <div id="quiz3-result" class="hidden mt-3 text-xs sm:text-sm p-3 rounded-xl border"></div>
+                    </div>
+                </div>
+
+                <!-- Exercise 4: Proof / Verification -->
+                <div class="p-5 rounded-2xl border border-slate-200 bg-slate-50/60 flex flex-col justify-between space-y-4">
+                    <div class="space-y-3">
+                        <div class="flex justify-between items-center">
+                            <span class="text-xs font-bold uppercase tracking-wider text-rose-700">ข้อที่ 4: การพิสูจน์การแทนค่ากลับ</span>
+                            <span class="text-xs bg-slate-200 text-slate-700 px-2 py-0.5 rounded font-mono">Proof Verification</span>
+                        </div>
+                        <p class="text-sm text-slate-700">
+                            ถ้าแก้สมการแล้วได้รากหนึ่งคือ \(x = 2 + 3i\) ข้อใดแสดงการพิสูจน์ว่า \(x\) นี้เป็นรากของสมการ \(x^2 - 4x + 13 = 0\) ได้อย่างรัดกุมที่สุด?
+                        </p>
+
+                        <!-- Radio Options -->
+                        <div class="space-y-2 text-sm pt-2">
+                            <label class="flex items-center gap-3 p-2.5 rounded-lg bg-white border border-slate-200 cursor-pointer hover:bg-slate-50 transition">
+                                <input type="radio" name="quiz4" value="opt1" class="accent-indigo-600">
+                                <span>คำนวณ \(x - 2 = 3i \implies (x-2)^2 = -9 \implies x^2 - 4x + 4 + 9 = 0 \implies x^2 - 4x + 13 = 0\)</span>
+                            </label>
+                            <label class="flex items-center gap-3 p-2.5 rounded-lg bg-white border border-slate-200 cursor-pointer hover:bg-slate-50 transition">
+                                <input type="radio" name="quiz4" value="opt2" class="accent-indigo-600">
+                                <span>แทนค่า \(x = 2\) ละเลยส่วนจินตภาพ \(3i\) แล้วได้ค่า \(4 - 8 + 13 \neq 0\)</span>
+                            </label>
+                            <label class="flex items-center gap-3 p-2.5 rounded-lg bg-white border border-slate-200 cursor-pointer hover:bg-slate-50 transition">
+                                <input type="radio" name="quiz4" value="opt3" class="accent-indigo-600">
+                                <span>สรุปว่าสมการกำลังสองไม่มีทางมีคำตอบเป็นจำนวนเชิงซ้อนได้</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="pt-2">
+                        <button onclick="evaluateExercise(4, 'opt1', 'ถูกต้อง! การพิสูจน์สามารถทำได้ทั้งการแทนค่าตรง $(2+3i)^2 - 4(2+3i) + 13 = (4 + 12i - 9) - 8 - 12i + 13 = (-5 - 8 + 13) + (12i - 12i) = 0$ หรือการย้ายข้าง $x-2 = 3i$ แล้วยกกำลังสองทั้งสองข้าง จะได้พหุนามเดิมอย่างสมบูรณ์แบบ')" class="w-full py-2 bg-slate-900 hover:bg-slate-800 text-white rounded-xl text-sm font-semibold transition">
+                            ตรวจคำตอบ
+                        </button>
+                        <div id="quiz4-result" class="hidden mt-3 text-xs sm:text-sm p-3 rounded-xl border"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+
+
+    </main>
+
+    <!-- INTERACTIVE JAVASCRIPT LOGIC -->
+    <script>
+        // DOM Controller Elements
+        const sliderA = document.getElementById('sliderA');
+        const numA = document.getElementById('numA');
+        const labelA = document.getElementById('labelA');
+
+        const sliderB = document.getElementById('sliderB');
+        const numB = document.getElementById('numB');
+        const labelB = document.getElementById('labelB');
+
+        const sliderC = document.getElementById('sliderC');
+        const numC = document.getElementById('numC');
+        const labelC = document.getElementById('labelC');
+
+        const displayStandard = document.getElementById('displayStandard');
+        const displayVertex = document.getElementById('displayVertex');
+        const displayVertexPoint = document.getElementById('displayVertexPoint');
+        const discBadge = document.getElementById('discBadge');
+        const stepContainer = document.getElementById('stepContainer');
+
+        const canvas = document.getElementById('parabolaCanvas');
+        const ctx = canvas.getContext('2d');
+
+        // State Coefficients
+        let a = 1.0;
+        let b = -6.0;
+        let c = 8.0;
+
+        function setCoefficients(valA, valB, valC) {
+            a = parseFloat(valA);
+            b = parseFloat(valB);
+            c = parseFloat(valC);
+
+            sliderA.value = a;
+            numA.value = a;
+            labelA.textContent = a;
+
+            sliderB.value = b;
+            numB.value = b;
+            labelB.textContent = b;
+
+            sliderC.value = c;
+            numC.value = c;
+            labelC.textContent = c;
+
+            recomputeAndRender();
+        }
+
+        // Event Listeners for Coefficients
+        sliderA.addEventListener('input', (e) => {
+            let val = parseFloat(e.target.value);
+            if (val === 0) val = 0.5; // Prevent a=0 in quadratic equation
+            a = val;
+            numA.value = a;
+            labelA.textContent = a;
+            recomputeAndRender();
+        });
+        numA.addEventListener('input', (e) => {
+            let val = parseFloat(e.target.value) || 1;
+            if (val === 0) val = 1;
+            a = val;
+            sliderA.value = a;
+            labelA.textContent = a;
+            recomputeAndRender();
+        });
+
+        sliderB.addEventListener('input', (e) => {
+            b = parseFloat(e.target.value);
+            numB.value = b;
+            labelB.textContent = b;
+            recomputeAndRender();
+        });
+        numB.addEventListener('input', (e) => {
+            b = parseFloat(e.target.value) || 0;
+            sliderB.value = b;
+            labelB.textContent = b;
+            recomputeAndRender();
+        });
+
+        sliderC.addEventListener('input', (e) => {
+            c = parseFloat(e.target.value);
+            numC.value = c;
+            labelC.textContent = c;
+            recomputeAndRender();
+        });
+        numC.addEventListener('input', (e) => {
+            c = parseFloat(e.target.value) || 0;
+            sliderC.value = c;
+            labelC.textContent = c;
+            recomputeAndRender();
+        });
+
+        function formatNum(n) {
+            if (Number.isInteger(n)) return n.toString();
+            return n.toFixed(2);
+        }
+
+        function recomputeAndRender() {
+            // Guardrail: a != 0
+            if (a === 0) a = 1;
+
+            // 1. Discriminant & Roots
+            const D = (b * b) - (4 * a * c);
+            const h = -b / (2 * a);
+            const k = c - ((b * b) / (4 * a));
+
+            // 2. Format Standard equation text
+            let standardStr = "";
+            if (a === 1) standardStr = "x²";
+            else if (a === -1) standardStr = "-x²";
+            else standardStr = `${formatNum(a)}x²`;
+
+            if (b > 0) standardStr += ` + ${formatNum(b)}x`;
+            else if (b < 0) standardStr += ` - ${formatNum(Math.abs(b))}x`;
+
+            if (c > 0) standardStr += ` + ${formatNum(c)}`;
+            else if (c < 0) standardStr += ` - ${formatNum(Math.abs(c))}`;
+
+            standardStr += " = 0";
+            displayStandard.textContent = standardStr;
+
+            // 3. Format Vertex Form: a(x - h)^2 + k = 0
+            let hSign = h >= 0 ? `- ${formatNum(Math.abs(h))}` : `+ ${formatNum(Math.abs(h))}`;
+            let kSign = k >= 0 ? `+ ${formatNum(Math.abs(k))}` : `- ${formatNum(Math.abs(k))}`;
+            let aPrefix = a === 1 ? "" : (a === -1 ? "-" : `${formatNum(a)}`);
+            displayVertex.textContent = `${aPrefix}(x ${hSign})² ${kSign} = 0`;
+            displayVertexPoint.textContent = `(${formatNum(h)}, ${formatNum(k)})`;
+
+            // 4. Discriminant Badge
+            if (D > 0) {
+                discBadge.className = "text-xs px-2.5 py-0.5 rounded-full font-mono font-bold bg-emerald-100 text-emerald-800 border border-emerald-300";
+                discBadge.textContent = `D = ${formatNum(D)} > 0 (รากจริง 2 ค่า)`;
+            } else if (D === 0) {
+                discBadge.className = "text-xs px-2.5 py-0.5 rounded-full font-mono font-bold bg-sky-100 text-sky-800 border border-sky-300";
+                discBadge.textContent = `D = 0 (รากจริงซ้ำกัน 1 ค่า)`;
+            } else {
+                discBadge.className = "text-xs px-2.5 py-0.5 rounded-full font-mono font-bold bg-purple-100 text-purple-800 border border-purple-300";
+                discBadge.textContent = `D = ${formatNum(D)} < 0 (รากเชิงซ้อนคู่สังยุค)`;
+            }
+
+            // 5. Step breakdown HTML
+            let bOver2a = b / (2 * a);
+            let bOver2aSq = bOver2a * bOver2a;
+            let cOverA = c / a;
+
+            let rootDescription = "";
+            if (D > 0) {
+                const r1 = (-b + Math.sqrt(D)) / (2 * a);
+                const r2 = (-b - Math.sqrt(D)) / (2 * a);
+                rootDescription = `
+                    <div class="p-3 bg-emerald-50 rounded-xl border border-emerald-200 mt-2 text-emerald-950">
+                        <span class="font-bold">รากของสมการในสนามจริง:</span>
+                        <div class="font-mono text-base font-bold mt-1 text-emerald-700">
+                            x₁ = ${formatNum(r1)}, &nbsp; x₂ = ${formatNum(r2)}
+                        </div>
+                    </div>
+                `;
+            } else if (D === 0) {
+                const r = -b / (2 * a);
+                rootDescription = `
+                    <div class="p-3 bg-sky-50 rounded-xl border border-sky-200 mt-2 text-sky-950">
+                        <span class="font-bold">รากของสมการ (รากซ้ำ / Double Root):</span>
+                        <div class="font-mono text-base font-bold mt-1 text-sky-700">
+                            x = ${formatNum(r)}
+                        </div>
+                    </div>
+                `;
+            } else {
+                const realPart = -b / (2 * a);
+                const imagPart = Math.sqrt(-D) / (2 * Math.abs(a));
+                rootDescription = `
+                    <div class="p-3 bg-purple-50 rounded-xl border border-purple-200 mt-2 text-purple-950">
+                        <span class="font-bold">รากของสมการในสนามจำนวนเชิงซ้อน (Complex Conjugates):</span>
+                        <div class="font-mono text-base font-bold mt-1 text-purple-700">
+                            x = ${formatNum(realPart)} &plusmn; ${formatNum(imagPart)}i
+                        </div>
+                        <div class="text-[11px] text-purple-800 mt-0.5">(กราฟพาราโบลาไม่ตัดแกน x ในระนาบจริง)</div>
+                    </div>
+                `;
+            }
+
+            stepContainer.innerHTML = `
+                <div class="flex items-start gap-2">
+                    <span class="w-1.5 h-1.5 rounded-full bg-indigo-500 mt-2"></span>
+                    <div>
+                        <span class="text-slate-500">ขั้นที่ 1: ดึงหรือหารด้วยสัมประสิทธิ์ \(a = ${formatNum(a)}\) :</span>
+                        <div class="font-mono font-semibold text-slate-800">x² + (${formatNum(b/a)})x + (${formatNum(cOverA)}) = 0</div>
+                    </div>
+                </div>
+                <div class="flex items-start gap-2">
+                    <span class="w-1.5 h-1.5 rounded-full bg-indigo-500 mt-2"></span>
+                    <div>
+                        <span class="text-slate-500">ขั้นที่ 2: จัดรูปกำลังสองสมบูรณ์โดยบวกเข้าและหักออกด้วย \((b/2a)² = (${formatNum(bOver2a)})² = ${formatNum(bOver2aSq)}\) :</span>
+                        <div class="font-mono font-semibold text-slate-800">(x + ${formatNum(bOver2a)})² - ${formatNum(bOver2aSq)} + (${formatNum(cOverA)}) = 0</div>
+                    </div>
+                </div>
+                <div class="flex items-start gap-2">
+                    <span class="w-1.5 h-1.5 rounded-full bg-indigo-500 mt-2"></span>
+                    <div>
+                        <span class="text-slate-500">ขั้นที่ 3: สรุปรูปกำลังสองสมบูรณ์ (Vertex Form):</span>
+                        <div class="font-mono font-semibold text-indigo-700">${aPrefix}(x ${hSign})² = ${formatNum(-k)}</div>
+                    </div>
+                </div>
+                ${rootDescription}
+            `;
+
+            // Draw Parabola
+            drawParabola(h, k, D);
+        }
+
+        function drawParabola(h, k, D) {
+            const rect = canvas.getBoundingClientRect();
+            const width = rect.width;
+            const height = rect.height;
+
+            if (width === 0 || height === 0) return;
+
+            const dpr = window.devicePixelRatio || 1;
+            canvas.width = width * dpr;
+            canvas.height = height * dpr;
+            ctx.scale(dpr, dpr);
+
+            // Origin at center
+            const originX = width / 2;
+            const originY = height / 2;
+            const scale = width / 20; // 10 units each direction (-10 to +10)
+
+            // Canvas Background
+            ctx.fillStyle = '#090d16';
+            ctx.fillRect(0, 0, width, height);
+
+            // Draw Coordinate Grid
+            ctx.lineWidth = 1;
+            ctx.strokeStyle = '#1e293b';
+            ctx.font = '10px monospace';
+            ctx.fillStyle = '#64748b';
+
+            for (let xVal = -10; xVal <= 10; xVal += 2) {
+                const screenX = originX + xVal * scale;
+                ctx.beginPath();
+                ctx.moveTo(screenX, 0);
+                ctx.lineTo(screenX, height);
+                ctx.stroke();
+                if (xVal !== 0) ctx.fillText(xVal, screenX - 6, originY + 13);
+            }
+
+            for (let yVal = -10; yVal <= 10; yVal += 2) {
+                const screenY = originY - yVal * scale;
+                ctx.beginPath();
+                ctx.moveTo(0, screenY);
+                ctx.lineTo(width, screenY);
+                ctx.stroke();
+                if (yVal !== 0) ctx.fillText(yVal, originX + 5, screenY + 3);
+            }
+
+            // Main Axes
+            ctx.lineWidth = 1.75;
+            ctx.strokeStyle = '#94a3b8';
+
+            // X-Axis
+            ctx.beginPath();
+            ctx.moveTo(0, originY);
+            ctx.lineTo(width, originY);
+            ctx.stroke();
+
+            // Y-Axis
+            ctx.beginPath();
+            ctx.moveTo(originX, 0);
+            ctx.lineTo(originX, height);
+            ctx.stroke();
+
+            ctx.fillText('0', originX - 10, originY + 12);
+            ctx.fillText('x', width - 12, originY - 6);
+            ctx.fillText('y', originX + 8, 14);
+
+            // Draw Axis of Symmetry: x = h
+            const hScreenX = originX + h * scale;
+            ctx.setLineDash([4, 4]);
+            ctx.lineWidth = 1.5;
+            ctx.strokeStyle = '#38bdf8';
+            ctx.beginPath();
+            ctx.moveTo(hScreenX, 0);
+            ctx.lineTo(hScreenX, height);
+            ctx.stroke();
+            ctx.setLineDash([]); // Reset line dash
+
+            // Draw Parabola Curve
+            ctx.lineWidth = 2.5;
+            ctx.strokeStyle = '#818cf8';
+            ctx.beginPath();
+
+            let firstPoint = true;
+            for (let px = 0; px <= width; px += 2) {
+                const graphX = (px - originX) / scale;
+                const graphY = a * graphX * graphX + b * graphX + c;
+                const py = originY - graphY * scale;
+
+                if (firstPoint) {
+                    ctx.moveTo(px, py);
+                    firstPoint = false;
+                } else {
+                    ctx.lineTo(px, py);
+                }
+            }
+            ctx.stroke();
+
+            // Highlight Roots (X-intercepts) if real
+            if (D >= 0) {
+                const r1 = (-b + Math.sqrt(D)) / (2 * a);
+                const r2 = (-b - Math.sqrt(D)) / (2 * a);
+
+                [r1, r2].forEach(root => {
+                    const rx = originX + root * scale;
+                    const ry = originY;
+
+                    // Glowing Circle for real roots
+                    ctx.fillStyle = '#fbbf24';
+                    ctx.beginPath();
+                    ctx.arc(rx, ry, 5, 0, Math.PI * 2);
+                    ctx.fill();
+
+                    ctx.strokeStyle = '#ffffff';
+                    ctx.lineWidth = 1.5;
+                    ctx.beginPath();
+                    ctx.arc(rx, ry, 5, 0, Math.PI * 2);
+                    ctx.stroke();
+
+                    // Coordinates label
+                    ctx.fillStyle = '#fbbf24';
+                    ctx.font = 'bold 10px monospace';
+                    ctx.fillText(`(${formatNum(root)}, 0)`, rx - 18, ry + 16);
+                });
+            }
+
+            // Highlight Vertex (h, k)
+            const vx = originX + h * scale;
+            const vy = originY - k * scale;
+
+            ctx.fillStyle = '#34d399';
+            ctx.beginPath();
+            ctx.arc(vx, vy, 5.5, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.strokeStyle = '#ffffff';
+            ctx.lineWidth = 1.5;
+            ctx.beginPath();
+            ctx.arc(vx, vy, 5.5, 0, Math.PI * 2);
+            ctx.stroke();
+
+            ctx.fillStyle = '#34d399';
+            ctx.font = 'bold 10px monospace';
+            const vertexLabelY = a > 0 ? vy + 16 : vy - 10;
+            ctx.fillText(`V(${formatNum(h)}, ${formatNum(k)})`, vx - 22, vertexLabelY);
+        }
+
+        // Accordion Controller
+        function toggleAccordion(id) {
+            const content = document.getElementById(`content-${id}`);
+            const icon = document.getElementById(`icon-${id}`);
+
+            if (content.classList.contains('hidden')) {
+                content.classList.remove('hidden');
+                icon.classList.add('rotate-180');
+            } else {
+                content.classList.add('hidden');
+                icon.classList.remove('rotate-180');
+            }
+        }
+
+        // Quiz Evaluator
+        function evaluateExercise(quizNumber, correctOption, solutionExplanation) {
+            const radios = document.getElementsByName(`quiz${quizNumber}`);
+            let chosen = null;
+            for (let r of radios) {
+                if (r.checked) {
+                    chosen = r.value;
+                    break;
+                }
+            }
+
+            const feedback = document.getElementById(`quiz${quizNumber}-result`);
+            feedback.classList.remove('hidden', 'bg-emerald-50', 'text-emerald-900', 'border-emerald-300', 'bg-rose-50', 'text-rose-900', 'border-rose-300', 'bg-amber-50', 'text-amber-900', 'border-amber-300');
+
+            if (!chosen) {
+                feedback.className = 'mt-3 text-xs sm:text-sm p-3 rounded-xl border bg-amber-50 text-amber-900 border-amber-300';
+                feedback.innerHTML = '<strong>แจ้งเตือน:</strong> โปรดเลือกคำตอบก่อนทำการตรวจ';
+                return;
+            }
+
+            if (chosen === correctOption) {
+                feedback.className = 'mt-3 text-xs sm:text-sm p-3 rounded-xl border bg-emerald-50 text-emerald-900 border-emerald-300';
+                feedback.innerHTML = `<strong>ผลการประเมิน: ถูกต้องยอดเยี่ยม!</strong><br><span class="leading-relaxed mt-1 block">${solutionExplanation}</span>`;
+            } else {
+                feedback.className = 'mt-3 text-xs sm:text-sm p-3 rounded-xl border bg-rose-50 text-rose-900 border-rose-300';
+                feedback.innerHTML = `<strong>ผลการประเมิน: ยังไม่ถูกต้อง</strong><br><span class="leading-relaxed mt-1 block">${solutionExplanation}</span>`;
+            }
+
+            // Math Re-rendering in result box
+            if (window.renderMathInElement) {
+                renderMathInElement(feedback, {
+                    delimiters: [
+                        {left: '$$', right: '$$', display: true},
+                        {left: '$', right: '$', display: false},
+                        {left: '\\(', right: '\\)', display: false},
+                        {left: '\\[', right: '\\]', display: true}
+                    ]
+                });
+            }
+        }
+
+        // Window resize event handler
+        window.addEventListener('resize', () => {
+            recomputeAndRender();
+        });
+
+        // Initialize execution on window load
+        window.onload = function() {
+            recomputeAndRender();
+            if (window.renderMathInElement) {
+                renderMathInElement(document.body, {
+                    delimiters: [
+                        {left: '$$', right: '$$', display: true},
+                        {left: '$', right: '$', display: false},
+                        {left: '\\(', right: '\\)', display: false},
+                        {left: '\\[', right: '\\]', display: true}
+                    ]
+                });
+            }
+        };
+    </script>
+</body>
+</html>

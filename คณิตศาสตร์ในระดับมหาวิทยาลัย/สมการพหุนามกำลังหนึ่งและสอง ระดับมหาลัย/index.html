@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="th" class="h-full">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ชุดการเรียนรู้คณิตศาสตร์: สมการพหุนาม</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Google Fonts: Prompt -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Prompt:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Prompt', sans-serif;
+    }
+    .no-scrollbar::-webkit-scrollbar {
+      display: none;
+    }
+    .no-scrollbar {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+  </style>
+<script>
+  // ตรวจสอบว่ามีสถานะล็อกอินและอีเมลบันทึกไว้หรือไม่
+  const isLoggedIn = localStorage.getItem("dms_is_logged_in") === "true";
+  const userEmail = localStorage.getItem("dms_user_email");
+
+  // หากไม่มี ให้ดีดกลับไปหน้าเข้าสู่ระบบทันที
+  if (!isLoggedIn || !userEmail) {
+    // ปรับ Path ให้ถอยกลับไปหาไฟล์ login.html ตามระดับโฟลเดอร์ (เช่น "../login.html" หากอยู่ในโฟลเดอร์ย่อย 1 ชั้น)
+    window.location.replace("../../login.html"); 
+  }
+</script>
+</head>
+<body class="h-full flex flex-col bg-slate-100 text-slate-800 antialiased overflow-hidden">
+
+  <!-- แถบ Header และ Menu ด้านบน -->
+  <header class="bg-white border-b border-slate-200 shadow-sm flex-none z-20">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      
+      <!-- ส่วนชื่อหลักสูตรและปุ่มเครื่องมือ -->
+      <div class="flex items-center justify-between py-3 border-b border-slate-100">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-xl bg-indigo-600 flex items-center justify-center text-white font-bold text-xl shadow-md shadow-indigo-100">
+            $P$
+          </div>
+          <div>
+            <h1 class="text-lg font-bold text-slate-900 leading-tight">
+              สมการพหุนามกำลังหนึ่งและสอง
+            </h1>
+
+          </div>
+        </div>
+
+        <div class="flex items-center gap-2">
+        </div>
+      </div>
+
+      <!-- แถบปุ่มเมนู (ตัวเลขในวงกลม + ชื่อเรื่อง) -->
+      <nav id="navBar" class="flex gap-2 py-2.5 overflow-x-auto no-scrollbar">
+      </nav>
+    </div>
+  </header>
+
+  <!-- กรอบแสดงเนื้อหาผ่าน iframe (แสดงผลทันที ไม่ผ่านฉากเบลอ) -->
+  <main class="flex-1 w-full h-full bg-slate-50 overflow-hidden">
+    <iframe 
+      id="contentFrame" 
+      src="" 
+      class="w-full h-full border-0 bg-white"
+      title="เนื้อหาบทเรียน">
+    </iframe>
+  </main>
+
+  <script>
+    const lessons = [
+      { num: '1', title: 'สมการพหุนามกำลังหนึ่ง', file: '1 สมการพหุนามกำลังหนึ่ง.html' },
+      { num: '2', title: 'รูปมาตรฐานและการแปลงสมการกำลังสอง', file: '2 รูปมาตรฐานและการแปลงสมการกำลังสอง.html' },
+      { num: '3', title: 'สูตรแก้สมการกำลังสองและการพิสูจน์', file: '3 สูตรแก้สมการกำลังสองและการพิสูจน์.html' },
+      { num: '4', title: 'ตัวจำแนกและลักษณะของราก', file: '4 ตัวจำแนกและลักษณะของราก.html' },
+      { num: '5', title: 'รากกับสัมประสิทธิ์ของสมการกำลังสอง', file: '5 รากกับสัมประสิทธิ์ของสมการกำลังสอง.html' },
+      { num: '6', title: 'การสร้างสมการและการแปลงนิพจน์เกี่ยวกับราก', file: '6 การสร้างสมการและการแปลงนิพจน์เกี่ยวกับราก.html' },
+      { num: '7', title: 'การประยุกต์และการวิเคราะห์สมการกำลังสอง', file: '7 การประยุกต์และการวิเคราะห์สมการกำลังสอง.html' },
+      { num: '📝', title: 'แบบทดสอบวัดผลสัมฤทธิ์', file: 'แบบทดสอบ.html' }
+    ];
+
+    let currentFile = '';
+
+    function buildMenu() {
+      const nav = document.getElementById('navBar');
+      nav.innerHTML = '';
+
+      lessons.forEach((item, index) => {
+        const btn = document.createElement('button');
+        btn.id = `nav-btn-${index}`;
+        btn.onclick = () => loadLesson(index);
+        
+        btn.className = "flex-none px-3.5 py-1.5 rounded-lg text-xs font-medium transition-colors flex items-center gap-2 whitespace-nowrap border border-transparent text-slate-600 hover:text-slate-900 hover:bg-slate-100";
+        
+        btn.innerHTML = `
+          <span class="num-circle w-5 h-5 rounded-full flex items-center justify-center text-[11px] font-bold bg-slate-200 text-slate-700">${item.num}</span>
+          <span>${item.title}</span>
+        `;
+        nav.appendChild(btn);
+      });
+    }
+
+    function loadLesson(index) {
+      const item = lessons[index];
+      currentFile = item.file;
+
+      // สลับหน้าใน iframe ตรงๆ ทันที ไม่ใส่ class เบลอ
+      const iframe = document.getElementById('contentFrame');
+      iframe.src = encodeURI(item.file);
+
+      // อัปเดตสถานะปุ่มเมนู
+      lessons.forEach((_, i) => {
+        const btn = document.getElementById(`nav-btn-${i}`);
+        const circle = btn.querySelector('.num-circle');
+        
+        if (i === index) {
+          btn.className = "flex-none px-3.5 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-2 whitespace-nowrap bg-indigo-600 text-white shadow-sm shadow-indigo-200 border border-indigo-600";
+          if (circle) {
+            circle.className = "num-circle w-5 h-5 rounded-full flex items-center justify-center text-[11px] font-bold bg-white text-indigo-700";
+          }
+          btn.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+        } else {
+          btn.className = "flex-none px-3.5 py-1.5 rounded-lg text-xs font-medium flex items-center gap-2 whitespace-nowrap border border-transparent text-slate-600 hover:text-slate-900 hover:bg-slate-100";
+          if (circle) {
+            circle.className = "num-circle w-5 h-5 rounded-full flex items-center justify-center text-[11px] font-bold bg-slate-200 text-slate-700";
+          }
+        }
+      });
+    }
+
+    function reloadCurrentFrame() {
+      const iframe = document.getElementById('contentFrame');
+      if (iframe.src) {
+        iframe.contentWindow.location.reload();
+      }
+    }
+
+    function openInNewTab() {
+      if (currentFile) {
+        window.open(encodeURI(currentFile), '_blank');
+      }
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      buildMenu();
+      loadLesson(0);
+    });
+  </script>
+</body>
+</html>

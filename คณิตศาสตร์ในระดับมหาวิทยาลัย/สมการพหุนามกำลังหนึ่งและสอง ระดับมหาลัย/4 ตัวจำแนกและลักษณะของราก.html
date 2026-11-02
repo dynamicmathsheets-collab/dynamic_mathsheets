@@ -1,0 +1,1092 @@
+<!DOCTYPE html>
+<html lang="th" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>เรื่องที่ 4: ตัวจำแนกและลักษณะของราก | นวัตกรรมการเรียนรู้คณิตศาสตร์</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Prompt, Sarabun, JetBrains Mono -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Prompt:wght@400;500;600;700&family=Sarabun:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+    <!-- KaTeX CDN for LaTeX rendering -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Sarabun', 'sans-serif'],
+                        heading: ['Prompt', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Sarabun', sans-serif;
+            background-color: #f8fafc;
+            color: #0f172a;
+        }
+        h1, h2, h3, h4, h5, h6 {
+            font-family: 'Prompt', sans-serif;
+        }
+        .katex-display {
+            margin: 0.4em 0 !important;
+        }
+        /* Custom scrollbars */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+    </style>
+</head>
+<body class="min-h-screen antialiased selection:bg-indigo-600 selection:text-white">
+
+    <!-- Primary Layout Container strictly conforming to max-w-6xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 (max 1,152px) -->
+    <main class="max-w-6xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 space-y-10">
+
+        <!-- HEADER SECTION -->
+        <header class="bg-gradient-to-br from-slate-900 via-indigo-950 to-slate-900 text-white rounded-3xl p-6 sm:p-10 shadow-xl border border-indigo-900/50 relative overflow-hidden">
+            <div class="absolute -right-20 -top-20 w-80 h-80 bg-indigo-500/15 rounded-full blur-3xl pointer-events-none"></div>
+            <div class="relative z-10 space-y-3">
+
+                <h1 class="text-2xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-white font-heading">
+                    เรื่องที่ 4: ตัวจำแนกและลักษณะของราก
+                </h1>
+                <p class="text-indigo-200 text-sm sm:text-base font-light max-w-3xl leading-relaxed">
+                    The Discriminant ($\Delta = b^2 - 4ac$): การจำแนกจำนวนและชนิดของรากโดยไม่ต้องแก้สมการ ความหมายของรากซ้ำและพหุภาพ (Multiplicity) ตลอดจนการเชื่อมโยงเชิงเรขาคณิตกับจุดตัดแกน $x$ ของพาราโบลา
+                </p>
+            </div>
+        </header>
+
+        <!-- 1. วัตถุประสงค์การเรียนรู้ -->
+        <section class="bg-white rounded-2xl p-6 sm:p-8 shadow-sm border border-slate-200/80">
+            <div class="flex items-center gap-3 mb-4">
+                <div class="p-2.5 rounded-xl bg-indigo-100 text-indigo-700">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                </div>
+                <h2 class="text-xl sm:text-2xl font-bold text-slate-900 font-heading">1. วัตถุประสงค์การเรียนรู้ (Learning Objectives)</h2>
+            </div>
+            <div class="bg-indigo-50/60 rounded-xl p-5 border-l-4 border-indigo-600 text-slate-700 space-y-2">
+                <p class="font-medium text-slate-900 text-base sm:text-lg">เมื่อศึกษาหัวข้อนี้จบแล้ว ผู้เรียนสามารถ:</p>
+                <ul class="list-disc list-inside space-y-2 text-slate-700 leading-relaxed">
+                    <li>คำนวณและใช้ตัวจำแนก (\(\Delta = b^2 - 4ac\)) เพื่อวิเคราะห์จำนวนและชนิดของรากของสมการกำลังสองได้อย่างถูกต้องแม่นยำ</li>
+                    <li>อธิบายความหมายของรากซ้ำ (Repeated Root) พหุภาพของราก (\(k=2\)) และความสัมพันธ์กับรูปแยกตัวประกอบ \(a(x - r)^2 = 0\)</li>
+                    <li>เชื่อมโยงเครื่องหมายของตัวจำแนกกับลักษณะเชิงเรขาคณิตของกราฟพาราโบลา \(y = ax^2 + bx + c\) และการตัดหรือสัมผัสแกน \(x\)</li>
+                    <li>หาค่าหรือช่วงของพารามิเตอร์คงตัวที่ทำให้สมการมีรากตามเงื่อนไขที่กำหนดได้</li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- 2. เนื้อหาหลัก -->
+        <section class="bg-white rounded-2xl p-6 sm:p-8 shadow-sm border border-slate-200/80 space-y-8">
+            <div class="flex items-center gap-3">
+                <div class="p-2.5 rounded-xl bg-blue-100 text-blue-700">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                    </svg>
+                </div>
+                <div>
+                    <h2 class="text-xl sm:text-2xl font-bold text-slate-900 font-heading">2. เนื้อหาหลัก (Core Mathematical Concepts)</h2>
+                    <p class="text-xs sm:text-sm text-slate-500">บทนิยาม การจำแนก 3 กรณี และความสัมพันธ์กับพหุภาพของราก</p>
+                </div>
+            </div>
+
+            <!-- Definition Box -->
+            <div class="p-6 rounded-2xl bg-slate-900 text-white space-y-3 shadow-lg">
+                <div class="text-xs text-indigo-300 font-semibold uppercase tracking-wider">บทนิยาม: ตัวจำแนก (The Discriminant)</div>
+                <p class="text-sm text-slate-200 leading-relaxed">
+                    สำหรับสมการกำลังสองที่มีสัมประสิทธิ์เป็นจำนวนจริง \(ax^2 + bx + c = 0\) โดยที่ \(a \neq 0\) ค่าตัวจำแนกถูกนิยามโดย:
+                </p>
+                <div class="py-3 px-4 bg-slate-800/90 rounded-xl border border-slate-700 text-center font-mono text-2xl font-bold text-amber-300">
+                    $$\Delta = b^2 - 4ac$$
+                </div>
+                <p class="text-xs text-slate-400 leading-relaxed">
+                    เนื่องจากในสูตรแก้สมการกำลังสอง \(x = \frac{-b \pm \sqrt{\Delta}}{2a}\) พจน์ \(\Delta\) ปรากฏอยู่ภายใต้เครื่องหมายรากที่สอง เครื่องหมายของ \(\Delta\) จึงเป็นตัวกำหนดพฤติกรรมของรากทั้งหมด
+                </p>
+            </div>
+
+            <!-- 3 Cases Grid -->
+            <div class="grid md:grid-cols-3 gap-5">
+                <!-- Case 1: Delta > 0 -->
+                <div class="p-5 rounded-2xl bg-emerald-50/60 border border-emerald-200 flex flex-col justify-between space-y-3">
+                    <div>
+                        <div class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded bg-emerald-200 text-emerald-800 text-xs font-bold uppercase mb-2">
+                            กรณีที่ 1: \(\Delta > 0\)
+                        </div>
+                        <h3 class="text-base font-bold text-emerald-950">รากจริง 2 ค่าที่แตกต่างกัน</h3>
+                        <p class="text-xs text-emerald-800 font-medium">Two Distinct Real Roots</p>
+                        <div class="my-3 p-3 bg-white rounded-xl border border-emerald-200 text-xs text-slate-700 space-y-1.5 font-sans">
+                            <div><strong>ลักษณะราก:</strong> \(\sqrt{\Delta} > 0\) เป็นจำนวนจริงบวก ทำให้การบวกและลบให้ค่าต่างกัน:</div>
+                            <div class="font-mono text-center font-semibold text-emerald-700">\(x = \frac{-b \pm \sqrt{\Delta}}{2a}\)</div>
+                            <div><strong>รูปแยกตัวประกอบ:</strong> \(a(x - r_1)(x - r_2) = 0\) โดย \(r_1 \neq r_2\)</div>
+                        </div>
+                    </div>
+                    <div class="text-xs bg-emerald-100/70 p-2.5 rounded-lg text-emerald-900 border border-emerald-200">
+                        <strong>เรขาคณิต:</strong> พาราโบลา <em>ตัดแกน \(x\) ที่ 2 จุดแตกต่างกัน</em> คือ \((r_1, 0)\) และ \((r_2, 0)\)
+                    </div>
+                </div>
+
+                <!-- Case 2: Delta = 0 -->
+                <div class="p-5 rounded-2xl bg-sky-50/60 border border-sky-200 flex flex-col justify-between space-y-3">
+                    <div>
+                        <div class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded bg-sky-200 text-sky-800 text-xs font-bold uppercase mb-2">
+                            กรณีที่ 2: \(\Delta = 0\)
+                        </div>
+                        <h3 class="text-base font-bold text-sky-950">รากจริงซ้ำ 1 ค่า (พหุภาพ 2)</h3>
+                        <p class="text-xs text-sky-800 font-medium">One Repeated Root (Multiplicity 2)</p>
+                        <div class="my-3 p-3 bg-white rounded-xl border border-sky-200 text-xs text-slate-700 space-y-1.5 font-sans">
+                            <div><strong>ลักษณะราก:</strong> \(\sqrt{\Delta} = 0\) การบวกหรือลบ 0 ให้ผลเท่าเดิม:</div>
+                            <div class="font-mono text-center font-semibold text-sky-700">\(x_1 = x_2 = -\frac{b}{2a}\)</div>
+                            <div><strong>รูปแยกตัวประกอบ:</strong> เป็นกำลังสองสมบูรณ์ \(a(x - r)^2 = 0\)</div>
+                        </div>
+                    </div>
+                    <div class="text-xs bg-sky-100/70 p-2.5 rounded-lg text-sky-900 border border-sky-200">
+                        <strong>เรขาคณิต:</strong> พาราโบลา <em>สัมผัสแกน \(x\) ที่จุดเดียว (Tangent)</em> ซึ่งเป็นจุดยอด \(V(-\frac{b}{2a}, 0)\) พอดี
+                    </div>
+                </div>
+
+                <!-- Case 3: Delta < 0 -->
+                <div class="p-5 rounded-2xl bg-purple-50/60 border border-purple-200 flex flex-col justify-between space-y-3">
+                    <div>
+                        <div class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded bg-purple-200 text-purple-800 text-xs font-bold uppercase mb-2">
+                            กรณีที่ 3: \(\Delta < 0\)
+                        </div>
+                        <h3 class="text-base font-bold text-purple-950">รากเชิงซ้อนคู่สังยุค 2 ค่า</h3>
+                        <p class="text-xs text-purple-800 font-medium">Two Complex Conjugate Roots</p>
+                        <div class="my-3 p-3 bg-white rounded-xl border border-purple-200 text-xs text-slate-700 space-y-1.5 font-sans">
+                            <div><strong>ลักษณะราก:</strong> \(\sqrt{\Delta} = i\sqrt{|\Delta|}\) อยู่ในสนามจำนวนเชิงซ้อน (\(\mathbb{C}\)):</div>
+                            <div class="font-mono text-center font-semibold text-purple-700">\(x = \alpha \pm \beta i, \quad \beta \neq 0\)</div>
+                            <div><strong>รูปแยกตัวประกอบ:</strong> ไม่สามารถแยกตัวประกอบในสนามจริง (\(\mathbb{R}\)) ได้</div>
+                        </div>
+                    </div>
+                    <div class="text-xs bg-purple-100/70 p-2.5 rounded-lg text-purple-900 border border-purple-200">
+                        <strong>เรขาคณิต:</strong> พาราโบลา <em>ไม่ตัดและไม่แตะแกน \(x\)</em> (ลอยอยู่เหนือแกน \(x\) ทั้งหมดหรือจมอยู่ใต้แกนทั้งหมด)
+                    </div>
+                </div>
+            </div>
+
+            <!-- Deep Dive on Repeated Roots & Multiplicity -->
+            <div class="p-5 rounded-2xl bg-slate-50 border border-slate-200 space-y-3">
+                <h3 class="text-base font-bold text-slate-900 font-heading flex items-center gap-2">
+                    <span class="w-2.5 h-2.5 rounded-full bg-indigo-600"></span>
+                    มโนทัศน์เชิงลึก: รากซ้ำและพหุภาพ (Repeated Roots & Multiplicity)
+                </h3>
+                <p class="text-xs sm:text-sm text-slate-700 leading-relaxed">
+                    ตาม <strong>ทฤษฎีบทหลักมูลของพีชคณิต (Fundamental Theorem of Algebra)</strong> พหุนามดีกรีสองจะต้องมีรากคำตอบ 2 รากเสมอ เมื่อนับรวมพหุภาพ (Multiplicity):
+                </p>
+                <div class="grid sm:grid-cols-2 gap-4 text-xs sm:text-sm text-slate-700">
+                    <div class="p-3 bg-white rounded-xl border border-slate-200">
+                        <span class="font-bold text-indigo-900">มุมมองทางพีชคณิต:</span>
+                        <p class="mt-1 leading-relaxed text-slate-600">
+                            เมื่อ \(\Delta = 0\) พหุนามจะเขียนได้ในรูปกำลังสองสมบูรณ์ \(a(x - r)^2 = 0\) ซึ่งมีตัวประกอบเชิงเส้น \((x - r)\) ซ้ำกัน 2 ครั้ง จึงเรียกว่า <strong>รากที่มีพหุภาพเท่ากับ 2 (Root of multiplicity 2)</strong>
+                        </p>
+                    </div>
+                    <div class="p-3 bg-white rounded-xl border border-slate-200">
+                        <span class="font-bold text-indigo-900">มุมมองทางแคลคูลัสและเรขาคณิต:</span>
+                        <p class="mt-1 leading-relaxed text-slate-600">
+                            ที่จุดรากซ้ำ \(x = r\) กราฟไม่เพียงแต่มีค่า \(f(r) = 0\) เท่านั้น แต่ความชันของเส้นสัมผัสยังเป็นศูนย์ด้วย \(f'(r) = 2ar + b = 0\) เส้นโค้งจึงสัมผัสแนบกับแกน \(x\) โดยไม่ตัดข้ามไปอีกฝั่ง
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 3. แบบจำลองโต้ตอบ (Interactive Discriminant Simulator) -->
+        <section class="bg-white rounded-2xl p-6 sm:p-8 shadow-sm border border-slate-200/80 space-y-6">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 pb-4">
+                <div class="flex items-center gap-3">
+                    <div class="p-2.5 rounded-xl bg-indigo-100 text-indigo-700">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                        </svg>
+                    </div>
+                    <div>
+                        <h2 class="text-xl sm:text-2xl font-bold text-slate-900 font-heading">3. แบบจำลองโต้ตอบ (Interactive Discriminant Simulator)</h2>
+                        <p class="text-xs sm:text-sm text-slate-500">ปรับค่าสัมประสิทธิ์ \(a, b, c\) สังเกตค่า \(\Delta\) การแทนค่าแบบเรียลไทม์ และรูปทรงของพาราโบลาเทียบกับแกน \(x\)</p>
+                    </div>
+                </div>
+
+                <!-- Presets Buttons -->
+                <div class="flex flex-wrap gap-2">
+                    <button onclick="setCoefficients(1, -4, 3)" class="px-3 py-1.5 text-xs font-medium rounded-lg bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200 transition">ตัวอย่าง 1: \(\Delta > 0\) (ตัด 2 จุด)</button>
+                    <button onclick="setCoefficients(1, -4, 4)" class="px-3 py-1.5 text-xs font-medium rounded-lg bg-sky-50 hover:bg-sky-100 text-sky-800 border border-sky-200 transition">ตัวอย่าง 2: \(\Delta = 0\) (สัมผัส 1 จุด)</button>
+                    <button onclick="setCoefficients(1, -4, 6)" class="px-3 py-1.5 text-xs font-medium rounded-lg bg-purple-50 hover:bg-purple-100 text-purple-800 border border-purple-200 transition">ตัวอย่าง 3: \(\Delta < 0\) (ลอยไม่ตัดแกน)</button>
+                    <button onclick="setCoefficients(-1, 2, -1)" class="px-3 py-1.5 text-xs font-medium rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-300 transition">ตัวอย่าง 4: คว่ำสัมผัส (-1, 2, -1)</button>
+                </div>
+            </div>
+
+            <div class="grid lg:grid-cols-12 gap-8 items-start">
+                <!-- Controls and Calculation Panel (7 Cols) -->
+                <div class="lg:col-span-7 space-y-6">
+                    <!-- Coefficients Sliders -->
+                    <div class="bg-slate-50 p-5 rounded-2xl border border-slate-200 space-y-4">
+                        <!-- a -->
+                        <div>
+                            <div class="flex justify-between items-center mb-1">
+                                <label for="sliderA" class="text-sm font-semibold text-slate-800 flex items-center gap-2">
+                                    สัมประสิทธิ์ \(a\) :
+                                    <span id="labelA" class="font-mono text-indigo-600 font-bold text-base">1</span>
+                                </label>
+                                <input type="number" id="numA" step="0.5" value="1" class="w-20 px-2 py-1 text-right text-sm rounded-lg border border-slate-300 focus:ring-2 focus:ring-indigo-500 font-mono">
+                            </div>
+                            <input type="range" id="sliderA" min="-5" max="5" step="0.5" value="1" class="w-full accent-indigo-600 h-2 bg-slate-200 rounded-lg cursor-pointer">
+                            <div class="flex justify-between text-[11px] text-slate-400 font-mono mt-1">
+                                <span>-5 (คว่ำ)</span>
+                                <span class="text-rose-500 font-bold">ห้ามเป็น 0</span>
+                                <span>+5 (หงาย)</span>
+                            </div>
+                        </div>
+
+                        <!-- b -->
+                        <div>
+                            <div class="flex justify-between items-center mb-1">
+                                <label for="sliderB" class="text-sm font-semibold text-slate-800 flex items-center gap-2">
+                                    สัมประสิทธิ์ \(b\) :
+                                    <span id="labelB" class="font-mono text-indigo-600 font-bold text-base">-4</span>
+                                </label>
+                                <input type="number" id="numB" step="0.5" value="-4" class="w-20 px-2 py-1 text-right text-sm rounded-lg border border-slate-300 focus:ring-2 focus:ring-indigo-500 font-mono">
+                            </div>
+                            <input type="range" id="sliderB" min="-10" max="10" step="0.5" value="-4" class="w-full accent-indigo-600 h-2 bg-slate-200 rounded-lg cursor-pointer">
+                            <div class="flex justify-between text-[11px] text-slate-400 font-mono mt-1">
+                                <span>-10</span>
+                                <span>0</span>
+                                <span>+10</span>
+                            </div>
+                        </div>
+
+                        <!-- c -->
+                        <div>
+                            <div class="flex justify-between items-center mb-1">
+                                <label for="sliderC" class="text-sm font-semibold text-slate-800 flex items-center gap-2">
+                                    ค่าคงตัว \(c\) :
+                                    <span id="labelC" class="font-mono text-indigo-600 font-bold text-base">3</span>
+                                </label>
+                                <input type="number" id="numC" step="0.5" value="3" class="w-20 px-2 py-1 text-right text-sm rounded-lg border border-slate-300 focus:ring-2 focus:ring-indigo-500 font-mono">
+                            </div>
+                            <input type="range" id="sliderC" min="-10" max="10" step="0.5" value="3" class="w-full accent-indigo-600 h-2 bg-slate-200 rounded-lg cursor-pointer">
+                            <div class="flex justify-between text-[11px] text-slate-400 font-mono mt-1">
+                                <span>-10</span>
+                                <span>0</span>
+                                <span>+10</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Current Active Equation Display -->
+                    <div class="p-4 rounded-xl bg-slate-900 text-white shadow-md">
+                        <div class="text-xs text-indigo-300 font-medium uppercase tracking-wider mb-1">สมการปัจจุบันที่กำลังวิเคราะห์</div>
+                        <div id="equationDisplay" class="text-xl sm:text-2xl font-mono text-center py-2 font-bold text-amber-300">
+                            x² - 4x + 3 = 0
+                        </div>
+                    </div>
+
+                    <!-- Step-by-Step Discriminant Calculation -->
+                    <div class="p-5 rounded-2xl bg-white border border-slate-200 shadow-sm space-y-4">
+                        <div class="flex items-center justify-between border-b pb-2">
+                            <h4 class="text-sm font-bold text-slate-800 uppercase tracking-wider">การคำนวณตัวจำแนกและสรุปผล</h4>
+                            <span id="deltaBadge" class="text-xs px-2.5 py-0.5 rounded-full font-mono font-bold"></span>
+                        </div>
+                        <div id="calculationSteps" class="space-y-3 text-xs sm:text-sm text-slate-700 font-sans">
+                            <!-- Populated dynamically via JS -->
+                        </div>
+                    </div>
+
+                    <!-- Root Inspection & Factoring Representation -->
+                    <div class="p-4 rounded-xl bg-slate-50 border border-slate-200 text-xs sm:text-sm space-y-2">
+                        <span class="font-bold text-slate-900 flex items-center gap-1.5">
+                            <svg class="w-4 h-4 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+                            </svg>
+                            การวิเคราะห์รากและรูปแยกตัวประกอบ (Roots & Factored Form):
+                        </span>
+                        <div id="rootAnalysisDetails" class="text-slate-700 leading-relaxed font-sans">
+                            <!-- Populated dynamically via JS -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Column: Interactive Graph & Canvas (5 Cols) -->
+                <div class="lg:col-span-5 flex flex-col items-center space-y-4">
+                    <div class="w-full bg-slate-900 rounded-2xl p-4 shadow-lg border border-slate-800">
+                        <div class="flex items-center justify-between text-xs text-slate-300 mb-2 px-1">
+                            <span class="font-semibold text-slate-200 flex items-center gap-1.5">
+                                <span class="w-2.5 h-2.5 rounded-full bg-indigo-400"></span> ระนาบพิกัด \(y = ax^2 + bx + c\)
+                            </span>
+                            <span class="text-slate-400 text-[11px] font-mono" id="graphStateText">จุดตัดแกน x = รากคำตอบ</span>
+                        </div>
+                        <div class="relative w-full aspect-square max-h-[380px] bg-slate-950 rounded-xl overflow-hidden border border-slate-800 flex items-center justify-center">
+                            <canvas id="graphCanvas" class="w-full h-full block cursor-crosshair"></canvas>
+                        </div>
+                        <div class="flex flex-wrap items-center justify-between mt-3 text-xs text-slate-400 px-1 font-mono gap-2">
+                            <div class="flex items-center gap-1.5">
+                                <span class="inline-block w-3 h-0.5 bg-indigo-400"></span> กราฟพาราโบลา
+                            </div>
+                            <div class="flex items-center gap-1.5">
+                                <span class="inline-block w-2.5 h-2.5 rounded-full bg-emerald-400"></span> จุดยอด \(V(h, k)\)
+                            </div>
+                            <div class="flex items-center gap-1.5">
+                                <span class="inline-block w-2.5 h-2.5 rounded-full bg-amber-400"></span> จุดตัดแกน \(x\)
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Geometric Correlation Explainer -->
+                    <div id="geoCorrelationCard" class="w-full p-4 rounded-xl border text-xs sm:text-sm leading-relaxed">
+                        <!-- Populated dynamically based on Delta & Vertex position -->
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 4. คำถามนำเพื่อค้นพบ (Guided Discovery Questions) -->
+        <section class="bg-white rounded-2xl p-6 sm:p-8 shadow-sm border border-slate-200/80 space-y-6">
+            <div class="flex items-center gap-3">
+                <div class="p-2.5 rounded-xl bg-amber-100 text-amber-700">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                </div>
+                <div>
+                    <h2 class="text-xl sm:text-2xl font-bold text-slate-900 font-heading">4. คำถามนำเพื่อค้นพบ (Guided Discovery Questions)</h2>
+                    <p class="text-xs sm:text-sm text-slate-500">คลิกที่แต่ละคำถามเพื่อคิดวิเคราะห์และเปิดดูคำอธิบายเชิงทฤษฎีทางคณิตศาสตร์</p>
+                </div>
+            </div>
+
+            <div class="space-y-4">
+                <!-- Question 1 -->
+                <div class="border border-slate-200 rounded-xl overflow-hidden bg-slate-50/50">
+                    <button onclick="toggleAccordion('disc1')" class="w-full text-left p-4 sm:p-5 flex justify-between items-center gap-4 hover:bg-slate-100/70 transition">
+                        <span class="font-semibold text-slate-800 text-base sm:text-lg flex items-center gap-3">
+                            <span class="flex-shrink-0 w-7 h-7 rounded-full bg-indigo-100 text-indigo-700 text-sm font-bold flex items-center justify-center">1</span>
+                            เหตุใดเครื่องหมายของตัวจำแนกจึงกำหนดชนิดของรากได้?
+                        </span>
+                        <svg id="icon-disc1" class="w-5 h-5 text-slate-500 transform transition-transform duration-200 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                        </svg>
+                    </button>
+                    <div id="content-disc1" class="hidden px-5 pb-5 text-slate-600 text-sm sm:text-base border-t border-slate-200 bg-white pt-4 space-y-2">
+                        <p class="font-bold text-slate-800">คำอธิบายจากพฤติกรรมของฟังก์ชันรากที่สอง:</p>
+                        <p class="leading-relaxed">
+                            จากสูตรราก \(x = \frac{-b \pm \sqrt{\Delta}}{2a}\) การดำเนินทางคณิตศาสตร์ที่ชี้ขาดลักษณะของผลลัพธ์อยู่ที่พจน์ \(\sqrt{\Delta}\):
+                        </p>
+                        <ul class="list-disc list-inside space-y-1.5 leading-relaxed text-slate-700 ml-2">
+                            <li>
+                                <strong>เมื่อ \(\Delta > 0\):</strong> \(\sqrt{\Delta}\) เป็นจำนวนจริงบวกที่มีค่าแน่นอน การมีเครื่องหมาย \(\pm\) นำหน้าจึงแยกผลลัพธ์ออกเป็น 2 ค่าที่แตกต่างกันอย่างสิ้นเชิงบนแกนจำนวนจริง
+                            </li>
+                            <li>
+                                <strong>เมื่อ \(\Delta = 0\):</strong> \(\sqrt{0} = 0\) ทำให้พจน์ \(\pm 0\) ไม่มีผลต่อการเปลี่ยนแปลงค่า ตัวเศษจึงเหลือเพียง \(-b\) ค่าเดียว ทำให้ได้รากซ้ำ \(x = -\frac{b}{2a}\)
+                            </li>
+                            <li>
+                                <strong>เมื่อ \(\Delta < 0\):</strong> ไม่มีจำนวนจริงใดที่ยกกำลังสองแล้วได้ค่าลบ ดังนั้น \(\sqrt{\Delta} = \sqrt{-|\Delta|} = i\sqrt{|\Delta|}\) จึงได้ส่วนจินตภาพที่ไม่เป็นศูนย์ ส่งผลให้รากทั้งสองแยกออกเป็นจำนวนเชิงซ้อนคู่สังยุค (Complex Conjugates)
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Question 2 -->
+                <div class="border border-slate-200 rounded-xl overflow-hidden bg-slate-50/50">
+                    <button onclick="toggleAccordion('disc2')" class="w-full text-left p-4 sm:p-5 flex justify-between items-center gap-4 hover:bg-slate-100/70 transition">
+                        <span class="font-semibold text-slate-800 text-base sm:text-lg flex items-center gap-3">
+                            <span class="flex-shrink-0 w-7 h-7 rounded-full bg-indigo-100 text-indigo-700 text-sm font-bold flex items-center justify-center">2</span>
+                            รากซ้ำแตกต่างจากรากสองรากที่มีค่าใกล้กันอย่างไร?
+                        </span>
+                        <svg id="icon-disc2" class="w-5 h-5 text-slate-500 transform transition-transform duration-200 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                        </svg>
+                    </button>
+                    <div id="content-disc2" class="hidden px-5 pb-5 text-slate-600 text-sm sm:text-base border-t border-slate-200 bg-white pt-4 space-y-2">
+                        <p class="font-bold text-slate-800">ความแตกต่างทั้งในเชิงลิมิต พีชคณิต และเรขาคณิต:</p>
+                        <div class="space-y-2 text-slate-700 leading-relaxed">
+                            <p>
+                                1. <strong>เชิงพีชคณิต (Multiplicity):</strong> รากสองรากที่ใกล้กัน (เช่น \(x_1 = 2.0001\) และ \(x_2 = 1.9999\)) ยังคงเป็นรากเดี่ยว 2 ตัว (\(\Delta > 0\) มีค่าน้อยมาก) พหุนามตัดแกน \(x\) สองครั้งและเปลี่ยนเครื่องหมายของค่า \(y\) ข้ามระหว่างสองจุดนั้น แต่กรณี <strong>รากซ้ำ (\(\Delta = 0\))</strong> พหุนามมีตัวประกอบ \((x - r)^2\) ซึ่งยกกำลังสอง ค่า \(y\) จะไม่เปลี่ยนเครื่องหมายเมื่อข้ามจุดนั้น (สัมผัสแล้ววกกลับ)
+                            </p>
+                            <p>
+                                2. <strong>เชิงเรขาคณิตและการสัมผัส (Tangency):</strong> รากซ้ำเกิดขึ้นเมื่อจุดยอดของพาราโบลาแตะอยู่บนแกน \(x\) พอดี (\(k = 0\)) เส้นแกน \(x\) จึงทำหน้าที่เป็น <em>เส้นสัมผัส (Tangent Line)</em> ของกราฟ ในขณะที่กรณีรากใกล้กัน แกน \(x\) จะเป็น <em>เส้นตัด (Secant Line)</em>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Question 3 -->
+                <div class="border border-slate-200 rounded-xl overflow-hidden bg-slate-50/50">
+                    <button onclick="toggleAccordion('disc3')" class="w-full text-left p-4 sm:p-5 flex justify-between items-center gap-4 hover:bg-slate-100/70 transition">
+                        <span class="font-semibold text-slate-800 text-base sm:text-lg flex items-center gap-3">
+                            <span class="flex-shrink-0 w-7 h-7 rounded-full bg-indigo-100 text-indigo-700 text-sm font-bold flex items-center justify-center">3</span>
+                            กราฟช่วยอธิบายลักษณะของรากจริงได้อย่างไร?
+                        </span>
+                        <svg id="icon-disc3" class="w-5 h-5 text-slate-500 transform transition-transform duration-200 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                        </svg>
+                    </button>
+                    <div id="content-disc3" class="hidden px-5 pb-5 text-slate-600 text-sm sm:text-base border-t border-slate-200 bg-white pt-4 space-y-2">
+                        <p class="font-bold text-slate-800">การตีความตำแหน่งจุดยอด \(V(h, k)\) และการตัดแกน \(x\):</p>
+                        <p class="leading-relaxed">
+                            พิกัดแนวดิ่งของจุดยอดของพาราโบลาคือ \(k = -\frac{\Delta}{4a}\) ดังนั้นความสัมพันธ์ระหว่างเครื่องหมายของ \(\Delta\) กับตำแหน่งกราฟจึงมีสมบัติสอดคล้องกันอย่างสมบูรณ์:
+                        </p>
+                        <ul class="list-disc list-inside space-y-1.5 text-slate-700 ml-2">
+                            <li>สำหรับพาราโบลาหงาย (\(a > 0\)): ถ้า \(\Delta > 0\) จุดยอดจะอยู่ <em>ใต้แกน \(x\)</em> (\(k < 0\)) แขนทั้งสองจึงต้องพุ่งขึ้นตัดแกน \(x\) สองจุด</li>
+                            <li>ถ้า \(\Delta = 0\): จุดยอดอยู่ <em>บนแกน \(x\) พอดี</em> (\(k = 0\)) กราฟสัมผัสจุดเดียว</li>
+                            <li>ถ้า \(\Delta < 0\): จุดยอดอยู่ <em>เหนือแกน \(x\)</em> (\(k > 0\)) แขนพุ่งขึ้นไม่ตัดแกน \(x\) เลย ส่งผลให้ไม่มีคำตอบเป็นจำนวนจริง</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 5. แบบฝึกหัดสำหรับนักศึกษา (Interactive Exercises & Parameter Conditions) -->
+        <section class="bg-white rounded-2xl p-6 sm:p-8 shadow-sm border border-slate-200/80 space-y-6">
+            <div class="flex items-center gap-3">
+                <div class="p-2.5 rounded-xl bg-emerald-100 text-emerald-700">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
+                    </svg>
+                </div>
+                <div>
+                    <h2 class="text-xl sm:text-2xl font-bold text-slate-900 font-heading">5. แบบฝึกหัดสำหรับนักศึกษา (Practice Exercises)</h2>
+                    <p class="text-xs sm:text-sm text-slate-500">วิเคราะห์ชนิดของรากโดยไม่ต้องแก้สมการเต็มรูป และหาค่าเงื่อนไขของพารามิเตอร์</p>
+                </div>
+            </div>
+
+            <div class="grid md:grid-cols-2 gap-6">
+                <!-- Exercise 1: Analyze 2x^2 - 5x + 7 = 0 -->
+                <div class="p-5 rounded-2xl border border-slate-200 bg-slate-50/60 flex flex-col justify-between space-y-4">
+                    <div class="space-y-3">
+                        <div class="flex justify-between items-center">
+                            <span class="text-xs font-bold uppercase tracking-wider text-indigo-700">ข้อที่ 1: การวิเคราะห์ตัวจำแนก</span>
+                            <span class="text-xs bg-slate-200 text-slate-700 px-2 py-0.5 rounded font-mono">Analysis</span>
+                        </div>
+                        <p class="text-sm text-slate-700">
+                            พิจารณาสมการ \(2x^2 - 5x + 7 = 0\) ค่าตัวจำแนก \(\Delta\) และลักษณะของรากคือข้อใด?
+                        </p>
+                        <div class="space-y-2 text-sm pt-1">
+                            <label class="flex items-center gap-3 p-2.5 rounded-lg bg-white border border-slate-200 cursor-pointer hover:bg-slate-50 transition">
+                                <input type="radio" name="quiz1" value="opt1" class="accent-indigo-600">
+                                <span>\(\Delta = -31 < 0\) มีรากเชิงซ้อน 2 รากที่เป็นสังยุคกัน (ไม่ตัดแกน \(x\))</span>
+                            </label>
+                            <label class="flex items-center gap-3 p-2.5 rounded-lg bg-white border border-slate-200 cursor-pointer hover:bg-slate-50 transition">
+                                <input type="radio" name="quiz1" value="opt2" class="accent-indigo-600">
+                                <span>\(\Delta = 81 > 0\) มีรากจริง 2 รากที่แตกต่างกัน</span>
+                            </label>
+                            <label class="flex items-center gap-3 p-2.5 rounded-lg bg-white border border-slate-200 cursor-pointer hover:bg-slate-50 transition">
+                                <input type="radio" name="quiz1" value="opt3" class="accent-indigo-600">
+                                <span>\(\Delta = 0\) มีรากจริงซ้ำหนึ่งราก</span>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="pt-2">
+                        <button onclick="evaluateQuiz(1, 'opt1', 'ถูกต้อง! $a=2, b=-5, c=7$ คำนวณ $\\Delta = (-5)^2 - 4(2)(7) = 25 - 56 = -31 < 0$ ตัวจำแนกมีค่าเป็นลบ ดังนั้นสมการจึงไม่มีรากจริง แต่มีรากเชิงซ้อนคู่สังยุค 2 ราก')" class="w-full py-2 bg-slate-900 hover:bg-slate-800 text-white rounded-xl text-sm font-semibold transition">
+                            ตรวจคำตอบ
+                        </button>
+                        <div id="quiz1-result" class="hidden mt-3 text-xs sm:text-sm p-3 rounded-xl border"></div>
+                    </div>
+                </div>
+
+                <!-- Exercise 2: Analyze 9x^2 - 12x + 4 = 0 -->
+                <div class="p-5 rounded-2xl border border-slate-200 bg-slate-50/60 flex flex-col justify-between space-y-4">
+                    <div class="space-y-3">
+                        <div class="flex justify-between items-center">
+                            <span class="text-xs font-bold uppercase tracking-wider text-sky-700">ข้อที่ 2: รากซ้ำและพหุภาพ</span>
+                            <span class="text-xs bg-slate-200 text-slate-700 px-2 py-0.5 rounded font-mono">Repeated Root</span>
+                        </div>
+                        <p class="text-sm text-slate-700">
+                            พิจารณาสมการ \(9x^2 - 12x + 4 = 0\) ค่าตัวจำแนก \(\Delta\) และลักษณะของรากคือข้อใด?
+                        </p>
+                        <div class="space-y-2 text-sm pt-1">
+                            <label class="flex items-center gap-3 p-2.5 rounded-lg bg-white border border-slate-200 cursor-pointer hover:bg-slate-50 transition">
+                                <input type="radio" name="quiz2" value="opt1" class="accent-indigo-600">
+                                <span>\(\Delta = 0\) มีรากจริงซ้ำหนึ่งรากคือ \(x = \frac{2}{3}\) (พหุภาพ 2)</span>
+                            </label>
+                            <label class="flex items-center gap-3 p-2.5 rounded-lg bg-white border border-slate-200 cursor-pointer hover:bg-slate-50 transition">
+                                <input type="radio" name="quiz2" value="opt2" class="accent-indigo-600">
+                                <span>\(\Delta = 288 > 0\) มีรากจริงสองรากที่แตกต่างกัน</span>
+                            </label>
+                            <label class="flex items-center gap-3 p-2.5 rounded-lg bg-white border border-slate-200 cursor-pointer hover:bg-slate-50 transition">
+                                <input type="radio" name="quiz2" value="opt3" class="accent-indigo-600">
+                                <span>\(\Delta = -144 < 0\) ไม่มีคำตอบจริง</span>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="pt-2">
+                        <button onclick="evaluateQuiz(2, 'opt1', 'ถูกต้อง! $a=9, b=-12, c=4$ จะได้ $\\Delta = (-12)^2 - 4(9)(4) = 144 - 144 = 0$ สมการมีรากจริงซ้ำหนึ่งราก $x = -\\frac{-12}{2(9)} = \\frac{12}{18} = \\frac{2}{3}$ ซึ่งสอดคล้องกับรูปกำลังสองสมบูรณ์ $(3x - 2)^2 = 0$')" class="w-full py-2 bg-slate-900 hover:bg-slate-800 text-white rounded-xl text-sm font-semibold transition">
+                            ตรวจคำตอบ
+                        </button>
+                        <div id="quiz2-result" class="hidden mt-3 text-xs sm:text-sm p-3 rounded-xl border"></div>
+                    </div>
+                </div>
+
+                <!-- Exercise 3: Parameter Condition for Repeated Root -->
+                <div class="p-5 rounded-2xl border border-slate-200 bg-slate-50/60 flex flex-col justify-between space-y-4">
+                    <div class="space-y-3">
+                        <div class="flex justify-between items-center">
+                            <span class="text-xs font-bold uppercase tracking-wider text-amber-700">ข้อที่ 3: เงื่อนไขพารามิเตอร์รากซ้ำ</span>
+                            <span class="text-xs bg-slate-200 text-slate-700 px-2 py-0.5 rounded font-mono">Parameter k</span>
+                        </div>
+                        <p class="text-sm text-slate-700">
+                            กำหนดสมการ \(x^2 + kx + 9 = 0\) จงหาค่าของ \(k\) ทั้งหมดที่ทำให้สมการนี้ <strong>มีรากจริงซ้ำหนึ่งราก</strong>:
+                        </p>
+                        <div class="space-y-2 text-sm pt-1">
+                            <label class="flex items-center gap-3 p-2.5 rounded-lg bg-white border border-slate-200 cursor-pointer hover:bg-slate-50 transition">
+                                <input type="radio" name="quiz3" value="opt1" class="accent-indigo-600">
+                                <span>\(k = 6\) เท่านั้น</span>
+                            </label>
+                            <label class="flex items-center gap-3 p-2.5 rounded-lg bg-white border border-slate-200 cursor-pointer hover:bg-slate-50 transition">
+                                <input type="radio" name="quiz3" value="opt2" class="accent-indigo-600">
+                                <span>\(k = \pm 6\) (นั่นคือ \(k = 6\) หรือ \(k = -6\))</span>
+                            </label>
+                            <label class="flex items-center gap-3 p-2.5 rounded-lg bg-white border border-slate-200 cursor-pointer hover:bg-slate-50 transition">
+                                <input type="radio" name="quiz3" value="opt3" class="accent-indigo-600">
+                                <span>\(k = \pm 3\)</span>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="pt-2">
+                        <button onclick="evaluateQuiz(3, 'opt2', 'ถูกต้อง! สมการมีรากซ้ำก็ต่อเมื่อ $\\Delta = 0$ นั่นคือ $k^2 - 4(1)(9) = 0 \\implies k^2 - 36 = 0 \\implies k^2 = 36$ ได้ค่า $k = \\pm 6$ (ถ้า $k=6$ ได้ $(x+3)^2=0$; ถ้า $k=-6$ ได้ $(x-3)^2=0$)')" class="w-full py-2 bg-slate-900 hover:bg-slate-800 text-white rounded-xl text-sm font-semibold transition">
+                            ตรวจคำตอบ
+                        </button>
+                        <div id="quiz3-result" class="hidden mt-3 text-xs sm:text-sm p-3 rounded-xl border"></div>
+                    </div>
+                </div>
+
+                <!-- Exercise 4: Parameter Inequality for Distinct Roots -->
+                <div class="p-5 rounded-2xl border border-slate-200 bg-slate-50/60 flex flex-col justify-between space-y-4">
+                    <div class="space-y-3">
+                        <div class="flex justify-between items-center">
+                            <span class="text-xs font-bold uppercase tracking-wider text-rose-700">ข้อที่ 4: อสมการหาช่วงพารามิเตอร์</span>
+                            <span class="text-xs bg-slate-200 text-slate-700 px-2 py-0.5 rounded font-mono">Parameter m</span>
+                        </div>
+                        <p class="text-sm text-slate-700">
+                            กำหนดสมการ \(3x^2 - 6x + m = 0\) ค่าของ \(m\) ต้องสอดคล้องกับเงื่อนไขใดเพื่อให้สมการ <strong>มีรากจริง 2 รากที่แตกต่างกัน</strong>?
+                        </p>
+                        <div class="space-y-2 text-sm pt-1">
+                            <label class="flex items-center gap-3 p-2.5 rounded-lg bg-white border border-slate-200 cursor-pointer hover:bg-slate-50 transition">
+                                <input type="radio" name="quiz4" value="opt1" class="accent-indigo-600">
+                                <span>\(m < 3\)</span>
+                            </label>
+                            <label class="flex items-center gap-3 p-2.5 rounded-lg bg-white border border-slate-200 cursor-pointer hover:bg-slate-50 transition">
+                                <input type="radio" name="quiz4" value="opt2" class="accent-indigo-600">
+                                <span>\(m > 3\)</span>
+                            </label>
+                            <label class="flex items-center gap-3 p-2.5 rounded-lg bg-white border border-slate-200 cursor-pointer hover:bg-slate-50 transition">
+                                <input type="radio" name="quiz4" value="opt3" class="accent-indigo-600">
+                                <span>\(m \le 3\)</span>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="pt-2">
+                        <button onclick="evaluateQuiz(4, 'opt1', 'ถูกต้อง! มีรากจริง 2 ค่าต่างกันเมื่อ $\\Delta > 0$ ดังนั้น $(-6)^2 - 4(3)(m) > 0 \\implies 36 - 12m > 0 \\implies 36 > 12m \\implies m < 3$ (ไม่รวม $m=3$ เพราะที่ $m=3$ จะได้รากซ้ำ)')" class="w-full py-2 bg-slate-900 hover:bg-slate-800 text-white rounded-xl text-sm font-semibold transition">
+                            ตรวจคำตอบ
+                        </button>
+                        <div id="quiz4-result" class="hidden mt-3 text-xs sm:text-sm p-3 rounded-xl border"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+
+    </main>
+
+    <!-- INTERACTIVE JAVASCRIPT LOGIC -->
+    <script>
+        // DOM Controls
+        const sliderA = document.getElementById('sliderA');
+        const numA = document.getElementById('numA');
+        const labelA = document.getElementById('labelA');
+
+        const sliderB = document.getElementById('sliderB');
+        const numB = document.getElementById('numB');
+        const labelB = document.getElementById('labelB');
+
+        const sliderC = document.getElementById('sliderC');
+        const numC = document.getElementById('numC');
+        const labelC = document.getElementById('labelC');
+
+        const equationDisplay = document.getElementById('equationDisplay');
+        const calculationSteps = document.getElementById('calculationSteps');
+        const deltaBadge = document.getElementById('deltaBadge');
+        const rootAnalysisDetails = document.getElementById('rootAnalysisDetails');
+        const geoCorrelationCard = document.getElementById('geoCorrelationCard');
+        const graphStateText = document.getElementById('graphStateText');
+
+        const canvas = document.getElementById('graphCanvas');
+        const ctx = canvas.getContext('2d');
+
+        // State coefficients
+        let a = 1.0;
+        let b = -4.0;
+        let c = 3.0;
+
+        function setCoefficients(valA, valB, valC) {
+            a = parseFloat(valA);
+            b = parseFloat(valB);
+            c = parseFloat(valC);
+
+            sliderA.value = a;
+            numA.value = a;
+            labelA.textContent = a;
+
+            sliderB.value = b;
+            numB.value = b;
+            labelB.textContent = b;
+
+            sliderC.value = c;
+            numC.value = c;
+            labelC.textContent = c;
+
+            renderSimulator();
+        }
+
+        // Sliders & Number Input event listeners
+        sliderA.addEventListener('input', (e) => {
+            let val = parseFloat(e.target.value);
+            if (val === 0) val = 0.5; // Prevent a=0 in quadratic equation
+            a = val;
+            numA.value = a;
+            labelA.textContent = a;
+            renderSimulator();
+        });
+        numA.addEventListener('input', (e) => {
+            let val = parseFloat(e.target.value) || 1;
+            if (val === 0) val = 1;
+            a = val;
+            sliderA.value = a;
+            labelA.textContent = a;
+            renderSimulator();
+        });
+
+        sliderB.addEventListener('input', (e) => {
+            b = parseFloat(e.target.value);
+            numB.value = b;
+            labelB.textContent = b;
+            renderSimulator();
+        });
+        numB.addEventListener('input', (e) => {
+            b = parseFloat(e.target.value) || 0;
+            sliderB.value = b;
+            labelB.textContent = b;
+            renderSimulator();
+        });
+
+        sliderC.addEventListener('input', (e) => {
+            c = parseFloat(e.target.value);
+            numC.value = c;
+            labelC.textContent = c;
+            renderSimulator();
+        });
+        numC.addEventListener('input', (e) => {
+            c = parseFloat(e.target.value) || 0;
+            sliderC.value = c;
+            labelC.textContent = c;
+            renderSimulator();
+        });
+
+        function formatN(num) {
+            if (Number.isInteger(num)) return num.toString();
+            return num.toFixed(2);
+        }
+
+        function renderSimulator() {
+            if (a === 0) a = 1;
+
+            // 1. Format equation text
+            let eqStr = "";
+            if (a === 1) eqStr = "x²";
+            else if (a === -1) eqStr = "-x²";
+            else eqStr = `${formatN(a)}x²`;
+
+            if (b > 0) eqStr += ` + ${formatN(b)}x`;
+            else if (b < 0) eqStr += ` - ${formatN(Math.abs(b))}x`;
+
+            if (c > 0) eqStr += ` + ${formatN(c)}`;
+            else if (c < 0) eqStr += ` - ${formatN(Math.abs(c))}`;
+
+            eqStr += " = 0";
+            equationDisplay.textContent = eqStr;
+
+            // 2. Discriminant computation
+            const delta = (b * b) - (4 * a * c);
+            const fourAC = 4 * a * c;
+            const h = -b / (2 * a);
+            const k = c - ((b * b) / (4 * a));
+
+            // Badge styling
+            if (delta > 0) {
+                deltaBadge.className = "text-xs px-2.5 py-0.5 rounded-full font-mono font-bold bg-emerald-100 text-emerald-800 border border-emerald-300";
+                deltaBadge.textContent = `Δ = ${formatN(delta)} > 0 (รากจริง 2 ค่า)`;
+                graphStateText.textContent = "กราฟตัดแกน x สองจุด";
+            } else if (delta === 0) {
+                deltaBadge.className = "text-xs px-2.5 py-0.5 rounded-full font-mono font-bold bg-sky-100 text-sky-800 border border-sky-300";
+                deltaBadge.textContent = `Δ = 0 (รากจริงซ้ำ 1 ค่า / Multiplicity 2)`;
+                graphStateText.textContent = "กราฟสัมผัสแกน x หนึ่งจุด";
+            } else {
+                deltaBadge.className = "text-xs px-2.5 py-0.5 rounded-full font-mono font-bold bg-purple-100 text-purple-800 border border-purple-300";
+                deltaBadge.textContent = `Δ = ${formatN(delta)} < 0 (รากเชิงซ้อนคู่สังยุค)`;
+                graphStateText.textContent = "กราฟไม่ตัดแกน x";
+            }
+
+            // Calculation Steps HTML
+            calculationSteps.innerHTML = `
+                <div class="p-3 bg-slate-50 rounded-xl border border-slate-200 font-mono text-xs sm:text-sm space-y-1">
+                    <div class="text-slate-500 font-sans text-xs">แทนค่าในนิยาม \\(\\Delta = b^2 - 4ac\\) :</div>
+                    <div class="text-slate-900">\\Delta = (${formatN(b)})² - 4(${formatN(a)})(${formatN(c)})</div>
+                    <div class="text-slate-900">\\Delta = ${formatN(b*b)} - (${formatN(fourAC)}) = <span class="font-bold text-indigo-700 text-base">${formatN(delta)}</span></div>
+                </div>
+            `;
+
+            // Root Analysis Details
+            let rootHTML = "";
+            let geoHTML = "";
+
+            if (delta > 0) {
+                const sqrtD = Math.sqrt(delta);
+                const r1 = (-b + sqrtD) / (2 * a);
+                const r2 = (-b - sqrtD) / (2 * a);
+
+                let aPref = a === 1 ? "" : (a === -1 ? "-" : `${formatN(a)}`);
+                let s1 = r1 >= 0 ? `- ${formatN(r1)}` : `+ ${formatN(Math.abs(r1))}`;
+                let s2 = r2 >= 0 ? `- ${formatN(r2)}` : `+ ${formatN(Math.abs(r2))}`;
+
+                rootHTML = `
+                    <div class="space-y-1.5">
+                        <div>สมการมีรากจริง 2 รากที่แตกต่างกันอย่างสิ้นเชิง:</div>
+                        <div class="font-mono font-bold text-emerald-700 text-sm">
+                            x₁ = ${formatN(r1)}, &nbsp; x₂ = ${formatN(r2)}
+                        </div>
+                        <div class="text-xs text-slate-500">
+                            รูปแยกตัวประกอบเทียบเคียง: <span class="font-mono text-slate-800 font-semibold">${aPref}(x ${s1})(x ${s2}) = 0</span>
+                        </div>
+                    </div>
+                `;
+
+                geoHTML = `
+                    <div class="font-bold text-emerald-900 flex items-center gap-1.5 mb-1">
+                        <span class="w-2 h-2 rounded-full bg-emerald-500"></span> การอธิบายเชิงเรขาคณิต (\\(\\Delta > 0\\)):
+                    </div>
+                    <p class="text-slate-700">
+                        จุดยอดพาราโบลาอยู่ที่ \\(V(${formatN(h)}, ${formatN(k)})\\) โดยพาราโบลา${a > 0 ? 'หงายและจุดยอดอยู่ใต้แกน x (\\(k < 0\\))' : 'คว่ำและจุดยอดอยู่เหนือแกน x (\\(k > 0\\))'} ทำให้เส้นกราฟ <strong>ตัดแกน \\(x\\) สองจุด</strong> ที่ \\(x = ${formatN(r1)}\\) และ \\(x = ${formatN(r2)}\\)
+                    </p>
+                `;
+                geoCorrelationCard.className = "w-full p-4 rounded-xl border bg-emerald-50 text-slate-800 border-emerald-200 text-xs sm:text-sm";
+
+            } else if (delta === 0) {
+                const r = -b / (2 * a);
+                let aPref = a === 1 ? "" : (a === -1 ? "-" : `${formatN(a)}`);
+                let s = r >= 0 ? `- ${formatN(r)}` : `+ ${formatN(Math.abs(r))}`;
+
+                rootHTML = `
+                    <div class="space-y-1.5">
+                        <div>สมการมีรากจริงซ้ำหนึ่งราก (พหุภาพของรากเท่ากับ 2):</div>
+                        <div class="font-mono font-bold text-sky-700 text-sm">
+                            x₁ = x₂ = ${formatN(r)}
+                        </div>
+                        <div class="text-xs text-slate-500">
+                            รูปกำลังสองสมบูรณ์: <span class="font-mono text-slate-800 font-semibold">${aPref}(x ${s})² = 0</span>
+                        </div>
+                    </div>
+                `;
+
+                geoHTML = `
+                    <div class="font-bold text-sky-900 flex items-center gap-1.5 mb-1">
+                        <span class="w-2 h-2 rounded-full bg-sky-500"></span> การอธิบายเชิงเรขาคณิต (\\(\\Delta = 0\\)):
+                    </div>
+                    <p class="text-slate-700">
+                        จุดยอดของพาราโบลา \\(V(${formatN(h)}, ${formatN(k)})\\) อยู่ <strong>บนแกน \\(x\\) พอดี</strong> (เนื่องจาก \\(k = -\\Delta / 4a = 0\\)) ส่งผลให้เส้นกราฟ <strong>สัมผัสแกน \\(x\\) ที่จุดเดียว</strong> พอดี
+                    </p>
+                `;
+                geoCorrelationCard.className = "w-full p-4 rounded-xl border bg-sky-50 text-slate-800 border-sky-200 text-xs sm:text-sm";
+
+            } else {
+                const realPart = -b / (2 * a);
+                const imagPart = Math.sqrt(-delta) / (2 * Math.abs(a));
+
+                rootHTML = `
+                    <div class="space-y-1.5">
+                        <div>สมการไม่มีรากในระบบจำนวนจริง แต่มีรากเชิงซ้อนคู่สังยุคในสนาม \\(\\mathbb{C}\\):</div>
+                        <div class="font-mono font-bold text-purple-700 text-sm">
+                            x = ${formatN(realPart)} &plusmn; ${formatN(imagPart)}i
+                        </div>
+                        <div class="text-xs text-slate-500">
+                            พหุนามนี้ลดทอนไม่ได้ในสนามจำนวนจริง (Irreducible over \\(\\mathbb{R}\\))
+                        </div>
+                    </div>
+                `;
+
+                geoHTML = `
+                    <div class="font-bold text-purple-900 flex items-center gap-1.5 mb-1">
+                        <span class="w-2 h-2 rounded-full bg-purple-500"></span> การอธิบายเชิงเรขาคณิต (\\(\\Delta < 0\\)):
+                    </div>
+                    <p class="text-slate-700">
+                        จุดยอดพาราโบลาอยู่ที่ \\(V(${formatN(h)}, ${formatN(k)})\\) โดยพาราโบลา${a > 0 ? 'หงายและลอยอยู่เหนือแกน x ทั้งหมด (\\(k > 0\\))' : 'คว่ำและจมอยู่ใต้แกน x ทั้งหมด (\\(k < 0\\))'} ทำให้กราฟ <strong>ไม่ตัดหรือแตะแกน \\(x\\) เลย</strong>
+                    </p>
+                `;
+                geoCorrelationCard.className = "w-full p-4 rounded-xl border bg-purple-50 text-slate-800 border-purple-200 text-xs sm:text-sm";
+            }
+
+            rootAnalysisDetails.innerHTML = rootHTML;
+            geoCorrelationCard.innerHTML = geoHTML;
+
+            // 3. Draw Parabola on Canvas
+            drawGraph(delta, h, k);
+
+            // Re-render KaTeX if available
+            if (window.renderMathInElement) {
+                renderMathInElement(calculationSteps, {
+                    delimiters: [{left: '\\(', right: '\\)', display: false}]
+                });
+                renderMathInElement(rootAnalysisDetails, {
+                    delimiters: [{left: '\\(', right: '\\)', display: false}]
+                });
+                renderMathInElement(geoCorrelationCard, {
+                    delimiters: [{left: '\\(', right: '\\)', display: false}]
+                });
+            }
+        }
+
+        function drawGraph(delta, h, k) {
+            const rect = canvas.getBoundingClientRect();
+            const width = rect.width;
+            const height = rect.height;
+
+            if (width === 0 || height === 0) return;
+
+            const dpr = window.devicePixelRatio || 1;
+            canvas.width = width * dpr;
+            canvas.height = height * dpr;
+            ctx.scale(dpr, dpr);
+
+            const originX = width / 2;
+            const originY = height / 2;
+            const scale = width / 18; // -9 to +9 range
+
+            // Background
+            ctx.fillStyle = '#090d16';
+            ctx.fillRect(0, 0, width, height);
+
+            // Grid Lines
+            ctx.lineWidth = 1;
+            ctx.strokeStyle = '#1e293b';
+            ctx.font = '10px monospace';
+            ctx.fillStyle = '#64748b';
+
+            for (let xVal = -10; xVal <= 10; xVal += 2) {
+                const screenX = originX + xVal * scale;
+                ctx.beginPath();
+                ctx.moveTo(screenX, 0);
+                ctx.lineTo(screenX, height);
+                ctx.stroke();
+                if (xVal !== 0) ctx.fillText(xVal, screenX - 6, originY + 13);
+            }
+
+            for (let yVal = -10; yVal <= 10; yVal += 2) {
+                const screenY = originY - yVal * scale;
+                ctx.beginPath();
+                ctx.moveTo(0, screenY);
+                ctx.lineTo(width, screenY);
+                ctx.stroke();
+                if (yVal !== 0) ctx.fillText(yVal, originX + 5, screenY + 3);
+            }
+
+            // Main Axes
+            ctx.lineWidth = 1.75;
+            ctx.strokeStyle = '#94a3b8';
+
+            // X-Axis
+            ctx.beginPath();
+            ctx.moveTo(0, originY);
+            ctx.lineTo(width, originY);
+            ctx.stroke();
+
+            // Y-Axis
+            ctx.beginPath();
+            ctx.moveTo(originX, 0);
+            ctx.lineTo(originX, height);
+            ctx.stroke();
+
+            ctx.fillText('0', originX - 10, originY + 12);
+            ctx.fillText('x', width - 12, originY - 6);
+            ctx.fillText('y', originX + 8, 14);
+
+            // Draw Parabola Curve
+            ctx.lineWidth = 2.5;
+            if (delta > 0) ctx.strokeStyle = '#10b981'; // Emerald
+            else if (delta === 0) ctx.strokeStyle = '#38bdf8'; // Sky blue
+            else ctx.strokeStyle = '#c084fc'; // Purple
+
+            ctx.beginPath();
+            let firstPt = true;
+            for (let px = 0; px <= width; px += 2) {
+                const gx = (px - originX) / scale;
+                const gy = a * gx * gx + b * gx + c;
+                const py = originY - gy * scale;
+
+                if (firstPt) {
+                    ctx.moveTo(px, py);
+                    firstPt = false;
+                } else {
+                    ctx.lineTo(px, py);
+                }
+            }
+            ctx.stroke();
+
+            // Highlight Real Roots on X-axis (if Delta >= 0)
+            if (delta > 0) {
+                const sqrtD = Math.sqrt(delta);
+                const r1 = (-b + sqrtD) / (2 * a);
+                const r2 = (-b - sqrtD) / (2 * a);
+
+                [r1, r2].forEach(r => {
+                    const rx = originX + r * scale;
+                    const ry = originY;
+
+                    ctx.fillStyle = '#fbbf24';
+                    ctx.beginPath();
+                    ctx.arc(rx, ry, 5, 0, Math.PI * 2);
+                    ctx.fill();
+
+                    ctx.strokeStyle = '#ffffff';
+                    ctx.lineWidth = 1.5;
+                    ctx.beginPath();
+                    ctx.arc(rx, ry, 5, 0, Math.PI * 2);
+                    ctx.stroke();
+
+                    ctx.fillStyle = '#fbbf24';
+                    ctx.font = 'bold 10px monospace';
+                    ctx.fillText(`(${formatN(r)}, 0)`, rx - 18, ry + 16);
+                });
+            } else if (delta === 0) {
+                const r = -b / (2 * a);
+                const rx = originX + r * scale;
+                const ry = originY;
+
+                ctx.fillStyle = '#38bdf8';
+                ctx.beginPath();
+                ctx.arc(rx, ry, 6, 0, Math.PI * 2);
+                ctx.fill();
+
+                ctx.strokeStyle = '#ffffff';
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                ctx.arc(rx, ry, 6, 0, Math.PI * 2);
+                ctx.stroke();
+
+                ctx.fillStyle = '#38bdf8';
+                ctx.font = 'bold 10px monospace';
+                ctx.fillText(`รากซ้ำ (${formatN(r)}, 0)`, rx - 24, ry + 16);
+            }
+
+            // Highlight Vertex Point V(h, k)
+            const vx = originX + h * scale;
+            const vy = originY - k * scale;
+
+            ctx.fillStyle = '#34d399';
+            ctx.beginPath();
+            ctx.arc(vx, vy, 5, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.strokeStyle = '#ffffff';
+            ctx.lineWidth = 1.5;
+            ctx.beginPath();
+            ctx.arc(vx, vy, 5, 0, Math.PI * 2);
+            ctx.stroke();
+
+            ctx.fillStyle = '#34d399';
+            ctx.font = 'bold 10px monospace';
+            const vertexLabelY = a > 0 ? vy + 16 : vy - 8;
+            ctx.fillText(`V(${formatN(h)}, ${formatN(k)})`, vx - 22, vertexLabelY);
+        }
+
+        // Accordion Controller
+        function toggleAccordion(id) {
+            const content = document.getElementById(`content-${id}`);
+            const icon = document.getElementById(`icon-${id}`);
+
+            if (content.classList.contains('hidden')) {
+                content.classList.remove('hidden');
+                icon.classList.add('rotate-180');
+            } else {
+                content.classList.add('hidden');
+                icon.classList.remove('rotate-180');
+            }
+        }
+
+        // Quiz Evaluation Handler
+        function evaluateQuiz(quizNum, correctOpt, explanation) {
+            const options = document.getElementsByName(`quiz${quizNum}`);
+            let chosen = null;
+            for (let opt of options) {
+                if (opt.checked) {
+                    chosen = opt.value;
+                    break;
+                }
+            }
+
+            const resBox = document.getElementById(`quiz${quizNum}-result`);
+            resBox.classList.remove('hidden', 'bg-emerald-50', 'text-emerald-900', 'border-emerald-300', 'bg-rose-50', 'text-rose-900', 'border-rose-300', 'bg-amber-50', 'text-amber-900', 'border-amber-300');
+
+            if (!chosen) {
+                resBox.className = 'mt-3 text-xs sm:text-sm p-3 rounded-xl border bg-amber-50 text-amber-900 border-amber-300';
+                resBox.innerHTML = '<strong>แจ้งเตือน:</strong> โปรดเลือกคำตอบก่อนทำการตรวจ';
+                return;
+            }
+
+            if (chosen === correctOpt) {
+                resBox.className = 'mt-3 text-xs sm:text-sm p-3 rounded-xl border bg-emerald-50 text-emerald-900 border-emerald-300';
+                resBox.innerHTML = `<strong>ผลการประเมิน: ถูกต้องยอดเยี่ยม!</strong><br><span class="leading-relaxed mt-1 block">${explanation}</span>`;
+            } else {
+                resBox.className = 'mt-3 text-xs sm:text-sm p-3 rounded-xl border bg-rose-50 text-rose-900 border-rose-300';
+                resBox.innerHTML = `<strong>ผลการประเมิน: ยังไม่ถูกต้อง</strong><br><span class="leading-relaxed mt-1 block">${explanation}</span>`;
+            }
+
+            if (window.renderMathInElement) {
+                renderMathInElement(resBox, {
+                    delimiters: [
+                        {left: '$$', right: '$$', display: true},
+                        {left: '$', right: '$', display: false},
+                        {left: '\\(', right: '\\)', display: false},
+                        {left: '\\[', right: '\\]', display: true}
+                    ]
+                });
+            }
+        }
+
+        // Resize Listener
+        window.addEventListener('resize', () => {
+            renderSimulator();
+        });
+
+        // Window onload
+        window.onload = function() {
+            renderSimulator();
+            if (window.renderMathInElement) {
+                renderMathInElement(document.body, {
+                    delimiters: [
+                        {left: '$$', right: '$$', display: true},
+                        {left: '$', right: '$', display: false},
+                        {left: '\\(', right: '\\)', display: false},
+                        {left: '\\[', right: '\\]', display: true}
+                    ]
+                });
+            }
+        };
+    </script>
+</body>
+</html>
