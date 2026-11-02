@@ -1,0 +1,1024 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>เรื่องที่ 5: ทฤษฎีบทเดอมัวฟร์และรากที่ n</title>
+
+  <!-- Google Fonts: Sarabun & Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome 6 CDN -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Sarabun', 'Inter', 'sans-serif'],
+            mono: ['Courier New', 'monospace'],
+          },
+          colors: {
+            brand: {
+              50: '#eef2ff',
+              100: '#e0e7ff',
+              500: '#6366f1',
+              600: '#4f46e5',
+              700: '#4338ca',
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- KaTeX for Math Formula Rendering -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js"></script>
+
+  <style>
+    html {
+      scroll-behavior: smooth;
+    }
+    input[type=range]::-webkit-slider-thumb {
+      cursor: pointer;
+    }
+    .root-card:hover {
+      transform: translateY(-2px);
+    }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-800 font-sans antialiased selection:bg-indigo-100 selection:text-indigo-800">
+
+  <!-- Main Container: Strict Width 1,152px -->
+  <div class="max-w-6xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 space-y-8">
+
+    <!-- Header Section -->
+    <header class="bg-white border border-slate-200/80 rounded-2xl shadow-sm p-6 sm:p-8 relative overflow-hidden">
+      <div class="absolute -right-16 -top-16 w-64 h-64 bg-gradient-to-br from-indigo-100 via-violet-100 to-sky-50 rounded-full blur-2xl opacity-75 pointer-events-none"></div>
+      <div class="relative z-10">
+        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold bg-indigo-50 text-indigo-700 border border-indigo-200/60 mb-3">
+          <span class="w-2 h-2 rounded-full bg-indigo-500 animate-pulse"></span>
+          สื่อการเรียนรู้เชิงโต้ตอบ (Interactive Learning)
+        </div>
+        <h1 class="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-slate-900 tracking-tight leading-tight flex flex-wrap items-center gap-3">
+          <span>เรื่องที่ 5: ทฤษฎีบทเดอมัวฟร์และรากที่ \(n\)</span>
+          <span class="text-xs font-medium px-2.5 py-1 rounded-md bg-violet-100 text-violet-800 border border-violet-200">De Moivre's Theorem &amp; \(n\)-th Roots</span>
+        </h1>
+        <p class="text-slate-500 text-sm sm:text-base mt-2">
+          การยกกำลังจำนวนเชิงซ้อนในรูปเชิงขั้ว การหารากที่ \(n\) ทั้งหมด และการกระจายตัวแบบสมมาตรเป็นรูป \(n\) เหลี่ยมด้านเท่าบนระนาบเชิงซ้อน
+        </p>
+
+        <!-- Learning Objectives -->
+        <div class="mt-6 p-4 sm:p-5 rounded-xl bg-gradient-to-r from-indigo-50/90 via-violet-50/70 to-blue-50/50 border-l-4 border-indigo-600 text-slate-700 shadow-xs">
+          <h2 class="text-sm uppercase tracking-wider font-bold text-indigo-900 flex items-center gap-2 mb-1.5">
+            <i class="fa-solid fa-bullseye text-indigo-600"></i>
+            วัตถุประสงค์การเรียนรู้
+          </h2>
+          <p class="text-sm sm:text-base leading-relaxed text-slate-800">
+            นักศึกษาสามารถใช้ทฤษฎีบทเดอมัวฟร์ในการยกกำลังจำนวนเชิงซ้อน และหารากที่ \(n\) ของจำนวนเชิงซ้อนโดยแสดงคำตอบทั้งหมดได้อย่างถูกต้อง
+          </p>
+        </div>
+      </div>
+    </header>
+
+    <!-- Main Content & Simulator Grid -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+
+      <!-- Left Column: Structured Mathematics Theory -->
+      <section class="lg:col-span-5 space-y-5">
+        <div class="bg-white border border-slate-200/80 rounded-2xl p-6 shadow-sm">
+          <h2 class="text-lg font-bold text-slate-900 border-b border-slate-100 pb-3 mb-4 flex items-center gap-2">
+            <span class="flex items-center justify-center w-7 h-7 rounded-lg bg-indigo-600 text-white text-xs font-bold">1-5</span>
+            บทสรุปสาระสำคัญทางทฤษฎี
+          </h2>
+
+          <div class="space-y-4 text-sm sm:text-base text-slate-700">
+
+            <!-- 1 & 2. ทฤษฎีบทเดอมัวฟร์และการยกกำลัง -->
+            <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-200/70">
+              <h3 class="font-semibold text-slate-900 text-xs sm:text-sm text-indigo-950 flex items-center gap-2">
+                <i class="fa-solid fa-superscript text-indigo-600"></i>
+                1 &amp; 2. ทฤษฎีบทเดอมัวฟร์ (De Moivre's Theorem)
+              </h3>
+              <p class="text-xs text-slate-600 mt-1">
+                สำหรับการยกกำลังจำนวนเต็ม \(n \in \mathbb{Z}\) ของจำนวนเชิงซ้อนในรูปเชิงขั้ว:
+              </p>
+              <div class="mt-2 text-center py-2 px-3 bg-white rounded-lg border border-slate-200 font-mono text-xs sm:text-sm text-indigo-700 font-bold overflow-x-auto">
+                \[ [r(\cos\theta + i\sin\theta)]^n = r^n(\cos n\theta + i\sin n\theta) \]
+              </div>
+              <p class="text-[11px] text-slate-500 mt-1.5">
+                <i class="fa-solid fa-lightbulb text-amber-500 mr-1"></i><strong>หลักการ:</strong> ยกกำลังโมดูลัสเป็น \(r^n\) และคูณมุมอาร์กิวเมนต์ด้วย \(n\)
+              </p>
+            </div>
+
+            <!-- 3. ความหมายของรากที่ n -->
+            <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-200/70">
+              <h3 class="font-semibold text-slate-900 text-xs sm:text-sm text-indigo-950 flex items-center gap-2">
+                <i class="fa-solid fa-square-root-variable text-violet-600"></i>
+                3. ความหมายของรากที่ \(n\) ของจำนวนเชิงซ้อน
+              </h3>
+              <p class="text-xs text-slate-600 mt-1 leading-relaxed">
+                จำนวนเชิงซ้อน \(w\) จะเป็น<strong>รากที่ \(n\)</strong> ของ \(z\) ก็ต่อเมื่อ \(w^n = z\)
+              </p>
+              <p class="text-xs text-slate-500 mt-1">
+                สำหรับ \(z \neq 0\) ใดๆ จะมีรากที่ \(n\) ที่แตกต่างกัน<strong>พอดี \(n\) ค่าเสมอ</strong>ในระบบจำนวนเชิงซ้อน
+              </p>
+            </div>
+
+            <!-- 4. สูตรการหารากที่ n -->
+            <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-200/70">
+              <h3 class="font-semibold text-slate-900 text-xs sm:text-sm text-indigo-950 flex items-center gap-2">
+                <i class="fa-solid fa-calculator text-emerald-600"></i>
+                4. สูตรการหารากที่ \(n\) ของจำนวนเชิงซ้อน
+              </h3>
+              <p class="text-xs text-slate-600 mt-1">
+                ให้ \(z = r(\cos\theta + i\sin\theta)\) โดย \(r > 0\) รากที่ \(n\) ของ \(z\) คือ:
+              </p>
+              <div class="mt-2 py-2 px-3 bg-white rounded-lg border border-slate-200 font-mono text-xs sm:text-sm text-slate-900 overflow-x-auto leading-relaxed">
+                \[ w_k = r^{1/n}\left[\cos\left(\frac{\theta + 360^\circ k}{n}\right) + i\sin\left(\frac{\theta + 360^\circ k}{n}\right)\right] \]
+              </div>
+              <p class="text-xs text-indigo-900 font-medium mt-1">
+                โดยแทนค่าดัชนี \(k = 0, 1, 2, \dots, n-1\)
+              </p>
+            </div>
+
+            <!-- 5. การกระจายตัวของรากบนระนาบ -->
+            <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-200/70">
+              <h3 class="font-semibold text-slate-900 text-xs sm:text-sm text-indigo-950 flex items-center gap-2">
+                <i class="fa-solid fa-draw-polygon text-sky-600"></i>
+                5. การกระจายตัวของรากบนระนาบเชิงซ้อน
+              </h3>
+              <ul class="list-disc list-inside text-xs text-slate-600 space-y-1.5 mt-1">
+                <li>รากทั้งหมด \(w_0, \dots, w_{n-1}\) อยู่บน<strong>วงกลมรัศมีเท่ากันคือ \(R = r^{1/n} = \sqrt[n]{r}\)</strong></li>
+                <li>รากแต่ละตัวที่อยู่ติดกันทำมุมห่างกันเท่าๆ กันคือ \(\Delta\theta = \frac{360^\circ}{n}\) หรือ \(\frac{2\pi}{n}\)</li>
+                <li>จุดยอดของรากทั้ง \(n\) ตัวจะประกอบกันเป็น<strong>รูปหลายเหลี่ยมด้านเท่ามุมเท่า (Regular \(n\)-gon)</strong> แนบในวงกลม</li>
+              </ul>
+            </div>
+
+          </div>
+        </div>
+      </section>
+
+      <!-- Right Column: Interactive Simulator (Roots & Powers) -->
+      <section class="lg:col-span-7 space-y-6">
+        <div class="bg-white border border-slate-200/80 rounded-2xl p-6 shadow-sm flex flex-col justify-between">
+          <div>
+            <div class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-100 pb-3 mb-4">
+              <div>
+                <h2 class="text-lg font-bold text-slate-900 flex items-center gap-2">
+                  <i class="fa-solid fa-chart-pie text-indigo-600"></i>
+                  แบบจำลองรากที่ \(n\) และการยกกำลัง (Simulator)
+                </h2>
+                <p class="text-xs text-slate-500">เลือกโหมดการคำนวณ ปรับค่าตัวแปร และสังเกตรูปหลายเหลี่ยมของรากบนระนาบ</p>
+              </div>
+
+              <!-- Simulator Tabs -->
+              <div class="inline-flex p-1 bg-slate-100 rounded-xl text-xs font-semibold">
+                <button id="tabModeRoots" onclick="switchSimMode('roots')" class="px-3 py-1.5 rounded-lg bg-white text-indigo-700 shadow-xs transition flex items-center gap-1.5">
+                  <i class="fa-solid fa-snowflake"></i>
+                  <span>รากที่ \(n\) (\(n\)-th Roots)</span>
+                </button>
+                <button id="tabModePower" onclick="switchSimMode('power')" class="px-3 py-1.5 rounded-lg text-slate-600 hover:text-slate-900 transition flex items-center gap-1.5">
+                  <i class="fa-solid fa-bolt"></i>
+                  <span>ยกกำลัง \(z^n\) (Power)</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- Canvas Container -->
+            <div class="relative w-full aspect-square max-h-[380px] mx-auto bg-slate-950 rounded-xl overflow-hidden shadow-inner border border-slate-800">
+              <canvas id="simCanvas" class="w-full h-full block"></canvas>
+              
+              <!-- Canvas Badges -->
+              <div class="absolute bottom-2 left-2 bg-slate-900/85 backdrop-blur text-[11px] text-slate-300 px-2.5 py-1 rounded-md border border-slate-800 pointer-events-none flex items-center gap-1.5">
+                <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
+                <span id="canvasRadiusInfo">รัศมีราก R = 2.000</span>
+              </div>
+              <div id="canvasAngleStepBadge" class="absolute top-2 right-2 bg-indigo-950/85 backdrop-blur text-xs font-mono font-bold text-indigo-300 px-2.5 py-1 rounded-md border border-indigo-800 pointer-events-none">
+                Δθ = 120° (รูป 3 เหลี่ยม)
+              </div>
+            </div>
+
+            <!-- Controls: Roots Mode -->
+            <div id="controlsRoots" class="mt-4 p-4 rounded-xl bg-slate-50 border border-slate-200/80 space-y-3.5">
+              <!-- Preset Buttons -->
+              <div>
+                <span class="text-xs font-semibold text-slate-500 block mb-1.5">เลือกพรีเซ็ตตัวอย่างสำคัญ (Presets):</span>
+                <div class="flex flex-wrap gap-2 text-xs">
+                  <button onclick="applyPreset(8, 0, 3)" class="px-2.5 py-1 bg-white hover:bg-indigo-50 hover:text-indigo-600 text-slate-700 rounded-lg border border-slate-200 font-medium transition shadow-2xs">
+                    รากที่ 3 ของ 8 (ตัวอย่างหลัก)
+                  </button>
+                  <button onclick="applyPreset(16, 180, 4)" class="px-2.5 py-1 bg-white hover:bg-indigo-50 hover:text-indigo-600 text-slate-700 rounded-lg border border-slate-200 font-medium transition shadow-2xs">
+                    รากที่ 4 ของ -16 (Q2/Q3)
+                  </button>
+                  <button onclick="applyPreset(1, 0, 5)" class="px-2.5 py-1 bg-white hover:bg-indigo-50 hover:text-indigo-600 text-slate-700 rounded-lg border border-slate-200 font-medium transition shadow-2xs">
+                    รากที่ 5 ของ 1 (5 เหลี่ยม)
+                  </button>
+                  <button onclick="applyPreset(64, 0, 6)" class="px-2.5 py-1 bg-white hover:bg-indigo-50 hover:text-indigo-600 text-slate-700 rounded-lg border border-slate-200 font-medium transition shadow-2xs">
+                    รากที่ 6 ของ 64 (6 เหลี่ยม)
+                  </button>
+                </div>
+              </div>
+
+              <!-- Slider r -->
+              <div>
+                <div class="flex justify-between text-xs sm:text-sm mb-1">
+                  <span class="font-medium text-slate-700 flex items-center gap-1.5">
+                    <span class="w-2.5 h-2.5 rounded-full bg-blue-500"></span>
+                    โมดูลัสตัวตั้ง \(r = |z|\)
+                  </span>
+                  <span id="labelR" class="font-mono font-bold text-blue-700 bg-white px-2 py-0.5 rounded border border-blue-200 text-xs">8.0</span>
+                </div>
+                <input id="sliderR" type="range" min="1" max="64" step="1" value="8" 
+                  class="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-blue-600 focus:outline-none">
+              </div>
+
+              <!-- Slider theta -->
+              <div>
+                <div class="flex justify-between text-xs sm:text-sm mb-1">
+                  <span class="font-medium text-slate-700 flex items-center gap-1.5">
+                    <span class="w-2.5 h-2.5 rounded-full bg-amber-500"></span>
+                    มุมตัวตั้ง \(\theta\) (องศา)
+                  </span>
+                  <span id="labelTheta" class="font-mono font-bold text-amber-700 bg-white px-2 py-0.5 rounded border border-amber-200 text-xs">0°</span>
+                </div>
+                <input id="sliderTheta" type="range" min="0" max="360" step="5" value="0" 
+                  class="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-amber-500 focus:outline-none">
+              </div>
+
+              <!-- Slider n -->
+              <div>
+                <div class="flex justify-between text-xs sm:text-sm mb-1">
+                  <span class="font-medium text-slate-700 flex items-center gap-1.5">
+                    <span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
+                    ดัชนีรากที่ \(n\) (จำนวนราก: 2 ถึง 8)
+                  </span>
+                  <span id="labelN" class="font-mono font-bold text-emerald-700 bg-white px-2.5 py-0.5 rounded border border-emerald-200 text-xs">n = 3</span>
+                </div>
+                <input id="sliderN" type="range" min="2" max="8" step="1" value="3" 
+                  class="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-emerald-600 focus:outline-none">
+              </div>
+            </div>
+
+            <!-- Controls: Power Mode -->
+            <div id="controlsPower" class="hidden mt-4 p-4 rounded-xl bg-slate-50 border border-slate-200/80 space-y-3.5">
+              <div class="p-3 bg-indigo-50/80 rounded-lg border border-indigo-200 text-xs text-indigo-900">
+                <i class="fa-solid fa-circle-info mr-1"></i>
+                โหมดนี้แสดงการใช้ <strong>\([r\operatorname{cis}\theta]^n = r^n\operatorname{cis}(n\theta)\)</strong> เมื่อยกกำลังจำนวนเชิงซ้อน
+              </div>
+
+              <div>
+                <div class="flex justify-between text-xs sm:text-sm mb-1">
+                  <span class="font-medium text-slate-700">โมดูลัสฐาน \(r\):</span>
+                  <span id="labelPowR" class="font-mono font-bold text-indigo-700">1.414</span>
+                </div>
+                <input id="sliderPowR" type="range" min="0.5" max="3" step="0.1" value="1.4" 
+                  class="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-indigo-600">
+              </div>
+
+              <div>
+                <div class="flex justify-between text-xs sm:text-sm mb-1">
+                  <span class="font-medium text-slate-700">มุมฐาน \(\theta\) (องศา):</span>
+                  <span id="labelPowTheta" class="font-mono font-bold text-amber-700">45°</span>
+                </div>
+                <input id="sliderPowTheta" type="range" min="0" max="360" step="5" value="45" 
+                  class="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-amber-500">
+              </div>
+
+              <div>
+                <div class="flex justify-between text-xs sm:text-sm mb-1">
+                  <span class="font-medium text-slate-700">เลขชี้กำลัง \(n\):</span>
+                  <span id="labelPowN" class="font-mono font-bold text-violet-700">n = 4</span>
+                </div>
+                <input id="sliderPowN" type="range" min="1" max="8" step="1" value="4" 
+                  class="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-violet-600">
+              </div>
+
+              <div class="p-3 bg-white rounded-lg border border-slate-200 text-xs font-mono space-y-1">
+                <div class="text-slate-500">ผลการยกกำลัง \(z^n\):</div>
+                <div id="powerResultMath" class="text-sm font-bold text-indigo-900">
+                  <!-- Computed by JS -->
+                </div>
+              </div>
+            </div>
+
+            <!-- Real-time Roots Detail Panel -->
+            <div id="rootsOutputPanel" class="mt-4 space-y-2">
+              <div class="flex items-center justify-between text-xs text-slate-600 font-bold uppercase tracking-wider px-1">
+                <span>รายการรากทั้งหมด (All \(n\) Roots):</span>
+                <span id="rootsCountBadge" class="text-indigo-600 font-mono">ทั้งหมด 3 คำตอบ</span>
+              </div>
+              <div id="rootsListContainer" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5 max-h-56 overflow-y-auto pr-1">
+                <!-- Dynamically generated root cards -->
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <!-- Guided Discovery Questions Section -->
+    <section class="bg-white border border-slate-200/80 rounded-2xl p-6 sm:p-8 shadow-sm">
+      <div class="flex items-center gap-3 mb-6">
+        <div class="w-10 h-10 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center border border-amber-200/60 shadow-xs">
+          <i class="fa-solid fa-lightbulb text-xl"></i>
+        </div>
+        <div>
+          <h2 class="text-xl font-bold text-slate-900">คำถามนำเพื่อการค้นพบ (Guided Discovery)</h2>
+          <p class="text-xs sm:text-sm text-slate-500">คลิกที่แต่ละคำถามเพื่อเปิดดูแนวคิดและคำอธิบายทางเรขาคณิต</p>
+        </div>
+      </div>
+
+      <div class="space-y-4">
+        <!-- Question 1 -->
+        <div class="border border-slate-200 rounded-xl overflow-hidden transition bg-slate-50/50">
+          <button onclick="toggleDiscovery(1)" class="w-full text-left px-5 py-4 flex justify-between items-center gap-4 hover:bg-slate-100/60 transition">
+            <span class="font-semibold text-slate-800 text-sm sm:text-base flex items-center gap-3">
+              <span class="w-6 h-6 rounded-full bg-indigo-100 text-indigo-700 text-xs flex items-center justify-center font-bold">1</span>
+              รากที่ \(n\) ของจำนวนเชิงซ้อนที่ไม่เป็นศูนย์มีทั้งหมดกี่ค่า?
+            </span>
+            <span id="disc-chevron-1" class="text-slate-400 transition-transform duration-200">
+              <i class="fa-solid fa-chevron-down"></i>
+            </span>
+          </button>
+          <div id="disc-ans-1" class="hidden px-5 py-4 bg-white border-t border-slate-200 text-sm sm:text-base text-slate-700 space-y-2">
+            <p class="font-medium text-emerald-800 flex items-center gap-1.5">
+              <i class="fa-solid fa-circle-check text-emerald-600"></i>
+              แนวคิดคำตอบ:
+            </p>
+            <p>
+              มีทั้งหมด <strong>\(n\) ค่าพอดี (Exactly \(n\) distinct values)</strong>
+            </p>
+            <p class="text-xs sm:text-sm text-slate-600">
+              เป็นผลมาจากทฤษฎีบทมูลฐานของพีชคณิต (Fundamental Theorem of Algebra) เพราะสมการ \(w^n - z = 0\) เป็นพหุนามดีกรี \(n\) จึงมีคำตอบในระบบจำนวนเชิงซ้อนพอดี \(n\) ราก ซึ่งเกิดขึ้นจากการแทนค่าดัชนี \(k = 0, 1, 2, \dots, n-1\) หากแทนค่า \(k = n\) จะได้มุมที่วนครบรอบ \(360^\circ\) กลับมาซ้ำกับค่าของ \(k = 0\)
+            </p>
+          </div>
+        </div>
+
+        <!-- Question 2 -->
+        <div class="border border-slate-200 rounded-xl overflow-hidden transition bg-slate-50/50">
+          <button onclick="toggleDiscovery(2)" class="w-full text-left px-5 py-4 flex justify-between items-center gap-4 hover:bg-slate-100/60 transition">
+            <span class="font-semibold text-slate-800 text-sm sm:text-base flex items-center gap-3">
+              <span class="w-6 h-6 rounded-full bg-indigo-100 text-indigo-700 text-xs flex items-center justify-center font-bold">2</span>
+              รากที่ได้กระจายตัวอย่างไรบนวงกลม?
+            </span>
+            <span id="disc-chevron-2" class="text-slate-400 transition-transform duration-200">
+              <i class="fa-solid fa-chevron-down"></i>
+            </span>
+          </button>
+          <div id="disc-ans-2" class="hidden px-5 py-4 bg-white border-t border-slate-200 text-sm sm:text-base text-slate-700 space-y-2">
+            <p class="font-medium text-emerald-800 flex items-center gap-1.5">
+              <i class="fa-solid fa-circle-check text-emerald-600"></i>
+              แนวคิดคำตอบ:
+            </p>
+            <p>
+              รากทั้ง \(n\) ตัวจะ <strong>กระจายตัวอย่างสม่ำเสมอสมมาตรบนวงกลมรัศมี \(R = r^{1/n}\)</strong> ที่มีจุดศูนย์กลางที่จุดกำเนิด \((0,0)\)
+            </p>
+            <p class="text-xs sm:text-sm text-slate-600">
+              โดยจุดปลายของเวกเตอร์รากแต่ละตัวทำหน้าที่เป็น <strong>จุดยอดของรูปหลายเหลี่ยมด้านเท่ามุมเท่า (Regular \(n\)-gon)</strong> แนบในวงกลม เช่น:
+            </p>
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs font-mono text-center pt-1">
+              <div class="p-2 bg-slate-50 rounded border border-slate-200">\(n=3\): สามเหลี่ยมด้านเท่า</div>
+              <div class="p-2 bg-slate-50 rounded border border-slate-200">\(n=4\): สี่เหลี่ยมจัตุรัส</div>
+              <div class="p-2 bg-slate-50 rounded border border-slate-200">\(n=5\): ห้าเหลี่ยมด้านเท่า</div>
+              <div class="p-2 bg-slate-50 rounded border border-slate-200">\(n=6\): หกเหลี่ยมด้านเท่า</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Question 3 -->
+        <div class="border border-slate-200 rounded-xl overflow-hidden transition bg-slate-50/50">
+          <button onclick="toggleDiscovery(3)" class="w-full text-left px-5 py-4 flex justify-between items-center gap-4 hover:bg-slate-100/60 transition">
+            <span class="font-semibold text-slate-800 text-sm sm:text-base flex items-center gap-3">
+              <span class="w-6 h-6 rounded-full bg-indigo-100 text-indigo-700 text-xs flex items-center justify-center font-bold">3</span>
+              เมื่อเพิ่ม \(n\) ระยะเชิงมุมระหว่างรากที่อยู่ติดกันเปลี่ยนอย่างไร?
+            </span>
+            <span id="disc-chevron-3" class="text-slate-400 transition-transform duration-200">
+              <i class="fa-solid fa-chevron-down"></i>
+            </span>
+          </button>
+          <div id="disc-ans-3" class="hidden px-5 py-4 bg-white border-t border-slate-200 text-sm sm:text-base text-slate-700 space-y-2">
+            <p class="font-medium text-emerald-800 flex items-center gap-1.5">
+              <i class="fa-solid fa-circle-check text-emerald-600"></i>
+              แนวคิดคำตอบ:
+            </p>
+            <p>
+              ระยะเชิงมุมระหว่างรากที่อยู่ติดกันคือ <strong>\(\Delta\theta = \frac{360^\circ}{n}\)</strong> (หรือ \(\frac{2\pi}{n}\))
+            </p>
+            <p class="text-xs sm:text-sm text-slate-600">
+              ดังนั้น <strong>เมื่อ \(n\) มีค่าเพิ่มขึ้น ระยะเชิงมุมระหว่างรากที่อยู่ติดกันจะลดลง (เล็กลงเรื่อยๆ)</strong> ทำให้รากแต่ละตัวอยู่ใกล้ชิดกันมากขึ้นรอบเส้นรอบวง และเมื่อ \(n \to \infty\) จุดของรากจะเรียงตัวชิดกันจนเกือบกลายเป็นเส้นรอบวงต่อเนื่องของวงกลม
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Student Exercises Section -->
+    <section class="bg-white border border-slate-200/80 rounded-2xl p-6 sm:p-8 shadow-sm">
+      <div class="flex items-center gap-3 mb-6">
+        <div class="w-10 h-10 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center border border-indigo-200/60 shadow-xs">
+          <i class="fa-solid fa-pen-to-square text-xl"></i>
+        </div>
+        <div>
+          <h2 class="text-xl font-bold text-slate-900">แบบฝึกหัดสำหรับนักศึกษา (Interactive Exercises)</h2>
+          <p class="text-xs sm:text-sm text-slate-500">ฝึกคำนวณกำลังและรากที่ \(n\) พร้อมตรวจคำตอบและดูเฉลยละเอียด</p>
+        </div>
+      </div>
+
+      <div class="space-y-6">
+
+        <!-- Exercise 1 -->
+        <div class="p-5 rounded-xl border border-slate-200 bg-slate-50/40">
+          <h3 class="font-semibold text-slate-900 text-sm sm:text-base mb-3 flex items-center gap-2">
+            <span class="w-6 h-6 rounded-md bg-indigo-600 text-white text-xs flex items-center justify-center font-bold">1</span>
+            ใช้ทฤษฎีบทเดอมัวฟร์คำนวณ \((1 + i)^4\)
+          </h3>
+          <div class="flex flex-wrap items-center gap-3 max-w-sm mb-3">
+            <span class="text-xs font-semibold text-slate-600">ผลลัพธ์ \(a + bi\):</span>
+            <input id="ex1_re" type="number" placeholder="ส่วนจริง" class="w-28 px-3 py-1.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-indigo-500 text-center font-mono text-sm">
+            <span class="font-bold text-slate-500">+</span>
+            <input id="ex1_im" type="number" placeholder="ส่วนจินตภาพ" class="w-28 px-3 py-1.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-indigo-500 text-center font-mono text-sm">
+            <span class="font-bold text-slate-600 font-mono">i</span>
+          </div>
+          <div class="flex flex-wrap gap-2 items-center">
+            <button onclick="checkEx1()" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs sm:text-sm font-medium rounded-lg shadow-sm transition">
+              ตรวจคำตอบ
+            </button>
+            <button onclick="toggleExSol('sol1')" class="px-4 py-2 bg-white hover:bg-slate-100 text-slate-700 text-xs sm:text-sm font-medium rounded-lg border border-slate-200 transition">
+              ดูเฉลยละเอียด
+            </button>
+            <div id="ex1_feedback" class="text-xs sm:text-sm font-semibold"></div>
+          </div>
+          <div id="sol1" class="hidden mt-3 p-3.5 bg-white rounded-lg border border-slate-200 text-xs sm:text-sm text-slate-700 space-y-1.5 leading-relaxed">
+            <strong>วิธีทำ:</strong><br>
+            1. เขียน \(1 + i\) ในรูปเชิงขั้ว: \(r = \sqrt{1^2 + 1^2} = \sqrt{2}\) และ \(\theta = 45^\circ\)<br>
+            \(1 + i = \sqrt{2}(\cos 45^\circ + i\sin 45^\circ)\)<br>
+            2. ใช้ทฤษฎีบทเดอมัวฟร์ยกกำลัง 4:<br>
+            \((1 + i)^4 = (\sqrt{2})^4 [\cos(4 \times 45^\circ) + i\sin(4 \times 45^\circ)]\)<br>
+            \( = 4 [\cos 180^\circ + i\sin 180^\circ] = 4(-1 + 0i) = -4\)<br>
+            <span class="text-emerald-700 font-semibold">ดังนั้น ส่วนจริงคือ -4 และ ส่วนจินตภาพคือ 0 (คำตอบคือ -4)</span>
+          </div>
+        </div>
+
+        <!-- Exercise 2 -->
+        <div class="p-5 rounded-xl border border-slate-200 bg-slate-50/40">
+          <h3 class="font-semibold text-slate-900 text-sm sm:text-base mb-3 flex items-center gap-2">
+            <span class="w-6 h-6 rounded-md bg-indigo-600 text-white text-xs flex items-center justify-center font-bold">2</span>
+            จงหารากที่สามทั้งหมดของ \(8\) (ระบุรัศมีราก \(R\) และมุมทั้ง 3 ค่า)
+          </h3>
+          <div class="grid grid-cols-1 sm:grid-cols-4 gap-2.5 max-w-lg mb-3">
+            <div class="p-2 bg-white rounded-lg border border-slate-200">
+              <label class="block text-[11px] font-semibold text-slate-500 mb-0.5">รัศมีราก \(R = \sqrt[3]{8}\):</label>
+              <input id="ex2_r" type="number" placeholder="2" class="w-full px-2 py-1 border rounded font-mono text-center text-sm">
+            </div>
+            <div class="p-2 bg-white rounded-lg border border-slate-200">
+              <label class="block text-[11px] font-semibold text-slate-500 mb-0.5">มุม \(\theta_0\) (\(k=0\)):</label>
+              <input id="ex2_t0" type="number" placeholder="0" class="w-full px-2 py-1 border rounded font-mono text-center text-sm">
+            </div>
+            <div class="p-2 bg-white rounded-lg border border-slate-200">
+              <label class="block text-[11px] font-semibold text-slate-500 mb-0.5">มุม \(\theta_1\) (\(k=1\)):</label>
+              <input id="ex2_t1" type="number" placeholder="120" class="w-full px-2 py-1 border rounded font-mono text-center text-sm">
+            </div>
+            <div class="p-2 bg-white rounded-lg border border-slate-200">
+              <label class="block text-[11px] font-semibold text-slate-500 mb-0.5">มุม \(\theta_2\) (\(k=2\)):</label>
+              <input id="ex2_t2" type="number" placeholder="240" class="w-full px-2 py-1 border rounded font-mono text-center text-sm">
+            </div>
+          </div>
+          <div class="flex flex-wrap gap-2 items-center">
+            <button onclick="checkEx2()" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs sm:text-sm font-medium rounded-lg shadow-sm transition">
+              ตรวจคำตอบ
+            </button>
+            <button onclick="toggleExSol('sol2')" class="px-4 py-2 bg-white hover:bg-slate-100 text-slate-700 text-xs sm:text-sm font-medium rounded-lg border border-slate-200 transition">
+              ดูเฉลยละเอียด
+            </button>
+            <div id="ex2_feedback" class="text-xs sm:text-sm font-semibold"></div>
+          </div>
+          <div id="sol2" class="hidden mt-3 p-3.5 bg-white rounded-lg border border-slate-200 text-xs sm:text-sm text-slate-700 space-y-1.5 leading-relaxed">
+            <strong>วิธีทำ:</strong><br>
+            เขียน \(8 = 8(\cos 0^\circ + i\sin 0^\circ)\)<br>
+            รัศมีราก: \(R = 8^{1/3} = 2\)<br>
+            มุมของรากทั้งสาม: \(\frac{0^\circ + 360^\circ k}{3}\) สำหรับ \(k = 0, 1, 2\)<br>
+            • \(k = 0 \implies \theta_0 = 0^\circ \implies w_0 = 2(\cos 0^\circ + i\sin 0^\circ) = 2\)<br>
+            • \(k = 1 \implies \theta_1 = 120^\circ \implies w_1 = 2(\cos 120^\circ + i\sin 120^\circ) = -1 + \sqrt{3}i\)<br>
+            • \(k = 2 \implies \theta_2 = 240^\circ \implies w_2 = 2(\cos 240^\circ + i\sin 240^\circ) = -1 - \sqrt{3}i\)<br>
+            <span class="text-emerald-700 font-semibold">รากทั้งสามคือ \(2\), \(-1+\sqrt{3}i\), และ \(-1-\sqrt{3}i\)</span>
+          </div>
+        </div>
+
+        <!-- Exercise 3 -->
+        <div class="p-5 rounded-xl border border-slate-200 bg-slate-50/40">
+          <h3 class="font-semibold text-slate-900 text-sm sm:text-base mb-3 flex items-center gap-2">
+            <span class="w-6 h-6 rounded-md bg-indigo-600 text-white text-xs flex items-center justify-center font-bold">3</span>
+            จงหารากที่สี่ทั้งหมดของ \(-16\) และแสดงคำตอบในรูปเชิงขั้ว
+          </h3>
+          <p class="text-xs text-slate-500 mb-2">เลือกเซตของคำตอบเชิงขั้วที่ถูกต้องสมบูรณ์:</p>
+          <div class="space-y-2 mb-3">
+            <label class="flex items-center gap-3 p-3 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 cursor-pointer text-sm">
+              <input type="radio" name="ex3_opt" value="opt1" class="text-indigo-600 focus:ring-indigo-500">
+              <span>รัศมี \(R = 4\) มีมุมคือ \(0^\circ, 90^\circ, 180^\circ, 270^\circ\)</span>
+            </label>
+            <label class="flex items-center gap-3 p-3 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 cursor-pointer text-sm">
+              <input type="radio" name="ex3_opt" value="correct" class="text-indigo-600 focus:ring-indigo-500">
+              <span>รัศมี \(R = 2\) มีมุมทั้งสี่คือ \(45^\circ, 135^\circ, 225^\circ, 315^\circ\) ในรูป \(2\operatorname{cis}\theta\)</span>
+            </label>
+            <label class="flex items-center gap-3 p-3 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 cursor-pointer text-sm">
+              <input type="radio" name="ex3_opt" value="opt3" class="text-indigo-600 focus:ring-indigo-500">
+              <span>รัศมี \(R = 2\) มีมุมทั้งสี่คือ \(30^\circ, 120^\circ, 210^\circ, 300^\circ\) ในรูป \(2\operatorname{cis}\theta\)</span>
+            </label>
+          </div>
+          <div class="flex flex-wrap gap-2 items-center">
+            <button onclick="checkEx3()" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs sm:text-sm font-medium rounded-lg shadow-sm transition">
+              ตรวจคำตอบ
+            </button>
+            <button onclick="toggleExSol('sol3')" class="px-4 py-2 bg-white hover:bg-slate-100 text-slate-700 text-xs sm:text-sm font-medium rounded-lg border border-slate-200 transition">
+              ดูคำอธิบายทางคณิตศาสตร์
+            </button>
+            <div id="ex3_feedback" class="text-xs sm:text-sm font-semibold"></div>
+          </div>
+          <div id="sol3" class="hidden mt-3 p-3.5 bg-white rounded-lg border border-slate-200 text-xs sm:text-sm text-slate-700 space-y-1.5 leading-relaxed">
+            <strong>วิธีทำ:</strong><br>
+            เขียน \(-16\) ในรูปเชิงขั้ว: \(-16 = 16(\cos 180^\circ + i\sin 180^\circ)\)<br>
+            รัศมีราก: \(R = 16^{1/4} = 2\)<br>
+            มุมของรากที่สี่: \(\frac{180^\circ + 360^\circ k}{4} = 45^\circ + 90^\circ k\) สำหรับ \(k = 0, 1, 2, 3\)<br>
+            • \(k=0 \implies 45^\circ \implies 2\operatorname{cis}45^\circ = \sqrt{2} + \sqrt{2}i\)<br>
+            • \(k=1 \implies 135^\circ \implies 2\operatorname{cis}135^\circ = -\sqrt{2} + \sqrt{2}i\)<br>
+            • \(k=2 \implies 225^\circ \implies 2\operatorname{cis}225^\circ = -\sqrt{2} - \sqrt{2}i\)<br>
+            • \(k=3 \implies 315^\circ \implies 2\operatorname{cis}315^\circ = \sqrt{2} - \sqrt{2}i\)<br>
+            <span class="text-emerald-700 font-semibold">เป็นรูปสี่เหลี่ยมจัตุรัสแนบในวงกลมรัศมี 2 พอดี</span>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="text-center text-xs text-slate-400 py-4 border-t border-slate-200/60 flex items-center justify-center gap-2">
+      <i class="fa-solid fa-graduation-cap text-indigo-500"></i>
+      <span>สื่อประกอบการสอนวิชาคณิตศาสตร์ • เรื่องที่ 5 ทฤษฎีบทเดอมัวฟร์และรากที่ \(n\)</span>
+    </footer>
+
+  </div>
+
+  <!-- Interactive Simulator & Canvas Script -->
+  <script>
+    // State
+    let currentSimMode = 'roots'; // 'roots' or 'power'
+
+    // Roots State
+    let root_r = 8.0;
+    let root_theta = 0; // degrees
+    let root_n = 3;
+
+    // Power State
+    let pow_r = 1.414;
+    let pow_theta = 45; // degrees
+    let pow_n = 4;
+
+    // DOM Elements
+    const canvas = document.getElementById('simCanvas');
+    const ctx = canvas.getContext('2d');
+    const tabModeRoots = document.getElementById('tabModeRoots');
+    const tabModePower = document.getElementById('tabModePower');
+    const controlsRoots = document.getElementById('controlsRoots');
+    const controlsPower = document.getElementById('controlsPower');
+    const rootsOutputPanel = document.getElementById('rootsOutputPanel');
+
+    // Roots Controls
+    const sliderR = document.getElementById('sliderR');
+    const sliderTheta = document.getElementById('sliderTheta');
+    const sliderN = document.getElementById('sliderN');
+    const labelR = document.getElementById('labelR');
+    const labelTheta = document.getElementById('labelTheta');
+    const labelN = document.getElementById('labelN');
+    const rootsCountBadge = document.getElementById('rootsCountBadge');
+    const rootsListContainer = document.getElementById('rootsListContainer');
+    const canvasRadiusInfo = document.getElementById('canvasRadiusInfo');
+    const canvasAngleStepBadge = document.getElementById('canvasAngleStepBadge');
+
+    // Power Controls
+    const sliderPowR = document.getElementById('sliderPowR');
+    const sliderPowTheta = document.getElementById('sliderPowTheta');
+    const sliderPowN = document.getElementById('sliderPowN');
+    const labelPowR = document.getElementById('labelPowR');
+    const labelPowTheta = document.getElementById('labelPowTheta');
+    const labelPowN = document.getElementById('labelPowN');
+    const powerResultMath = document.getElementById('powerResultMath');
+
+    // Distinct Colors for Roots
+    const rootColors = [
+      '#6366f1', // Indigo
+      '#10b981', // Emerald
+      '#f59e0b', // Amber
+      '#ec4899', // Pink
+      '#06b6d4', // Cyan
+      '#8b5cf6', // Violet
+      '#ef4444', // Red
+      '#14b8a6'  // Teal
+    ];
+
+    function switchSimMode(mode) {
+      currentSimMode = mode;
+      if (mode === 'roots') {
+        tabModeRoots.className = 'px-3 py-1.5 rounded-lg bg-white text-indigo-700 shadow-xs transition flex items-center gap-1.5';
+        tabModePower.className = 'px-3 py-1.5 rounded-lg text-slate-600 hover:text-slate-900 transition flex items-center gap-1.5';
+        controlsRoots.classList.remove('hidden');
+        controlsPower.classList.add('hidden');
+        rootsOutputPanel.classList.remove('hidden');
+      } else {
+        tabModePower.className = 'px-3 py-1.5 rounded-lg bg-white text-indigo-700 shadow-xs transition flex items-center gap-1.5';
+        tabModeRoots.className = 'px-3 py-1.5 rounded-lg text-slate-600 hover:text-slate-900 transition flex items-center gap-1.5';
+        controlsPower.classList.remove('hidden');
+        controlsRoots.classList.add('hidden');
+        rootsOutputPanel.classList.add('hidden');
+      }
+      updateSim();
+    }
+
+    function applyPreset(r, theta, n) {
+      root_r = r;
+      root_theta = theta;
+      root_n = n;
+      sliderR.value = r;
+      sliderTheta.value = theta;
+      sliderN.value = n;
+      updateSim();
+    }
+
+    function resizeCanvas() {
+      const rect = canvas.getBoundingClientRect();
+      const dpr = window.devicePixelRatio || 1;
+      canvas.width = rect.width * dpr;
+      canvas.height = rect.height * dpr;
+      ctx.resetTransform();
+      ctx.scale(dpr, dpr);
+      updateSim();
+    }
+
+    function updateSim() {
+      if (currentSimMode === 'roots') {
+        labelR.textContent = root_r.toFixed(1);
+        labelTheta.textContent = `${root_theta}°`;
+        labelN.textContent = `n = ${root_n}`;
+
+        const rootRadius = Math.pow(root_r, 1 / root_n);
+        const deltaTheta = 360 / root_n;
+
+        canvasRadiusInfo.textContent = `รัศมีราก R = ${rootRadius.toFixed(3)}`;
+        canvasAngleStepBadge.textContent = `Δθ = ${deltaTheta.toFixed(1)}° (รูป ${root_n} เหลี่ยม)`;
+        rootsCountBadge.textContent = `ทั้งหมด ${root_n} คำตอบ (k = 0..${root_n - 1})`;
+
+        // Build Roots List
+        rootsListContainer.innerHTML = '';
+        const rootsData = [];
+
+        for (let k = 0; k < root_n; k++) {
+          const angleDeg = (root_theta + 360 * k) / root_n;
+          const normAngle = ((angleDeg % 360) + 360) % 360;
+          const rad = (normAngle * Math.PI) / 180;
+          const a = rootRadius * Math.cos(rad);
+          const b = rootRadius * Math.sin(rad);
+
+          rootsData.push({ k, angleDeg: normAngle, a, b, color: rootColors[k % rootColors.length] });
+
+          // Card Item
+          const sign = b >= 0 ? '+' : '-';
+          const card = document.createElement('div');
+          card.className = 'root-card p-2.5 rounded-xl bg-white border border-slate-200/80 shadow-2xs text-xs space-y-1 transition';
+          card.style.borderLeft = `4px solid ${rootColors[k % rootColors.length]}`;
+          card.innerHTML = `
+            <div class="flex items-center justify-between font-bold">
+              <span style="color: ${rootColors[k % rootColors.length]}">w_${k} (k=${k})</span>
+              <span class="font-mono text-slate-500">${normAngle.toFixed(1)}°</span>
+            </div>
+            <div class="font-mono text-slate-700 text-[11px] truncate">
+              ${rootRadius.toFixed(2)} cis ${normAngle.toFixed(1)}°
+            </div>
+            <div class="font-mono font-semibold text-slate-900 text-[11px] truncate">
+              = ${a.toFixed(2)} ${sign} ${Math.abs(b).toFixed(2)}i
+            </div>
+          `;
+          rootsListContainer.appendChild(card);
+        }
+
+        drawRootsCanvas(rootRadius, rootsData);
+
+      } else {
+        // Power Mode
+        labelPowR.textContent = pow_r.toFixed(2);
+        labelPowTheta.textContent = `${pow_theta}°`;
+        labelPowN.textContent = `n = ${pow_n}`;
+
+        const resR = Math.pow(pow_r, pow_n);
+        const resTheta = pow_theta * pow_n;
+        const normTheta = ((resTheta % 360) + 360) % 360;
+        const resRad = (normTheta * Math.PI) / 180;
+        const a = resR * Math.cos(resRad);
+        const b = resR * Math.sin(resRad);
+
+        const sign = b >= 0 ? '+' : '-';
+        powerResultMath.innerHTML = `
+          \\( z^${pow_n} = (${pow_r.toFixed(2)})^${pow_n} [\\cos(${pow_n} \\times ${pow_theta}^\\circ) + i\\sin(${pow_n} \\times ${pow_theta}^\\circ)] \\)<br>
+          \\( = ${resR.toFixed(2)}(\\cos ${normTheta}^\\circ + i\\sin ${normTheta}^\\circ) = ${a.toFixed(2)} ${sign} ${Math.abs(b).toFixed(2)}i \\)
+        `;
+
+        if (window.renderMathInElement) {
+          renderMathInElement(powerResultMath, { delimiters: [{left: '\\(', right: '\\)', display: false}] });
+        }
+
+        drawPowerCanvas(pow_r, pow_theta, resR, normTheta, pow_n);
+      }
+    }
+
+    // Canvas Draw: Roots Mode
+    function drawRootsCanvas(R, rootsData) {
+      const rect = canvas.getBoundingClientRect();
+      const w = rect.width;
+      const h = rect.height;
+      const centerX = w / 2;
+      const centerY = h / 2;
+
+      ctx.clearRect(0, 0, w, h);
+
+      // Determine scale to fit circle with padding
+      const maxRange = Math.max(R * 1.35, 2.5);
+      const scale = (Math.min(w, h) / 2) / maxRange;
+
+      // Draw Axes
+      ctx.lineWidth = 1;
+      ctx.strokeStyle = '#334155';
+      ctx.beginPath();
+      ctx.moveTo(0, centerY);
+      ctx.lineTo(w, centerY);
+      ctx.stroke();
+
+      ctx.beginPath();
+      ctx.moveTo(centerX, 0);
+      ctx.lineTo(centerX, h);
+      ctx.stroke();
+
+      // Axis labels
+      ctx.font = 'bold 11px Inter, sans-serif';
+      ctx.fillStyle = '#64748b';
+      ctx.fillText('+Re', w - 28, centerY - 8);
+      ctx.fillText('+Im', centerX + 8, 14);
+
+      // Draw Root Circle (dashed)
+      ctx.save();
+      ctx.lineWidth = 1.5;
+      ctx.setLineDash([4, 4]);
+      ctx.strokeStyle = 'rgba(99, 102, 241, 0.45)';
+      ctx.beginPath();
+      ctx.arc(centerX, centerY, R * scale, 0, Math.PI * 2);
+      ctx.stroke();
+      ctx.restore();
+
+      // Draw Regular Polygon (connecting roots)
+      if (rootsData.length >= 3) {
+        ctx.save();
+        ctx.lineWidth = 2;
+        ctx.strokeStyle = 'rgba(129, 140, 248, 0.5)';
+        ctx.fillStyle = 'rgba(99, 102, 241, 0.08)';
+        ctx.beginPath();
+        rootsData.forEach((rt, idx) => {
+          const px = centerX + rt.a * scale;
+          const py = centerY - rt.b * scale;
+          if (idx === 0) ctx.moveTo(px, py);
+          else ctx.lineTo(px, py);
+        });
+        ctx.closePath();
+        ctx.fill();
+        ctx.stroke();
+        ctx.restore();
+      } else if (rootsData.length === 2) {
+        // Line between 2 roots
+        ctx.save();
+        ctx.lineWidth = 2;
+        ctx.strokeStyle = 'rgba(129, 140, 248, 0.5)';
+        ctx.beginPath();
+        ctx.moveTo(centerX + rootsData[0].a * scale, centerY - rootsData[0].b * scale);
+        ctx.lineTo(centerX + rootsData[1].a * scale, centerY - rootsData[1].b * scale);
+        ctx.stroke();
+        ctx.restore();
+      }
+
+      // Draw Vectors and Points for each Root
+      rootsData.forEach((rt) => {
+        const px = centerX + rt.a * scale;
+        const py = centerY - rt.b * scale;
+
+        // Vector line
+        ctx.lineWidth = 2;
+        ctx.strokeStyle = rt.color;
+        ctx.beginPath();
+        ctx.moveTo(centerX, centerY);
+        ctx.lineTo(px, py);
+        ctx.stroke();
+
+        // Node circle
+        ctx.fillStyle = '#ffffff';
+        ctx.beginPath();
+        ctx.arc(px, py, 5, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.lineWidth = 2.5;
+        ctx.strokeStyle = rt.color;
+        ctx.stroke();
+
+        // Label
+        ctx.font = 'bold 11px Inter, Sarabun, sans-serif';
+        ctx.fillStyle = rt.color;
+        const rad = (rt.angleDeg * Math.PI) / 180;
+        const textDist = 14;
+        ctx.fillText(`w${rt.k}`, px + Math.cos(rad) * textDist - 4, py - Math.sin(rad) * textDist + 3);
+      });
+    }
+
+    // Canvas Draw: Power Mode
+    function drawPowerCanvas(r, theta, resR, resTheta, n) {
+      const rect = canvas.getBoundingClientRect();
+      const w = rect.width;
+      const h = rect.height;
+      const centerX = w / 2;
+      const centerY = h / 2;
+
+      ctx.clearRect(0, 0, w, h);
+
+      const maxLimit = Math.max(resR * 1.25, 3);
+      const scale = (Math.min(w, h) / 2) / maxLimit;
+
+      // Axes
+      ctx.lineWidth = 1;
+      ctx.strokeStyle = '#334155';
+      ctx.beginPath();
+      ctx.moveTo(0, centerY);
+      ctx.lineTo(w, centerY);
+      ctx.stroke();
+
+      ctx.beginPath();
+      ctx.moveTo(centerX, 0);
+      ctx.lineTo(centerX, h);
+      ctx.stroke();
+
+      // Draw base vector z (Blue)
+      const rad1 = (theta * Math.PI) / 180;
+      const px1 = centerX + r * Math.cos(rad1) * scale;
+      const py1 = centerY - r * Math.sin(rad1) * scale;
+
+      ctx.lineWidth = 2.5;
+      ctx.strokeStyle = '#3b82f6';
+      ctx.beginPath();
+      ctx.moveTo(centerX, centerY);
+      ctx.lineTo(px1, py1);
+      ctx.stroke();
+
+      ctx.fillStyle = '#3b82f6';
+      ctx.beginPath();
+      ctx.arc(px1, py1, 5, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.font = 'bold 11px Inter, sans-serif';
+      ctx.fillText(`z (${r.toFixed(1)}, ${theta}°)`, px1 + 8, py1 - 6);
+
+      // Draw Result vector z^n (Violet/Rose)
+      const rad2 = (resTheta * Math.PI) / 180;
+      const px2 = centerX + resR * Math.cos(rad2) * scale;
+      const py2 = centerY - resR * Math.sin(rad2) * scale;
+
+      ctx.lineWidth = 3;
+      ctx.strokeStyle = '#ec4899';
+      ctx.beginPath();
+      ctx.moveTo(centerX, centerY);
+      ctx.lineTo(px2, py2);
+      ctx.stroke();
+
+      ctx.fillStyle = '#ec4899';
+      ctx.beginPath();
+      ctx.arc(px2, py2, 6, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.font = 'bold 11px Inter, sans-serif';
+      ctx.fillText(`z^${n} (${resR.toFixed(1)}, ${resTheta.toFixed(0)}°)`, px2 + 8, py2 - 8);
+    }
+
+    // Slider Event Listeners
+    sliderR.addEventListener('input', (e) => {
+      root_r = parseFloat(e.target.value);
+      updateSim();
+    });
+    sliderTheta.addEventListener('input', (e) => {
+      root_theta = parseInt(e.target.value, 10);
+      updateSim();
+    });
+    sliderN.addEventListener('input', (e) => {
+      root_n = parseInt(e.target.value, 10);
+      updateSim();
+    });
+
+    sliderPowR.addEventListener('input', (e) => {
+      pow_r = parseFloat(e.target.value);
+      updateSim();
+    });
+    sliderPowTheta.addEventListener('input', (e) => {
+      pow_theta = parseInt(e.target.value, 10);
+      updateSim();
+    });
+    sliderPowN.addEventListener('input', (e) => {
+      pow_n = parseInt(e.target.value, 10);
+      updateSim();
+    });
+
+    // Guided Discovery Accordions
+    function toggleDiscovery(id) {
+      const ans = document.getElementById(`disc-ans-${id}`);
+      const chv = document.getElementById(`disc-chevron-${id}`);
+      if (ans.classList.contains('hidden')) {
+        ans.classList.remove('hidden');
+        chv.style.transform = 'rotate(180deg)';
+      } else {
+        ans.classList.add('hidden');
+        chv.style.transform = 'rotate(0deg)';
+      }
+    }
+
+    // Exercise Solution Toggles
+    function toggleExSol(id) {
+      document.getElementById(id).classList.toggle('hidden');
+    }
+
+    // Exercise Checkers
+    function checkEx1() {
+      const re = parseFloat(document.getElementById('ex1_re').value);
+      const im = parseFloat(document.getElementById('ex1_im').value);
+      const fb = document.getElementById('ex1_feedback');
+
+      if (re === -4 && (im === 0 || isNaN(im))) {
+        fb.innerHTML = '<span class="text-emerald-600">✓ ถูกต้องยอดเยี่ยม! (1+i)⁴ = -4</span>';
+      } else {
+        fb.innerHTML = '<span class="text-rose-600">✗ ยังไม่ถูกต้อง ลองเขียน 1+i ในรูปเชิงขั้วแล้วยกกำลัง 4</span>';
+      }
+    }
+
+    function checkEx2() {
+      const r = parseFloat(document.getElementById('ex2_r').value);
+      const t0 = parseFloat(document.getElementById('ex2_t0').value);
+      const t1 = parseFloat(document.getElementById('ex2_t1').value);
+      const t2 = parseFloat(document.getElementById('ex2_t2').value);
+      const fb = document.getElementById('ex2_feedback');
+
+      const isR = (r === 2);
+      const isAngles = (t0 === 0 && t1 === 120 && t2 === 240);
+
+      if (isR && isAngles) {
+        fb.innerHTML = '<span class="text-emerald-600">✓ ถูกต้องสมบูรณ์แบบ! R=2 และมุมคือ 0°, 120°, 240°</span>';
+      } else if (isR && !isAngles) {
+        fb.innerHTML = '<span class="text-amber-600">รัศมี R=2 ถูกต้องแล้ว แต่มุมทั้งสามยังไม่ตรง</span>';
+      } else {
+        fb.innerHTML = '<span class="text-rose-600">✗ ยังไม่ถูกต้อง รัศมีคือ ∛8 = 2 และแบ่งมุม 360°/3</span>';
+      }
+    }
+
+    function checkEx3() {
+      const selected = document.querySelector('input[name="ex3_opt"]:checked');
+      const fb = document.getElementById('ex3_feedback');
+
+      if (!selected) {
+        fb.innerHTML = '<span class="text-amber-600">โปรดเลือกคำตอบก่อน</span>';
+        return;
+      }
+
+      if (selected.value === 'correct') {
+        fb.innerHTML = '<span class="text-emerald-600">✓ ถูกต้องสมบูรณ์แบบ! R = 2 มุมคือ 45°, 135°, 225°, 315°</span>';
+      } else {
+        fb.innerHTML = '<span class="text-rose-600">✗ ยังไม่ถูกต้อง -16 มีมุมเริ่มต้น 180° แล้วหารด้วย 4 ได้ 45°</span>';
+      }
+    }
+
+    window.addEventListener('resize', resizeCanvas);
+
+    // Initial Load
+    window.onload = function() {
+      if (window.renderMathInElement) {
+        renderMathInElement(document.body, {
+          delimiters: [
+            {left: '$$', right: '$$', display: true},
+            {left: '\\[', right: '\\]', display: true},
+            {left: '\\(', right: '\\)', display: false},
+            {left: '$', right: '$', display: false}
+          ],
+          throwOnError: false
+        });
+      }
+      resizeCanvas();
+      updateSim();
+    };
+  </script>
+</body>
+</html>

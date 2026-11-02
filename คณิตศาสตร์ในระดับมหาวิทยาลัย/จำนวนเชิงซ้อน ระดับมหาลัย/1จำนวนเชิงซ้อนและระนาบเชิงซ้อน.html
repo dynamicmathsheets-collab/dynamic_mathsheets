@@ -1,0 +1,875 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>เรื่องที่ 1: ความหมายของจำนวนเชิงซ้อนและระนาบเชิงซ้อน</title>
+  
+  <!-- Google Fonts: Sarabun & Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Sarabun', 'Inter', 'sans-serif'],
+            mono: ['Courier New', 'monospace'],
+          },
+          colors: {
+            brand: {
+              50: '#eef2ff',
+              100: '#e0e7ff',
+              500: '#6366f1',
+              600: '#4f46e5',
+              700: '#4338ca',
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- KaTeX for Math Rendering -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js"></script>
+
+  <style>
+    /* ซ่อน scrollbar ส่วนเกินและปรับแต่งความลื่นไหล */
+    html {
+      scroll-behavior: smooth;
+    }
+    .grid-bg {
+      background-image: radial-gradient(#cbd5e1 1px, transparent 1px);
+      background-size: 20px 20px;
+    }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-800 font-sans antialiased selection:bg-indigo-100 selection:text-indigo-800">
+
+  <!-- Main Container: max-w-6xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 -->
+  <div class="max-w-6xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 space-y-8">
+    
+    <!-- Hero / Header Section -->
+    <header class="bg-white border border-slate-200/80 rounded-2xl shadow-sm p-6 sm:p-8 relative overflow-hidden">
+      <div class="absolute -right-16 -top-16 w-56 h-56 bg-gradient-to-br from-indigo-100 to-indigo-50 rounded-full blur-2xl opacity-60 pointer-events-none"></div>
+      <div class="relative z-10">
+        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold bg-indigo-50 text-indigo-700 border border-indigo-200/60 mb-3">
+          <span class="w-2 h-2 rounded-full bg-indigo-500 animate-pulse"></span>
+          สื่อการเรียนรู้เชิงโต้ตอบ (Interactive Learning)
+        </div>
+        <h1 class="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-slate-900 tracking-tight leading-tight">
+          เรื่องที่ 1: ความหมายของจำนวนเชิงซ้อนและระนาบเชิงซ้อน
+        </h1>
+        <p class="text-slate-500 text-sm sm:text-base mt-2">
+          บทนำสู่การขยายระบบจำนวน และการทำความเข้าใจระนาบเชิงซ้อน (Argand Diagram)
+        </p>
+
+        <!-- Learning Objectives Box -->
+        <div class="mt-6 p-4 sm:p-5 rounded-xl bg-gradient-to-r from-blue-50/80 to-indigo-50/50 border-l-4 border-indigo-600 text-slate-700">
+          <h2 class="text-sm uppercase tracking-wider font-bold text-indigo-900 flex items-center gap-2 mb-1.5">
+            <svg class="w-5 h-5 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
+            วัตถุประสงค์การเรียนรู้
+          </h2>
+          <p class="text-sm sm:text-base leading-relaxed text-slate-800">
+            นักศึกษาสามารถอธิบายความหมายของจำนวนเชิงซ้อน ระบุส่วนจริงและส่วนจินตภาพ ดำเนินการพื้นฐาน และแสดงจำนวนเชิงซ้อนบนระนาบเชิงซ้อนได้อย่างถูกต้อง
+          </p>
+        </div>
+      </div>
+    </header>
+
+    <!-- Content Sections (Grid 2 Columns on Desktop) -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+      
+      <!-- Theory Content (Left Column) -->
+      <section class="lg:col-span-5 space-y-6">
+        <div class="bg-white border border-slate-200/80 rounded-2xl p-6 shadow-sm">
+          <h2 class="text-lg font-bold text-slate-900 border-b border-slate-100 pb-3 mb-4 flex items-center gap-2">
+            <span class="flex items-center justify-center w-7 h-7 rounded-lg bg-indigo-600 text-white text-xs font-bold">1-5</span>
+            บทสรุปสาระสำคัญ
+          </h2>
+          
+          <div class="space-y-4 text-sm sm:text-base text-slate-700">
+            <!-- 1. ความหมายของจำนวนเชิงซ้อน -->
+            <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-200/60">
+              <h3 class="font-semibold text-slate-900 text-sm mb-1 text-indigo-900">1. ความหมายของจำนวนเชิงซ้อน</h3>
+              <p>จำนวนเชิงซ้อน (Complex Number) เขียนอยู่ในรูป:</p>
+              <div class="text-center py-2 my-1 bg-white rounded-lg border border-slate-200 font-mono text-base text-indigo-700">
+                \( z = a + bi \)
+              </div>
+              <p class="text-xs text-slate-500">โดยที่ \(a\) และ \(b\) เป็นจำนวนจริง (\(a, b \in \mathbb{R}\))</p>
+            </div>
+
+            <!-- 2. หน่วยจินตภาพ -->
+            <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-200/60">
+              <h3 class="font-semibold text-slate-900 text-sm mb-1 text-indigo-900">2. หน่วยจินตภาพ (Imaginary Unit)</h3>
+              <p>ใช้อักษรแทนด้วย \(i\) ซึ่งมีสมบัติพื้นฐานสำคัญคือ:</p>
+              <div class="text-center py-1.5 my-1 bg-white rounded-lg border border-slate-200 font-mono text-base text-amber-700">
+                \( i^2 = -1 \quad (\text{หรือ } i = \sqrt{-1}) \)
+              </div>
+            </div>
+
+            <!-- 3. ส่วนจริงและส่วนจินตภาพ -->
+            <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-200/60">
+              <h3 class="font-semibold text-slate-900 text-sm mb-1 text-indigo-900">3. ส่วนจริงและส่วนจินตภาพ</h3>
+              <p>สำหรับจำนวนเชิงซ้อน \(z = a + bi\):</p>
+              <ul class="list-disc list-inside mt-1 space-y-1 text-sm text-slate-600">
+                <li><strong class="text-slate-800">ส่วนจริง (Real part):</strong> \(\operatorname{Re}(z) = a\)</li>
+                <li><strong class="text-slate-800">ส่วนจินตภาพ (Imaginary part):</strong> \(\operatorname{Im}(z) = b\) <span class="text-xs text-rose-500 font-medium">*(ระวัง: ไม่นำ \(i\) มารวมในค่าส่วนจินตภาพ)*</span></li>
+              </ul>
+            </div>
+
+            <!-- 4. การเท่ากันของจำนวนเชิงซ้อน -->
+            <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-200/60">
+              <h3 class="font-semibold text-slate-900 text-sm mb-1 text-indigo-900">4. การเท่ากันของจำนวนเชิงซ้อน</h3>
+              <p class="text-sm">
+                ให้ \(a + bi = c + di\) จะได้ว่า
+              </p>
+              <div class="text-center py-1 my-1 bg-white rounded-lg border border-slate-200 text-sm font-semibold text-slate-800">
+                \(a = c\) และ \(b = d\)
+              </div>
+              <p class="text-xs text-slate-500">จำนวนเชิงซ้อนจะเท่ากันก็ต่อเมื่อส่วนจริงเท่ากัน และส่วนจินตภาพต้องเท่ากันด้วย</p>
+            </div>
+
+            <!-- 5. การแทนบนระนาบเชิงซ้อน -->
+            <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-200/60">
+              <h3 class="font-semibold text-slate-900 text-sm mb-1 text-indigo-900">5. การแทนบนระนาบเชิงซ้อน (Argand Plane)</h3>
+              <p class="text-sm text-slate-600">
+                เนื่องจาก \(z = a + bi\) ประกอบด้วยคู่ลำดับ \((a, b)\):
+              </p>
+              <div class="grid grid-cols-2 gap-2 mt-2 text-xs">
+                <div class="p-2 rounded-lg bg-blue-50 text-blue-900 text-center border border-blue-200/60">
+                  <div class="font-bold">แกนนอน (Re)</div>
+                  แทน ส่วนจริง (\(a\))
+                </div>
+                <div class="p-2 rounded-lg bg-emerald-50 text-emerald-900 text-center border border-emerald-200/60">
+                  <div class="font-bold">แกนตั้ง (Im)</div>
+                  แทน ส่วนจินตภาพ (\(b\))
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Interactive Complex Plane (Right Column) -->
+      <section class="lg:col-span-7 space-y-6">
+        <div class="bg-white border border-slate-200/80 rounded-2xl p-6 shadow-sm flex flex-col h-full">
+          <div class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-100 pb-3 mb-4">
+            <div>
+              <h2 class="text-lg font-bold text-slate-900 flex items-center gap-2">
+                <svg class="w-5 h-5 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 10l-2 1m0 0l-2-1m2 1v2.5M20 7l-2 1m2-1l-2-1m2 1v2.5M14 4l-2-1-2 1M4 7l2-1M4 7l2 1M4 7v2.5M12 21l-2-1m2 1l2-1m-2 1v-2.5M6 18l-2-1v-2.5M18 18l2-1v-2.5"></path>
+                </svg>
+                แบบจำลองระนาบเชิงซ้อน (Argand Diagram)
+              </h2>
+              <p class="text-xs text-slate-500">คลิกลากจุดบนระนาบ หรือปรับค่าสไลเดอร์ด้านล่างเพื่อสังเกตพิกัด</p>
+            </div>
+            
+            <!-- Badge Live Equation -->
+            <div id="equationBadge" class="px-3 py-1.5 rounded-xl bg-indigo-50 border border-indigo-200 text-indigo-900 font-mono text-sm sm:text-base font-bold shadow-sm">
+              <!-- Rendered dynamically -->
+            </div>
+          </div>
+
+          <!-- Canvas Container -->
+          <div class="relative w-full aspect-square max-h-[440px] mx-auto bg-slate-900 rounded-xl overflow-hidden shadow-inner border border-slate-800 touch-none cursor-crosshair">
+            <canvas id="complexCanvas" class="w-full h-full block"></canvas>
+            
+            <!-- Quick Helper Indicator -->
+            <div class="absolute bottom-2 left-2 bg-slate-800/80 backdrop-blur text-[11px] text-slate-300 px-2.5 py-1 rounded-md pointer-events-none border border-slate-700/60">
+              💡 คลิกหรือแตะลากจุดบนระนาบได้
+            </div>
+            <div id="hoverCoords" class="absolute top-2 right-2 bg-slate-800/80 backdrop-blur text-[11px] font-mono text-indigo-300 px-2 py-0.5 rounded-md pointer-events-none border border-slate-700/60 hidden">
+              (0, 0)
+            </div>
+          </div>
+
+          <!-- Interactive Controls -->
+          <div class="mt-5 space-y-4 bg-slate-50 p-4 rounded-xl border border-slate-200/80">
+            <!-- Slider a (Real) -->
+            <div>
+              <div class="flex justify-between items-center text-sm mb-1">
+                <span class="font-medium text-slate-700 flex items-center gap-1.5">
+                  <span class="w-3 h-3 rounded-full bg-blue-500 inline-block"></span>
+                  ส่วนจริง \(a = \operatorname{Re}(z)\)
+                </span>
+                <span id="valA" class="font-mono font-bold text-blue-700 bg-white px-2 py-0.5 rounded border border-blue-200 text-xs">3</span>
+              </div>
+              <input id="sliderA" type="range" min="-8" max="8" step="1" value="3" 
+                class="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-blue-600 focus:outline-none">
+            </div>
+
+            <!-- Slider b (Imaginary) -->
+            <div>
+              <div class="flex justify-between items-center text-sm mb-1">
+                <span class="font-medium text-slate-700 flex items-center gap-1.5">
+                  <span class="w-3 h-3 rounded-full bg-emerald-500 inline-block"></span>
+                  ส่วนจินตภาพ \(b = \operatorname{Im}(z)\)
+                </span>
+                <span id="valB" class="font-mono font-bold text-emerald-700 bg-white px-2 py-0.5 rounded border border-emerald-200 text-xs">2</span>
+              </div>
+              <input id="sliderB" type="range" min="-8" max="8" step="1" value="2" 
+                class="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-emerald-600 focus:outline-none">
+            </div>
+
+            <!-- Preset Buttons -->
+            <div class="pt-2 border-t border-slate-200/60">
+              <span class="text-xs font-semibold text-slate-500 block mb-2">เลือกตัวอย่างค่าล่วงหน้า (Presets):</span>
+              <div class="flex flex-wrap gap-2">
+                <button onclick="setZ(3, 2)" class="px-3 py-1.5 text-xs font-medium bg-white hover:bg-indigo-50 hover:text-indigo-600 text-slate-700 rounded-lg border border-slate-200 shadow-xs transition">
+                  ตัวอย่าง: \(z = 3 + 2i\)
+                </button>
+                <button onclick="setZ(-4, 0)" class="px-3 py-1.5 text-xs font-medium bg-white hover:bg-indigo-50 hover:text-indigo-600 text-slate-700 rounded-lg border border-slate-200 shadow-xs transition">
+                  จำนวนจริงแท้: \(z = -4\)
+                </button>
+                <button onclick="setZ(0, 5)" class="px-3 py-1.5 text-xs font-medium bg-white hover:bg-indigo-50 hover:text-indigo-600 text-slate-700 rounded-lg border border-slate-200 shadow-xs transition">
+                  จินตภาพแท้: \(z = 5i\)
+                </button>
+                <button onclick="setZ(-3, -4)" class="px-3 py-1.5 text-xs font-medium bg-white hover:bg-indigo-50 hover:text-indigo-600 text-slate-700 rounded-lg border border-slate-200 shadow-xs transition">
+                  ควอดรันต์ 3: \(z = -3 - 4i\)
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <!-- Guided Discovery Questions Section -->
+    <section class="bg-white border border-slate-200/80 rounded-2xl p-6 sm:p-8 shadow-sm">
+      <div class="flex items-center gap-3 mb-6">
+        <div class="w-10 h-10 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center border border-amber-200/60 shadow-xs">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path>
+          </svg>
+        </div>
+        <div>
+          <h2 class="text-xl font-bold text-slate-900">คำถามนำเพื่อการค้นพบ (Guided Discovery)</h2>
+          <p class="text-xs sm:text-sm text-slate-500">ทดลองตอบด้วยความเข้าใจตนเอง จากนั้นคลิกเพื่อตรวจสอบแนวคิด</p>
+        </div>
+      </div>
+
+      <div class="space-y-4">
+        <!-- Question 1 -->
+        <div class="border border-slate-200 rounded-xl overflow-hidden transition-all bg-slate-50/50">
+          <button onclick="toggleAnswer(1)" class="w-full text-left px-5 py-4 flex justify-between items-center gap-4 hover:bg-slate-100/60 transition">
+            <span class="font-semibold text-slate-800 text-sm sm:text-base flex items-center gap-3">
+              <span class="w-6 h-6 rounded-full bg-indigo-100 text-indigo-700 text-xs flex items-center justify-center font-bold">1</span>
+              เมื่อปรับค่า \(a\) แต่คงค่า \(b\) ไว้ จุดบนระนาบเคลื่อนที่ไปในทิศทางใด?
+            </span>
+            <span id="chevron-1" class="text-slate-400 transition-transform duration-200">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+            </span>
+          </button>
+          <div id="ans-1" class="hidden px-5 py-4 bg-white border-t border-slate-200 text-sm sm:text-base text-slate-700 space-y-2">
+            <p class="font-medium text-emerald-800 flex items-center gap-1.5">
+              <svg class="w-4 h-4 text-emerald-600 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+              แนวคิดคำตอบ:
+            </p>
+            <p>
+              จุดจะเคลื่อนที่ไปตาม <strong>แนวนอน (ขนานกับแกนส่วนจริง หรือ Real Axis)</strong> โดย:
+            </p>
+            <ul class="list-disc list-inside ml-2 text-slate-600 text-xs sm:text-sm space-y-1">
+              <li>ถ้า \(a\) เพิ่มขึ้น จุดจะเลื่อนไปทาง<strong>ขวา</strong></li>
+              <li>ถ้า \(a\) ลดลง จุดจะเลื่อนไปทาง<strong>ซ้าย</strong></li>
+              <li>ระดับความสูงตามแกนตั้ง (\(b\)) จะคงที่เสมอ</li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- Question 2 -->
+        <div class="border border-slate-200 rounded-xl overflow-hidden transition-all bg-slate-50/50">
+          <button onclick="toggleAnswer(2)" class="w-full text-left px-5 py-4 flex justify-between items-center gap-4 hover:bg-slate-100/60 transition">
+            <span class="font-semibold text-slate-800 text-sm sm:text-base flex items-center gap-3">
+              <span class="w-6 h-6 rounded-full bg-indigo-100 text-indigo-700 text-xs flex items-center justify-center font-bold">2</span>
+              จำนวนเชิงซ้อนสองจำนวนจะเท่ากันเมื่อใด?
+            </span>
+            <span id="chevron-2" class="text-slate-400 transition-transform duration-200">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+            </span>
+          </button>
+          <div id="ans-2" class="hidden px-5 py-4 bg-white border-t border-slate-200 text-sm sm:text-base text-slate-700 space-y-2">
+            <p class="font-medium text-emerald-800 flex items-center gap-1.5">
+              <svg class="w-4 h-4 text-emerald-600 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+              แนวคิดคำตอบ:
+            </p>
+            <p>
+              ให้ \(z_1 = a + bi\) และ \(z_2 = c + di\) จะได้ว่า \(z_1 = z_2\) ก็ต่อเมื่อ <strong>ส่วนจริงเท่ากัน และส่วนจินตภาพต้องเท่ากันด้วยพร้อมกัน</strong>
+            </p>
+            <div class="bg-slate-50 p-3 rounded-lg border border-slate-200 font-mono text-center text-sm font-semibold text-indigo-800">
+              \(a = c\) และ \(b = d\)
+            </div>
+            <p class="text-xs text-slate-500">ในมุมมองเรขาคณิต หมายถึง จุดทั้งสองต้องทับเป็นจุดเดียวกันบนระนาบเชิงซ้อน</p>
+          </div>
+        </div>
+
+        <!-- Question 3 -->
+        <div class="border border-slate-200 rounded-xl overflow-hidden transition-all bg-slate-50/50">
+          <button onclick="toggleAnswer(3)" class="w-full text-left px-5 py-4 flex justify-between items-center gap-4 hover:bg-slate-100/60 transition">
+            <span class="font-semibold text-slate-800 text-sm sm:text-base flex items-center gap-3">
+              <span class="w-6 h-6 rounded-full bg-indigo-100 text-indigo-700 text-xs flex items-center justify-center font-bold">3</span>
+              จำนวนจริงและจำนวนจินตภาพแท้เป็นกรณีพิเศษของจำนวนเชิงซ้อนอย่างไร?
+            </span>
+            <span id="chevron-3" class="text-slate-400 transition-transform duration-200">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+            </span>
+          </button>
+          <div id="ans-3" class="hidden px-5 py-4 bg-white border-t border-slate-200 text-sm sm:text-base text-slate-700 space-y-3">
+            <p class="font-medium text-emerald-800 flex items-center gap-1.5">
+              <svg class="w-4 h-4 text-emerald-600 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+              แนวคิดคำตอบ:
+            </p>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
+              <div class="p-3 bg-blue-50/60 rounded-lg border border-blue-100">
+                <span class="font-bold text-blue-900 block mb-1">1. จำนวนจริงแท้ (Pure Real Number)</span>
+                คือจำนวนเชิงซ้อนที่มี <strong>ส่วนจินตภาพเป็น 0 (\(b = 0\))</strong> ทำให้เหลือเพียง \(z = a + 0i = a\) ซึ่งอยู่บน <strong>แกนนอน</strong>
+              </div>
+              <div class="p-3 bg-emerald-50/60 rounded-lg border border-emerald-100">
+                <span class="font-bold text-emerald-900 block mb-1">2. จำนวนจินตภาพแท้ (Pure Imaginary)</span>
+                คือจำนวนเชิงซ้อนที่มี <strong>ส่วนจริงเป็น 0 (\(a = 0\)) แต่ \(b \neq 0\)</strong> ทำให้เหลือ \(z = 0 + bi = bi\) ซึ่งอยู่บน <strong>แกนตั้ง</strong>
+              </div>
+            </div>
+            <p class="text-xs text-slate-500">ดังนั้น เซตของจำนวนจริง (\(\mathbb{R}\)) จึงเป็นสับเซตของเซตจำนวนเชิงซ้อน (\(\mathbb{C}\))</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Student Exercises Section -->
+    <section class="bg-white border border-slate-200/80 rounded-2xl p-6 sm:p-8 shadow-sm">
+      <div class="flex items-center gap-3 mb-6">
+        <div class="w-10 h-10 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center border border-indigo-200/60 shadow-xs">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+          </svg>
+        </div>
+        <div>
+          <h2 class="text-xl font-bold text-slate-900">แบบฝึกหัดสำหรับนักศึกษา (Interactive Exercises)</h2>
+          <p class="text-xs sm:text-sm text-slate-500">ตอบคำถามแล้วกดปุ่ม "ตรวจคำตอบ" หรือ "แสดงเฉลย"</p>
+        </div>
+      </div>
+
+      <div class="space-y-6">
+        
+        <!-- Exercise 1 -->
+        <div class="p-5 rounded-xl border border-slate-200 bg-slate-50/40">
+          <h3 class="font-semibold text-slate-900 text-sm sm:text-base mb-3 flex items-center gap-2">
+            <span class="w-6 h-6 rounded-md bg-indigo-600 text-white text-xs flex items-center justify-center font-bold">1</span>
+            จงระบุส่วนจริงและส่วนจินตภาพของ \(z = -4 + 7i\)
+          </h3>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-md">
+            <div>
+              <label class="block text-xs font-semibold text-slate-600 mb-1">ส่วนจริง \(\operatorname{Re}(z)\):</label>
+              <input id="ex1_re" type="number" placeholder="เช่น -4" class="w-full px-3 py-2 rounded-lg border border-slate-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-sm font-mono">
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-600 mb-1">ส่วนจินตภาพ \(\operatorname{Im}(z)\):</label>
+              <input id="ex1_im" type="number" placeholder="เช่น 7" class="w-full px-3 py-2 rounded-lg border border-slate-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-sm font-mono">
+            </div>
+          </div>
+          <div class="mt-4 flex flex-wrap gap-2 items-center">
+            <button onclick="checkEx1()" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs sm:text-sm font-medium rounded-lg shadow-sm transition">
+              ตรวจคำตอบ
+            </button>
+            <button onclick="showEx1Solution()" class="px-4 py-2 bg-white hover:bg-slate-100 text-slate-700 text-xs sm:text-sm font-medium rounded-lg border border-slate-200 transition">
+              ดูเฉลยละเอียด
+            </button>
+            <div id="ex1_feedback" class="text-xs sm:text-sm font-semibold"></div>
+          </div>
+          <div id="ex1_sol" class="hidden mt-3 p-3 bg-white rounded-lg border border-slate-200 text-xs sm:text-sm text-slate-700">
+            <strong>เฉลย:</strong> ส่วนจริงคือ \(\operatorname{Re}(z) = -4\) และส่วนจินตภาพคือ \(\operatorname{Im}(z) = 7\) (ข้อควรระวัง: ส่วนจินตภาพคือค่าสัมประสิทธิ์หน้า \(i\) ไม่ต้องใส่ตัวอักษร \(i\) มาด้วย)
+          </div>
+        </div>
+
+        <!-- Exercise 2 -->
+        <div class="p-5 rounded-xl border border-slate-200 bg-slate-50/40">
+          <h3 class="font-semibold text-slate-900 text-sm sm:text-base mb-3 flex items-center gap-2">
+            <span class="w-6 h-6 rounded-md bg-indigo-600 text-white text-xs flex items-center justify-center font-bold">2</span>
+            จงแทน \(z = -2 - 3i\) เป็นจุดบนระนาบเชิงซ้อน พร้อมระบุพิกัด \((x, y)\)
+          </h3>
+          <div class="flex flex-wrap items-center gap-2 max-w-sm mb-3">
+            <span class="font-bold text-slate-600">(</span>
+            <input id="ex2_x" type="number" placeholder="x (Re)" class="w-24 px-3 py-2 rounded-lg border border-slate-300 focus:ring-2 focus:ring-indigo-500 text-center font-mono text-sm">
+            <span class="font-bold text-slate-600">,</span>
+            <input id="ex2_y" type="number" placeholder="y (Im)" class="w-24 px-3 py-2 rounded-lg border border-slate-300 focus:ring-2 focus:ring-indigo-500 text-center font-mono text-sm">
+            <span class="font-bold text-slate-600">)</span>
+          </div>
+          <div class="flex flex-wrap gap-2 items-center">
+            <button onclick="checkEx2()" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs sm:text-sm font-medium rounded-lg shadow-sm transition">
+              ตรวจและแสดงบนระนาบ
+            </button>
+            <button onclick="showEx2Solution()" class="px-4 py-2 bg-white hover:bg-slate-100 text-slate-700 text-xs sm:text-sm font-medium rounded-lg border border-slate-200 transition">
+              ดูเฉลยละเอียด
+            </button>
+            <div id="ex2_feedback" class="text-xs sm:text-sm font-semibold"></div>
+          </div>
+          <div id="ex2_sol" class="hidden mt-3 p-3 bg-white rounded-lg border border-slate-200 text-xs sm:text-sm text-slate-700">
+            <strong>เฉลย:</strong> พิกัดคือ \((-2, -3)\) อยู่ในควอดรันต์ที่ 3 (ด้านล่างซ้าย) โดยมีแกนนอน \(= -2\) และแกนตั้ง \(= -3\)
+          </div>
+        </div>
+
+        <!-- Exercise 3 -->
+        <div class="p-5 rounded-xl border border-slate-200 bg-slate-50/40">
+          <h3 class="font-semibold text-slate-900 text-sm sm:text-base mb-3 flex items-center gap-2">
+            <span class="w-6 h-6 rounded-md bg-indigo-600 text-white text-xs flex items-center justify-center font-bold">3</span>
+            จงอธิบายว่าเหตุใด \(3 + 2i \neq 3 - 2i\)
+          </h3>
+          <p class="text-xs text-slate-500 mb-2">เลือกเหตุผลที่ถูกต้องที่สุดตามนิยามการเท่ากันของจำนวนเชิงซ้อน:</p>
+          <div class="space-y-2 mb-3">
+            <label class="flex items-center gap-3 p-3 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 cursor-pointer text-sm">
+              <input type="radio" name="ex3" value="wrong1" class="text-indigo-600 focus:ring-indigo-500">
+              <span>เพราะส่วนจริงของทั้งสองตัวไม่เท่ากัน (\(3 \neq 3\))</span>
+            </label>
+            <label class="flex items-center gap-3 p-3 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 cursor-pointer text-sm">
+              <input type="radio" name="ex3" value="correct" class="text-indigo-600 focus:ring-indigo-500">
+              <span>เพราะส่วนจินตภาพไม่เท่ากัน โดย \(2 \neq -2\) แม้ว่าส่วนจริงจะเท่ากันก็ตาม</span>
+            </label>
+            <label class="flex items-center gap-3 p-3 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 cursor-pointer text-sm">
+              <input type="radio" name="ex3" value="wrong2" class="text-indigo-600 focus:ring-indigo-500">
+              <span>เพราะเครื่องหมายบวกกับลบไม่สามารถอยู่บนระนาบเดียวกันได้</span>
+            </label>
+          </div>
+          <div class="flex flex-wrap gap-2 items-center">
+            <button onclick="checkEx3()" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs sm:text-sm font-medium rounded-lg shadow-sm transition">
+              ตรวจคำตอบ
+            </button>
+            <button onclick="showEx3Solution()" class="px-4 py-2 bg-white hover:bg-slate-100 text-slate-700 text-xs sm:text-sm font-medium rounded-lg border border-slate-200 transition">
+              ดูคำอธิบายทางเรขาคณิต
+            </button>
+            <div id="ex3_feedback" class="text-xs sm:text-sm font-semibold"></div>
+          </div>
+          <div id="ex3_sol" class="hidden mt-3 p-3 bg-white rounded-lg border border-slate-200 text-xs sm:text-sm text-slate-700 leading-relaxed">
+            <strong>คำอธิบาย:</strong> จำนวนเชิงซ้อนจะเท่ากันได้ ทั้งส่วนจริงและส่วนจินตภาพต้องมีค่าตรงกันทุกประการ ในกรณีนี้ ส่วนจริงเท่ากันคือ \(3 = 3\) แต่ส่วนจินตภาพคือ \(2\) และ \(-2\) ซึ่ง \(2 \neq -2\) จึงทำให้ \(3+2i \neq 3-2i\)<br>
+            <span class="text-indigo-700 font-medium">ในเชิงเรขาคณิต:</span> \(3+2i\) แทนจุด \((3, 2)\) ซึ่งอยู่เหนือแกนนอน ส่วน \(3-2i\) แทนจุด \((3, -2)\) ซึ่งอยู่ใต้แกนนอน (ทั้งสองเป็นสังยุคซึ่งกันและกัน ไม่ใช่จุดเดียวกัน)
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- Footer Note -->
+    <footer class="text-center text-xs text-slate-400 py-4 border-t border-slate-200/60">
+      สื่อประกอบการสอนวิชาคณิตศาสตร์ • เรื่องระบบจำนวนเชิงซ้อนและระนาบเชิงซ้อน (Argand Plane)
+    </footer>
+
+  </div>
+
+  <!-- Interactive Canvas & Application Script -->
+  <script>
+    // State Variables
+    let currentA = 3;
+    let currentB = 2;
+    const minVal = -8;
+    const maxVal = 8;
+    let isDragging = false;
+
+    // DOM Elements
+    const canvas = document.getElementById('complexCanvas');
+    const ctx = canvas.getContext('2d');
+    const sliderA = document.getElementById('sliderA');
+    const sliderB = document.getElementById('sliderB');
+    const valA = document.getElementById('valA');
+    const valB = document.getElementById('valB');
+    const equationBadge = document.getElementById('equationBadge');
+    const hoverCoords = document.getElementById('hoverCoords');
+
+    // Resize Canvas keeping sharpness
+    function resizeCanvas() {
+      const rect = canvas.getBoundingClientRect();
+      const dpr = window.devicePixelRatio || 1;
+      canvas.width = rect.width * dpr;
+      canvas.height = rect.height * dpr;
+      ctx.resetTransform();
+      ctx.scale(dpr, dpr);
+      draw();
+    }
+
+    // Coordinate conversion: Math -> Canvas
+    function toCanvasCoords(a, b, width, height) {
+      const centerX = width / 2;
+      const centerY = height / 2;
+      const scale = width / (maxVal - minVal + 2); // scale based on range
+      const x = centerX + a * scale;
+      const y = centerY - b * scale; // Invert Y
+      return { x, y, scale };
+    }
+
+    // Coordinate conversion: Canvas -> Math
+    function toMathCoords(clientX, clientY) {
+      const rect = canvas.getBoundingClientRect();
+      const width = rect.width;
+      const height = rect.height;
+      const xPix = clientX - rect.left;
+      const yPix = clientY - rect.top;
+      
+      const centerX = width / 2;
+      const centerY = height / 2;
+      const scale = width / (maxVal - minVal + 2);
+
+      let a = Math.round((xPix - centerX) / scale);
+      let b = Math.round((centerY - yPix) / scale);
+
+      // Clamp values
+      a = Math.max(minVal, Math.min(maxVal, a));
+      b = Math.max(minVal, Math.min(maxVal, b));
+
+      return { a, b };
+    }
+
+    // Render Canvas Scene
+    function draw() {
+      const rect = canvas.getBoundingClientRect();
+      const width = rect.width;
+      const height = rect.height;
+
+      ctx.clearRect(0, 0, width, height);
+
+      const centerX = width / 2;
+      const centerY = height / 2;
+      const scale = width / (maxVal - minVal + 2);
+
+      // 1. Draw Grid Lines
+      ctx.lineWidth = 1;
+      ctx.strokeStyle = '#1e293b'; // Slate 800
+      ctx.fillStyle = '#64748b';  // Slate 500
+      ctx.font = '10px Inter, sans-serif';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+
+      for (let i = minVal; i <= maxVal; i++) {
+        if (i === 0) continue;
+        const x = centerX + i * scale;
+        const y = centerY - i * scale;
+
+        // Vertical Grid Line
+        ctx.beginPath();
+        ctx.moveTo(x, 0);
+        ctx.lineTo(x, height);
+        ctx.stroke();
+
+        // Horizontal Grid Line
+        ctx.beginPath();
+        ctx.moveTo(0, y);
+        ctx.lineTo(width, y);
+        ctx.stroke();
+
+        // Grid numbers
+        ctx.fillText(i, x, centerY + 14);
+        ctx.fillText(i + 'i', centerX - 14, y);
+      }
+
+      // 2. Draw Main Axes
+      ctx.lineWidth = 2;
+      ctx.strokeStyle = '#94a3b8'; // Slate 400
+
+      // Re Axis (Horizontal)
+      ctx.beginPath();
+      ctx.moveTo(0, centerY);
+      ctx.lineTo(width, centerY);
+      ctx.stroke();
+
+      // Im Axis (Vertical)
+      ctx.beginPath();
+      ctx.moveTo(centerX, 0);
+      ctx.lineTo(centerX, height);
+      ctx.stroke();
+
+      // Axes Labels
+      ctx.font = 'bold 12px Inter, sans-serif';
+      ctx.fillStyle = '#38bdf8'; // Sky 400
+      ctx.fillText('Re (ส่วนจริง)', width - 42, centerY - 14);
+
+      ctx.fillStyle = '#34d399'; // Emerald 400
+      ctx.fillText('Im (ส่วนจินตภาพ)', centerX + 56, 16);
+
+      // Origin Point
+      ctx.fillStyle = '#cbd5e1';
+      ctx.fillText('O (0,0)', centerX - 16, centerY + 14);
+
+      // 3. Projections & Dashed Lines
+      const { x: pX, y: pY } = toCanvasCoords(currentA, currentB, width, height);
+
+      ctx.setLineDash([4, 4]);
+      ctx.lineWidth = 1.5;
+
+      // Projection to Re axis
+      ctx.strokeStyle = '#38bdf8'; // Cyan
+      ctx.beginPath();
+      ctx.moveTo(pX, pY);
+      ctx.lineTo(pX, centerY);
+      ctx.stroke();
+
+      // Projection to Im axis
+      ctx.strokeStyle = '#34d399'; // Green
+      ctx.beginPath();
+      ctx.moveTo(pX, pY);
+      ctx.lineTo(centerX, pY);
+      ctx.stroke();
+
+      ctx.setLineDash([]); // Reset line dash
+
+      // 4. Vector from Origin to Point
+      ctx.lineWidth = 2.5;
+      ctx.strokeStyle = '#818cf8'; // Indigo 400
+      ctx.beginPath();
+      ctx.moveTo(centerX, centerY);
+      ctx.lineTo(pX, pY);
+      ctx.stroke();
+
+      // Draw Arrow Head on Vector
+      const angle = Math.atan2(pY - centerY, pX - centerX);
+      const headlen = 8;
+      if (currentA !== 0 || currentB !== 0) {
+        ctx.fillStyle = '#818cf8';
+        ctx.beginPath();
+        ctx.moveTo(pX, pY);
+        ctx.lineTo(pX - headlen * Math.cos(angle - Math.PI / 6), pY - headlen * Math.sin(angle - Math.PI / 6));
+        ctx.lineTo(pX - headlen * Math.cos(angle + Math.PI / 6), pY - headlen * Math.sin(angle + Math.PI / 6));
+        ctx.fill();
+      }
+
+      // 5. Point z = (a, b)
+      ctx.shadowColor = '#6366f1';
+      ctx.shadowBlur = 12;
+      ctx.fillStyle = '#ffffff';
+      ctx.beginPath();
+      ctx.arc(pX, pY, 7, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.lineWidth = 2.5;
+      ctx.strokeStyle = '#6366f1';
+      ctx.stroke();
+      ctx.shadowBlur = 0; // reset
+
+      // Coordinate Label Tag
+      const signStr = currentB >= 0 ? `+ ${currentB}i` : `- ${Math.abs(currentB)}i`;
+      const zLabel = `z = ${currentA} ${signStr}`;
+      const coordLabel = `(${currentA}, ${currentB})`;
+
+      ctx.font = 'bold 12px Inter, Sarabun, sans-serif';
+      ctx.fillStyle = '#ffffff';
+      ctx.textAlign = 'left';
+      
+      // Determine label offset based on quadrant
+      const offsetX = currentA >= 0 ? 12 : -85;
+      const offsetY = currentB >= 0 ? -12 : 22;
+
+      ctx.fillStyle = 'rgba(15, 23, 42, 0.85)';
+      ctx.fillRect(pX + offsetX - 6, pY + offsetY - 14, 96, 32);
+      ctx.strokeStyle = '#475569';
+      ctx.lineWidth = 1;
+      ctx.strokeRect(pX + offsetX - 6, pY + offsetY - 14, 96, 32);
+
+      ctx.fillStyle = '#a5b4fc';
+      ctx.fillText(zLabel, pX + offsetX, pY + offsetY);
+      ctx.fillStyle = '#cbd5e1';
+      ctx.font = '10px Inter, sans-serif';
+      ctx.fillText(coordLabel, pX + offsetX, pY + offsetY + 14);
+    }
+
+    // Update UI elements and Equation Badge
+    function updateUI() {
+      sliderA.value = currentA;
+      sliderB.value = currentB;
+      valA.textContent = currentA;
+      valB.textContent = currentB;
+
+      // Format complex string
+      let compStr = '';
+      if (currentA === 0 && currentB === 0) {
+        compStr = '0';
+      } else if (currentA === 0) {
+        compStr = currentB === 1 ? 'i' : currentB === -1 ? '-i' : `${currentB}i`;
+      } else if (currentB === 0) {
+        compStr = `${currentA}`;
+      } else {
+        const sign = currentB > 0 ? '+' : '-';
+        const bVal = Math.abs(currentB) === 1 ? '' : Math.abs(currentB);
+        compStr = `${currentA} ${sign} ${bVal}i`;
+      }
+
+      equationBadge.innerHTML = `\\( z = ${compStr} \\iff (${currentA}, ${currentB}) \\)`;
+      
+      // Render KaTeX for Badge
+      if (window.renderMathInElement) {
+        renderMathInElement(equationBadge, {
+          delimiters: [{left: '\\(', right: '\\)', display: false}]
+        });
+      }
+
+      draw();
+    }
+
+    // Set z directly (used by presets & exercises)
+    function setZ(a, b) {
+      currentA = a;
+      currentB = b;
+      updateUI();
+    }
+
+    // Sliders Listeners
+    sliderA.addEventListener('input', (e) => {
+      currentA = parseInt(e.target.value, 10);
+      updateUI();
+    });
+
+    sliderB.addEventListener('input', (e) => {
+      currentB = parseInt(e.target.value, 10);
+      updateUI();
+    });
+
+    // Mouse & Touch Interactivity on Canvas
+    function handlePointerMove(e) {
+      const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+      const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+      const { a, b } = toMathCoords(clientX, clientY);
+
+      hoverCoords.classList.remove('hidden');
+      hoverCoords.textContent = `พิกัด (${a}, ${b})`;
+
+      if (isDragging) {
+        currentA = a;
+        currentB = b;
+        updateUI();
+      }
+    }
+
+    canvas.addEventListener('mousedown', (e) => {
+      isDragging = true;
+      handlePointerMove(e);
+    });
+
+    window.addEventListener('mouseup', () => {
+      isDragging = false;
+    });
+
+    canvas.addEventListener('mousemove', handlePointerMove);
+
+    canvas.addEventListener('mouseleave', () => {
+      hoverCoords.classList.add('hidden');
+    });
+
+    // Touch events for mobile support
+    canvas.addEventListener('touchstart', (e) => {
+      isDragging = true;
+      handlePointerMove(e);
+      e.preventDefault();
+    }, { passive: false });
+
+    canvas.addEventListener('touchmove', (e) => {
+      handlePointerMove(e);
+      e.preventDefault();
+    }, { passive: false });
+
+    window.addEventListener('touchend', () => {
+      isDragging = false;
+    });
+
+    // Window Resize Observer
+    window.addEventListener('resize', resizeCanvas);
+
+    // Toggle Answers Accordion
+    function toggleAnswer(id) {
+      const ans = document.getElementById(`ans-${id}`);
+      const chevron = document.getElementById(`chevron-${id}`);
+      if (ans.classList.contains('hidden')) {
+        ans.classList.remove('hidden');
+        chevron.style.transform = 'rotate(180deg)';
+      } else {
+        ans.classList.add('hidden');
+        chevron.style.transform = 'rotate(0deg)';
+      }
+    }
+
+    // --- Interactive Exercises Functions ---
+    // Exercise 1
+    function checkEx1() {
+      const reVal = document.getElementById('ex1_re').value.trim();
+      const imVal = document.getElementById('ex1_im').value.trim();
+      const feedback = document.getElementById('ex1_feedback');
+
+      if (reVal === '-4' && imVal === '7') {
+        feedback.innerHTML = '<span class="text-emerald-600">✓ ถูกต้องยอดเยี่ยม! Re(z) = -4, Im(z) = 7</span>';
+      } else {
+        feedback.innerHTML = '<span class="text-rose-600">✗ ยังไม่ถูกต้อง ลองตรวจสอบเครื่องหมายและสัมประสิทธิ์หน้า i</span>';
+      }
+    }
+
+    function showEx1Solution() {
+      const sol = document.getElementById('ex1_sol');
+      sol.classList.toggle('hidden');
+    }
+
+    // Exercise 2
+    function checkEx2() {
+      const x = document.getElementById('ex2_x').value.trim();
+      const y = document.getElementById('ex2_y').value.trim();
+      const feedback = document.getElementById('ex2_feedback');
+
+      if (x === '-2' && y === '-3') {
+        feedback.innerHTML = '<span class="text-emerald-600">✓ ถูกต้อง! พิกัดคือ (-2, -3) จุดถูกตั้งค่าบนระนาบแล้ว</span>';
+        setZ(-2, -3);
+        // เลื่อนหน้าจอเล็กน้อยเพื่อให้เห็น Canvas ถ้าจำเป็น
+        canvas.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      } else {
+        feedback.innerHTML = '<span class="text-rose-600">✗ ยังไม่ถูกต้อง จำไว้ว่าพิกัดคือ (Re, Im)</span>';
+      }
+    }
+
+    function showEx2Solution() {
+      const sol = document.getElementById('ex2_sol');
+      sol.classList.toggle('hidden');
+    }
+
+    // Exercise 3
+    function checkEx3() {
+      const selected = document.querySelector('input[name="ex3"]:checked');
+      const feedback = document.getElementById('ex3_feedback');
+
+      if (!selected) {
+        feedback.innerHTML = '<span class="text-amber-600">โปรดเลือกคำตอบก่อน</span>';
+        return;
+      }
+
+      if (selected.value === 'correct') {
+        feedback.innerHTML = '<span class="text-emerald-600">✓ ถูกต้องสมบูรณ์แบบ! เพราะส่วนจินตภาพ 2 ≠ -2</span>';
+      } else {
+        feedback.innerHTML = '<span class="text-rose-600">✗ ยังไม่ถูกต้อง ลองพิจารณานิยามการเท่ากันของส่วนจริงและส่วนจินตภาพ</span>';
+      }
+    }
+
+    function showEx3Solution() {
+      const sol = document.getElementById('ex3_sol');
+      sol.classList.toggle('hidden');
+    }
+
+    // Initial Setup on Page Load
+    window.onload = function () {
+      // 1. Initial Math Rendering with KaTeX
+      if (window.renderMathInElement) {
+        renderMathInElement(document.body, {
+          delimiters: [
+            {left: '$$', right: '$$', display: true},
+            {left: '\\[', right: '\\]', display: true},
+            {left: '\\(', right: '\\)', display: false},
+            {left: '$', right: '$', display: false}
+          ],
+          throwOnError: false
+        });
+      }
+
+      // 2. Initial Canvas Draw
+      resizeCanvas();
+      updateUI();
+    };
+  </script>
+</body>
+</html>

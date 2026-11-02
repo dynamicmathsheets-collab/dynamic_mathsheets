@@ -1,0 +1,976 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>เรื่องที่ 3: โมดูลัสและอาร์กิวเมนต์ของจำนวนเชิงซ้อน</title>
+
+  <!-- Google Fonts: Sarabun & Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Sarabun', 'Inter', 'sans-serif'],
+            mono: ['Courier New', 'monospace'],
+          },
+          colors: {
+            brand: {
+              50: '#eef2ff',
+              100: '#e0e7ff',
+              500: '#6366f1',
+              600: '#4f46e5',
+              700: '#4338ca',
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- KaTeX for Math Rendering -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js"></script>
+
+  <style>
+    html {
+      scroll-behavior: smooth;
+    }
+    input[type=range]::-webkit-slider-thumb {
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-800 font-sans antialiased selection:bg-indigo-100 selection:text-indigo-800">
+
+  <!-- Main Container: Strict Width 1,152px -->
+  <div class="max-w-6xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 space-y-8">
+
+    <!-- Header Section -->
+    <header class="bg-white border border-slate-200/80 rounded-2xl shadow-sm p-6 sm:p-8 relative overflow-hidden">
+      <div class="absolute -right-16 -top-16 w-60 h-60 bg-gradient-to-br from-indigo-100 via-sky-50 to-emerald-50 rounded-full blur-2xl opacity-70 pointer-events-none"></div>
+      <div class="relative z-10">
+        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold bg-indigo-50 text-indigo-700 border border-indigo-200/60 mb-3">
+          <span class="w-2 h-2 rounded-full bg-indigo-500 animate-pulse"></span>
+          สื่อการเรียนรู้เชิงโต้ตอบ (Interactive Learning)
+        </div>
+        <h1 class="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-slate-900 tracking-tight leading-tight">
+          เรื่องที่ 3: โมดูลัสและอาร์กิวเมนต์ของจำนวนเชิงซ้อน
+        </h1>
+        <p class="text-slate-500 text-sm sm:text-base mt-2">
+          (Modulus and Argument of Complex Numbers & Introduction to Polar Form)
+        </p>
+
+        <!-- Learning Objectives -->
+        <div class="mt-6 p-4 sm:p-5 rounded-xl bg-gradient-to-r from-blue-50/90 to-indigo-50/60 border-l-4 border-indigo-600 text-slate-700 shadow-xs">
+          <h2 class="text-sm uppercase tracking-wider font-bold text-indigo-900 flex items-center gap-2 mb-1.5">
+            <svg class="w-5 h-5 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
+            วัตถุประสงค์การเรียนรู้
+          </h2>
+          <p class="text-sm sm:text-base leading-relaxed text-slate-800">
+            นักศึกษาสามารถหาโมดูลัสและอาร์กิวเมนต์ของจำนวนเชิงซ้อน อธิบายความหมายทางเรขาคณิต และเชื่อมโยงกับการเขียนจำนวนเชิงซ้อนในรูปเชิงขั้วได้
+          </p>
+        </div>
+      </div>
+    </header>
+
+    <!-- Main Content & Simulator Grid -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+
+      <!-- Left Column: Structured Theory -->
+      <section class="lg:col-span-5 space-y-5">
+        <div class="bg-white border border-slate-200/80 rounded-2xl p-6 shadow-sm">
+          <h2 class="text-lg font-bold text-slate-900 border-b border-slate-100 pb-3 mb-4 flex items-center gap-2">
+            <span class="flex items-center justify-center w-7 h-7 rounded-lg bg-indigo-600 text-white text-xs font-bold">1-5</span>
+            บทสรุปสาระสำคัญทางทฤษฎี
+          </h2>
+
+          <div class="space-y-4 text-sm sm:text-base text-slate-700">
+
+            <!-- 1. โมดูลัส -->
+            <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-200/70">
+              <h3 class="font-semibold text-slate-900 text-xs sm:text-sm text-indigo-950">1. โมดูลัส (Modulus: \(|z|\) หรือ \(r\))</h3>
+              <p class="text-xs text-slate-500 mt-0.5">คือระยะทางจากจุดกำเนิด \((0,0)\) ถึงจุด \((a, b)\) บนระนาบ</p>
+              <div class="mt-2 text-center py-2 bg-white rounded-lg border border-slate-200 font-mono text-base text-indigo-700">
+                \[ |z| = \sqrt{a^2 + b^2} \]
+              </div>
+              <p class="text-xs text-slate-500 mt-1">โดยที่ \(|z| \ge 0\) เสมอ และ \(|z| = 0 \iff z = 0\)</p>
+            </div>
+
+            <!-- 2. อาร์กิวเมนต์ -->
+            <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-200/70">
+              <h3 class="font-semibold text-slate-900 text-xs sm:text-sm text-indigo-950">2. อาร์กิวเมนต์ (Argument: \(\arg z\))</h3>
+              <p class="text-xs text-slate-600 mt-0.5">
+                สำหรับ \(z \neq 0\) คือมุมที่วัดทวนเข็มนาฬิกาจากแกนจริงบวก (\(+{\rm Re}\)) ไปยังเวกเตอร์ \(z\) ซึ่งมุมนี้มีได้ไม่สิ้นสุด:
+              </p>
+              <div class="mt-2 text-center py-1.5 bg-white rounded-lg border border-slate-200 font-mono text-sm text-slate-800">
+                \( \arg z = \theta + 360^\circ k \quad (k \in \mathbb{Z}) \)
+              </div>
+              <div class="mt-2 text-xs text-rose-700 bg-rose-50 border border-rose-200 p-2 rounded-lg">
+                ⚠️ <strong>ข้อควรระวัง:</strong> ในกรณีจำนวนเชิงซ้อนศูนย์ \(z = 0\) จะ<strong>ไม่นิยาม</strong>อาร์กิวเมนต์
+              </div>
+            </div>
+
+            <!-- 3. กฎจตุภาค -->
+            <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-200/70">
+              <h3 class="font-semibold text-slate-900 text-xs sm:text-sm text-indigo-950">3. การหาอาร์กิวเมนต์ในแต่ละจตุภาค</h3>
+              <p class="text-xs text-slate-500 mb-2">กำหนดมุมอ้างอิง \(\alpha = \arctan\left|\frac{b}{a}\right|\):</p>
+              <div class="grid grid-cols-2 gap-2 text-xs font-mono">
+                <div class="p-2 bg-white rounded-lg border border-slate-200">
+                  <span class="font-bold text-indigo-700">Q1</span> (\(a>0, b>0\)):<br>
+                  \(\theta = \alpha\)
+                </div>
+                <div class="p-2 bg-white rounded-lg border border-slate-200">
+                  <span class="font-bold text-indigo-700">Q2</span> (\(a<0, b>0\)):<br>
+                  \(\theta = 180^\circ - \alpha\)
+                </div>
+                <div class="p-2 bg-white rounded-lg border border-slate-200">
+                  <span class="font-bold text-indigo-700">Q3</span> (\(a<0, b<0\)):<br>
+                  \(\theta = 180^\circ + \alpha\) หรือ \(-180^\circ + \alpha\)
+                </div>
+                <div class="p-2 bg-white rounded-lg border border-slate-200">
+                  <span class="font-bold text-indigo-700">Q4</span> (\(a>0, b<0\)):<br>
+                  \(\theta = 360^\circ - \alpha\) หรือ \(-\alpha\)
+                </div>
+              </div>
+            </div>
+
+            <!-- 4. อาร์กิวเมนต์หลัก -->
+            <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-200/70">
+              <h3 class="font-semibold text-slate-900 text-xs sm:text-sm text-indigo-950">4. อาร์กิวเมนต์หลัก (Principal Argument: \(\operatorname{Arg} z\))</h3>
+              <p class="text-xs text-slate-600 mt-0.5">
+                นิยมกำหนดให้อยู่ในช่วงมาตรฐาน:
+              </p>
+              <div class="mt-1 text-center py-1 bg-white rounded-lg border border-slate-200 font-mono text-xs text-emerald-700 font-bold">
+                \( -\pi < \operatorname{Arg}(z) \le \pi \quad (\text{หรือ } -180^\circ < \theta \le 180^\circ) \)
+              </div>
+              <p class="text-[11px] text-slate-500 mt-1">หรือในบางตำราใช้ช่วง \([0, 2\pi) \equiv [0^\circ, 360^\circ)\)</p>
+            </div>
+
+            <!-- 5. เชื่อมโยงสู่รูปเชิงขั้ว -->
+            <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-200/70">
+              <h3 class="font-semibold text-slate-900 text-xs sm:text-sm text-indigo-950">5. การเชื่อมโยงกับรูปเชิงขั้ว (Polar Form)</h3>
+              <p class="text-xs text-slate-600 mt-0.5">เนื่องจาก \(a = r\cos\theta\) และ \(b = r\sin\theta\):</p>
+              <div class="mt-1.5 text-center py-1.5 bg-white rounded-lg border border-slate-200 font-mono text-sm text-indigo-900 font-semibold">
+                \( z = r(\cos\theta + i\sin\theta) = r\,\operatorname{cis}\theta \)
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </section>
+
+      <!-- Right Column: Interactive Modulus & Argument Simulator -->
+      <section class="lg:col-span-7 space-y-6">
+        <div class="bg-white border border-slate-200/80 rounded-2xl p-6 shadow-sm flex flex-col justify-between">
+          <div>
+            <div class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-100 pb-3 mb-4">
+              <div>
+                <h2 class="text-lg font-bold text-slate-900 flex items-center gap-2">
+                  <svg class="w-5 h-5 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 3.055A9.001 9.001 0 1020.945 13H11V3.055z"></path>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.488 9H15V3.512A9.025 9.025 0 0120.488 9z"></path>
+                  </svg>
+                  แบบจำลองระนาบเชิงขั้วและระนาบเชิงซ้อน (Simulator)
+                </h2>
+                <p class="text-xs text-slate-500">คลิกลากจุด หรือเลื่อนสไลเดอร์เพื่อดูการเปลี่ยนแปลงของระยะ \(r\) และมุม \(\theta\)</p>
+              </div>
+
+              <!-- Live Complex Display -->
+              <div id="liveZDisplay" class="px-3 py-1.5 rounded-xl bg-indigo-50 border border-indigo-200 text-indigo-900 font-mono text-sm font-bold shadow-xs">
+                \(z = 3 + 4i\)
+              </div>
+            </div>
+
+            <!-- Canvas Container -->
+            <div class="relative w-full aspect-square max-h-[390px] mx-auto bg-slate-950 rounded-xl overflow-hidden shadow-inner border border-slate-800 touch-none cursor-crosshair">
+              <canvas id="argandCanvas" class="w-full h-full block"></canvas>
+              
+              <!-- Canvas Hints -->
+              <div class="absolute bottom-2 left-2 bg-slate-900/80 backdrop-blur text-[11px] text-slate-300 px-2.5 py-1 rounded-md border border-slate-800 pointer-events-none">
+                📍 คลิก/ลากบนระนาบได้โดยตรง
+              </div>
+              <div id="canvasQuadrantBadge" class="absolute top-2 right-2 bg-indigo-950/80 backdrop-blur text-xs font-mono font-bold text-indigo-300 px-2.5 py-1 rounded-md border border-indigo-800 pointer-events-none">
+                Quadrant I
+              </div>
+            </div>
+
+            <!-- Sliders & Preset Control Panel -->
+            <div class="mt-4 p-4 rounded-xl bg-slate-50 border border-slate-200/80 space-y-3">
+              <!-- Slider a (Re) -->
+              <div>
+                <div class="flex justify-between items-center text-xs sm:text-sm mb-1">
+                  <span class="font-medium text-slate-700 flex items-center gap-1.5">
+                    <span class="w-3 h-3 rounded-full bg-blue-500 inline-block"></span>
+                    ส่วนจริง \(a = \operatorname{Re}(z)\)
+                  </span>
+                  <span id="labelA" class="font-mono font-bold text-blue-700 bg-white px-2 py-0.5 rounded border border-blue-200 text-xs">3.0</span>
+                </div>
+                <input id="sliderA" type="range" min="-8" max="8" step="0.5" value="3" 
+                  class="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-blue-600 focus:outline-none">
+              </div>
+
+              <!-- Slider b (Im) -->
+              <div>
+                <div class="flex justify-between items-center text-xs sm:text-sm mb-1">
+                  <span class="font-medium text-slate-700 flex items-center gap-1.5">
+                    <span class="w-3 h-3 rounded-full bg-emerald-500 inline-block"></span>
+                    ส่วนจินตภาพ \(b = \operatorname{Im}(z)\)
+                  </span>
+                  <span id="labelB" class="font-mono font-bold text-emerald-700 bg-white px-2 py-0.5 rounded border border-emerald-200 text-xs">4.0</span>
+                </div>
+                <input id="sliderB" type="range" min="-8" max="8" step="0.5" value="4" 
+                  class="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-emerald-600 focus:outline-none">
+              </div>
+
+              <!-- Preset Buttons -->
+              <div class="pt-2 border-t border-slate-200/70">
+                <span class="text-xs font-semibold text-slate-500 block mb-1.5">เลือกพิกัดตัวอย่าง (Presets):</span>
+                <div class="flex flex-wrap gap-2 text-xs">
+                  <button onclick="setCoords(3, 4)" class="px-2.5 py-1.5 bg-white hover:bg-indigo-50 hover:text-indigo-600 text-slate-700 rounded-lg border border-slate-200 font-medium transition shadow-2xs">
+                    \(3+4i\) (ตัวอย่างหลัก)
+                  </button>
+                  <button onclick="setCoords(1, 1)" class="px-2.5 py-1.5 bg-white hover:bg-indigo-50 hover:text-indigo-600 text-slate-700 rounded-lg border border-slate-200 font-medium transition shadow-2xs">
+                    \(1+i\) (\(45^\circ\))
+                  </button>
+                  <button onclick="setCoords(-3, 3)" class="px-2.5 py-1.5 bg-white hover:bg-indigo-50 hover:text-indigo-600 text-slate-700 rounded-lg border border-slate-200 font-medium transition shadow-2xs">
+                    \(-3+3i\) (Q2)
+                  </button>
+                  <button onclick="setCoords(-4, -4)" class="px-2.5 py-1.5 bg-white hover:bg-indigo-50 hover:text-indigo-600 text-slate-700 rounded-lg border border-slate-200 font-medium transition shadow-2xs">
+                    \(-4-4i\) (Q3)
+                  </button>
+                  <button onclick="setCoords(4, -3)" class="px-2.5 py-1.5 bg-white hover:bg-indigo-50 hover:text-indigo-600 text-slate-700 rounded-lg border border-slate-200 font-medium transition shadow-2xs">
+                    \(4-3i\) (Q4)
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Real-Time Analytical Output Cards -->
+          <div class="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <!-- Modulus Result Card -->
+            <div class="p-3.5 rounded-xl bg-gradient-to-br from-indigo-900 to-slate-900 text-white shadow-xs">
+              <span class="text-[11px] uppercase tracking-wider text-indigo-300 font-semibold block mb-1">
+                โมดูลัส (Modulus: \(|z|\) หรือ \(r\))
+              </span>
+              <div id="modulusFormula" class="text-xs font-mono text-slate-300 mb-1">
+                <!-- \sqrt{3^2 + 4^2} -->
+              </div>
+              <div class="flex items-baseline gap-2">
+                <span class="text-xs text-slate-400">ค่าแท้จริง:</span>
+                <span id="modulusValue" class="text-xl font-mono font-bold text-sky-400">5.000</span>
+              </div>
+            </div>
+
+            <!-- Argument Result Card -->
+            <div class="p-3.5 rounded-xl bg-gradient-to-br from-indigo-900 to-slate-900 text-white shadow-xs">
+              <span class="text-[11px] uppercase tracking-wider text-indigo-300 font-semibold block mb-1">
+                อาร์กิวเมนต์หลัก (Argument: \(\theta\))
+              </span>
+              <div class="flex items-baseline gap-2 mb-1">
+                <span class="text-xs text-slate-400">องศา:</span>
+                <span id="argDegree" class="text-xl font-mono font-bold text-amber-400">53.13°</span>
+                <span id="argDegree360" class="text-xs text-slate-400 font-mono">(53.13°)</span>
+              </div>
+              <div class="text-xs font-mono text-slate-300">
+                เรเดียน: <span id="argRadian" class="text-emerald-400 font-bold">0.927 rad</span>
+              </div>
+            </div>
+
+            <!-- Polar Form Connection Card (Full width on both) -->
+            <div class="sm:col-span-2 p-3.5 rounded-xl bg-indigo-50/80 border border-indigo-200/80 text-indigo-950">
+              <div class="text-xs font-bold uppercase tracking-wider text-indigo-900 flex items-center justify-between">
+                <span>การเชื่อมโยงสู่รูปเชิงขั้ว (Polar Form Conversion):</span>
+                <span class="text-[11px] font-normal text-indigo-600">\(z = r(\cos\theta + i\sin\theta)\)</span>
+              </div>
+              <div id="polarFormText" class="mt-1.5 font-mono text-sm sm:text-base font-semibold text-indigo-900 bg-white p-2 rounded-lg border border-indigo-100 text-center overflow-x-auto">
+                <!-- 5(\cos 53.13^\circ + i\sin 53.13^\circ) -->
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <!-- Guided Discovery Questions Section -->
+    <section class="bg-white border border-slate-200/80 rounded-2xl p-6 sm:p-8 shadow-sm">
+      <div class="flex items-center gap-3 mb-6">
+        <div class="w-10 h-10 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center border border-amber-200/60 shadow-xs">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path>
+          </svg>
+        </div>
+        <div>
+          <h2 class="text-xl font-bold text-slate-900">คำถามนำเพื่อการค้นพบ (Guided Discovery)</h2>
+          <p class="text-xs sm:text-sm text-slate-500">คลิกที่แต่ละคำถามเพื่อเปิดดูแนวคิดและคำอธิบายทางเรขาคณิต</p>
+        </div>
+      </div>
+
+      <div class="space-y-4">
+        <!-- Question 1 -->
+        <div class="border border-slate-200 rounded-xl overflow-hidden transition bg-slate-50/50">
+          <button onclick="toggleDiscovery(1)" class="w-full text-left px-5 py-4 flex justify-between items-center gap-4 hover:bg-slate-100/60 transition">
+            <span class="font-semibold text-slate-800 text-sm sm:text-base flex items-center gap-3">
+              <span class="w-6 h-6 rounded-full bg-indigo-100 text-indigo-700 text-xs flex items-center justify-center font-bold">1</span>
+              จำนวนเชิงซ้อนที่มีโมดูลัสเท่ากันอยู่บนเส้นหรือเส้นโค้งชนิดใด?
+            </span>
+            <span id="disc-chevron-1" class="text-slate-400 transition-transform duration-200">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+            </span>
+          </button>
+          <div id="disc-ans-1" class="hidden px-5 py-4 bg-white border-t border-slate-200 text-sm sm:text-base text-slate-700 space-y-2">
+            <p class="font-medium text-emerald-800 flex items-center gap-1.5">
+              <svg class="w-4 h-4 text-emerald-600 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+              แนวคิดคำตอบ:
+            </p>
+            <p>
+              อยู่บน <strong>"วงกลม" (Circle) ที่มีจุดศูนย์กลางอยู่ที่จุดกำเนิด \((0,0)\) และมีรัศมี \(r = |z|\)</strong>
+            </p>
+            <div class="bg-slate-50 p-3 rounded-lg border border-slate-200 font-mono text-center text-sm font-semibold text-indigo-800">
+              \(|z| = r \iff \sqrt{a^2 + b^2} = r \iff a^2 + b^2 = r^2\)
+            </div>
+            <p class="text-xs text-slate-600">
+              ซึ่งตรงกับสมการวงกลมมาตรฐานในเรขาคณิตวิเคราะห์อย่างสมบูรณ์ บนระนาบจำลองด้านบน คุณจะสังเกตเห็นเส้นประวงกลมสีฟ้าอ่อนที่หมุนผ่านจุด \(z\) เสมอ
+            </p>
+          </div>
+        </div>
+
+        <!-- Question 2 -->
+        <div class="border border-slate-200 rounded-xl overflow-hidden transition bg-slate-50/50">
+          <button onclick="toggleDiscovery(2)" class="w-full text-left px-5 py-4 flex justify-between items-center gap-4 hover:bg-slate-100/60 transition">
+            <span class="font-semibold text-slate-800 text-sm sm:text-base flex items-center gap-3">
+              <span class="w-6 h-6 rounded-full bg-indigo-100 text-indigo-700 text-xs flex items-center justify-center font-bold">2</span>
+              เมื่อจุดอยู่ในแต่ละจตุภาค การกำหนดมุมต้องพิจารณาอะไร?
+            </span>
+            <span id="disc-chevron-2" class="text-slate-400 transition-transform duration-200">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+            </span>
+          </button>
+          <div id="disc-ans-2" class="hidden px-5 py-4 bg-white border-t border-slate-200 text-sm sm:text-base text-slate-700 space-y-2">
+            <p class="font-medium text-emerald-800 flex items-center gap-1.5">
+              <svg class="w-4 h-4 text-emerald-600 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+              แนวคิดคำตอบ:
+            </p>
+            <p>
+              ต้องพิจารณา <strong>เครื่องหมายของส่วนจริง (\(a\)) และส่วนจินตภาพ (\(b\))</strong> เพื่อระบุจตุภาคที่ถูกต้อง เพราะฟังก์ชันตรีโกณมิติผกผัน (\(\arctan\)) เพียงอย่างเดียวไม่สามารถแยกความแตกต่างระหว่าง Q1 กับ Q3 หรือ Q2 กับ Q4 ได้:
+            </p>
+            <ul class="list-disc list-inside text-xs sm:text-sm text-slate-600 space-y-1 ml-2">
+              <li>ตัวอย่าง: \(1+i\) (\(\frac{1}{1} = 1\)) อยู่ใน Q1 ให้มุม \(45^\circ\)</li>
+              <li>แต่ \(-1-i\) (\(\frac{-1}{-1} = 1\)) อัตราส่วนเท่ากัน แต่อยู่ใน Q3 จึงต้องปรับเป็น \(180^\circ + 45^\circ = 225^\circ\) (หรือ \(-135^\circ\))</li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- Question 3 -->
+        <div class="border border-slate-200 rounded-xl overflow-hidden transition bg-slate-50/50">
+          <button onclick="toggleDiscovery(3)" class="w-full text-left px-5 py-4 flex justify-between items-center gap-4 hover:bg-slate-100/60 transition">
+            <span class="font-semibold text-slate-800 text-sm sm:text-base flex items-center gap-3">
+              <span class="w-6 h-6 rounded-full bg-indigo-100 text-indigo-700 text-xs flex items-center justify-center font-bold">3</span>
+              จำนวนเชิงซ้อนที่มีโมดูลัสเท่ากันและอาร์กิวเมนต์เท่ากัน จำเป็นต้องเป็นจำนวนเดียวกันหรือไม่?
+            </span>
+            <span id="disc-chevron-3" class="text-slate-400 transition-transform duration-200">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+            </span>
+          </button>
+          <div id="disc-ans-3" class="hidden px-5 py-4 bg-white border-t border-slate-200 text-sm sm:text-base text-slate-700 space-y-2">
+            <p class="font-medium text-emerald-800 flex items-center gap-1.5">
+              <svg class="w-4 h-4 text-emerald-600 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+              แนวคิดคำตอบ:
+            </p>
+            <p>
+              <strong>จำเป็นต้องเป็นจำนวนเดียวกันอย่างแน่นอน</strong>
+            </p>
+            <p class="text-slate-600 text-xs sm:text-sm">
+              เนื่องจากพิกัดเชิงขั้ว \((r, \theta)\) สามารถแปลงกลับเป็นพิกัดคาร์ทีเซียน \((a, b)\) ได้เพียงรูปแบบเดียวเสมอ ผ่านสูตร:
+            </p>
+            <div class="bg-slate-50 p-2.5 rounded-lg border border-slate-200 font-mono text-center text-xs sm:text-sm text-indigo-900">
+              \(a = r\cos\theta \quad\text{และ}\quad b = r\sin\theta\)
+            </div>
+            <p class="text-xs text-slate-500">
+              เมื่อ \(r_1 = r_2\) และ \(\theta_1 \equiv \theta_2\) ย่อมทำให้ \(a_1 = a_2\) และ \(b_1 = b_2\) เสมอ ส่งผลให้ \(z_1 = z_2\)
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Student Exercises Section -->
+    <section class="bg-white border border-slate-200/80 rounded-2xl p-6 sm:p-8 shadow-sm">
+      <div class="flex items-center gap-3 mb-6">
+        <div class="w-10 h-10 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center border border-indigo-200/60 shadow-xs">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+          </svg>
+        </div>
+        <div>
+          <h2 class="text-xl font-bold text-slate-900">แบบฝึกหัดสำหรับนักศึกษา (Interactive Exercises)</h2>
+          <p class="text-xs sm:text-sm text-slate-500">ฝึกคำนวณและตรวจสอบความเข้าใจด้วยตนเอง</p>
+        </div>
+      </div>
+
+      <div class="space-y-6">
+
+        <!-- Exercise 1 -->
+        <div class="p-5 rounded-xl border border-slate-200 bg-slate-50/40">
+          <h3 class="font-semibold text-slate-900 text-sm sm:text-base mb-3 flex items-center gap-2">
+            <span class="w-6 h-6 rounded-md bg-indigo-600 text-white text-xs flex items-center justify-center font-bold">1</span>
+            จงหาโมดูลัสของ \(z = -5 + 12i\)
+          </h3>
+          <div class="flex flex-wrap items-center gap-3 max-w-sm mb-3">
+            <span class="text-xs font-semibold text-slate-600">\(|z| =\)</span>
+            <input id="ex1_input" type="number" placeholder="เช่น 13" class="w-32 px-3 py-1.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-indigo-500 text-center font-mono text-sm">
+          </div>
+          <div class="flex flex-wrap gap-2 items-center">
+            <button onclick="checkEx1()" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs sm:text-sm font-medium rounded-lg shadow-sm transition">
+              ตรวจคำตอบ
+            </button>
+            <button onclick="toggleExSol('sol1')" class="px-4 py-2 bg-white hover:bg-slate-100 text-slate-700 text-xs sm:text-sm font-medium rounded-lg border border-slate-200 transition">
+              ดูเฉลยละเอียด
+            </button>
+            <div id="ex1_feedback" class="text-xs sm:text-sm font-semibold"></div>
+          </div>
+          <div id="sol1" class="hidden mt-3 p-3.5 bg-white rounded-lg border border-slate-200 text-xs sm:text-sm text-slate-700 space-y-1">
+            <strong>วิธีทำ:</strong><br>
+            จากสูตร \(|z| = \sqrt{a^2 + b^2}\)<br>
+            แทนค่า \(a = -5\) และ \(b = 12\):<br>
+            \(|z| = \sqrt{(-5)^2 + (12)^2} = \sqrt{25 + 144} = \sqrt{169} = 13\)<br>
+            <span class="text-emerald-700 font-semibold">ดังนั้น โมดูลัสของ \(z\) คือ 13</span>
+          </div>
+        </div>
+
+        <!-- Exercise 2 -->
+        <div class="p-5 rounded-xl border border-slate-200 bg-slate-50/40">
+          <h3 class="font-semibold text-slate-900 text-sm sm:text-base mb-3 flex items-center gap-2">
+            <span class="w-6 h-6 rounded-md bg-indigo-600 text-white text-xs flex items-center justify-center font-bold">2</span>
+            จงหาอาร์กิวเมนต์หลัก (หน่วยองศา) ของ \(z_1 = 1 + i\) และ \(z_2 = -1 - i\)
+          </h3>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-lg mb-3">
+            <div class="p-3 bg-white rounded-lg border border-slate-200">
+              <label class="block text-xs font-semibold text-slate-600 mb-1">อาร์กิวเมนต์หลักของ \(z_1 = 1+i\):</label>
+              <div class="flex items-center gap-1.5">
+                <input id="ex2_z1" type="number" placeholder="45" class="w-full px-3 py-1.5 rounded border font-mono text-center text-sm">
+                <span class="text-xs font-bold text-slate-500">°</span>
+              </div>
+            </div>
+            <div class="p-3 bg-white rounded-lg border border-slate-200">
+              <label class="block text-xs font-semibold text-slate-600 mb-1">อาร์กิวเมนต์หลักของ \(z_2 = -1-i\):</label>
+              <div class="flex items-center gap-1.5">
+                <input id="ex2_z2" type="number" placeholder="-135 หรือ 225" class="w-full px-3 py-1.5 rounded border font-mono text-center text-sm">
+                <span class="text-xs font-bold text-slate-500">°</span>
+              </div>
+            </div>
+          </div>
+          <div class="flex flex-wrap gap-2 items-center">
+            <button onclick="checkEx2()" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs sm:text-sm font-medium rounded-lg shadow-sm transition">
+              ตรวจคำตอบ
+            </button>
+            <button onclick="toggleExSol('sol2')" class="px-4 py-2 bg-white hover:bg-slate-100 text-slate-700 text-xs sm:text-sm font-medium rounded-lg border border-slate-200 transition">
+              ดูเฉลยละเอียด
+            </button>
+            <div id="ex2_feedback" class="text-xs sm:text-sm font-semibold"></div>
+          </div>
+          <div id="sol2" class="hidden mt-3 p-3.5 bg-white rounded-lg border border-slate-200 text-xs sm:text-sm text-slate-700 space-y-2">
+            <strong>วิธีทำ:</strong><br>
+            <p>
+              1. สำหรับ \(z_1 = 1 + i\): มี \(a=1, b=1\) (อยู่ใน Q1)<br>
+              \(\theta = \arctan(1/1) = 45^\circ\) (หรือ \(\frac{\pi}{4}\) rad)
+            </p>
+            <p>
+              2. สำหรับ \(z_2 = -1 - i\): มี \(a=-1, b=-1\) (อยู่ใน Q3)<br>
+              มุมอ้างอิง \(\alpha = \arctan(1) = 45^\circ\)<br>
+              • หากอยู่ในช่วง \((-\pi, \pi]\): \(\theta = -180^\circ + 45^\circ = -135^\circ\) (หรือ \(-\frac{3\pi}{4}\) rad)<br>
+              • หากอยู่ในช่วง \([0, 2\pi)\): \(\theta = 180^\circ + 45^\circ = 225^\circ\) (หรือ \(\frac{5\pi}{4}\) rad)
+            </p>
+            <span class="text-emerald-700 font-semibold">ระบบยอมรับทั้ง -135° และ 225°</span>
+          </div>
+        </div>
+
+        <!-- Exercise 3 -->
+        <div class="p-5 rounded-xl border border-slate-200 bg-slate-50/40">
+          <h3 class="font-semibold text-slate-900 text-sm sm:text-base mb-3 flex items-center gap-2">
+            <span class="w-6 h-6 rounded-md bg-indigo-600 text-white text-xs flex items-center justify-center font-bold">3</span>
+            จงอธิบายความแตกต่างระหว่างโมดูลัสกับอาร์กิวเมนต์
+          </h3>
+          <p class="text-xs text-slate-500 mb-2">ลองสรุปสาระสำคัญตามความเข้าใจลงในช่องด้านล่าง แล้วกดเพื่อตรวจเช็คเกณฑ์ประเมิน:</p>
+          <textarea id="ex3_text" rows="3" placeholder="เขียนคำอธิบายความแตกต่าง เช่น ในแง่ขนาด ทิศทาง หน่วย และความหมายทางเรขาคณิต..." 
+            class="w-full p-3 rounded-lg border border-slate-300 focus:ring-2 focus:ring-indigo-500 text-sm font-sans mb-3"></textarea>
+          
+          <div class="flex flex-wrap gap-2 items-center">
+            <button onclick="checkEx3()" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs sm:text-sm font-medium rounded-lg shadow-sm transition">
+              ส่งคำตอบและเทียบเกณฑ์
+            </button>
+            <button onclick="toggleExSol('sol3')" class="px-4 py-2 bg-white hover:bg-slate-100 text-slate-700 text-xs sm:text-sm font-medium rounded-lg border border-slate-200 transition">
+              ดูคำอธิบายเปรียบเทียบมาตรฐาน
+            </button>
+            <div id="ex3_feedback" class="text-xs sm:text-sm font-semibold"></div>
+          </div>
+
+          <div id="sol3" class="hidden mt-3 p-4 bg-white rounded-lg border border-slate-200 text-xs sm:text-sm text-slate-700 space-y-2">
+            <div class="font-bold text-indigo-900 border-b pb-1">ตารางเปรียบเทียบความแตกต่างที่สำคัญ:</div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
+              <div class="p-2.5 bg-blue-50/60 rounded-lg border border-blue-100">
+                <span class="font-bold text-blue-900 block mb-1">โมดูลัส (\(|z|\) หรือ \(r\))</span>
+                <ul class="list-disc list-inside space-y-0.5 text-slate-600 text-xs">
+                  <li><strong>ความหมาย:</strong> "ขนาด" หรือระยะห่างจากจุดกำเนิด</li>
+                  <li><strong>ค่า:</strong> เป็นจำนวนจริงที่ไม่เป็นลบ (\(\ge 0\)) เสมอ</li>
+                  <li><strong>หน่วย:</strong> หน่วยความยาว</li>
+                  <li><strong>รูปทรง:</strong> กำหนดขนาดของวงกลม</li>
+                </ul>
+              </div>
+              <div class="p-2.5 bg-amber-50/60 rounded-lg border border-amber-100">
+                <span class="font-bold text-amber-900 block mb-1">อาร์กิวเมนต์ (\(\arg z\) หรือ \(\theta\))</span>
+                <ul class="list-disc list-inside space-y-0.5 text-slate-600 text-xs">
+                  <li><strong>ความหมาย:</strong> "ทิศทาง" หรือมุมที่ทำกับแกนจริงบวก</li>
+                  <li><strong>ค่า:</strong> มีได้อนันต์ค่าตามการวนรอบ (\(+2k\pi\))</li>
+                  <li><strong>หน่วย:</strong> องศา (Degrees) หรือ เรเดียน (Radians)</li>
+                  <li><strong>รูปทรง:</strong> กำหนดแนวเส้นรังสี (Ray) จากจุดกำเนิด</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="text-center text-xs text-slate-400 py-4 border-t border-slate-200/60">
+      สื่อประกอบการสอนวิชาคณิตศาสตร์ • เรื่องที่ 3 โมดูลัสและอาร์กิวเมนต์ของจำนวนเชิงซ้อน
+    </footer>
+
+  </div>
+
+  <!-- Interactive Logic & Visualization Script -->
+  <script>
+    // State
+    let currentA = 3.0;
+    let currentB = 4.0;
+    const maxRange = 10;
+    let isDragging = false;
+
+    // Elements
+    const canvas = document.getElementById('argandCanvas');
+    const ctx = canvas.getContext('2d');
+    const sliderA = document.getElementById('sliderA');
+    const sliderB = document.getElementById('sliderB');
+    const labelA = document.getElementById('labelA');
+    const labelB = document.getElementById('labelB');
+    const liveZDisplay = document.getElementById('liveZDisplay');
+    const modulusFormula = document.getElementById('modulusFormula');
+    const modulusValue = document.getElementById('modulusValue');
+    const argDegree = document.getElementById('argDegree');
+    const argDegree360 = document.getElementById('argDegree360');
+    const argRadian = document.getElementById('argRadian');
+    const polarFormText = document.getElementById('polarFormText');
+    const canvasQuadrantBadge = document.getElementById('canvasQuadrantBadge');
+
+    function resizeCanvas() {
+      const rect = canvas.getBoundingClientRect();
+      const dpr = window.devicePixelRatio || 1;
+      canvas.width = rect.width * dpr;
+      canvas.height = rect.height * dpr;
+      ctx.resetTransform();
+      ctx.scale(dpr, dpr);
+      updateApp();
+    }
+
+    function setCoords(a, b) {
+      currentA = a;
+      currentB = b;
+      sliderA.value = a;
+      sliderB.value = b;
+      updateApp();
+    }
+
+    function toMathCoords(clientX, clientY) {
+      const rect = canvas.getBoundingClientRect();
+      const w = rect.width;
+      const h = rect.height;
+      const xPix = clientX - rect.left;
+      const yPix = clientY - rect.top;
+
+      const centerX = w / 2;
+      const centerY = h / 2;
+      const scale = (w / 2) / (maxRange + 1);
+
+      let a = (xPix - centerX) / scale;
+      let b = (centerY - yPix) / scale;
+
+      // Snap to nearest 0.5
+      a = Math.round(a * 2) / 2;
+      b = Math.round(b * 2) / 2;
+
+      a = Math.max(-8, Math.min(8, a));
+      b = Math.max(-8, Math.min(8, b));
+
+      return { a, b };
+    }
+
+    function updateApp() {
+      labelA.textContent = currentA.toFixed(1);
+      labelB.textContent = currentB.toFixed(1);
+
+      // 1. Calculations
+      const a = currentA;
+      const b = currentB;
+      const r = Math.sqrt(a * a + b * b);
+      
+      // Argument calculations
+      let thetaRad = 0;
+      let thetaDeg = 0;
+      let theta360 = 0;
+      let quadStr = '';
+
+      if (a === 0 && b === 0) {
+        quadStr = 'จุดกำเนิด (0,0) [ไม่นิยามอาร์กิวเมนต์]';
+      } else {
+        thetaRad = Math.atan2(b, a); // returns (-PI, PI]
+        thetaDeg = thetaRad * (180 / Math.PI);
+        theta360 = thetaDeg >= 0 ? thetaDeg : 360 + thetaDeg;
+
+        if (a > 0 && b > 0) quadStr = 'Quadrant I (จตุภาคที่ 1)';
+        else if (a < 0 && b > 0) quadStr = 'Quadrant II (จตุภาคที่ 2)';
+        else if (a < 0 && b < 0) quadStr = 'Quadrant III (จตุภาคที่ 3)';
+        else if (a > 0 && b < 0) quadStr = 'Quadrant IV (จตุภาคที่ 4)';
+        else if (b === 0 && a > 0) quadStr = 'บนแกนจริงบวก (+Re)';
+        else if (b === 0 && a < 0) quadStr = 'บนแกนจริงลบ (-Re)';
+        else if (a === 0 && b > 0) quadStr = 'บนแกนจินตภาพบวก (+Im)';
+        else if (a === 0 && b < 0) quadStr = 'บนแกนจินตภาพลบ (-Im)';
+      }
+
+      canvasQuadrantBadge.textContent = quadStr;
+
+      // 2. Format Complex string
+      const sign = b >= 0 ? '+' : '-';
+      const absB = Math.abs(b);
+      liveZDisplay.innerHTML = `\\( z = ${a} ${sign} ${absB}i \\)`;
+
+      // 3. Modulus Output
+      const sumSq = (a * a + b * b).toFixed(1).replace('.0', '');
+      modulusFormula.innerHTML = `\\( |z| = \\sqrt{(${a})^2 + (${b})^2} = \\sqrt{${sumSq}} \\)`;
+      modulusValue.textContent = r.toFixed(3);
+
+      // 4. Argument Output
+      if (a === 0 && b === 0) {
+        argDegree.textContent = 'ไม่นิยาม';
+        argDegree360.textContent = '';
+        argRadian.textContent = 'ไม่นิยาม';
+        polarFormText.innerHTML = '\\( z = 0 \\)';
+      } else {
+        argDegree.textContent = `${thetaDeg.toFixed(2)}°`;
+        argDegree360.textContent = `(${theta360.toFixed(2)}°)`;
+        argRadian.textContent = `${thetaRad.toFixed(3)} rad`;
+        polarFormText.innerHTML = `\\( z = ${r.toFixed(2)} (\\cos ${thetaDeg.toFixed(2)}^\\circ + i\\sin ${thetaDeg.toFixed(2)}^\\circ) \\)`;
+      }
+
+      if (window.renderMathInElement) {
+        renderMathInElement(liveZDisplay, { delimiters: [{left: '\\(', right: '\\)', display: false}] });
+        renderMathInElement(modulusFormula, { delimiters: [{left: '\\(', right: '\\)', display: false}] });
+        renderMathInElement(polarFormText, { delimiters: [{left: '\\(', right: '\\)', display: false}] });
+      }
+
+      // 5. Draw Canvas
+      drawCanvas(a, b, r, thetaRad);
+    }
+
+    function drawCanvas(a, b, r, thetaRad) {
+      const rect = canvas.getBoundingClientRect();
+      const w = rect.width;
+      const h = rect.height;
+
+      ctx.clearRect(0, 0, w, h);
+
+      const centerX = w / 2;
+      const centerY = h / 2;
+      const scale = (w / 2) / (maxRange + 1);
+
+      // Draw Grid
+      ctx.lineWidth = 1;
+      ctx.strokeStyle = '#1e293b';
+      ctx.fillStyle = '#64748b';
+      ctx.font = '10px Inter, sans-serif';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+
+      for (let i = -maxRange; i <= maxRange; i += 2) {
+        if (i === 0) continue;
+        const x = centerX + i * scale;
+        const y = centerY - i * scale;
+
+        ctx.beginPath();
+        ctx.moveTo(x, 0);
+        ctx.lineTo(x, h);
+        ctx.stroke();
+
+        ctx.beginPath();
+        ctx.moveTo(0, y);
+        ctx.lineTo(w, y);
+        ctx.stroke();
+
+        ctx.fillText(i, x, centerY + 12);
+        ctx.fillText(i + 'i', centerX - 12, y);
+      }
+
+      // Draw Concentric Reference Circles
+      ctx.strokeStyle = '#0f172a';
+      ctx.lineWidth = 1;
+      [2, 4, 6, 8].forEach(radVal => {
+        ctx.beginPath();
+        ctx.arc(centerX, centerY, radVal * scale, 0, Math.PI * 2);
+        ctx.stroke();
+      });
+
+      // Modulus Locus Circle (Dashed Circle passing through z)
+      if (r > 0) {
+        ctx.save();
+        ctx.setLineDash([5, 5]);
+        ctx.strokeStyle = 'rgba(56, 189, 248, 0.4)'; // Sky blue translucent
+        ctx.lineWidth = 1.5;
+        ctx.beginPath();
+        ctx.arc(centerX, centerY, r * scale, 0, Math.PI * 2);
+        ctx.stroke();
+        ctx.restore();
+      }
+
+      // Main Axes
+      ctx.lineWidth = 2;
+      ctx.strokeStyle = '#64748b';
+      ctx.beginPath();
+      ctx.moveTo(0, centerY);
+      ctx.lineTo(w, centerY);
+      ctx.stroke();
+
+      ctx.beginPath();
+      ctx.moveTo(centerX, 0);
+      ctx.lineTo(centerX, h);
+      ctx.stroke();
+
+      // Axis Labels
+      ctx.font = 'bold 11px Inter, sans-serif';
+      ctx.fillStyle = '#38bdf8';
+      ctx.fillText('+Re', w - 16, centerY - 10);
+      ctx.fillStyle = '#34d399';
+      ctx.fillText('+Im', centerX + 18, 12);
+
+      const px = centerX + a * scale;
+      const py = centerY - b * scale;
+
+      // Draw Angle Arc (Argument)
+      if (r > 0.3) {
+        ctx.save();
+        ctx.lineWidth = 2;
+        ctx.strokeStyle = '#fbbf24'; // Amber
+        ctx.fillStyle = 'rgba(251, 191, 36, 0.15)';
+        ctx.beginPath();
+        ctx.moveTo(centerX, centerY);
+
+        const arcRadius = Math.min(36, (r * scale) * 0.45);
+        if (thetaRad >= 0) {
+          ctx.arc(centerX, centerY, arcRadius, 0, -thetaRad, true);
+        } else {
+          ctx.arc(centerX, centerY, arcRadius, 0, -thetaRad, false);
+        }
+        ctx.closePath();
+        ctx.stroke();
+        ctx.fill();
+
+        // Theta symbol
+        const midAngle = -thetaRad / 2;
+        const textDist = arcRadius + 14;
+        ctx.fillStyle = '#fbbf24';
+        ctx.font = 'bold 11px Inter, sans-serif';
+        ctx.fillText('θ', centerX + Math.cos(midAngle) * textDist, centerY + Math.sin(midAngle) * textDist);
+        ctx.restore();
+      }
+
+      // Projection Dashed Lines
+      ctx.save();
+      ctx.setLineDash([3, 3]);
+      ctx.lineWidth = 1;
+      ctx.strokeStyle = '#475569';
+      ctx.beginPath();
+      ctx.moveTo(px, py);
+      ctx.lineTo(px, centerY);
+      ctx.lineTo(centerX, centerY);
+      ctx.stroke();
+      ctx.restore();
+
+      // Vector from Origin to Point
+      ctx.lineWidth = 3;
+      ctx.strokeStyle = '#6366f1'; // Indigo
+      ctx.beginPath();
+      ctx.moveTo(centerX, centerY);
+      ctx.lineTo(px, py);
+      ctx.stroke();
+
+      // Arrowhead
+      if (r > 0.1) {
+        const headlen = 9;
+        const angle = Math.atan2(py - centerY, px - centerX);
+        ctx.fillStyle = '#6366f1';
+        ctx.beginPath();
+        ctx.moveTo(px, py);
+        ctx.lineTo(px - headlen * Math.cos(angle - Math.PI / 6), py - headlen * Math.sin(angle - Math.PI / 6));
+        ctx.lineTo(px - headlen * Math.cos(angle + Math.PI / 6), py - headlen * Math.sin(angle + Math.PI / 6));
+        ctx.fill();
+      }
+
+      // Point z Circle
+      ctx.shadowColor = '#818cf8';
+      ctx.shadowBlur = 10;
+      ctx.fillStyle = '#ffffff';
+      ctx.beginPath();
+      ctx.arc(px, py, 6, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.lineWidth = 2.5;
+      ctx.strokeStyle = '#4f46e5';
+      ctx.stroke();
+      ctx.shadowBlur = 0;
+
+      // Coordinate Label Tag
+      ctx.font = 'bold 11px Inter, Sarabun, sans-serif';
+      ctx.fillStyle = 'rgba(15, 23, 42, 0.85)';
+      const offsetX = a >= 0 ? 12 : -75;
+      const offsetY = b >= 0 ? -14 : 20;
+
+      ctx.fillRect(px + offsetX - 4, py + offsetY - 12, 80, 24);
+      ctx.strokeStyle = '#334155';
+      ctx.lineWidth = 1;
+      ctx.strokeRect(px + offsetX - 4, py + offsetY - 12, 80, 24);
+
+      ctx.fillStyle = '#e2e8f0';
+      ctx.textAlign = 'left';
+      ctx.fillText(`(${a.toFixed(1)}, ${b.toFixed(1)})`, px + offsetX, py + offsetY + 3);
+    }
+
+    // Pointer Interactivity on Canvas
+    function handlePointer(clientX, clientY) {
+      const { a, b } = toMathCoords(clientX, clientY);
+      currentA = a;
+      currentB = b;
+      sliderA.value = a;
+      sliderB.value = b;
+      updateApp();
+    }
+
+    canvas.addEventListener('mousedown', (e) => {
+      isDragging = true;
+      handlePointer(e.clientX, e.clientY);
+    });
+
+    window.addEventListener('mouseup', () => { isDragging = false; });
+    canvas.addEventListener('mousemove', (e) => {
+      if (isDragging) handlePointer(e.clientX, e.clientY);
+    });
+
+    canvas.addEventListener('touchstart', (e) => {
+      isDragging = true;
+      handlePointer(e.touches[0].clientX, e.touches[0].clientY);
+      e.preventDefault();
+    }, { passive: false });
+
+    canvas.addEventListener('touchmove', (e) => {
+      if (isDragging) handlePointer(e.touches[0].clientX, e.touches[0].clientY);
+      e.preventDefault();
+    }, { passive: false });
+
+    window.addEventListener('touchend', () => { isDragging = false; });
+
+    // Slider Event Listeners
+    sliderA.addEventListener('input', (e) => {
+      currentA = parseFloat(e.target.value);
+      updateApp();
+    });
+
+    sliderB.addEventListener('input', (e) => {
+      currentB = parseFloat(e.target.value);
+      updateApp();
+    });
+
+    // Guided Discovery Accordions
+    function toggleDiscovery(id) {
+      const ans = document.getElementById(`disc-ans-${id}`);
+      const chv = document.getElementById(`disc-chevron-${id}`);
+      if (ans.classList.contains('hidden')) {
+        ans.classList.remove('hidden');
+        chv.style.transform = 'rotate(180deg)';
+      } else {
+        ans.classList.add('hidden');
+        chv.style.transform = 'rotate(0deg)';
+      }
+    }
+
+    // Exercise toggles
+    function toggleExSol(id) {
+      document.getElementById(id).classList.toggle('hidden');
+    }
+
+    // Exercise Checkers
+    function checkEx1() {
+      const val = document.getElementById('ex1_input').value.trim();
+      const fb = document.getElementById('ex1_feedback');
+      if (val === '13') {
+        fb.innerHTML = '<span class="text-emerald-600">✓ ถูกต้อง! |z| = √(25 + 144) = 13</span>';
+      } else {
+        fb.innerHTML = '<span class="text-rose-600">✗ ยังไม่ถูกต้อง ลองคำนวณ √((-5)² + 12²) อีกครั้ง</span>';
+      }
+    }
+
+    function checkEx2() {
+      const z1 = parseFloat(document.getElementById('ex2_z1').value);
+      const z2 = parseFloat(document.getElementById('ex2_z2').value);
+      const fb = document.getElementById('ex2_feedback');
+
+      const isZ1Correct = (z1 === 45);
+      const isZ2Correct = (z2 === -135 || z2 === 225);
+
+      if (isZ1Correct && isZ2Correct) {
+        fb.innerHTML = '<span class="text-emerald-600">✓ ถูกต้องสมบูรณ์ทั้งสองข้อ! (z₁ = 45° และ z₂ = -135° หรือ 225°)</span>';
+      } else if (isZ1Correct && !isZ2Correct) {
+        fb.innerHTML = '<span class="text-amber-600">z₁ ถูกต้องแล้ว แต่ z₂ (Q3) ยังไม่ถูกต้อง ลองดูจตุภาคที่ 3</span>';
+      } else {
+        fb.innerHTML = '<span class="text-rose-600">✗ ยังไม่ถูกต้อง ตรวจสอบมุมอ้างอิงและตำแหน่งในแต่ละจตุภาค</span>';
+      }
+    }
+
+    function checkEx3() {
+      const text = document.getElementById('ex3_text').value.trim();
+      const fb = document.getElementById('ex3_feedback');
+      if (text.length < 10) {
+        fb.innerHTML = '<span class="text-amber-600">กรุณาเขียนอธิบายความแตกต่างให้ชัดเจนก่อนตรวจ</span>';
+        return;
+      }
+      fb.innerHTML = '<span class="text-emerald-600">✓ บันทึกคำตอบแล้ว! โปรดคลิก "ดูคำอธิบายเปรียบเทียบมาตรฐาน" เพื่อเทียบประเด็น</span>';
+      document.getElementById('sol3').classList.remove('hidden');
+    }
+
+    window.addEventListener('resize', resizeCanvas);
+
+    // Initial Load
+    window.onload = function() {
+      if (window.renderMathInElement) {
+        renderMathInElement(document.body, {
+          delimiters: [
+            {left: '$$', right: '$$', display: true},
+            {left: '\\[', right: '\\]', display: true},
+            {left: '\\(', right: '\\)', display: false},
+            {left: '$', right: '$', display: false}
+          ],
+          throwOnError: false
+        });
+      }
+      resizeCanvas();
+    };
+  </script>
+</body>
+</html>
