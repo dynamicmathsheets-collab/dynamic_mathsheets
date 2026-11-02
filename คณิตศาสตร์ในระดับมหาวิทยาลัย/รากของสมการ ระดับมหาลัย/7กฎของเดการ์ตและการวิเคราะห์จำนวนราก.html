@@ -1,0 +1,1168 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>เรื่องที่ 7: กฎของเดการ์ตและการวิเคราะห์จำนวนราก (Descartes' Rule of Signs)</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Sarabun, Inter, Fira Code -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&family=Inter:wght@400;500;600;700&family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- KaTeX for math typography -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js"
+        onload="renderMathInElement(document.body, {delimiters: [{left: '$$', right: '$$', display: true}, {left: '$', right: '$', display: false}]});"></script>
+    <style>
+        body {
+            font-family: 'Sarabun', 'Inter', sans-serif;
+        }
+        .code-font {
+            font-family: 'Fira Code', monospace;
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 antialiased min-h-screen">
+
+    <!-- Main Container: Fixed Width 1,152px (max-w-6xl) -->
+    <main class="max-w-6xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 space-y-8">
+
+        <!-- Title Banner -->
+        <div class="bg-gradient-to-r from-slate-900 via-indigo-950 to-indigo-900 rounded-2xl p-6 sm:p-8 text-white shadow-md relative overflow-hidden">
+            <div class="relative z-10 space-y-2">
+                <div class="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-indigo-500/20 border border-indigo-400/30 text-indigo-200 text-xs font-semibold tracking-wide uppercase">
+                    <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                    <span>บทที่ 1: รากของสมการ • เรื่องที่ 7 (เรื่องสุดท้ายของบท)</span>
+                </div>
+                <h1 class="text-2xl sm:text-3xl font-extrabold tracking-tight">กฎของเดการ์ตและการวิเคราะห์จำนวนราก (Descartes' Rule of Signs)</h1>
+                <p class="text-indigo-200 text-sm sm:text-base max-w-3xl leading-relaxed">
+                    ประเมินขอบเขตจำนวนรากจริงบวก รากจริงลบ และรากเชิงซ้อนของพหุนามได้อย่างรวดเร็วผ่านการสังเกตการสลับเครื่องหมายของสัมประสิทธิ์ โดยไม่ต้องแก้สมการจริง
+                </p>
+            </div>
+            <!-- Decorative backdrop glow -->
+            <div class="absolute -right-12 -bottom-12 w-64 h-64 rounded-full bg-indigo-600/15 pointer-events-none blur-3xl"></div>
+        </div>
+
+        <!-- ========================================== -->
+        <!-- ส่วนที่ 1: วัตถุประสงค์การเรียนรู้ -->
+        <!-- ========================================== -->
+        <section class="bg-white rounded-2xl p-6 sm:p-7 shadow-sm border border-slate-200/80 transition-all hover:shadow-md">
+            <div class="flex items-center space-x-3 mb-4">
+                <div class="p-2.5 rounded-xl bg-blue-50 text-blue-600">
+                    <i class="fa-solid fa-bullseye text-xl"></i>
+                </div>
+                <div>
+                    <h2 class="text-lg font-bold text-slate-900">ส่วนที่ 1 : วัตถุประสงค์การเรียนรู้ (Learning Objectives)</h2>
+                    <p class="text-xs text-slate-500">ทักษะสำคัญที่นักศึกษาจะได้รับหลังศึกษาจบหัวข้อนี้</p>
+                </div>
+            </div>
+
+            <div class="bg-gradient-to-br from-blue-50/70 to-indigo-50/40 rounded-xl p-5 border border-blue-100">
+                <p class="text-slate-800 text-base leading-relaxed mb-3">
+                    นักศึกษาสามารถใช้กฎของเดการ์ตวิเคราะห์จำนวนรากบวกและรากลบที่เป็นไปได้ และเชื่อมโยงผลที่ได้กับทฤษฎีบทอื่นเพื่อจำกัดจำนวนรากของสมการพหุนาม:
+                </p>
+                <ul class="space-y-2.5 text-slate-700 text-sm sm:text-base">
+                    <li class="flex items-start space-x-2.5">
+                        <span class="inline-block w-5 h-5 rounded-full bg-blue-600 text-white text-xs flex items-center justify-center font-bold flex-shrink-0 mt-0.5">✓</span>
+                        <span><strong>นับจำนวนการสลับเครื่องหมาย (Sign Variations)</strong> ของสัมประสิทธิ์ใน $P(x)$ และ $P(-x)$ ได้อย่างถูกต้องแม่นยำ</span>
+                    </li>
+                    <li class="flex items-start space-x-2.5">
+                        <span class="inline-block w-5 h-5 rounded-full bg-blue-600 text-white text-xs flex items-center justify-center font-bold flex-shrink-0 mt-0.5">✓</span>
+                        <span>สร้าง<strong>ตารางแจกแจงกรณีรากที่เป็นไปได้ (Possibility Matrix)</strong> เพื่อจำกัดขอบเขตจำนวนรากจริงบวก รากจริงลบ รากศูนย์ และรากเชิงซ้อนคู่สังยุค</span>
+                    </li>
+                    <li class="flex items-start space-x-2.5">
+                        <span class="inline-block w-5 h-5 rounded-full bg-blue-600 text-white text-xs flex items-center justify-center font-bold flex-shrink-0 mt-0.5">✓</span>
+                        <span>บูรณาการกฎของเดการ์ตร่วมกับ<strong>ทฤษฎีบทรากตรรกยะ</strong>และ<strong>ทฤษฎีบทมูลฐานของพีชคณิต</strong>เพื่อตัดตัวเลือกรากที่ไม่จำเป็นและเร่งการหารากด้วยวิธีเชิงตัวเลข</span>
+                    </li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- ========================================== -->
+        <!-- ส่วนที่ 2: เนื้อหาหลัก -->
+        <!-- ========================================== -->
+        <section class="bg-white rounded-2xl p-6 sm:p-7 shadow-sm border border-slate-200/80 space-y-6">
+            <div class="flex items-center space-x-3 pb-3 border-b border-slate-100">
+                <div class="p-2.5 rounded-xl bg-indigo-50 text-indigo-600">
+                    <i class="fa-solid fa-book-open text-xl"></i>
+                </div>
+                <div>
+                    <h2 class="text-lg font-bold text-slate-900">ส่วนที่ 2 : เนื้อหาหลัก (Core Content)</h2>
+                    <p class="text-xs text-slate-500">ทฤษฎีบทการเปลี่ยนเครื่องหมาย เกณฑ์การวิเคราะห์ และกรณีรากเชิงซ้อน</p>
+                </div>
+            </div>
+
+            <!-- 2.1 ข้อความทฤษฎีกฎของเดการ์ต -->
+            <div class="space-y-3">
+                <h3 class="text-base font-bold text-slate-800 flex items-center space-x-2">
+                    <span class="w-2 h-2 rounded-full bg-indigo-600"></span>
+                    <span>2.1 กฎของเดการ์ตว่าด้วยการเปลี่ยนเครื่องหมาย (Descartes' Rule of Signs)</span>
+                </h3>
+                <div class="p-4 bg-slate-50 rounded-xl border border-slate-200 text-slate-700 leading-relaxed text-sm sm:text-base space-y-2">
+                    <p>
+                        กำหนดพหุนามที่มีสัมประสิทธิ์เป็นจำนวนจริง เรียงตามลำดับดีกรีจากมากไปน้อย:
+                    </p>
+                    <div class="my-2 py-2 px-4 text-center text-indigo-950 bg-white rounded-lg border border-slate-200 font-bold overflow-x-auto text-base">
+                        $$P(x) = a_n x^n + a_{n-1} x^{n-1} + \dots + a_1 x + a_0 \quad (a_n \neq 0)$$
+                    </div>
+                    <p>
+                        ให้ $v_+$ แทน<strong>จำนวนครั้งที่มีการเปลี่ยนเครื่องหมาย</strong> (จาก $+$ เป็น $-$ หรือจาก $-$ เป็น $+$) ของสัมประสิทธิ์ที่ไม่เป็นศูนย์ใน $P(x)$ และ $v_-$ แทนนับการเปลี่ยนเครื่องหมายใน $P(-x)$
+                    </p>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3 pt-2">
+                        <div class="bg-indigo-50 p-4 rounded-xl border border-indigo-200">
+                            <h4 class="font-bold text-indigo-950 text-sm mb-1 flex items-center space-x-1.5">
+                                <i class="fa-solid fa-plus-circle text-indigo-600"></i>
+                                <span>1. จำนวนรากจริงบวก (Positive Real Roots)</span>
+                            </h4>
+                            <p class="text-xs sm:text-sm text-slate-700 leading-relaxed">
+                                จำนวนรากจริงบวก (นับตามพหุภาพ) จะเท่ากับ $v_+$ หรือลดลงจาก $v_+$ เป็นจำนวนเต็มคู่ที่ไม่เป็นลบ:
+                            </p>
+                            <div class="mt-2 text-center font-mono font-bold text-indigo-700 bg-white p-2 rounded border border-indigo-100">
+                                $$n_+ = v_+ - 2k \quad (k = 0, 1, 2, \dots \text{ และ } n_+ \ge 0)$$
+                            </div>
+                        </div>
+                        <div class="bg-emerald-50 p-4 rounded-xl border border-emerald-200">
+                            <h4 class="font-bold text-emerald-950 text-sm mb-1 flex items-center space-x-1.5">
+                                <i class="fa-solid fa-minus-circle text-emerald-600"></i>
+                                <span>2. จำนวนรากจริงลบ (Negative Real Roots)</span>
+                            </h4>
+                            <p class="text-xs sm:text-sm text-slate-700 leading-relaxed">
+                                จำนวนรากจริงลบ (นับตามพหุภาพ) จะเท่ากับ $v_-$ หรือลดลงจาก $v_-$ เป็นจำนวนเต็มคู่ที่ไม่เป็นลบ:
+                            </p>
+                            <div class="mt-2 text-center font-mono font-bold text-emerald-700 bg-white p-2 rounded border border-emerald-100">
+                                $$n_- = v_- - 2k \quad (k = 0, 1, 2, \dots \text{ และ } n_- \ge 0)$$
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 2.2 เทคนิคการหาสัมประสิทธิ์ใน P(-x) และรากศูนย์ -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-2">
+                    <h4 class="text-sm sm:text-base font-bold text-slate-900 flex items-center space-x-2">
+                        <span class="w-2 h-2 rounded-full bg-purple-500"></span>
+                        <span>2.2 การหาสัมประสิทธิ์ของ $P(-x)$ อย่างรวดเร็ว</span>
+                    </h4>
+                    <p class="text-xs sm:text-sm text-slate-700 leading-relaxed">
+                        เมื่อแทน $x$ ด้วย $-x$ พฤติกรรมของกำลังจะเป็นตัวกำหนดเครื่องหมาย:
+                    </p>
+                    <ul class="text-xs sm:text-sm text-slate-600 space-y-1 list-disc list-inside font-mono">
+                        <li>$(-x)^{\text{เลขคู่}} = +x^{\text{เลขคู่}}$ $\rightarrow$ <strong>เครื่องหมายคงเดิม</strong></li>
+                        <li>$(-x)^{\text{เลขคี่}} = -x^{\text{เลขคี่}}$ $\rightarrow$ <strong>เครื่องหมายกลับด้าน $(+ \leftrightarrow -)$</strong></li>
+                    </ul>
+                    <p class="text-xs text-slate-500 pt-1">
+                        ข้อควรระวัง: พจน์ที่มีสัมประสิทธิ์เป็น $0$ จะถูกข้ามไป ไม่นำมานับการสลับเครื่องหมาย
+                    </p>
+                </div>
+
+                <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-2">
+                    <h4 class="text-sm sm:text-base font-bold text-slate-900 flex items-center space-x-2">
+                        <span class="w-2 h-2 rounded-full bg-amber-500"></span>
+                        <span>2.3 รากศูนย์ ($x=0$) และรากเชิงซ้อน</span>
+                    </h4>
+                    <p class="text-xs sm:text-sm text-slate-700 leading-relaxed">
+                        • <strong>รากศูนย์:</strong> สังเกตจากพจน์คงตัว $a_0 = 0$ หาก $x^k$ เป็นกำลังต่ำสุดที่ดึงตัวร่วมออกมาได้ จะมีรากศูนย์ซ้ำ $k$ ราก<br>
+                        • <strong>รากเชิงซ้อน:</strong> เนื่องจากสัมประสิทธิ์เป็นจริง รากเชิงซ้อนจะเกิดเป็นคู่สังยุค ($a \pm bi$) เสมอ ทำให้ลดจำนวนรากจริงลงทีละ 2 ราก ($v - 2k$)
+                    </p>
+                    <div class="p-2 bg-white rounded border border-slate-200 text-xs font-mono text-center font-bold text-indigo-700">
+                        $$\text{รากเชิงซ้อน } n_c = n - (n_+ + n_- + n_0)$$
+                    </div>
+                </div>
+            </div>
+
+            <!-- 2.4 ตัวอย่าง Step-by-Step พร้อมตารางแจกแจงกรณี -->
+            <div class="bg-indigo-50/40 p-4 sm:p-5 rounded-xl border border-indigo-100 space-y-3">
+                <h4 class="text-sm sm:text-base font-bold text-indigo-950 flex items-center space-x-2">
+                    <span class="px-2 py-0.5 rounded bg-indigo-200 text-indigo-900 text-xs font-semibold">ตัวอย่าง</span>
+                    <span>การวิเคราะห์พหุนาม $P(x) = 2x^4 - x^3 - 3x^2 + 5x - 2$</span>
+                </h4>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs sm:text-sm">
+                    <div class="p-3 bg-white rounded-lg border border-indigo-200 space-y-1">
+                        <strong class="text-indigo-900">1. วิเคราะห์ $P(x)$ (รากบวก):</strong><br>
+                        เครื่องหมาย: $\mathbf{+} \quad \mathbf{-} \quad \mathbf{-} \quad \mathbf{+} \quad \mathbf{-}$<br>
+                        การสลับ: $(+ \rightarrow -)$, $(- \rightarrow +)$, $(+ \rightarrow -)$ รวม $v_+ = 3$<br>
+                        <span class="text-emerald-700 font-bold">สรุป: จำนวนรากจริงบวกที่เป็นไปได้คือ 3 หรือ 1 ราก</span>
+                    </div>
+                    <div class="p-3 bg-white rounded-lg border border-indigo-200 space-y-1">
+                        <strong class="text-indigo-900">2. วิเคราะห์ $P(-x)$ (รากลบ):</strong><br>
+                        $P(-x) = 2(-x)^4 - (-x)^3 - 3(-x)^2 + 5(-x) - 2 = 2x^4 + x^3 - 3x^2 - 5x - 2$<br>
+                        เครื่องหมาย: $\mathbf{+} \quad \mathbf{+} \quad \mathbf{-} \quad \mathbf{-} \quad \mathbf{-}$<br>
+                        การสลับ: $(+ \rightarrow -)$ รวม $v_- = 1$<br>
+                        <span class="text-emerald-700 font-bold">สรุป: จำนวนรากจริงลบที่เป็นไปได้คือ 1 รากแน่นอน</span>
+                    </div>
+                </div>
+                <div class="p-3 bg-white rounded-lg border border-indigo-200 text-xs text-slate-700">
+                    <span class="font-bold text-slate-900">ตารางแจกแจงกรณีทั้งหมด (ดีกรีรวม $n=4$, $a_0 \neq 0$ จึงไม่มีรากศูนย์):</span>
+                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-1 font-mono text-center">
+                        <div class="p-1.5 bg-slate-50 rounded border border-slate-200">
+                            กรณี 1: บวก 3, ลบ 1, เชิงซ้อน 0
+                        </div>
+                        <div class="p-1.5 bg-slate-50 rounded border border-slate-200">
+                            กรณี 2: บวก 1, ลบ 1, เชิงซ้อน 2
+                        </div>
+                        <div class="col-span-2 p-1.5 bg-emerald-50 rounded border border-emerald-200 font-sans text-emerald-800 text-left px-3">
+                            💡 ผลสรุป: สมการนี้การันตีว่า<strong>ต้องมีรากจริงลบอย่างน้อย 1 ราก</strong> และ<strong>มีรากจริงบวกอย่างน้อย 1 ราก</strong> แน่นอน!
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ========================================== -->
+        <!-- ส่วนที่ 3: แบบจำลองโต้ตอบ (Interactive Simulation) -->
+        <!-- ========================================== -->
+        <section class="bg-white rounded-2xl p-6 sm:p-7 shadow-sm border border-slate-200/80 space-y-6">
+            <div class="flex items-center justify-between pb-3 border-b border-slate-100 flex-wrap gap-2">
+                <div class="flex items-center space-x-3">
+                    <div class="p-2.5 rounded-xl bg-purple-50 text-purple-600">
+                        <i class="fa-solid fa-chart-line text-xl"></i>
+                    </div>
+                    <div>
+                        <h2 class="text-lg font-bold text-slate-900">ส่วนที่ 3 : แบบจำลองโต้ตอบ (Descartes' Sign Analyzer & Possibility Explorer)</h2>
+                        <p class="text-xs text-slate-500">ปรับสัมประสิทธิ์ ตรวจนับการสลับเครื่องหมาย และสำรวจเมทริกซ์ความเป็นไปได้</p>
+                    </div>
+                </div>
+
+                <!-- Degree and Presets -->
+                <div class="flex items-center space-x-3">
+                    <div class="flex items-center space-x-1.5">
+                        <span class="text-xs font-semibold text-slate-600">ดีกรี:</span>
+                        <div class="inline-flex rounded-lg border border-slate-200 bg-slate-100 p-0.5" id="degSwitch">
+                            <button id="deg3Btn" class="px-2 py-1 text-xs font-semibold rounded-md text-slate-600 hover:text-slate-900 transition">ดีกรี 3</button>
+                            <button id="deg4Btn" class="px-2.5 py-1 text-xs font-bold rounded-md bg-white text-indigo-600 shadow-sm transition">ดีกรี 4</button>
+                            <button id="deg5Btn" class="px-2 py-1 text-xs font-semibold rounded-md text-slate-600 hover:text-slate-900 transition">ดีกรี 5</button>
+                        </div>
+                    </div>
+                    <div class="flex items-center space-x-1.5">
+                        <span class="text-xs font-semibold text-slate-600">พรีเซ็ต:</span>
+                        <select id="descartesPreset" class="text-xs bg-slate-100 border border-slate-300 rounded-lg px-2.5 py-1.5 font-medium text-slate-700 hover:bg-slate-200 transition">
+                            <option value="p1">ตัวอย่างทั่วไป: 2x⁴ - x³ - 3x² + 5x - 2</option>
+                            <option value="p2">ไม่มีรากจริงบวก: x⁴ + 2x³ + 3x² + 4x + 5</option>
+                            <option value="p3">สลับเครื่องหมายถี่: x⁴ - 4x³ + 6x² - 4x + 1</option>
+                            <option value="p4">มีรากศูนย์: 2x⁴ - 4x³ - 6x² (a0=0, a1=0)</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Polynomial Coefficients Controls -->
+            <div class="bg-slate-50 p-4 sm:p-5 rounded-xl border border-slate-200 space-y-4">
+                <div class="flex items-center justify-between">
+                    <span class="text-xs font-bold uppercase tracking-wider text-slate-600">กำหนดสัมประสิทธิ์ $P(x) = \sum a_i x^i$</span>
+                    <button id="resetModelBtn" class="text-xs text-indigo-600 font-semibold hover:underline">คืนค่าเริ่มต้น</button>
+                </div>
+
+                <!-- Dynamic Coefficient Inputs Grid -->
+                <div id="coeffInputsGrid" class="grid grid-cols-2 sm:grid-cols-6 gap-2.5 text-center text-xs">
+                    <!-- Populated dynamically via JS -->
+                </div>
+
+                <!-- Formatted Active Polynomial Display -->
+                <div class="p-3 bg-indigo-950 text-white rounded-xl shadow-inner text-center font-mono font-bold text-sm sm:text-base" id="activePolyDisplay">
+                    P(x) = 2x⁴ - x³ - 3x² + 5x - 2
+                </div>
+            </div>
+
+            <!-- Parallel Comparison Panels: P(x) vs P(-x) -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                
+                <!-- Box 1: P(x) Positive Root Analysis -->
+                <div class="bg-white rounded-2xl p-5 border border-indigo-200 shadow-sm space-y-3">
+                    <div class="flex items-center justify-between pb-2 border-b border-indigo-100">
+                        <span class="text-xs font-bold text-indigo-900 uppercase tracking-wider flex items-center space-x-1.5">
+                            <i class="fa-solid fa-plus-circle text-indigo-600"></i>
+                            <span>การวิเคราะห์ $P(x)$ $\rightarrow$ รากจริงบวก ($n_+$)</span>
+                        </span>
+                        <span id="vPlusBadge" class="text-xs px-2.5 py-0.5 rounded-full bg-indigo-100 text-indigo-800 font-mono font-bold">
+                            สลับ v+ = 3 ครั้ง
+                        </span>
+                    </div>
+
+                    <!-- Sequence of terms and signs -->
+                    <div class="space-y-1.5 text-xs">
+                        <div class="text-slate-500">ลำดับเครื่องหมายของสัมประสิทธิ์:</div>
+                        <div id="pPlusSignsSequence" class="flex flex-wrap items-center gap-1.5 font-mono py-1">
+                            <!-- Injected via JS -->
+                        </div>
+                    </div>
+
+                    <div class="p-3 bg-indigo-50/60 rounded-xl border border-indigo-100 text-xs space-y-1">
+                        <div class="font-bold text-indigo-950">จำนวนรากจริงบวกที่เป็นไปได้ ($v_+ - 2k$):</div>
+                        <div id="pPlusSummary" class="text-sm font-bold font-mono text-indigo-700">
+                            3 หรือ 1 ราก
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Box 2: P(-x) Negative Root Analysis -->
+                <div class="bg-white rounded-2xl p-5 border border-emerald-200 shadow-sm space-y-3">
+                    <div class="flex items-center justify-between pb-2 border-b border-emerald-100">
+                        <span class="text-xs font-bold text-emerald-900 uppercase tracking-wider flex items-center space-x-1.5">
+                            <i class="fa-solid fa-minus-circle text-emerald-600"></i>
+                            <span>การวิเคราะห์ $P(-x)$ $\rightarrow$ รากจริงลบ ($n_-$)</span>
+                        </span>
+                        <span id="vMinusBadge" class="text-xs px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800 font-mono font-bold">
+                            สลับ v- = 1 ครั้ง
+                        </span>
+                    </div>
+
+                    <!-- Sequence of terms and signs -->
+                    <div class="space-y-1.5 text-xs">
+                        <div class="text-slate-500">ลำดับเครื่องหมายของสัมประสิทธิ์ใน $P(-x)$:</div>
+                        <div id="pMinusSignsSequence" class="flex flex-wrap items-center gap-1.5 font-mono py-1">
+                            <!-- Injected via JS -->
+                        </div>
+                    </div>
+
+                    <div class="p-3 bg-emerald-50/60 rounded-xl border border-emerald-100 text-xs space-y-1">
+                        <div class="font-bold text-emerald-950">จำนวนรากจริงลบที่เป็นไปได้ ($v_- - 2k$):</div>
+                        <div id="pMinusSummary" class="text-sm font-bold font-mono text-emerald-700">
+                            1 ราก
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Possibility Matrix & Canvas Graph Layout -->
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+                
+                <!-- Left: Interactive Possibility Matrix (6 cols) -->
+                <div class="lg:col-span-6 space-y-4">
+                    <div class="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm">
+                        <div class="p-3.5 bg-slate-100/70 border-b border-slate-200 font-bold text-xs text-slate-800 flex justify-between items-center">
+                            <span class="flex items-center space-x-1.5">
+                                <i class="fa-solid fa-table-cells text-indigo-600"></i>
+                                <span>ตารางแจกแจงกรณีรากที่เป็นไปได้ทั้งหมด (Possibility Matrix)</span>
+                            </span>
+                            <span id="caseCountBadge" class="text-[11px] font-mono px-2 py-0.5 rounded bg-white text-indigo-700 border border-slate-200">
+                                รวม 2 กรณี
+                            </span>
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-xs text-center border-collapse">
+                                <thead>
+                                    <tr class="bg-slate-50 text-slate-600 border-b border-slate-200 font-medium">
+                                        <th class="py-2.5 px-2">กรณีที่</th>
+                                        <th class="py-2.5 px-2 text-indigo-700 font-bold">รากจริงบวก ($n_+$)</th>
+                                        <th class="py-2.5 px-2 text-emerald-700 font-bold">รากจริงลบ ($n_-$)</th>
+                                        <th class="py-2.5 px-2 text-amber-700 font-bold">รากศูนย์ ($n_0$)</th>
+                                        <th class="py-2.5 px-2 text-purple-700 font-bold">รากเชิงซ้อน ($n_c$)</th>
+                                        <th class="py-2.5 px-2 bg-slate-100 font-bold">ดีกรีรวม ($n$)</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="possibilityMatrixBody" class="divide-y divide-slate-100 font-mono">
+                                    <!-- Populated dynamically via JS -->
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="p-3 bg-slate-50 border-t border-slate-200 text-[11px] text-slate-500 leading-relaxed">
+                            *หมายเหตุ: รากเชิงซ้อน $n_c = n - (n_+ + n_- + n_0)$ จะต้องเป็นจำนวนคู่ ($0, 2, 4, \dots$) เสมอ เพราะเกิดเป็นคู่สังยุค
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right: Interactive Canvas Plotter (6 cols) -->
+                <div class="lg:col-span-6 flex flex-col items-center">
+                    <div class="w-full bg-slate-900 rounded-2xl p-3 border border-slate-800 shadow-md">
+                        <div class="flex justify-between items-center px-2 py-1 mb-2 text-xs text-slate-300">
+                            <span class="font-medium flex items-center space-x-1.5">
+                                <span class="w-2.5 h-2.5 rounded-full bg-indigo-400 inline-block"></span>
+                                <span>กราฟยืนยัน $y = P(x)$ ตัดแกนจริง</span>
+                            </span>
+                            <div class="flex items-center space-x-3 text-[11px]">
+                                <span class="flex items-center space-x-1">
+                                    <span class="w-2 h-2 rounded-full bg-indigo-400"></span>
+                                    <span>$P(x)$</span>
+                                </span>
+                                <span class="flex items-center space-x-1">
+                                    <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+                                    <span>รากบวก ($x > 0$)</span>
+                                </span>
+                                <span class="flex items-center space-x-1">
+                                    <span class="w-2 h-2 rounded-full bg-rose-400"></span>
+                                    <span>รากลบ ($x < 0$)</span>
+                                </span>
+                            </div>
+                        </div>
+
+                        <!-- Canvas Visualizer -->
+                        <div class="relative w-full aspect-[4/3] max-h-[360px] bg-slate-950 rounded-xl overflow-hidden">
+                            <canvas id="descartesCanvas" class="w-full h-full block"></canvas>
+                        </div>
+
+                        <!-- Graph Summary Badge -->
+                        <div class="mt-2.5 p-2 bg-slate-800/60 rounded-lg text-slate-300 text-xs flex justify-between items-center">
+                            <span class="text-[11px] text-slate-400">
+                                💡 จุดสีบนแกน $X$ แสดงตำแหน่งรากจริงที่ตรวจพบจริงบนกราฟ
+                            </span>
+                            <span id="detectedRootsSummary" class="text-[11px] font-mono text-emerald-400 font-bold">
+                                ตรวจพบ: บวก 3, ลบ 1 (ตรงกับกรณีที่ 1)
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- ========================================== -->
+        <!-- ส่วนที่ 4: คำถามนำเพื่อค้นพบ -->
+        <!-- ========================================== -->
+        <section class="bg-white rounded-2xl p-6 sm:p-7 shadow-sm border border-slate-200/80 space-y-5">
+            <div class="flex items-center space-x-3 pb-3 border-b border-slate-100">
+                <div class="p-2.5 rounded-xl bg-amber-50 text-amber-600">
+                    <i class="fa-solid fa-lightbulb text-xl"></i>
+                </div>
+                <div>
+                    <h2 class="text-lg font-bold text-slate-900">ส่วนที่ 4 : คำถามนำเพื่อค้นพบ (Guided Discovery Questions)</h2>
+                    <p class="text-xs text-slate-500">ท้าทายความคิดเพื่อสร้างความเข้าใจที่ลึกซึ้ง (คลิกเพื่อดูแนวทางคำตอบ)</p>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <!-- Question 1 -->
+                <div class="border border-slate-200 rounded-xl p-4 bg-slate-50/50 flex flex-col justify-between">
+                    <div>
+                        <div class="text-indigo-600 font-bold text-xs uppercase tracking-wider mb-1">คำถามที่ 1</div>
+                        <h3 class="text-sm font-semibold text-slate-900 mb-2">
+                            การเปลี่ยนเครื่องหมายของสัมประสิทธิ์บอกอะไรเกี่ยวกับราก?
+                        </h3>
+                        <p class="text-xs text-slate-600 leading-relaxed">
+                            ทำไมพหุนามที่สัมประสิทธิ์เป็นบวกทั้งหมด จึงไม่มีทางมีรากจริงบวกได้เลยแม้แต่รากเดียว?
+                        </p>
+                    </div>
+                    <div class="mt-4 pt-3 border-t border-slate-200/80">
+                        <button onclick="toggleHint('hint1')" class="text-xs font-semibold text-indigo-600 hover:text-indigo-800 flex items-center space-x-1 focus:outline-none">
+                            <span id="hint1_text">💡 ดูแนวทางคำตอบ</span>
+                            <span id="hint1_arr">↓</span>
+                        </button>
+                        <div id="hint1" class="hidden mt-2 p-3 bg-white rounded-lg border border-indigo-100 text-xs text-slate-700 leading-relaxed shadow-sm">
+                            <strong>แนวคำตอบ:</strong> การเปลี่ยนเครื่องหมายสะท้อนถึงการแข่งขันระหว่างพจน์บวกและลบ หากสัมประสิทธิ์เป็นบวกทั้งหมด เมื่อแทนค่า $x > 0$ ทุกพจน์ $a_i x^i > 0$ จะมีค่าเป็นบวกทั้งหมด ผลรวมจึงมากกว่าศูนย์เสมอ ($P(x) > 0$) ไม่มีทางเป็นศูนย์ได้ ดังนั้น <strong>การมีรากจริงบวกจำเป็นต้องมีพจน์ที่มีเครื่องหมายต่างกันเข้ามาหักล้าง</strong> ซึ่งการเปลี่ยนเครื่องหมายจะเป็นตัวกำหนดขอบเขตบนสูงสุดของจำนวนรากบวกที่เป็นไปได้
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Question 2 -->
+                <div class="border border-slate-200 rounded-xl p-4 bg-slate-50/50 flex flex-col justify-between">
+                    <div>
+                        <div class="text-indigo-600 font-bold text-xs uppercase tracking-wider mb-1">คำถามที่ 2</div>
+                        <h3 class="text-sm font-semibold text-slate-900 mb-2">
+                            เหตุใดจำนวนรากบวกที่แท้จริงจึงอาจน้อยกว่าจำนวนการเปลี่ยนเครื่องหมาย?
+                        </h3>
+                        <p class="text-xs text-slate-600 leading-relaxed">
+                            ทำไมจำนวนรากจริงจึงต้องลดลงทีละ 2 รากเสมอ ($v - 2, v - 4, \dots$)?
+                        </p>
+                    </div>
+                    <div class="mt-4 pt-3 border-t border-slate-200/80">
+                        <button onclick="toggleHint('hint2')" class="text-xs font-semibold text-indigo-600 hover:text-indigo-800 flex items-center space-x-1 focus:outline-none">
+                            <span id="hint2_text">💡 ดูแนวทางคำตอบ</span>
+                            <span id="hint2_arr">↓</span>
+                        </button>
+                        <div id="hint2" class="hidden mt-2 p-3 bg-white rounded-lg border border-indigo-100 text-xs text-slate-700 leading-relaxed shadow-sm">
+                            <strong>แนวคำตอบ: เพราะรากเชิงซ้อนที่ไม่ใช่จำนวนจริงจะเกิดขึ้นเป็นคู่สังยุค (Complex Conjugate Pairs) เสมอ</strong> ตามทฤษฎีบทรากเชิงซ้อนสังยุค ($a + bi$ และ $a - bi$) ในพหุนามสัมประสิทธิ์จริง เมื่อรากจริงหายไปเพื่อกลายสภาพเป็นรากเชิงซ้อน จึงต้องหายไปทีละ 2 ตัวพร้อมกันเสมอ ทำให้ $n_+ = v_+ - 2k$ และ $n_- = v_- - 2k$
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Question 3 -->
+                <div class="border border-slate-200 rounded-xl p-4 bg-slate-50/50 flex flex-col justify-between">
+                    <div>
+                        <div class="text-indigo-600 font-bold text-xs uppercase tracking-wider mb-1">คำถามที่ 3</div>
+                        <h3 class="text-sm font-semibold text-slate-900 mb-2">
+                            เมื่อนำกฎของเดการ์ตมาใช้ร่วมกับรากตรรกยะ เราจำกัดตัวเลือกได้มากขึ้นอย่างไร?
+                        </h3>
+                        <p class="text-xs text-slate-600 leading-relaxed">
+                            ถ้ากฎของเดการ์ตสรุปได้ว่า $v_+ = 0$ เราจะประหยัดเวลาในการทดสอบรากตรรกยะได้อย่างไร?
+                        </p>
+                    </div>
+                    <div class="mt-4 pt-3 border-t border-slate-200/80">
+                        <button onclick="toggleHint('hint3')" class="text-xs font-semibold text-indigo-600 hover:text-indigo-800 flex items-center space-x-1 focus:outline-none">
+                            <span id="hint3_text">💡 ดูแนวทางคำตอบ</span>
+                            <span id="hint3_arr">↓</span>
+                        </button>
+                        <div id="hint3" class="hidden mt-2 p-3 bg-white rounded-lg border border-indigo-100 text-xs text-slate-700 leading-relaxed shadow-sm">
+                            <strong>แนวคำตอบ: ช่วยตัดตัวเลือกผู้ท้าชิงออกไปได้ถึงครึ่งหนึ่งทันที!</strong> เช่น หากทฤษฎีบทรากตรรกยะให้ค่าผู้ท้าชิง $\pm 1, \pm 2, \pm 3, \pm 6$ รวม 8 ค่า แต่กฎของเดการ์ตฟ้องว่า $v_+ = 0$ (ไม่มีรากจริงบวกแน่นอน) เราสามารถ<strong>ตัดค่าบวก $+1, +2, +3, +6$ ทิ้งทั้งหมด</strong> เหลือเพียงค่าลบให้ทดสอบเพียง 4 ค่าเท่านั้น ช่วยประหยัดเวลาและทรัพยากรการคำนวณอย่างมหาศาล
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ========================================== -->
+        <!-- ส่วนที่ 5: แบบฝึกหัดสำหรับนักศึกษา -->
+        <!-- ========================================== -->
+        <section class="bg-white rounded-2xl p-6 sm:p-7 shadow-sm border border-slate-200/80 space-y-6">
+            <div class="flex items-center space-x-3 pb-3 border-b border-slate-100">
+                <div class="p-2.5 rounded-xl bg-emerald-50 text-emerald-600">
+                    <i class="fa-solid fa-pen-to-square text-xl"></i>
+                </div>
+                <div>
+                    <h2 class="text-lg font-bold text-slate-900">ส่วนที่ 5 : แบบฝึกหัดสำหรับนักศึกษา (Practice Exercises)</h2>
+                    <p class="text-xs text-slate-500">ทดสอบทักษะการวิเคราะห์กฎของเดการ์ต การจำแนกประเภทราก และการนำไปประยุกต์ร่วม</p>
+                </div>
+            </div>
+
+            <div class="space-y-6">
+                <!-- Exercise 1 -->
+                <div class="p-4 sm:p-5 rounded-xl bg-slate-50 border border-slate-200 space-y-3">
+                    <div class="flex items-center justify-between">
+                        <span class="text-xs font-bold text-indigo-700 bg-indigo-100 px-2.5 py-0.5 rounded-full">ข้อที่ 1: การวิเคราะห์จำนวนรากบวกและรากลบ</span>
+                    </div>
+                    <p class="text-sm font-medium text-slate-800">
+                        กำหนดพหุนาม $P(x) = 2x^4 - 3x^3 - 5x^2 + 3x - 1$ จงวิเคราะห์ว่าสมการนี้สามารถมี<strong>รากจริงบวก</strong>และ<strong>รากจริงลบ</strong>ได้กี่รากตามลำดับ?
+                    </p>
+
+                    <div class="space-y-2 text-xs sm:text-sm">
+                        <label class="flex items-center space-x-2.5 p-2 rounded-lg hover:bg-white cursor-pointer transition">
+                            <input type="radio" name="ex1_opt" value="A" class="text-indigo-600">
+                            <span class="text-slate-700">ก) รากบวก: 3 หรือ 1 ราก, รากลบ: 1 ราก</span>
+                        </label>
+                        <label class="flex items-center space-x-2.5 p-2 rounded-lg hover:bg-white cursor-pointer transition">
+                            <input type="radio" name="ex1_opt" value="B" class="text-indigo-600">
+                            <span class="text-slate-700">ข) รากบวก: 2 หรือ 0 ราก, รากลบ: 2 หรือ 0 ราก</span>
+                        </label>
+                        <label class="flex items-center space-x-2.5 p-2 rounded-lg hover:bg-white cursor-pointer transition">
+                            <input type="radio" name="ex1_opt" value="C" class="text-indigo-600">
+                            <span class="text-slate-700">ค) รากบวก: 4 หรือ 2 ราก, รากลบ: ไม่มีเลย (0 ราก)</span>
+                        </label>
+                    </div>
+
+                    <div class="flex items-center space-x-3 pt-2">
+                        <button onclick="checkEx1()" class="px-4 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold shadow-sm transition">
+                            ตรวจคำตอบ
+                        </button>
+                        <span id="ex1_result" class="text-xs font-medium"></span>
+                    </div>
+                    <div id="ex1_expl" class="hidden text-xs bg-white p-3 rounded-lg border border-slate-200 text-slate-700"></div>
+                </div>
+
+                <!-- Exercise 2 -->
+                <div class="p-4 sm:p-5 rounded-xl bg-slate-50 border border-slate-200 space-y-3">
+                    <div class="flex items-center justify-between">
+                        <span class="text-xs font-bold text-indigo-700 bg-indigo-100 px-2.5 py-0.5 rounded-full">ข้อที่ 2: การวิเคราะห์พหุนามที่มีรากศูนย์</span>
+                    </div>
+                    <p class="text-sm font-medium text-slate-800">
+                        สำหรับพหุนาม $Q(x) = x^5 + 4x^3 + 2x$ ข้อสรุปใดถูกต้องที่สุดเกี่ยวกับรากของสมการนี้?
+                    </p>
+
+                    <div class="space-y-2 text-xs sm:text-sm">
+                        <label class="flex items-center space-x-2.5 p-2 rounded-lg hover:bg-white cursor-pointer transition">
+                            <input type="radio" name="ex2_opt" value="A" class="text-indigo-600">
+                            <span class="text-slate-700">ก) มีรากจริงบวก 1 ราก, รากจริงลบ 1 ราก และมีรากศูนย์ 1 ราก</span>
+                        </label>
+                        <label class="flex items-center space-x-2.5 p-2 rounded-lg hover:bg-white cursor-pointer transition">
+                            <input type="radio" name="ex2_opt" value="B" class="text-indigo-600">
+                            <span class="text-slate-700">ข) ไม่มีรากจริงบวก (0 ราก), ไม่มีรากจริงลบ (0 ราก), มีรากศูนย์ 1 ราก ($x=0$) และมีรากเชิงซ้อน 4 ราก</span>
+                        </label>
+                        <label class="flex items-center space-x-2.5 p-2 rounded-lg hover:bg-white cursor-pointer transition">
+                            <input type="radio" name="ex2_opt" value="C" class="text-indigo-600">
+                            <span class="text-slate-700">ค) มีรากจริงบวก 3 ราก และรากจริงลบ 2 ราก</span>
+                        </label>
+                    </div>
+
+                    <div class="flex items-center space-x-3 pt-2">
+                        <button onclick="checkEx2()" class="px-4 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold shadow-sm transition">
+                            ตรวจคำตอบ
+                        </button>
+                        <span id="ex2_result" class="text-xs font-medium"></span>
+                    </div>
+                    <div id="ex2_expl" class="hidden text-xs bg-white p-3 rounded-lg border border-slate-200 text-slate-700"></div>
+                </div>
+
+                <!-- Exercise 3 -->
+                <div class="p-4 sm:p-5 rounded-xl bg-slate-50 border border-slate-200 space-y-3">
+                    <div class="flex items-center justify-between">
+                        <span class="text-xs font-bold text-indigo-700 bg-indigo-100 px-2.5 py-0.5 rounded-full">ข้อที่ 3: การประยุกต์ร่วมกับทฤษฎีบทรากตรรกยะ</span>
+                    </div>
+                    <p class="text-sm font-medium text-slate-800">
+                        กำหนด $P(x) = x^3 + 3x^2 + 5x + 6 = 0$ หากนำกฎของเดการ์ตมาใช้ร่วมกับทฤษฎีบทรากตรรกยะ จะสามารถตัดตัวเลือกรากตรรกยะและเหลือค่าที่ต้องทดลองกี่ค่า?
+                    </p>
+
+                    <div class="space-y-2 text-xs sm:text-sm">
+                        <label class="flex items-center space-x-2.5 p-2 rounded-lg hover:bg-white cursor-pointer transition">
+                            <input type="radio" name="ex3_opt" value="A" class="text-indigo-600">
+                            <span class="text-slate-700">ก) เนื่องจาก $v_+ = 0$ จึงตัดค่าบวกทิ้งทั้งหมด เหลือเฉพาะค่าลบ 4 ค่าคือ $-1, -2, -3, -6$</span>
+                        </label>
+                        <label class="flex items-center space-x-2.5 p-2 rounded-lg hover:bg-white cursor-pointer transition">
+                            <input type="radio" name="ex3_opt" value="B" class="text-indigo-600">
+                            <span class="text-slate-700">ข) ต้องทดสอบทั้งบวกและลบครบ 8 ค่าตามเดิม เพราะกฎของเดการ์ตช่วยอะไรไม่ได้</span>
+                        </label>
+                        <label class="flex items-center space-x-2.5 p-2 rounded-lg hover:bg-white cursor-pointer transition">
+                            <input type="radio" name="ex3_opt" value="C" class="text-indigo-600">
+                            <span class="text-slate-700">ค) ตัดค่าลบทิ้งทั้งหมด เหลือเฉพาะค่าบวก $+1, +2, +3, +6$</span>
+                        </label>
+                    </div>
+
+                    <div class="flex items-center space-x-3 pt-2">
+                        <button onclick="checkEx3()" class="px-4 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold shadow-sm transition">
+                            ตรวจคำตอบ
+                        </button>
+                        <span id="ex3_result" class="text-xs font-medium"></span>
+                    </div>
+                    <div id="ex3_expl" class="hidden text-xs bg-white p-3 rounded-lg border border-slate-200 text-slate-700"></div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-white border-t border-slate-200 mt-12 py-6 text-center text-xs text-slate-500">
+        <div class="max-w-6xl w-full mx-auto px-4 sm:px-6 lg:px-8">
+            <p>บทเรียนแบบโต้ตอบ: ระเบียบวิธีเชิงตัวเลข (Numerical Methods) • เรื่องที่ 7 กฎของเดการ์ตและการวิเคราะห์จำนวนราก</p>
+            <p class="mt-1 text-slate-400">สิ้นสุดบทที่ 1 รากของสมการ (7 หัวข้อสมบูรณ์)</p>
+        </div>
+    </footer>
+
+    <!-- Interactive Simulation Script -->
+    <script>
+        // State
+        let currentDegree = 4;
+        let coeffs = [2, -1, -3, 5, -2]; // a4, a3, a2, a1, a0
+
+        // DOM elements
+        const deg3Btn = document.getElementById('deg3Btn');
+        const deg4Btn = document.getElementById('deg4Btn');
+        const deg5Btn = document.getElementById('deg5Btn');
+        const descartesPreset = document.getElementById('descartesPreset');
+        const coeffInputsGrid = document.getElementById('coeffInputsGrid');
+        const activePolyDisplay = document.getElementById('activePolyDisplay');
+        const resetModelBtn = document.getElementById('resetModelBtn');
+
+        const vPlusBadge = document.getElementById('vPlusBadge');
+        const pPlusSignsSequence = document.getElementById('pPlusSignsSequence');
+        const pPlusSummary = document.getElementById('pPlusSummary');
+
+        const vMinusBadge = document.getElementById('vMinusBadge');
+        const pMinusSignsSequence = document.getElementById('pMinusSignsSequence');
+        const pMinusSummary = document.getElementById('pMinusSummary');
+
+        const possibilityMatrixBody = document.getElementById('possibilityMatrixBody');
+        const caseCountBadge = document.getElementById('caseCountBadge');
+        const detectedRootsSummary = document.getElementById('detectedRootsSummary');
+
+        // Canvas element
+        const canvas = document.getElementById('descartesCanvas');
+        const ctx = canvas.getContext('2d');
+        const xMin = -4;
+        const xMax = 4;
+        let yMin = -20;
+        let yMax = 20;
+
+        // Polynomial evaluation helper
+        function evalPoly(x) {
+            let sum = 0;
+            const n = currentDegree;
+            for (let i = 0; i <= n; i++) {
+                sum += coeffs[i] * Math.pow(x, n - i);
+            }
+            return sum;
+        }
+
+        // Coordinate transforms
+        function toCanvasX(x, width) {
+            return ((x - xMin) / (xMax - xMin)) * width;
+        }
+
+        function toCanvasY(y, height) {
+            return height - ((y - yMin) / (yMax - yMin)) * height;
+        }
+
+        function toMathX(px, width) {
+            return xMin + (px / width) * (xMax - xMin);
+        }
+
+        function resizeCanvas() {
+            const rect = canvas.parentElement.getBoundingClientRect();
+            const dpr = window.devicePixelRatio || 1;
+            canvas.width = rect.width * dpr;
+            canvas.height = rect.height * dpr;
+            ctx.resetTransform?.();
+            ctx.scale(dpr, dpr);
+            drawPlot();
+        }
+
+        // Render Dynamic Inputs Grid
+        function renderCoeffInputs() {
+            coeffInputsGrid.innerHTML = '';
+            for (let i = currentDegree; i >= 0; i--) {
+                const col = document.createElement('div');
+                const label = document.createElement('label');
+                label.className = 'block text-slate-500 mb-1 font-mono font-medium';
+                label.innerText = `a${i} (x${i})`;
+
+                const inp = document.createElement('input');
+                inp.type = 'number';
+                inp.step = '1';
+                inp.id = `input_coeff_${i}`;
+                inp.className = 'w-full text-center font-mono font-bold bg-white border border-slate-300 rounded-lg py-1.5 focus:ring-2 focus:ring-indigo-500 focus:outline-none';
+                
+                const idx = currentDegree - i;
+                inp.value = coeffs[idx] !== undefined ? coeffs[idx] : (i === currentDegree ? 1 : 0);
+
+                inp.addEventListener('input', () => {
+                    syncInputsFromGrid();
+                });
+
+                col.appendChild(label);
+                col.appendChild(inp);
+                coeffInputsGrid.appendChild(col);
+            }
+        }
+
+        function syncInputsFromGrid() {
+            const newCoeffs = [];
+            for (let i = currentDegree; i >= 0; i--) {
+                const el = document.getElementById(`input_coeff_${i}`);
+                newCoeffs.push(parseFloat(el.value) || 0);
+            }
+            coeffs = newCoeffs;
+            updateModel();
+        }
+
+        // Update All Analytics
+        function updateModel() {
+            const n = currentDegree;
+
+            // 1. Build Equation String
+            let eqStr = 'P(x) = ';
+            let terms = [];
+            for (let i = 0; i <= n; i++) {
+                const power = n - i;
+                const c = coeffs[i];
+                if (c !== 0 || (power === 0 && terms.length === 0)) {
+                    let sign = (c > 0 && terms.length > 0) ? '+ ' : (c < 0 ? '- ' : '');
+                    let absC = Math.abs(c);
+                    let cStr = (absC === 1 && power > 0) ? '' : absC;
+                    let xStr = power > 1 ? `x^{${power}}` : (power === 1 ? 'x' : '');
+                    terms.push(`${sign}${cStr}${xStr}`);
+                }
+            }
+            activePolyDisplay.innerText = terms.length > 0 ? `P(x) = ${terms.join(' ')}` : 'P(x) = 0';
+
+            // 2. Count Zero Roots
+            let zeroRoots = 0;
+            for (let i = n; i >= 0; i--) {
+                if (coeffs[i] === 0) {
+                    zeroRoots++;
+                } else {
+                    break;
+                }
+            }
+
+            // 3. Analyze P(x) Sign Variations (v+)
+            const nonZeroP = [];
+            for (let i = 0; i <= n; i++) {
+                if (coeffs[i] !== 0) {
+                    nonZeroP.push({ power: n - i, val: coeffs[i], sign: coeffs[i] > 0 ? '+' : '-' });
+                }
+            }
+
+            let vPlus = 0;
+            pPlusSignsSequence.innerHTML = '';
+            nonZeroP.forEach((term, idx) => {
+                const badge = document.createElement('span');
+                badge.className = `px-2 py-0.5 rounded font-bold ${term.sign === '+' ? 'bg-indigo-100 text-indigo-800 border border-indigo-200' : 'bg-rose-100 text-rose-800 border border-rose-200'}`;
+                badge.innerText = `${term.sign} (${term.val > 0 ? '+' : ''}${term.val}x^${term.power})`;
+                pPlusSignsSequence.appendChild(badge);
+
+                if (idx < nonZeroP.length - 1) {
+                    const nextTerm = nonZeroP[idx + 1];
+                    const isChange = (term.sign !== nextTerm.sign);
+                    const arrow = document.createElement('span');
+                    if (isChange) {
+                        vPlus++;
+                        arrow.className = 'text-xs text-rose-600 font-bold px-1 animate-pulse';
+                        arrow.innerText = '⮂ สลับ!';
+                    } else {
+                        arrow.className = 'text-xs text-slate-400 px-0.5';
+                        arrow.innerText = '→';
+                    }
+                    pPlusSignsSequence.appendChild(arrow);
+                }
+            });
+
+            vPlusBadge.innerText = `สลับ v+ = ${vPlus} ครั้ง`;
+            const posOptions = [];
+            for (let k = vPlus; k >= 0; k -= 2) posOptions.push(k);
+            pPlusSummary.innerText = posOptions.join(' หรือ ') + ' ราก';
+
+            // 4. Analyze P(-x) Sign Variations (v-)
+            const nonZeroM = [];
+            for (let i = 0; i <= n; i++) {
+                const power = n - i;
+                const coeff = coeffs[i];
+                if (coeff !== 0) {
+                    const signMultiplier = (power % 2 === 0) ? 1 : -1;
+                    const valM = coeff * signMultiplier;
+                    nonZeroM.push({ power: power, val: valM, sign: valM > 0 ? '+' : '-' });
+                }
+            }
+
+            let vMinus = 0;
+            pMinusSignsSequence.innerHTML = '';
+            nonZeroM.forEach((term, idx) => {
+                const badge = document.createElement('span');
+                badge.className = `px-2 py-0.5 rounded font-bold ${term.sign === '+' ? 'bg-emerald-100 text-emerald-800 border border-emerald-200' : 'bg-amber-100 text-amber-800 border border-amber-200'}`;
+                badge.innerText = `${term.sign} (${term.val > 0 ? '+' : ''}${term.val}x^${term.power})`;
+                pMinusSignsSequence.appendChild(badge);
+
+                if (idx < nonZeroM.length - 1) {
+                    const nextTerm = nonZeroM[idx + 1];
+                    const isChange = (term.sign !== nextTerm.sign);
+                    const arrow = document.createElement('span');
+                    if (isChange) {
+                        vMinus++;
+                        arrow.className = 'text-xs text-emerald-600 font-bold px-1 animate-pulse';
+                        arrow.innerText = '⮂ สลับ!';
+                    } else {
+                        arrow.className = 'text-xs text-slate-400 px-0.5';
+                        arrow.innerText = '→';
+                    }
+                    pMinusSignsSequence.appendChild(arrow);
+                }
+            });
+
+            vMinusBadge.innerText = `สลับ v- = ${vMinus} ครั้ง`;
+            const negOptions = [];
+            for (let k = vMinus; k >= 0; k -= 2) negOptions.push(k);
+            pMinusSummary.innerText = negOptions.join(' หรือ ') + ' ราก';
+
+            // 5. Generate Possibility Matrix
+            possibilityMatrixBody.innerHTML = '';
+            let caseIndex = 1;
+            posOptions.forEach(pCount => {
+                negOptions.forEach(nCount => {
+                    const compCount = n - (pCount + nCount + zeroRoots);
+                    if (compCount >= 0 && compCount % 2 === 0) {
+                        const tr = document.createElement('tr');
+                        tr.className = 'hover:bg-slate-50 transition';
+                        tr.innerHTML = `
+                            <td class="py-2.5 px-2 font-bold text-slate-700">กรณีที่ ${caseIndex++}</td>
+                            <td class="py-2.5 px-2 text-indigo-700 font-bold bg-indigo-50/40">${pCount}</td>
+                            <td class="py-2.5 px-2 text-emerald-700 font-bold bg-emerald-50/40">${nCount}</td>
+                            <td class="py-2.5 px-2 text-amber-700 font-bold">${zeroRoots}</td>
+                            <td class="py-2.5 px-2 text-purple-700 font-bold">${compCount}</td>
+                            <td class="py-2.5 px-2 bg-slate-100 font-bold text-slate-800">${n}</td>
+                        `;
+                        possibilityMatrixBody.appendChild(tr);
+                    }
+                });
+            });
+            caseCountBadge.innerText = `รวม ${caseIndex - 1} กรณีที่เป็นไปได้`;
+
+            // 6. Draw Graph and detect actual roots
+            drawPlot();
+        }
+
+        // Draw Interactive Plot on Canvas & Detect Real Roots
+        function drawPlot() {
+            const rect = canvas.parentElement.getBoundingClientRect();
+            const width = rect.width;
+            const height = rect.height;
+            if (width === 0 || height === 0) return;
+
+            ctx.clearRect(0, 0, width, height);
+
+            // 1. Grid
+            ctx.lineWidth = 1;
+            ctx.strokeStyle = '#1e293b';
+            ctx.fillStyle = '#64748b';
+            ctx.font = '10px Inter, sans-serif';
+
+            for (let x = Math.ceil(xMin); x <= Math.floor(xMax); x++) {
+                const cx = toCanvasX(x, width);
+                ctx.beginPath();
+                ctx.moveTo(cx, 0);
+                ctx.lineTo(cx, height);
+                ctx.stroke();
+
+                if (x !== 0) {
+                    const cy0 = toCanvasY(0, height);
+                    ctx.fillText(x, cx - 4, Math.min(Math.max(cy0 + 12, 14), height - 4));
+                }
+            }
+
+            for (let y = Math.ceil(yMin); y <= Math.floor(yMax); y += 10) {
+                const cy = toCanvasY(y, height);
+                ctx.beginPath();
+                ctx.moveTo(0, cy);
+                ctx.lineTo(width, cy);
+                ctx.stroke();
+
+                if (y !== 0) {
+                    const cx0 = toCanvasX(0, width);
+                    ctx.fillText(y, Math.min(Math.max(cx0 + 4, 2), width - 20), cy + 3);
+                }
+            }
+
+            // 2. Axes
+            ctx.lineWidth = 2;
+            ctx.strokeStyle = '#475569';
+            const cy0 = toCanvasY(0, height);
+            ctx.beginPath();
+            ctx.moveTo(0, cy0);
+            ctx.lineTo(width, cy0);
+            ctx.stroke();
+
+            const cx0 = toCanvasX(0, width);
+            ctx.beginPath();
+            ctx.moveTo(cx0, 0);
+            ctx.lineTo(cx0, height);
+            ctx.stroke();
+
+            // 3. Draw Polynomial Curve
+            ctx.beginPath();
+            ctx.lineWidth = 2.5;
+            ctx.strokeStyle = '#818cf8';
+
+            let first = true;
+            for (let px = 0; px <= width; px += 2) {
+                const xVal = toMathX(px, width);
+                const yVal = evalPoly(xVal);
+                const py = toCanvasY(yVal, height);
+
+                if (first) {
+                    ctx.moveTo(px, py);
+                    first = false;
+                } else {
+                    ctx.lineTo(px, py);
+                }
+            }
+            ctx.stroke();
+
+            // 4. Numerical search for actual real roots within [-4, 4]
+            const realRoots = [];
+            const step = 0.02;
+            let prevX = xMin;
+            let prevY = evalPoly(prevX);
+
+            for (let x = xMin + step; x <= xMax; x += step) {
+                const y = evalPoly(x);
+                if (Math.abs(y) < 1e-6) {
+                    realRoots.push(x);
+                } else if (prevY * y < 0) {
+                    // Sign change: bisect
+                    let left = prevX, right = x;
+                    for (let k = 0; k < 20; k++) {
+                        const mid = (left + right) / 2;
+                        if (evalPoly(left) * evalPoly(mid) <= 0) right = mid;
+                        else left = mid;
+                    }
+                    realRoots.push((left + right) / 2);
+                }
+                prevX = x;
+                prevY = y;
+            }
+
+            // Mark detected real roots on Canvas
+            let actualPos = 0;
+            let actualNeg = 0;
+            let actualZero = 0;
+
+            realRoots.forEach(r => {
+                if (Math.abs(r) < 1e-3) actualZero++;
+                else if (r > 0) actualPos++;
+                else actualNeg++;
+
+                const rx = toCanvasX(r, width);
+                const ry = toCanvasY(0, height);
+
+                // Circle glow
+                ctx.beginPath();
+                ctx.arc(rx, ry, 7, 0, Math.PI * 2);
+                ctx.fillStyle = r > 0 ? 'rgba(52, 211, 153, 0.4)' : (r < 0 ? 'rgba(251, 113, 133, 0.4)' : 'rgba(251, 191, 36, 0.4)');
+                ctx.fill();
+
+                // Solid center dot
+                ctx.beginPath();
+                ctx.arc(rx, ry, 4, 0, Math.PI * 2);
+                ctx.fillStyle = r > 0 ? '#10b981' : (r < 0 ? '#f43f5e' : '#f59e0b');
+                ctx.fill();
+
+                // Label
+                ctx.fillStyle = '#f8fafc';
+                ctx.font = 'bold 10px monospace';
+                ctx.fillText(`r≈${r.toFixed(2)}`, rx - 14, ry - 10);
+            });
+
+            detectedRootsSummary.innerText = `ตรวจพบบนกราฟ: บวก ${actualPos}, ลบ ${actualNeg}, ศูนย์ ${actualZero}`;
+        }
+
+        // Degree Switches
+        deg3Btn.addEventListener('click', () => {
+            currentDegree = 3;
+            coeffs = [1, -2, -1, 2];
+            setDegreeUI();
+        });
+
+        deg4Btn.addEventListener('click', () => {
+            currentDegree = 4;
+            coeffs = [2, -1, -3, 5, -2];
+            setDegreeUI();
+        });
+
+        deg5Btn.addEventListener('click', () => {
+            currentDegree = 5;
+            coeffs = [1, 0, -4, 0, 3, 0];
+            setDegreeUI();
+        });
+
+        function setDegreeUI() {
+            [deg3Btn, deg4Btn, deg5Btn].forEach(b => {
+                b.className = 'px-2 py-1 text-xs font-semibold rounded-md text-slate-600 hover:text-slate-900 transition';
+            });
+            if (currentDegree === 3) deg3Btn.className = 'px-2.5 py-1 text-xs font-bold rounded-md bg-white text-indigo-600 shadow-sm transition';
+            if (currentDegree === 4) deg4Btn.className = 'px-2.5 py-1 text-xs font-bold rounded-md bg-white text-indigo-600 shadow-sm transition';
+            if (currentDegree === 5) deg5Btn.className = 'px-2.5 py-1 text-xs font-bold rounded-md bg-white text-indigo-600 shadow-sm transition';
+            renderCoeffInputs();
+            updateModel();
+        }
+
+        // Preset Listener
+        descartesPreset.addEventListener('change', (e) => {
+            const v = e.target.value;
+            if (v === 'p1') {
+                currentDegree = 4;
+                coeffs = [2, -1, -3, 5, -2];
+            } else if (v === 'p2') {
+                currentDegree = 4;
+                coeffs = [1, 2, 3, 4, 5];
+            } else if (v === 'p3') {
+                currentDegree = 4;
+                coeffs = [1, -4, 6, -4, 1];
+            } else if (v === 'p4') {
+                currentDegree = 4;
+                coeffs = [2, -4, -6, 0, 0];
+            }
+            setDegreeUI();
+        });
+
+        // Reset Button
+        resetModelBtn.addEventListener('click', () => {
+            descartesPreset.value = 'p1';
+            currentDegree = 4;
+            coeffs = [2, -1, -3, 5, -2];
+            setDegreeUI();
+        });
+
+        // Toggle Discovery Hints
+        function toggleHint(id) {
+            const el = document.getElementById(id);
+            const text = document.getElementById(id + '_text');
+            const arr = document.getElementById(id + '_arr');
+            if (el.classList.contains('hidden')) {
+                el.classList.remove('hidden');
+                text.innerText = 'ซ่อนแนวทางคำตอบ';
+                arr.innerText = '↑';
+            } else {
+                el.classList.add('hidden');
+                text.innerText = '💡 ดูแนวทางคำตอบ';
+                arr.innerText = '↓';
+            }
+        }
+
+        // Exercises Verification Functions
+        function checkEx1() {
+            const opt = document.querySelector('input[name="ex1_opt"]:checked');
+            const res = document.getElementById('ex1_result');
+            const expl = document.getElementById('ex1_expl');
+
+            if (!opt) {
+                res.innerHTML = '<span class="text-amber-600 font-bold">กรุณาเลือกคำตอบ</span>';
+                return;
+            }
+
+            // P(x) = 2x^4 - 3x^3 - 5x^2 + 3x - 1
+            // Signs in P(x): + , - , - , + , - -> changes: (+ to -), (- to +), (+ to -) => v+ = 3 -> 3 or 1
+            // P(-x) = 2x^4 + 3x^3 - 5x^2 - 3x - 1
+            // Signs in P(-x): + , + , - , - , - -> changes: (+ to -) => v- = 1 -> 1
+            if (opt.value === 'A') {
+                res.innerHTML = '<span class="text-emerald-600 font-bold">✓ ถูกต้องยอดเยี่ยม! ข้อ ก. (รากบวก: 3 หรือ 1, รากลบ: 1)</span>';
+                expl.className = 'text-xs bg-emerald-50 p-3 rounded-lg border border-emerald-200 text-slate-800 space-y-1 block';
+                expl.innerHTML = `<strong>ขั้นตอนการวิเคราะห์:</strong><br>
+                    • ลำดับเครื่องหมายใน $P(x)$: $+ , - , - , + , -$ มีการสลับเครื่องหมาย 3 ครั้ง $\\rightarrow$ รากจริงบวกคือ $3$ หรือ $3-2=1$ ราก<br>
+                    • ลำดับเครื่องหมายใน $P(-x)$: $+ , + , - , - , -$ มีการสลับเครื่องหมาย 1 ครั้ง $\\rightarrow$ รากจริงลบคือ $1$ รากแน่นอน`;
+            } else {
+                res.innerHTML = '<span class="text-rose-600 font-bold">✕ ยังไม่ถูกต้อง ตรวจสอบการนับการสลับเครื่องหมาย</span>';
+                expl.className = 'text-xs bg-rose-50 p-3 rounded-lg border border-rose-200 text-slate-800 space-y-1 block';
+                expl.innerHTML = '<strong>คำใบ้:</strong> เขียนลำดับเครื่องหมายของ $P(x)$ และ $P(-x)$ ออกมาทีละตัว แล้วนับจุดที่มีการเปลี่ยนเครื่องหมาย';
+            }
+            if (window.renderMathInElement) renderMathInElement(expl);
+        }
+
+        function checkEx2() {
+            const opt = document.querySelector('input[name="ex2_opt"]:checked');
+            const res = document.getElementById('ex2_result');
+            const expl = document.getElementById('ex2_expl');
+
+            if (!opt) {
+                res.innerHTML = '<span class="text-amber-600 font-bold">กรุณาเลือกคำตอบ</span>';
+                return;
+            }
+
+            // Q(x) = x^5 + 4x^3 + 2x = x(x^4 + 4x^2 + 2)
+            // Signs: + , + , + -> v+ = 0 (no positive root)
+            // Q(-x) = -x^5 - 4x^3 - 2x -> Signs: - , - , - -> v- = 0 (no negative root)
+            // Factor x out -> 1 zero root (x = 0)
+            // Total degree = 5 -> Remaining 4 roots are complex
+            if (opt.value === 'B') {
+                res.innerHTML = '<span class="text-emerald-600 font-bold">✓ ถูกต้องสมบูรณ์แบบ! ข้อ ข.</span>';
+                expl.className = 'text-xs bg-emerald-50 p-3 rounded-lg border border-emerald-200 text-slate-800 space-y-1 block';
+                expl.innerHTML = `<strong>บทวิเคราะห์:</strong><br>
+                    1. พหุนามไม่มีพจน์คงตัว ($a_0 = 0$) และดึง $x$ ออกมาได้ $Q(x) = x(x^4 + 4x^2 + 2) = 0$ จึงมีรากศูนย์ 1 ราก ($x=0$)<br>
+                    2. เครื่องหมายใน $Q(x)$ เป็นบวกทั้งหมด $\\rightarrow v_+ = 0$ (ไม่มีรากจริงบวก)<br>
+                    3. เครื่องหมายใน $Q(-x)$ เป็นลบทั้งหมด $\\rightarrow v_- = 0$ (ไม่มีรากจริงลบ)<br>
+                    4. จากดีกรีรวม $n=5$ ทำให้รากที่เหลือ $5 - (0 + 0 + 1) = 4$ รากต้องเป็นรากเชิงซ้อนทั้งหมด`;
+            } else {
+                res.innerHTML = '<span class="text-rose-600 font-bold">✕ ยังไม่ถูกต้อง</span>';
+                expl.className = 'text-xs bg-rose-50 p-3 rounded-lg border border-rose-200 text-slate-800 space-y-1 block';
+                expl.innerHTML = '<strong>คำใบ้:</strong> สังเกตว่า $Q(x)$ ไม่มีเครื่องหมายลบเลย และพจน์ต่ำสุดคือ $x$';
+            }
+            if (window.renderMathInElement) renderMathInElement(expl);
+        }
+
+        function checkEx3() {
+            const opt = document.querySelector('input[name="ex3_opt"]:checked');
+            const res = document.getElementById('ex3_result');
+            const expl = document.getElementById('ex3_expl');
+
+            if (!opt) {
+                res.innerHTML = '<span class="text-amber-600 font-bold">กรุณาเลือกคำตอบ</span>';
+                return;
+            }
+
+            // P(x) = x^3 + 3x^2 + 5x + 6 -> signs all + -> v+ = 0 -> no positive root!
+            // Rational candidates: +-1, +-2, +-3, +-6
+            // Discard positive candidates: 1, 2, 3, 6 -> only -1, -2, -3, -6 left
+            if (opt.value === 'A') {
+                res.innerHTML = '<span class="text-emerald-600 font-bold">✓ ถูกต้องยอดเยี่ยม! ข้อ ก.</span>';
+                expl.className = 'text-xs bg-emerald-50 p-3 rounded-lg border border-emerald-200 text-slate-800 space-y-1 block';
+                expl.innerHTML = `<strong>การประยุกต์ร่วมกัน:</strong><br>
+                    1. ทฤษฎีบทรากตรรกยะให้ค่าผู้ท้าชิงคือ $\\pm 1, \\pm 2, \\pm 3, \\pm 6$ รวม 8 ค่า<br>
+                    2. กฎของเดการ์ต: สัมประสิทธิ์ของ $P(x)$ เป็น $+ , + , + , +$ (บวกทั้งหมด) $\\rightarrow v_+ = 0$ แปลว่า <strong>ไม่มีรากจริงบวกอย่างแน่นอน</strong><br>
+                    3. ดังนั้นสามารถตัดตัวเลือกที่เป็นบวกทิ้งทั้งหมดได้ทันที เหลือเพียง $-1, -2, -3, -6$ เพียง 4 ค่า ช่วยประหยัดเวลาทดสอบได้ครึ่งหนึ่ง`;
+            } else {
+                res.innerHTML = '<span class="text-rose-600 font-bold">✕ ยังไม่ถูกต้อง</span>';
+                expl.className = 'text-xs bg-rose-50 p-3 rounded-lg border border-rose-200 text-slate-800 space-y-1 block';
+                expl.innerHTML = '<strong>คำใบ้:</strong> สัมประสิทธิ์ของ $P(x)$ เป็นบวกทั้งหมด แสดงว่าจำนวนรากบวก $v_+$ เท่ากับเท่าใด?';
+            }
+            if (window.renderMathInElement) renderMathInElement(expl);
+        }
+
+        // Window resize and initial load
+        window.addEventListener('resize', resizeCanvas);
+        window.addEventListener('load', () => {
+            renderCoeffInputs();
+            updateModel();
+            resizeCanvas();
+        });
+    </script>
+</body>
+</html>

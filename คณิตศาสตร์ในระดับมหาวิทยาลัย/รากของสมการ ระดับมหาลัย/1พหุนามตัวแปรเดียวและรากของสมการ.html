@@ -1,0 +1,1080 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>บทที่ 1: รากของสมการ - พหุนามตัวแปรเดียวและรากของสมการ</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Sarabun & Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Sarabun:wght@300;400;500;600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+    <!-- MathJax for sharp mathematical formulas -->
+    <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']],
+                displayMath: [['$$', '$$'], ['\\[', '\\]']]
+            },
+            svg: { fontCache: 'global' }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <style>
+        body {
+            font-family: 'Sarabun', 'Inter', sans-serif;
+        }
+        .code-font {
+            font-family: 'Fira Code', monospace;
+        }
+        /* Custom scrollbar for tab navigation */
+        .hide-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .hide-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 antialiased min-h-screen flex flex-col">
+
+    <!-- Main Container: Constant Fixed Width Constraint (1,152px) -->
+    <main class="max-w-6xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 space-y-8 flex-grow">
+
+        <!-- Title Banner -->
+        <div class="bg-gradient-to-r from-indigo-900 via-indigo-800 to-slate-900 rounded-2xl p-6 sm:p-8 text-white shadow-md relative overflow-hidden">
+            <div class="relative z-10 space-y-2">
+                <div class="inline-flex items-center px-3 py-1 rounded-full bg-indigo-500/25 border border-indigo-400/30 text-indigo-200 text-xs font-semibold tracking-wide uppercase">
+                    เรื่องที่ 1 • โมดูลปูพื้นฐานมโนทัศน์
+                </div>
+                <h2 class="text-2xl sm:text-3xl font-extrabold tracking-tight">พหุนามตัวแปรเดียวและรากของสมการ</h2>
+                <p class="text-indigo-200 text-sm sm:text-base max-w-3xl leading-relaxed">
+                    ทำความเข้าใจโครงสร้างพีชคณิตของฟังก์ชันพหุนาม นิยามของรากสมการ และพฤติกรรมเชิงเรขาคณิตของการตัดแกน $x$ เพื่อเป็นรากฐานสู่การแก้สมการด้วยระเบียบวิธีเชิงตัวเลข
+                </p>
+            </div>
+            <!-- Subtle background decorative SVG circles -->
+            <div class="absolute -right-8 -bottom-10 w-64 h-64 rounded-full bg-indigo-500/10 pointer-events-none blur-2xl"></div>
+        </div>
+
+        <!-- ========================================== -->
+        <!-- ส่วนที่ 1: วัตถุประสงค์การเรียนรู้ (Learning Objectives) -->
+        <!-- ========================================== -->
+        <section class="bg-white rounded-2xl p-6 sm:p-7 shadow-sm border border-slate-200/80 transition-all hover:shadow-md">
+            <div class="flex items-center space-x-3 mb-4">
+                <div class="p-2.5 rounded-xl bg-blue-50 text-blue-600">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                </div>
+                <div>
+                    <h3 class="text-lg font-bold text-slate-900">1. วัตถุประสงค์การเรียนรู้ (Learning Objectives)</h3>
+                    <p class="text-xs text-slate-500">เป้าหมายสมรรถนะเมื่อศึกษาจบเนื้อหาในส่วนนี้</p>
+                </div>
+            </div>
+
+            <div class="bg-gradient-to-br from-blue-50/60 to-indigo-50/30 rounded-xl p-5 border border-blue-100">
+                <p class="text-slate-800 text-base leading-relaxed mb-3">
+                    เมื่อศึกษาและปฏิสัมพันธ์กับโมเดลนี้แล้ว นักศึกษาจะมีความสามารถดังต่อไปนี้:
+                </p>
+                <ul class="space-y-2.5 text-slate-700 text-sm sm:text-base">
+                    <li class="flex items-start space-x-2.5">
+                        <span class="inline-block w-5 h-5 rounded-full bg-blue-600 text-white text-xs flex items-center justify-center font-bold flex-shrink-0 mt-0.5">✓</span>
+                        <span>อธิบายความหมายของ<strong>พหุนามตัวแปรเดียว (Single-variable polynomial)</strong>, ดีกรี (Degree), สัมประสิทธิ์ (Coefficients) และค่าของพหุนาม $P(c)$ ได้อย่างถูกต้องแม่นยำ</span>
+                    </li>
+                    <li class="flex items-start space-x-2.5">
+                        <span class="inline-block w-5 h-5 rounded-full bg-blue-600 text-white text-xs flex items-center justify-center font-bold flex-shrink-0 mt-0.5">✓</span>
+                        <span>นิยามและเข้าใจเงื่อนไขของ<strong>รากของสมการ (Root of Equation)</strong> พร้อมทั้งเชื่อมโยงการหารากกับเงื่อนไข $P(a) = 0$ ทั้งในมุมมองพีชคณิตและเรขาคณิต (จุดตัดแกน $x$)</span>
+                    </li>
+                    <li class="flex items-start space-x-2.5">
+                        <span class="inline-block w-5 h-5 rounded-full bg-blue-600 text-white text-xs flex items-center justify-center font-bold flex-shrink-0 mt-0.5">✓</span>
+                        <span>จำแนกความแตกต่างระหว่าง<strong>รากจริง (Real Roots)</strong> และ<strong>รากเชิงซ้อน (Complex Roots)</strong> พร้อมทั้งตระหนักถึงข้อจำกัดของการวิเคราะห์ด้วยกราฟเพียงอย่างเดียว</span>
+                    </li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- ========================================== -->
+        <!-- ส่วนที่ 2: เนื้อหาหลัก (Core Content) -->
+        <!-- ========================================== -->
+        <section class="bg-white rounded-2xl p-6 sm:p-7 shadow-sm border border-slate-200/80 space-y-6">
+            <div class="flex items-center space-x-3 pb-3 border-b border-slate-100">
+                <div class="p-2.5 rounded-xl bg-indigo-50 text-indigo-600">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                    </svg>
+                </div>
+                <div>
+                    <h3 class="text-lg font-bold text-slate-900">2. เนื้อหาหลัก (Core Content)</h3>
+                    <p class="text-xs text-slate-500">มโนทัศน์และนิยามเชิงคณิตศาสตร์ที่สำคัญ</p>
+                </div>
+            </div>
+
+            <!-- 2.1 นิยามพหุนาม -->
+            <div class="space-y-3">
+                <h4 class="text-base font-bold text-slate-800 flex items-center space-x-2">
+                    <span class="w-2 h-2 rounded-full bg-indigo-500"></span>
+                    <span>2.1 นิยามพหุนามตัวแปรเดียวเหนือสนามจำนวนจริงและจำนวนเชิงซ้อน</span>
+                </h4>
+                <div class="p-4 bg-slate-50 rounded-xl border border-slate-200 text-slate-700 leading-relaxed text-sm sm:text-base">
+                    <p class="mb-2">
+                        <strong>พหุนามตัวแปรเดียว (Polynomial in one variable)</strong> ในรูปมาตรฐานคือฟังก์ชันที่เขียนอยู่ในรูป:
+                    </p>
+                    <div class="my-3 py-2 text-center overflow-x-auto text-indigo-900 bg-white rounded-lg border border-slate-200">
+                        $$P(x) = a_n x^n + a_{n-1} x^{n-1} + \dots + a_1 x + a_0 = \sum_{i=0}^{n} a_i x^i$$
+                    </div>
+                    <ul class="list-disc list-inside space-y-1 text-sm text-slate-600">
+                        <li>หากสัมประสิทธิ์ $a_n, \dots, a_0 \in \mathbb{R}$ จะเรียกว่า พหุนามเหนือสนามจำนวนจริง $\mathbb{R}[x]$</li>
+                        <li>หากสัมประสิทธิ์ $a_n, \dots, a_0 \in \mathbb{C}$ จะเรียกว่า พหุนามเหนือสนามจำนวนเชิงซ้อน $\mathbb{C}[x]$</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- 2.2 ดีกรี สัมประสิทธิ์ และค่าของพหุนาม -->
+            <div class="space-y-3">
+                <h4 class="text-base font-bold text-slate-800 flex items-center space-x-2">
+                    <span class="w-2 h-2 rounded-full bg-indigo-500"></span>
+                    <span>2.2 ดีกรี สัมประสิทธิ์ และค่าของพหุนาม</span>
+                </h4>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-3 text-sm">
+                    <div class="bg-indigo-50/50 p-3.5 rounded-xl border border-indigo-100">
+                        <h5 class="font-bold text-indigo-950 mb-1">ดีกรี (Degree, $\deg P$)</h5>
+                        <p class="text-slate-600">คือกำลังสูงสุดของตัวแปร $x$ ที่มีสัมประสิทธิ์ไม่เป็นศูนย์ ($a_n \neq 0$ โดยที่ $n \in \{0, 1, 2, \dots\}$)</p>
+                    </div>
+                    <div class="bg-indigo-50/50 p-3.5 rounded-xl border border-indigo-100">
+                        <h5 class="font-bold text-indigo-950 mb-1">สัมประสิทธิ์ (Coefficients)</h5>
+                        <p class="text-slate-600">ค่าคงที่ $a_i$ หน้า $x^i$ โดย $a_n$ คือ <em>สัมประสิทธิ์นำ (Leading coeff)</em> และ $a_0$ คือ <em>พจน์คงตัว (Constant)</em></p>
+                    </div>
+                    <div class="bg-indigo-50/50 p-3.5 rounded-xl border border-indigo-100">
+                        <h5 class="font-bold text-indigo-950 mb-1">ค่าของพหุนาม ณ จุด $c$</h5>
+                        <p class="text-slate-600">ผลลัพธ์ที่ได้จากการแทนค่า $x$ ด้วยค่าคงตัว $c$ เขียนแทนด้วย $P(c) = a_n c^n + \dots + a_0$</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 2.3 & 2.4 นิยามรากและความแตกต่าง -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="bg-slate-50 p-4 rounded-xl border border-slate-200">
+                    <h4 class="text-sm sm:text-base font-bold text-slate-900 mb-2 flex items-center space-x-1.5">
+                        <span class="text-amber-500">●</span>
+                        <span>2.3 นิยามรากของสมการพหุนาม</span>
+                    </h4>
+                    <p class="text-slate-700 text-sm leading-relaxed mb-2">
+                        จำนวน $r$ (อาจเป็นจำนวนจริงหรือเชิงซ้อน) จะเรียกว่าเป็น <strong>รากของสมการ (Root หรือ Zero)</strong> ของ $P(x) = 0$ ก็ต่อเมื่อ:
+                    </p>
+                    <div class="bg-white p-2 rounded-lg border border-slate-200 text-center font-bold text-indigo-700 text-base">
+                        $$P(r) = 0$$
+                    </div>
+                    <p class="text-xs text-slate-500 mt-2">
+                        ในทางเรขาคณิต: รากจริงของ $P(x)=0$ คือพิกัด $x$ ของจุดที่กราฟ $y = P(x)$ ตัดหรือสัมผัสกับแกน $X$ ($y=0$)
+                    </p>
+                </div>
+
+                <div class="bg-slate-50 p-4 rounded-xl border border-slate-200">
+                    <h4 class="text-sm sm:text-base font-bold text-slate-900 mb-2 flex items-center space-x-1.5">
+                        <span class="text-emerald-500">●</span>
+                        <span>2.4 รากจริง (Real) vs รากเชิงซ้อน (Complex)</span>
+                    </h4>
+                    <p class="text-slate-700 text-sm leading-relaxed mb-2">
+                        ตาม <strong>ทฤษฎีบทหลักมูลของพีชคณิต (Fundamental Theorem of Algebra)</strong> พหุนามดีกรี $n \ge 1$ จะมีรากทั้งหมด $n$ รากในระบบจำนวนเชิงซ้อน (นับการซ้ำ)
+                    </p>
+                    <ul class="text-xs sm:text-sm text-slate-600 space-y-1 list-disc list-inside">
+                        <li><strong>รากจริง ($r \in \mathbb{R}$):</strong> สังเกตเห็นได้จากกราฟพิกัดฉาก 2 มิติ ($x$-intercept)</li>
+                        <li><strong>รากเชิงซ้อน ($r = a \pm bi$):</strong> ไม่ตัดแกนจริง มองไม่เห็นบนระนาบ $xy$ ปกติ แต่ต้องมีคู่สังยุคเสมอเมื่อสัมประสิทธิ์เป็นจริง</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- 2.5 ตัวอย่างการตรวจสอบรากด้วยการแทนค่าแบบ Step-by-Step -->
+            <div class="bg-amber-50/50 rounded-xl p-4 sm:p-5 border border-amber-200">
+                <h4 class="text-sm sm:text-base font-bold text-amber-950 mb-3 flex items-center space-x-2">
+                    <span class="px-2 py-0.5 rounded bg-amber-200 text-amber-900 text-xs font-semibold">ตัวอย่าง</span>
+                    <span>การตรวจสอบรากของพหุนาม $P(x) = x^3 - 2x^2 - 5x + 6$</span>
+                </h4>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
+                    <div class="bg-white p-3.5 rounded-lg border border-amber-100 space-y-1.5">
+                        <div class="font-semibold text-slate-800 flex items-center justify-between">
+                            <span>ทดสอบ $x = 1$</span>
+                            <span class="text-xs px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 font-bold">เป็นราก</span>
+                        </div>
+                        <p class="text-slate-600 text-xs">แทนค่าลงใน $P(x)$:</p>
+                        <p class="code-font text-xs text-slate-700 bg-slate-50 p-2 rounded">
+                            P(1) = (1)³ - 2(1)² - 5(1) + 6<br>
+                            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;= 1 - 2 - 5 + 6 = 0
+                        </p>
+                        <p class="text-xs text-emerald-700 font-medium">✓ เนื่องจาก $P(1) = 0$ ดังนั้น $x = 1$ เป็นรากของสมการ</p>
+                    </div>
+
+                    <div class="bg-white p-3.5 rounded-lg border border-amber-100 space-y-1.5">
+                        <div class="font-semibold text-slate-800 flex items-center justify-between">
+                            <span>ทดสอบ $x = 2$</span>
+                            <span class="text-xs px-2 py-0.5 rounded-full bg-rose-100 text-rose-800 font-bold">ไม่เป็นราก</span>
+                        </div>
+                        <p class="text-slate-600 text-xs">แทนค่าลงใน $P(x)$:</p>
+                        <p class="code-font text-xs text-slate-700 bg-slate-50 p-2 rounded">
+                            P(2) = (2)³ - 2(2)² - 5(2) + 6<br>
+                            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;= 8 - 8 - 10 + 6 = -4 ≠ 0
+                        </p>
+                        <p class="text-xs text-rose-700 font-medium">✕ เนื่องจาก $P(2) = -4 \neq 0$ ดังนั้น $x = 2$ ไม่ใช่รากของสมการ</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ========================================== -->
+        <!-- ส่วนที่ 3: แบบจำลองโต้ตอบ (Interactive Model) -->
+        <!-- ========================================== -->
+        <section class="bg-white rounded-2xl p-6 sm:p-7 shadow-sm border border-slate-200/80 space-y-6">
+            <div class="flex items-center justify-between pb-3 border-b border-slate-100 flex-wrap gap-2">
+                <div class="flex items-center space-x-3">
+                    <div class="p-2.5 rounded-xl bg-purple-50 text-purple-600">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z" />
+                        </svg>
+                    </div>
+                    <div>
+                        <h3 class="text-lg font-bold text-slate-900">3. แบบจำลองโต้ตอบ (Interactive Simulation)</h3>
+                        <p class="text-xs text-slate-500">ปรับสัมประสิทธิ์ สังเกตกราฟ และลากจุดตรวจค่า $P(x)$ แบบเรียลไทม์</p>
+                    </div>
+                </div>
+                <!-- Preset Selector -->
+                <div class="flex items-center space-x-2">
+                    <label class="text-xs font-semibold text-slate-500">ตัวอย่างรูปทรง:</label>
+                    <select id="presetSelect" class="text-xs bg-slate-100 border border-slate-300 rounded-lg px-2.5 py-1.5 font-medium text-slate-700 hover:bg-slate-200 transition-colors">
+                        <option value="cubic3roots">ดีกรี 3 (3 รากจริง: x³ - 3x - 1)</option>
+                        <option value="cubic1root">ดีกรี 3 (1 รากจริง 2 เชิงซ้อน: x³ + 2x - 3)</option>
+                        <option value="quad2roots">ดีกรี 2 (2 รากจริง: x² - 4)</option>
+                        <option value="quadComplex">ดีกรี 2 (ไม่มีรากจริง: x² + 1)</option>
+                        <option value="linear">ดีกรี 1 (เชิงเส้น: 2x - 3)</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Simulation Layout: 2 Columns on desktop -->
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+                
+                <!-- Left Controls Panel (5 cols) -->
+                <div class="lg:col-span-5 space-y-4">
+                    <!-- Polynomial Formula Display Box -->
+                    <div class="bg-indigo-950 text-white p-4 rounded-xl shadow-inner text-center">
+                        <div class="text-xs text-indigo-300 uppercase tracking-wider font-semibold mb-1">พหุนามปัจจุบัน $P(x)$</div>
+                        <div id="equationDisplay" class="text-lg font-bold text-yellow-300 font-mono tracking-tight py-1">
+                            P(x) = 1.0x³ + 0.0x² - 3.0x - 1.0
+                        </div>
+                        <div id="degreeBadge" class="inline-block mt-2 px-2.5 py-0.5 rounded-full bg-indigo-800 text-indigo-200 text-xs font-medium">
+                            ดีกรี: 3
+                        </div>
+                    </div>
+
+                    <!-- Coefficient Sliders -->
+                    <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-3">
+                        <div class="flex justify-between items-center text-xs font-bold text-slate-700 mb-1">
+                            <span>ปรับค่าสัมประสิทธิ์: $P(x) = ax^3 + bx^2 + cx + d$</span>
+                            <button id="resetCoeffsBtn" class="text-indigo-600 hover:text-indigo-800 font-semibold underline text-xs">รีเซ็ต</button>
+                        </div>
+
+                        <!-- Slider a -->
+                        <div class="space-y-1">
+                            <div class="flex justify-between text-xs text-slate-600">
+                                <span>สัมประสิทธิ์ $a$ ($x^3$):</span>
+                                <span id="val_a" class="font-bold text-slate-800">1.0</span>
+                            </div>
+                            <input type="range" id="slider_a" min="-4" max="4" step="0.5" value="1" class="w-full h-1.5 bg-slate-300 rounded-lg appearance-none cursor-pointer accent-indigo-600">
+                        </div>
+
+                        <!-- Slider b -->
+                        <div class="space-y-1">
+                            <div class="flex justify-between text-xs text-slate-600">
+                                <span>สัมประสิทธิ์ $b$ ($x^2$):</span>
+                                <span id="val_b" class="font-bold text-slate-800">0.0</span>
+                            </div>
+                            <input type="range" id="slider_b" min="-5" max="5" step="0.5" value="0" class="w-full h-1.5 bg-slate-300 rounded-lg appearance-none cursor-pointer accent-indigo-600">
+                        </div>
+
+                        <!-- Slider c -->
+                        <div class="space-y-1">
+                            <div class="flex justify-between text-xs text-slate-600">
+                                <span>สัมประสิทธิ์ $c$ ($x$):</span>
+                                <span id="val_c" class="font-bold text-slate-800">-3.0</span>
+                            </div>
+                            <input type="range" id="slider_c" min="-6" max="6" step="0.5" value="-3" class="w-full h-1.5 bg-slate-300 rounded-lg appearance-none cursor-pointer accent-indigo-600">
+                        </div>
+
+                        <!-- Slider d -->
+                        <div class="space-y-1">
+                            <div class="flex justify-between text-xs text-slate-600">
+                                <span>สัมประสิทธิ์ $d$ (ค่าคงที่):</span>
+                                <span id="val_d" class="font-bold text-slate-800">-1.0</span>
+                            </div>
+                            <input type="range" id="slider_d" min="-8" max="8" step="0.5" value="-1" class="w-full h-1.5 bg-slate-300 rounded-lg appearance-none cursor-pointer accent-indigo-600">
+                        </div>
+                    </div>
+
+                    <!-- Probe Value (x) Slider & Test Evaluation -->
+                    <div class="bg-indigo-50/70 p-4 rounded-xl border border-indigo-200/80 space-y-3">
+                        <div class="flex justify-between items-center text-xs font-bold text-indigo-900">
+                            <span>🔍 จุดสำรวจและทดสอบค่า $x$</span>
+                            <span class="text-indigo-600 text-xs">ขยับเพื่อเช็ค $P(x)$</span>
+                        </div>
+                        <div class="space-y-1">
+                            <div class="flex justify-between text-xs text-slate-700">
+                                <span>เลือกพิกัด $x$:</span>
+                                <span id="probeXDisplay" class="font-mono font-bold text-indigo-700 text-sm">x = 1.00</span>
+                            </div>
+                            <input type="range" id="probeSlider" min="-4.5" max="4.5" step="0.05" value="1.0" class="w-full h-2 bg-indigo-200 rounded-lg appearance-none cursor-pointer accent-purple-600">
+                        </div>
+
+                        <!-- Live Calculation Card -->
+                        <div class="p-3 bg-white rounded-lg border border-indigo-100 flex items-center justify-between">
+                            <div>
+                                <div class="text-xs text-slate-500">ผลการคำนวณ $P(x)$:</div>
+                                <div id="probeResultP" class="text-base font-bold font-mono text-slate-900">P(1.00) = -3.00</div>
+                            </div>
+                            <div id="isRootBadge" class="px-2.5 py-1 rounded text-xs font-bold bg-slate-100 text-slate-600">
+                                ไม่ใช่ราก
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Root Analysis Summary -->
+                    <div class="bg-white p-3.5 rounded-xl border border-slate-200 shadow-sm text-xs space-y-2">
+                        <div class="font-bold text-slate-800 flex items-center justify-between">
+                            <span>การวิเคราะห์รากจริงบนกราฟ:</span>
+                            <span id="rootCountLabel" class="text-indigo-700 font-semibold">พบ 3 รากจริง</span>
+                        </div>
+                        <div id="detectedRootsList" class="flex flex-wrap gap-1.5 pt-1">
+                            <!-- Populated dynamically via JS -->
+                        </div>
+                        <div id="complexRootsNote" class="text-slate-500 italic text-[11px] pt-1 border-t border-slate-100">
+                            หมายเหตุ: จุดสีแดงบนกราฟคือพิกัดจุดตัดแกน $x$ ($P(x)=0$)
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Canvas Plotter (7 cols) -->
+                <div class="lg:col-span-7 flex flex-col items-center">
+                    <div class="w-full bg-slate-900 rounded-2xl p-3 border border-slate-800 shadow-md relative">
+                        <div class="flex justify-between items-center px-2 py-1 mb-2 text-xs text-slate-300">
+                            <span class="font-medium flex items-center space-x-1.5">
+                                <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 inline-block"></span>
+                                <span>ระนาบพิกัด $xy$ [-5, 5]</span>
+                            </span>
+                            <div class="flex items-center space-x-3 text-[11px]">
+                                <span class="flex items-center space-x-1">
+                                    <span class="w-2 h-2 rounded-full bg-indigo-400"></span>
+                                    <span>$y = P(x)$</span>
+                                </span>
+                                <span class="flex items-center space-x-1">
+                                    <span class="w-2 h-2 rounded-full bg-rose-500"></span>
+                                    <span>ราก ($P=0$)</span>
+                                </span>
+                                <span class="flex items-center space-x-1">
+                                    <span class="w-2 h-2 rounded-full bg-amber-400"></span>
+                                    <span>จุดสำรวจ</span>
+                                </span>
+                            </div>
+                        </div>
+                        
+                        <!-- Interactive Canvas -->
+                        <div class="relative w-full aspect-[4/3] max-h-[460px] bg-slate-950 rounded-xl overflow-hidden cursor-crosshair">
+                            <canvas id="polyCanvas" class="w-full h-full block"></canvas>
+                        </div>
+
+                        <!-- Canvas footer tip -->
+                        <div class="mt-2 text-center text-slate-400 text-xs">
+                            💡 ผู้เรียนสามารถคลิกหรือเลื่อนเมาส์บนกราฟเพื่อเปลี่ยนพิกัด $x$ ของจุดสำรวจได้โดยตรง
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- ========================================== -->
+        <!-- ส่วนที่ 4: คำถามนำเพื่อค้นพบ (Guided Discovery Questions) -->
+        <!-- ========================================== -->
+        <section class="bg-white rounded-2xl p-6 sm:p-7 shadow-sm border border-slate-200/80 space-y-5">
+            <div class="flex items-center space-x-3 pb-3 border-b border-slate-100">
+                <div class="p-2.5 rounded-xl bg-amber-50 text-amber-600">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+                    </svg>
+                </div>
+                <div>
+                    <h3 class="text-lg font-bold text-slate-900">4. คำถามนำเพื่อค้นพบ (Guided Discovery Questions)</h3>
+                    <p class="text-xs text-slate-500">ท้าทายความคิดเพื่อสร้างความเข้าใจที่ลึกซึ้ง (คลิกเพื่อดูแนวคิดและการอธิบาย)</p>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <!-- Question 1 -->
+                <div class="border border-slate-200 rounded-xl p-4 bg-slate-50/50 flex flex-col justify-between">
+                    <div>
+                        <div class="text-indigo-600 font-bold text-xs uppercase tracking-wider mb-1">คำถามที่ 1</div>
+                        <h4 class="text-sm font-semibold text-slate-900 mb-2">
+                            เงื่อนไขใดทำให้จำนวนหนึ่งเป็นรากของพหุนาม?
+                        </h4>
+                        <p class="text-xs text-slate-600 leading-relaxed">
+                            พิจารณาความสัมพันธ์ระหว่างค่าตัวเลข $a$, ฟังก์ชัน $P(a)$ และจุดตัดแกนบนระนาบเรขาคณิต
+                        </p>
+                    </div>
+                    <div class="mt-4 pt-3 border-t border-slate-200/80">
+                        <button onclick="toggleHint('hint1')" class="text-xs font-semibold text-indigo-600 hover:text-indigo-800 flex items-center space-x-1 focus:outline-none">
+                            <span id="hint1_btn_text">💡 ดูแนวทางคำตอบ</span>
+                            <span id="hint1_arrow">↓</span>
+                        </button>
+                        <div id="hint1" class="hidden mt-2 p-3 bg-white rounded-lg border border-indigo-100 text-xs text-slate-700 leading-relaxed shadow-sm">
+                            <strong>คำตอบ:</strong> เงื่อนไขเชิงพีชคณิตคือเมื่อแทนค่า $x = a$ แล้วทำให้ค่าของฟังก์ชันเท่ากับศูนย์พอดี นั่นคือ <strong>$P(a) = 0$</strong> ซึ่งในเชิงเรขาคณิตจะตรงกับตำแหน่งที่กราฟ $y = P(x)$ มีค่า $y = 0$ พอดี (จุดตัดแกน $x$ ที่พิกัด $(a, 0)$)
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Question 2 -->
+                <div class="border border-slate-200 rounded-xl p-4 bg-slate-50/50 flex flex-col justify-between">
+                    <div>
+                        <div class="text-indigo-600 font-bold text-xs uppercase tracking-wider mb-1">คำถามที่ 2</div>
+                        <h4 class="text-sm font-semibold text-slate-900 mb-2">
+                            พหุนามดีกรี $n$ จำเป็นต้องมีรากจริง $n$ รากหรือไม่?
+                        </h4>
+                        <p class="text-xs text-slate-600 leading-relaxed">
+                            ทดลองเลือกพหุนาม $x^2 + 1 = 0$ หรือเลื่อนกราฟพาราโบลาไม่ให้ตัดแกน $x$ ดูในแบบจำลอง
+                        </p>
+                    </div>
+                    <div class="mt-4 pt-3 border-t border-slate-200/80">
+                        <button onclick="toggleHint('hint2')" class="text-xs font-semibold text-indigo-600 hover:text-indigo-800 flex items-center space-x-1 focus:outline-none">
+                            <span id="hint2_btn_text">💡 ดูแนวทางคำตอบ</span>
+                            <span id="hint2_arrow">↓</span>
+                        </button>
+                        <div id="hint2" class="hidden mt-2 p-3 bg-white rounded-lg border border-indigo-100 text-xs text-slate-700 leading-relaxed shadow-sm">
+                            <strong>คำตอบ: ไม่จำเป็น!</strong> พหุนามดีกรี $n$ มีรากในระบบจำนวนเชิงซ้อนเสมอ $n$ ราก (Fundamental Theorem of Algebra) แต่รากที่เป็น<strong>จำนวนจริง</strong>อาจมีน้อยกว่า $n$ ได้ เช่น $x^2 + 1 = 0$ มีดีกรี 2 แต่ไม่มีรากจริงเลยแม้แต่รากเดียว (มีรากเชิงซ้อน 2 รากคือ $\pm i$)
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Question 3 -->
+                <div class="border border-slate-200 rounded-xl p-4 bg-slate-50/50 flex flex-col justify-between">
+                    <div>
+                        <div class="text-indigo-600 font-bold text-xs uppercase tracking-wider mb-1">คำถามที่ 3</div>
+                        <h4 class="text-sm font-semibold text-slate-900 mb-2">
+                            เหตุใดการดูกราฟเพียงอย่างเดียวจึงไม่พอสำหรับหารากทั้งหมด?
+                        </h4>
+                        <p class="text-xs text-slate-600 leading-relaxed">
+                            กราฟ 2 มิติที่เรามองเห็นบนจอภาพ มีมิติของระบบจำนวนใดที่ซ่อนอยู่?
+                        </p>
+                    </div>
+                    <div class="mt-4 pt-3 border-t border-slate-200/80">
+                        <button onclick="toggleHint('hint3')" class="text-xs font-semibold text-indigo-600 hover:text-indigo-800 flex items-center space-x-1 focus:outline-none">
+                            <span id="hint3_btn_text">💡 ดูแนวทางคำตอบ</span>
+                            <span id="hint3_arrow">↓</span>
+                        </button>
+                        <div id="hint3" class="hidden mt-2 p-3 bg-white rounded-lg border border-indigo-100 text-xs text-slate-700 leading-relaxed shadow-sm">
+                            <strong>คำตอบ:</strong> มี 2 เหตุผลสำคัญ:
+                            <ol class="list-decimal list-inside mt-1 space-y-1">
+                                <li>กราฟระนาบพิกัด $xy$ แสดงได้เฉพาะ<strong>รากจริง</strong>เท่านั้น หากมีรากเชิงซ้อน ($a \pm bi$) จะไม่ปรากฏเป็นจุดตัดแกน $x$</li>
+                                <li>การอ่านค่าจากกราฟด้วยสายตามี<strong>ความคลาดเคลื่อน (Visual error)</strong> ทำให้ได้เพียงค่าประมาณ จึงจำเป็นต้องใช้วิธีเชิงตัวเลข (Numerical Methods) คำนวณอย่างแม่นยำ</li>
+                            </ol>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ========================================== -->
+        <!-- ส่วนที่ 5: แบบฝึกหัดสำหรับนักศึกษา (Self-Check Exercises) -->
+        <!-- ========================================== -->
+        <section class="bg-white rounded-2xl p-6 sm:p-7 shadow-sm border border-slate-200/80 space-y-6">
+            <div class="flex items-center space-x-3 pb-3 border-b border-slate-100">
+                <div class="p-2.5 rounded-xl bg-emerald-50 text-emerald-600">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                    </svg>
+                </div>
+                <div>
+                    <h3 class="text-lg font-bold text-slate-900">5. แบบฝึกหัดสำหรับนักศึกษา (Self-Check Exercises)</h3>
+                    <p class="text-xs text-slate-500">ทดสอบความเข้าใจด้วยตนเอง พร้อมรับผลการตรวจและคำอธิบายละเอียดทันที</p>
+                </div>
+            </div>
+
+            <div class="space-y-6">
+                <!-- Exercise 1 -->
+                <div class="p-4 sm:p-5 rounded-xl bg-slate-50 border border-slate-200 space-y-3">
+                    <div class="flex items-center justify-between">
+                        <span class="text-xs font-bold text-emerald-700 bg-emerald-100 px-2.5 py-0.5 rounded-full">ข้อที่ 1: การจำแนกดีกรีและสัมประสิทธิ์</span>
+                    </div>
+                    <p class="text-sm font-medium text-slate-800">
+                        กำหนดพหุนาม $Q(x) = 7x^4 - 3x^2 + 2x - 9$ จงระบุ<strong>ดีกรี (Degree)</strong> ของพหุนามนี้ และค่าของ<strong>สัมประสิทธิ์นำ (Leading Coefficient)</strong>
+                    </p>
+                    
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
+                        <div>
+                            <label class="block text-xs text-slate-600 mb-1 font-medium">ดีกรีของพหุนาม คือ:</label>
+                            <input type="number" id="ex1_degree" placeholder="กรอกตัวเลข..." class="w-full bg-white border border-slate-300 rounded-lg px-3 py-1.5 focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-xs text-slate-600 mb-1 font-medium">สัมประสิทธิ์นำ ($a_n$) คือ:</label>
+                            <input type="number" id="ex1_lead" placeholder="กรอกตัวเลข..." class="w-full bg-white border border-slate-300 rounded-lg px-3 py-1.5 focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+                        </div>
+                    </div>
+
+                    <div class="flex items-center space-x-3 pt-2">
+                        <button onclick="checkEx1()" class="px-4 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold shadow-sm transition">
+                            ตรวจคำตอบ
+                        </button>
+                        <span id="ex1_result" class="text-xs font-medium"></span>
+                    </div>
+                    <div id="ex1_expl" class="hidden text-xs bg-white p-3 rounded-lg border border-slate-200 text-slate-700"></div>
+                </div>
+
+                <!-- Exercise 2 -->
+                <div class="p-4 sm:p-5 rounded-xl bg-slate-50 border border-slate-200 space-y-3">
+                    <div class="flex items-center justify-between">
+                        <span class="text-xs font-bold text-emerald-700 bg-emerald-100 px-2.5 py-0.5 rounded-full">ข้อที่ 2: ตรวจสอบความเป็นรากด้วยการแทนค่า</span>
+                    </div>
+                    <p class="text-sm font-medium text-slate-800">
+                        สำหรับพหุนาม $P(x) = x^3 - 4x^2 + x + 6$ จงตรวจสอบว่าค่า $x = 2$ และ $x = 3$ เป็นรากของสมการหรือไม่?
+                    </p>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
+                        <div class="bg-white p-3 rounded-lg border border-slate-200 space-y-2">
+                            <span class="text-xs font-bold text-slate-700 block">สำหรับ $x = 2$:</span>
+                            <div class="flex space-x-4 text-xs">
+                                <label class="inline-flex items-center">
+                                    <input type="radio" name="ex2_root2" value="yes" class="text-indigo-600">
+                                    <span class="ml-1.5 text-slate-700">เป็นราก</span>
+                                </label>
+                                <label class="inline-flex items-center">
+                                    <input type="radio" name="ex2_root2" value="no" class="text-indigo-600">
+                                    <span class="ml-1.5 text-slate-700">ไม่เป็นราก</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="bg-white p-3 rounded-lg border border-slate-200 space-y-2">
+                            <span class="text-xs font-bold text-slate-700 block">สำหรับ $x = 3$:</span>
+                            <div class="flex space-x-4 text-xs">
+                                <label class="inline-flex items-center">
+                                    <input type="radio" name="ex2_root3" value="yes" class="text-indigo-600">
+                                    <span class="ml-1.5 text-slate-700">เป็นราก</span>
+                                </label>
+                                <label class="inline-flex items-center">
+                                    <input type="radio" name="ex2_root3" value="no" class="text-indigo-600">
+                                    <span class="ml-1.5 text-slate-700">ไม่เป็นราก</span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center space-x-3 pt-2">
+                        <button onclick="checkEx2()" class="px-4 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold shadow-sm transition">
+                            ตรวจคำตอบ
+                        </button>
+                        <span id="ex2_result" class="text-xs font-medium"></span>
+                    </div>
+                    <div id="ex2_expl" class="hidden text-xs bg-white p-3 rounded-lg border border-slate-200 text-slate-700"></div>
+                </div>
+
+                <!-- Exercise 3 -->
+                <div class="p-4 sm:p-5 rounded-xl bg-slate-50 border border-slate-200 space-y-3">
+                    <div class="flex items-center justify-between">
+                        <span class="text-xs font-bold text-emerald-700 bg-emerald-100 px-2.5 py-0.5 rounded-full">ข้อที่ 3: วิเคราะห์รากจริงและรากเชิงซ้อน</span>
+                    </div>
+                    <p class="text-sm font-medium text-slate-800">
+                        พหุนาม $f(x) = x^2 + 9$ มีรากจริงกี่ตัว และมีรากเชิงซ้อนคือค่าใด?
+                    </p>
+
+                    <div class="space-y-2 text-xs sm:text-sm">
+                        <label class="flex items-center space-x-2.5 p-2 rounded-lg hover:bg-white cursor-pointer transition">
+                            <input type="radio" name="ex3_opt" value="A" class="text-indigo-600">
+                            <span class="text-slate-700">ก) มีรากจริง 2 ตัวคือ $x = 3$ และ $x = -3$</span>
+                        </label>
+                        <label class="flex items-center space-x-2.5 p-2 rounded-lg hover:bg-white cursor-pointer transition">
+                            <input type="radio" name="ex3_opt" value="B" class="text-indigo-600">
+                            <span class="text-slate-700">ข) ไม่มีรากจริง (0 ราก) แต่มีรากเชิงซ้อน 2 รากคือ $x = 3i$ และ $x = -3i$</span>
+                        </label>
+                        <label class="flex items-center space-x-2.5 p-2 rounded-lg hover:bg-white cursor-pointer transition">
+                            <input type="radio" name="ex3_opt" value="C" class="text-indigo-600">
+                            <span class="text-slate-700">ค) มีรากจริง 1 ตัวคือ $x = 0$</span>
+                        </label>
+                    </div>
+
+                    <div class="flex items-center space-x-3 pt-2">
+                        <button onclick="checkEx3()" class="px-4 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold shadow-sm transition">
+                            ตรวจคำตอบ
+                        </button>
+                        <span id="ex3_result" class="text-xs font-medium"></span>
+                    </div>
+                    <div id="ex3_expl" class="hidden text-xs bg-white p-3 rounded-lg border border-slate-200 text-slate-700"></div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-white border-t border-slate-200 mt-12 py-6 text-center text-xs text-slate-500">
+        <div class="max-w-6xl w-full mx-auto px-4 sm:px-6 lg:px-8">
+            <p>บทเรียนแบบโต้ตอบ: ระเบียบวิธีเชิงตัวเลข (Numerical Methods) • แถบที่ 1: พหุนามตัวแปรเดียวและรากของสมการ</p>
+            <p class="mt-1 text-slate-400">พัฒนาเพื่อส่งเสริมการสำรวจมโนทัศน์คณิตศาสตร์ด้วยแบบจำลองเชิงภาพ</p>
+        </div>
+    </footer>
+
+    <!-- Interactive Script -->
+    <script>
+        // --- State Variables for Polynomial P(x) = ax^3 + bx^2 + cx + d ---
+        let coeffA = 1.0;
+        let coeffB = 0.0;
+        let coeffC = -3.0;
+        let coeffD = -1.0;
+        let probeX = 1.0;
+
+        // Canvas Elements
+        const canvas = document.getElementById('polyCanvas');
+        const ctx = canvas.getContext('2d');
+
+        // Coordinate Boundaries
+        const xMin = -5;
+        const xMax = 5;
+        const yMin = -10;
+        const yMax = 10;
+
+        // Initialize and setup resize listeners
+        function resizeCanvas() {
+            const rect = canvas.parentElement.getBoundingClientRect();
+            // Set internal resolution matching devicePixelRatio for crystal sharpness
+            const dpr = window.devicePixelRatio || 1;
+            canvas.width = rect.width * dpr;
+            canvas.height = rect.height * dpr;
+            ctx.resetTransform?.();
+            ctx.scale(dpr, dpr);
+            drawPlot();
+        }
+
+        // Coordinate transformation helpers
+        function toCanvasX(xVal, width) {
+            return ((xVal - xMin) / (xMax - xMin)) * width;
+        }
+
+        function toCanvasY(yVal, height) {
+            return height - ((yVal - yMin) / (yMax - yMin)) * height;
+        }
+
+        function toMathX(px, width) {
+            return xMin + (px / width) * (xMax - xMin);
+        }
+
+        // Polynomial evaluation function
+        function evalPoly(x) {
+            return coeffA * Math.pow(x, 3) + coeffB * Math.pow(x, 2) + coeffC * x + coeffD;
+        }
+
+        // High precision numerical root finding via bisection search within [-5, 5]
+        function findRealRoots() {
+            const roots = [];
+            const step = 0.05;
+            let prevX = xMin;
+            let prevY = evalPoly(prevX);
+
+            for (let x = xMin + step; x <= xMax; x += step) {
+                const y = evalPoly(x);
+                if (Math.abs(y) < 1e-7) {
+                    roots.push(x);
+                } else if (prevY * y < 0) {
+                    // Sign change indicates root in between; refine with bisection
+                    let left = prevX;
+                    let right = x;
+                    for (let k = 0; k < 25; k++) {
+                        const mid = (left + right) / 2;
+                        const midY = evalPoly(mid);
+                        if (prevY * midY <= 0) {
+                            right = mid;
+                        } else {
+                            left = mid;
+                        }
+                    }
+                    roots.push((left + right) / 2);
+                }
+                prevX = x;
+                prevY = y;
+            }
+            return roots;
+        }
+
+        // Redraw complete canvas graph
+        function drawPlot() {
+            const rect = canvas.parentElement.getBoundingClientRect();
+            const width = rect.width;
+            const height = rect.height;
+
+            if (width === 0 || height === 0) return;
+
+            ctx.clearRect(0, 0, width, height);
+
+            // 1. Draw Grid lines
+            ctx.lineWidth = 1;
+            ctx.strokeStyle = '#1e293b'; // slate-800
+            ctx.fillStyle = '#64748b';   // slate-500
+            ctx.font = '10px Inter, sans-serif';
+
+            // Vertical grid lines
+            for (let x = Math.ceil(xMin); x <= Math.floor(xMax); x++) {
+                const cx = toCanvasX(x, width);
+                ctx.beginPath();
+                ctx.moveTo(cx, 0);
+                ctx.lineTo(cx, height);
+                ctx.stroke();
+
+                if (x !== 0) {
+                    const cyZero = toCanvasY(0, height);
+                    ctx.fillText(x, cx - 4, Math.min(Math.max(cyZero + 12, 14), height - 4));
+                }
+            }
+
+            // Horizontal grid lines
+            for (let y = Math.ceil(yMin); y <= Math.floor(yMax); y += 2) {
+                const cy = toCanvasY(y, height);
+                ctx.beginPath();
+                ctx.moveTo(0, cy);
+                ctx.lineTo(width, cy);
+                ctx.stroke();
+
+                if (y !== 0) {
+                    const cxZero = toCanvasX(0, width);
+                    ctx.fillText(y, Math.min(Math.max(cxZero + 4, 2), width - 20), cy + 3);
+                }
+            }
+
+            // 2. Draw Major Axes (X and Y)
+            ctx.lineWidth = 2;
+            ctx.strokeStyle = '#475569'; // slate-600
+            
+            // X-Axis (y=0)
+            const cy0 = toCanvasY(0, height);
+            ctx.beginPath();
+            ctx.moveTo(0, cy0);
+            ctx.lineTo(width, cy0);
+            ctx.stroke();
+
+            // Y-Axis (x=0)
+            const cx0 = toCanvasX(0, width);
+            ctx.beginPath();
+            ctx.moveTo(cx0, 0);
+            ctx.lineTo(cx0, height);
+            ctx.stroke();
+
+            // Axis labels
+            ctx.fillStyle = '#94a3b8';
+            ctx.fillText('X', width - 12, cy0 - 6);
+            ctx.fillText('Y', cx0 + 6, 12);
+
+            // 3. Draw Polynomial Curve
+            ctx.beginPath();
+            ctx.lineWidth = 2.5;
+            ctx.strokeStyle = '#818cf8'; // indigo-400
+
+            let firstPoint = true;
+            const pxStep = 2;
+            for (let px = 0; px <= width; px += pxStep) {
+                const xVal = toMathX(px, width);
+                const yVal = evalPoly(xVal);
+                const py = toCanvasY(yVal, height);
+
+                // Clip lines to prevent canvas out-of-range artifacts
+                if (firstPoint) {
+                    ctx.moveTo(px, py);
+                    firstPoint = false;
+                } else {
+                    ctx.lineTo(px, py);
+                }
+            }
+            ctx.stroke();
+
+            // 4. Highlight Real Roots (X-intercepts)
+            const roots = findRealRoots();
+            updateRootBadge(roots);
+
+            roots.forEach(root => {
+                const rx = toCanvasX(root, width);
+                const ry = toCanvasY(0, height);
+
+                // Glowing outer circle
+                ctx.beginPath();
+                ctx.arc(rx, ry, 7, 0, Math.PI * 2);
+                ctx.fillStyle = 'rgba(239, 68, 68, 0.35)'; // red glow
+                ctx.fill();
+
+                // Center solid dot
+                ctx.beginPath();
+                ctx.arc(rx, ry, 3.5, 0, Math.PI * 2);
+                ctx.fillStyle = '#ef4444'; // rose-500
+                ctx.fill();
+
+                // Root label
+                ctx.fillStyle = '#f87171';
+                ctx.font = 'bold 10px monospace';
+                ctx.fillText(`r ≈ ${root.toFixed(2)}`, rx - 18, ry - 10);
+            });
+
+            // 5. Draw Probe Point and Projections
+            const probeY = evalPoly(probeX);
+            const probeCanvasX = toCanvasX(probeX, width);
+            const probeCanvasY = toCanvasY(probeY, height);
+
+            // Dotted projection line to X-axis
+            ctx.beginPath();
+            ctx.setLineDash([4, 4]);
+            ctx.lineWidth = 1.2;
+            ctx.strokeStyle = '#fbbf24'; // amber-400
+            ctx.moveTo(probeCanvasX, cy0);
+            ctx.lineTo(probeCanvasX, probeCanvasY);
+            ctx.stroke();
+            ctx.setLineDash([]); // reset line dash
+
+            // Probe circle
+            ctx.beginPath();
+            ctx.arc(probeCanvasX, probeCanvasY, 6, 0, Math.PI * 2);
+            ctx.fillStyle = '#fbbf24'; // amber-400
+            ctx.fill();
+            ctx.lineWidth = 2;
+            ctx.strokeStyle = '#ffffff';
+            ctx.stroke();
+        }
+
+        // Update Equation Text and Degree Info
+        function updateEquationUI() {
+            // Determine active degree
+            let deg = 0;
+            if (coeffA !== 0) deg = 3;
+            else if (coeffB !== 0) deg = 2;
+            else if (coeffC !== 0) deg = 1;
+            else deg = 0;
+
+            document.getElementById('degreeBadge').innerText = `ดีกรี: ${deg}`;
+
+            // Build readable equation string
+            let eq = 'P(x) = ';
+            let terms = [];
+
+            if (coeffA !== 0) terms.push(`${coeffA > 0 && terms.length > 0 ? '+ ' : ''}${coeffA === 1 ? '' : coeffA === -1 ? '-' : coeffA}x³`);
+            if (coeffB !== 0) terms.push(`${coeffB > 0 && terms.length > 0 ? '+ ' : ''}${coeffB === 1 ? '' : coeffB === -1 ? '-' : coeffB}x²`);
+            if (coeffC !== 0) terms.push(`${coeffC > 0 && terms.length > 0 ? '+ ' : ''}${coeffC === 1 ? '' : coeffC === -1 ? '-' : coeffC}x`);
+            if (coeffD !== 0 || terms.length === 0) terms.push(`${coeffD > 0 && terms.length > 0 ? '+ ' : ''}${coeffD}`);
+
+            eq += terms.join(' ');
+            document.getElementById('equationDisplay').innerText = eq;
+
+            // Update probe stats
+            const valP = evalPoly(probeX);
+            document.getElementById('probeXDisplay').innerText = `x = ${probeX.toFixed(2)}`;
+            document.getElementById('probeResultP').innerText = `P(${probeX.toFixed(2)}) = ${valP.toFixed(2)}`;
+
+            const badge = document.getElementById('isRootBadge');
+            if (Math.abs(valP) < 0.08) {
+                badge.className = 'px-2.5 py-1 rounded text-xs font-bold bg-emerald-100 text-emerald-800 border border-emerald-300 animate-pulse';
+                badge.innerText = '🎯 เป็นรากของสมการ! P(x) ≈ 0';
+            } else {
+                badge.className = 'px-2.5 py-1 rounded text-xs font-bold bg-slate-100 text-slate-600';
+                badge.innerText = 'ไม่ใช่ราก (P(x) ≠ 0)';
+            }
+        }
+
+        // Update Root Analysis List in the UI
+        function updateRootBadge(roots) {
+            const list = document.getElementById('detectedRootsList');
+            const label = document.getElementById('rootCountLabel');
+            list.innerHTML = '';
+
+            let deg = (coeffA !== 0 ? 3 : (coeffB !== 0 ? 2 : (coeffC !== 0 ? 1 : 0)));
+            const realCount = roots.length;
+            const complexCount = deg - realCount;
+
+            label.innerText = `พบ ${realCount} รากจริง (${realCount === 0 ? 'ไม่มีจุดตัดแกน x' : 'จุดตัดแกน x'})`;
+
+            if (roots.length === 0) {
+                list.innerHTML = '<span class="text-xs text-rose-500 font-medium">ไม่มีจุดตัดแกนจริง (รากทั้งหมดเป็นจำนวนเชิงซ้อนสังยุค)</span>';
+            } else {
+                roots.forEach(r => {
+                    const tag = document.createElement('span');
+                    tag.className = 'px-2 py-0.5 rounded bg-rose-50 text-rose-700 border border-rose-200 font-mono font-medium';
+                    tag.innerText = `x ≈ ${r.toFixed(3)}`;
+                    list.appendChild(tag);
+                });
+            }
+
+            if (complexCount > 0 && deg > 0) {
+                const compTag = document.createElement('span');
+                compTag.className = 'px-2 py-0.5 rounded bg-purple-50 text-purple-700 border border-purple-200 font-mono font-medium';
+                compTag.innerText = `+ รากเชิงซ้อนอีก ${complexCount} ตัว`;
+                list.appendChild(compTag);
+            }
+        }
+
+        // Sliders Listeners
+        const sliderA = document.getElementById('slider_a');
+        const sliderB = document.getElementById('slider_b');
+        const sliderC = document.getElementById('slider_c');
+        const sliderD = document.getElementById('slider_d');
+        const probeSlider = document.getElementById('probeSlider');
+
+        function syncSliders() {
+            coeffA = parseFloat(sliderA.value);
+            coeffB = parseFloat(sliderB.value);
+            coeffC = parseFloat(sliderC.value);
+            coeffD = parseFloat(sliderD.value);
+            probeX = parseFloat(probeSlider.value);
+
+            document.getElementById('val_a').innerText = coeffA.toFixed(1);
+            document.getElementById('val_b').innerText = coeffB.toFixed(1);
+            document.getElementById('val_c').innerText = coeffC.toFixed(1);
+            document.getElementById('val_d').innerText = coeffD.toFixed(1);
+
+            updateEquationUI();
+            drawPlot();
+        }
+
+        sliderA.addEventListener('input', syncSliders);
+        sliderB.addEventListener('input', syncSliders);
+        sliderC.addEventListener('input', syncSliders);
+        sliderD.addEventListener('input', syncSliders);
+        probeSlider.addEventListener('input', syncSliders);
+
+        // Reset Button
+        document.getElementById('resetCoeffsBtn').addEventListener('click', () => {
+            sliderA.value = 1;
+            sliderB.value = 0;
+            sliderC.value = -3;
+            sliderD.value = -1;
+            probeSlider.value = 1.0;
+            syncSliders();
+        });
+
+        // Preset Configurations
+        document.getElementById('presetSelect').addEventListener('change', (e) => {
+            const v = e.target.value;
+            if (v === 'cubic3roots') {
+                sliderA.value = 1; sliderB.value = 0; sliderC.value = -3; sliderD.value = -1;
+            } else if (v === 'cubic1root') {
+                sliderA.value = 1; sliderB.value = 0; sliderC.value = 2; sliderD.value = -3;
+            } else if (v === 'quad2roots') {
+                sliderA.value = 0; sliderB.value = 1; sliderC.value = 0; sliderD.value = -4;
+            } else if (v === 'quadComplex') {
+                sliderA.value = 0; sliderB.value = 1; sliderC.value = 0; sliderD.value = 1;
+            } else if (v === 'linear') {
+                sliderA.value = 0; sliderB.value = 0; sliderC.value = 2; sliderD.value = -3;
+            }
+            syncSliders();
+        });
+
+        // Canvas interactive click / touch probe movement
+        function handleCanvasPointer(e) {
+            const rect = canvas.getBoundingClientRect();
+            const clientX = e.clientX || (e.touches && e.touches[0] ? e.touches[0].clientX : null);
+            if (clientX === null) return;
+
+            const px = clientX - rect.left;
+            const newX = Math.max(-4.5, Math.min(4.5, toMathX(px, rect.width)));
+            probeSlider.value = newX;
+            probeX = newX;
+            updateEquationUI();
+            drawPlot();
+        }
+
+        canvas.addEventListener('click', handleCanvasPointer);
+        canvas.addEventListener('mousemove', (e) => {
+            if (e.buttons === 1) handleCanvasPointer(e);
+        });
+        canvas.addEventListener('touchmove', handleCanvasPointer, { passive: true });
+
+        // --- Guided Discovery Accordion Logic ---
+        function toggleHint(id) {
+            const el = document.getElementById(id);
+            const btnText = document.getElementById(id + '_btn_text');
+            const arrow = document.getElementById(id + '_arrow');
+            if (el.classList.contains('hidden')) {
+                el.classList.remove('hidden');
+                btnText.innerText = 'ซ่อนแนวทางคำตอบ';
+                arrow.innerText = '↑';
+            } else {
+                el.classList.add('hidden');
+                btnText.innerText = '💡 ดูแนวทางคำตอบ';
+                arrow.innerText = '↓';
+            }
+        }
+
+        // --- Exercise Checkers ---
+        function checkEx1() {
+            const deg = document.getElementById('ex1_degree').value.trim();
+            const lead = document.getElementById('ex1_lead').value.trim();
+            const res = document.getElementById('ex1_result');
+            const expl = document.getElementById('ex1_expl');
+
+            if (deg === '4' && lead === '7') {
+                res.innerHTML = '<span class="text-emerald-600 font-bold">✓ ถูกต้องยอดเยี่ยม!</span>';
+                expl.className = 'text-xs bg-emerald-50 p-3 rounded-lg border border-emerald-200 text-slate-800 space-y-1 block';
+                expl.innerHTML = '<strong>คำอธิบาย:</strong> พหุนาม $Q(x) = 7x^4 - 3x^2 + 2x - 9$ มีกำลังสูงสุดคือ 4 จึงมีดีกรีเท่ากับ 4 และมีสัมประสิทธิ์นำหน้าพจน์ $x^4$ คือ 7';
+            } else {
+                res.innerHTML = '<span class="text-rose-600 font-bold">✕ ยังไม่ถูกต้อง ลองใหม่อีกครั้ง</span>';
+                expl.className = 'text-xs bg-rose-50 p-3 rounded-lg border border-rose-200 text-slate-800 space-y-1 block';
+                expl.innerHTML = '<strong>แนะแนวทาง:</strong> ดีกรีคือกำลังสูงสุดของตัวแปร $x$ (ดูที่เลขชี้กำลังสูงสุด) และสัมประสิทธิ์นำคือตัวเลขที่คูณอยู่หน้าตัวแปรที่มีกำลังสูงสุดนั้น';
+            }
+            if (window.MathJax) MathJax.typesetPromise();
+        }
+
+        function checkEx2() {
+            const r2 = document.querySelector('input[name="ex2_root2"]:checked');
+            const r3 = document.querySelector('input[name="ex2_root3"]:checked');
+            const res = document.getElementById('ex2_result');
+            const expl = document.getElementById('ex2_expl');
+
+            if (!r2 || !r3) {
+                res.innerHTML = '<span class="text-amber-600 font-bold">กรุณาเลือกคำตอบทั้งสองค่า</span>';
+                return;
+            }
+
+            // P(2) = 8 - 16 + 2 + 6 = 0 -> YES
+            // P(3) = 27 - 36 + 3 + 6 = 0 -> YES
+            if (r2.value === 'yes' && r3.value === 'yes') {
+                res.innerHTML = '<span class="text-emerald-600 font-bold">✓ ถูกต้องทั้งหมด! ทั้งสองค่าเป็นราก</span>';
+                expl.className = 'text-xs bg-emerald-50 p-3 rounded-lg border border-emerald-200 text-slate-800 space-y-1 block';
+                expl.innerHTML = `<strong>การคำนวณ:</strong><br>
+                    • แทน $x=2$: $P(2) = (2)^3 - 4(2)^2 + 2 + 6 = 8 - 16 + 2 + 6 = 0$ (จริง)<br>
+                    • แทน $x=3$: $P(3) = (3)^3 - 4(3)^2 + 3 + 6 = 27 - 36 + 3 + 6 = 0$ (จริง)`;
+            } else {
+                res.innerHTML = '<span class="text-rose-600 font-bold">✕ ยังไม่ถูกต้อง ตรวจสอบการคิดเลข</span>';
+                expl.className = 'text-xs bg-rose-50 p-3 rounded-lg border border-rose-200 text-slate-800 space-y-1 block';
+                expl.innerHTML = '<strong>คำใบ้:</strong> ลองแทนค่า $x$ ลงในแต่ละพจน์อย่างระมัดระวัง แล้วดูว่าผลรวมเป็น 0 หรือไม่';
+            }
+            if (window.MathJax) MathJax.typesetPromise();
+        }
+
+        function checkEx3() {
+            const opt = document.querySelector('input[name="ex3_opt"]:checked');
+            const res = document.getElementById('ex3_result');
+            const expl = document.getElementById('ex3_expl');
+
+            if (!opt) {
+                res.innerHTML = '<span class="text-amber-600 font-bold">กรุณาเลือกคำตอบ</span>';
+                return;
+            }
+
+            if (opt.value === 'B') {
+                res.innerHTML = '<span class="text-emerald-600 font-bold">✓ ถูกต้อง! ข้อ ข.</span>';
+                expl.className = 'text-xs bg-emerald-50 p-3 rounded-lg border border-emerald-200 text-slate-800 space-y-1 block';
+                expl.innerHTML = '<strong>คำอธิบาย:</strong> จากสมการ $x^2 + 9 = 0$ จะได้ $x^2 = -9$ ซึ่งไม่มีจำนวนจริงใดที่ยกกำลังสองแล้วได้ค่าลบ ดังนั้นจึง<strong>ไม่มีรากจริง</strong> แต่ในระบบจำนวนเชิงซ้อน $x = \\pm\\sqrt{-9} = \\pm 3i$ ทำให้ได้รากเชิงซ้อน 2 ตัวเป็นคู่สังยุคกัน';
+            } else {
+                res.innerHTML = '<span class="text-rose-600 font-bold">✕ ยังไม่ถูกต้อง</span>';
+                expl.className = 'text-xs bg-rose-50 p-3 rounded-lg border border-rose-200 text-slate-800 space-y-1 block';
+                expl.innerHTML = '<strong>คำใบ้:</strong> สังเกตว่า $x^2 \\ge 0$ สำหรับจำนวนจริงทุกตัว ดังนั้น $x^2 + 9$ จะมีค่าน้อยที่สุดคือ 9 ซึ่งไม่มีทางตัดแกน $x$ (เป็น 0) ในระนาบจำนวนจริงได้เลย';
+            }
+            if (window.MathJax) MathJax.typesetPromise();
+        }
+
+        // Window resize and initial load handler
+        window.addEventListener('resize', resizeCanvas);
+        window.addEventListener('load', () => {
+            resizeCanvas();
+            syncSliders();
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,813 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>บทที่ 1: รากของสมการ - เรื่องที่ 2 ทฤษฎีบทเศษเหลือและทฤษฎีบทตัวประกอบ</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Sarabun:wght@300;400;500;600;700&family=Fira+Code:wght@400;500;600&display=swap" rel="stylesheet">
+    <!-- MathJax for Mathematical Formatting -->
+    <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']],
+                displayMath: [['$$', '$$'], ['\\[', '\\]']]
+            },
+            svg: { fontCache: 'global' }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <style>
+        body {
+            font-family: 'Sarabun', 'Inter', sans-serif;
+        }
+        .code-font {
+            font-family: 'Fira Code', monospace;
+        }
+        .hide-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .hide-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 antialiased min-h-screen flex flex-col">
+
+    <!-- Header Navigation & Course Title -->
+
+    <!-- Main Container: Constant Fixed Width Constraint (1,152px) -->
+    <main class="max-w-6xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 space-y-8 flex-grow">
+
+        <!-- Title Banner -->
+        <div class="bg-gradient-to-r from-slate-900 via-indigo-900 to-indigo-950 rounded-2xl p-6 sm:p-8 text-white shadow-md relative overflow-hidden">
+            <div class="relative z-10 space-y-2">
+                <div class="inline-flex items-center px-3 py-1 rounded-full bg-indigo-500/25 border border-indigo-400/30 text-indigo-200 text-xs font-semibold tracking-wide uppercase">
+                    แถบที่ 2 • เครื่องมือวิเคราะห์พีชคณิต
+                </div>
+                <h2 class="text-2xl sm:text-3xl font-extrabold tracking-tight">ทฤษฎีบทเศษเหลือและทฤษฎีบทตัวประกอบ</h2>
+                <p class="text-indigo-200 text-sm sm:text-base max-w-3xl leading-relaxed">
+                    สำรวจความเชื่อมโยงอันทรงพลังระหว่างการหารพหุนาม ค่าของฟังก์ชัน $P(a)$ การตรวจสอบรากสมการ และกลไกการลดรูปดีกรีเพื่อหาผลเฉลยทั้งหมด
+                </p>
+            </div>
+            <div class="absolute -right-10 -bottom-12 w-64 h-64 rounded-full bg-indigo-600/10 pointer-events-none blur-3xl"></div>
+        </div>
+
+        <!-- ========================================== -->
+        <!-- ส่วนที่ 1: วัตถุประสงค์การเรียนรู้ (Learning Objectives) -->
+        <!-- ========================================== -->
+        <section class="bg-white rounded-2xl p-6 sm:p-7 shadow-sm border border-slate-200/80 transition-all hover:shadow-md">
+            <div class="flex items-center space-x-3 mb-4">
+                <div class="p-2.5 rounded-xl bg-blue-50 text-blue-600">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                </div>
+                <div>
+                    <h3 class="text-lg font-bold text-slate-900">1. วัตถุประสงค์การเรียนรู้ (Learning Objectives)</h3>
+                    <p class="text-xs text-slate-500">ทักษะและความเข้าใจที่นักศึกษาจะได้รับหลังศึกษาจบหัวข้อนี้</p>
+                </div>
+            </div>
+
+            <div class="bg-gradient-to-br from-blue-50/60 to-indigo-50/30 rounded-xl p-5 border border-blue-100">
+                <p class="text-slate-800 text-base leading-relaxed mb-3">
+                    เมื่อศึกษาและมีปฏิสัมพันธ์กับโมเดลการเรียนรู้นี้แล้ว นักศึกษาจะมีความสามารถดังต่อไปนี้:
+                </p>
+                <ul class="space-y-2.5 text-slate-700 text-sm sm:text-base">
+                    <li class="flex items-start space-x-2.5">
+                        <span class="inline-block w-5 h-5 rounded-full bg-blue-600 text-white text-xs flex items-center justify-center font-bold flex-shrink-0 mt-0.5">✓</span>
+                        <span>อธิบายและพิสูจน์<strong>ทฤษฎีบทเศษเหลือ (Remainder Theorem)</strong> และ<strong>ทฤษฎีบทตัวประกอบ (Factor Theorem)</strong> โดยใช้ขั้นตอนวิธีการหารพหุนามได้อย่างรัดกุม</span>
+                    </li>
+                    <li class="flex items-start space-x-2.5">
+                        <span class="inline-block w-5 h-5 rounded-full bg-blue-600 text-white text-xs flex items-center justify-center font-bold flex-shrink-0 mt-0.5">✓</span>
+                        <span>ประยุกต์ทฤษฎีบทเพื่อ<strong>ตรวจสอบรากของสมการ</strong>ได้อย่างรวดเร็วโดยไม่ต้องตั้งหารพหุนามเต็มรูป</span>
+                    </li>
+                    <li class="flex items-start space-x-2.5">
+                        <span class="inline-block w-5 h-5 rounded-full bg-blue-600 text-white text-xs flex items-center justify-center font-bold flex-shrink-0 mt-0.5">✓</span>
+                        <span>นำการหารสังเคราะห์มาใช้<strong>ลดทอนดีกรีของสมการ (Depressed Polynomial)</strong> และแยกตัวประกอบเพื่อหารากที่เหลือทั้งหมดของสมการพหุนาม</span>
+                    </li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- ========================================== -->
+        <!-- ส่วนที่ 2: เนื้อหาหลัก (Core Content) -->
+        <!-- ========================================== -->
+        <section class="bg-white rounded-2xl p-6 sm:p-7 shadow-sm border border-slate-200/80 space-y-6">
+            <div class="flex items-center space-x-3 pb-3 border-b border-slate-100">
+                <div class="p-2.5 rounded-xl bg-indigo-50 text-indigo-600">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                    </svg>
+                </div>
+                <div>
+                    <h3 class="text-lg font-bold text-slate-900">2. เนื้อหาหลัก (Core Content)</h3>
+                    <p class="text-xs text-slate-500">ทฤษฎีบท บทพิสูจน์เชิงพีชคณิต และการประยุกต์ลดทอนดีกรี</p>
+                </div>
+            </div>
+
+            <!-- 2.1 ทฤษฎีบทการหารพหุนาม -->
+            <div class="space-y-3">
+                <h4 class="text-base font-bold text-slate-800 flex items-center space-x-2">
+                    <span class="w-2 h-2 rounded-full bg-indigo-500"></span>
+                    <span>2.1 ทฤษฎีบทขั้นตอนวิธีการหารพหุนาม (Polynomial Division Algorithm)</span>
+                </h4>
+                <div class="p-4 bg-slate-50 rounded-xl border border-slate-200 text-slate-700 leading-relaxed text-sm sm:text-base">
+                    <p class="mb-2">
+                        ถ้า $P(x)$ เป็นพหุนามที่มีดีกรี $n \ge 1$ และหารด้วยตัวหารเชิงเส้น $d(x) = x - a$ จะมีพหุนามผลหาร $Q(x)$ และเศษเหลือ $R$ เพียงชุดเดียวที่สอดคล้องกับเอกลักษณ์:
+                    </p>
+                    <div class="my-3 py-2 text-center text-indigo-900 bg-white rounded-lg border border-slate-200 font-bold text-base">
+                        $$P(x) = (x - a)Q(x) + R$$
+                    </div>
+                    <p class="text-xs text-slate-600">
+                        โดยที่ดีกรีของเศษเหลือ $R$ จะต้องน้อยกว่าดีกรีของตัวหาร $(x-a)$ เนื่องจากตัวหารมีดีกรีเท่ากับ 1 ดังนั้น <strong>$R$ จึงเป็นค่าคงตัว (Constant)</strong> เสมอ
+                    </p>
+                </div>
+            </div>
+
+            <!-- 2.2 & 2.3 ทฤษฎีบทเศษเหลือและตัวประกอบ -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="bg-indigo-50/40 p-4 rounded-xl border border-indigo-100 flex flex-col justify-between">
+                    <div>
+                        <h4 class="text-sm sm:text-base font-bold text-indigo-950 mb-2 flex items-center space-x-1.5">
+                            <span class="w-2 h-2 rounded-full bg-indigo-600"></span>
+                            <span>2.2 ทฤษฎีบทเศษเหลือ (Remainder Theorem)</span>
+                        </h4>
+                        <p class="text-slate-700 text-sm leading-relaxed mb-3">
+                            เศษจากการหารพหุนาม $P(x)$ ด้วย $x - a$ จะมีค่าเท่ากับค่าของฟังก์ชันพหุนามเมื่อแทน $x$ ด้วย $a$ เสมอ:
+                        </p>
+                    </div>
+                    <div class="bg-white p-3 rounded-lg border border-indigo-200 text-center font-bold text-indigo-700 text-base shadow-sm">
+                        $$\text{เศษเหลือ } R = P(a)$$
+                    </div>
+                </div>
+
+                <div class="bg-emerald-50/40 p-4 rounded-xl border border-emerald-100 flex flex-col justify-between">
+                    <div>
+                        <h4 class="text-sm sm:text-base font-bold text-emerald-950 mb-2 flex items-center space-x-1.5">
+                            <span class="w-2 h-2 rounded-full bg-emerald-600"></span>
+                            <span>2.3 ทฤษฎีบทตัวประกอบ (Factor Theorem)</span>
+                        </h4>
+                        <p class="text-slate-700 text-sm leading-relaxed mb-3">
+                            พหุนามเชิงเส้น $x - a$ จะเป็นตัวประกอบหนึ่งของ $P(x)$ (หารลงตัว) ก็ต่อเมื่อ เศษเหลือมีค่าเป็นศูนย์:
+                        </p>
+                    </div>
+                    <div class="bg-white p-3 rounded-lg border border-emerald-200 text-center font-bold text-emerald-700 text-base shadow-sm">
+                        $$x - a \text{ เป็นตัวประกอบ } \iff P(a) = 0$$
+                    </div>
+                </div>
+            </div>
+
+            <!-- 2.4 การพิสูจน์โดยใช้เอกลักษณ์การหารพหุนาม -->
+            <div class="bg-slate-50 p-4 sm:p-5 rounded-xl border border-slate-200 space-y-3">
+                <h4 class="text-sm sm:text-base font-bold text-slate-900 flex items-center space-x-2">
+                    <span class="px-2 py-0.5 rounded bg-slate-200 text-slate-800 text-xs font-semibold">การพิสูจน์</span>
+                    <span>บทพิสูจน์เชิงเอกลักษณ์ (Mathematical Proof)</span>
+                </h4>
+                <div class="text-sm text-slate-700 space-y-3">
+                    <div class="p-3 bg-white rounded-lg border border-slate-200 leading-relaxed">
+                        <strong class="text-indigo-900">ขั้นที่ 1 (พิสูจน์ทฤษฎีบทเศษเหลือ):</strong><br>
+                        จากขั้นตอนวิธีการหารพหุนาม เราทราบว่ามี $Q(x)$ และค่าคงตัว $R$ ซึ่งทำให้:
+                        <div class="text-center py-1 font-mono text-indigo-700">$P(x) = (x - a)Q(x) + R$</div>
+                        เมื่อทำการแทนค่าตัวแปร $x = a$ ลงในเอกลักษณ์ทั้งสองข้าง จะได้:
+                        <div class="text-center py-1 font-mono text-indigo-700">
+                            $P(a) = (a - a)Q(a) + R = (0) \cdot Q(a) + R = 0 + R = R$
+                        </div>
+                        ดังนั้นสรุปได้ว่า $\mathbf{R = P(a)}$ เป็นจริงเสมอ $\blacksquare$
+                    </div>
+
+                    <div class="p-3 bg-white rounded-lg border border-slate-200 leading-relaxed">
+                        <strong class="text-emerald-900">ขั้นที่ 2 (พิสูจน์ทฤษฎีบทตัวประกอบ):</strong><br>
+                        • $(\Rightarrow)$ ถ้า $x - a$ เป็นตัวประกอบของ $P(x)$ หมายความว่าการหารลงตัว นั่นคือเศษ $R = 0$ ซึ่งจากทฤษฎีบทเศษเหลือ $R = P(a)$ ส่งผลให้ $P(a) = 0$<br>
+                        • $(\Leftarrow)$ ในทางกลับกัน ถ้า $P(a) = 0$ จะได้เศษ $R = P(a) = 0$ ส่งผลให้เอกลักษณ์กลายเป็น $P(x) = (x - a)Q(x)$ ซึ่งแสดงอย่างชัดเจนว่า $x - a$ เป็นตัวประกอบของ $P(x)$ $\blacksquare$
+                    </div>
+                </div>
+            </div>
+
+            <!-- 2.5 การประยุกต์กับการแยกตัวประกอบและลดทอนดีกรี -->
+            <div class="p-4 sm:p-5 rounded-xl bg-amber-50/50 border border-amber-200 space-y-2">
+                <h4 class="text-sm sm:text-base font-bold text-amber-950 flex items-center space-x-2">
+                    <span class="w-2 h-2 rounded-full bg-amber-500"></span>
+                    <span>2.5 การประยุกต์: การลดทอนดีกรี (Depressed Polynomial) สู่การแก้สมการสมบูรณ์</span>
+                </h4>
+                <p class="text-sm text-slate-700 leading-relaxed">
+                    เมื่อเราพบว่า $P(a) = 0$ (ได้รากแรกคือ $x = a$) เราสามารถนำ $x - a$ ไปหาร $P(x)$ ด้วย<strong>การหารสังเคราะห์</strong> เพื่อให้ได้พหุนามผลหาร $Q(x)$ ซึ่งมีดีกรีลดลง 1 ($n-1$) ทำให้แก้สมการที่เหลือได้ง่ายขึ้น เช่น ดีกรี 3 ลดเหลือดีกรี 2 (กำลังสอง) ซึ่งใช้สูตร $x = \frac{-b \pm \sqrt{b^2 - 4ac}}{2a}$ หารากที่เหลือทั้งหมดได้ทันที
+                </p>
+            </div>
+        </section>
+
+        <!-- ========================================== -->
+        <!-- ส่วนที่ 3: แบบจำลองโต้ตอบ (Interactive Model) -->
+        <!-- ========================================== -->
+        <section class="bg-white rounded-2xl p-6 sm:p-7 shadow-sm border border-slate-200/80 space-y-6">
+            <div class="flex items-center justify-between pb-3 border-b border-slate-100 flex-wrap gap-2">
+                <div class="flex items-center space-x-3">
+                    <div class="p-2.5 rounded-xl bg-purple-50 text-purple-600">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                        </svg>
+                    </div>
+                    <div>
+                        <h3 class="text-lg font-bold text-slate-900">3. แบบจำลองโต้ตอบ (Interactive Simulation)</h3>
+                        <p class="text-xs text-slate-500">เปรียบเทียบเศษ $R$ จากวิธีแทนค่า $P(a)$ กับการหารสังเคราะห์แบบเรียลไทม์</p>
+                    </div>
+                </div>
+
+                <!-- Preset Selector -->
+                <div class="flex items-center space-x-2">
+                    <label class="text-xs font-semibold text-slate-500">ตัวอย่างสมการ:</label>
+                    <select id="simPreset" class="text-xs bg-slate-100 border border-slate-300 rounded-lg px-2.5 py-1.5 font-medium text-slate-700 hover:bg-slate-200 transition">
+                        <option value="preset1">P(x) = x³ - 3x² - 4x + 12 (ลอง a = 2 [ราก])</option>
+                        <option value="preset2">P(x) = 2x³ - 3x² - 5x + 6 (ลอง a = 1 [ราก])</option>
+                        <option value="preset3">P(x) = x³ - 2x² + x - 5 (ลอง a = 3 [มีเศษ])</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Simulation Controls & Display -->
+            <div class="space-y-6">
+                <!-- Coefficient Inputs & Divisor a -->
+                <div class="bg-slate-50 p-4 sm:p-5 rounded-xl border border-slate-200 space-y-4">
+                    <div class="flex items-center justify-between flex-wrap gap-2">
+                        <span class="text-xs font-bold tracking-wider text-slate-600">กำหนดสัมประสิทธิ์ $P(x) = c_3 x^3 + c_2 x^2 + c_1 x + c_0$</span>
+                        <button id="resetSimBtn" class="text-xs font-semibold text-indigo-600 hover:underline">คืนค่าเริ่มต้น</button>
+                    </div>
+
+                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-center">
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-600 mb-1">$c_3$ ($x^3$)</label>
+                            <input type="number" id="in_c3" value="1" class="w-full text-center font-mono font-bold bg-white border border-slate-300 rounded-lg py-1.5 focus:ring-2 focus:ring-indigo-500 focus:outline-none text-sm">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-600 mb-1">$c_2$ ($x^2$)</label>
+                            <input type="number" id="in_c2" value="-3" class="w-full text-center font-mono font-bold bg-white border border-slate-300 rounded-lg py-1.5 focus:ring-2 focus:ring-indigo-500 focus:outline-none text-sm">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-600 mb-1">$c_1$ ($x$)</label>
+                            <input type="number" id="in_c1" value="-4" class="w-full text-center font-mono font-bold bg-white border border-slate-300 rounded-lg py-1.5 focus:ring-2 focus:ring-indigo-500 focus:outline-none text-sm">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-600 mb-1">$c_0$ (ค่าคงที่)</label>
+                            <input type="number" id="in_c0" value="12" class="w-full text-center font-mono font-bold bg-white border border-slate-300 rounded-lg py-1.5 focus:ring-2 focus:ring-indigo-500 focus:outline-none text-sm">
+                        </div>
+                    </div>
+
+                    <!-- Divisor a slider/input -->
+                    <div class="pt-3 border-t border-slate-200">
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="text-sm font-bold text-slate-800">
+                                ตัวหารเชิงเส้น $d(x) = x - a$ <span class="text-xs font-normal text-slate-500">(ค่า $a$ คือตัวทดสอบ)</span>
+                            </span>
+                            <span class="text-base font-bold font-mono px-3 py-0.5 rounded-lg bg-indigo-100 text-indigo-800" id="val_a_badge">a = 2</span>
+                        </div>
+                        <div class="flex items-center space-x-4">
+                            <span class="text-xs font-mono text-slate-500">-5</span>
+                            <input type="range" id="slider_a" min="-5" max="5" step="1" value="2" class="w-full h-2 bg-slate-300 rounded-lg appearance-none cursor-pointer accent-indigo-600">
+                            <span class="text-xs font-mono text-slate-500">+5</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Side-by-Side Dual Verification View -->
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 items-stretch">
+                    
+                    <!-- Method 1: Direct Substitution P(a) -->
+                    <div class="bg-indigo-50/40 rounded-2xl p-5 border border-indigo-100 flex flex-col justify-between">
+                        <div>
+                            <div class="flex items-center justify-between mb-3 pb-2 border-b border-indigo-100">
+                                <span class="text-xs font-bold text-indigo-900 uppercase tracking-wider">วิธีที่ 1: ทฤษฎีบทเศษเหลือ</span>
+                                <span class="text-xs px-2 py-0.5 rounded bg-indigo-100 text-indigo-700 font-semibold">แทนค่า P(a)</span>
+                            </div>
+                            <div class="space-y-2 text-sm text-slate-700 font-mono">
+                                <div class="text-xs text-slate-500 font-sans">แทนค่า $x = a$ ลงในพหุนาม:</div>
+                                <div id="subStep1" class="p-2.5 bg-white rounded-lg border border-indigo-100 overflow-x-auto text-xs sm:text-sm">
+                                    P(2) = 1(2)³ - 3(2)² - 4(2) + 12
+                                </div>
+                                <div id="subStep2" class="p-2.5 bg-white rounded-lg border border-indigo-100 text-xs sm:text-sm text-slate-600">
+                                    = 8 - 12 - 8 + 12
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mt-4 pt-3 border-t border-indigo-100 flex items-center justify-between">
+                            <span class="text-xs font-semibold text-slate-600 font-sans">เศษเหลือ $R = P(a)$:</span>
+                            <span id="subResultR" class="text-xl font-extrabold font-mono text-indigo-700">0</span>
+                        </div>
+                    </div>
+
+                    <!-- Method 2: Synthetic Division Table -->
+                    <div class="bg-slate-900 text-slate-100 rounded-2xl p-5 border border-slate-800 flex flex-col justify-between">
+                        <div>
+                            <div class="flex items-center justify-between mb-3 pb-2 border-b border-slate-800">
+                                <span class="text-xs font-bold text-emerald-400 uppercase tracking-wider">วิธีที่ 2: การหารสังเคราะห์</span>
+                                <span class="text-xs px-2 py-0.5 rounded bg-slate-800 text-slate-300 font-semibold">Synthetic Division</span>
+                            </div>
+                            
+                            <!-- Synthetic Table Dynamic Render -->
+                            <div class="overflow-x-auto py-1">
+                                <div id="synthTableContainer" class="font-mono text-center text-sm inline-block min-w-full">
+                                    <!-- Populated dynamically via JS -->
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mt-4 pt-3 border-t border-slate-800 flex items-center justify-between">
+                            <span class="text-xs text-slate-400">เศษเหลือจากการหาร:</span>
+                            <span id="synthResultR" class="text-xl font-extrabold font-mono text-emerald-400">0</span>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- Theorem Conclusion & Factorization Result Box -->
+                <div id="conclusionCard" class="p-5 rounded-2xl border transition-all duration-300">
+                    <div class="flex items-start space-x-3.5">
+                        <span id="conclusionIcon" class="p-2 rounded-xl text-xl flex-shrink-0">🎉</span>
+                        <div class="space-y-1.5 flex-grow">
+                            <h4 id="conclusionTitle" class="text-base font-bold">
+                                วิเคราะห์ความสัมพันธ์: $x - 2$ เป็นตัวประกอบหรือไม่?
+                            </h4>
+                            <p id="conclusionDesc" class="text-sm leading-relaxed">
+                                ผลการคำนวณจะแสดงสถานะความเป็นรากและรูปแยกตัวประกอบ
+                            </p>
+                            <!-- Depressed equation if factor -->
+                            <div id="factorizationDisplay" class="pt-2"></div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- ========================================== -->
+        <!-- ส่วนที่ 4: คำถามนำเพื่อค้นพบ (Guided Discovery Questions) -->
+        <!-- ========================================== -->
+        <section class="bg-white rounded-2xl p-6 sm:p-7 shadow-sm border border-slate-200/80 space-y-5">
+            <div class="flex items-center space-x-3 pb-3 border-b border-slate-100">
+                <div class="p-2.5 rounded-xl bg-amber-50 text-amber-600">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+                    </svg>
+                </div>
+                <div>
+                    <h3 class="text-lg font-bold text-slate-900">4. คำถามนำเพื่อค้นพบ (Guided Discovery Questions)</h3>
+                    <p class="text-xs text-slate-500">ท้าทายความคิดเพื่อสร้างความเข้าใจเชิงมโนทัศน์ (คลิกเพื่อดูแนวทางคำตอบ)</p>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <!-- Question 1 -->
+                <div class="border border-slate-200 rounded-xl p-4 bg-slate-50/50 flex flex-col justify-between">
+                    <div>
+                        <div class="text-indigo-600 font-bold text-xs uppercase tracking-wider mb-1">คำถามที่ 1</div>
+                        <h4 class="text-sm font-semibold text-slate-900 mb-2">
+                            เหตุใดเศษจากการหารด้วย $x-a$ จึงหาได้โดยไม่ต้องหารพหุนามเต็มรูป?
+                        </h4>
+                        <p class="text-xs text-slate-600 leading-relaxed">
+                            สังเกตสิ่งที่เกิดขึ้นกับพจน์ผลหาร $(x-a)Q(x)$ เมื่อเราแทนค่าตัวแปร $x$ ด้วย $a$
+                        </p>
+                    </div>
+                    <div class="mt-4 pt-3 border-t border-slate-200/80">
+                        <button onclick="toggleHint('qHint1')" class="text-xs font-semibold text-indigo-600 hover:text-indigo-800 flex items-center space-x-1 focus:outline-none">
+                            <span id="qHint1_text">💡 ดูแนวทางคำตอบ</span>
+                            <span id="qHint1_arr">↓</span>
+                        </button>
+                        <div id="qHint1" class="hidden mt-2 p-3 bg-white rounded-lg border border-indigo-100 text-xs text-slate-700 leading-relaxed shadow-sm">
+                            <strong>แนวคำตอบ:</strong> เพราะจากเอกลักษณ์ $P(x) = (x-a)Q(x) + R$ การเลือกแทนค่า $x = a$ จะบังคับให้พจน์ $(a-a)Q(a) = 0 \cdot Q(a) = 0$ ยุบหายไปทันทีโดยไม่ต้องสนใจว่าพหุนามผลหาร $Q(x)$ จะยาวหรือซับซ้อนเพียงใด เหลือเพียงค่าคงที่ $R$ ทางขวา ทำให้ได้ $R = P(a)$ โดยตรง
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Question 2 -->
+                <div class="border border-slate-200 rounded-xl p-4 bg-slate-50/50 flex flex-col justify-between">
+                    <div>
+                        <div class="text-indigo-600 font-bold text-xs uppercase tracking-wider mb-1">คำถามที่ 2</div>
+                        <h4 class="text-sm font-semibold text-slate-900 mb-2">
+                            ความสัมพันธ์ระหว่าง "เศษเป็นศูนย์" กับ "การเป็นราก" คืออะไร?
+                        </h4>
+                        <p class="text-xs text-slate-600 leading-relaxed">
+                            เปรียบเทียบเงื่อนไขทางพีชคณิต $P(a)=0$ กับเงื่อนไขการหารลงตัวของพหุนาม
+                        </p>
+                    </div>
+                    <div class="mt-4 pt-3 border-t border-slate-200/80">
+                        <button onclick="toggleHint('qHint2')" class="text-xs font-semibold text-indigo-600 hover:text-indigo-800 flex items-center space-x-1 focus:outline-none">
+                            <span id="qHint2_text">💡 ดูแนวทางคำตอบ</span>
+                            <span id="qHint2_arr">↓</span>
+                        </button>
+                        <div id="qHint2" class="hidden mt-2 p-3 bg-white rounded-lg border border-indigo-100 text-xs text-slate-700 leading-relaxed shadow-sm">
+                            <strong>แนวคำตอบ:</strong> มีความหมายสมมูลกันโดยสมบูรณ์! เมื่อเศษเหลือเป็นศูนย์ ($R = 0$) ย่อมแปลว่า $P(a) = 0$ ซึ่งตรงกับนิยามของรากสมการพอดี ขณะเดียวกันทำให้ $P(x) = (x-a)Q(x)$ ส่งผลให้ $x-a$ เป็นตัวประกอบ ดังนั้น "เศษเป็นศูนย์ $\iff$ $x-a$ เป็นตัวประกอบ $\iff$ $a$ เป็นรากของสมการ"
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Question 3 -->
+                <div class="border border-slate-200 rounded-xl p-4 bg-slate-50/50 flex flex-col justify-between">
+                    <div>
+                        <div class="text-indigo-600 font-bold text-xs uppercase tracking-wider mb-1">คำถามที่ 3</div>
+                        <h4 class="text-sm font-semibold text-slate-900 mb-2">
+                            ถ้าทราบรากหนึ่งราก เราสามารถลดดีกรีของสมการได้อย่างไร?
+                        </h4>
+                        <p class="text-xs text-slate-600 leading-relaxed">
+                            พิจารณาว่าเราจะนำ $Q(x)$ ที่ได้จากการหารสังเคราะห์ไปใช้ค้นหารากที่เหลือต่ออย่างไร
+                        </p>
+                    </div>
+                    <div class="mt-4 pt-3 border-t border-slate-200/80">
+                        <button onclick="toggleHint('qHint3')" class="text-xs font-semibold text-indigo-600 hover:text-indigo-800 flex items-center space-x-1 focus:outline-none">
+                            <span id="qHint3_text">💡 ดูแนวทางคำตอบ</span>
+                            <span id="qHint3_arr">↓</span>
+                        </button>
+                        <div id="qHint3" class="hidden mt-2 p-3 bg-white rounded-lg border border-indigo-100 text-xs text-slate-700 leading-relaxed shadow-sm">
+                            <strong>แนวคำตอบ:</strong> เมื่อทราบว่า $a$ เป็นรากหนึ่ง ($P(a)=0$) เรานำ $x-a$ ไปหารสังเคราะห์ $P(x)$ จะได้สมการลดทอน $Q(x)$ ที่มีดีกรีเท่ากับ $n-1$ รากที่เหลือทั้งหมดของ $P(x) = 0$ จะกลายเป็นรากของสมการย่อย $Q(x) = 0$ ทำให้ปัญหาการแก้สมการดีกรีสูงถูกย่อยเป็นปัญหาที่ง่ายลงตามลำดับ
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ========================================== -->
+        <!-- ส่วนที่ 5: แบบฝึกหัดสำหรับนักศึกษา (Self-Check Exercises) -->
+        <!-- ========================================== -->
+        <section class="bg-white rounded-2xl p-6 sm:p-7 shadow-sm border border-slate-200/80 space-y-6">
+            <div class="flex items-center space-x-3 pb-3 border-b border-slate-100">
+                <div class="p-2.5 rounded-xl bg-emerald-50 text-emerald-600">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                    </svg>
+                </div>
+                <div>
+                    <h3 class="text-lg font-bold text-slate-900">5. แบบฝึกหัดสำหรับนักศึกษา (Self-Check Exercises)</h3>
+                    <p class="text-xs text-slate-500">ทดสอบทักษะการพิสูจน์ ตรวจสอบตัวประกอบ และการลดรูปดีกรีเพื่อแยกตัวประกอบ</p>
+                </div>
+            </div>
+
+            <div class="space-y-6">
+                <!-- Exercise 1 -->
+                <div class="p-4 sm:p-5 rounded-xl bg-slate-50 border border-slate-200 space-y-3">
+                    <div class="flex items-center justify-between">
+                        <span class="text-xs font-bold text-indigo-700 bg-indigo-100 px-2.5 py-0.5 rounded-full">ข้อที่ 1: ขั้นตอนการพิสูจน์ทฤษฎีบทเศษเหลือ</span>
+                    </div>
+                    <p class="text-sm font-medium text-slate-800">
+                        ในการพิสูจน์ว่าเศษจากการหาร $P(x)$ ด้วย $x - a$ มีค่าเท่ากับ $P(a)$ เหตุใด $R$ ในสมการ $P(x) = (x-a)Q(x) + R$ จึงเป็นค่าคงตัว (ไม่มีตัวแปร $x$ ปรากฏอยู่)?
+                    </p>
+
+                    <div class="space-y-2 text-xs sm:text-sm">
+                        <label class="flex items-center space-x-2.5 p-2 rounded-lg hover:bg-white cursor-pointer transition">
+                            <input type="radio" name="ex1_opt" value="A" class="text-indigo-600">
+                            <span class="text-slate-700">ก) เพราะ $P(x)$ มีสัมประสิทธิ์เป็นจำนวนจริงเสมอ</span>
+                        </label>
+                        <label class="flex items-center space-x-2.5 p-2 rounded-lg hover:bg-white cursor-pointer transition">
+                            <input type="radio" name="ex1_opt" value="B" class="text-indigo-600">
+                            <span class="text-slate-700">ข) เพราะขั้นตอนวิธีการหารระบุว่าดีกรีของเศษเหลือ $R$ ต้องน้อยกว่าดีกรีของตัวหาร $(x-a)$ ซึ่งมีดีกรีเท่ากับ 1 ดังนั้น $\deg R = 0$ หรือ $R = 0$</span>
+                        </label>
+                        <label class="flex items-center space-x-2.5 p-2 rounded-lg hover:bg-white cursor-pointer transition">
+                            <input type="radio" name="ex1_opt" value="C" class="text-indigo-600">
+                            <span class="text-slate-700">ค) เพราะพหุนามผลหาร $Q(x)$ จะมีดีกรีเท่ากับ $P(x)$ เสมอ</span>
+                        </label>
+                    </div>
+
+                    <div class="flex items-center space-x-3 pt-2">
+                        <button onclick="checkEx1()" class="px-4 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold shadow-sm transition">
+                            ตรวจคำตอบ
+                        </button>
+                        <span id="ex1_result" class="text-xs font-medium"></span>
+                    </div>
+                    <div id="ex1_expl" class="hidden text-xs bg-white p-3 rounded-lg border border-slate-200 text-slate-700"></div>
+                </div>
+
+                <!-- Exercise 2 -->
+                <div class="p-4 sm:p-5 rounded-xl bg-slate-50 border border-slate-200 space-y-3">
+                    <div class="flex items-center justify-between">
+                        <span class="text-xs font-bold text-indigo-700 bg-indigo-100 px-2.5 py-0.5 rounded-full">ข้อที่ 2: ตรวจสอบตัวประกอบและการหาร</span>
+                    </div>
+                    <p class="text-sm font-medium text-slate-800">
+                        กำหนด $P(x) = 2x^3 - 3x^2 - 5x + 6$ จงหาเศษเหลือจากการหาร $P(x)$ ด้วย $x - 2$ และระบุว่า $x - 2$ เป็นตัวประกอบของ $P(x)$ หรือไม่?
+                    </p>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
+                        <div>
+                            <label class="block text-xs text-slate-600 mb-1 font-medium">เศษเหลือ $R = P(2)$ คือ:</label>
+                            <input type="number" id="ex2_remainder" placeholder="กรอกตัวเลขเศษ..." class="w-full bg-white border border-slate-300 rounded-lg px-3 py-1.5 focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-xs text-slate-600 mb-1 font-medium">$x - 2$ เป็นตัวประกอบหรือไม่?</label>
+                            <select id="ex2_isFactor" class="w-full bg-white border border-slate-300 rounded-lg px-3 py-1.5 focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+                                <option value="">-- เลือกคำตอบ --</option>
+                                <option value="yes">เป็นตัวประกอบ (หารลงตัว)</option>
+                                <option value="no">ไม่เป็นตัวประกอบ (มีเศษเหลือ)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center space-x-3 pt-2">
+                        <button onclick="checkEx2()" class="px-4 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold shadow-sm transition">
+                            ตรวจคำตอบ
+                        </button>
+                        <span id="ex2_result" class="text-xs font-medium"></span>
+                    </div>
+                    <div id="ex2_expl" class="hidden text-xs bg-white p-3 rounded-lg border border-slate-200 text-slate-700"></div>
+                </div>
+
+                <!-- Exercise 3 -->
+                <div class="p-4 sm:p-5 rounded-xl bg-slate-50 border border-slate-200 space-y-3">
+                    <div class="flex items-center justify-between">
+                        <span class="text-xs font-bold text-indigo-700 bg-indigo-100 px-2.5 py-0.5 rounded-full">ข้อที่ 3: การลดดีกรีและแยกตัวประกอบสมบูรณ์</span>
+                    </div>
+                    <p class="text-sm font-medium text-slate-800">
+                        จาก $P(x) = 2x^3 - 3x^2 - 5x + 6$ เมื่อทราบว่า $x = 1$ เป็นรากหนึ่ง ($P(1) = 0$) เมื่อนำ $x - 1$ ไปหารสังเคราะห์จะได้ผลหาร $Q(x)$ คือข้อใด และรากทั้งหมดของสมการ $P(x)=0$ คือค่าใด?
+                    </p>
+
+                    <div class="space-y-2 text-xs sm:text-sm">
+                        <label class="flex items-center space-x-2.5 p-2 rounded-lg hover:bg-white cursor-pointer transition">
+                            <input type="radio" name="ex3_opt" value="A" class="text-indigo-600">
+                            <span class="text-slate-700">ก) ผลหาร $Q(x) = 2x^2 - x - 6$ และรากทั้งหมดคือ $x = 1, 2, -\frac{3}{2}$</span>
+                        </label>
+                        <label class="flex items-center space-x-2.5 p-2 rounded-lg hover:bg-white cursor-pointer transition">
+                            <input type="radio" name="ex3_opt" value="B" class="text-indigo-600">
+                            <span class="text-slate-700">ข) ผลหาร $Q(x) = 2x^2 + x - 6$ และรากทั้งหมดคือ $x = 1, -2, 3$</span>
+                        </label>
+                        <label class="flex items-center space-x-2.5 p-2 rounded-lg hover:bg-white cursor-pointer transition">
+                            <input type="radio" name="ex3_opt" value="C" class="text-indigo-600">
+                            <span class="text-slate-700">ค) ผลหาร $Q(x) = x^2 - 3x + 2$ และรากทั้งหมดคือ $x = 1, 2, 3$</span>
+                        </label>
+                    </div>
+
+                    <div class="flex items-center space-x-3 pt-2">
+                        <button onclick="checkEx3()" class="px-4 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold shadow-sm transition">
+                            ตรวจคำตอบ
+                        </button>
+                        <span id="ex3_result" class="text-xs font-medium"></span>
+                    </div>
+                    <div id="ex3_expl" class="hidden text-xs bg-white p-3 rounded-lg border border-slate-200 text-slate-700"></div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-white border-t border-slate-200 mt-12 py-6 text-center text-xs text-slate-500">
+        <div class="max-w-6xl w-full mx-auto px-4 sm:px-6 lg:px-8">
+            <p>บทเรียนแบบโต้ตอบ: ระเบียบวิธีเชิงตัวเลข (Numerical Methods) • บทที่ 1 รากของสมการ</p>
+            <p class="mt-1 text-slate-400">เรื่องที่ 2: ทฤษฎีบทเศษเหลือและทฤษฎีบทตัวประกอบ (Remainder and Factor Theorems)</p>
+        </div>
+    </footer>
+
+    <!-- Interactive Simulation & Exercise Script -->
+    <script>
+        // DOM Elements
+        const inC3 = document.getElementById('in_c3');
+        const inC2 = document.getElementById('in_c2');
+        const inC1 = document.getElementById('in_c1');
+        const inC0 = document.getElementById('in_c0');
+        const sliderA = document.getElementById('slider_a');
+        const valABadge = document.getElementById('val_a_badge');
+
+        const subStep1 = document.getElementById('subStep1');
+        const subStep2 = document.getElementById('subStep2');
+        const subResultR = document.getElementById('subResultR');
+
+        const synthTableContainer = document.getElementById('synthTableContainer');
+        const synthResultR = document.getElementById('synthResultR');
+
+        const conclusionCard = document.getElementById('conclusionCard');
+        const conclusionTitle = document.getElementById('conclusionTitle');
+        const conclusionDesc = document.getElementById('conclusionDesc');
+        const conclusionIcon = document.getElementById('conclusionIcon');
+        const factorizationDisplay = document.getElementById('factorizationDisplay');
+
+        const simPreset = document.getElementById('simPreset');
+        const resetSimBtn = document.getElementById('resetSimBtn');
+
+        // Execute Synthetic Division & Evaluate Substitution
+        function runSimulation() {
+            const c3 = parseFloat(inC3.value) || 0;
+            const c2 = parseFloat(inC2.value) || 0;
+            const c1 = parseFloat(inC1.value) || 0;
+            const c0 = parseFloat(inC0.value) || 0;
+            const a = parseFloat(sliderA.value);
+
+            valABadge.innerText = `a = ${a}`;
+
+            // Method 1: Evaluate P(a)
+            const term3 = c3 * Math.pow(a, 3);
+            const term2 = c2 * Math.pow(a, 2);
+            const term1 = c1 * a;
+            const term0 = c0;
+            const remainderP = term3 + term2 + term1 + term0;
+
+            const signStr = (n) => (n >= 0 ? `+ ${n}` : `- ${Math.abs(n)}`);
+
+            subStep1.innerHTML = `P(${a}) = ${c3}(${a})³ ${signStr(c2)}(${a})² ${signStr(c1)}(${a}) ${signStr(c0)}`;
+            subStep2.innerHTML = `= ${term3} ${signStr(term2)} ${signStr(term1)} ${signStr(term0)}`;
+            subResultR.innerText = remainderP;
+
+            // Method 2: Synthetic Division Algorithm
+            // Row 1: c3, c2, c1, c0
+            // Row 2: -,  a*q2, a*q1, a*q0
+            // Row 3: q2, q1,   q0,   R
+            const q2 = c3;
+            const m1 = a * q2;
+            const q1 = c2 + m1;
+            const m2 = a * q1;
+            const q0 = c1 + m2;
+            const m3 = a * q0;
+            const remainderSynth = c0 + m3;
+
+            synthResultR.innerText = remainderSynth;
+
+            // Render Synthetic Table with clean styling
+            renderSyntheticTable(a, [c3, c2, c1, c0], ['—', m1, m2, m3], [q2, q1, q0, remainderSynth]);
+
+            // Update Conclusion Card
+            if (remainderSynth === 0) {
+                conclusionCard.className = 'p-5 rounded-2xl border bg-emerald-50/70 border-emerald-300 text-emerald-950';
+                conclusionIcon.innerText = '✅';
+                conclusionTitle.innerText = `สรุปผล: (x - ${a}) เป็นตัวประกอบของ P(x) และ x = ${a} เป็นรากของสมการ!`;
+                conclusionDesc.innerHTML = `เนื่องจากเศษเหลือ $R = P(${a}) = 0$ พอดี พหุนามจึงถูกแยกตัวประกอบได้เป็น:`;
+                
+                // Construct Q(x) formula
+                const qxStr = `${q2 !== 1 ? (q2 === -1 ? '-' : q2) : ''}x² ${signStr(q1)}x ${signStr(q0)}`;
+                factorizationDisplay.innerHTML = `
+                    <div class="p-3 bg-white/90 rounded-xl border border-emerald-200 text-emerald-900 font-bold font-mono text-center text-sm sm:text-base">
+                        P(x) = (x - ${a})(${qxStr})
+                    </div>
+                    <p class="text-xs text-emerald-800 mt-2">
+                        💡 พหุนามผลหารลดดีกรีเหลือ 2 ($Q(x) = ${qxStr}$) สามารถนำไปหารากที่เหลือต่อได้ทันที
+                    </p>
+                `;
+            } else {
+                conclusionCard.className = 'p-5 rounded-2xl border bg-rose-50/70 border-rose-200 text-rose-950';
+                conclusionIcon.innerText = '❌';
+                conclusionTitle.innerText = `สรุปผล: (x - ${a}) ไม่เป็นตัวประกอบของ P(x) และ x = ${a} ไม่ใช่ราก`;
+                conclusionDesc.innerHTML = `เนื่องจากเศษเหลือ $R = P(${a}) = ${remainderSynth} \\neq 0$ การหารจึงมีเศษเหลือ ไม่สามารถแยกตัวประกอบลงตัวได้`;
+                
+                const qxStr = `${q2 !== 1 ? (q2 === -1 ? '-' : q2) : ''}x² ${signStr(q1)}x ${signStr(q0)}`;
+                factorizationDisplay.innerHTML = `
+                    <div class="p-3 bg-white/90 rounded-xl border border-rose-200 text-rose-900 font-mono text-center text-xs sm:text-sm">
+                        P(x) = (x - ${a})(${qxStr}) + (${remainderSynth})
+                    </div>
+                `;
+            }
+
+            if (window.MathJax && MathJax.typesetPromise) {
+                MathJax.typesetPromise();
+            }
+        }
+
+        // Render Synthetic Division grid
+        function renderSyntheticTable(a, r1, r2, r3) {
+            synthTableContainer.innerHTML = `
+                <table class="mx-auto border-collapse text-xs sm:text-sm">
+                    <tr>
+                        <td class="pr-4 pb-2 text-indigo-400 font-bold border-r-2 border-slate-600">${a}</td>
+                        <td class="px-3 pb-2 text-slate-300">${r1[0]}</td>
+                        <td class="px-3 pb-2 text-slate-300">${r1[1]}</td>
+                        <td class="px-3 pb-2 text-slate-300">${r1[2]}</td>
+                        <td class="px-3 pb-2 text-slate-300">${r1[3]}</td>
+                    </tr>
+                    <tr>
+                        <td class="pr-4 py-2 text-slate-500 border-r-2 border-slate-600"></td>
+                        <td class="px-3 py-2 text-slate-500">${r2[0]}</td>
+                        <td class="px-3 py-2 text-emerald-400/80">${r2[1]}</td>
+                        <td class="px-3 py-2 text-emerald-400/80">${r2[2]}</td>
+                        <td class="px-3 py-2 text-emerald-400/80">${r2[3]}</td>
+                    </tr>
+                    <tr class="border-t-2 border-slate-600 font-bold">
+                        <td class="pr-4 pt-2 text-slate-500 border-r-2 border-slate-600">ผลลัพธ์:</td>
+                        <td class="px-3 pt-2 text-indigo-300">${r3[0]}</td>
+                        <td class="px-3 pt-2 text-indigo-300">${r3[1]}</td>
+                        <td class="px-3 pt-2 text-indigo-300">${r3[2]}</td>
+                        <td class="px-3 pt-2 text-emerald-400 bg-slate-800/80 rounded-b-md border border-emerald-500/30">${r3[3]}</td>
+                    </tr>
+                </table>
+                <div class="text-[11px] text-slate-400 mt-2">
+                    แถวล่างสุดคือ สัมประสิทธิ์ของผลหาร $Q(x)$ และ [เศษเหลือ $R$] ในกรอบเขียว
+                </div>
+            `;
+        }
+
+        // Event Listeners for Simulation
+        [inC3, inC2, inC1, inC0].forEach(input => {
+            input.addEventListener('input', runSimulation);
+        });
+        sliderA.addEventListener('input', runSimulation);
+
+        resetSimBtn.addEventListener('click', () => {
+            inC3.value = 1;
+            inC2.value = -3;
+            inC1.value = -4;
+            inC0.value = 12;
+            sliderA.value = 2;
+            runSimulation();
+        });
+
+        simPreset.addEventListener('change', (e) => {
+            const v = e.target.value;
+            if (v === 'preset1') {
+                inC3.value = 1; inC2.value = -3; inC1.value = -4; inC0.value = 12; sliderA.value = 2;
+            } else if (v === 'preset2') {
+                inC3.value = 2; inC2.value = -3; inC1.value = -5; inC0.value = 6; sliderA.value = 1;
+            } else if (v === 'preset3') {
+                inC3.value = 1; inC2.value = -2; inC1.value = 1; inC0.value = -5; sliderA.value = 3;
+            }
+            runSimulation();
+        });
+
+        // Guided Discovery Accordion Toggle
+        function toggleHint(id) {
+            const el = document.getElementById(id);
+            const text = document.getElementById(id + '_text');
+            const arr = document.getElementById(id + '_arr');
+            if (el.classList.contains('hidden')) {
+                el.classList.remove('hidden');
+                text.innerText = 'ซ่อนแนวทางคำตอบ';
+                arr.innerText = '↑';
+            } else {
+                el.classList.add('hidden');
+                text.innerText = '💡 ดูแนวทางคำตอบ';
+                arr.innerText = '↓';
+            }
+        }
+
+        // Exercise Checking Functions
+        function checkEx1() {
+            const opt = document.querySelector('input[name="ex1_opt"]:checked');
+            const res = document.getElementById('ex1_result');
+            const expl = document.getElementById('ex1_expl');
+
+            if (!opt) {
+                res.innerHTML = '<span class="text-amber-600 font-bold">กรุณาเลือกคำตอบ</span>';
+                return;
+            }
+
+            if (opt.value === 'B') {
+                res.innerHTML = '<span class="text-emerald-600 font-bold">✓ ถูกต้องยอดเยี่ยม! ข้อ ข.</span>';
+                expl.className = 'text-xs bg-emerald-50 p-3 rounded-lg border border-emerald-200 text-slate-800 space-y-1 block';
+                expl.innerHTML = '<strong>คำอธิบาย:</strong> ขั้นตอนวิธีการหารกำหนดให้ $\\deg R < \\deg(ตัวหาร)$ เนื่องจากตัวหาร $x - a$ มีดีกรี 1 ดังนั้น $\\deg R$ ต้องน้อยกว่า 1 ซึ่งก็คือ 0 (ค่าคงตัว) หรือเศษเหลือเป็น 0 พอดี';
+            } else {
+                res.innerHTML = '<span class="text-rose-600 font-bold">✕ ยังไม่ถูกต้อง</span>';
+                expl.className = 'text-xs bg-rose-50 p-3 rounded-lg border border-rose-200 text-slate-800 space-y-1 block';
+                expl.innerHTML = '<strong>คำใบ้:</strong> ลองทบทวนเงื่อนไขของเศษเหลือในขั้นตอนวิธีการหารว่าดีกรีของเศษต้องสัมพันธ์กับดีกรีของตัวหารอย่างไร';
+            }
+            if (window.MathJax) MathJax.typesetPromise();
+        }
+
+        function checkEx2() {
+            const rem = document.getElementById('ex2_remainder').value.trim();
+            const isFac = document.getElementById('ex2_isFactor').value;
+            const res = document.getElementById('ex2_result');
+            const expl = document.getElementById('ex2_expl');
+
+            if (!rem || !isFac) {
+                res.innerHTML = '<span class="text-amber-600 font-bold">กรุณากรอกเศษและเลือกคำตอบ</span>';
+                return;
+            }
+
+            // P(2) = 2(8) - 3(4) - 5(2) + 6 = 16 - 12 - 10 + 6 = 0
+            if (rem === '0' && isFac === 'yes') {
+                res.innerHTML = '<span class="text-emerald-600 font-bold">✓ ถูกต้องทั้งหมด! เศษเป็น 0 และเป็นตัวประกอบ</span>';
+                expl.className = 'text-xs bg-emerald-50 p-3 rounded-lg border border-emerald-200 text-slate-800 space-y-1 block';
+                expl.innerHTML = '<strong>การคำนวณ:</strong> $P(2) = 2(2)^3 - 3(2)^2 - 5(2) + 6 = 16 - 12 - 10 + 6 = 0$ เนื่องจากเศษเป็น 0 ตามทฤษฎีบทตัวประกอบจึงสรุปได้ว่า $x - 2$ หาร $P(x)$ ลงตัวและเป็นตัวประกอบหนึ่ง';
+            } else {
+                res.innerHTML = '<span class="text-rose-600 font-bold">✕ ยังไม่ถูกต้อง ตรวจสอบการคิดเลข</span>';
+                expl.className = 'text-xs bg-rose-50 p-3 rounded-lg border border-rose-200 text-slate-800 space-y-1 block';
+                expl.innerHTML = '<strong>คำใบ้:</strong> คำนวณ $2(2)^3 - 3(2)^2 - 5(2) + 6 = 16 - 12 - 10 + 6$ แล้วดูว่าผลลัพธ์เป็น 0 หรือไม่';
+            }
+            if (window.MathJax) MathJax.typesetPromise();
+        }
+
+        function checkEx3() {
+            const opt = document.querySelector('input[name="ex3_opt"]:checked');
+            const res = document.getElementById('ex3_result');
+            const expl = document.getElementById('ex3_expl');
+
+            if (!opt) {
+                res.innerHTML = '<span class="text-amber-600 font-bold">กรุณาเลือกคำตอบ</span>';
+                return;
+            }
+
+            if (opt.value === 'A') {
+                res.innerHTML = '<span class="text-emerald-600 font-bold">✓ ถูกต้องสมบูรณ์แบบ! ข้อ ก.</span>';
+                expl.className = 'text-xs bg-emerald-50 p-3 rounded-lg border border-emerald-200 text-slate-800 space-y-1 block';
+                expl.innerHTML = `<strong>ขั้นตอนการแก้:</strong><br>
+                    1. นำ $x=1$ ไปหารสังเคราะห์ $2x^3 - 3x^2 - 5x + 6$ จะได้ผลหารคือ $Q(x) = 2x^2 - x - 6$<br>
+                    2. แยกตัวประกอบสมการลดทอน $2x^2 - x - 6 = (2x + 3)(x - 2) = 0$<br>
+                    3. ดังนั้นรากที่เหลือคือ $x = 2$ และ $x = -\\frac{3}{2}$ รวมกับรากแรก $x = 1$ สรุปรากทั้งหมดคือ $x = 1, 2, -\\frac{3}{2}$`;
+            } else {
+                res.innerHTML = '<span class="text-rose-600 font-bold">✕ ยังไม่ถูกต้อง</span>';
+                expl.className = 'text-xs bg-rose-50 p-3 rounded-lg border border-rose-200 text-slate-800 space-y-1 block';
+                expl.innerHTML = '<strong>คำใบ้:</strong> ลองตั้งหารสังเคราะห์ด้วย 1: นำ 2 ลงมา $\\rightarrow$ คูณ 1 บวก -3 ได้ -1 $\\rightarrow$ คูณ 1 บวก -5 ได้ -6 จากนั้นแยกตัวประกอบของ $2x^2 - x - 6$';
+            }
+            if (window.MathJax) MathJax.typesetPromise();
+        }
+
+        // Initialize simulation on load
+        window.addEventListener('load', runSimulation);
+    </script>
+</body>
+</html>

@@ -1,0 +1,956 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>เรื่องที่ 3: กระบวนการของฮอร์เนอร์ (Horner's Method)</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Sarabun, Inter, Fira Code -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&family=Inter:wght@400;500;600;700&family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- MathJax for sharp math typesetting -->
+    <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']],
+                displayMath: [['$$', '$$'], ['\\[', '\\]']]
+            },
+            svg: { fontCache: 'global' }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <style>
+        body {
+            font-family: 'Sarabun', 'Inter', sans-serif;
+        }
+        .code-font {
+            font-family: 'Fira Code', monospace;
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 antialiased min-h-screen">
+
+    <!-- Main Container: Fixed Width 1,152px (max-w-6xl) -->
+    <main class="max-w-6xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 space-y-8">
+
+        <!-- Title Banner (No Top Header / Navigation as requested) -->
+        <div class="bg-gradient-to-r from-slate-900 via-indigo-950 to-indigo-900 rounded-2xl p-6 sm:p-8 text-white shadow-md relative overflow-hidden">
+            <div class="relative z-10 space-y-2">
+                <div class="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-indigo-500/20 border border-indigo-400/30 text-indigo-200 text-xs font-semibold tracking-wide uppercase">
+                    <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                    <span>บทที่ 1: รากของสมการ • เรื่องที่ 3</span>
+                </div>
+                <h1 class="text-2xl sm:text-3xl font-extrabold tracking-tight">กระบวนการของฮอร์เนอร์ (Horner's Method)</h1>
+                <p class="text-indigo-200 text-sm sm:text-base max-w-3xl leading-relaxed">
+                    เพิ่มประสิทธิภาพการคำนวณค่าพหุนามด้วยรูปกำลังซ้อน (Nested Form) เชื่อมโยงสู่ขั้นตอนวิธีการหารสังเคราะห์ และการลดดีกรีของสมการเพื่อหารากที่เหลือทั้งหมด
+                </p>
+            </div>
+            <!-- Decorative blur shape -->
+            <div class="absolute -right-12 -bottom-12 w-64 h-64 rounded-full bg-indigo-600/15 pointer-events-none blur-3xl"></div>
+        </div>
+
+        <!-- ========================================== -->
+        <!-- ส่วนที่ 1: วัตถุประสงค์การเรียนรู้ -->
+        <!-- ========================================== -->
+        <section class="bg-white rounded-2xl p-6 sm:p-7 shadow-sm border border-slate-200/80 transition-all hover:shadow-md">
+            <div class="flex items-center space-x-3 mb-4">
+                <div class="p-2.5 rounded-xl bg-blue-50 text-blue-600">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                </div>
+                <div>
+                    <h2 class="text-lg font-bold text-slate-900">1. วัตถุประสงค์การเรียนรู้ (Learning Objectives)</h2>
+                    <p class="text-xs text-slate-500">ผลลัพธ์การเรียนรู้ที่คาดหวังสำหรับหัวข้อนี้</p>
+                </div>
+            </div>
+
+            <div class="bg-gradient-to-br from-blue-50/70 to-indigo-50/40 rounded-xl p-5 border border-blue-100">
+                <p class="text-slate-800 text-base leading-relaxed mb-3">
+                    เมื่อศึกษาและทดลองกับแบบจำลองในโมดูลนี้แล้ว นักศึกษาจะมีความสามารถดังต่อไปนี้:
+                </p>
+                <ul class="space-y-2.5 text-slate-700 text-sm sm:text-base">
+                    <li class="flex items-start space-x-2.5">
+                        <span class="inline-block w-5 h-5 rounded-full bg-blue-600 text-white text-xs flex items-center justify-center font-bold flex-shrink-0 mt-0.5">✓</span>
+                        <span>อธิบาย<strong>หลักการของกระบวนการฮอร์เนอร์</strong>และการจัดรูปพหุนามให้อยู่ในรูปกำลังซ้อน (Nested Multiplication Form) ได้อย่างถูกต้อง</span>
+                    </li>
+                    <li class="flex items-start space-x-2.5">
+                        <span class="inline-block w-5 h-5 rounded-full bg-blue-600 text-white text-xs flex items-center justify-center font-bold flex-shrink-0 mt-0.5">✓</span>
+                        <span><strong>คำนวณค่าพหุนามและหารพหุนามด้วยตัวประกอบเชิงเส้น</strong> $(x - a)$ ได้อย่างรวดเร็ว โดยเข้าใจความสัมพันธ์ระหว่างกระบวนการฮอร์เนอร์กับการหารสังเคราะห์ (Synthetic Division)</span>
+                    </li>
+                    <li class="flex items-start space-x-2.5">
+                        <span class="inline-block w-5 h-5 rounded-full bg-blue-600 text-white text-xs flex items-center justify-center font-bold flex-shrink-0 mt-0.5">✓</span>
+                        <span>นำสัมประสิทธิ์ผลหารที่ได้ไป<strong>ลดทอนดีกรีของสมการ (Polynomial Deflation)</strong> เมื่อทราบราก เพื่อหารากที่เหลือทั้งหมดของสมการดีกรีสูง</span>
+                    </li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- ========================================== -->
+        <!-- ส่วนที่ 2: เนื้อหาหลัก -->
+        <!-- ========================================== -->
+        <section class="bg-white rounded-2xl p-6 sm:p-7 shadow-sm border border-slate-200/80 space-y-6">
+            <div class="flex items-center space-x-3 pb-3 border-b border-slate-100">
+                <div class="p-2.5 rounded-xl bg-indigo-50 text-indigo-600">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                    </svg>
+                </div>
+                <div>
+                    <h2 class="text-lg font-bold text-slate-900">2. เนื้อหาหลัก (Core Content)</h2>
+                    <p class="text-xs text-slate-500">มโนทัศน์ ความซับซ้อนเชิงการคำนวณ และการพิสูจน์ความสัมพันธ์</p>
+                </div>
+            </div>
+
+            <!-- 2.1 การจัดรูปพหุนามให้อยู่ในรูปกำลังซ้อน -->
+            <div class="space-y-3">
+                <h3 class="text-base font-bold text-slate-800 flex items-center space-x-2">
+                    <span class="w-2 h-2 rounded-full bg-indigo-600"></span>
+                    <span>2.1 การจัดรูปพหุนามให้อยู่ในรูปกำลังซ้อน (Nested Multiplication / Horner Form)</span>
+                </h3>
+                <div class="p-4 bg-slate-50 rounded-xl border border-slate-200 text-slate-700 leading-relaxed text-sm sm:text-base space-y-2">
+                    <p>
+                        พหุนามดีกรี $n$ ทั่วไป $P(x) = a_n x^n + a_{n-1} x^{n-1} + \dots + a_1 x + a_0$ สามารถจัดกลุ่มตัวแปร $x$ ดึงตัวคูณร่วมออกมาซ้อนกันเป็นชั้น ๆ ได้ดังนี้:
+                    </p>
+                    <div class="my-3 py-3 px-4 text-center text-indigo-950 bg-white rounded-lg border border-slate-200 font-bold overflow-x-auto">
+                        $$P(x) = \Big( \dots \big((a_n x + a_{n-1})x + a_{n-2}\big)x + \dots + a_1 \Big)x + a_0$$
+                    </div>
+                    <p class="text-xs sm:text-sm text-slate-600">
+                        <strong>ตัวอย่างสำหรับพหุนามดีกรี 3:</strong> $P(x) = a_3 x^3 + a_2 x^2 + a_1 x + a_0$ จะเขียนเป็นรูปซ้อนได้คือ:
+                        <span class="font-mono text-indigo-750 font-bold"> $P(x) = ((a_3 x + a_2)x + a_1)x + a_0$</span>
+                    </p>
+                </div>
+            </div>
+
+            <!-- 2.2 ขั้นตอนการคำนวณแบบฮอร์เนอร์ -->
+            <div class="space-y-3">
+                <h3 class="text-base font-bold text-slate-800 flex items-center space-x-2">
+                    <span class="w-2 h-2 rounded-full bg-indigo-600"></span>
+                    <span>2.2 ขั้นตอนการคำนวณแบบเวียนเกิด (Horner's Recurrence Algorithm)</span>
+                </h3>
+                <div class="bg-indigo-50/50 p-4 rounded-xl border border-indigo-100 text-sm space-y-3">
+                    <p class="text-slate-700">
+                        เมื่อต้องการหาค่า $P(c)$ ขั้นตอนวิธีจะเริ่มจากสัมประสิทธิ์นำ แล้วคูณด้วย $c$ และบวกสัมประสิทธิ์ตัวถัดไปวนซ้ำจนครบพจน์คงตัว:
+                    </p>
+                    <div class="bg-white p-3.5 rounded-lg border border-indigo-200 font-mono text-xs sm:text-sm space-y-1.5 text-slate-800">
+                        <div class="text-indigo-700 font-bold">• ค่าเริ่มต้น: $b_n = a_n$</div>
+                        <div class="text-slate-700">• ขั้นตอนเวียนเกิด: $b_k = a_k + b_{k+1} \cdot c \quad \text{สำหรับ } k = n-1, n-2, \dots, 0$</div>
+                        <div class="text-emerald-700 font-bold">• ผลลัพธ์สุดท้าย: ค่าพหุนาม $P(c) = b_0$</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 2.3 ความสัมพันธ์กับการหารสังเคราะห์และความได้เปรียบเชิงคำนวณ -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-2">
+                    <h4 class="text-sm sm:text-base font-bold text-slate-900 flex items-center space-x-2">
+                        <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+                        <span>2.3 ความสัมพันธ์กับการหารสังเคราะห์</span>
+                    </h4>
+                    <p class="text-xs sm:text-sm text-slate-700 leading-relaxed">
+                        สัมประสิทธิ์ $b_n, b_{n-1}, \dots, b_1$ ที่ได้จากกระบวนการฮอร์เนอร์ แท้จริงแล้วคือ<strong>สัมประสิทธิ์ของพหุนามผลหาร $Q(x)$</strong> เมื่อหาร $P(x)$ ด้วย $(x - c)$ พอดี:
+                    </p>
+                    <div class="p-2.5 bg-white rounded-lg border border-slate-200 text-center font-bold text-xs sm:text-sm text-indigo-700">
+                        $$P(x) = (x - c)\underbrace{(b_n x^{n-1} + \dots + b_1)}_{Q(x)} + \underbrace{b_0}_{R = P(c)}$$
+                    </div>
+                </div>
+
+                <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-2">
+                    <h4 class="text-sm sm:text-base font-bold text-slate-900 flex items-center space-x-2">
+                        <span class="w-2 h-2 rounded-full bg-amber-500"></span>
+                        <span>2.4 ความได้เปรียบเชิงการคำนวณ (Complexity)</span>
+                    </h4>
+                    <p class="text-xs sm:text-sm text-slate-700 leading-relaxed">
+                        การคำนวณด้วยวิธีของฮอร์เนอร์ช่วยลดภาระงานของคอมพิวเตอร์อย่างมหาศาล:
+                    </p>
+                    <table class="w-full text-xs text-left border-collapse bg-white rounded-lg overflow-hidden border border-slate-200">
+                        <thead>
+                            <tr class="bg-slate-100 text-slate-700 border-b border-slate-200">
+                                <th class="p-2">วิธีคำนวณ</th>
+                                <th class="p-2">จำนวนการคูณ</th>
+                                <th class="p-2">จำนวนการบวก</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-100 text-slate-600">
+                            <tr>
+                                <td class="p-2">แทนค่าตรงไปตรงมา</td>
+                                <td class="p-2 text-rose-600 font-semibold">$\frac{n(n+1)}{2} \approx O(n^2)$</td>
+                                <td class="p-2">$n$ ครั้ง</td>
+                            </tr>
+                            <tr class="bg-emerald-50/50">
+                                <td class="p-2 font-bold text-emerald-800">กระบวนการฮอร์เนอร์</td>
+                                <td class="p-2 text-emerald-700 font-bold">$n$ ครั้ง $(O(n))$</td>
+                                <td class="p-2 text-emerald-700 font-bold">$n$ ครั้ง</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- 2.5 การลดดีกรีของสมการ -->
+            <div class="p-4 sm:p-5 rounded-xl bg-amber-50/50 border border-amber-200 space-y-2">
+                <h4 class="text-sm sm:text-base font-bold text-amber-950 flex items-center space-x-2">
+                    <span class="px-2 py-0.5 rounded bg-amber-200 text-amber-900 text-xs font-semibold">การประยุกต์</span>
+                    <span>2.5 การลดทอนดีกรี (Polynomial Deflation) เมื่อทราบราก</span>
+                </h4>
+                <p class="text-xs sm:text-sm text-slate-700 leading-relaxed">
+                    หากเศษเหลือ $b_0 = P(c) = 0$ หมายความว่า $x = c$ เป็นรากของสมการ $P(x) = 0$ เราสามารถดึงตัวประกอบ $(x - c)$ ออกมาได้ทันที และนำพหุนามผลหาร $Q(x) = b_n x^{n-1} + \dots + b_1 = 0$ ซึ่งมีดีกรีลดลง 1 ($n-1$) ไปหารากที่เหลือต่อด้วยวิธีเชิงตัวเลขหรือสูตรพีชคณิตได้โดยตรง
+                </p>
+            </div>
+        </section>
+
+        <!-- ========================================== -->
+        <!-- ส่วนที่ 3: แบบจำลองโต้ตอบ (Interactive Simulator) -->
+        <!-- ========================================== -->
+        <section class="bg-white rounded-2xl p-6 sm:p-7 shadow-sm border border-slate-200/80 space-y-6">
+            <div class="flex items-center justify-between pb-3 border-b border-slate-100 flex-wrap gap-2">
+                <div class="flex items-center space-x-3">
+                    <div class="p-2.5 rounded-xl bg-purple-50 text-purple-600">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                        </svg>
+                    </div>
+                    <div>
+                        <h2 class="text-lg font-bold text-slate-900">3. แบบจำลองโต้ตอบ (Interactive Simulator)</h2>
+                        <p class="text-xs text-slate-500">เปรียบเทียบวิธีแทนค่าตรงกับกระบวนการฮอร์เนอร์ พร้อมวิเคราะห์รอบการคำนวณ</p>
+                    </div>
+                </div>
+
+                <!-- Degree Selector & Preset -->
+                <div class="flex items-center space-x-3">
+                    <div class="flex items-center space-x-1.5">
+                        <span class="text-xs font-semibold text-slate-600">เลือกดีกรี:</span>
+                        <select id="degreeSelect" class="text-xs bg-slate-100 border border-slate-300 rounded-lg px-2.5 py-1.5 font-bold text-indigo-700 hover:bg-slate-200 transition">
+                            <option value="4">ดีกรี 4 (กำลังสี่)</option>
+                            <option value="3" selected>ดีกรี 3 (กำลังสาม)</option>
+                            <option value="2">ดีกรี 2 (กำลังสอง)</option>
+                        </select>
+                    </div>
+                    <div class="flex items-center space-x-1.5">
+                        <span class="text-xs font-semibold text-slate-600">ชุดข้อมูลตัวอย่าง:</span>
+                        <select id="hornerPreset" class="text-xs bg-slate-100 border border-slate-300 rounded-lg px-2.5 py-1.5 font-medium text-slate-700 hover:bg-slate-200 transition">
+                            <option value="ex1">P(x) = 2x³ - 3x² - 5x + 6 (ที่ x = 2)</option>
+                            <option value="ex2">P(x) = x³ - 4x² + x + 6 (ที่ x = 3 [ราก])</option>
+                            <option value="ex3">P(x) = x⁴ - 2x³ + 3x - 5 (ที่ x = -2)</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Simulator Input Form -->
+            <div class="bg-slate-50 p-4 sm:p-5 rounded-xl border border-slate-200 space-y-4">
+                <div class="flex items-center justify-between">
+                    <span class="text-xs font-bold uppercase tracking-wider text-slate-600">กำหนดสัมประสิทธิ์ $a_i$ และจุดทดสอบ $x = a$</span>
+                    <button id="resetSimBtn" class="text-xs text-indigo-600 font-semibold hover:underline">คืนค่าเริ่มต้น</button>
+                </div>
+
+                <!-- Coefficient Inputs Dynamic Grid -->
+                <div id="coeffInputsGrid" class="grid grid-cols-2 sm:grid-cols-5 gap-3 text-center">
+                    <!-- Populated dynamically based on degree -->
+                </div>
+
+                <!-- Input for x = a -->
+                <div class="pt-3 border-t border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                    <div class="flex items-center space-x-3">
+                        <label class="text-sm font-bold text-slate-800">ค่าของตัวแปรที่ต้องการคำนวณ ($x = a$):</label>
+                        <input type="number" id="inputA" value="2" step="0.5" class="w-24 text-center font-mono font-bold bg-white border border-slate-300 rounded-lg py-1.5 focus:ring-2 focus:ring-indigo-500 focus:outline-none text-sm">
+                    </div>
+                    <!-- Nested Form Preview -->
+                    <div class="text-xs font-mono text-indigo-900 bg-indigo-50 px-3 py-1.5 rounded-lg border border-indigo-200 overflow-x-auto">
+                        <span class="font-sans font-bold text-indigo-700">รูปกำลังซ้อน:</span> <span id="nestedFormText">--</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Comparison Grid: Side-by-Side (Direct Evaluation vs Horner's Method) -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 items-stretch">
+                
+                <!-- Method 1: Direct Substitution -->
+                <div class="bg-white rounded-2xl p-5 border border-slate-200 shadow-sm flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+                            <div>
+                                <h3 class="text-sm font-bold text-slate-900">วิธีที่ 1: แทนค่าตรงไปตรงมา (Direct Evaluation)</h3>
+                                <p class="text-xs text-slate-500">คำนวณค่ายกกำลังแต่ละพจน์แล้วนำมาบวกกัน</p>
+                            </div>
+                            <span class="text-xs px-2 py-1 rounded bg-rose-50 text-rose-700 font-semibold border border-rose-100">ทั่วไป</span>
+                        </div>
+
+                        <!-- Step breakdown -->
+                        <div class="my-4 space-y-2 font-mono text-xs sm:text-sm">
+                            <div class="text-slate-500 text-xs font-sans">ขั้นตอนการคำนวณแต่ละพจน์:</div>
+                            <div id="directStepDetail" class="p-3 bg-slate-50 rounded-xl border border-slate-200 text-slate-700 overflow-x-auto leading-relaxed">
+                                <!-- Generated by JS -->
+                            </div>
+                        </div>
+
+                        <!-- Workload Counter -->
+                        <div class="p-3 bg-rose-50/50 rounded-xl border border-rose-100 space-y-1.5">
+                            <div class="text-xs font-bold text-rose-900 font-sans">จำนวนรอบการคำนวณ (Operations):</div>
+                            <div class="grid grid-cols-2 gap-2 text-xs font-mono">
+                                <div class="bg-white p-2 rounded border border-rose-200 text-slate-700">
+                                    การคูณ: <span id="directMultiCount" class="font-bold text-rose-600">6</span> ครั้ง
+                                </div>
+                                <div class="bg-white p-2 rounded border border-rose-200 text-slate-700">
+                                    การบวก: <span id="directAddCount" class="font-bold text-rose-600">3</span> ครั้ง
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between">
+                        <span class="text-xs font-bold text-slate-600">ผลลัพธ์ $P(a)$:</span>
+                        <span id="directFinalResult" class="text-xl font-mono font-extrabold text-slate-800">0</span>
+                    </div>
+                </div>
+
+                <!-- Method 2: Horner's Method -->
+                <div class="bg-slate-900 text-slate-100 rounded-2xl p-5 border border-slate-800 shadow-md flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-center justify-between pb-3 border-b border-slate-800">
+                            <div>
+                                <h3 class="text-sm font-bold text-emerald-400">วิธีที่ 2: กระบวนการฮอร์เนอร์ (Horner's Method)</h3>
+                                <p class="text-xs text-slate-400">คำนวณแบบเวียนเกิดจากวงเล็บในสุดออกมาด้านนอก</p>
+                            </div>
+                            <span class="text-xs px-2 py-1 rounded bg-emerald-950 text-emerald-300 font-semibold border border-emerald-800">แนะนำ $O(n)$</span>
+                        </div>
+
+                        <!-- Horner Recurrence Table -->
+                        <div class="my-4 overflow-x-auto">
+                            <div id="hornerTableContainer" class="font-mono text-center text-xs sm:text-sm">
+                                <!-- Dynamic Horner Table -->
+                            </div>
+                        </div>
+
+                        <!-- Workload Counter -->
+                        <div class="p-3 bg-emerald-950/40 rounded-xl border border-emerald-800/80 space-y-1.5">
+                            <div class="text-xs font-bold text-emerald-400 font-sans">จำนวนรอบการคำนวณ (Operations):</div>
+                            <div class="grid grid-cols-2 gap-2 text-xs font-mono">
+                                <div class="bg-slate-800/90 p-2 rounded border border-emerald-700/50 text-slate-200">
+                                    การคูณ: <span id="hornerMultiCount" class="font-bold text-emerald-400">3</span> ครั้ง
+                                </div>
+                                <div class="bg-slate-800/90 p-2 rounded border border-emerald-700/50 text-slate-200">
+                                    การบวก: <span id="hornerAddCount" class="font-bold text-emerald-400">3</span> ครั้ง
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-4 pt-3 border-t border-slate-800 flex items-center justify-between">
+                        <span class="text-xs font-bold text-slate-400">ผลลัพธ์ $b_0 = P(a)$:</span>
+                        <span id="hornerFinalResult" class="text-xl font-mono font-extrabold text-emerald-400">0</span>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Summary & Deflation Status Banner -->
+            <div id="deflationResultBox" class="p-5 rounded-2xl border transition-all duration-300">
+                <!-- Injected via JavaScript -->
+            </div>
+        </section>
+
+        <!-- ========================================== -->
+        <!-- ส่วนที่ 4: คำถามนำเพื่อค้นพบ (Guided Discovery Questions) -->
+        <!-- ========================================== -->
+        <section class="bg-white rounded-2xl p-6 sm:p-7 shadow-sm border border-slate-200/80 space-y-5">
+            <div class="flex items-center space-x-3 pb-3 border-b border-slate-100">
+                <div class="p-2.5 rounded-xl bg-amber-50 text-amber-600">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+                    </svg>
+                </div>
+                <div>
+                    <h2 class="text-lg font-bold text-slate-900">4. คำถามนำเพื่อค้นพบ (Guided Discovery Questions)</h2>
+                    <p class="text-xs text-slate-500">ท้าทายความคิดเพื่อสร้างความเข้าใจเชิงสัจพจน์ (คลิกเพื่อดูแนวทางคำตอบ)</p>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <!-- Question 1 -->
+                <div class="border border-slate-200 rounded-xl p-4 bg-slate-50/50 flex flex-col justify-between">
+                    <div>
+                        <div class="text-indigo-600 font-bold text-xs uppercase tracking-wider mb-1">คำถามที่ 1</div>
+                        <h3 class="text-sm font-semibold text-slate-900 mb-2">
+                            เหตุใดฮอร์เนอร์จึงลดจำนวนการคูณและการบวกได้?
+                        </h3>
+                        <p class="text-xs text-slate-600 leading-relaxed">
+                            พิจารณาการคำนวณพจน์ $x^4, x^3, x^2$ ซ้ำซ้อนในวิธีทั่วไป เทียบกับการดึงตัวประกอบร่วมออกไปทีละชั้น
+                        </p>
+                    </div>
+                    <div class="mt-4 pt-3 border-t border-slate-200/80">
+                        <button onclick="toggleHint('hint1')" class="text-xs font-semibold text-indigo-600 hover:text-indigo-800 flex items-center space-x-1 focus:outline-none">
+                            <span id="hint1_text">💡 ดูแนวทางคำตอบ</span>
+                            <span id="hint1_arr">↓</span>
+                        </button>
+                        <div id="hint1" class="hidden mt-2 p-3 bg-white rounded-lg border border-indigo-100 text-xs text-slate-700 leading-relaxed shadow-sm">
+                            <strong>แนวคำตอบ:</strong> การคำนวณแบบเดิมต้องยกกำลังค่า $x$ ในแต่ละพจน์แยกกัน (เช่น $x^3 = x \cdot x \cdot x$ ต้องคูณ 2 ครั้ง แล้วคูณด้วยสัมประสิทธิ์อีก 1 ครั้ง รวมเป็น 3 ครั้ง) ทำให้จำนวนการคูณพุ่งสูงถึง $\frac{n(n+1)}{2}$ แต่รูปกำลังซ้อนของฮอร์เนอร์ใช้คุณสมบัติการแจกแจงดึง $x$ ออกมา ทำให้ในแต่ละขั้นตอนมีเพียง <strong>การคูณ 1 ครั้ง และการบวก 1 ครั้งต่อ 1 ดีกรี</strong> จึงใช้การคูณเพียง $n$ ครั้งเท่านั้น
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Question 2 -->
+                <div class="border border-slate-200 rounded-xl p-4 bg-slate-50/50 flex flex-col justify-between">
+                    <div>
+                        <div class="text-indigo-600 font-bold text-xs uppercase tracking-wider mb-1">คำถามที่ 2</div>
+                        <h3 class="text-sm font-semibold text-slate-900 mb-2">
+                            ค่าสุดท้ายจากกระบวนการฮอร์เนอร์มีความหมายอย่างไร?
+                        </h3>
+                        <p class="text-xs text-slate-600 leading-relaxed">
+                            พิจารณาความหมายของค่า $b_0$ ทั้งในมุมมองของค่าฟังก์ชันและการหารพหุนาม
+                        </p>
+                    </div>
+                    <div class="mt-4 pt-3 border-t border-slate-200/80">
+                        <button onclick="toggleHint('hint2')" class="text-xs font-semibold text-indigo-600 hover:text-indigo-800 flex items-center space-x-1 focus:outline-none">
+                            <span id="hint2_text">💡 ดูแนวทางคำตอบ</span>
+                            <span id="hint2_arr">↓</span>
+                        </button>
+                        <div id="hint2" class="hidden mt-2 p-3 bg-white rounded-lg border border-indigo-100 text-xs text-slate-700 leading-relaxed shadow-sm">
+                            <strong>แนวคำตอบ:</strong> มี 2 ความหมายสำคัญที่เชื่อมโยงกันอย่างสมบูรณ์:
+                            <ol class="list-decimal list-inside mt-1 space-y-1">
+                                <li>คือค่าของฟังก์ชันพหุนาม ณ จุดนั้น หรือ <strong>$b_0 = P(a)$</strong></li>
+                                <li>คือ <strong>เศษเหลือ (Remainder, $R$)</strong> ที่ได้จากการหารพหุนาม $P(x)$ ด้วยทวินามเชิงเส้น $(x - a)$ ตามทฤษฎีบทเศษเหลือ</li>
+                            </ol>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Question 3 -->
+                <div class="border border-slate-200 rounded-xl p-4 bg-slate-50/50 flex flex-col justify-between">
+                    <div>
+                        <div class="text-indigo-600 font-bold text-xs uppercase tracking-wider mb-1">คำถามที่ 3</div>
+                        <h3 class="text-sm font-semibold text-slate-900 mb-2">
+                            หากค่าสุดท้ายเป็นศูนย์ จะสรุปอะไรเกี่ยวกับพหุนามได้บ้าง?
+                        </h3>
+                        <p class="text-xs text-slate-600 leading-relaxed">
+                            เชื่อมโยงทฤษฎีบทตัวประกอบและผลประโยชน์ของแถวสัมประสิทธิ์ที่เหลือ
+                        </p>
+                    </div>
+                    <div class="mt-4 pt-3 border-t border-slate-200/80">
+                        <button onclick="toggleHint('hint3')" class="text-xs font-semibold text-indigo-600 hover:text-indigo-800 flex items-center space-x-1 focus:outline-none">
+                            <span id="hint3_text">💡 ดูแนวทางคำตอบ</span>
+                            <span id="hint3_arr">↓</span>
+                        </button>
+                        <div id="hint3" class="hidden mt-2 p-3 bg-white rounded-lg border border-indigo-100 text-xs text-slate-700 leading-relaxed shadow-sm">
+                            <strong>แนวคำตอบ:</strong> สรุปได้ทันทีว่า:
+                            <ul class="list-disc list-inside mt-1 space-y-1">
+                                <li>$x = a$ เป็น <strong>รากของสมการ</strong> $P(x) = 0$</li>
+                                <li>$(x - a)$ เป็น <strong>ตัวประกอบ</strong> ที่หาร $P(x)$ ได้ลงตัว</li>
+                                <li>สามารถ <strong>ลดทอนดีกรี</strong> ของสมการลง 1 ขั้น โดยใช้ตัวเลขแถวล่าง $b_n, \dots, b_1$ เป็นสัมประสิทธิ์ของสมการใหม่ $Q(x) = 0$ เพื่อหารากที่เหลือต่อไปได้อย่างง่ายดาย</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ========================================== -->
+        <!-- ส่วนที่ 5: แบบฝึกหัดสำหรับนักศึกษา -->
+        <!-- ========================================== -->
+        <section class="bg-white rounded-2xl p-6 sm:p-7 shadow-sm border border-slate-200/80 space-y-6">
+            <div class="flex items-center space-x-3 pb-3 border-b border-slate-100">
+                <div class="p-2.5 rounded-xl bg-emerald-50 text-emerald-600">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                    </svg>
+                </div>
+                <div>
+                    <h2 class="text-lg font-bold text-slate-900">5. แบบฝึกหัดสำหรับนักศึกษา (Self-Check Exercises)</h2>
+                    <p class="text-xs text-slate-500">ทดสอบทักษะการคำนวณ การหาผลหาร และการลดทอนดีกรีของสมการ</p>
+                </div>
+            </div>
+
+            <div class="space-y-6">
+                <!-- Exercise 1 -->
+                <div class="p-4 sm:p-5 rounded-xl bg-slate-50 border border-slate-200 space-y-3">
+                    <div class="flex items-center justify-between">
+                        <span class="text-xs font-bold text-indigo-700 bg-indigo-100 px-2.5 py-0.5 rounded-full">ข้อที่ 1: คำนวณค่าพหุนามด้วยกระบวนการฮอร์เนอร์</span>
+                    </div>
+                    <p class="text-sm font-medium text-slate-800">
+                        จงใช้กระบวนการฮอร์เนอร์หาค่าของ $P(x) = 3x^3 - 4x^2 + 2x - 5$ ณ จุด $x = 2$ (ค่า $b_0$ หรือ $P(2)$)
+                    </p>
+
+                    <div class="max-w-xs">
+                        <label class="block text-xs text-slate-600 mb-1 font-medium">ค่าผลลัพธ์ $P(2)$ คือ:</label>
+                        <input type="number" id="ex1_ans" placeholder="กรอกตัวเลขคำตอบ..." class="w-full bg-white border border-slate-300 rounded-lg px-3 py-1.5 focus:ring-2 focus:ring-indigo-500 focus:outline-none text-sm">
+                    </div>
+
+                    <div class="flex items-center space-x-3 pt-2">
+                        <button onclick="checkEx1()" class="px-4 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold shadow-sm transition">
+                            ตรวจคำตอบ
+                        </button>
+                        <span id="ex1_result" class="text-xs font-medium"></span>
+                    </div>
+                    <div id="ex1_expl" class="hidden text-xs bg-white p-3 rounded-lg border border-slate-200 text-slate-700"></div>
+                </div>
+
+                <!-- Exercise 2 -->
+                <div class="p-4 sm:p-5 rounded-xl bg-slate-50 border border-slate-200 space-y-3">
+                    <div class="flex items-center justify-between">
+                        <span class="text-xs font-bold text-indigo-700 bg-indigo-100 px-2.5 py-0.5 rounded-full">ข้อที่ 2: การหารพหุนามและหาพหุนามผลหาร</span>
+                    </div>
+                    <p class="text-sm font-medium text-slate-800">
+                        เมื่อนำ $P(x) = 2x^3 + 3x^2 - 8x + 3$ มาหารด้วย $(x - 1)$ โดยกระบวนการฮอร์เนอร์ สัมประสิทธิ์ของผลหาร $Q(x)$ และเศษเหลือ $R$ คือข้อใด?
+                    </p>
+
+                    <div class="space-y-2 text-xs sm:text-sm">
+                        <label class="flex items-center space-x-2.5 p-2 rounded-lg hover:bg-white cursor-pointer transition">
+                            <input type="radio" name="ex2_opt" value="A" class="text-indigo-600">
+                            <span class="text-slate-700">ก) $Q(x) = 2x^2 + 5x - 3$ และเศษ $R = 0$ (หารลงตัว)</span>
+                        </label>
+                        <label class="flex items-center space-x-2.5 p-2 rounded-lg hover:bg-white cursor-pointer transition">
+                            <input type="radio" name="ex2_opt" value="B" class="text-indigo-600">
+                            <span class="text-slate-700">ข) $Q(x) = 2x^2 + x - 9$ และเศษ $R = -6$</span>
+                        </label>
+                        <label class="flex items-center space-x-2.5 p-2 rounded-lg hover:bg-white cursor-pointer transition">
+                            <input type="radio" name="ex2_opt" value="C" class="text-indigo-600">
+                            <span class="text-slate-700">ค) $Q(x) = 2x^2 + 5x + 3$ และเศษ $R = 6$</span>
+                        </label>
+                    </div>
+
+                    <div class="flex items-center space-x-3 pt-2">
+                        <button onclick="checkEx2()" class="px-4 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold shadow-sm transition">
+                            ตรวจคำตอบ
+                        </button>
+                        <span id="ex2_result" class="text-xs font-medium"></span>
+                    </div>
+                    <div id="ex2_expl" class="hidden text-xs bg-white p-3 rounded-lg border border-slate-200 text-slate-700"></div>
+                </div>
+
+                <!-- Exercise 3 -->
+                <div class="p-4 sm:p-5 rounded-xl bg-slate-50 border border-slate-200 space-y-3">
+                    <div class="flex items-center justify-between">
+                        <span class="text-xs font-bold text-indigo-700 bg-indigo-100 px-2.5 py-0.5 rounded-full">ข้อที่ 3: ลดทอนดีกรีและหารากทั้งหมด</span>
+                    </div>
+                    <p class="text-sm font-medium text-slate-800">
+                        กำหนดสมการ $x^3 - 6x^2 + 11x - 6 = 0$ เมื่อทดสอบพบว่า $x = 1$ เป็นรากหนึ่งของสมการ จงใช้สมการลดทอน $Q(x) = 0$ หารากที่เหลืออีก 2 ตัว
+                    </p>
+
+                    <div class="space-y-2 text-xs sm:text-sm">
+                        <label class="flex items-center space-x-2.5 p-2 rounded-lg hover:bg-white cursor-pointer transition">
+                            <input type="radio" name="ex3_opt" value="A" class="text-indigo-600">
+                            <span class="text-slate-700">ก) รากที่เหลือคือ $x = -2$ และ $x = -3$</span>
+                        </label>
+                        <label class="flex items-center space-x-2.5 p-2 rounded-lg hover:bg-white cursor-pointer transition">
+                            <input type="radio" name="ex3_opt" value="B" class="text-indigo-600">
+                            <span class="text-slate-700">ข) รากที่เหลือคือ $x = 2$ และ $x = 3$</span>
+                        </label>
+                        <label class="flex items-center space-x-2.5 p-2 rounded-lg hover:bg-white cursor-pointer transition">
+                            <input type="radio" name="ex3_opt" value="C" class="text-indigo-600">
+                            <span class="text-slate-700">ค) รากที่เหลือคือ $x = 2 \pm i\sqrt{3}$</span>
+                        </label>
+                    </div>
+
+                    <div class="flex items-center space-x-3 pt-2">
+                        <button onclick="checkEx3()" class="px-4 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold shadow-sm transition">
+                            ตรวจคำตอบ
+                        </button>
+                        <span id="ex3_result" class="text-xs font-medium"></span>
+                    </div>
+                    <div id="ex3_expl" class="hidden text-xs bg-white p-3 rounded-lg border border-slate-200 text-slate-700"></div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-white border-t border-slate-200 mt-12 py-6 text-center text-xs text-slate-500">
+        <div class="max-w-6xl w-full mx-auto px-4 sm:px-6 lg:px-8">
+            <p>บทเรียนแบบโต้ตอบ: ระเบียบวิธีเชิงตัวเลข (Numerical Methods) • เรื่องที่ 3 กระบวนการของฮอร์เนอร์</p>
+            <p class="mt-1 text-slate-400">เน้นการเพิ่มประสิทธิภาพเชิงการคำนวณ (Computational Efficiency) และการประยุกต์ลดทอนดีกรี</p>
+        </div>
+    </footer>
+
+    <!-- Interactive Logic Script -->
+    <script>
+        // Degree configuration default
+        let currentDegree = 3;
+        let currentCoeffs = [2, -3, -5, 6]; // a3, a2, a1, a0
+        let currentA = 2;
+
+        const degreeSelect = document.getElementById('degreeSelect');
+        const hornerPreset = document.getElementById('hornerPreset');
+        const coeffInputsGrid = document.getElementById('coeffInputsGrid');
+        const inputA = document.getElementById('inputA');
+        const resetSimBtn = document.getElementById('resetSimBtn');
+        const nestedFormText = document.getElementById('nestedFormText');
+
+        // Direct method outputs
+        const directStepDetail = document.getElementById('directStepDetail');
+        const directMultiCount = document.getElementById('directMultiCount');
+        const directAddCount = document.getElementById('directAddCount');
+        const directFinalResult = document.getElementById('directFinalResult');
+
+        // Horner method outputs
+        const hornerTableContainer = document.getElementById('hornerTableContainer');
+        const hornerMultiCount = document.getElementById('hornerMultiCount');
+        const hornerAddCount = document.getElementById('hornerAddCount');
+        const hornerFinalResult = document.getElementById('hornerFinalResult');
+        const deflationResultBox = document.getElementById('deflationResultBox');
+
+        // Build Inputs for coefficients dynamically based on degree
+        function renderCoeffInputs() {
+            coeffInputsGrid.innerHTML = '';
+            for (let i = currentDegree; i >= 0; i--) {
+                const col = document.createElement('div');
+                const label = document.createElement('label');
+                label.className = 'block text-xs font-semibold text-slate-600 mb-1';
+                label.innerHTML = `สัมประสิทธิ์ $a_${i}$ ($x^{${i}}$)`;
+
+                const inp = document.createElement('input');
+                inp.type = 'number';
+                inp.step = 'any';
+                inp.id = `coeff_input_${i}`;
+                inp.className = 'w-full text-center font-mono font-bold bg-white border border-slate-300 rounded-lg py-1.5 focus:ring-2 focus:ring-indigo-500 focus:outline-none text-sm';
+                
+                const idx = currentDegree - i;
+                inp.value = currentCoeffs[idx] !== undefined ? currentCoeffs[idx] : 1;
+
+                inp.addEventListener('input', () => {
+                    readInputsAndUpdate();
+                });
+
+                col.appendChild(label);
+                col.appendChild(inp);
+                coeffInputsGrid.appendChild(col);
+            }
+            if (window.MathJax && MathJax.typesetPromise) {
+                MathJax.typesetPromise();
+            }
+        }
+
+        function readInputsAndUpdate() {
+            const newCoeffs = [];
+            for (let i = currentDegree; i >= 0; i--) {
+                const el = document.getElementById(`coeff_input_${i}`);
+                newCoeffs.push(parseFloat(el.value) || 0);
+            }
+            currentCoeffs = newCoeffs;
+            currentA = parseFloat(inputA.value) || 0;
+            executeSim();
+        }
+
+        // Main Calculation & Rendering
+        function executeSim() {
+            const n = currentDegree;
+            const a = currentA;
+            const c = currentCoeffs; // [a_n, a_{n-1}, ..., a_0]
+
+            // 1. Render Nested Form String
+            // E.g., for deg 3: ((a3*x + a2)*x + a1)*x + a0
+            let nested = `${c[0]}`;
+            for (let i = 1; i <= n; i++) {
+                const coeff = c[i];
+                const sign = coeff >= 0 ? `+ ${coeff}` : `- ${Math.abs(coeff)}`;
+                nested = `(${nested} · x ${sign})`;
+            }
+            nestedFormText.innerText = nested;
+
+            // 2. Direct Evaluation Logic & Step Details
+            let directResult = 0;
+            let directStepsHtml = '';
+            let totalMulti = 0;
+            let totalAdd = n; // n additions
+
+            for (let i = 0; i <= n; i++) {
+                const power = n - i;
+                const coeff = c[i];
+                const valPower = Math.pow(a, power);
+                const termVal = coeff * valPower;
+                directResult += termVal;
+
+                // Counting multiplications: power mults for x^power, plus 1 mult for coeff*x^power (if power > 0)
+                if (power > 0) {
+                    totalMulti += power; // for computing a^power
+                    if (coeff !== 1) totalMulti += 1; // for coeff * (a^power)
+                }
+
+                directStepsHtml += `<div class="flex items-center justify-between py-1 border-b border-slate-200/60 last:border-0">
+                    <span>พจน์ $a_{${power}} x^{${power}}$:</span>
+                    <span class="font-bold">${coeff} · (${a})^{${power}} = ${termVal.toFixed(2)}</span>
+                </div>`;
+            }
+
+            directStepDetail.innerHTML = directStepsHtml;
+            directMultiCount.innerText = totalMulti;
+            directAddCount.innerText = totalAdd;
+            directFinalResult.innerText = directResult.toFixed(2);
+
+            // 3. Horner's Recurrence Algorithm
+            // b_n = a_n
+            // b_k = a_k + b_{k+1} * a
+            const b = new Array(n + 1);
+            const multTerms = new Array(n + 1);
+            b[0] = c[0]; // leading coefficient
+            multTerms[0] = 0;
+
+            for (let i = 1; i <= n; i++) {
+                multTerms[i] = b[i - 1] * a;
+                b[i] = c[i] + multTerms[i];
+            }
+
+            const hornerResult = b[n]; // remainder b0
+            hornerMultiCount.innerText = n; // exactly n multiplications!
+            hornerAddCount.innerText = n;   // exactly n additions!
+            hornerFinalResult.innerText = hornerResult.toFixed(2);
+
+            // Render Horner Synthetic Table
+            renderHornerTable(a, c, multTerms, b);
+
+            // 4. Update Deflation & Status Banner
+            renderDeflationBanner(a, b, hornerResult);
+
+            if (window.MathJax && MathJax.typesetPromise) {
+                MathJax.typesetPromise();
+            }
+        }
+
+        // Render clean Horner synthetic division grid
+        function renderHornerTable(a, aCoeffs, mults, bVals) {
+            let tr1 = `<td class="pr-3 pb-2 text-indigo-400 font-bold border-r-2 border-slate-700">${a}</td>`;
+            let tr2 = `<td class="pr-3 py-2 text-slate-500 border-r-2 border-slate-700"></td>`;
+            let tr3 = `<td class="pr-3 pt-2 text-slate-400 font-semibold border-r-2 border-slate-700">ผลลัพธ์ $b_k$:</td>`;
+
+            for (let i = 0; i <= currentDegree; i++) {
+                tr1 += `<td class="px-2.5 pb-2 text-slate-200">${aCoeffs[i]}</td>`;
+                tr2 += `<td class="px-2.5 py-2 ${i === 0 ? 'text-slate-600' : 'text-emerald-400'}">${i === 0 ? '—' : mults[i]}</td>`;
+                
+                const isLast = (i === currentDegree);
+                tr3 += `<td class="px-2.5 pt-2 font-bold ${isLast ? 'text-emerald-400 bg-slate-800 rounded-md border border-emerald-500/40' : 'text-indigo-300'}">${bVals[i]}</td>`;
+            }
+
+            hornerTableContainer.innerHTML = `
+                <table class="mx-auto border-collapse text-xs sm:text-sm">
+                    <tr>${tr1}</tr>
+                    <tr>${tr2}</tr>
+                    <tr class="border-t-2 border-slate-700">${tr3}</tr>
+                </table>
+                <div class="text-[11px] text-slate-400 mt-2 text-center">
+                    ตัวเลขแถวล่าง: สัมประสิทธิ์ของผลหาร $Q(x)$ และ [เศษเหลือ $b_0$ หรือ $P(${a})$] ในกรอบเขียว
+                </div>
+            `;
+        }
+
+        // Render Deflation Notification Box
+        function renderDeflationBanner(a, bVals, remainder) {
+            const isRoot = Math.abs(remainder) < 1e-6;
+
+            if (isRoot) {
+                // Build depressed polynomial Q(x)
+                let qxTerms = [];
+                const depDeg = currentDegree - 1;
+                for (let i = 0; i <= depDeg; i++) {
+                    const pwr = depDeg - i;
+                    const coeff = bVals[i];
+                    if (coeff !== 0) {
+                        const sign = (coeff > 0 && qxTerms.length > 0) ? '+ ' : (coeff < 0 ? '- ' : '');
+                        const absC = Math.abs(coeff);
+                        const cStr = (absC === 1 && pwr > 0) ? '' : absC;
+                        const xStr = pwr > 1 ? `x^{${pwr}}` : (pwr === 1 ? 'x' : '');
+                        qxTerms.push(`${sign}${cStr}${xStr}`);
+                    }
+                }
+                const qxStr = qxTerms.length > 0 ? qxTerms.join(' ') : '0';
+
+                deflationResultBox.className = 'p-5 rounded-2xl border bg-emerald-50/80 border-emerald-300 text-emerald-950';
+                deflationResultBox.innerHTML = `
+                    <div class="flex items-start space-x-3.5">
+                        <span class="p-2 rounded-xl text-xl flex-shrink-0 bg-emerald-200">🎯</span>
+                        <div class="space-y-1.5 flex-grow">
+                            <h4 class="text-base font-bold text-emerald-900">
+                                ตรวจพบรากของสมการ: $x = ${a}$ ทำให้ $P(${a}) = 0$ พอดี!
+                            </h4>
+                            <p class="text-sm text-emerald-800 leading-relaxed">
+                                ตามทฤษฎีบทตัวประกอบ ทวินาม $(x - ${a})$ เป็นตัวประกอบของ $P(x)$ เราสามารถ<strong>ลดทอนดีกรี</strong>ลง 1 ขั้น โดยใช้สัมประสิทธิ์ $b_k$ ที่เหลือ:
+                            </p>
+                            <div class="p-3 bg-white rounded-xl border border-emerald-200 text-emerald-900 font-mono text-center font-bold text-sm sm:text-base my-2">
+                                $$P(x) = (x - ${a}) \\underbrace{(${qxStr})}_{Q(x)}$$
+                            </div>
+                            <p class="text-xs text-emerald-700">
+                                ✨ สมการผลหารลดทอน $Q(x) = 0$ มีดีกรีเพียง ${depDeg} ช่วยให้สามารถแก้สมการหารากที่เหลือต่อได้สะดวกยิ่งขึ้น
+                            </p>
+                        </div>
+                    </div>
+                `;
+            } else {
+                deflationResultBox.className = 'p-5 rounded-2xl border bg-slate-50 border-slate-200 text-slate-800';
+                deflationResultBox.innerHTML = `
+                    <div class="flex items-start space-x-3.5">
+                        <span class="p-2 rounded-xl text-xl flex-shrink-0 bg-slate-200">ℹ️</span>
+                        <div class="space-y-1.5 flex-grow">
+                            <h4 class="text-base font-bold text-slate-900">
+                                ค่าเศษเหลือ $b_0 = P(${a}) = ${remainder.toFixed(2)} \\neq 0$
+                            </h4>
+                            <p class="text-sm text-slate-600 leading-relaxed">
+                                เนื่องจากเศษเหลือไม่เป็นศูนย์ ดังนั้น $x = ${a}$ จึง<strong>ไม่ใช่ราก</strong>ของสมการ $P(x) = 0$ และการหารด้วย $(x - ${a})$ จะมีเศษเหลือตามเอกลักษณ์:
+                            </p>
+                            <div class="p-2.5 bg-white rounded-lg border border-slate-200 font-mono text-xs sm:text-sm text-center text-slate-700">
+                                $P(x) = (x - ${a}) Q(x) + (${remainder.toFixed(2)})$
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+        }
+
+        // Preset Configurations
+        hornerPreset.addEventListener('change', (e) => {
+            const v = e.target.value;
+            if (v === 'ex1') {
+                degreeSelect.value = "3";
+                currentDegree = 3;
+                currentCoeffs = [2, -3, -5, 6];
+                inputA.value = 2;
+            } else if (v === 'ex2') {
+                degreeSelect.value = "3";
+                currentDegree = 3;
+                currentCoeffs = [1, -4, 1, 6];
+                inputA.value = 3;
+            } else if (v === 'ex3') {
+                degreeSelect.value = "4";
+                currentDegree = 4;
+                currentCoeffs = [1, -2, 0, 3, -5];
+                inputA.value = -2;
+            }
+            renderCoeffInputs();
+            readInputsAndUpdate();
+        });
+
+        // Degree change listener
+        degreeSelect.addEventListener('change', (e) => {
+            currentDegree = parseInt(e.target.value);
+            // Default coefficients for the selected degree
+            if (currentDegree === 2) currentCoeffs = [1, -3, 2];
+            else if (currentDegree === 3) currentCoeffs = [2, -3, -5, 6];
+            else if (currentDegree === 4) currentCoeffs = [1, -2, 0, 3, -5];
+            renderCoeffInputs();
+            readInputsAndUpdate();
+        });
+
+        // Input A Listener
+        inputA.addEventListener('input', () => {
+            readInputsAndUpdate();
+        });
+
+        // Reset Button
+        resetSimBtn.addEventListener('click', () => {
+            degreeSelect.value = "3";
+            currentDegree = 3;
+            currentCoeffs = [2, -3, -5, 6];
+            inputA.value = 2;
+            renderCoeffInputs();
+            readInputsAndUpdate();
+        });
+
+        // Toggle Discovery Hints
+        function toggleHint(id) {
+            const el = document.getElementById(id);
+            const text = document.getElementById(id + '_text');
+            const arr = document.getElementById(id + '_arr');
+            if (el.classList.contains('hidden')) {
+                el.classList.remove('hidden');
+                text.innerText = 'ซ่อนแนวทางคำตอบ';
+                arr.innerText = '↑';
+            } else {
+                el.classList.add('hidden');
+                text.innerText = '💡 ดูแนวทางคำตอบ';
+                arr.innerText = '↓';
+            }
+        }
+
+        // Exercises Verification
+        function checkEx1() {
+            const val = document.getElementById('ex1_ans').value.trim();
+            const res = document.getElementById('ex1_result');
+            const expl = document.getElementById('ex1_expl');
+
+            // P(x) = 3x^3 - 4x^2 + 2x - 5 at x = 2
+            // b3 = 3
+            // b2 = -4 + 3*2 = 2
+            // b1 = 2 + 2*2 = 6
+            // b0 = -5 + 6*2 = 7
+            if (val === '7') {
+                res.innerHTML = '<span class="text-emerald-600 font-bold">✓ ถูกต้องยอดเยี่ยม! P(2) = 7</span>';
+                expl.className = 'text-xs bg-emerald-50 p-3 rounded-lg border border-emerald-200 text-slate-800 space-y-1 block';
+                expl.innerHTML = `<strong>ขั้นตอนฮอร์เนอร์:</strong><br>
+                    • $b_3 = 3$<br>
+                    • $b_2 = -4 + (3)(2) = 2$<br>
+                    • $b_1 = 2 + (2)(2) = 6$<br>
+                    • $b_0 = -5 + (6)(2) = 7$ ดังนั้นเศษหรือค่า $P(2) = 7$`;
+            } else {
+                res.innerHTML = '<span class="text-rose-600 font-bold">✕ ยังไม่ถูกต้อง ลองทดสอบใหม่อีกครั้ง</span>';
+                expl.className = 'text-xs bg-rose-50 p-3 rounded-lg border border-rose-200 text-slate-800 space-y-1 block';
+                expl.innerHTML = '<strong>คำใบ้:</strong> เริ่มจาก 3 $\\rightarrow$ คูณ 2 บวก -4 ได้ 2 $\\rightarrow$ คูณ 2 บวก 2 ได้ 6 $\\rightarrow$ คูณ 2 บวก -5';
+            }
+            if (window.MathJax) MathJax.typesetPromise();
+        }
+
+        function checkEx2() {
+            const opt = document.querySelector('input[name="ex2_opt"]:checked');
+            const res = document.getElementById('ex2_result');
+            const expl = document.getElementById('ex2_expl');
+
+            if (!opt) {
+                res.innerHTML = '<span class="text-amber-600 font-bold">กรุณาเลือกคำตอบ</span>';
+                return;
+            }
+
+            // 2, 3, -8, 3 with x = 1
+            // b3 = 2
+            // b2 = 3 + 2(1) = 5
+            // b1 = -8 + 5(1) = -3
+            // b0 = 3 + (-3)(1) = 0 -> Q(x) = 2x^2 + 5x - 3, R = 0
+            if (opt.value === 'A') {
+                res.innerHTML = '<span class="text-emerald-600 font-bold">✓ ถูกต้องสมบูรณ์แบบ! ข้อ ก.</span>';
+                expl.className = 'text-xs bg-emerald-50 p-3 rounded-lg border border-emerald-200 text-slate-800 space-y-1 block';
+                expl.innerHTML = `<strong>แนวคิด:</strong> สัมประสิทธิ์ของผลหารคือแถว $b_k$: ได้ $2, 5, -3$ ซึ่งตรงกับ $Q(x) = 2x^2 + 5x - 3$ และเศษสุดท้ายคือ $b_0 = 0$ แสดงว่าหารลงตัวพอดี`;
+            } else {
+                res.innerHTML = '<span class="text-rose-600 font-bold">✕ ยังไม่ถูกต้อง</span>';
+                expl.className = 'text-xs bg-rose-50 p-3 rounded-lg border border-rose-200 text-slate-800 space-y-1 block';
+                expl.innerHTML = '<strong>คำใบ้:</strong> ตั้งแถวตัวเลข $2, 3, -8, 3$ แล้วทำการคูณด้วย $1$ แล้วบวกสะสมทีละขั้น';
+            }
+            if (window.MathJax) MathJax.typesetPromise();
+        }
+
+        function checkEx3() {
+            const opt = document.querySelector('input[name="ex3_opt"]:checked');
+            const res = document.getElementById('ex3_result');
+            const expl = document.getElementById('ex3_expl');
+
+            if (!opt) {
+                res.innerHTML = '<span class="text-amber-600 font-bold">กรุณาเลือกคำตอบ</span>';
+                return;
+            }
+
+            // x^3 - 6x^2 + 11x - 6 = 0, root x = 1
+            // b3 = 1
+            // b2 = -6 + 1(1) = -5
+            // b1 = 11 + (-5)(1) = 6
+            // b0 = -6 + 6(1) = 0
+            // Q(x) = x^2 - 5x + 6 = (x - 2)(x - 3) = 0 -> roots are 2, 3
+            if (opt.value === 'B') {
+                res.innerHTML = '<span class="text-emerald-600 font-bold">✓ ถูกต้องยอดเยี่ยม! ข้อ ข.</span>';
+                expl.className = 'text-xs bg-emerald-50 p-3 rounded-lg border border-emerald-200 text-slate-800 space-y-1 block';
+                expl.innerHTML = `<strong>ขั้นตอนการแก้:</strong><br>
+                    1. นำ $x=1$ ไปหารสังเคราะห์ $1, -6, 11, -6$ จะได้ผลหารลดทอน $Q(x) = x^2 - 5x + 6$<br>
+                    2. แยกตัวประกอบสมการลดทอน: $x^2 - 5x + 6 = (x - 2)(x - 3) = 0$<br>
+                    3. ดังนั้นรากที่เหลืออีก 2 ค่าคือ $x = 2$ และ $x = 3$`;
+            } else {
+                res.innerHTML = '<span class="text-rose-600 font-bold">✕ ยังไม่ถูกต้อง</span>';
+                expl.className = 'text-xs bg-rose-50 p-3 rounded-lg border border-rose-200 text-slate-800 space-y-1 block';
+                expl.innerHTML = '<strong>คำใบ้:</strong> สมการลดทอนที่ได้คือ $x^2 - 5x + 6 = 0$ ลองแยกตัวประกอบของพหุนามกำลังสองนี้';
+            }
+            if (window.MathJax) MathJax.typesetPromise();
+        }
+
+        // Initialize on window load
+        window.addEventListener('load', () => {
+            renderCoeffInputs();
+            readInputsAndUpdate();
+        });
+    </script>
+</body>
+</html>
