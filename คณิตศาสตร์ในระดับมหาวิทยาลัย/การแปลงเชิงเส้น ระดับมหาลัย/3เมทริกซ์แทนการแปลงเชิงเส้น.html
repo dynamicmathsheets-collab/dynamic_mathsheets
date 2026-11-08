@@ -1,0 +1,789 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>เรื่องที่ 3: เมทริกซ์แทนการแปลงเชิงเส้น (Matrix Representation)</title>
+
+  <!-- Google Fonts: Sarabun & Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Sarabun', 'Inter', 'sans-serif'],
+            mono: ['ui-monospace', 'SFMono-Regular', 'Menlo', 'monospace']
+          },
+          colors: {
+            brand: {
+              50: '#eef2ff',
+              100: '#e0e7ff',
+              200: '#c7d2fe',
+              300: '#a5b4fc',
+              400: '#818cf8',
+              500: '#6366f1',
+              600: '#4f46e5',
+              700: '#4338ca',
+              800: '#3730a3',
+              900: '#312e81',
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- MathJax 3 configuration -->
+  <script>
+    window.MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']],
+        displayMath: [['$$', '$$'], ['\\[', '\\]']],
+        processEscapes: true
+      },
+      svg: {
+        fontCache: 'global'
+      },
+      startup: {
+        pageReady: () => {
+          return MathJax.startup.defaultPageReady();
+        }
+      }
+    };
+  </script>
+  <script type="text/javascript" id="MathJax-script" async
+    src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js">
+  </script>
+
+  <style>
+    mjx-container {
+      display: inline-grid;
+      overflow-x: auto;
+      overflow-y: hidden;
+      max-width: 100%;
+      vertical-align: middle;
+    }
+    input[type=number]::-webkit-inner-spin-button,
+    input[type=number]::-webkit-outer-spin-button {
+      opacity: 1;
+    }
+    .matrix-bracket {
+      position: relative;
+    }
+    .matrix-bracket::before {
+      content: "";
+      position: absolute;
+      left: -6px;
+      top: 0;
+      bottom: 0;
+      width: 4px;
+      border-left: 2px solid currentColor;
+      border-top: 2px solid currentColor;
+      border-bottom: 2px solid currentColor;
+    }
+    .matrix-bracket::after {
+      content: "";
+      position: absolute;
+      right: -6px;
+      top: 0;
+      bottom: 0;
+      width: 4px;
+      border-right: 2px solid currentColor;
+      border-top: 2px solid currentColor;
+      border-bottom: 2px solid currentColor;
+    }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-800 font-sans antialiased selection:bg-brand-500 selection:text-white min-h-screen">
+
+  <!-- Header Section -->
+  <header class="bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 text-white border-b border-indigo-500/20 shadow-sm">
+    <div class="max-w-6xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
+      <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+        <div>
+          <h1 class="text-xl sm:text-2xl lg:text-3xl font-bold tracking-tight text-white">
+            เรื่องที่ 3: เมทริกซ์แทนการแปลงเชิงเส้น
+          </h1>
+          <p class="text-slate-300 text-xs sm:text-sm font-light mt-1">
+            Matrix Representation of Linear Transformation & Standard Basis
+          </p>
+        </div>
+        <div class="hidden md:flex flex-col items-end text-xs text-slate-400 border-l border-slate-700 pl-4 space-y-1">
+          <span class="text-indigo-300 font-mono text-[11px]">$T(\mathbf{x}) = A\mathbf{x}$</span>
+          <span>การแปลงระหว่างปริภูมิ $\mathbb{R}^n \to \mathbb{R}^m$</span>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Section 1: วัตถุประสงค์การเรียนรู้ -->
+  <section class="max-w-6xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
+    <div class="bg-white rounded-xl p-4 sm:p-5 shadow-sm border border-slate-200/80">
+      <div class="flex items-center gap-2.5 border-b border-slate-100 pb-3 mb-3">
+        <div class="w-8 h-8 rounded-lg bg-indigo-50 text-indigo-600 flex items-center justify-center font-bold text-sm">
+          <i class="fa-solid fa-bullseye text-base"></i>
+        </div>
+        <div>
+          <h2 class="text-base sm:text-lg font-bold text-slate-900">1. วัตถุประสงค์การเรียนรู้</h2>
+          <p class="text-[11px] text-slate-400">Learning Objective</p>
+        </div>
+      </div>
+      <div class="bg-indigo-50/60 border border-indigo-100 rounded-lg p-3 sm:p-4 flex items-start gap-3">
+        <span class="inline-flex items-center justify-center p-1 bg-indigo-600 text-white rounded text-xs mt-0.5">
+          <i class="fa-solid fa-check text-xs"></i>
+        </span>
+        <p class="text-sm sm:text-base text-slate-700 leading-relaxed">
+          เมื่อศึกษาบทเรียนนี้แล้ว <strong class="text-indigo-950 font-semibold">นักศึกษาสามารถหาเมทริกซ์แทนการแปลงเชิงเส้นระหว่างปริภูมิ $\mathbb{R}^n$ และ $\mathbb{R}^m$ โดยอาศัยฐานมาตรฐานได้</strong> เข้าใจขั้นตอนการสร้างเมทริกซ์ $A$ จากภาพของเวกเตอร์ฐาน $T(\mathbf{e}_i)$ และสามารถประยุกต์ใช้ความสัมพันธ์ $T(\mathbf{x}) = A\mathbf{x}$ ในการคำนวณได้อย่างแม่นยำ
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Section 2: เนื้อหาหลัก -->
+  <section class="max-w-6xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 -mt-6 sm:-mt-8">
+    <div class="bg-white rounded-xl p-4 sm:p-5 shadow-sm border border-slate-200/80">
+      <div class="flex items-center gap-2.5 border-b border-slate-100 pb-3 mb-4">
+        <div class="w-8 h-8 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center font-bold text-sm">
+          <i class="fa-solid fa-book-open text-base"></i>
+        </div>
+        <div>
+          <h2 class="text-base sm:text-lg font-bold text-slate-900">2. เนื้อหาหลักและทฤษฎีบทการแทนด้วยเมทริกซ์</h2>
+          <p class="text-[11px] text-slate-400">Theoretical Foundations & Matrix Representation</p>
+        </div>
+      </div>
+
+      <p class="text-xs sm:text-sm text-slate-700 leading-relaxed mb-4">
+        หนึ่งในความงดงามของพีชคณิตเชิงเส้นคือ <strong>ทุกการแปลงเชิงเส้น $T: \mathbb{R}^n \to \mathbb{R}^m$ สามารถแทนได้ด้วยการคูณด้วยเมทริกซ์เพียงหนึ่งเดียว</strong> ซึ่งเรียกว่า <em>เมทริกซ์มาตรฐาน (Standard Matrix)</em> ของการแปลง $T$
+      </p>
+
+      <!-- Key Concept Cards -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-3.5 mb-4">
+        <!-- Basis Vectors -->
+        <div class="border border-slate-200 bg-slate-50/70 rounded-xl p-3.5">
+          <div class="flex items-center justify-between mb-2">
+            <span class="text-xs font-bold text-indigo-700 flex items-center gap-1.5">
+              <span class="w-5 h-5 rounded-full bg-indigo-600 text-white flex items-center justify-center text-[10px]">1</span>
+              เวกเตอร์ฐานมาตรฐาน (Standard Basis)
+            </span>
+            <span class="text-[10px] font-mono bg-indigo-100 text-indigo-800 px-1.5 py-0.5 rounded">$\mathcal{E} \subset \mathbb{R}^n$</span>
+          </div>
+          <p class="text-xs text-slate-600 leading-relaxed mb-2">
+            เวกเตอร์ฐานมาตรฐานของ $\mathbb{R}^n$ คือเวกเตอร์ที่มีสมาชิกเป็น 1 ในแถวที่ $i$ และเป็น 0 ในตำแหน่งอื่น:
+          </p>
+          <div class="bg-white p-2 rounded-lg border border-slate-200 text-center font-mono text-xs text-indigo-950 font-semibold shadow-sm">
+            $$\mathbf{e}_1 = \begin{bmatrix} 1 \\ 0 \\ \vdots \\ 0 \end{bmatrix}, \; \mathbf{e}_2 = \begin{bmatrix} 0 \\ 1 \\ \vdots \\ 0 \end{bmatrix}, \; \dots, \; \mathbf{e}_n = \begin{bmatrix} 0 \\ 0 \\ \vdots \\ 1 \end{bmatrix}$$
+          </div>
+        </div>
+
+        <!-- Construction of A -->
+        <div class="border border-slate-200 bg-slate-50/70 rounded-xl p-3.5">
+          <div class="flex items-center justify-between mb-2">
+            <span class="text-xs font-bold text-indigo-700 flex items-center gap-1.5">
+              <span class="w-5 h-5 rounded-full bg-indigo-600 text-white flex items-center justify-center text-[10px]">2</span>
+              การสร้างเมทริกซ์จาก $T(\mathbf{e}_i)$
+            </span>
+            <span class="text-[10px] font-mono bg-indigo-100 text-indigo-800 px-1.5 py-0.5 rounded">Columns of $A$</span>
+          </div>
+          <p class="text-xs text-slate-600 leading-relaxed mb-2">
+            นำภาพของเวกเตอร์ฐานแต่ละตัวมาจัดเรียงเป็น <strong>คอลัมน์ (Columns)</strong> ของเมทริกซ์ $A$:
+          </p>
+          <div class="bg-white p-2 rounded-lg border border-slate-200 text-center font-mono text-xs text-indigo-950 font-semibold shadow-sm">
+            $$A = [T] = \begin{bmatrix} T(\mathbf{e}_1) & T(\mathbf{e}_2) & \cdots & T(\mathbf{e}_n) \end{bmatrix}$$
+          </div>
+        </div>
+      </div>
+
+      <!-- Linear Relation & Dimension Breakdown -->
+      <div class="grid grid-cols-1 md:grid-cols-12 gap-3.5">
+        <div class="md:col-span-7 bg-gradient-to-br from-slate-900 to-indigo-950 text-white p-4 rounded-xl shadow-sm border border-indigo-800/40">
+          <h3 class="text-xs font-bold uppercase tracking-wider text-indigo-300 flex items-center gap-2 mb-2">
+            <i class="fa-solid fa-link"></i>
+            ความสัมพันธ์ $T(\mathbf{x}) = A\mathbf{x}$
+          </h3>
+          <p class="text-xs text-slate-300 leading-relaxed mb-2">
+            สำหรับเวกเตอร์ใด ๆ $\mathbf{x} = x_1\mathbf{e}_1 + x_2\mathbf{e}_2 + \dots + x_n\mathbf{e}_n \in \mathbb{R}^n$ เมื่อใช้สมบัติการคงสภาพการรวมเชิงเส้น:
+          </p>
+          <div class="py-2 px-3 bg-slate-800/80 rounded-lg border border-slate-700 text-center font-mono text-xs sm:text-sm text-emerald-300">
+            $$T(\mathbf{x}) = \sum_{i=1}^n x_i T(\mathbf{e}_i) = \begin{bmatrix} T(\mathbf{e}_1) & \cdots & T(\mathbf{e}_n) \end{bmatrix} \begin{bmatrix} x_1 \\ \vdots \\ x_n \end{bmatrix} = A\mathbf{x}$$
+          </div>
+        </div>
+
+        <div class="md:col-span-5 bg-indigo-50/50 border border-indigo-100 p-4 rounded-xl flex flex-col justify-between">
+          <div>
+            <h3 class="text-xs font-bold text-indigo-950 uppercase tracking-wider mb-1 flex items-center gap-1.5">
+              <i class="fa-solid fa-ruler-combined text-indigo-600"></i>
+              ขนาดและมิติของเมทริกซ์ (Matrix Dimension)
+            </h3>
+            <p class="text-xs text-slate-600 leading-relaxed mt-1">
+              ถ้าการแปลงส่งจากโดเมนมิติ $n$ ไปยังโคโดเมนมิติ $m$ นั่นคือ:
+            </p>
+            <div class="text-center font-bold text-indigo-900 text-sm my-2 font-mono">
+              $$T: \mathbb{R}^n \longrightarrow \mathbb{R}^m \implies A \in \mathbb{R}^{m \times n}$$
+            </div>
+          </div>
+          <p class="text-[11px] text-slate-500 bg-white p-2 rounded border border-indigo-100">
+            <strong>ข้อสังเกต:</strong> เมทริกซ์ $A$ จะมี <strong>$m$ แถว</strong> (มิติปลายทาง) และ <strong>$n$ หลัก</strong> (มิติต้นทาง)
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Section 3: แบบจำลองโต้ตอบ -->
+  <section class="max-w-6xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 -mt-6 sm:-mt-8">
+    <div class="bg-white rounded-xl p-4 sm:p-5 shadow-sm border border-slate-200/80">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-100 pb-3 mb-4">
+        <div class="flex items-center gap-2.5">
+          <div class="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center font-bold text-sm">
+            <i class="fa-solid fa-sliders text-base"></i>
+          </div>
+          <div>
+            <h2 class="text-base sm:text-lg font-bold text-slate-900">3. แบบจำลองโต้ตอบ: การสร้างเมทริกซ์และการตรวจสอบ $T(\mathbf{x}) = A\mathbf{x}$</h2>
+            <p class="text-[11px] text-slate-400">Interactive Standard Matrix Generator & 2D Vector Visualizer</p>
+          </div>
+        </div>
+        <span class="inline-flex items-center gap-1 text-[11px] font-semibold px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800 border border-emerald-300 self-start sm:self-auto">
+          <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+          Interactive Live Compute
+        </span>
+      </div>
+
+      <!-- Presets Toolbar -->
+      <div class="mb-4 bg-slate-50 p-3 rounded-xl border border-slate-200 flex flex-wrap items-center gap-2">
+        <span class="text-xs font-bold text-slate-700 flex items-center gap-1">
+          <i class="fa-solid fa-shapes text-indigo-600"></i> ตัวอย่างมาตรฐาน (Presets):
+        </span>
+        <button type="button" onclick="setPreset('identity')" class="px-2.5 py-1 text-xs rounded bg-white border border-slate-300 hover:bg-indigo-50 hover:text-indigo-700 transition">เอกลักษณ์ (Identity)</button>
+        <button type="button" onclick="setPreset('rotate90')" class="px-2.5 py-1 text-xs rounded bg-white border border-slate-300 hover:bg-indigo-50 hover:text-indigo-700 transition">หมุน $90^\circ$ ทวนเข็ม</button>
+        <button type="button" onclick="setPreset('scale')" class="px-2.5 py-1 text-xs rounded bg-white border border-slate-300 hover:bg-indigo-50 hover:text-indigo-700 transition">การขยายขนาด (Scaling)</button>
+        <button type="button" onclick="setPreset('shear')" class="px-2.5 py-1 text-xs rounded bg-white border border-slate-300 hover:bg-indigo-50 hover:text-indigo-700 transition">การเฉือนแนวนอน (Shear)</button>
+        <button type="button" onclick="setPreset('reflectX')" class="px-2.5 py-1 text-xs rounded bg-white border border-slate-300 hover:bg-indigo-50 hover:text-indigo-700 transition">สะท้อนแกน X</button>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-4">
+        <!-- Controls & Input Area (5 Cols) -->
+        <div class="lg:col-span-5 space-y-3.5 bg-slate-50 p-3.5 sm:p-4 rounded-xl border border-slate-200">
+          <div>
+            <h3 class="text-xs font-bold uppercase tracking-wider text-slate-700 mb-2 flex items-center gap-1.5">
+              <span>ก. กำหนดภาพของฐานมาตรฐาน $T(\mathbf{e}_1)$ และ $T(\mathbf{e}_2)$</span>
+            </h3>
+            
+            <div class="grid grid-cols-2 gap-3">
+              <!-- T(e1) -->
+              <div class="bg-white p-3 rounded-lg border border-indigo-200 shadow-sm space-y-1.5">
+                <div class="flex items-center justify-between">
+                  <span class="text-xs font-bold text-indigo-700">ภาพ $T(\mathbf{e}_1)$</span>
+                  <span class="text-[10px] text-slate-400 font-mono">คอลัมน์ที่ 1</span>
+                </div>
+                <div class="space-y-1">
+                  <div class="flex items-center gap-1">
+                    <span class="text-[11px] font-mono text-slate-500 w-4">a:</span>
+                    <input type="number" id="mat_a" value="2" step="0.5" class="w-full text-xs font-mono border rounded px-2 py-1 text-center font-bold text-slate-800 focus:ring-1 focus:ring-indigo-500 focus:outline-none" oninput="updateSimulation()">
+                  </div>
+                  <div class="flex items-center gap-1">
+                    <span class="text-[11px] font-mono text-slate-500 w-4">c:</span>
+                    <input type="number" id="mat_c" value="1" step="0.5" class="w-full text-xs font-mono border rounded px-2 py-1 text-center font-bold text-slate-800 focus:ring-1 focus:ring-indigo-500 focus:outline-none" oninput="updateSimulation()">
+                  </div>
+                </div>
+              </div>
+
+              <!-- T(e2) -->
+              <div class="bg-white p-3 rounded-lg border border-indigo-200 shadow-sm space-y-1.5">
+                <div class="flex items-center justify-between">
+                  <span class="text-xs font-bold text-indigo-700">ภาพ $T(\mathbf{e}_2)$</span>
+                  <span class="text-[10px] text-slate-400 font-mono">คอลัมน์ที่ 2</span>
+                </div>
+                <div class="space-y-1">
+                  <div class="flex items-center gap-1">
+                    <span class="text-[11px] font-mono text-slate-500 w-4">b:</span>
+                    <input type="number" id="mat_b" value="-1" step="0.5" class="w-full text-xs font-mono border rounded px-2 py-1 text-center font-bold text-slate-800 focus:ring-1 focus:ring-indigo-500 focus:outline-none" oninput="updateSimulation()">
+                  </div>
+                  <div class="flex items-center gap-1">
+                    <span class="text-[11px] font-mono text-slate-500 w-4">d:</span>
+                    <input type="number" id="mat_d" value="3" step="0.5" class="w-full text-xs font-mono border rounded px-2 py-1 text-center font-bold text-slate-800 focus:ring-1 focus:ring-indigo-500 focus:outline-none" oninput="updateSimulation()">
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Vector x input -->
+          <div class="pt-2 border-t border-slate-200">
+            <h3 class="text-xs font-bold uppercase tracking-wider text-slate-700 mb-2 flex items-center justify-between">
+              <span>ข. ป้อนเวกเตอร์นำเข้า $\mathbf{x} = \begin{bmatrix} x_1 \\ x_2 \end{bmatrix}$</span>
+              <span class="text-[10px] text-slate-400 font-normal">Input Vector</span>
+            </h3>
+            <div class="bg-white p-3 rounded-lg border border-slate-200 shadow-sm">
+              <div class="grid grid-cols-2 gap-3">
+                <div class="flex items-center gap-2">
+                  <label for="vec_x1" class="text-xs font-mono font-bold text-slate-600">$x_1$ :</label>
+                  <input type="number" id="vec_x1" value="2" step="0.5" class="w-full text-xs font-mono border rounded px-2 py-1 text-center font-bold text-indigo-900 focus:ring-1 focus:ring-indigo-500 focus:outline-none" oninput="updateSimulation()">
+                </div>
+                <div class="flex items-center gap-2">
+                  <label for="vec_x2" class="text-xs font-mono font-bold text-slate-600">$x_2$ :</label>
+                  <input type="number" id="vec_x2" value="1.5" step="0.5" class="w-full text-xs font-mono border rounded px-2 py-1 text-center font-bold text-indigo-900 focus:ring-1 focus:ring-indigo-500 focus:outline-none" oninput="updateSimulation()">
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Standard Matrix Display -->
+          <div class="bg-indigo-950 text-white p-3 rounded-lg border border-indigo-800">
+            <div class="text-[11px] text-indigo-300 font-mono mb-1">เมทริกซ์มาตรฐาน $A = [T]$ :</div>
+            <div id="matrixDisplayBox" class="text-center font-mono text-sm sm:text-base text-emerald-300 py-1">
+              $$A = \begin{bmatrix} 2 & -1 \\ 1 & 3 \end{bmatrix}$$
+            </div>
+          </div>
+        </div>
+
+        <!-- Verification & Canvas Area (7 Cols) -->
+        <div class="lg:col-span-7 space-y-3">
+          
+          <!-- Side-by-side Verification Comparison -->
+          <div class="bg-slate-50 border border-slate-200 rounded-xl p-3">
+            <div class="flex items-center justify-between pb-2 border-b border-slate-200 mb-2">
+              <span class="text-xs sm:text-sm font-bold text-slate-800 flex items-center gap-1.5">
+                <i class="fa-solid fa-code-compare text-indigo-600"></i>
+                การเปรียบเทียบการคำนวณทั้ง 2 วิธี
+              </span>
+              <span id="matchBadge" class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800">
+                ผลลัพธ์ตรงกัน 100%
+              </span>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
+              <!-- Method 1: Linear Combination of Images -->
+              <div class="bg-white p-2.5 rounded-lg border border-slate-200 shadow-sm">
+                <div class="text-[10px] text-slate-500 font-semibold mb-1">
+                  1. กระจายตามผลรวมเชิงเส้น:
+                </div>
+                <div class="font-mono text-[11px] text-indigo-950 mb-1">
+                  $T(\mathbf{x}) = x_1 T(\mathbf{e}_1) + x_2 T(\mathbf{e}_2)$
+                </div>
+                <div id="method1Detail" class="font-mono text-[11px] text-slate-600 leading-tight">
+                  = 2(2, 1) + 1.5(-1, 3)
+                </div>
+                <div id="method1Result" class="font-mono font-bold text-slate-900 text-sm mt-1 text-emerald-600">
+                  = (2.5, 6.5)
+                </div>
+              </div>
+
+              <!-- Method 2: Matrix Multiplication -->
+              <div class="bg-white p-2.5 rounded-lg border border-slate-200 shadow-sm">
+                <div class="text-[10px] text-slate-500 font-semibold mb-1">
+                  2. คำนวณผ่านการคูณเมทริกซ์:
+                </div>
+                <div class="font-mono text-[11px] text-indigo-950 mb-1">
+                  $A\mathbf{x} = \begin{bmatrix} a & b \\ c & d \end{bmatrix} \begin{bmatrix} x_1 \\ x_2 \end{bmatrix}$
+                </div>
+                <div id="method2Detail" class="font-mono text-[11px] text-slate-600 leading-tight">
+                  = [2(2)+(-1)(1.5), 1(2)+3(1.5)]
+                </div>
+                <div id="method2Result" class="font-mono font-bold text-slate-900 text-sm mt-1 text-emerald-600">
+                  = (2.5, 6.5)
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Canvas 2D Vector Visualization -->
+          <div class="bg-slate-900 rounded-xl p-3 border border-slate-800 text-white">
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-xs font-semibold text-slate-300 flex items-center gap-1.5">
+                <i class="fa-solid fa-chart-line text-indigo-400"></i>
+                ภาพแสดงเวกเตอร์ในปริภูมิ 2 มิติ ($\mathbb{R}^2$)
+              </span>
+              <div class="flex items-center gap-3 text-[11px] font-mono">
+                <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-cyan-400 inline-block"></span> Input $\mathbf{x}$</span>
+                <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-emerald-400 inline-block"></span> Output $T(\mathbf{x})$</span>
+              </div>
+            </div>
+            
+            <div class="relative w-full h-44 bg-slate-950 rounded-lg overflow-hidden border border-slate-800 flex items-center justify-center">
+              <canvas id="vectorCanvas" class="w-full h-full block"></canvas>
+            </div>
+            <div class="flex items-center justify-between text-[10px] text-slate-400 mt-1.5 px-1">
+              <span>แกนพิกัดศูนย์กลาง $(0,0)$ กึ่งกลางระนาบ</span>
+              <span id="canvasCoordsText" class="font-mono text-slate-300">x: (2, 1.5) ➔ T(x): (2.5, 6.5)</span>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Section 4: คำถามนำเพื่อค้นพบ -->
+  <section class="max-w-6xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 -mt-6 sm:-mt-8">
+    <div class="bg-gradient-to-r from-amber-500/10 via-amber-500/5 to-transparent rounded-xl p-4 sm:p-5 border border-amber-300/80 shadow-sm">
+      <div class="flex items-start gap-3">
+        <div class="w-9 h-9 rounded-lg bg-amber-500 text-white flex-shrink-0 flex items-center justify-center font-bold text-lg shadow-sm">
+          <i class="fa-solid fa-lightbulb"></i>
+        </div>
+        <div class="flex-1">
+          <span class="text-[11px] font-bold uppercase tracking-wider text-amber-800">คำถามนำเพื่อค้นพบ (Guided Discovery Question)</span>
+          <h2 class="text-base sm:text-lg font-bold text-slate-900 mt-0.5">
+            "เหตุใดภาพของเวกเตอร์ฐานมาตรฐาน จึงเพียงพอสำหรับกำหนดการแปลงเชิงเส้นบน $\mathbb R^n$ ทั้งหมด?"
+          </h2>
+          <p class="text-xs sm:text-sm text-slate-600 mt-1">
+            ในปริภูมิ $\mathbb{R}^n$ มีเวกเตอร์อยู่อย่างนับไม่ถ้วน ทำไมเราจึงต้องรู้ผลการแปลงแค่ $n$ ตัวเท่านั้น ก็สามารถรู้ผลการแปลงของทุกจุดในจักรวาลของ $\mathbb{R}^n$ ได้อย่างสมบูรณ์?
+          </p>
+
+          <div class="mt-3">
+            <button type="button" onclick="toggleDiscoverySection()" id="btnDiscoveryToggle" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-amber-600 hover:bg-amber-700 text-white font-medium text-xs sm:text-sm transition-all shadow-sm cursor-pointer">
+              <span>💡 คลิกเพื่อดูแนวคิดและคำอธิบายเชิงทฤษฎี</span>
+              <i id="discoveryIcon" class="fa-solid fa-chevron-down text-xs ml-1 transition-transform duration-200"></i>
+            </button>
+          </div>
+
+          <div id="discoveryAnswerBox" class="hidden mt-3 pt-3 border-t border-amber-200/80 space-y-2">
+            <div class="bg-white rounded-lg p-3.5 border border-amber-200 text-slate-700 text-xs sm:text-sm leading-relaxed space-y-2.5 shadow-sm">
+              <p>
+                <strong>1. สมบัติการแผ่ทั่วและเอกลักษณ์ของการเขียนฐาน (Spanning & Unique Representation):</strong><br>
+                เซตของเวกเตอร์ฐานมาตรฐาน $\mathcal{E} = \{\mathbf{e}_1, \mathbf{e}_2, \dots, \mathbf{e}_n\}$ มีสมบัติเป็นฐานหลัก (Basis) ของ $\mathbb{R}^n$ นั่นหมายความว่า เวกเตอร์ใด ๆ $\mathbf{x} \in \mathbb{R}^n$ สามารถเขียนเป็นผลรวมเชิงเส้นของ $\mathbf{e}_i$ ได้เพียง <strong>แบบเดียวเท่านั้น (Unique Linear Combination)</strong> เสมอ:
+                $$\mathbf{x} = x_1\mathbf{e}_1 + x_2\mathbf{e}_2 + \dots + x_n\mathbf{e}_n$$
+              </p>
+              <p>
+                <strong>2. การถ่ายทอดผ่านสัจพจน์เชิงเส้น (Linearity Propagation):</strong><br>
+                เนื่องจาก $T$ มีสมบัติเชิงเส้น จึงกระจายการคำนวณเข้าไปในผลรวมเชิงเส้นได้โดยตรง:
+                $$T(\mathbf{x}) = T\left(\sum_{i=1}^n x_i \mathbf{e}_i\right) = \sum_{i=1}^n x_i T(\mathbf{e}_i)$$
+                สมการนี้แสดงให้เห็นว่า ค่าของ $T(\mathbf{x})$ ใด ๆ ขึ้นอยู่กับ $T(\mathbf{e}_i)$ เท่านั้น! ดังนั้น หากเรารู้ภาพของฐานมาตรฐานทั้ง $n$ เวกเตอร์ ก็เปรียบเสมือนเราได้ “พิมพ์เขียว (Blueprint)” ของการแปลงทั้งระบบไว้ในมือ ซึ่งถูกนำมาบันทึกเป็นคอลัมน์ของเมทริกซ์ $A$ นั่นเอง
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Section 5: แบบฝึกหัดสำหรับนักศึกษา -->
+  <section class="max-w-6xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 -mt-6 sm:-mt-8">
+    <div class="bg-white rounded-xl p-4 sm:p-5 shadow-sm border border-slate-200/80">
+      <div class="flex items-center gap-2.5 border-b border-slate-100 pb-3 mb-4">
+        <div class="w-8 h-8 rounded-lg bg-violet-50 text-violet-600 flex items-center justify-center font-bold text-sm">
+          <i class="fa-solid fa-pencil text-base"></i>
+        </div>
+        <div>
+          <h2 class="text-base sm:text-lg font-bold text-slate-900">5. แบบฝึกหัดสำหรับนักศึกษาและขั้นตอนวิธีทำ</h2>
+          <p class="text-[11px] text-slate-400">Student Practice Exercise & Rigorous Step-by-Step Solution</p>
+        </div>
+      </div>
+
+      <div class="bg-slate-50 rounded-xl p-4 border border-slate-200 space-y-3">
+        <div class="inline-block px-2.5 py-0.5 rounded text-[11px] font-bold bg-violet-100 text-violet-800">
+          โจทย์แบบฝึกหัด (Practice Problem)
+        </div>
+        <p class="text-xs sm:text-sm font-semibold text-slate-900 leading-relaxed">
+          กำหนดการแปลงเชิงเส้น $T: \mathbb{R}^2 \to \mathbb{R}^3$ โดยนิยาม:
+        </p>
+        <div class="my-2 py-2 px-3 bg-white rounded-lg border border-slate-300 text-center text-sm sm:text-base font-mono text-indigo-950 font-bold shadow-sm">
+          $$T(x, y) = (2x + y, \; x - 3y, \; 4x)$$
+        </div>
+        <p class="text-xs text-slate-700 leading-relaxed">
+          จงหาเมทริกซ์มาตรฐาน $A$ ที่ทำให้ $T(\mathbf{x}) = A\mathbf{x}$ สำหรับทุกเวกเตอร์ $\mathbf{x} \in \mathbb{R}^2$ และทำการตรวจสอบความสัมพันธ์ดังกล่าวกับเวกเตอร์ตัวอย่างอย่างน้อยสองตัว
+        </p>
+
+        <div class="pt-2">
+          <button type="button" onclick="toggleSolutionAccordion()" id="btnToggleSolution" class="px-3.5 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white font-medium text-xs sm:text-sm transition-all shadow-sm flex items-center gap-1.5 cursor-pointer">
+            <i class="fa-solid fa-book-open"></i>
+            <span>แสดงวิธีทำและเฉลยละเอียดทุกขั้นตอน</span>
+            <i id="solutionChevronIcon" class="fa-solid fa-chevron-down text-xs ml-1 transition-transform duration-200"></i>
+          </button>
+        </div>
+
+        <!-- Full Solution Area -->
+        <div id="fullSolutionBox" class="hidden mt-3 pt-3 border-t border-dashed border-indigo-200 space-y-3 text-xs sm:text-sm">
+          
+          <!-- Step 1 -->
+          <div class="bg-white p-3.5 rounded-lg border border-slate-200 space-y-1.5">
+            <span class="font-bold text-indigo-900 block">ขั้นที่ 1: หาภาพของเวกเตอร์ฐานมาตรฐานใน $\mathbb{R}^2$</span>
+            <p class="text-slate-600 text-xs leading-relaxed">
+              แทนเวกเตอร์ฐานมาตรฐาน $\mathbf{e}_1 = \begin{bmatrix} 1 \\ 0 \end{bmatrix}$ และ $\mathbf{e}_2 = \begin{bmatrix} 0 \\ 1 \end{bmatrix}$ ลงในฟังก์ชัน $T$:
+            </p>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs font-mono">
+              <div class="p-2 bg-slate-50 rounded border border-slate-200 text-slate-800">
+                $$T(\mathbf{e}_1) = T(1, 0) = \begin{bmatrix} 2(1) + 0 \\ 1 - 3(0) \\ 4(1) \end{bmatrix} = \begin{bmatrix} 2 \\ 1 \\ 4 \end{bmatrix}$$
+              </div>
+              <div class="p-2 bg-slate-50 rounded border border-slate-200 text-slate-800">
+                $$T(\mathbf{e}_2) = T(0, 1) = \begin{bmatrix} 2(0) + 1 \\ 0 - 3(1) \\ 4(0) \end{bmatrix} = \begin{bmatrix} 1 \\ -3 \\ 0 \end{bmatrix}$$
+              </div>
+            </div>
+          </div>
+
+          <!-- Step 2 -->
+          <div class="bg-white p-3.5 rounded-lg border border-slate-200 space-y-1.5">
+            <span class="font-bold text-indigo-900 block">ขั้นที่ 2: นำภาพของเวกเตอร์ฐานมาสร้างเมทริกซ์มาตรฐาน $A$</span>
+            <p class="text-slate-600 text-xs leading-relaxed">
+              จัดเรียง $T(\mathbf{e}_1)$ และ $T(\mathbf{e}_2)$ เป็นคอลัมน์ จะได้เมทริกซ์มิติ $3 \times 2$:
+            </p>
+            <div class="p-2.5 bg-slate-50 rounded font-mono text-center text-xs sm:text-sm text-indigo-950 font-bold border border-slate-200">
+              $$A = [T(\mathbf{e}_1) \mid T(\mathbf{e}_2)] = \begin{bmatrix} 2 & 1 \\ 1 & -3 \\ 4 & 0 \end{bmatrix}$$
+            </div>
+          </div>
+
+          <!-- Step 3 & 4 Verification with 2 Vectors -->
+          <div class="bg-white p-3.5 rounded-lg border border-slate-200 space-y-2">
+            <span class="font-bold text-indigo-900 block">ขั้นที่ 3: ตรวจสอบความสัมพันธ์กับเวกเตอร์ตัวอย่าง 2 ตัว</span>
+            
+            <!-- Sample Vector 1 -->
+            <div class="p-2.5 bg-slate-50 rounded-lg border border-slate-200 space-y-1">
+              <div class="font-semibold text-slate-800 text-xs">ตัวอย่างที่ 1: เลือก $\mathbf{u} = \begin{bmatrix} 1 \\ 2 \end{bmatrix}$</div>
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs font-mono text-slate-700">
+                <div>
+                  <strong>ผ่านนิยาม $T$:</strong><br>
+                  $T(1, 2) = (2(1)+2, 1-3(2), 4(1)) = (4, -5, 4)$
+                </div>
+                <div>
+                  <strong>ผ่านการคูณเมทริกซ์ $A\mathbf{u}$:</strong><br>
+                  $\begin{bmatrix} 2 & 1 \\ 1 & -3 \\ 4 & 0 \end{bmatrix}\begin{bmatrix} 1 \\ 2 \end{bmatrix} = \begin{bmatrix} 2(1)+1(2) \\ 1(1)+(-3)(2) \\ 4(1)+0(2) \end{bmatrix} = \begin{bmatrix} 4 \\ -5 \\ 4 \end{bmatrix}$
+                </div>
+              </div>
+              <div class="text-[11px] text-emerald-700 font-semibold">✓ ผลลัพธ์ $T(\mathbf{u}) = A\mathbf{u}$ ตรงกันอย่างสมบูรณ์</div>
+            </div>
+
+            <!-- Sample Vector 2 -->
+            <div class="p-2.5 bg-slate-50 rounded-lg border border-slate-200 space-y-1">
+              <div class="font-semibold text-slate-800 text-xs">ตัวอย่างที่ 2: เลือก $\mathbf{v} = \begin{bmatrix} -1 \\ 3 \end{bmatrix}$</div>
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs font-mono text-slate-700">
+                <div>
+                  <strong>ผ่านนิยาม $T$:</strong><br>
+                  $T(-1, 3) = (2(-1)+3, -1-3(3), 4(-1)) = (1, -10, -4)$
+                </div>
+                <div>
+                  <strong>ผ่านการคูณเมทริกซ์ $A\mathbf{v}$:</strong><br>
+                  $\begin{bmatrix} 2 & 1 \\ 1 & -3 \\ 4 & 0 \end{bmatrix}\begin{bmatrix} -1 \\ 3 \end{bmatrix} = \begin{bmatrix} 2(-1)+1(3) \\ 1(-1)+(-3)(3) \\ 4(-1)+0(3) \end{bmatrix} = \begin{bmatrix} 1 \\ -10 \\ -4 \end{bmatrix}$
+                </div>
+              </div>
+              <div class="text-[11px] text-emerald-700 font-semibold">✓ ผลลัพธ์ $T(\mathbf{v}) = A\mathbf{v}$ ตรงกันอย่างสมบูรณ์</div>
+            </div>
+
+            <div class="flex justify-end pt-1">
+              <span class="font-serif font-bold text-indigo-600 text-sm">ตรวจสอบสมบูรณ์ ∎</span>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- Simulation & Visualization Script -->
+  <script>
+    // Presets definition
+    const presets = {
+      identity: { a: 1, c: 0, b: 0, d: 1 },
+      rotate90: { a: 0, c: 1, b: -1, d: 0 },
+      scale:    { a: 1.5, c: 0, b: 0, d: 1.5 },
+      shear:    { a: 1, c: 0, b: 1, d: 1 },
+      reflectX: { a: 1, c: 0, b: 0, d: -1 }
+    };
+
+    function setPreset(name) {
+      if (!presets[name]) return;
+      const p = presets[name];
+      document.getElementById('mat_a').value = p.a;
+      document.getElementById('mat_c').value = p.c;
+      document.getElementById('mat_b').value = p.b;
+      document.getElementById('mat_d').value = p.d;
+      updateSimulation();
+    }
+
+    function formatNumber(num) {
+      return Number.isInteger(num) ? num.toString() : num.toFixed(2);
+    }
+
+    function updateSimulation() {
+      // 1. Read Values
+      const a = parseFloat(document.getElementById('mat_a').value) || 0;
+      const c = parseFloat(document.getElementById('mat_c').value) || 0;
+      const b = parseFloat(document.getElementById('mat_b').value) || 0;
+      const d = parseFloat(document.getElementById('mat_d').value) || 0;
+      const x1 = parseFloat(document.getElementById('vec_x1').value) || 0;
+      const x2 = parseFloat(document.getElementById('vec_x2').value) || 0;
+
+      // 2. Compute Method 1: Linear combination x1*T(e1) + x2*T(e2)
+      // T(e1) = (a, c), T(e2) = (b, d)
+      const res1_x = x1 * a + x2 * b;
+      const res1_y = x1 * c + x2 * d;
+
+      // 3. Compute Method 2: Matrix multiplication A * x
+      // [a b; c d] * [x1; x2] = [a*x1 + b*x2; c*x1 + d*x2]
+      const res2_x = a * x1 + b * x2;
+      const res2_y = c * x1 + d * x2;
+
+      // 4. Update Matrix Box
+      const matrixBox = document.getElementById('matrixDisplayBox');
+      matrixBox.innerHTML = `$$A = \\begin{bmatrix} ${formatNumber(a)} & ${formatNumber(b)} \\\\ ${formatNumber(c)} & ${formatNumber(d)} \\end{bmatrix}$$`;
+
+      // 5. Update Details
+      document.getElementById('method1Detail').innerText = 
+        `= ${formatNumber(x1)}(${formatNumber(a)}, ${formatNumber(c)}) + ${formatNumber(x2)}(${formatNumber(b)}, ${formatNumber(d)})`;
+      document.getElementById('method1Result').innerText = 
+        `= (${formatNumber(res1_x)}, ${formatNumber(res1_y)})`;
+
+      document.getElementById('method2Detail').innerText = 
+        `= [${formatNumber(a)}(${formatNumber(x1)}) + ${formatNumber(b)}(${formatNumber(x2)}), ${formatNumber(c)}(${formatNumber(x1)}) + ${formatNumber(d)}(${formatNumber(x2)})]`;
+      document.getElementById('method2Result').innerText = 
+        `= (${formatNumber(res2_x)}, ${formatNumber(res2_y)})`;
+
+      document.getElementById('canvasCoordsText').innerText = 
+        `x: (${formatNumber(x1)}, ${formatNumber(x2)}) ➔ T(x): (${formatNumber(res1_x)}, ${formatNumber(res1_y)})`;
+
+      // Typeset newly injected TeX in matrix box
+      if (window.MathJax && MathJax.typesetPromise) {
+        MathJax.typesetPromise([matrixBox]).catch(err => console.log(err));
+      }
+
+      // 6. Draw on Canvas
+      drawCanvas(x1, x2, res1_x, res1_y);
+    }
+
+    function drawCanvas(x1, x2, tx, ty) {
+      const canvas = document.getElementById('vectorCanvas');
+      if (!canvas) return;
+
+      const rect = canvas.getBoundingClientRect();
+      const dpr = window.devicePixelRatio || 1;
+      canvas.width = rect.width * dpr;
+      canvas.height = rect.height * dpr;
+
+      const ctx = canvas.getContext('2d');
+      ctx.scale(dpr, dpr);
+
+      const w = rect.width;
+      const h = rect.height;
+      const originX = w / 2;
+      const originY = h / 2;
+
+      // Determine scale dynamically so vectors stay in view
+      const maxCoord = Math.max(Math.abs(x1), Math.abs(x2), Math.abs(tx), Math.abs(ty), 4);
+      const scale = (Math.min(w, h) / 2) * 0.75 / maxCoord;
+
+      // Clear background
+      ctx.fillStyle = '#020617';
+      ctx.fillRect(0, 0, w, h);
+
+      // Draw Grid Lines
+      ctx.strokeStyle = '#1e293b';
+      ctx.lineWidth = 1;
+
+      const step = Math.max(1, Math.round(maxCoord / 4));
+      for (let i = -10; i <= 10; i++) {
+        const gx = originX + i * step * scale;
+        const gy = originY - i * step * scale;
+
+        ctx.beginPath();
+        ctx.moveTo(gx, 0);
+        ctx.lineTo(gx, h);
+        ctx.stroke();
+
+        ctx.beginPath();
+        ctx.moveTo(0, gy);
+        ctx.lineTo(w, gy);
+        ctx.stroke();
+      }
+
+      // Draw Main Axes
+      ctx.strokeStyle = '#475569';
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      ctx.moveTo(0, originY);
+      ctx.lineTo(w, originY);
+      ctx.moveTo(originX, 0);
+      ctx.lineTo(originX, h);
+      ctx.stroke();
+
+      // Helper function to draw an arrow
+      function drawArrow(toX, toY, color, label) {
+        const destX = originX + toX * scale;
+        const destY = originY - toY * scale;
+
+        ctx.strokeStyle = color;
+        ctx.fillStyle = color;
+        ctx.lineWidth = 2.5;
+
+        // Line
+        ctx.beginPath();
+        ctx.moveTo(originX, originY);
+        ctx.lineTo(destX, destY);
+        ctx.stroke();
+
+        // Arrow head
+        const angle = Math.atan2(destY - originY, destX - originX);
+        const headLen = 8;
+        ctx.beginPath();
+        ctx.moveTo(destX, destY);
+        ctx.lineTo(destX - headLen * Math.cos(angle - Math.PI / 6), destY - headLen * Math.sin(angle - Math.PI / 6));
+        ctx.lineTo(destX - headLen * Math.cos(angle + Math.PI / 6), destY - headLen * Math.sin(angle + Math.PI / 6));
+        ctx.fill();
+
+        // Label
+        ctx.font = '10px Inter, sans-serif';
+        ctx.fillText(label, destX + 6, destY - 6);
+      }
+
+      // Draw Vector x (Cyan)
+      drawArrow(x1, x2, '#22d3ee', `x (${formatNumber(x1)}, ${formatNumber(x2)})`);
+
+      // Draw Vector T(x) (Emerald)
+      drawArrow(tx, ty, '#34d399', `T(x) (${formatNumber(tx)}, ${formatNumber(ty)})`);
+    }
+
+    // Toggle discovery section
+    function toggleDiscoverySection() {
+      const box = document.getElementById('discoveryAnswerBox');
+      const icon = document.getElementById('discoveryIcon');
+      const isHidden = box.classList.contains('hidden');
+
+      if (isHidden) {
+        box.classList.remove('hidden');
+        icon.classList.add('rotate-180');
+        if (window.MathJax && MathJax.typesetPromise) {
+          MathJax.typesetPromise([box]).catch(e => console.log(e));
+        }
+      } else {
+        box.classList.add('hidden');
+        icon.classList.remove('rotate-180');
+      }
+    }
+
+    // Toggle solution accordion
+    function toggleSolutionAccordion() {
+      const box = document.getElementById('fullSolutionBox');
+      const icon = document.getElementById('solutionChevronIcon');
+      const isHidden = box.classList.contains('hidden');
+
+      if (isHidden) {
+        box.classList.remove('hidden');
+        icon.classList.add('rotate-180');
+        if (window.MathJax && MathJax.typesetPromise) {
+          MathJax.typesetPromise([box]).catch(e => console.log(e));
+        }
+      } else {
+        box.classList.add('hidden');
+        icon.classList.remove('rotate-180');
+      }
+    }
+
+    // Handle responsive canvas resize
+    window.addEventListener('resize', () => {
+      updateSimulation();
+    });
+
+    // Initialize on window load
+    window.onload = function() {
+      updateSimulation();
+    };
+  </script>
+</body>
+</html>

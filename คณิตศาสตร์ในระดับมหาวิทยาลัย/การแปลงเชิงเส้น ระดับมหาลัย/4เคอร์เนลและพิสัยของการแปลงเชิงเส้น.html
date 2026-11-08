@@ -1,0 +1,817 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>เรื่องที่ 4: เคอร์เนลและพิสัยของการแปลงเชิงเส้น (Kernel & Range)</title>
+
+  <!-- Google Fonts: Sarabun, Prompt & Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Prompt:wght@400;500;600;700&family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Sarabun', 'Prompt', 'Inter', 'sans-serif'],
+            mono: ['ui-monospace', 'SFMono-Regular', 'Menlo', 'monospace']
+          },
+          colors: {
+            brand: {
+              50: '#eef2ff',
+              100: '#e0e7ff',
+              200: '#c7d2fe',
+              300: '#a5b4fc',
+              400: '#818cf8',
+              500: '#6366f1',
+              600: '#4f46e5',
+              700: '#4338ca',
+              800: '#3730a3',
+              900: '#312e81',
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- MathJax 3 configuration -->
+  <script>
+    window.MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']],
+        displayMath: [['$$', '$$'], ['\\[', '\\]']],
+        processEscapes: true
+      },
+      svg: {
+        fontCache: 'global'
+      },
+      startup: {
+        pageReady: () => {
+          return MathJax.startup.defaultPageReady();
+        }
+      }
+    };
+  </script>
+  <script type="text/javascript" id="MathJax-script" async
+    src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js">
+  </script>
+
+  <style>
+    mjx-container {
+      display: inline-grid;
+      overflow-x: auto;
+      overflow-y: hidden;
+      max-width: 100%;
+      vertical-align: middle;
+    }
+    input[type=number]::-webkit-inner-spin-button,
+    input[type=number]::-webkit-outer-spin-button {
+      opacity: 1;
+    }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-800 font-sans antialiased selection:bg-brand-500 selection:text-white min-h-screen">
+
+  <!-- Header Section -->
+  <header class="bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 text-white border-b border-indigo-500/20 shadow-sm">
+    <div class="max-w-6xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
+      <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+        <div>
+
+          <h1 class="text-xl sm:text-2xl lg:text-3xl font-bold tracking-tight text-white">
+            เรื่องที่ 4: เคอร์เนลและพิสัยของการแปลงเชิงเส้น
+          </h1>
+          <p class="text-slate-300 text-xs sm:text-sm font-light mt-1">
+            Kernel (Null Space), Range (Column Space) & The Rank-Nullity Theorem
+          </p>
+        </div>
+        <div class="hidden md:flex flex-col items-end text-xs text-slate-400 border-l border-slate-700 pl-4 space-y-1">
+          <span class="text-indigo-300 font-mono text-[11px]">$\dim(\ker(T)) + \dim(\operatorname{Range}(T)) = \dim(V)$</span>
+          <span>ความสัมพันธ์ระหว่าง Null Space และ Column Space</span>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Section 1: วัตถุประสงค์การเรียนรู้ -->
+  <section class="max-w-6xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
+    <div class="bg-white rounded-xl p-4 sm:p-5 shadow-sm border border-slate-200/80">
+      <div class="flex items-center gap-2.5 border-b border-slate-100 pb-3 mb-3">
+        <div class="w-8 h-8 rounded-lg bg-indigo-50 text-indigo-600 flex items-center justify-center font-bold text-sm">
+          <i class="fa-solid fa-bullseye text-base"></i>
+        </div>
+        <div>
+          <h2 class="text-base sm:text-lg font-bold text-slate-900">1. วัตถุประสงค์การเรียนรู้</h2>
+          <p class="text-[11px] text-slate-400">Learning Objective</p>
+        </div>
+      </div>
+      <div class="bg-indigo-50/60 border border-indigo-100 rounded-lg p-3 sm:p-4 flex items-start gap-3">
+        <span class="inline-flex items-center justify-center p-1 bg-indigo-600 text-white rounded text-xs mt-0.5">
+          <i class="fa-solid fa-check text-xs"></i>
+        </span>
+        <p class="text-sm sm:text-base text-slate-700 leading-relaxed">
+          เมื่อศึกษาบทเรียนนี้แล้ว <strong class="text-indigo-950 font-semibold">นักศึกษาสามารถหาเคอร์เนลและพิสัยของการแปลงเชิงเส้น</strong> พร้อมทั้งอธิบายความหมายทางเรขาคณิตและพีชคณิต ความสัมพันธ์กับปริภูมิว่าง (Null Space) และปริภูมิคอลัมน์ (Column Space) ของเมทริกซ์แทนการแปลง และประยุกต์ใช้ทฤษฎีบทแรงก์-นุลลิตี (Rank-Nullity Theorem) ได้อย่างถูกต้อง
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Section 2: เนื้อหาหลัก -->
+  <section class="max-w-6xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 -mt-6 sm:-mt-8">
+    <div class="bg-white rounded-xl p-4 sm:p-5 shadow-sm border border-slate-200/80">
+      <div class="flex items-center gap-2.5 border-b border-slate-100 pb-3 mb-4">
+        <div class="w-8 h-8 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center font-bold text-sm">
+          <i class="fa-solid fa-book-bookmark text-base"></i>
+        </div>
+        <div>
+          <h2 class="text-base sm:text-lg font-bold text-slate-900">2. เนื้อหาหลักและนิยามเชิงรูปนัย</h2>
+          <p class="text-[11px] text-slate-400">Formal Definitions, Theorems & Subspaces</p>
+        </div>
+      </div>
+
+      <p class="text-xs sm:text-sm text-slate-700 leading-relaxed mb-4">
+        ให้ $V$ และ $W$ เป็นปริภูมิเวกเตอร์ และ $T: V \to W$ เป็นการแปลงเชิงเส้น การทำความเข้าใจโครงสร้างของการแปลงจะพิจารณาจากปริภูมิย่อยพื้นฐาน 2 ปริภูมิ คือ <strong>เคอร์เนล (สิ่งที่ถูกยุบรวมเป็นศูนย์)</strong> และ <strong>พิสัย (ผลลัพธ์ที่เป็นไปได้ทั้งหมด)</strong>
+      </p>
+
+      <!-- 2 Major Subspaces Definitions Grid -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-3.5 mb-4">
+        <!-- Kernel -->
+        <div class="border border-slate-200 bg-slate-50/70 rounded-xl p-3.5">
+          <div class="flex items-center justify-between mb-2">
+            <span class="text-xs font-bold text-indigo-700 flex items-center gap-1.5">
+              <span class="w-5 h-5 rounded-full bg-indigo-600 text-white flex items-center justify-center text-[10px]">1</span>
+              เคอร์เนลของการแปลง (Kernel)
+            </span>
+            <span class="text-[10px] font-mono bg-indigo-100 text-indigo-800 px-1.5 py-0.5 rounded">$\ker(T) \subseteq V$</span>
+          </div>
+          <div class="my-2 py-2 px-3 bg-white rounded-lg border border-slate-200 text-center font-semibold text-slate-900 text-xs sm:text-sm shadow-sm font-mono">
+            $$\ker(T) = \{\mathbf{v} \in V : T(\mathbf{v}) = \mathbf{0}_W\}$$
+          </div>
+          <p class="text-xs text-slate-600 leading-relaxed">
+            คือเซตของเวกเตอร์ทั้งหมดในโดเมน $V$ ที่ถูกส่งไปยังเวกเตอร์ศูนย์ของโคโดเมน $W$ 
+            เมื่อแทนด้วยเมทริกซ์ $T(\mathbf{x}) = A\mathbf{x}$ เคอร์เนลคือ <strong>ปริภูมิว่าง (Null Space, $\operatorname{Nul}(A)$)</strong> ซึ่งหาได้จากการแก้สมการเอกพันธุ์:
+          </p>
+          <div class="text-center font-mono text-xs font-bold text-indigo-900 mt-1.5 bg-indigo-50/80 p-1 rounded">
+            $A\mathbf{x} = \mathbf{0}$
+          </div>
+        </div>
+
+        <!-- Range -->
+        <div class="border border-slate-200 bg-slate-50/70 rounded-xl p-3.5">
+          <div class="flex items-center justify-between mb-2">
+            <span class="text-xs font-bold text-indigo-700 flex items-center gap-1.5">
+              <span class="w-5 h-5 rounded-full bg-indigo-600 text-white flex items-center justify-center text-[10px]">2</span>
+              พิสัยของการแปลง (Range / Image)
+            </span>
+            <span class="text-[10px] font-mono bg-indigo-100 text-indigo-800 px-1.5 py-0.5 rounded">$\operatorname{Range}(T) \subseteq W$</span>
+          </div>
+          <div class="my-2 py-2 px-3 bg-white rounded-lg border border-slate-200 text-center font-semibold text-slate-900 text-xs sm:text-sm shadow-sm font-mono">
+            $$\operatorname{Range}(T) = \{T(\mathbf{v}) \in W : \mathbf{v} \in V\}$$
+          </div>
+          <p class="text-xs text-slate-600 leading-relaxed">
+            คือเซตของเวกเตอร์ผลลัพธ์ทั้งหมดในโคโดเมน $W$ ที่เกิดจากการส่งค่าจาก $V$
+            เมื่อแทนด้วยเมทริกซ์ $A$ พิสัยคือ <strong>ปริภูมิคอลัมน์ (Column Space, $\operatorname{Col}(A)$)</strong> ซึ่งเกิดจากการแผ่ทั่วของคอลัมน์ของ $A$:
+          </p>
+          <div class="text-center font-mono text-xs font-bold text-indigo-900 mt-1.5 bg-indigo-50/80 p-1 rounded">
+            $\operatorname{Range}(T) = \operatorname{Col}(A) = \operatorname{Span}\{\text{คอลัมน์หลักของ } A\}$
+          </div>
+        </div>
+      </div>
+
+      <!-- Theorem & Rank-Nullity Connection -->
+      <div class="grid grid-cols-1 md:grid-cols-12 gap-3.5">
+        <!-- Subspace Theorem -->
+        <div class="md:col-span-6 bg-slate-50 border border-slate-200 rounded-xl p-3.5 space-y-2">
+          <h3 class="text-xs font-bold text-slate-800 flex items-center gap-1.5">
+            <i class="fa-solid fa-layer-group text-indigo-600"></i>
+            ทฤษฎีบท: ความเป็นปริภูมิย่อย (Subspace Theorem)
+          </h3>
+          <ul class="text-xs text-slate-600 space-y-1.5 leading-relaxed list-disc list-inside">
+            <li>$\ker(T)$ เป็น <strong>ปริภูมิย่อย (Subspace)</strong> ของโดเมน $V$ เสมอ</li>
+            <li>$\operatorname{Range}(T)$ เป็น <strong>ปริภูมิย่อย (Subspace)</strong> ของโคโดเมน $W$ เสมอ</li>
+            <li>มิติของเคอร์เนล เรียกว่า <strong>นุลลิตี (Nullity)</strong>: $\operatorname{nullity}(T) = \dim(\ker(T))$</li>
+            <li>มิติของพิสัย เรียกว่า <strong>แรงก์ (Rank)</strong>: $\operatorname{rank}(T) = \dim(\operatorname{Range}(T))$</li>
+          </ul>
+        </div>
+
+        <!-- Rank-Nullity Theorem Box -->
+        <div class="md:col-span-6 bg-gradient-to-br from-indigo-950 to-slate-900 text-white rounded-xl p-3.5 border border-indigo-800 flex flex-col justify-between">
+          <div>
+            <div class="flex items-center justify-between pb-1.5 border-b border-indigo-800 mb-2">
+              <span class="text-[11px] font-bold text-indigo-300 uppercase tracking-wider">
+                <i class="fa-solid fa-scale-balanced mr-1"></i>
+                ทฤษฎีบทแรงก์-นุลลิตี (The Rank-Nullity Theorem)
+              </span>
+              <span class="text-[10px] bg-indigo-500/30 text-indigo-200 px-2 py-0.5 rounded-full font-mono">Fundamental</span>
+            </div>
+            <p class="text-xs text-slate-300 leading-relaxed mb-2">
+              ถ้า $V$ มีมิติจำกัด $n = \dim(V)$ สำหรับการแปลงเชิงเส้น $T: V \to W$ ใด ๆ จะได้ว่า:
+            </p>
+            <div class="py-2 px-3 bg-slate-900/90 rounded-lg border border-slate-700 text-center font-mono text-sm sm:text-base text-emerald-300 font-bold shadow-inner">
+              $$\dim(\ker(T)) + \dim(\operatorname{Range}(T)) = \dim(V)$$
+            </div>
+          </div>
+          <p class="text-[11px] text-slate-400 mt-2 font-mono text-center">
+            $\text{Nullity}(A) + \text{Rank}(A) = n \quad (\text{จำนวนคอลัมน์ของ } A)$
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Section 3: แบบจำลองโต้ตอบ -->
+  <section class="max-w-6xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 -mt-6 sm:-mt-8">
+    <div class="bg-white rounded-xl p-4 sm:p-5 shadow-sm border border-slate-200/80">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-100 pb-3 mb-4">
+        <div class="flex items-center gap-2.5">
+          <div class="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center font-bold text-sm">
+            <i class="fa-solid fa-gears text-base"></i>
+          </div>
+          <div>
+            <h2 class="text-base sm:text-lg font-bold text-slate-900">3. แบบจำลองโต้ตอบ: เครื่องมือคำนวณฐานหลักของเคอร์เนลและพิสัย</h2>
+            <p class="text-[11px] text-slate-400">Interactive Kernel & Range Solver with RREF Computation</p>
+          </div>
+        </div>
+        <span class="inline-flex items-center gap-1 text-[11px] font-semibold px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800 border border-emerald-300 self-start sm:self-auto">
+          <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+          Live RREF Engine
+        </span>
+      </div>
+
+      <!-- Presets & Matrix Dimension Bar -->
+      <div class="bg-slate-50 p-3 rounded-xl border border-slate-200 mb-4 flex flex-wrap items-center justify-between gap-2.5">
+        <div class="flex flex-wrap items-center gap-2">
+          <span class="text-xs font-bold text-slate-700 flex items-center gap-1">
+            <i class="fa-solid fa-table-cells text-indigo-600"></i> มิติของเมทริกซ์ $A$:
+          </span>
+          <select id="matrixDimensionSelect" onchange="changeMatrixDimensions()" class="text-xs font-bold border border-slate-300 rounded px-2.5 py-1.5 bg-white text-slate-800 focus:ring-1 focus:ring-indigo-500 cursor-pointer">
+            <option value="2x3" selected>2 × 3 (m=2, n=3)</option>
+            <option value="2x2">2 × 2 (m=2, n=2)</option>
+            <option value="3x2">3 × 2 (m=3, n=2)</option>
+            <option value="3x3">3 × 3 (m=3, n=3)</option>
+          </select>
+        </div>
+
+        <div class="flex flex-wrap items-center gap-1.5">
+          <span class="text-xs font-semibold text-slate-500">ตัวอย่าง:</span>
+          <button type="button" onclick="loadExercisePreset()" class="px-2.5 py-1 text-xs rounded bg-white border border-indigo-200 text-indigo-700 hover:bg-indigo-50 font-medium transition cursor-pointer">
+            เมทริกซ์จากแบบฝึกหัด (2×3)
+          </button>
+          <button type="button" onclick="loadIdentityPreset()" class="px-2.5 py-1 text-xs rounded bg-white border border-slate-300 hover:bg-slate-100 text-slate-700 transition cursor-pointer">
+            Invertible / Full Rank
+          </button>
+          <button type="button" onclick="loadDependentPreset()" class="px-2.5 py-1 text-xs rounded bg-white border border-slate-300 hover:bg-slate-100 text-slate-700 transition cursor-pointer">
+            Rank 1 (แถวพึ่งพิง)
+          </button>
+        </div>
+      </div>
+
+      <!-- Grid Layout: Matrix Input & Live Solutions -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-4">
+        
+        <!-- Left: Matrix Editor Form (5 cols) -->
+        <div class="lg:col-span-5 space-y-3 bg-slate-50 p-3.5 sm:p-4 rounded-xl border border-slate-200">
+          <div class="flex items-center justify-between">
+            <h3 class="text-xs font-bold uppercase tracking-wider text-slate-700 flex items-center gap-1.5">
+              <span>ก. เมทริกซ์ต้นทาง $A \in \mathbb{R}^{m \times n}$</span>
+            </h3>
+            <span id="matrixSizeBadge" class="text-[10px] font-mono px-2 py-0.5 rounded bg-indigo-100 text-indigo-800 font-bold">2 × 3</span>
+          </div>
+          
+          <p class="text-[11px] text-slate-500">
+            แก้ไขตัวเลขในช่องตารางด้านล่างเพื่อสังเกตผลการคำนวณฐานหลักแบบเรียลไทม์:
+          </p>
+
+          <!-- Dynamic Matrix Grid Container -->
+          <div class="bg-white p-3 rounded-lg border border-slate-200 shadow-sm flex items-center justify-center min-h-[140px]">
+            <div id="matrixInputsContainer" class="grid gap-2">
+              <!-- Dynamically populated via JavaScript -->
+            </div>
+          </div>
+
+          <!-- RREF Quick View -->
+          <div class="bg-slate-900 text-white p-3 rounded-lg border border-slate-800">
+            <div class="flex items-center justify-between text-[11px] text-slate-300 font-mono mb-1">
+              <span>รูปขั้นบันไดลดรูป (RREF of $A$):</span>
+              <span id="pivotCountBadge" class="text-emerald-400 font-bold">1 Pivot</span>
+            </div>
+            <div id="rrefDisplayBox" class="text-center font-mono text-xs sm:text-sm text-emerald-300 py-1 overflow-x-auto">
+              <!-- MathJax RREF -->
+            </div>
+          </div>
+
+          <div class="flex justify-end">
+            <button type="button" onclick="computeKernelAndRange()" class="w-full py-2 px-3 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white font-medium text-xs sm:text-sm transition flex items-center justify-center gap-1.5 shadow-sm cursor-pointer">
+              <i class="fa-solid fa-calculator"></i>
+              <span>คำนวณและปรับปรุงการวิเคราะห์</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Right: Results & Bases Breakdowns (7 cols) -->
+        <div class="lg:col-span-7 space-y-3">
+          
+          <!-- Rank-Nullity Theorem Check Banner -->
+          <div id="rankNullityBanner" class="p-3 rounded-xl border flex items-center justify-between bg-indigo-50 border-indigo-200 text-indigo-950">
+            <div class="flex items-center gap-2.5">
+              <div class="w-8 h-8 rounded-full bg-indigo-600 text-white flex items-center justify-center font-bold text-xs flex-shrink-0">
+                <i class="fa-solid fa-check"></i>
+              </div>
+              <div>
+                <div class="text-[10px] font-bold uppercase tracking-wider text-indigo-600">ความสอดคล้องของมิติ (Rank-Nullity Verification)</div>
+                <div id="rankNullityFormulaText" class="text-xs sm:text-sm font-bold font-mono">
+                  $\dim(\ker(T)) + \dim(\operatorname{Range}(T)) = 2 + 1 = 3 = n$
+                </div>
+              </div>
+            </div>
+            <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 border border-emerald-300">
+              Verified
+            </span>
+          </div>
+
+          <!-- Kernel (Null Space) Result Box -->
+          <div class="bg-slate-50 border border-slate-200 rounded-xl p-3">
+            <div class="flex items-center justify-between pb-2 border-b border-slate-200 mb-2">
+              <span class="text-xs sm:text-sm font-bold text-slate-800 flex items-center gap-1.5">
+                <span class="w-2 h-2 rounded-full bg-indigo-600"></span>
+                ฐานหลักของเคอร์เนล (Basis for $\ker(T) = \operatorname{Nul}(A)$)
+              </span>
+              <span id="nullityBadge" class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-indigo-100 text-indigo-800">
+                Nullity = 2
+              </span>
+            </div>
+
+            <div class="space-y-1.5">
+              <p id="kernelStepsExplanation" class="text-xs text-slate-600 leading-relaxed">
+                จากสมการ $A\mathbf{x} = \mathbf{0}$ แปลงเป็นระบบสมการจาก RREF โดยมีตัวแปรอิสระ (Free variables)
+              </p>
+              <div id="kernelBasisDisplay" class="bg-white p-2.5 rounded-lg border border-slate-200 font-mono text-center text-xs sm:text-sm text-indigo-950 font-bold overflow-x-auto">
+                <!-- Basis Vectors Rendered Here -->
+              </div>
+            </div>
+          </div>
+
+          <!-- Range (Column Space) Result Box -->
+          <div class="bg-slate-50 border border-slate-200 rounded-xl p-3">
+            <div class="flex items-center justify-between pb-2 border-b border-slate-200 mb-2">
+              <span class="text-xs sm:text-sm font-bold text-slate-800 flex items-center gap-1.5">
+                <span class="w-2 h-2 rounded-full bg-emerald-600"></span>
+                ฐานหลักของพิสัย (Basis for $\operatorname{Range}(T) = \operatorname{Col}(A)$)
+              </span>
+              <span id="rankBadge" class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800">
+                Rank = 1
+              </span>
+            </div>
+
+            <div class="space-y-1.5">
+              <p id="rangeStepsExplanation" class="text-xs text-slate-600 leading-relaxed">
+                นำคอลัมน์ของเมทริกซ์ $A$ ดั้งเดิมที่ตรงกับตำแหน่ง Pivot Columns ของ RREF:
+              </p>
+              <div id="rangeBasisDisplay" class="bg-white p-2.5 rounded-lg border border-slate-200 font-mono text-center text-xs sm:text-sm text-emerald-950 font-bold overflow-x-auto">
+                <!-- Basis Vectors Rendered Here -->
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Section 4: คำถามนำเพื่อค้นพบ -->
+  <section class="max-w-6xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 -mt-6 sm:-mt-8">
+    <div class="bg-gradient-to-r from-amber-500/10 via-amber-500/5 to-transparent rounded-xl p-4 sm:p-5 border border-amber-300/80 shadow-sm">
+      <div class="flex items-start gap-3">
+        <div class="w-9 h-9 rounded-lg bg-amber-500 text-white flex-shrink-0 flex items-center justify-center font-bold text-lg shadow-sm">
+          <i class="fa-solid fa-lightbulb"></i>
+        </div>
+        <div class="flex-1">
+          <span class="text-[11px] font-bold uppercase tracking-wider text-amber-800">คำถามนำเพื่อค้นพบ (Guided Discovery Question)</span>
+          <h2 class="text-base sm:text-lg font-bold text-slate-900 mt-0.5">
+            "เคอร์เนลที่มีเพียงเวกเตอร์ศูนย์ บอกอะไรเกี่ยวกับการแปลงเชิงเส้นนั้น?"
+          </h2>
+          <p class="text-xs sm:text-sm text-slate-600 mt-1">
+            หาก $\ker(T) = \{\mathbf{0}\}$ (นั่นคือ นุลลิตีเป็นศูนย์) โครงสร้างทางเรขาคณิตและการจับคู่ของฟังก์ชัน $T$ จะมีสมบัติพิเศษอย่างไร?
+          </p>
+
+          <div class="mt-3">
+            <button type="button" onclick="toggleDiscoverySection()" id="btnDiscoveryToggle" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-amber-600 hover:bg-amber-700 text-white font-medium text-xs sm:text-sm transition-all shadow-sm cursor-pointer">
+              <span>💡 คลิกเพื่อดูบทวิเคราะห์และความหมายเชิงลึก</span>
+              <i id="discoveryIcon" class="fa-solid fa-chevron-down text-xs ml-1 transition-transform duration-200"></i>
+            </button>
+          </div>
+
+          <div id="discoveryAnswerBox" class="hidden mt-3 pt-3 border-t border-amber-200/80 space-y-2">
+            <div class="bg-white rounded-lg p-3.5 border border-amber-200 text-slate-700 text-xs sm:text-sm leading-relaxed space-y-2.5 shadow-sm">
+              <p>
+                <strong>1. บ่งบอกว่า $T$ เป็นฟังก์ชันหนึ่งต่อหนึ่ง (One-to-One / Injective):</strong><br>
+                <strong>ทฤษฎีบท:</strong> $T: V \to W$ เป็นฟังก์ชันหนึ่งต่อหนึ่ง ก็ต่อเมื่อ $\ker(T) = \{\mathbf{0}\}$<br>
+                <em>แนวคิดการพิสูจน์:</em> ถ้า $T(\mathbf{u}) = T(\mathbf{v})$ แล้ว $T(\mathbf{u}) - T(\mathbf{v}) = \mathbf{0}$ โดยสมบัติเชิงเส้นจะได้ $T(\mathbf{u} - \mathbf{v}) = \mathbf{0}$ ซึ่งหมายความว่า $\mathbf{u} - \mathbf{v} \in \ker(T)$ แต่เนื่องจากเคอร์เนลมีเพียงเวกเตอร์ศูนย์ จึงบีบให้ $\mathbf{u} - \mathbf{v} = \mathbf{0}$ นั่นคือ $\mathbf{u} = \mathbf{v}$ อย่างแน่นอน!
+              </p>
+              <p>
+                <strong>2. คอลัมน์ของเมทริกซ์ $A$ เป็นอิสระเชิงเส้นต่อกัน (Linearly Independent):</strong><br>
+                สมการ $A\mathbf{x} = \mathbf{0}$ มีเพียงคำตอบชัด (Trivial Solution $\mathbf{x} = \mathbf{0}$) เท่านั้น ไม่มีเวกเตอร์อื่นใดถูก "ยุบรวม (Collapse)" หายไปในจุดกำเนิด ทำให้การแปลงไม่สูญเสียมิติของข้อมูล
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Section 5: แบบฝึกหัดสำหรับนักศึกษา -->
+  <section class="max-w-6xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 -mt-6 sm:-mt-8">
+    <div class="bg-white rounded-xl p-4 sm:p-5 shadow-sm border border-slate-200/80">
+      <div class="flex items-center gap-2.5 border-b border-slate-100 pb-3 mb-4">
+        <div class="w-8 h-8 rounded-lg bg-violet-50 text-violet-600 flex items-center justify-center font-bold text-sm">
+          <i class="fa-solid fa-pencil text-base"></i>
+        </div>
+        <div>
+          <h2 class="text-base sm:text-lg font-bold text-slate-900">5. แบบฝึกหัดสำหรับนักศึกษาและขั้นตอนวิธีทำ</h2>
+          <p class="text-[11px] text-slate-400">Student Practice Exercise & Step-by-Step Rigorous Solution</p>
+        </div>
+      </div>
+
+      <div class="bg-slate-50 rounded-xl p-4 border border-slate-200 space-y-3">
+        <div class="inline-block px-2.5 py-0.5 rounded text-[11px] font-bold bg-violet-100 text-violet-800">
+          โจทย์แบบฝึกหัด (Practice Problem)
+        </div>
+        <p class="text-xs sm:text-sm font-semibold text-slate-900 leading-relaxed">
+          กำหนดเมทริกซ์แทนการแปลงเชิงเส้น $T: \mathbb{R}^3 \to \mathbb{R}^2$ ซึ่งนิยามโดย $T(\mathbf{x}) = A\mathbf{x}$ โดยที่:
+        </p>
+        <div class="my-2 py-2 px-3 bg-white rounded-lg border border-slate-300 text-center text-sm sm:text-base font-mono text-indigo-950 font-bold shadow-sm">
+          $$A = \begin{bmatrix} 1 & 2 & 3 \\ 2 & 4 & 6 \end{bmatrix}$$
+        </div>
+        <p class="text-xs text-slate-700 leading-relaxed">
+          จงหาฐานหลัก (Basis) และมิติ (Dimension) ของ $\ker(T)$ และ $\operatorname{Range}(T)$ พร้อมทั้งตรวจสอบความสอดคล้องกับทฤษฎีบทแรงก์-นุลลิตี
+        </p>
+
+        <div class="pt-2">
+          <button type="button" onclick="toggleSolutionAccordion()" id="btnToggleSolution" class="px-3.5 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white font-medium text-xs sm:text-sm transition-all shadow-sm flex items-center gap-1.5 cursor-pointer">
+            <i class="fa-solid fa-book-open"></i>
+            <span>แสดงวิธีทำและเฉลยละเอียดอย่างเป็นทางการ</span>
+            <i id="solutionChevronIcon" class="fa-solid fa-chevron-down text-xs ml-1 transition-transform duration-200"></i>
+          </button>
+        </div>
+
+        <!-- Full Solution Area -->
+        <div id="fullSolutionBox" class="hidden mt-3 pt-3 border-t border-dashed border-indigo-200 space-y-3 text-xs sm:text-sm">
+          
+          <!-- Step 1: RREF -->
+          <div class="bg-white p-3.5 rounded-lg border border-slate-200 space-y-1.5">
+            <span class="font-bold text-indigo-900 block">ขั้นที่ 1: ดำเนินการตามแถวขั้นมูลฐาน (Row Reduction to RREF)</span>
+            <p class="text-slate-600 text-xs leading-relaxed">
+              นำเมทริกซ์แต่งเติมสำหรับสมการเอกพันธุ์ $[A \mid \mathbf{0}]$ มาทำการกำจัดแบบเกาส์-จอร์แดน ($R_2 \leftarrow R_2 - 2R_1$):
+            </p>
+            <div class="p-2.5 bg-slate-50 rounded font-mono text-center text-xs sm:text-sm text-slate-800 border border-slate-200">
+              $$\begin{bmatrix} 1 & 2 & 3 & \big| & 0 \\ 2 & 4 & 6 & \big| & 0 \end{bmatrix} \xrightarrow{R_2 - 2R_1} \begin{bmatrix} 1 & 2 & 3 & \big| & 0 \\ 0 & 0 & 0 & \big| & 0 \end{bmatrix}$$
+            </div>
+            <p class="text-[11px] text-slate-500">
+              พบว่ามี <strong>หลักไพวอต (Pivot Column) คือ คอลัมน์ที่ 1</strong> และมีตัวแปรอิสระ (Free variables) คือ $x_2$ และ $x_3$
+            </p>
+          </div>
+
+          <!-- Step 2: Kernel Basis -->
+          <div class="bg-white p-3.5 rounded-lg border border-slate-200 space-y-1.5">
+            <span class="font-bold text-indigo-900 block">ขั้นที่ 2: หาฐานหลักของ $\ker(T)$ (Null Space)</span>
+            <p class="text-slate-600 text-xs leading-relaxed">
+              จากแถวที่ 1 จะได้สมการ: $x_1 + 2x_2 + 3x_3 = 0 \implies x_1 = -2x_2 - 3x_3$<br>
+              เขียนเวกเตอร์ผลลัพธ์ $\mathbf{x} \in \ker(T)$ ในรูปตัวแปรอิสระ $x_2, x_3$:
+            </p>
+            <div class="p-2.5 bg-slate-50 rounded font-mono text-xs sm:text-sm text-indigo-950 border border-slate-200">
+              $$\mathbf{x} = \begin{bmatrix} x_1 \\ x_2 \\ x_3 \end{bmatrix} = \begin{bmatrix} -2x_2 - 3x_3 \\ x_2 \\ x_3 \end{bmatrix} = x_2 \begin{bmatrix} -2 \\ 1 \\ 0 \end{bmatrix} + x_3 \begin{bmatrix} -3 \\ 0 \\ 1 \end{bmatrix}$$
+            </div>
+            <div class="p-2 bg-indigo-50/70 rounded text-indigo-900 text-xs font-semibold">
+              ดังนั้น ฐานหลักของ $\ker(T)$ คือ $\left\{ \begin{bmatrix} -2 \\ 1 \\ 0 \end{bmatrix}, \; \begin{bmatrix} -3 \\ 0 \\ 1 \end{bmatrix} \right\}$ และ $\operatorname{nullity}(T) = \dim(\ker(T)) = 2$
+            </div>
+          </div>
+
+          <!-- Step 3: Range Basis -->
+          <div class="bg-white p-3.5 rounded-lg border border-slate-200 space-y-1.5">
+            <span class="font-bold text-indigo-900 block">ขั้นที่ 3: หาฐานหลักของ $\operatorname{Range}(T)$ (Column Space)</span>
+            <p class="text-slate-600 text-xs leading-relaxed">
+              เนื่องจากคอลัมน์แรกเป็น Pivot Column เพียงคอลัมน์เดียว จึงเลือก <strong>คอลัมน์ที่ 1 ของเมทริกซ์ $A$ ดั้งเดิม</strong> มาเป็นฐานหลัก:
+            </p>
+            <div class="p-2 bg-emerald-50/70 rounded text-emerald-900 text-xs font-semibold">
+              ฐานหลักของ $\operatorname{Range}(T)$ คือ $\left\{ \begin{bmatrix} 1 \\ 2 \end{bmatrix} \right\}$ และ $\operatorname{rank}(T) = \dim(\operatorname{Range}(T)) = 1$
+            </div>
+          </div>
+
+          <!-- Step 4: Verification -->
+          <div class="bg-slate-900 text-white p-3 rounded-lg flex flex-col sm:flex-row items-center justify-between text-xs gap-2">
+            <div>
+              <strong>ตรวจสอบทฤษฎีบท Rank-Nullity:</strong><br>
+              $\operatorname{nullity}(T) + \operatorname{rank}(T) = 2 + 1 = 3 = \dim(\mathbb{R}^3)$ ซึ่งเท่ากับมิติของโดเมนพอดี
+            </div>
+            <span class="font-serif font-bold text-emerald-400 text-sm whitespace-nowrap">ตรวจสอบถูกต้องสมบูรณ์ ∎</span>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Interactive Matrix & RREF Engine Script -->
+  <script>
+    // State of matrix dimensions and values
+    let matrixRows = 2;
+    let matrixCols = 3;
+    let matrixData = [
+      [1, 2, 3],
+      [2, 4, 6]
+    ];
+
+    // Helper: format fractions or floats nicely
+    function formatVal(num) {
+      if (Math.abs(num) < 1e-9) return "0";
+      if (Math.abs(num - Math.round(num)) < 1e-6) {
+        return Math.round(num).toString();
+      }
+      return num.toFixed(2).replace(/\.?0+$/, "");
+    }
+
+    // Set matrix dimension from dropdown
+    function changeMatrixDimensions() {
+      const select = document.getElementById('matrixDimensionSelect');
+      const val = select.value;
+      const [r, c] = val.split('x').map(Number);
+      matrixRows = r;
+      matrixCols = c;
+
+      // Adjust matrixData array
+      const newData = [];
+      for (let i = 0; i < matrixRows; i++) {
+        const row = [];
+        for (let j = 0; j < matrixCols; j++) {
+          if (matrixData[i] && matrixData[i][j] !== undefined) {
+            row.push(matrixData[i][j]);
+          } else {
+            row.push(i === j ? 1 : 0);
+          }
+        }
+        newData.push(row);
+      }
+      matrixData = newData;
+
+      document.getElementById('matrixSizeBadge').innerText = `${matrixRows} × ${matrixCols}`;
+      buildMatrixInputs();
+      computeKernelAndRange();
+    }
+
+    // Build the dynamic input grid
+    function buildMatrixInputs() {
+      const container = document.getElementById('matrixInputsContainer');
+      container.innerHTML = "";
+      container.style.gridTemplateColumns = `repeat(${matrixCols}, minmax(0, 1fr))`;
+
+      for (let i = 0; i < matrixRows; i++) {
+        for (let j = 0; j < matrixCols; j++) {
+          const input = document.createElement('input');
+          input.type = "number";
+          input.step = "any";
+          input.value = matrixData[i][j];
+          input.className = "w-14 sm:w-16 text-center font-mono text-xs sm:text-sm font-bold border border-slate-300 rounded p-1.5 focus:ring-2 focus:ring-indigo-500 focus:outline-none bg-slate-50 hover:bg-white text-slate-800 transition";
+          input.dataset.row = i;
+          input.dataset.col = j;
+          input.oninput = (e) => {
+            const r = parseInt(e.target.dataset.row);
+            const c = parseInt(e.target.dataset.col);
+            matrixData[r][c] = parseFloat(e.target.value) || 0;
+            computeKernelAndRange();
+          };
+          container.appendChild(input);
+        }
+      }
+    }
+
+    // Presets
+    function loadExercisePreset() {
+      document.getElementById('matrixDimensionSelect').value = "2x3";
+      matrixRows = 2;
+      matrixCols = 3;
+      matrixData = [
+        [1, 2, 3],
+        [2, 4, 6]
+      ];
+      document.getElementById('matrixSizeBadge').innerText = "2 × 3";
+      buildMatrixInputs();
+      computeKernelAndRange();
+    }
+
+    function loadIdentityPreset() {
+      document.getElementById('matrixDimensionSelect').value = "3x3";
+      matrixRows = 3;
+      matrixCols = 3;
+      matrixData = [
+        [1, 0, 0],
+        [0, 1, 0],
+        [0, 0, 1]
+      ];
+      document.getElementById('matrixSizeBadge').innerText = "3 × 3";
+      buildMatrixInputs();
+      computeKernelAndRange();
+    }
+
+    function loadDependentPreset() {
+      document.getElementById('matrixDimensionSelect').value = "2x2";
+      matrixRows = 2;
+      matrixCols = 2;
+      matrixData = [
+        [1, -2],
+        [-2, 4]
+      ];
+      document.getElementById('matrixSizeBadge').innerText = "2 × 2";
+      buildMatrixInputs();
+      computeKernelAndRange();
+    }
+
+    // Core Gaussian Elimination to compute RREF
+    function calculateRREF(mat, numRows, numCols) {
+      // Deep clone
+      const A = mat.map(row => [...row]);
+      let lead = 0;
+      const pivotColumns = [];
+
+      for (let r = 0; r < numRows; r++) {
+        if (lead >= numCols) break;
+        let i = r;
+
+        // Find non-zero pivot in column lead
+        while (Math.abs(A[i][lead]) < 1e-9) {
+          i++;
+          if (i === numRows) {
+            i = r;
+            lead++;
+            if (lead === numCols) break;
+          }
+        }
+        if (lead >= numCols) break;
+
+        // Swap rows
+        [A[i], A[r]] = [A[r], A[i]];
+
+        // Divide row by pivot
+        const pivotVal = A[r][lead];
+        for (let j = 0; j < numCols; j++) {
+          A[r][j] /= pivotVal;
+        }
+        pivotColumns.push(lead);
+
+        // Eliminate column entries above and below
+        for (let k = 0; k < numRows; k++) {
+          if (k !== r) {
+            const factor = A[k][lead];
+            for (let j = 0; j < numCols; j++) {
+              A[k][j] -= factor * A[r][j];
+            }
+          }
+        }
+        lead++;
+      }
+
+      // Clean tiny floating point noise
+      for (let i = 0; i < numRows; i++) {
+        for (let j = 0; j < numCols; j++) {
+          if (Math.abs(A[i][j]) < 1e-9) A[i][j] = 0;
+        }
+      }
+
+      return { rref: A, pivotColumns };
+    }
+
+    // Main Computation and DOM Update
+    function computeKernelAndRange() {
+      const { rref, pivotColumns } = calculateRREF(matrixData, matrixRows, matrixCols);
+      const rank = pivotColumns.length;
+      const nullity = matrixCols - rank;
+
+      // 1. Render RREF Display in MathJax
+      const rrefRowsStr = rref.map(row => row.map(v => formatVal(v)).join(" & ")).join(" \\\\ ");
+      const rrefBox = document.getElementById('rrefDisplayBox');
+      rrefBox.innerHTML = `$$\\operatorname{RREF}(A) = \\begin{bmatrix} ${rrefRowsStr} \\end{bmatrix}$$`;
+      document.getElementById('pivotCountBadge').innerText = `${rank} Pivot${rank > 1 ? 's' : ''}`;
+
+      // 2. Determine Free Columns (Variables)
+      const freeColumns = [];
+      for (let j = 0; j < matrixCols; j++) {
+        if (!pivotColumns.includes(j)) {
+          freeColumns.push(j);
+        }
+      }
+
+      // 3. Compute Basis for Kernel (Null Space)
+      const kernelBasisContainer = document.getElementById('kernelBasisDisplay');
+      const kernelExplanation = document.getElementById('kernelStepsExplanation');
+      document.getElementById('nullityBadge').innerText = `Nullity = ${nullity}`;
+
+      if (nullity === 0) {
+        kernelExplanation.innerHTML = "เนื่องจากทุกคอลัมน์เป็น Pivot Column ไม่มีตัวแปรอิสระ สมการ $A\\mathbf{x} = \\mathbf{0}$ จึงมีเพียงคำตอบชัดคำตอบเดียว:";
+        kernelBasisContainer.innerHTML = `$$\\ker(T) = \\{\\mathbf{0}_{\\mathbb{R}^{${matrixCols}}}\\} \\quad \\implies \\quad \\text{ฐานหลักเป็นเซตว่าง } (\\emptyset)$$`;
+      } else {
+        kernelExplanation.innerHTML = `ตรวจพบตัวแปรอิสระ ${nullity} ตัว ได้แก่ ${freeColumns.map(c => `x_{${c+1}}`).join(', ')} จึงสร้างเวกเตอร์ฐานหลักได้ดังนี้:`;
+        
+        // Build basis vectors for each free variable
+        const basisVectors = freeColumns.map(freeCol => {
+          const vec = new Array(matrixCols).fill(0);
+          vec[freeCol] = 1; // set free var to 1
+
+          // for each pivot row
+          for (let r = 0; r < pivotColumns.length; r++) {
+            const pCol = pivotColumns[r];
+            // x_pivot + rref[r][freeCol] * 1 = 0 => x_pivot = -rref[r][freeCol]
+            vec[pCol] = -rref[r][freeCol];
+          }
+          return vec;
+        });
+
+        const basisTeX = basisVectors.map(vec => {
+          return `\\begin{bmatrix} ${vec.map(v => formatVal(v)).join(" \\\\ ")} \\end{bmatrix}`;
+        }).join(" , \\; ");
+
+        kernelBasisContainer.innerHTML = `$$\\mathcal{B}_{\\ker} = \\left\\{ ${basisTeX} \\right\\}$$`;
+      }
+
+      // 4. Compute Basis for Range (Column Space)
+      const rangeBasisContainer = document.getElementById('rangeBasisDisplay');
+      const rangeExplanation = document.getElementById('rangeStepsExplanation');
+      document.getElementById('rankBadge').innerText = `Rank = ${rank}`;
+
+      if (rank === 0) {
+        rangeExplanation.innerHTML = "เมทริกซ์ $A$ เป็นเมทริกซ์ศูนย์ทั้งหมด:";
+        rangeBasisContainer.innerHTML = `$$\\operatorname{Range}(T) = \\{\\mathbf{0}_{\\mathbb{R}^{${matrixRows}}}\\}$$`;
+      } else {
+        rangeExplanation.innerHTML = `เลือกคอลัมน์ของเมทริกซ์ $A$ ดั้งเดิมที่ตรงกับ Pivot Columns (หลักที่ ${pivotColumns.map(p => p+1).join(', ')}):`;
+        
+        const colVectorsTeX = pivotColumns.map(pCol => {
+          const colVals = [];
+          for (let r = 0; r < matrixRows; r++) {
+            colVals.push(formatVal(matrixData[r][pCol]));
+          }
+          return `\\begin{bmatrix} ${colVals.join(" \\\\ ")} \\end{bmatrix}`;
+        }).join(" , \\; ");
+
+        rangeBasisContainer.innerHTML = `$$\\mathcal{B}_{\\operatorname{Range}} = \\left\\{ ${colVectorsTeX} \\right\\}$$`;
+      }
+
+      // 5. Update Rank-Nullity Banner
+      const bannerFormula = document.getElementById('rankNullityFormulaText');
+      bannerFormula.innerHTML = `$$\\dim(\\ker(T)) + \\dim(\\operatorname{Range}(T)) = ${nullity} + ${rank} = ${matrixCols} = \\dim(V)$$`;
+
+      // 6. Typeset MathJax
+      if (window.MathJax && MathJax.typesetPromise) {
+        MathJax.typesetPromise([rrefBox, kernelBasisContainer, rangeBasisContainer, bannerFormula]).catch(e => console.log(e));
+      }
+    }
+
+    // Toggle discovery section
+    function toggleDiscoverySection() {
+      const box = document.getElementById('discoveryAnswerBox');
+      const icon = document.getElementById('discoveryIcon');
+      const isHidden = box.classList.contains('hidden');
+
+      if (isHidden) {
+        box.classList.remove('hidden');
+        icon.classList.add('rotate-180');
+        if (window.MathJax && MathJax.typesetPromise) {
+          MathJax.typesetPromise([box]).catch(e => console.log(e));
+        }
+      } else {
+        box.classList.add('hidden');
+        icon.classList.remove('rotate-180');
+      }
+    }
+
+    // Toggle solution accordion
+    function toggleSolutionAccordion() {
+      const box = document.getElementById('fullSolutionBox');
+      const icon = document.getElementById('solutionChevronIcon');
+      const isHidden = box.classList.contains('hidden');
+
+      if (isHidden) {
+        box.classList.remove('hidden');
+        icon.classList.add('rotate-180');
+        if (window.MathJax && MathJax.typesetPromise) {
+          MathJax.typesetPromise([box]).catch(e => console.log(e));
+        }
+      } else {
+        box.classList.add('hidden');
+        icon.classList.remove('rotate-180');
+      }
+    }
+
+    // Initial setup on window load
+    window.onload = function() {
+      buildMatrixInputs();
+      computeKernelAndRange();
+    };
+  </script>
+</body>
+</html>

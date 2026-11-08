@@ -1,0 +1,837 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>เรื่องที่ 7: การแปลงเชิงเส้นระหว่างปริภูมิที่มีฐานกำหนด</title>
+
+  <!-- Google Fonts: Sarabun, Prompt & Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Prompt:wght@400;500;600;700&family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Sarabun', 'Prompt', 'Inter', 'sans-serif'],
+            mono: ['ui-monospace', 'SFMono-Regular', 'Menlo', 'monospace']
+          },
+          colors: {
+            brand: {
+              50: '#eef2ff',
+              100: '#e0e7ff',
+              200: '#c7d2fe',
+              300: '#a5b4fc',
+              400: '#818cf8',
+              500: '#6366f1',
+              600: '#4f46e5',
+              700: '#4338ca',
+              800: '#3730a3',
+              900: '#312e81',
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- MathJax 3 Configuration -->
+  <script>
+    window.MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']],
+        displayMath: [['$$', '$$'], ['\\[', '\\]']],
+        processEscapes: true
+      },
+      svg: {
+        fontCache: 'global'
+      },
+      startup: {
+        pageReady: () => {
+          return MathJax.startup.defaultPageReady();
+        }
+      }
+    };
+  </script>
+  <script type="text/javascript" id="MathJax-script" async
+    src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js">
+  </script>
+
+  <style>
+    mjx-container {
+      display: inline-grid;
+      overflow-x: auto;
+      overflow-y: hidden;
+      max-width: 100%;
+      vertical-align: middle;
+    }
+    input[type=number]::-webkit-inner-spin-button,
+    input[type=number]::-webkit-outer-spin-button {
+      opacity: 1;
+    }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-800 font-sans antialiased selection:bg-brand-500 selection:text-white min-h-screen">
+
+  <!-- Header Section -->
+  <header class="bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 text-white border-b border-indigo-500/20 shadow-sm">
+    <div class="max-w-6xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
+      <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+        <div>
+
+          <h1 class="text-xl sm:text-2xl lg:text-3xl font-bold tracking-tight text-white">
+            เรื่องที่ 7: การแปลงเชิงเส้นระหว่างปริภูมิที่มีฐานกำหนด
+          </h1>
+          <p class="text-slate-300 text-xs sm:text-sm font-light mt-1">
+            Linear Transformations with Respect to Arbitrary Bases & Coordinate Representations
+          </p>
+        </div>
+        <div class="hidden md:flex flex-col items-end text-xs text-slate-400 border-l border-slate-700 pl-4 space-y-1">
+          <span class="text-indigo-300 font-mono text-[11px]">$[T(\mathbf{x})]_{B'} = [T]_{B'}^B [\mathbf{x}]_B$</span>
+          <span class="text-emerald-300 font-mono text-[11px]">$[T]_B = P^{-1} [T] P$</span>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Section 1: วัตถุประสงค์การเรียนรู้ -->
+  <section class="max-w-6xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
+    <div class="bg-white rounded-xl p-4 sm:p-5 shadow-sm border border-slate-200/80">
+      <div class="flex items-center gap-2.5 border-b border-slate-100 pb-3 mb-3">
+        <div class="w-8 h-8 rounded-lg bg-indigo-50 text-indigo-600 flex items-center justify-center font-bold text-sm">
+          <i class="fa-solid fa-bullseye text-base"></i>
+        </div>
+        <div>
+          <h2 class="text-base sm:text-lg font-bold text-slate-900">1. วัตถุประสงค์การเรียนรู้</h2>
+          <p class="text-[11px] text-slate-400">Learning Objective</p>
+        </div>
+      </div>
+      <div class="bg-indigo-50/60 border border-indigo-100 rounded-lg p-3 sm:p-4 flex items-start gap-3">
+        <span class="inline-flex items-center justify-center p-1 bg-indigo-600 text-white rounded text-xs mt-0.5">
+          <i class="fa-solid fa-check text-xs"></i>
+        </span>
+        <p class="text-sm sm:text-base text-slate-700 leading-relaxed">
+          เมื่อศึกษาบทเรียนนี้แล้ว <strong class="text-indigo-950 font-semibold">นักศึกษาสามารถแทนการแปลงเชิงเส้นด้วยเมทริกซ์เมื่อปริภูมิต้นทางหรือปลายทางใช้ฐานที่ไม่ใช่ฐานมาตรฐานได้</strong> สามารถคำนวณเวกเตอร์พิกัดเทียบกับฐานใด ๆ เข้าใจความสัมพันธ์ระหว่างการเปลี่ยนฐาน (Change of Basis) กับการแปลงคล้าย (Similarity Transformation) และสามารถประยุกต์ใช้สมการ $[T(\mathbf{x})]_{B'} = [T]_{B'}^B [\mathbf{x}]_B$ ในการแก้ปัญหาได้อย่างแม่นยำ
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Section 2: เนื้อหาหลัก -->
+  <section class="max-w-6xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 -mt-6 sm:-mt-8">
+    <div class="bg-white rounded-xl p-4 sm:p-5 shadow-sm border border-slate-200/80">
+      <div class="flex items-center gap-2.5 border-b border-slate-100 pb-3 mb-4">
+        <div class="w-8 h-8 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center font-bold text-sm">
+          <i class="fa-solid fa-book-bookmark text-base"></i>
+        </div>
+        <div>
+          <h2 class="text-base sm:text-lg font-bold text-slate-900">2. เนื้อหาหลักและทฤษฎีบทการแทนด้วยฐานกำหนด</h2>
+          <p class="text-[11px] text-slate-400">Coordinate Vectors, Matrix with Respect to Bases & Change of Coordinates</p>
+        </div>
+      </div>
+
+      <p class="text-xs sm:text-sm text-slate-700 leading-relaxed mb-4">
+        ในบทก่อนหน้านี้ เราแทนการแปลงเชิงเส้นเทียบกับ <em>ฐานมาตรฐาน</em> เสมอ อย่างไรก็ตาม ในการประยุกต์ใช้จริง (เช่น การแปลงรูปทรงเรขาคณิต, การทำให้เมทริกซ์เป็นแนวทแยง หรือควอนตัมฟิสิกส์) การเลือกใช้ <strong>ฐานหลักที่สอดคล้องกับธรรมชาติของปัญหา (Non-standard Bases)</strong> จะช่วยลดความซับซ้อนของการคำนวณได้อย่างมหาศาล
+      </p>
+
+      <!-- Grid 4 Key Core Components -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-3.5 mb-4">
+        
+        <!-- Component 1: Coordinate Vectors -->
+        <div class="border border-indigo-200/80 bg-indigo-50/40 rounded-xl p-3.5 space-y-2">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-bold text-indigo-900 flex items-center gap-1.5">
+              <span class="w-5 h-5 rounded-full bg-indigo-600 text-white flex items-center justify-center text-[10px]">1</span>
+              พิกัดของเวกเตอร์เทียบกับฐาน (Coordinate Vector)
+            </span>
+            <span class="text-[10px] font-mono bg-indigo-100 text-indigo-800 px-1.5 py-0.5 rounded font-bold">$[\mathbf{v}]_B$</span>
+          </div>
+          <p class="text-xs text-slate-600 leading-relaxed">
+            ให้ $B = \{\mathbf{u}_1, \mathbf{u}_2, \dots, \mathbf{u}_n\}$ เป็นฐานลำดับของปริภูมิเวกเตอร์ $V$ สำหรับเวกเตอร์ $\mathbf{v} \in V$ จะมีสเกลาร์ $c_1, \dots, c_n$ เพียงชุดเดียวที่:
+          </p>
+          <div class="bg-white p-2 rounded-lg border border-indigo-100 text-center font-mono text-xs text-indigo-950 font-bold shadow-sm">
+            $$\mathbf{v} = c_1\mathbf{u}_1 + c_2\mathbf{u}_2 + \dots + c_n\mathbf{u}_n$$
+          </div>
+          <p class="text-xs text-slate-600 leading-relaxed">
+            เราเรียกเวกเตอร์คอลัมน์ของสเกลาร์เหล่านี้ว่า <strong>เวกเตอร์พิกัดของ $\mathbf{v}$ เทียบกับฐาน $B$</strong> เขียนแทนด้วย:
+          </p>
+          <div class="text-center font-mono text-xs font-bold text-indigo-900 py-1 bg-white rounded border border-indigo-100">
+            $$[\mathbf{v}]_B = \begin{bmatrix} c_1 \\ c_2 \\ \vdots \\ c_n \end{bmatrix} \in \mathbb{R}^n$$
+          </div>
+        </div>
+
+        <!-- Component 2: Matrix with Respect to Bases -->
+        <div class="border border-indigo-200/80 bg-indigo-50/40 rounded-xl p-3.5 space-y-2">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-bold text-indigo-900 flex items-center gap-1.5">
+              <span class="w-5 h-5 rounded-full bg-indigo-600 text-white flex items-center justify-center text-[10px]">2</span>
+              เมทริกซ์แทนการแปลงเทียบกับฐาน $B$ และ $B'$
+            </span>
+            <span class="text-[10px] font-mono bg-indigo-100 text-indigo-800 px-1.5 py-0.5 rounded font-bold">$[T]_{B'}^B$</span>
+          </div>
+          <p class="text-xs text-slate-600 leading-relaxed">
+            ให้ $T: V \to W$ เป็นการแปลงเชิงเส้น โดย $B = \{\mathbf{u}_1, \dots, \mathbf{u}_n\}$ เป็นฐานของ $V$ และ $B' = \{\mathbf{w}_1, \dots, \mathbf{w}_m\}$ เป็นฐานของ $W$
+          </p>
+          <p class="text-xs text-slate-600 leading-relaxed">
+            เมทริกซ์แทนการแปลง $[T]_{B'}^B$ ขนาด $m \times n$ สร้างได้จากการนำ <strong>พิกัดของเวกเตอร์ภาพเทียบกับฐานปลายทาง $B'$</strong> มาเรียงเป็นคอลัมน์:
+          </p>
+          <div class="bg-white p-2 rounded-lg border border-indigo-100 text-center font-mono text-xs sm:text-sm text-indigo-950 font-bold shadow-sm">
+            $$[T]_{B'}^B = \begin{bmatrix} [T(\mathbf{u}_1)]_{B'} & [T(\mathbf{u}_2)]_{B'} & \dots & [T(\mathbf{u}_n)]_{B'} \end{bmatrix}$$
+          </div>
+          <p class="text-[11px] text-slate-500">
+            *ถ้า $V = W$ และใช้ฐาน $B = B'$ จะเขียนย่อเป็น $[T]_B$
+          </p>
+        </div>
+
+      </div>
+
+      <!-- Component 3 & 4: Change of Basis & Diagram -->
+      <div class="grid grid-cols-1 md:grid-cols-12 gap-3.5">
+        
+        <div class="md:col-span-7 bg-gradient-to-br from-slate-900 to-indigo-950 text-white p-4 rounded-xl shadow-sm border border-indigo-800/40 space-y-2">
+          <div class="flex items-center justify-between pb-1.5 border-b border-indigo-800">
+            <span class="text-xs font-bold uppercase tracking-wider text-indigo-300 flex items-center gap-1.5">
+              <i class="fa-solid fa-diagram-project"></i>
+              ความสัมพันธ์ระหว่างพิกัดเดิม พิกัดใหม่ และเมทริกซ์แทนการแปลง
+            </span>
+          </div>
+          <p class="text-xs text-slate-300 leading-relaxed">
+            สำหรับเวกเตอร์ $\mathbf{x} \in V$ ใด ๆ เราสามารถหาพิกัดของผลลัพธ์ $T(\mathbf{x})$ ในฐาน $B'$ ได้โดยตรงผ่านการคูณเมทริกซ์:
+          </p>
+          <div class="py-2.5 px-3 bg-slate-800/90 rounded-lg border border-slate-700 text-center font-mono text-sm sm:text-base text-emerald-300 font-bold">
+            $$[T(\mathbf{x})]_{B'} = [T]_{B'}^B \, [\mathbf{x}]_B$$
+          </div>
+          <p class="text-[11px] text-slate-400 leading-relaxed">
+            โครงสร้างพีชคณิตนี้ทำหน้าที่เป็น "สะพานเชื่อม" ระหว่างพิกัดนำเข้าในระบบฐานต้นทาง $[\mathbf{x}]_B$ ไปสู่พิกัดส่งออกในระบบฐานปลายทาง $[T(\mathbf{x})]_{B'}$
+          </p>
+        </div>
+
+        <div class="md:col-span-5 bg-indigo-50/50 border border-indigo-100 p-4 rounded-xl flex flex-col justify-between">
+          <div>
+            <h3 class="text-xs font-bold text-indigo-950 uppercase tracking-wider mb-1 flex items-center gap-1.5">
+              <i class="fa-solid fa-arrows-spin text-indigo-600"></i>
+              การเปลี่ยนฐาน (Change of Basis)
+            </h3>
+            <p class="text-xs text-slate-600 leading-relaxed mt-1">
+              ถ้า $P = P_{B'\leftarrow B}$ คือเมทริกซ์การเปลี่ยนฐานจาก $B$ ไป $B'$ และการแปลงเป็นตัวดำเนินการ $T: V \to V$ จะได้ความสัมพันธ์แบบ <strong>การแปลงคล้าย (Similarity Transformation)</strong>:
+            </p>
+            <div class="text-center font-bold text-indigo-900 text-xs sm:text-sm my-2 font-mono bg-white p-2 rounded border border-indigo-200">
+              $$[T]_{B'} = P^{-1} [T]_B P$$
+            </div>
+          </div>
+          <p class="text-[11px] text-slate-500 bg-white p-2 rounded border border-indigo-100">
+            <strong>สาระสำคัญ:</strong> เมทริกซ์แทนการแปลงจะเปลี่ยนไปตามฐานที่เลือก แต่สมบัติเฉพาะ เช่น ดีเทอร์มิแนนต์, รอย (Trace) และไอเกนแวลู จะคงที่เสมอ
+          </p>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- Section 3: แบบจำลองโต้ตอบ -->
+  <section class="max-w-6xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 -mt-6 sm:-mt-8">
+    <div class="bg-white rounded-xl p-4 sm:p-5 shadow-sm border border-slate-200/80">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-100 pb-3 mb-4">
+        <div class="flex items-center gap-2.5">
+          <div class="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center font-bold text-sm">
+            <i class="fa-solid fa-sliders text-base"></i>
+          </div>
+          <div>
+            <h2 class="text-base sm:text-lg font-bold text-slate-900">3. แบบจำลองโต้ตอบ: เครื่องมือคำนวณเมทริกซ์แทนการแปลงเทียบกับฐานกำหนด</h2>
+            <p class="text-[11px] text-slate-400">Interactive Coordinate Solver & $[T]_{B'}^B$ Matrix Assembly</p>
+          </div>
+        </div>
+        <span class="inline-flex items-center gap-1 text-[11px] font-semibold px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800 border border-emerald-300 self-start sm:self-auto">
+          <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+          Live Coordinate Engine
+        </span>
+      </div>
+
+      <!-- Presets Toolbar -->
+      <div class="bg-slate-50 p-3 rounded-xl border border-slate-200 mb-4 flex flex-wrap items-center justify-between gap-2.5">
+        <span class="text-xs font-bold text-slate-700 flex items-center gap-1">
+          <i class="fa-solid fa-wand-magic-sparkles text-indigo-600"></i> ตัวอย่างมาตรฐาน (Presets):
+        </span>
+        <div class="flex flex-wrap items-center gap-1.5">
+          <button type="button" onclick="loadPreset('exercise')" class="px-2.5 py-1 text-xs rounded bg-white border border-indigo-200 text-indigo-700 hover:bg-indigo-50 font-medium transition cursor-pointer">
+            โจทย์แบบฝึกหัด ($B = \{(1,1),(1,-1)\}$)
+          </button>
+          <button type="button" onclick="loadPreset('standard')" class="px-2.5 py-1 text-xs rounded bg-white border border-slate-300 hover:bg-slate-100 text-slate-700 transition cursor-pointer">
+            ฐานมาตรฐานทั้งสองด้าน ($\mathcal{E}$)
+          </button>
+          <button type="button" onclick="loadPreset('diff_bases')" class="px-2.5 py-1 text-xs rounded bg-white border border-slate-300 hover:bg-slate-100 text-slate-700 transition cursor-pointer">
+            ฐาน $B \neq B'$ (ต้นทางต่างจากปลายทาง)
+          </button>
+        </div>
+      </div>
+
+      <!-- Main Interactive Grid -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-4">
+        
+        <!-- Left: Input Bases and Transformation (5 cols) -->
+        <div class="lg:col-span-5 space-y-3.5 bg-slate-50 p-3.5 sm:p-4 rounded-xl border border-slate-200">
+          
+          <!-- Transformation Definition -->
+          <div class="bg-white p-3 rounded-lg border border-slate-200 shadow-sm space-y-2">
+            <span class="text-xs font-bold text-slate-800 flex items-center gap-1">
+              <i class="fa-solid fa-function text-indigo-600"></i>
+              นิยามการแปลง $T(x,y) = (ax + by, \; cx + dy)$
+            </span>
+            <div class="grid grid-cols-2 gap-2 text-xs font-mono">
+              <div class="flex items-center gap-1">
+                <span class="text-slate-500 w-4">a:</span>
+                <input type="number" id="tf_a" value="1" step="0.5" class="w-full text-center border rounded p-1 font-bold text-slate-800 focus:ring-1 focus:ring-indigo-500" oninput="calculateTransformationMatrix()">
+              </div>
+              <div class="flex items-center gap-1">
+                <span class="text-slate-500 w-4">b:</span>
+                <input type="number" id="tf_b" value="1" step="0.5" class="w-full text-center border rounded p-1 font-bold text-slate-800 focus:ring-1 focus:ring-indigo-500" oninput="calculateTransformationMatrix()">
+              </div>
+              <div class="flex items-center gap-1">
+                <span class="text-slate-500 w-4">c:</span>
+                <input type="number" id="tf_c" value="1" step="0.5" class="w-full text-center border rounded p-1 font-bold text-slate-800 focus:ring-1 focus:ring-indigo-500" oninput="calculateTransformationMatrix()">
+              </div>
+              <div class="flex items-center gap-1">
+                <span class="text-slate-500 w-4">d:</span>
+                <input type="number" id="tf_d" value="-1" step="0.5" class="w-full text-center border rounded p-1 font-bold text-slate-800 focus:ring-1 focus:ring-indigo-500" oninput="calculateTransformationMatrix()">
+              </div>
+            </div>
+          </div>
+
+          <!-- Basis B (Domain) -->
+          <div class="bg-white p-3 rounded-lg border border-indigo-200 shadow-sm space-y-2">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-bold text-indigo-900">ฐานต้นทาง $B = \{\mathbf{u}_1, \mathbf{u}_2\}$</span>
+              <span id="detBStatus" class="text-[10px] font-mono px-1.5 py-0.5 rounded bg-indigo-50 text-indigo-700 font-bold">Basis Valid</span>
+            </div>
+            <div class="grid grid-cols-2 gap-2 text-xs font-mono">
+              <div class="p-2 bg-slate-50 rounded border border-slate-200 space-y-1">
+                <span class="text-[10px] text-slate-500 block font-bold">$\mathbf{u}_1 = (u_{11}, u_{21})$</span>
+                <input type="number" id="u11" value="1" step="0.5" class="w-full text-center border rounded p-1 font-bold" oninput="calculateTransformationMatrix()">
+                <input type="number" id="u21" value="1" step="0.5" class="w-full text-center border rounded p-1 font-bold" oninput="calculateTransformationMatrix()">
+              </div>
+              <div class="p-2 bg-slate-50 rounded border border-slate-200 space-y-1">
+                <span class="text-[10px] text-slate-500 block font-bold">$\mathbf{u}_2 = (u_{12}, u_{22})$</span>
+                <input type="number" id="u12" value="1" step="0.5" class="w-full text-center border rounded p-1 font-bold" oninput="calculateTransformationMatrix()">
+                <input type="number" id="u22" value="-1" step="0.5" class="w-full text-center border rounded p-1 font-bold" oninput="calculateTransformationMatrix()">
+              </div>
+            </div>
+          </div>
+
+          <!-- Basis B' (Codomain) -->
+          <div class="bg-white p-3 rounded-lg border border-purple-200 shadow-sm space-y-2">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-bold text-purple-900">ฐานปลายทาง $B' = \{\mathbf{w}_1, \mathbf{w}_2\}$</span>
+              <span id="detBpStatus" class="text-[10px] font-mono px-1.5 py-0.5 rounded bg-purple-50 text-purple-700 font-bold">Basis Valid</span>
+            </div>
+            <div class="grid grid-cols-2 gap-2 text-xs font-mono">
+              <div class="p-2 bg-slate-50 rounded border border-slate-200 space-y-1">
+                <span class="text-[10px] text-slate-500 block font-bold">$\mathbf{w}_1 = (w_{11}, w_{21})$</span>
+                <input type="number" id="w11" value="1" step="0.5" class="w-full text-center border rounded p-1 font-bold" oninput="calculateTransformationMatrix()">
+                <input type="number" id="w21" value="1" step="0.5" class="w-full text-center border rounded p-1 font-bold" oninput="calculateTransformationMatrix()">
+              </div>
+              <div class="p-2 bg-slate-50 rounded border border-slate-200 space-y-1">
+                <span class="text-[10px] text-slate-500 block font-bold">$\mathbf{w}_2 = (w_{12}, w_{22})$</span>
+                <input type="number" id="w12" value="1" step="0.5" class="w-full text-center border rounded p-1 font-bold" oninput="calculateTransformationMatrix()">
+                <input type="number" id="w22" value="-1" step="0.5" class="w-full text-center border rounded p-1 font-bold" oninput="calculateTransformationMatrix()">
+              </div>
+            </div>
+          </div>
+
+          <!-- Vector x Test Input -->
+          <div class="bg-white p-3 rounded-lg border border-slate-200 shadow-sm space-y-1.5">
+            <span class="text-xs font-bold text-slate-700">ทดสอบเวกเตอร์ $\mathbf{x} = \begin{bmatrix} x \\ y \end{bmatrix}$ เพื่อตรวจความสัมพันธ์</span>
+            <div class="grid grid-cols-2 gap-2">
+              <div class="flex items-center gap-1.5 text-xs font-mono">
+                <span class="text-slate-500">x:</span>
+                <input type="number" id="in_x" value="3" step="0.5" class="w-full text-center border rounded p-1 font-bold text-slate-800" oninput="calculateTransformationMatrix()">
+              </div>
+              <div class="flex items-center gap-1.5 text-xs font-mono">
+                <span class="text-slate-500">y:</span>
+                <input type="number" id="in_y" value="1" step="0.5" class="w-full text-center border rounded p-1 font-bold text-slate-800" oninput="calculateTransformationMatrix()">
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Right: Step-by-Step Matrix Assembly & Verification (7 cols) -->
+        <div class="lg:col-span-7 space-y-3">
+          
+          <!-- Assembled Matrix Result Card -->
+          <div class="p-3.5 rounded-xl border flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-gradient-to-r from-indigo-900 to-slate-900 text-white shadow-sm">
+            <div>
+              <div class="text-[10px] font-bold uppercase tracking-wider text-indigo-300">เมทริกซ์แทนการแปลงที่สร้างได้ (Assembled Matrix)</div>
+              <div class="text-sm sm:text-base font-bold font-mono mt-0.5">$[T]_{B'}^B = \begin{bmatrix} [T(\mathbf{u}_1)]_{B'} & [T(\mathbf{u}_2)]_{B'} \end{bmatrix}$</div>
+            </div>
+            <div id="assembledMatrixBox" class="text-base sm:text-lg font-mono font-bold text-emerald-300 px-3 py-1 bg-slate-950/80 rounded-lg border border-indigo-700/60 text-center">
+              <!-- Rendered via JS -->
+            </div>
+          </div>
+
+          <!-- Step 1 & 2 Breakdown Cards -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 text-xs">
+            
+            <!-- Column 1 Construction -->
+            <div class="bg-white p-3 rounded-xl border border-indigo-200 shadow-sm space-y-1.5">
+              <div class="flex items-center justify-between">
+                <span class="font-bold text-indigo-900">คอลัมน์ที่ 1: $[T(\mathbf{u}_1)]_{B'}$</span>
+                <span class="text-[10px] font-mono bg-indigo-50 text-indigo-700 px-1.5 py-0.5 rounded font-bold">Column 1</span>
+              </div>
+              <div id="tu1Display" class="font-mono text-slate-600 text-[11px]">
+                $T(\mathbf{u}_1) = \dots$
+              </div>
+              <p class="text-[11px] text-slate-500">แก้สมการหาพิกัดเทียบกับฐาน $B'$:</p>
+              <div id="coord1Display" class="p-2 bg-indigo-50/50 rounded font-mono font-bold text-indigo-950 text-center border border-indigo-100">
+                <!-- Coord 1 -->
+              </div>
+            </div>
+
+            <!-- Column 2 Construction -->
+            <div class="bg-white p-3 rounded-xl border border-indigo-200 shadow-sm space-y-1.5">
+              <div class="flex items-center justify-between">
+                <span class="font-bold text-indigo-900">คอลัมน์ที่ 2: $[T(\mathbf{u}_2)]_{B'}$</span>
+                <span class="text-[10px] font-mono bg-indigo-50 text-indigo-700 px-1.5 py-0.5 rounded font-bold">Column 2</span>
+              </div>
+              <div id="tu2Display" class="font-mono text-slate-600 text-[11px]">
+                $T(\mathbf{u}_2) = \dots$
+              </div>
+              <p class="text-[11px] text-slate-500">แก้สมการหาพิกัดเทียบกับฐาน $B'$:</p>
+              <div id="coord2Display" class="p-2 bg-indigo-50/50 rounded font-mono font-bold text-indigo-950 text-center border border-indigo-100">
+                <!-- Coord 2 -->
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Two-Way Verification Comparison Card -->
+          <div class="bg-slate-50 border border-slate-200 rounded-xl p-3 space-y-2 text-xs">
+            <div class="flex items-center justify-between pb-1.5 border-b border-slate-200">
+              <span class="font-bold text-slate-800 flex items-center gap-1.5">
+                <i class="fa-solid fa-code-compare text-emerald-600"></i>
+                การตรวจสอบความสัมพันธ์ $[T(\mathbf{x})]_{B'} = [T]_{B'}^B [\mathbf{x}]_B$
+              </span>
+              <span id="coordVerifyBadge" class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800">
+                ผลลัพธ์ตรงกัน 100%
+              </span>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
+              <div class="bg-white p-2.5 rounded-lg border border-slate-200 space-y-1">
+                <span class="text-[10px] text-slate-500 font-semibold block">วิธีที่ 1: คำนวณตรง $T(\mathbf{x})$ แล้วหาพิกัดใน $B'$</span>
+                <div id="verifyMethod1" class="font-mono text-slate-800 text-[11px]">
+                  <!-- Method 1 -->
+                </div>
+              </div>
+              <div class="bg-white p-2.5 rounded-lg border border-slate-200 space-y-1">
+                <span class="text-[10px] text-slate-500 font-semibold block">วิธีที่ 2: คูณเมทริกซ์ $[T]_{B'}^B \times [\mathbf{x}]_B$</span>
+                <div id="verifyMethod2" class="font-mono text-slate-800 text-[11px]">
+                  <!-- Method 2 -->
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Section 4: คำถามนำเพื่อค้นพบ -->
+  <section class="max-w-6xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 -mt-6 sm:-mt-8">
+    <div class="bg-gradient-to-r from-amber-500/10 via-amber-500/5 to-transparent rounded-xl p-4 sm:p-5 border border-amber-300/80 shadow-sm">
+      <div class="flex items-start gap-3">
+        <div class="w-9 h-9 rounded-lg bg-amber-500 text-white flex-shrink-0 flex items-center justify-center font-bold text-lg shadow-sm">
+          <i class="fa-solid fa-lightbulb"></i>
+        </div>
+        <div class="flex-1">
+          <span class="text-[11px] font-bold uppercase tracking-wider text-amber-800">คำถามนำเพื่อค้นพบ (Guided Discovery Question)</span>
+          <h2 class="text-base sm:text-lg font-bold text-slate-900 mt-0.5">
+            "การแปลงเดียวกัน จะมีเมทริกซ์แทนต่างกันได้หรือไม่ เมื่อเปลี่ยนฐานที่ใช้แทนเวกเตอร์?"
+          </h2>
+          <p class="text-xs sm:text-sm text-slate-600 mt-1">
+            หากการแปลงเรขาคณิตคือการกระทำเดิม เช่น การหมุนหรือการสะท้อน ทำไมตัวเลขในตารางเมทริกซ์จึงสามารถเปลี่ยนแปลงไปได้ตามฐานที่เลือก?
+          </p>
+
+          <div class="mt-3">
+            <button type="button" onclick="toggleDiscoverySection()" id="btnDiscoveryToggle" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-amber-600 hover:bg-amber-700 text-white font-medium text-xs sm:text-sm transition-all shadow-sm cursor-pointer">
+              <span>💡 คลิกเพื่อดูแนวคิดและหลักการของ Similar Matrices & Diagonalization</span>
+              <i id="discoveryIcon" class="fa-solid fa-chevron-down text-xs ml-1 transition-transform duration-200"></i>
+            </button>
+          </div>
+
+          <div id="discoveryAnswerBox" class="hidden mt-3 pt-3 border-t border-amber-200/80 space-y-2">
+            <div class="bg-white rounded-lg p-3.5 border border-amber-200 text-slate-700 text-xs sm:text-sm leading-relaxed space-y-2.5 shadow-sm">
+              <div class="p-2 bg-emerald-50 rounded border border-emerald-200 text-emerald-950 font-bold text-xs sm:text-sm">
+                ✅ คำตอบ: ได้อย่างแน่นอน และมีเมทริกซ์แทนได้นับไม่ถ้วนตามฐานที่เลือก!
+              </div>
+              <p>
+                <strong>1. ความเป็นภววิสัยของการแปลง (Objectivity of Linear Transformation):</strong><br>
+                การแปลงเชิงเส้น $T$ เป็น "วัตถุทางเรขาคณิตที่แท้จริง" ซึ่งดำรงอยู่โดยไม่ขึ้นกับระบบพิกัดใด ๆ เปรียบเสมือนสิ่งของชิ้นหนึ่งในห้อง แต่ <strong>เมทริกซ์แทนการแปลง</strong> เป็นเพียง "ตัวแทนในเชิงตัวเลข (Numerical Representation)" ที่มองผ่านมุมมองของฐานที่เราเลือกเท่านั้น เมื่อเราเปลี่ยนมุมมอง (เปลี่ยนฐาน) ตัวเลขในเมทริกซ์จึงเปลี่ยนตามไปด้วย
+              </p>
+              <p>
+                <strong>2. เมทริกซ์ที่คล้ายกัน (Similar Matrices):</strong><br>
+                เมทริกซ์ทั้งหมดที่แทนการแปลง $T$ เดียวกัน จะมีความสัมพันธ์แบบการแปลงคล้าย:
+                $$A' = P^{-1} A P$$
+                โดยที่ $P$ คือเมทริกซ์การเปลี่ยนฐาน เมทริกซ์เหล่านี้จะมี <em>ดีเทอร์มิแนนต์, รอย (Trace), พหุนามลักษณะเฉพาะ และไอเกนแวลู</em> เหมือนกันทั้งหมด
+              </p>
+              <p>
+                <strong>3. หัวใจของการทำให้เป็นเมทริกซ์ทแยงมุม (Diagonalization):</strong><br>
+                เป้าหมายสูงสุดประการหนึ่งในวิชานี้คือ <strong>"การหาฐานหลักที่ดีที่สุด (Best Basis)"</strong> ซึ่งก็คือฐานที่ประกอบด้วยไอเกนเวกเตอร์ (Eigenvectors) เพราะจะทำให้เมทริกซ์แทนการแปลงกลายเป็น <em>เมทริกซ์แนวทแยง (Diagonal Matrix)</em> ซึ่งคำนวณกำลัง $A^k$ หรือแก้ระบบสมการเชิงอนุพันธ์ได้ง่ายที่สุด
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Section 5: แบบฝึกหัดสำหรับนักศึกษา -->
+  <section class="max-w-6xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 -mt-6 sm:-mt-8">
+    <div class="bg-white rounded-xl p-4 sm:p-5 shadow-sm border border-slate-200/80">
+      <div class="flex items-center gap-2.5 border-b border-slate-100 pb-3 mb-4">
+        <div class="w-8 h-8 rounded-lg bg-violet-50 text-violet-600 flex items-center justify-center font-bold text-sm">
+          <i class="fa-solid fa-pencil text-base"></i>
+        </div>
+        <div>
+          <h2 class="text-base sm:text-lg font-bold text-slate-900">5. แบบฝึกหัดสำหรับนักศึกษาและขั้นตอนวิธีทำอย่างละเอียด</h2>
+          <p class="text-[11px] text-slate-400">Student Practice Exercise & Rigorous Step-by-Step Solution</p>
+        </div>
+      </div>
+
+      <div class="bg-slate-50 rounded-xl p-4 border border-slate-200 space-y-3">
+        <div class="inline-block px-2.5 py-0.5 rounded text-[11px] font-bold bg-violet-100 text-violet-800">
+          โจทย์แบบฝึกหัด (Practice Problem)
+        </div>
+        <p class="text-xs sm:text-sm font-semibold text-slate-900 leading-relaxed">
+          กำหนดฐาน $B = \{\mathbf{u}_1, \mathbf{u}_2\}$ ของปริภูมิ $\mathbb{R}^2$ โดยที่ $\mathbf{u}_1 = (1, 1)$ และ $\mathbf{u}_2 = (1, -1)$<br>
+          และกำหนดการแปลงเชิงเส้น $T: \mathbb{R}^2 \to \mathbb{R}^2$ นิยามโดย:
+        </p>
+        <div class="my-2 py-2 px-3 bg-white rounded-lg border border-slate-300 text-center text-sm sm:text-base font-mono text-indigo-950 font-bold shadow-sm">
+          $$T(x, y) = (x + y, \; x - y)$$
+        </div>
+        <p class="text-xs text-slate-700 leading-relaxed">
+          จงหาเมทริกซ์แทนการแปลง $[T]_B$ เมื่อใช้ฐาน $B$ เป็นทั้งฐานของโดเมนและโคโดเมน พร้อมทั้งแสดงการตรวจสอบกับเวกเตอร์ใด ๆ
+        </p>
+
+        <div class="pt-2">
+          <button type="button" onclick="toggleSolutionAccordion()" id="btnToggleSolution" class="px-3.5 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white font-medium text-xs sm:text-sm transition-all shadow-sm flex items-center gap-1.5 cursor-pointer">
+            <i class="fa-solid fa-book-open"></i>
+            <span>แสดงวิธีทำและเฉลยละเอียดทุกขั้นตอน</span>
+            <i id="solutionChevronIcon" class="fa-solid fa-chevron-down text-xs ml-1 transition-transform duration-200"></i>
+          </button>
+        </div>
+
+        <!-- Full Solution Area -->
+        <div id="fullSolutionBox" class="hidden mt-3 pt-3 border-t border-dashed border-indigo-200 space-y-3 text-xs sm:text-sm">
+          
+          <div class="p-2.5 bg-emerald-50 rounded-lg border border-emerald-200 text-emerald-950 font-bold text-xs sm:text-sm flex items-center gap-2">
+            <i class="fa-solid fa-circle-check text-emerald-600 text-base"></i>
+            <span>บทสรุป: เมทริกซ์แทนการแปลงคือ $[T]_B = \begin{bmatrix} 1 & 1 \\ 1 & -1 \end{bmatrix}$</span>
+          </div>
+
+          <!-- Step 1 -->
+          <div class="bg-white p-3.5 rounded-lg border border-slate-200 space-y-1.5">
+            <span class="font-bold text-indigo-900 block">ขั้นที่ 1: หาภาพของเวกเตอร์ในฐาน $B$ ภายใต้การแปลง $T$</span>
+            <p class="text-slate-600 text-xs leading-relaxed">
+              แทนเวกเตอร์ $\mathbf{u}_1 = (1, 1)$ และ $\mathbf{u}_2 = (1, -1)$ ลงในสูตร $T(x,y) = (x+y, x-y)$:
+            </p>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs font-mono">
+              <div class="p-2 bg-slate-50 rounded border border-slate-200 text-slate-800">
+                $$T(\mathbf{u}_1) = T(1, 1) = (1+1, \; 1-1) = (2, 0)$$
+              </div>
+              <div class="p-2 bg-slate-50 rounded border border-slate-200 text-slate-800">
+                $$T(\mathbf{u}_2) = T(1, -1) = (1+(-1), \; 1-(-1)) = (0, 2)$$
+              </div>
+            </div>
+          </div>
+
+          <!-- Step 2 -->
+          <div class="bg-white p-3.5 rounded-lg border border-slate-200 space-y-1.5">
+            <span class="font-bold text-indigo-900 block">ขั้นที่ 2: หาพิกัดของภาพแต่ละตัวเทียบกับฐาน $B$</span>
+            <p class="text-slate-600 text-xs leading-relaxed">
+              เขียน $T(\mathbf{u}_1)$ และ $T(\mathbf{u}_2)$ เป็นการรวมเชิงเส้นของสมาชิกในฐาน $B = \{(1,1), (1,-1)\}$:
+            </p>
+            <div class="space-y-2 font-mono text-xs text-slate-800">
+              <div class="p-2 bg-slate-50 rounded border border-slate-200">
+                <strong>(ก) หา $[T(\mathbf{u}_1)]_B$:</strong> ตั้งสมการ $(2, 0) = c_1(1, 1) + c_2(1, -1) = (c_1 + c_2, \; c_1 - c_2)$<br>
+                $\implies c_1 + c_2 = 2$ และ $c_1 - c_2 = 0 \implies c_1 = 1, \; c_2 = 1$<br>
+                ดังนั้น คอลัมน์ที่ 1 คือ: $[T(\mathbf{u}_1)]_B = \begin{bmatrix} 1 \\ 1 \end{bmatrix}$
+              </div>
+              <div class="p-2 bg-slate-50 rounded border border-slate-200">
+                <strong>(ข) หา $[T(\mathbf{u}_2)]_B$:</strong> ตั้งสมการ $(0, 2) = d_1(1, 1) + d_2(1, -1) = (d_1 + d_2, \; d_1 - d_2)$<br>
+                $\implies d_1 + d_2 = 0$ และ $d_1 - d_2 = 2 \implies d_1 = 1, \; d_2 = -1$<br>
+                ดังนั้น คอลัมน์ที่ 2 คือ: $[T(\mathbf{u}_2)]_B = \begin{bmatrix} 1 \\ -1 \end{bmatrix}$
+              </div>
+            </div>
+          </div>
+
+          <!-- Step 3 -->
+          <div class="bg-white p-3.5 rounded-lg border border-slate-200 space-y-1.5">
+            <span class="font-bold text-indigo-900 block">ขั้นที่ 3: ประกอบเมทริกซ์ $[T]_B$ และวิเคราะห์ความหมาย</span>
+            <p class="text-slate-600 text-xs leading-relaxed">
+              นำเวกเตอร์พิกัดทั้งสองมาจัดเรียงเป็นคอลัมน์ของเมทริกซ์:
+            </p>
+            <div class="p-2.5 bg-slate-50 rounded font-mono text-center text-xs sm:text-sm text-indigo-950 font-bold border border-slate-200">
+              $$[T]_B = \begin{bmatrix} [T(\mathbf{u}_1)]_B & [T(\mathbf{u}_2)]_B \end{bmatrix} = \begin{bmatrix} 1 & 1 \\ 1 & -1 \end{bmatrix}$$
+            </div>
+            <p class="text-[11px] text-slate-500">
+              <em>ข้อสังเกตที่น่าทึ่ง:</em> เมทริกซ์มาตรฐานเทียบกับฐานมาตรฐาน $\mathcal{E}$ คือ $[T]_\mathcal{E} = \begin{bmatrix} 1 & 1 \\ 1 & -1 \end{bmatrix}$ ซึ่งบังเอิญเท่ากับ $[T]_B$ พอดิบพอดี เนื่องจากสมมาตรของการแปลงและการหมุนฐาน $45^\circ$
+            </p>
+          </div>
+
+          <div class="bg-slate-900 text-white p-3 rounded-lg flex items-center justify-between text-xs">
+            <span>การพิสูจน์และการคำนวณถูกต้องครบถ้วน</span>
+            <span class="font-serif font-bold text-emerald-400 text-sm">Q.E.D. ∎</span>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Interactive Coordinate Solver Script -->
+  <script>
+    // Presets Definition
+    const presets = {
+      exercise: {
+        tf: [1, 1, 1, -1],
+        u1: [1, 1], u2: [1, -1],
+        w1: [1, 1], w2: [1, -1],
+        inVec: [3, 1]
+      },
+      standard: {
+        tf: [2, 1, 1, 3],
+        u1: [1, 0], u2: [0, 1],
+        w1: [1, 0], w2: [0, 1],
+        inVec: [2, 1]
+      },
+      diff_bases: {
+        tf: [1, 2, 0, 1],
+        u1: [1, 1], u2: [0, 1],
+        w1: [1, 2], w2: [1, 0],
+        inVec: [2, 3]
+      }
+    };
+
+    function loadPreset(key) {
+      const p = presets[key];
+      if (!p) return;
+
+      document.getElementById('tf_a').value = p.tf[0];
+      document.getElementById('tf_b').value = p.tf[1];
+      document.getElementById('tf_c').value = p.tf[2];
+      document.getElementById('tf_d').value = p.tf[3];
+
+      document.getElementById('u11').value = p.u1[0];
+      document.getElementById('u21').value = p.u1[1];
+      document.getElementById('u12').value = p.u2[0];
+      document.getElementById('u22').value = p.u2[1];
+
+      document.getElementById('w11').value = p.w1[0];
+      document.getElementById('w21').value = p.w1[1];
+      document.getElementById('w12').value = p.w2[0];
+      document.getElementById('w22').value = p.w2[1];
+
+      document.getElementById('in_x').value = p.inVec[0];
+      document.getElementById('in_y').value = p.inVec[1];
+
+      calculateTransformationMatrix();
+    }
+
+    function formatNum(num) {
+      if (Math.abs(num) < 1e-9) return "0";
+      if (Math.abs(num - Math.round(num)) < 1e-6) {
+        return Math.round(num).toString();
+      }
+      return num.toFixed(2).replace(/\.?0+$/, "");
+    }
+
+    // Solve 2x2 system: [w1 w2] * [c1; c2] = v  => Coordinates [v]_B'
+    // W = [w11 w12; w21 w22], solve W * c = v
+    function getCoordinates2D(w1, w2, v) {
+      const det = w1[0]*w2[1] - w1[1]*w2[0];
+      if (Math.abs(det) < 1e-9) return null; // Basis invalid (linearly dependent)
+
+      const c1 = (v[0]*w2[1] - v[1]*w2[0]) / det;
+      const c2 = (w1[0]*v[1] - w1[1]*v[0]) / det;
+      return [c1, c2];
+    }
+
+    // Apply Transformation: T(x, y) = [a*x + b*y, c*x + d*y]
+    function applyT(tf, vec) {
+      return [
+        tf[0]*vec[0] + tf[1]*vec[1],
+        tf[2]*vec[0] + tf[3]*vec[1]
+      ];
+    }
+
+    function calculateTransformationMatrix() {
+      // 1. Read Inputs
+      const tf = [
+        parseFloat(document.getElementById('tf_a').value) || 0,
+        parseFloat(document.getElementById('tf_b').value) || 0,
+        parseFloat(document.getElementById('tf_c').value) || 0,
+        parseFloat(document.getElementById('tf_d').value) || 0
+      ];
+
+      const u1 = [
+        parseFloat(document.getElementById('u11').value) || 0,
+        parseFloat(document.getElementById('u21').value) || 0
+      ];
+      const u2 = [
+        parseFloat(document.getElementById('u12').value) || 0,
+        parseFloat(document.getElementById('u22').value) || 0
+      ];
+
+      const w1 = [
+        parseFloat(document.getElementById('w11').value) || 0,
+        parseFloat(document.getElementById('w21').value) || 0
+      ];
+      const w2 = [
+        parseFloat(document.getElementById('w12').value) || 0,
+        parseFloat(document.getElementById('w22').value) || 0
+      ];
+
+      const inVec = [
+        parseFloat(document.getElementById('in_x').value) || 0,
+        parseFloat(document.getElementById('in_y').value) || 0
+      ];
+
+      // 2. Validate Bases
+      const detU = u1[0]*u2[1] - u1[1]*u2[0];
+      const detW = w1[0]*w2[1] - w1[1]*w2[0];
+
+      const detBStatus = document.getElementById('detBStatus');
+      const detBpStatus = document.getElementById('detBpStatus');
+
+      if (Math.abs(detU) < 1e-9) {
+        detBStatus.className = "text-[10px] font-mono px-1.5 py-0.5 rounded bg-rose-100 text-rose-700 font-bold";
+        detBStatus.innerText = "Invalid Basis (det=0)";
+      } else {
+        detBStatus.className = "text-[10px] font-mono px-1.5 py-0.5 rounded bg-indigo-50 text-indigo-700 font-bold";
+        detBStatus.innerText = `Valid Basis (det=${formatNum(detU)})`;
+      }
+
+      if (Math.abs(detW) < 1e-9) {
+        detBpStatus.className = "text-[10px] font-mono px-1.5 py-0.5 rounded bg-rose-100 text-rose-700 font-bold";
+        detBpStatus.innerText = "Invalid Basis (det=0)";
+      } else {
+        detBpStatus.className = "text-[10px] font-mono px-1.5 py-0.5 rounded bg-purple-50 text-purple-700 font-bold";
+        detBpStatus.innerText = `Valid Basis (det=${formatNum(detW)})`;
+      }
+
+      if (Math.abs(detU) < 1e-9 || Math.abs(detW) < 1e-9) {
+        document.getElementById('assembledMatrixBox').innerHTML = "$$\\text{เวกเตอร์ในฐานไม่เป็นอิสระเชิงเส้น}$$";
+        return;
+      }
+
+      // 3. Compute T(u1) and T(u2)
+      const Tu1 = applyT(tf, u1);
+      const Tu2 = applyT(tf, u2);
+
+      document.getElementById('tu1Display').innerHTML = `$T(\\mathbf{u}_1) = (${formatNum(Tu1[0])}, ${formatNum(Tu1[1])})$`;
+      document.getElementById('tu2Display').innerHTML = `$T(\\mathbf{u}_2) = (${formatNum(Tu2[0])}, ${formatNum(Tu2[1])})$`;
+
+      // 4. Coordinates in B': [T(u1)]_B' and [T(u2)]_B'
+      const col1 = getCoordinates2D(w1, w2, Tu1);
+      const col2 = getCoordinates2D(w1, w2, Tu2);
+
+      document.getElementById('coord1Display').innerHTML = `$$[T(\\mathbf{u}_1)]_{B'} = \\begin{bmatrix} ${formatNum(col1[0])} \\\\ ${formatNum(col1[1])} \\end{bmatrix}$$`;
+      document.getElementById('coord2Display').innerHTML = `$$[T(\\mathbf{u}_2)]_{B'} = \\begin{bmatrix} ${formatNum(col2[0])} \\\\ ${formatNum(col2[1])} \\end{bmatrix}$$`;
+
+      // 5. Assembled Matrix [T]_B'^B
+      const assembledBox = document.getElementById('assembledMatrixBox');
+      assembledBox.innerHTML = `$$[T]_{B'}^B = \\begin{bmatrix} ${formatNum(col1[0])} & ${formatNum(col2[0])} \\\\ ${formatNum(col1[1])} & ${formatNum(col2[1])} \\end{bmatrix}$$`;
+
+      // 6. Verification with test vector x
+      // Method 1: T(x) directly, then coordinates in B'
+      const Tx = applyT(tf, inVec);
+      const coordTx_Bp = getCoordinates2D(w1, w2, Tx);
+
+      // Method 2: Coordinates of x in B: [x]_B, then multiply [T]_B'^B * [x]_B
+      const coordX_B = getCoordinates2D(u1, u2, inVec);
+      const multRes = [
+        col1[0]*coordX_B[0] + col2[0]*coordX_B[1],
+        col1[1]*coordX_B[0] + col2[1]*coordX_B[1]
+      ];
+
+      document.getElementById('verifyMethod1').innerHTML = 
+        `$T(\\mathbf{x}) = (${formatNum(Tx[0])}, ${formatNum(Tx[1])}) \\implies [T(\\mathbf{x})]_{B'} = \\begin{bmatrix} ${formatNum(coordTx_Bp[0])} \\\\ ${formatNum(coordTx_Bp[1])} \\end{bmatrix}$`;
+
+      document.getElementById('verifyMethod2').innerHTML = 
+        `$[\\mathbf{x}]_B = \\begin{bmatrix} ${formatNum(coordX_B[0])} \\\\ ${formatNum(coordX_B[1])} \\end{bmatrix} \\implies [T]_{B'}^B [\\mathbf{x}]_B = \\begin{bmatrix} ${formatNum(multRes[0])} \\\\ ${formatNum(multRes[1])} \\end{bmatrix}$`;
+
+      const match = Math.abs(coordTx_Bp[0] - multRes[0]) < 1e-5 && Math.abs(coordTx_Bp[1] - multRes[1]) < 1e-5;
+      const verifyBadge = document.getElementById('coordVerifyBadge');
+      if (match) {
+        verifyBadge.className = "text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800";
+        verifyBadge.innerText = "ผลลัพธ์ตรงกัน 100% ✓";
+      } else {
+        verifyBadge.className = "text-[10px] font-bold px-2 py-0.5 rounded-full bg-rose-100 text-rose-800";
+        verifyBadge.innerText = "ไม่ตรงกัน ✗";
+      }
+
+      // Typeset MathJax
+      if (window.MathJax && MathJax.typesetPromise) {
+        MathJax.typesetPromise([
+          assembledBox,
+          document.getElementById('tu1Display'),
+          document.getElementById('tu2Display'),
+          document.getElementById('coord1Display'),
+          document.getElementById('coord2Display'),
+          document.getElementById('verifyMethod1'),
+          document.getElementById('verifyMethod2')
+        ]).catch(e => console.log(e));
+      }
+    }
+
+    // Toggle discovery section
+    function toggleDiscoverySection() {
+      const box = document.getElementById('discoveryAnswerBox');
+      const icon = document.getElementById('discoveryIcon');
+      const isHidden = box.classList.contains('hidden');
+
+      if (isHidden) {
+        box.classList.remove('hidden');
+        icon.classList.add('rotate-180');
+        if (window.MathJax && MathJax.typesetPromise) {
+          MathJax.typesetPromise([box]).catch(e => console.log(e));
+        }
+      } else {
+        box.classList.add('hidden');
+        icon.classList.remove('rotate-180');
+      }
+    }
+
+    // Toggle solution accordion
+    function toggleSolutionAccordion() {
+      const box = document.getElementById('fullSolutionBox');
+      const icon = document.getElementById('solutionChevronIcon');
+      const isHidden = box.classList.contains('hidden');
+
+      if (isHidden) {
+        box.classList.remove('hidden');
+        icon.classList.add('rotate-180');
+        if (window.MathJax && MathJax.typesetPromise) {
+          MathJax.typesetPromise([box]).catch(e => console.log(e));
+        }
+      } else {
+        box.classList.add('hidden');
+        icon.classList.remove('rotate-180');
+      }
+    }
+
+    // Initialize on page load
+    window.onload = function() {
+      calculateTransformationMatrix();
+    };
+  </script>
+</body>
+</html>

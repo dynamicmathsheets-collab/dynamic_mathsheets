@@ -1,0 +1,841 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>แบบทดสอบวัดผลสัมฤทธิ์ทางการเรียน: การแปลงเชิงเส้น (Linear Transformation)</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- MathJax 3 configuration & script -->
+  <script>
+    window.MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']],
+        displayMath: [['$$', '$$'], ['\\[', '\\]']],
+        processEscapes: true
+      },
+      options: {
+        skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+      }
+    };
+  </script>
+  <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Sarabun:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Sarabun', sans-serif;
+    }
+    .math-text {
+      white-space: normal;
+      word-break: normal;
+    }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-800 antialiased selection:bg-indigo-500 selection:text-white">
+
+  <!-- Main Container -->
+  <div class="max-w-6xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
+    
+    <!-- Header Card -->
+    <header class="bg-gradient-to-br from-indigo-900 via-indigo-800 to-slate-900 text-white rounded-2xl p-6 sm:p-8 shadow-xl relative overflow-hidden border border-indigo-700/50">
+      <div class="relative z-10">
+        <h1 class="text-2xl sm:text-3xl lg:text-4xl font-extrabold tracking-tight text-white mb-2">
+          แบบทดสอบเรื่อง: การแปลงเชิงเส้น
+        </h1>
+        <p class="text-indigo-200 text-sm sm:text-base max-w-3xl leading-relaxed">
+          จำนวน 30 ข้อ (4 ตัวเลือก) ครอบคลุมระดับความยาก ง่าย 10 ข้อ, ปานกลาง 10 ข้อ, ยาก 10 ข้อ 
+          ประเมินสมรรถนะครบด้านพุทธิพิสัย (K), ทักษะกระบวนการ (P), และเจตคติ/การคิดขั้นสูง (A) ตามผลลัพธ์การเรียนรู้ (LO1 - LO8)
+        </p>
+
+        <!-- Stats Grid -->
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-6 pt-6 border-t border-indigo-700/60">
+          <div class="bg-indigo-800/40 rounded-xl p-3 border border-indigo-600/30 backdrop-blur-sm">
+            <span class="text-xs text-indigo-300 block">จำนวนข้อทั้งหมด</span>
+            <span class="text-xl sm:text-2xl font-bold text-white">30 ข้อ</span>
+          </div>
+          <div class="bg-indigo-800/40 rounded-xl p-3 border border-indigo-600/30 backdrop-blur-sm">
+            <span class="text-xs text-indigo-300 block">ตอบแล้ว</span>
+            <span id="answered-count" class="text-xl sm:text-2xl font-bold text-amber-300">0 / 30</span>
+          </div>
+          <div class="bg-indigo-800/40 rounded-xl p-3 border border-indigo-600/30 backdrop-blur-sm">
+            <span class="text-xs text-indigo-300 block">คะแนนที่ได้</span>
+            <span id="score-display" class="text-xl sm:text-2xl font-bold text-emerald-400">- / 30</span>
+          </div>
+          <div class="bg-indigo-800/40 rounded-xl p-3 border border-indigo-600/30 backdrop-blur-sm">
+            <span class="text-xs text-indigo-300 block">เวลาที่แนะนำ</span>
+            <span class="text-xl sm:text-2xl font-bold text-indigo-100">60 นาที</span>
+          </div>
+        </div>
+
+        <!-- Global Action Bar -->
+        <div class="mt-6 flex flex-wrap gap-2.5 items-center">
+          <button id="btn-submit-all" onclick="submitQuiz()" class="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-500 active:scale-95 text-white font-medium text-sm rounded-xl shadow-md transition-all flex items-center gap-1.5">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+            ตรวจคำตอบทั้งหมด
+          </button>
+          <button id="btn-toggle-all-explanations" onclick="toggleAllExplanations()" class="px-4 py-2.5 bg-slate-800 hover:bg-slate-700 active:scale-95 text-slate-200 border border-slate-600 font-medium text-sm rounded-xl transition-all">
+            เปิด/ปิดเฉลยทั้งหมด
+          </button>
+          <button onclick="resetQuiz()" class="px-4 py-2.5 bg-rose-900/40 hover:bg-rose-900/70 text-rose-200 border border-rose-700/50 font-medium text-sm rounded-xl transition-all">
+            ล้างคำตอบใหม่
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <!-- Quiz Blueprint Card -->
+    <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-4 sm:p-5 mt-4">
+      <h2 class="text-sm font-bold text-slate-700 uppercase tracking-wider mb-2 flex items-center gap-2">
+        <svg class="w-4 h-4 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
+        พิมพ์เขียวข้อสอบ (Exam Blueprint)
+      </h2>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs">
+        <div class="p-2.5 rounded-lg bg-slate-50 border border-slate-100">
+          <span class="font-semibold text-slate-700 block mb-1">ระดับความยาก:</span>
+          <div class="flex gap-2">
+            <span class="px-2 py-0.5 rounded bg-emerald-50 text-emerald-700 border border-emerald-200 font-medium">ง่าย 10 ข้อ</span>
+            <span class="px-2 py-0.5 rounded bg-amber-50 text-amber-700 border border-amber-200 font-medium">กลาง 10 ข้อ</span>
+            <span class="px-2 py-0.5 rounded bg-rose-50 text-rose-700 border border-rose-200 font-medium">ยาก 10 ข้อ</span>
+          </div>
+        </div>
+        <div class="p-2.5 rounded-lg bg-slate-50 border border-slate-100">
+          <span class="font-semibold text-slate-700 block mb-1">ด้านการประเมิน (K-P-A):</span>
+          <div class="flex gap-2">
+            <span class="px-2 py-0.5 rounded bg-blue-50 text-blue-700 border border-blue-200 font-medium">K (ความรู้) 10 ข้อ</span>
+            <span class="px-2 py-0.5 rounded bg-purple-50 text-purple-700 border border-purple-200 font-medium">P (ทักษะ) 10 ข้อ</span>
+            <span class="px-2 py-0.5 rounded bg-pink-50 text-pink-700 border border-pink-200 font-medium">A (เจตคติ) 10 ข้อ</span>
+          </div>
+        </div>
+        <div class="p-2.5 rounded-lg bg-slate-50 border border-slate-100">
+          <span class="font-semibold text-slate-700 block mb-1">ผลลัพธ์การเรียนรู้ (LO):</span>
+          <span class="text-slate-600">ครอบคลุม LO1 ถึง LO8 ทั้ง 8 เรื่องหลักอย่างสมดุล</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Questions Container -->
+    <main id="quiz-list" class="space-y-4 mt-4">
+      <!-- Questions rendered via JS -->
+    </main>
+
+    <!-- Bottom Result Floating Bar / Summary -->
+    <div id="result-summary-box" class="hidden mt-6 bg-white rounded-2xl shadow-xl border-2 border-indigo-500 p-6 sm:p-8">
+      <div class="text-center max-w-xl mx-auto">
+        <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-indigo-100 text-indigo-700 mb-3">
+          <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg>
+        </div>
+        <h3 class="text-2xl font-bold text-slate-800">ผลการทดสอบของคุณ</h3>
+        <p class="text-slate-500 text-sm mt-1">สรุปคะแนนและการวิเคราะห์ตามหมวดหมู่</p>
+        <div class="my-4 text-4xl sm:text-5xl font-extrabold text-indigo-600" id="final-score-val">0 / 30</div>
+        <p id="final-feedback" class="text-base text-slate-700 font-medium"></p>
+        
+        <div class="grid grid-cols-3 gap-3 my-6 pt-4 border-t border-slate-200">
+          <div class="bg-blue-50 p-3 rounded-xl border border-blue-100">
+            <span class="text-xs text-blue-600 font-semibold block">ด้านความรู้ (K)</span>
+            <span id="score-k" class="text-lg font-bold text-blue-900">-</span>
+          </div>
+          <div class="bg-purple-50 p-3 rounded-xl border border-purple-100">
+            <span class="text-xs text-purple-600 font-semibold block">ด้านทักษะ (P)</span>
+            <span id="score-p" class="text-lg font-bold text-purple-900">-</span>
+          </div>
+          <div class="bg-pink-50 p-3 rounded-xl border border-pink-100">
+            <span class="text-xs text-pink-600 font-semibold block">ด้านการประยุกต์ (A)</span>
+            <span id="score-a" class="text-lg font-bold text-pink-900">-</span>
+          </div>
+        </div>
+
+        <button onclick="window.scrollTo({top: 0, behavior: 'smooth'})" class="px-6 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-sm font-semibold shadow transition-all">
+          กลับขึ้นด้านบนเพื่อทบทวนเฉลย
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Questions Data & Application Script -->
+  <script>
+    const questions = [
+      {
+        id: 1,
+        diff: "ง่าย",
+        kpa: "K",
+        lo: "LO1: ความหมายและนิยาม",
+        text: "ข้อใดคือเงื่อนไขที่จำเป็นและเพียงพอสำหรับฟังก์ชัน $T: V \\to W$ ในการเป็นการแปลงเชิงเส้น?",
+        choices: [
+          "$T(\\mathbf{u}+\\mathbf{v})=T(\\mathbf{u})+T(\\mathbf{v})$ และ $T(c\\mathbf{v})=cT(\\mathbf{v})$ สำหรับทุก $\\mathbf{u},\\mathbf{v}\\in V$ และสเกลาร์ $c$",
+          "$T(\\mathbf{u}+\\mathbf{v})=T(\\mathbf{u})\\cdot T(\\mathbf{v})$ และ $T(c\\mathbf{v})=c+T(\\mathbf{v})$",
+          "$T(\\mathbf{0}_V) = \\mathbf{0}_W$ เพียงเงื่อนไขเดียว",
+          "$T(c\\mathbf{u}+\\mathbf{v})=T(\\mathbf{u})+cT(\\mathbf{v})$ สำหรับทุกสเกลาร์ $c$"
+        ],
+        ans: 0,
+        exp: "ตามนิยามของการแปลงเชิงเส้น ฟังก์ชัน $T$ จะเป็นการแปลงเชิงเส้นก็ต่อเมื่อมีสมบัติสองข้อคือ (1) สมบัติการบวก $T(\\mathbf{u}+\\mathbf{v})=T(\\mathbf{u})+T(\\mathbf{v})$ และ (2) สมบัติการคูณด้วยสเกลาร์ $T(c\\mathbf{v})=cT(\\mathbf{v})$ หรือรวมเป็น $T(a\\mathbf{u}+b\\mathbf{v})=aT(\\mathbf{u})+bT(\\mathbf{v})$"
+      },
+      {
+        id: 2,
+        diff: "ง่าย",
+        kpa: "P",
+        lo: "LO1: ความหมายและนิยาม",
+        text: "กำหนดฟังก์ชัน $T: \\mathbb{R}^2 \\to \\mathbb{R}^2$ จงตรวจสอบว่าข้อใดเป็นการแปลงเชิงเส้น",
+        choices: [
+          "$T(x,y) = (x+2, y)$",
+          "$T(x,y) = (2x - y, x + 3y)$",
+          "$T(x,y) = (xy, x+y)$",
+          "$T(x,y) = (x^2, y)$"
+        ],
+        ans: 1,
+        exp: "$T(x,y)=(2x-y, x+3y)$ เป็นการแปลงเชิงเส้นเนื่องจากแต่ละพิกัดเป็นผลรวมเชิงเส้นของตัวแปรระดับกำลัง 1 และไม่มีพจน์ค่าคงที่ ส่วน $T(x,y)=(x+2,y)$ มี $T(0,0)=(2,0)\\neq (0,0)$, พจน์ $xy$ และ $x^2$ มีดีกรีไม่เท่ากับ 1 จึงไม่เป็นเชิงเส้น"
+      },
+      {
+        id: 3,
+        diff: "ง่าย",
+        kpa: "A",
+        lo: "LO1: ความหมายและนิยาม",
+        text: "เหตุใดฟังก์ชัน $f(x) = 3x + 5$ ในทางคณิตศาสตร์ระดับมหาวิทยาลัย จึงไม่ถูกจัดว่าเป็นการแปลงเชิงเส้น แม้จะมีกราฟเป็นเส้นตรง?",
+        choices: [
+          "เพราะมีความชันเป็นจำนวนจริงบวก",
+          "เพราะไม่ผ่านจุดกำเนิด ทำให้ $f(0) = 5 \\neq 0$ ซึ่งขัดแย้งกับสมบัติพื้นฐาน $T(\\mathbf{0})=\\mathbf{0}$",
+          "เพราะโดเมนและเรนจ์เป็นจำนวนจริงมิติเดียว",
+          "เพราะค่า $x$ ไม่สามารถเป็นจำนวนลบได้"
+        ],
+        ans: 1,
+        exp: "การแปลงเชิงเส้นต้องส่งเวกเตอร์ศูนย์ไปยังเวกเตอร์ศูนย์เสมอ ($T(\\mathbf{0})=\\mathbf{0}$) ฟังก์ชัน $f(x)=3x+5$ มีค่า $f(0)=5\\neq 0$ และ $f(x_1+x_2)=3(x_1+x_2)+5 \\neq f(x_1)+f(x_2)$ จึงเป็นฟังก์ชันแอฟฟีน (Affine function) ไม่ใช่การแปลงเชิงเส้น"
+      },
+      {
+        id: 4,
+        diff: "ง่าย",
+        kpa: "K",
+        lo: "LO2: สมบัติพื้นฐาน",
+        text: "ถ้า $T: V \\to W$ เป็นการแปลงเชิงเส้น ข้อความใดต่อไปนี้ถูกต้องเสมอสำหรับทุก $\\mathbf{v} \\in V$?",
+        choices: [
+          "$T(-\\mathbf{v}) = -T(\\mathbf{v})$",
+          "$T(\\mathbf{v}) = \\mathbf{v}$",
+          "$T(2\\mathbf{v}) = (T(\\mathbf{v}))^2$",
+          "$T(\\mathbf{0}_V) = 1$"
+        ],
+        ans: 0,
+        exp: "จากสมบัติการคูณด้วยสเกลาร์ $T(c\\mathbf{v})=cT(\\mathbf{v})$ เมื่อแทน $c=-1$ จะได้ $T(-\\mathbf{v}) = T((-1)\\mathbf{v}) = (-1)T(\\mathbf{v}) = -T(\\mathbf{v})$ เสมอ"
+      },
+      {
+        id: 5,
+        diff: "ง่าย",
+        kpa: "P",
+        lo: "LO2: สมบัติพื้นฐาน",
+        text: "กำหนด $T: \\mathbb{R}^2 \\to \\mathbb{R}^2$ เป็นการแปลงเชิงเส้น โดย $T(1,0) = (2, 3)$ และ $T(0,1) = (-1, 4)$ จงหาค่าของ $T(2, 5)$",
+        choices: [
+          "$(1, 7)$",
+          "$(4, 15)$",
+          "$(-1, 26)$",
+          "$(3, 1)$"
+        ],
+        ans: 2,
+        exp: "เนื่องจาก $(2,5) = 2(1,0) + 5(0,1)$ จากการรักษาผลรวมเชิงเส้น จะได้ $T(2,5) = 2T(1,0) + 5T(0,1) = 2(2,3) + 5(-1,4) = (4,6) + (-5,20) = (-1, 26)$"
+      },
+      {
+        id: 6,
+        diff: "ง่าย",
+        kpa: "K",
+        lo: "LO3: เมทริกซ์แทนการแปลง",
+        text: "เมทริกซ์มาตรฐาน $A$ ของการแปลงเชิงเส้น $T: \\mathbb{R}^n \\to \\mathbb{R}^m$ เมื่อเทียบกับฐานมาตรฐาน จะมีมิติเท่าใด?",
+        choices: [
+          "$n \\times m$",
+          "$m \\times n$",
+          "$n \\times n$",
+          "$m \\times m$"
+        ],
+        ans: 1,
+        exp: "ถ้า $T: \\mathbb{R}^n \\to \\mathbb{R}^m$ เวกเตอร์นำเข้า $\\mathbf{x}\\in\\mathbb{R}^n$ มีขนาด $n\\times 1$ และผลลัพธ์ $T(\\mathbf{x})\\in\\mathbb{R}^m$ มีขนาด $m\\times 1$ เพื่อให้การคูณ $A\\mathbf{x}$ สอดคล้องกัน เมทริกซ์ $A$ ต้องมีมิติ $m \\times n$ โดยแต่ละคอลัมน์คือภาพของฐานมาตรฐาน $T(\\mathbf{e}_j) \\in \\mathbb{R}^m$"
+      },
+      {
+        id: 7,
+        diff: "ง่าย",
+        kpa: "P",
+        lo: "LO3: เมทริกซ์แทนการแปลง",
+        text: "เมทริกซ์มาตรฐานแทนการแปลง $T: \\mathbb{R}^2 \\to \\mathbb{R}^2$ ซึ่งกำหนดโดย $T(x,y) = (3x + 4y, 2x - y)$ คือข้อใด?",
+        choices: [
+          "$\\begin{bmatrix} 3 & 2 \\\\ 4 & -1 \\end{bmatrix}$",
+          "$\\begin{bmatrix} 3 & 4 \\\\ 2 & -1 \\end{bmatrix}$",
+          "$\\begin{bmatrix} 3 & 4 \\\\ -1 & 2 \\end{bmatrix}$",
+          "$\\begin{bmatrix} 4 & 3 \\\\ 2 & -1 \\end{bmatrix}$"
+        ],
+        ans: 1,
+        exp: "หาภาพของฐานมาตรฐาน: $T(1,0) = (3, 2)$ และ $T(0,1) = (4, -1)$ นำมาจัดวางเป็นคอลัมน์แรกและคอลัมน์ที่สองตามลำดับ จะได้ $A = \\begin{bmatrix} 3 & 4 \\\\ 2 & -1 \\end{bmatrix}$"
+      },
+      {
+        id: 8,
+        diff: "ง่าย",
+        kpa: "K",
+        lo: "LO4: เคอร์เนลและพิสัย",
+        text: "นิยามของเคอร์เนลของการแปลงเชิงเส้น $T: V \\to W$ คือข้อใด?",
+        choices: [
+          "$\\ker(T) = \\{\\mathbf{v} \\in V : T(\\mathbf{v}) = \\mathbf{0}_W\\}$",
+          "$\\ker(T) = \\{T(\\mathbf{v}) : \\mathbf{v} \\in V\\}$",
+          "$\\ker(T) = \\{\\mathbf{w} \\in W : \\mathbf{w} \\neq \\mathbf{0}\\}$",
+          "$\\ker(T) = \\{\\mathbf{v} \\in V : T(\\mathbf{v}) = \\mathbf{v}\\}$"
+        ],
+        ans: 0,
+        exp: "เคอร์เนล (Kernel หรือ Null Space) ของ $T$ คือเซตของเวกเตอร์ทั้งหมดในโดเมน $V$ ที่ส่งค่าผ่าน $T$ แล้วได้เวกเตอร์ศูนย์ของโคโดเมน $W$"
+      },
+      {
+        id: 9,
+        diff: "ง่าย",
+        kpa: "K",
+        lo: "LO5: หนึ่งต่อหนึ่งและทั่วถึง",
+        text: "การแปลงเชิงเส้น $T: V \\to W$ จะเป็นฟังก์ชันหนึ่งต่อหนึ่ง (Injective) ก็ต่อเมื่อเงื่อนไขใดเป็นจริง?",
+        choices: [
+          "$\\operatorname{Range}(T) = W$",
+          "$\\ker(T) = \\{\\mathbf{0}_V\\}$",
+          "$\\dim(V) > \\dim(W)$",
+          "$T(\\mathbf{0}_V) = \\mathbf{0}_W$"
+        ],
+        ans: 1,
+        exp: "ทฤษฎีบทพื้นฐานระบุว่า $T$ เป็นการแปลงหนึ่งต่อหนึ่ง ก็ต่อเมื่อ เคอร์เนลของ $T$ มีเพียงเวกเตอร์ศูนย์ตัวเดียว นั่นคือ $\\ker(T) = \\{\\mathbf{0}_V\\}$ (หรือ $\\operatorname{nullity}(T)=0$)"
+      },
+      {
+        id: 10,
+        diff: "ง่าย",
+        kpa: "A",
+        lo: "LO6: การประกอบและการแปลงผกผัน",
+        text: "ถ้า $T: V \\to W$ และ $S: W \\to U$ มีเมทริกซ์แทนการแปลงมาตรฐานคือ $A$ และ $B$ ตามลำดับ เมทริกซ์แทนการแปลงประกอบ $S \\circ T$ คือข้อใด?",
+        choices: [
+          "$A + B$",
+          "$AB$",
+          "$BA$",
+          "$A^{-1}B$"
+        ],
+        ans: 2,
+        exp: "เนื่องจาก $(S \\circ T)(\\mathbf{x}) = S(T(\\mathbf{x})) = B(A\\mathbf{x}) = (BA)\\mathbf{x}$ ดังนั้นเมทริกซ์แทนการแปลงประกอบ $S \\circ T$ คือผลคูณเมทริกซ์ $BA$ (ระวังเรื่องลำดับการคูณ)"
+      },
+      {
+        id: 11,
+        diff: "กลาง",
+        kpa: "K",
+        lo: "LO6: การประกอบและการแปลงผกผัน",
+        text: "การแปลงเชิงเส้น $T: V \\to W$ จะมีฟังก์ชันผกผัน $T^{-1}: W \\to V$ ก็ต่อเมื่อ $T$ มีสมบัติตามข้อใด?",
+        choices: [
+          "เป็นหนึ่งต่อหนึ่งแต่ไม่จำเป็นต้องทั่วถึง",
+          "เป็นฟังก์ชันทั่วถึงแต่ไม่จำเป็นต้องหนึ่งต่อหนึ่ง",
+          "เป็นทั้งฟังก์ชันหนึ่งต่อหนึ่งและทั่วถึง (Bijective)",
+          "มี $\\dim(V) < \\dim(W)$"
+        ],
+        ans: 2,
+        exp: "การที่ฟังก์ชันใด ๆ จะมีอินเวิร์สเป็นฟังก์ชัน ฟังก์ชันนั้นจะต้องเป็นฟังก์ชันหนึ่งต่อหนึ่งและทั่วถึง (Bijective หรือ Isomorphism) เท่านั้น"
+      },
+      {
+        id: 12,
+        diff: "กลาง",
+        kpa: "P",
+        lo: "LO6: การประกอบและการแปลงผกผัน",
+        text: "กำหนด $T: \\mathbb{R}^2 \\to \\mathbb{R}^2$ มีเมทริกซ์แทนการแปลง $A = \\begin{bmatrix} 1 & 2 \\\\ 3 & 5 \\end{bmatrix}$ จงหาเมทริกซ์ของการแปลงผกผัน $T^{-1}$",
+        choices: [
+          "$\\begin{bmatrix} -5 & 2 \\\\ 3 & -1 \\end{bmatrix}$",
+          "$\\begin{bmatrix} 5 & -2 \\\\ -3 & 1 \\end{bmatrix}$",
+          "$\\begin{bmatrix} 5 & 2 \\\\ 3 & 1 \\end{bmatrix}$",
+          "$\\begin{bmatrix} 1 & -2 \\\\ -3 & 5 \\end{bmatrix}$"
+        ],
+        ans: 0,
+        exp: "ดีเทอร์มิแนนต์ $\\det(A) = (1)(5) - (2)(3) = 5 - 6 = -1$ จากสูตรอินเวิร์ส $A^{-1} = \\frac{1}{\\det(A)} \\begin{bmatrix} d & -b \\\\ -c & a \\end{bmatrix} = \\frac{1}{-1}\\begin{bmatrix} 5 & -2 \\\\ -3 & 1 \\end{bmatrix} = \\begin{bmatrix} -5 & 2 \\\\ 3 & -1 \\end{bmatrix}$"
+      },
+      {
+        id: 13,
+        diff: "กลาง",
+        kpa: "A",
+        lo: "LO1: ความหมายและนิยาม",
+        text: "กำหนดการแปลง $T: M_{2\\times 2}(\\mathbb{R}) \\to \\mathbb{R}$ จงวิเคราะห์ว่าการแปลงในข้อใดเป็นการแปลงเชิงเส้น?",
+        choices: [
+          "$T(A) = \\det(A)$",
+          "$T(A) = \\operatorname{tr}(A)$ (ผลรวมสมาชิกในแนวทแยงหลัก)",
+          "$T(A) = \\operatorname{rank}(A)$",
+          "$T(A) = \\det(A + I_2)$"
+        ],
+        ans: 1,
+        exp: "ฟังก์ชันรอยต่อ (Trace) มีสมบัติ $\\operatorname{tr}(A+B) = \\operatorname{tr}(A)+\\operatorname{tr}(B)$ และ $\\operatorname{tr}(cA)=c\\operatorname{tr}(A)$ เสมอ จึงเป็นการแปลงเชิงเส้น ส่วน $\\det(A+B) \\neq \\det(A)+\\det(B)$ และ $\\operatorname{rank}(A)$ ไม่เป็นเชิงเส้น"
+      },
+      {
+        id: 14,
+        diff: "กลาง",
+        kpa: "P",
+        lo: "LO4: เคอร์เนลและพิสัย",
+        text: "กำหนดเมทริกซ์แทนการแปลง $A = \\begin{bmatrix} 1 & -2 & 1 \\\\ 2 & -4 & 2 \\end{bmatrix}$ มิติของเคอร์เนล (Nullity) และอันดับ (Rank) ของการแปลงนี้ตรงกับข้อใดตามลำดับ?",
+        choices: [
+          "Nullity = 1, Rank = 2",
+          "Nullity = 2, Rank = 1",
+          "Nullity = 3, Rank = 0",
+          "Nullity = 1, Rank = 1"
+        ],
+        ans: 1,
+        exp: "แถวที่ 2 เป็น 2 เท่าของแถวที่ 1 ส่งผลให้เมื่อทำเป็นรูปขั้นบันไดจะได้ 1 แถวที่ไม่ใช่ศูนย์ ดังนั้น $\\operatorname{rank}(A) = 1$ เนื่องจากโดเมนคือ $\\mathbb{R}^3$ ($n=3$) จาก Rank-Nullity Theorem: $\\operatorname{nullity} = 3 - 1 = 2$"
+      },
+      {
+        id: 15,
+        diff: "กลาง",
+        kpa: "A",
+        lo: "LO5: หนึ่งต่อหนึ่งและทั่วถึง",
+        text: "พิจารณาการแปลงเชิงเส้น $T: \\mathbb{R}^4 \\to \\mathbb{R}^3$ ข้อใดเป็นจริงเกี่ยวกับสมบัติหนึ่งต่อหนึ่งและทั่วถึง?",
+        choices: [
+          "$T$ สามารถเป็นหนึ่งต่อหนึ่งได้ หากเลือกฟังก์ชันที่เหมาะสม",
+          "$T$ ไม่มีทางเป็นหนึ่งต่อหนึ่งได้อย่างแน่นอน เพราะมิติโดเมนมากกว่ามิติโคโดเมน ($4 > 3$)",
+          "$T$ ไม่มีทางทั่วถึงได้อย่างแน่นอน",
+          "$T$ ต้องเป็นทั้งหนึ่งต่อหนึ่งและทั่วถึงเสมอ"
+        ],
+        ans: 1,
+        exp: "เนื่องจาก $\\operatorname{rank}(T) \\le \\min(3, 4) = 3$ ทำให้ $\\operatorname{nullity}(T) = 4 - \\operatorname{rank}(T) \\ge 4 - 3 = 1 > 0$ เมื่อ $\\ker(T) \\neq \\{\\mathbf{0}\\}$ การแปลงจึงไม่มีทางเป็นหนึ่งต่อหนึ่งได้อย่างแน่นอน"
+      },
+      {
+        id: 16,
+        diff: "กลาง",
+        kpa: "K",
+        lo: "LO8: ทฤษฎีบทมิติ",
+        text: "ตามทฤษฎีบทอันดับ–มิติ (Rank–Nullity Theorem) สำหรับการแปลงเชิงเส้น $T: V \\to W$ เมื่อ $V$ มีมิติจำกัด ข้อความใดถูกต้อง?",
+        choices: [
+          "$\\dim(V) = \\dim(\\ker T) + \\dim(\\operatorname{Range} T)$",
+          "$\\dim(W) = \\dim(\\ker T) + \\dim(\\operatorname{Range} T)$",
+          "$\\dim(V) + \\dim(W) = \\dim(\\ker T)$",
+          "$\\dim(\\ker T) = \\dim(\\operatorname{Range} T)$"
+        ],
+        ans: 0,
+        exp: "ทฤษฎีบท Rank-Nullity ระบุว่ามิติของโดเมน $\\dim(V)$ เท่ากับผลบวกของมิติเคอร์เนล (Nullity) และมิติพิสัย (Rank)"
+      },
+      {
+        id: 17,
+        diff: "กลาง",
+        kpa: "P",
+        lo: "LO8: ทฤษฎีบทมิติ",
+        text: "ถ้า $T: \\mathbb{R}^7 \\to \\mathbb{R}^4$ เป็นการแปลงเชิงเส้นที่มีสมบัติทั่วถึง (Surjective) แล้วมิติของ $\\ker(T)$ มีค่าเท่าใด?",
+        choices: [
+          "4",
+          "7",
+          "3",
+          "0"
+        ],
+        ans: 2,
+        exp: "เนื่องจาก $T$ ทั่วถึง แสดงว่า $\\operatorname{Range}(T) = \\mathbb{R}^4$ ดังนั้น $\\operatorname{rank}(T) = 4$ จากทฤษฎีบทอันดับ-มิติ: $\\dim(\\ker T) = \\dim(V) - \\operatorname{rank}(T) = 7 - 4 = 3$"
+      },
+{
+        id: 18,
+        diff: "กลาง",
+        kpa: "K",
+        lo: "LO7: การแปลงเชิงเส้นระหว่างปริภูมิที่มีฐานกำหนด",
+        text: "ให้ $B = \\{\\mathbf{v}_1, \\mathbf{v}_2\\}$ เป็นฐานหลักของ $V$ เมทริกซ์แทนการแปลง $[T]_B$ ถูกสร้างขึ้นจากเวกเตอร์คอลัมน์ใด?",
+        choices: [
+          "$[\\mathbf{v}_1]_B$ และ $[\\mathbf{v}_2]_B$",
+          "$[T(\\mathbf{v}_1)]_B$ และ $[T(\\mathbf{v}_2)]_B$",
+          "$T(\\mathbf{v}_1)$ และ $T(\\mathbf{v}_2)$ ในรูปพิกัดมาตรฐาน",
+          "เวกเตอร์ค่าไอเกนของ $T$"
+        ],
+        ans: 1,
+        exp: "เมทริกซ์แทนการแปลง $[T]_B$ เกิดจากการนำภาพของสมาชิกในฐานหลักมาเขียนเป็นเวกเตอร์พิกัดเทียบกับฐาน $B$ แล้วจัดวางเป็นคอลัมน์ นั่นคือ $[T]_B = \\begin{bmatrix} [T(\\mathbf{v}_1)]_B & [T(\\mathbf{v}_2)]_B \\end{bmatrix}$"
+      },
+      {
+        id: 19,
+        diff: "กลาง",
+        kpa: "P",
+        lo: "LO7: การแปลงเชิงเส้นระหว่างปริภูมิที่มีฐานกำหนด",
+        text: "กำหนดเวกเตอร์ $\\mathbf{v} = (5, 7)$ และฐานหลัก $B = \\{(1, 1), (1, -1)\\}$ เวกเตอร์พิกัด $[\\mathbf{v}]_B$ คือข้อใด?",
+        choices: [
+          "$\\begin{bmatrix} 6 \\\\ -1 \\end{bmatrix}$",
+          "$\\begin{bmatrix} 12 \\\\ 2 \\end{bmatrix}$",
+          "$\\begin{bmatrix} 5 \\\\ 7 \\end{bmatrix}$",
+          "$\\begin{bmatrix} 1 \\\\ 6 \\end{bmatrix}$"
+        ],
+        ans: 0,
+        exp: "แก้สมการ $c_1(1,1) + c_2(1,-1) = (5,7) \\Rightarrow c_1 + c_2 = 5$ และ $c_1 - c_2 = 7$ นำสมการบวกกันได้ $2c_1 = 12 \\Rightarrow c_1 = 6$ แทนค่าได้ $c_2 = -1$ ดังนั้น $[\\mathbf{v}]_B = \\begin{bmatrix} 6 \\\\ -1 \\end{bmatrix}$"
+      },
+      {
+        id: 20,
+        diff: "กลาง",
+        kpa: "A",
+        lo: "LO3: เมทริกซ์แทนการแปลง",
+        text: "การแปลงเชิงเส้น $T: \\mathbb{R}^2 \\to \\mathbb{R}^2$ หมุนเวกเตอร์ทวนเข็มนาฬิกาเป็นมุม $90^\\circ$ แล้วสะท้อนข้ามแกน $x$ จะมีเมทริกซ์แทนการแปลงลัพธ์ตรงกับข้อใด?",
+        choices: [
+          "$\\begin{bmatrix} 0 & -1 \\\\ 1 & 0 \\end{bmatrix}$",
+          "$\\begin{bmatrix} 0 & 1 \\\\ 1 & 0 \\end{bmatrix}$",
+          "$\\begin{bmatrix} 0 & -1 \\\\ -1 & 0 \\end{bmatrix}$",
+          "$\\begin{bmatrix} 0 & 1 \\\\ -1 & 0 \\end{bmatrix}$"
+        ],
+        ans: 2,
+        exp: "การหมุน $90^\\circ$: $R = \\begin{bmatrix} 0 & -1 \\\\ 1 & 0 \\end{bmatrix}$ การสะท้อนข้ามแกน $x$: $M = \\begin{bmatrix} 1 & 0 \\\\ 0 & -1 \\end{bmatrix}$ เมทริกซ์ผลลัพธ์คือ $MR = \\begin{bmatrix} 1 & 0 \\\\ 0 & -1 \\end{bmatrix}\\begin{bmatrix} 0 & -1 \\\\ 1 & 0 \\end{bmatrix} = \\begin{bmatrix} 0 & -1 \\\\ -1 & 0 \\end{bmatrix}$"
+      },
+      {
+        id: 21,
+        diff: "ยาก",
+        kpa: "K",
+        lo: "LO7: การแปลงเชิงเส้นระหว่างปริภูมิที่มีฐานกำหนด",
+        text: "ถ้า $[T]_B$ และ $[T]_{B'}$ เป็นเมทริกซ์แทนการแปลง $T$ เทียบกับฐาน $B$ และ $B'$ ตามลำดับ โดย $P = P_{B \\to B'}$ เป็นเมทริกซ์การเปลี่ยนฐาน ข้อใดแสดงความสัมพันธ์ที่ถูกต้อง?",
+        choices: [
+          "$[T]_{B'} = P [T]_B P^{-1}$",
+          "$[T]_{B'} = P^{-1} [T]_B P$",
+          "$[T]_{B'} = P [T]_B$",
+          "$[T]_{B'} = [T]_B P$"
+        ],
+        ans: 1,
+        exp: "ความสัมพันธ์ของการเปลี่ยนฐานคือ $[T]_{B'} = P_{B \\to B'} [T]_B P_{B' \\to B} = P^{-1} [T]_B P$ ซึ่งแสดงว่าเมทริกซ์ทั้งสองมีความคล้ายกัน (Similar Matrices)"
+      },
+      {
+        id: 22,
+        diff: "ยาก",
+        kpa: "P",
+        lo: "LO4: เคอร์เนลและพิสัย",
+        text: "กำหนดการแปลง $T: P_2(\\mathbb{R}) \\to P_1(\\mathbb{R})$ กำหนดโดย $T(p(x)) = p'(x)$ (อนุพันธ์) ฐานหลักของ $\\ker(T)$ คือเซตใด?",
+        choices: [
+          "$\\{x\\}$",
+          "$\\{1\\}$",
+          "$\\{1, x\\}$",
+          "$\\{\\emptyset\\}$"
+        ],
+        ans: 1,
+        exp: "พหุนาม $p(x) = ax^2 + bx + c$ จะมีอนุพันธ์ $p'(x) = 2ax + b = 0$ ก็ต่อเมื่อ $a=0$ และ $b=0$ ค่า $c$ เป็นค่าคงที่ใด ๆ ดังนั้น $p(x) = c = c(1)$ เวกเตอร์ฐานหลักของ $\\ker(T)$ จึงคือเซตของพหุนามคงที่ $\\{1\\}$"
+      },
+      {
+        id: 23,
+        diff: "ยาก",
+        kpa: "P",
+        lo: "LO7: การแปลงเชิงเส้นระหว่างปริภูมิที่มีฐานกำหนด",
+        text: "กำหนด $T: P_1(\\mathbb{R}) \\to P_1(\\mathbb{R})$ กำหนดโดย $T(p(x)) = p(x) + x p'(x)$ เมทริกซ์แทนการแปลงเทียบกับฐาน $B = \\{1, x\\}$ คือข้อใด?",
+        choices: [
+          "$\\begin{bmatrix} 1 & 0 \\\\ 0 & 2 \\end{bmatrix}$",
+          "$\\begin{bmatrix} 1 & 1 \\\\ 0 & 2 \\end{bmatrix}$",
+          "$\\begin{bmatrix} 2 & 0 \\\\ 0 & 1 \\end{bmatrix}$",
+          "$\\begin{bmatrix} 1 & 0 \\\\ 1 & 2 \\end{bmatrix}$"
+        ],
+        ans: 0,
+        exp: "ทดสอบกับฐาน: $T(1) = 1 + x(0) = 1 = 1(1) + 0(x) \\Rightarrow [T(1)]_B = \\begin{bmatrix}1 \\\\ 0\\end{bmatrix}$ และ $T(x) = x + x(1) = 2x = 0(1) + 2(x) \\Rightarrow [T(x)]_B = \\begin{bmatrix}0 \\\\ 2\\end{bmatrix}$ เมทริกซ์คือ $\\begin{bmatrix} 1 & 0 \\\\ 0 & 2 \\end{bmatrix}$"
+      },
+      {
+        id: 24,
+        diff: "ยาก",
+        kpa: "A",
+        lo: "LO2: สมบัติพื้นฐาน",
+        text: "ถ้า $T: V \\to W$ เป็นการแปลงเชิงเส้น และเซต $\\{T(\\mathbf{v}_1), T(\\mathbf{v}_2), \\dots, T(\\mathbf{v}_k)\\}$ เป็นอิสระเชิงเส้นใน $W$ ข้อสรุปใด **ถูกต้องและรัดกุมที่สุด**?",
+        choices: [
+          "เซต $\\{\\mathbf{v}_1, \\mathbf{v}_2, \\dots, \\mathbf{v}_k\\}$ ต้องเป็นอิสระเชิงเส้นใน $V$",
+          "เซต $\\{\\mathbf{v}_1, \\mathbf{v}_2, \\dots, \\mathbf{v}_k\\}$ ต้องแผ่ทั่ว $V$",
+          "$T$ ต้องเป็นฟังก์ชันทั่วถึง",
+          "$\\dim(V) = k$"
+        ],
+        ans: 0,
+        exp: "พิจารณาการรวมเชิงเส้น $c_1\\mathbf{v}_1 + \\dots + c_k\\mathbf{v}_k = \\mathbf{0}$ ใส่การแปลง $T$ จะได้ $c_1 T(\\mathbf{v}_1) + \\dots + c_k T(\\mathbf{v}_k) = T(\\mathbf{0}) = \\mathbf{0}$ เนื่องจากเซตของภาพเป็นอิสระเชิงเส้น บังคับให้ $c_1 = c_2 = \\dots = c_k = 0$ ดังนั้นเวกเตอร์ตั้งต้นจึงต้องเป็นอิสระเชิงเส้นด้วยเสมอ"
+      },
+      {
+        id: 25,
+        diff: "ยาก",
+        kpa: "A",
+        lo: "LO5: หนึ่งต่อหนึ่งและทั่วถึง",
+        text: "ให้ $T: V \\to V$ เป็นการแปลงเชิงเส้นบนปริภูมิเวกเตอร์ **มิติจำกัด** ข้อความใดต่อไปนี้ไม่สมมูลกับข้ออื่น?",
+        choices: [
+          "$T$ เป็นฟังก์ชันหนึ่งต่อหนึ่ง",
+          "$T$ เป็นฟังก์ชันทั่วถึง",
+          "$\\ker(T) = \\{\\mathbf{0}\\}$",
+          "$\\operatorname{Range}(T) = \\{\\mathbf{0}\\}$"
+        ],
+        ans: 3,
+        exp: "ในกรณีที่มิติโดเมนและโคโดเมนเท่ากันและจำกัด สมบัติ 'หนึ่งต่อหนึ่ง' $\\iff$ 'ทั่วถึง' $\\iff$ '$\\ker(T)=\\{\\mathbf{0}\\}$' $\\iff$ '$\\det([T])\\neq 0$' ล้วนสมมูลกัน ส่วน $\\operatorname{Range}(T)=\\{\\mathbf{0}\\}$ คือ Zero Transformation ซึ่งอยู่คนละความหมายกันโดยสิ้นเชิง"
+      },
+      {
+        id: 26,
+        diff: "ยาก",
+        kpa: "P",
+        lo: "LO8: ทฤษฎีบทมิติ",
+        text: "กำหนดเมทริกซ์ $A$ ขนาด $4 \\times 6$ โดยระบบสมการ $A\\mathbf{x} = \\mathbf{0}$ มีตัวแปรอิสระ (Free variables) เท่ากับ 2 ตัว มิติของปริภูมิคอลัมน์ $\\operatorname{Col}(A)$ คือเท่าใด?",
+        choices: [
+          "2",
+          "4",
+          "6",
+          "3"
+        ],
+        ans: 1,
+        exp: "จำนวนตัวแปรอิสระคือค่าของ $\\operatorname{nullity}(A) = 2$ เมทริกซ์มี 6 คอลัมน์ ($n=6$) จาก Rank-Nullity Theorem: $\\operatorname{rank}(A) = n - \\operatorname{nullity}(A) = 6 - 2 = 4$ มิติของปริภูมิคอลัมน์คือค่า Rank ซึ่งเท่ากับ 4"
+      },
+      {
+        id: 27,
+        diff: "ยาก",
+        kpa: "A",
+        lo: "LO8: ทฤษฎีบทมิติ",
+        text: "ระบบสมการเชิงเส้น $A\\mathbf{x} = \\mathbf{b}$ เมื่อ $A$ มีขนาด $m \\times n$ จะมีคำตอบสำหรับทุกเวกเตอร์ $\\mathbf{b} \\in \\mathbb{R}^m$ ก็ต่อเมื่อการแปลงเชิงเส้น $T(\\mathbf{x}) = A\\mathbf{x}$ มีสมบัติใด?",
+        choices: [
+          "เป็นการแปลงหนึ่งต่อหนึ่ง (Injective)",
+          "เป็นการแปลงทั่วถึง (Surjective)",
+          "มี $\\ker(T) = \\mathbb{R}^n$",
+          "มี $m > n$"
+        ],
+        ans: 1,
+        exp: "การที่ $A\\mathbf{x}=\\mathbf{b}$ มีคำตอบสำหรับทุก $\\mathbf{b}\\in\\mathbb{R}^m$ หมายความว่าทุกเวกเตอร์ในโคโดเมนต้องมีเวกเตอร์ในโดเมนส่งไปถึง ซึ่งตรงกับนิยามของการแปลงทั่วถึง (Surjective) นั่นคือ $\\operatorname{Range}(T) = \\mathbb{R}^m$"
+      },
+      {
+        id: 28,
+        diff: "ยาก",
+        kpa: "P",
+        lo: "LO6: การประกอบและการแปลงผกผัน",
+        text: "กำหนด $T: \\mathbb{R}^2 \\to \\mathbb{R}^2$ โดย $T(x, y) = (x+y, 2x+3y)$ จงหาค่าของ $T^{-1}(3, 8)$",
+        choices: [
+          "$(1, 2)$",
+          "$(2, 1)$",
+          "$(3, 2)$",
+          "$(-1, 4)$"
+        ],
+        ans: 0,
+        exp: "ตั้งสมการ $T(x,y) = (3,8) \\Rightarrow x + y = 3$ และ $2x + 3y = 8$ จากสมการแรก $y = 3 - x$ แทนลงในสมการที่สอง: $2x + 3(3 - x) = 8 \\Rightarrow -x + 9 = 8 \\Rightarrow x = 1$ จะได้ $y = 3 - 1 = 2$ ดังนั้น $T^{-1}(3,8) = (1, 2)$"
+      },
+      {
+        id: 29,
+        diff: "ยาก",
+        kpa: "A",
+        lo: "LO4: เคอร์เนลและพิสัย",
+        text: "ให้ $T: V \\to W$ เป็นการแปลงเชิงเส้น ข้อความใดต่อไปนี้เป็นจริงเสมอเกี่ยวกับการเป็นปริภูมิย่อย?",
+        choices: [
+          "$\\ker(T)$ เป็นปริภูมิย่อยของ $W$ และ $\\operatorname{Range}(T)$ เป็นปริภูมิย่อยของ $V$",
+          "$\\ker(T)$ เป็นปริภูมิย่อยของ $V$ และ $\\operatorname{Range}(T)$ เป็นปริภูมิย่อยของ $W$",
+          "ทั้ง $\\ker(T)$ และ $\\operatorname{Range}(T)$ เป็นปริภูมิย่อยของ $V$",
+          "ทั้ง $\\ker(T)$ และ $\\operatorname{Range}(T)$ ไม่จำเป็นต้องมีเวกเตอร์ศูนย์"
+        ],
+        ans: 1,
+        exp: "เคอร์เนลคือเซตของเวกเตอร์ต้นทางที่ถูกส่งไปยังศูนย์ จึงเป็นปริภูมิย่อยของโดเมน $V$ ส่วนพิสัยคือเซตของเวกเตอร์ผลลัพธ์ จึงเป็นปริภูมิย่อยของโคโดเมน $W$ เสมอ"
+      },
+      {
+        id: 30,
+        diff: "ยาก",
+        kpa: "P",
+        lo: "LO3: เมทริกซ์แทนการแปลง",
+        text: "กำหนดการแปลงเชิงเส้น $T: \\mathbb{R}^3 \\to \\mathbb{R}^2$ กำหนดโดย $T(x, y, z) = (2x - y + 3z, x + 4y - z)$ ถ้า $\\mathbf{u} = (1, -2, 1)$ จงหาภาพของ $T(\\mathbf{u})$",
+        choices: [
+          "$(7, -8)$",
+          "$(4, -6)$",
+          "$(7, -6)$",
+          "$(3, -8)$"
+        ],
+        ans: 0,
+        exp: "แทนค่า $x=1, y=-2, z=1$: พิกัดแรก $2(1) - (-2) + 3(1) = 2 + 2 + 3 = 7$ พิกัดที่สอง $1 + 4(-2) - 1 = 1 - 8 - 1 = -8$ ดังนั้นภาพที่ได้คือ $(7, -8)$"
+      }
+    ];
+
+    // State
+    const userAnswers = {};
+    const choiceLabels = ["ก", "ข", "ค", "ง"];
+
+    // Render Questions
+    function renderQuiz() {
+      const container = document.getElementById('quiz-list');
+      container.innerHTML = '';
+
+      questions.forEach((q) => {
+        const qCard = document.createElement('div');
+        qCard.id = `q-card-${q.id}`;
+        qCard.className = "bg-white rounded-xl shadow-sm border border-slate-200 p-4 sm:p-5 transition-all";
+
+        // Badges Styling
+        const diffBadge = q.diff === 'ง่าย' 
+          ? '<span class="px-2 py-0.5 rounded text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">ง่าย</span>'
+          : q.diff === 'กลาง' 
+            ? '<span class="px-2 py-0.5 rounded text-xs font-semibold bg-amber-50 text-amber-700 border border-amber-200">ปานกลาง</span>'
+            : '<span class="px-2 py-0.5 rounded text-xs font-semibold bg-rose-50 text-rose-700 border border-rose-200">ยาก</span>';
+
+        const kpaBadge = q.kpa === 'K'
+          ? '<span class="px-2 py-0.5 rounded text-xs font-semibold bg-blue-50 text-blue-700 border border-blue-200">ด้าน K (ความรู้)</span>'
+          : q.kpa === 'P'
+            ? '<span class="px-2 py-0.5 rounded text-xs font-semibold bg-purple-50 text-purple-700 border border-purple-200">ด้าน P (ทักษะ)</span>'
+            : '<span class="px-2 py-0.5 rounded text-xs font-semibold bg-pink-50 text-pink-700 border border-pink-200">ด้าน A (เจตคติ)</span>';
+
+        // Choices HTML
+        let choicesHtml = '';
+        q.choices.forEach((cText, cIdx) => {
+          choicesHtml += `
+            <div id="choice-btn-${q.id}-${cIdx}" 
+                 onclick="selectChoice(${q.id}, ${cIdx})" 
+                 class="group flex items-start gap-3 p-3 rounded-xl border border-slate-200 hover:border-indigo-300 hover:bg-indigo-50/40 cursor-pointer transition-all">
+              <span id="circle-${q.id}-${cIdx}" class="flex-shrink-0 w-7 h-7 rounded-full bg-slate-100 text-slate-600 font-semibold text-xs flex items-center justify-center border border-slate-300 group-hover:bg-indigo-600 group-hover:text-white group-hover:border-indigo-600 transition-all">
+                ${choiceLabels[cIdx]}
+              </span>
+              <div class="text-sm text-slate-800 pt-0.5 leading-relaxed math-text">
+                ${cText}
+              </div>
+            </div>
+          `;
+        });
+
+        qCard.innerHTML = `
+          <!-- Badges Header -->
+          <div class="flex flex-wrap items-center gap-1.5 mb-2.5 pb-2.5 border-b border-slate-100">
+            <span class="px-2 py-0.5 rounded text-xs font-bold bg-indigo-100 text-indigo-800">ข้อที่ ${q.id}</span>
+            ${diffBadge}
+            ${kpaBadge}
+            <span class="px-2 py-0.5 rounded text-xs font-medium bg-slate-100 text-slate-600 border border-slate-200">${q.lo}</span>
+          </div>
+
+          <!-- Question Text -->
+          <div class="text-sm sm:text-base font-semibold text-slate-800 mb-3 math-text leading-relaxed">
+            ${q.text}
+          </div>
+
+          <!-- Choices -->
+          <div class="space-y-2 mb-3">
+            ${choicesHtml}
+          </div>
+
+          <!-- Explanation Accordion -->
+          <div class="pt-2 border-t border-slate-100 flex flex-col gap-2">
+            <button onclick="toggleExplanation(${q.id})" class="inline-flex items-center gap-1 text-xs font-semibold text-indigo-600 hover:text-indigo-800 focus:outline-none w-fit transition-colors">
+              <svg id="icon-exp-${q.id}" class="w-3.5 h-3.5 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+              <span>เปิดเฉลยวิธีคิดละเอียด</span>
+            </button>
+
+            <div id="exp-box-${q.id}" class="hidden p-3.5 rounded-xl bg-slate-50 border border-slate-200 text-xs sm:text-sm text-slate-700 leading-relaxed math-text">
+              <div class="font-bold text-slate-900 mb-1 flex items-center gap-1.5">
+                <span class="w-2 h-2 rounded-full bg-indigo-600"></span>
+                <span>คำตอบที่ถูกต้อง: ตัวเลือก ${choiceLabels[q.ans]}</span>
+              </div>
+              <div class="text-slate-600 pl-3 border-l-2 border-indigo-300">
+                ${q.exp}
+              </div>
+            </div>
+          </div>
+        `;
+
+        container.appendChild(qCard);
+      });
+
+      // Trigger MathJax re-render
+      if (window.MathJax && window.MathJax.typesetPromise) {
+        window.MathJax.typesetPromise();
+      }
+    }
+
+    // Handle Choice Selection
+    function selectChoice(qId, cIdx) {
+      userAnswers[qId] = cIdx;
+
+      for (let i = 0; i < 4; i++) {
+        const item = document.getElementById(`choice-btn-${qId}-${i}`);
+        const circle = document.getElementById(`circle-${qId}-${i}`);
+        if (!item || !circle) continue;
+
+        if (i === cIdx) {
+          item.classList.remove('border-slate-200', 'bg-white', 'hover:bg-indigo-50/40');
+          item.classList.add('border-indigo-600', 'bg-indigo-50/80', 'ring-1', 'ring-indigo-600');
+          circle.classList.remove('bg-slate-100', 'text-slate-600', 'border-slate-300');
+          circle.classList.add('bg-indigo-600', 'text-white', 'border-indigo-600');
+        } else {
+          item.classList.remove('border-indigo-600', 'bg-indigo-50/80', 'ring-1', 'ring-indigo-600');
+          item.classList.add('border-slate-200', 'bg-white');
+          circle.classList.remove('bg-indigo-600', 'text-white', 'border-indigo-600');
+          circle.classList.add('bg-slate-100', 'text-slate-600', 'border-slate-300');
+        }
+      }
+
+      updateProgress();
+    }
+
+    // Update Progress
+    function updateProgress() {
+      const answered = Object.keys(userAnswers).length;
+      document.getElementById('answered-count').innerText = `${answered} / 30`;
+    }
+
+    // Toggle Single Explanation
+    function toggleExplanation(qId) {
+      const box = document.getElementById(`exp-box-${qId}`);
+      const icon = document.getElementById(`icon-exp-${qId}`);
+      if (box.classList.contains('hidden')) {
+        box.classList.remove('hidden');
+        icon.classList.add('rotate-180');
+        if (window.MathJax && window.MathJax.typesetPromise) {
+          window.MathJax.typesetPromise([box]);
+        }
+      } else {
+        box.classList.add('hidden');
+        icon.classList.remove('rotate-180');
+      }
+    }
+
+    // Toggle All Explanations
+    let allExplanationsOpen = false;
+    function toggleAllExplanations() {
+      allExplanationsOpen = !allExplanationsOpen;
+      questions.forEach(q => {
+        const box = document.getElementById(`exp-box-${q.id}`);
+        const icon = document.getElementById(`icon-exp-${q.id}`);
+        if (allExplanationsOpen) {
+          box.classList.remove('hidden');
+          icon.classList.add('rotate-180');
+        } else {
+          box.classList.add('hidden');
+          icon.classList.remove('rotate-180');
+        }
+      });
+      if (allExplanationsOpen && window.MathJax && window.MathJax.typesetPromise) {
+        window.MathJax.typesetPromise();
+      }
+    }
+
+    // Submit Quiz & Evaluate
+    function submitQuiz() {
+      let score = 0;
+      let scoreK = 0, totalK = 0;
+      let scoreP = 0, totalP = 0;
+      let scoreA = 0, totalA = 0;
+
+      questions.forEach(q => {
+        const userChoice = userAnswers[q.id];
+        const isCorrect = userChoice === q.ans;
+        const card = document.getElementById(`q-card-${q.id}`);
+
+        if (q.kpa === 'K') totalK++;
+        if (q.kpa === 'P') totalP++;
+        if (q.kpa === 'A') totalA++;
+
+        if (isCorrect) {
+          score++;
+          if (q.kpa === 'K') scoreK++;
+          if (q.kpa === 'P') scoreP++;
+          if (q.kpa === 'A') scoreA++;
+          card.classList.remove('border-rose-400', 'bg-rose-50/20');
+          card.classList.add('border-emerald-400', 'bg-emerald-50/20');
+        } else {
+          card.classList.remove('border-emerald-400', 'bg-emerald-50/20');
+          card.classList.add('border-rose-400', 'bg-rose-50/20');
+        }
+      });
+
+      // Update Display Stats
+      document.getElementById('score-display').innerText = `${score} / 30`;
+      document.getElementById('final-score-val').innerText = `${score} / 30`;
+
+      document.getElementById('score-k').innerText = `${scoreK} / ${totalK}`;
+      document.getElementById('score-p').innerText = `${scoreP} / ${totalP}`;
+      document.getElementById('score-a').innerText = `${scoreA} / ${totalA}`;
+
+      const feedback = document.getElementById('final-feedback');
+      const pct = (score / 30) * 100;
+      if (pct >= 80) {
+        feedback.innerText = "ยอดเยี่ยมมาก! คุณมีความเข้าใจในเรื่องการแปลงเชิงเส้นและการประยุกต์เป็นอย่างดี";
+        feedback.className = "text-base text-emerald-600 font-semibold";
+      } else if (pct >= 60) {
+        feedback.innerText = "ผ่านเกณฑ์มาตรฐาน! แนะนำให้ทบทวนหัวข้อที่ผิดพลาดเพิ่มเติมเพื่อความแม่นยำ";
+        feedback.className = "text-base text-amber-600 font-semibold";
+      } else {
+        feedback.innerText = "ควรทบทวนเนื้อหาและฝึกฝนการพิสูจน์รวมถึงความหมายของเคอร์เนลและพิสัยเพิ่มเติม";
+        feedback.className = "text-base text-rose-600 font-semibold";
+      }
+
+      // Show Result Box
+      const resBox = document.getElementById('result-summary-box');
+      resBox.classList.remove('hidden');
+      resBox.scrollIntoView({ behavior: 'smooth' });
+    }
+
+    // Reset Quiz
+    function resetQuiz() {
+      for (const k in userAnswers) delete userAnswers[k];
+      renderQuiz();
+      document.getElementById('answered-count').innerText = "0 / 30";
+      document.getElementById('score-display').innerText = "- / 30";
+      document.getElementById('result-summary-box').classList.add('hidden');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // Initialize on load
+    window.addEventListener('DOMContentLoaded', () => {
+      renderQuiz();
+    });
+  </script>
+</body>
+</html>

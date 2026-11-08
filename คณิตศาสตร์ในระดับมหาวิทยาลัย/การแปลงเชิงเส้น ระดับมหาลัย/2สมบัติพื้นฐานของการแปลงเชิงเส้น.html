@@ -1,0 +1,779 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>เรื่องที่ 2: สมบัติพื้นฐานของการแปลงเชิงเส้น</title>
+  
+  <!-- Google Fonts: Sarabun & Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Sarabun', 'Inter', 'sans-serif'],
+            mono: ['ui-monospace', 'SFMono-Regular', 'Menlo', 'monospace']
+          },
+          colors: {
+            brand: {
+              50: '#eef2ff',
+              100: '#e0e7ff',
+              200: '#c7d2fe',
+              300: '#a5b4fc',
+              400: '#818cf8',
+              500: '#6366f1',
+              600: '#4f46e5',
+              700: '#4338ca',
+              800: '#3730a3',
+              900: '#312e81',
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- MathJax 3 configuration -->
+  <script>
+    window.MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']],
+        displayMath: [['$$', '$$'], ['\\[', '\\]']],
+        processEscapes: true
+      },
+      svg: {
+        fontCache: 'global'
+      },
+      startup: {
+        pageReady: () => {
+          return MathJax.startup.defaultPageReady();
+        }
+      }
+    };
+  </script>
+  <script type="text/javascript" id="MathJax-script" async
+    src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js">
+  </script>
+
+  <style>
+    mjx-container {
+      display: inline-grid;
+      overflow-x: auto;
+      overflow-y: hidden;
+      max-width: 100%;
+      vertical-align: middle;
+    }
+    .proof-step-card {
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .proof-step-card:hover {
+      border-color: #6366f1;
+    }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-800 font-sans antialiased selection:bg-brand-500 selection:text-white min-h-screen">
+
+  <!-- Header Section (ใช้ container ตามข้อกำหนด) -->
+  <header class="bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 text-white border-b border-indigo-500/20 shadow-sm">
+    <div class="max-w-6xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
+      <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+        <div>
+          <h1 class="text-xl sm:text-2xl lg:text-3xl font-bold tracking-tight text-white">
+            เรื่องที่ 2: สมบัติพื้นฐานของการแปลงเชิงเส้น
+          </h1>
+          <p class="text-slate-300 text-xs sm:text-sm font-light mt-1">
+            Fundamental Properties of Linear Transformations & Step-by-Step Proofs
+          </p>
+        </div>
+        <div class="hidden md:flex flex-col items-end text-xs text-slate-400 border-l border-slate-700 pl-4 space-y-1">
+          <span class="text-indigo-300 font-mono text-[11px]">Homomorphism of Vector Spaces</span>
+          <span>การอนุรักษ์การรวมเชิงเส้น (Linear Combinations)</span>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Section 1: วัตถุประสงค์การเรียนรู้ -->
+  <section class="max-w-6xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
+    <div class="bg-white rounded-xl p-4 sm:p-5 shadow-sm border border-slate-200/80">
+      <div class="flex items-center gap-2.5 border-b border-slate-100 pb-3 mb-3">
+        <div class="w-8 h-8 rounded-lg bg-indigo-50 text-indigo-600 flex items-center justify-center font-bold text-sm">
+          <i class="fa-solid fa-bullseye text-base"></i>
+        </div>
+        <div>
+          <h2 class="text-base sm:text-lg font-bold text-slate-900">1. วัตถุประสงค์การเรียนรู้</h2>
+          <p class="text-[11px] text-slate-400">Learning Objective</p>
+        </div>
+      </div>
+      <div class="bg-indigo-50/60 border border-indigo-100 rounded-lg p-3 sm:p-4 flex items-start gap-3">
+        <span class="inline-flex items-center justify-center p-1 bg-indigo-600 text-white rounded text-xs mt-0.5">
+          <i class="fa-solid fa-check text-xs"></i>
+        </span>
+        <p class="text-sm sm:text-base text-slate-700 leading-relaxed">
+          เมื่อศึกษาบทเรียนนี้แล้ว <strong class="text-indigo-950 font-semibold">นักศึกษาสามารถพิสูจน์และอธิบายสมบัติพื้นฐานของการแปลงเชิงเส้นจากนิยามได้อย่างถูกต้อง</strong> รวมทั้งเข้าใจการประยุกต์ใช้สมบัติการคงสภาพการรวมเชิงเส้นเพื่อหาค่าของการแปลงบนเวกเตอร์ใด ๆ
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Section 2: เนื้อหาหลัก -->
+  <section class="max-w-6xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 -mt-6 sm:-mt-8">
+    <div class="bg-white rounded-xl p-4 sm:p-5 shadow-sm border border-slate-200/80">
+      <div class="flex items-center gap-2.5 border-b border-slate-100 pb-3 mb-4">
+        <div class="w-8 h-8 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center font-bold text-sm">
+          <i class="fa-solid fa-book-bookmark text-base"></i>
+        </div>
+        <div>
+          <h2 class="text-base sm:text-lg font-bold text-slate-900">2. เนื้อหาหลักและทฤษฎีบทสมบัติพื้นฐาน</h2>
+          <p class="text-[11px] text-slate-400">Fundamental Theorems & Identities</p>
+        </div>
+      </div>
+
+      <p class="text-xs sm:text-sm text-slate-700 leading-relaxed mb-4">
+        ให้ $V$ และ $W$ เป็นปริภูมิเวกเตอร์เหนือฟีลด์สเกลาร์ $\mathbb{R}$ และให้ $T: V \to W$ เป็นการแปลงเชิงเส้น (นั่นคือ $T(\mathbf{u}+\mathbf{v})=T(\mathbf{u})+T(\mathbf{v})$ และ $T(c\mathbf{v})=cT(\mathbf{v})$) จะได้ว่า $T$ มีสมบัติพื้นฐานที่สำคัญดังต่อไปนี้:
+      </p>
+
+      <!-- 4 Core Properties Grid -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-3.5">
+        
+        <!-- Property 1 -->
+        <div class="border border-slate-200 bg-slate-50/70 rounded-xl p-3.5 hover:bg-slate-50 transition-colors">
+          <div class="flex items-center justify-between mb-1.5">
+            <span class="text-xs font-bold text-indigo-700 flex items-center gap-1.5">
+              <span class="w-5 h-5 rounded-full bg-indigo-600 text-white flex items-center justify-center text-[10px]">1</span>
+              การส่งเวกเตอร์ศูนย์
+            </span>
+            <span class="text-[10px] font-mono bg-indigo-100 text-indigo-800 px-1.5 py-0.5 rounded">Zero Vector</span>
+          </div>
+          <div class="my-2 py-2 px-3 bg-white rounded-lg border border-slate-200 text-center font-semibold text-slate-900 text-sm">
+            $$T(\mathbf{0}_V) = \mathbf{0}_W$$
+          </div>
+          <p class="text-xs text-slate-600 leading-relaxed">
+            เวกเตอร์ศูนย์ของโดเมน $V$ จะถูกส่งไปยังเวกเตอร์ศูนย์ของโคโดเมน $W$ เสมอ (หาก $T(\mathbf{0}) \neq \mathbf{0}$ สรุปได้ทันทีว่าไม่เป็นการแปลงเชิงเส้น)
+          </p>
+        </div>
+
+        <!-- Property 2 -->
+        <div class="border border-slate-200 bg-slate-50/70 rounded-xl p-3.5 hover:bg-slate-50 transition-colors">
+          <div class="flex items-center justify-between mb-1.5">
+            <span class="text-xs font-bold text-indigo-700 flex items-center gap-1.5">
+              <span class="w-5 h-5 rounded-full bg-indigo-600 text-white flex items-center justify-center text-[10px]">2</span>
+              การส่งอินเวิร์สการบวก
+            </span>
+            <span class="text-[10px] font-mono bg-indigo-100 text-indigo-800 px-1.5 py-0.5 rounded">Additive Inverse</span>
+          </div>
+          <div class="my-2 py-2 px-3 bg-white rounded-lg border border-slate-200 text-center font-semibold text-slate-900 text-sm">
+            $$T(-\mathbf{v}) = -T(\mathbf{v})$$
+          </div>
+          <p class="text-xs text-slate-600 leading-relaxed">
+            ภาพของตัวผกผันการบวกของเวกเตอร์ $\mathbf{v}$ คือตัวผกผันการบวกของภาพ $T(\mathbf{v})$ ซึ่งสืบเนื่องมาจากสเกลาร์ $c = -1$
+          </p>
+        </div>
+
+        <!-- Property 3 -->
+        <div class="border border-slate-200 bg-slate-50/70 rounded-xl p-3.5 hover:bg-slate-50 transition-colors">
+          <div class="flex items-center justify-between mb-1.5">
+            <span class="text-xs font-bold text-indigo-700 flex items-center gap-1.5">
+              <span class="w-5 h-5 rounded-full bg-indigo-600 text-white flex items-center justify-center text-[10px]">3</span>
+              การรักษาผลต่างเวกเตอร์
+            </span>
+            <span class="text-[10px] font-mono bg-indigo-100 text-indigo-800 px-1.5 py-0.5 rounded">Subtraction</span>
+          </div>
+          <div class="my-2 py-2 px-3 bg-white rounded-lg border border-slate-200 text-center font-semibold text-slate-900 text-sm">
+            $$T(\mathbf{u} - \mathbf{v}) = T(\mathbf{u}) - T(\mathbf{v})$$
+          </div>
+          <p class="text-xs text-slate-600 leading-relaxed">
+            การแปลงเชิงเส้นกระจายข้ามการลบได้ โดยมองว่า $\mathbf{u} - \mathbf{v} = \mathbf{u} + (-1)\mathbf{v}$ แล้วใช้สมบัติการบวกและการคูณสเกลาร์
+          </p>
+        </div>
+
+        <!-- Property 4 -->
+        <div class="border border-slate-200 bg-slate-50/70 rounded-xl p-3.5 hover:bg-slate-50 transition-colors">
+          <div class="flex items-center justify-between mb-1.5">
+            <span class="text-xs font-bold text-indigo-700 flex items-center gap-1.5">
+              <span class="w-5 h-5 rounded-full bg-indigo-600 text-white flex items-center justify-center text-[10px]">4</span>
+              การรักษาผลรวมจำนวนจำกัด
+            </span>
+            <span class="text-[10px] font-mono bg-indigo-100 text-indigo-800 px-1.5 py-0.5 rounded">Finite Combination</span>
+          </div>
+          <div class="my-2 py-2 px-3 bg-white rounded-lg border border-slate-200 text-center font-semibold text-slate-900 text-xs sm:text-sm">
+            $$T\left(\sum_{i=1}^{k} c_i \mathbf{v}_i\right) = \sum_{i=1}^{k} c_i T(\mathbf{v}_i)$$
+          </div>
+          <p class="text-xs text-slate-600 leading-relaxed">
+            พิสูจน์โดยหลักอุปนัยเชิงคณิตศาสตร์ (Mathematical Induction) เป็นหัวใจสำคัญที่ทำให้การแปลงหาค่าได้จากเวกเตอร์ฐานหลัก (Basis)
+          </p>
+        </div>
+
+      </div>
+
+      <!-- Linear Identity & Equivalent Condition Note -->
+      <div class="mt-3.5 p-3.5 bg-gradient-to-r from-indigo-900 to-slate-900 text-white rounded-xl flex flex-col md:flex-row items-center justify-between gap-3 text-xs sm:text-sm">
+        <div class="space-y-1">
+          <div class="font-bold text-indigo-300 flex items-center gap-2">
+            <i class="fa-solid fa-atom"></i>
+            <span>การพิสูจน์เอกลักษณ์ของการแปลง (Identity & Linearity Preserving)</span>
+          </div>
+          <p class="text-slate-300 text-xs leading-relaxed">
+            สมบัติเหล่านี้แสดงให้เห็นว่า การแปลงเชิงเส้นรักษาโครงสร้างพีชคณิตทั้งหมดไว้ การกระทำก่อนแปลง หรือ แปลงแล้วกระทำ ให้ผลลัพธ์เหมือนกันทุกประการ
+          </p>
+        </div>
+        <div class="bg-indigo-950/80 border border-indigo-700/60 px-3 py-2 rounded-lg text-center whitespace-nowrap text-xs font-mono text-emerald-300">
+          $T(a\mathbf{u} + b\mathbf{v}) = aT(\mathbf{u}) + bT(\mathbf{v})$
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Section 3: แบบจำลองโต้ตอบ -->
+  <section class="max-w-6xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 -mt-6 sm:-mt-8">
+    <div class="bg-white rounded-xl p-4 sm:p-5 shadow-sm border border-slate-200/80">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-100 pb-3 mb-4">
+        <div class="flex items-center gap-2.5">
+          <div class="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center font-bold text-sm">
+            <i class="fa-solid fa-arrow-down-short-wide text-base"></i>
+          </div>
+          <div>
+            <h2 class="text-base sm:text-lg font-bold text-slate-900">3. แบบจำลองโต้ตอบ: เครื่องมือฝึกเรียงลำดับตรรกะการพิสูจน์</h2>
+            <p class="text-[11px] text-slate-400">Interactive Proof Step Ordering & Logical Verification Sandbox</p>
+          </div>
+        </div>
+        <span class="text-[11px] font-semibold px-2.5 py-0.5 rounded-full bg-indigo-50 text-indigo-700 border border-indigo-200 self-start sm:self-auto">
+          <i class="fa-solid fa-sliders mr-1"></i> Interactive Sandbox
+        </span>
+      </div>
+
+      <!-- Controls: Select Proof Theorem -->
+      <div class="bg-slate-50 p-3.5 rounded-xl border border-slate-200 mb-4 space-y-3">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <label for="proofSelect" class="text-xs sm:text-sm font-bold text-slate-800 flex items-center gap-1.5">
+            <i class="fa-solid fa-graduation-cap text-indigo-600"></i>
+            เลือกทฤษฎีบทที่ต้องการฝึกพิสูจน์:
+          </label>
+          <div class="relative min-w-[280px]">
+            <select id="proofSelect" onchange="loadSelectedTheorem()" class="w-full text-xs sm:text-sm font-medium border border-slate-300 rounded-lg px-3 py-2 bg-white text-slate-800 focus:ring-2 focus:ring-indigo-500 focus:outline-none cursor-pointer">
+              <option value="zero">1. พิสูจน์ว่า T(0) = 0</option>
+              <option value="inverse">2. พิสูจน์ว่า T(-v) = -T(v)</option>
+              <option value="linear_comb">3. พิสูจน์ว่า T(au + bv) = aT(u) + bT(v)</option>
+            </select>
+          </div>
+        </div>
+
+        <div id="theoremObjectiveBox" class="text-xs bg-white p-2.5 rounded-lg border border-slate-200 text-slate-700">
+          <span class="font-bold text-indigo-800">เป้าหมาย:</span> พิสูจน์ว่าเวกเตอร์ศูนย์ในโดเมน $V$ จะต้องส่งไปยังเวกเตอร์ศูนย์ในโคโดเมน $W$ โดยใช้นิยามการคูณสเกลาร์ $T(c\mathbf{v}) = cT(\mathbf{v})$ เมื่อ $c = 0$
+        </div>
+      </div>
+
+      <!-- Interactive Step Ordering List Area -->
+      <div class="space-y-2 mb-4">
+        <div class="flex items-center justify-between text-xs text-slate-500 px-1 font-medium">
+          <span><i class="fa-solid fa-list-ol mr-1"></i> จัดเรียงขั้นตอนการพิสูจน์ (ใช้ปุ่มขึ้น/ลง เพื่อจัดลำดับจากสมมติฐานสู่บทสรุป):</span>
+          <span id="stepCounter" class="text-indigo-600 font-bold">4 ขั้นตอน</span>
+        </div>
+
+        <!-- Container where step cards will be dynamically rendered -->
+        <div id="stepsContainer" class="space-y-2">
+          <!-- Dynamically loaded -->
+        </div>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="flex flex-wrap items-center gap-2 pt-2 border-t border-slate-100">
+        <button type="button" onclick="verifyProofOrder()" class="px-4 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white font-medium text-xs sm:text-sm transition-all shadow-sm flex items-center gap-1.5 cursor-pointer">
+          <i class="fa-solid fa-circle-check"></i>
+          <span>ตรวจสอบความถูกต้องของลำดับการพิสูจน์</span>
+        </button>
+
+        <button type="button" onclick="resetCurrentTheorem(true)" class="px-3.5 py-2 rounded-lg bg-slate-200 hover:bg-slate-300 text-slate-700 font-medium text-xs sm:text-sm transition-all flex items-center gap-1.5 cursor-pointer">
+          <i class="fa-solid fa-shuffle"></i>
+          <span>สลับลำดับใหม่ (Shuffle)</span>
+        </button>
+
+        <button type="button" onclick="solveTheoremDirectly()" class="px-3.5 py-2 rounded-lg border border-slate-300 hover:bg-slate-100 text-slate-700 font-medium text-xs sm:text-sm transition-all flex items-center gap-1.5 cursor-pointer">
+          <i class="fa-solid fa-wand-magic-sparkles text-amber-500"></i>
+          <span>แสดงลำดับที่ถูกต้องทันที</span>
+        </button>
+      </div>
+
+      <!-- Feedback Area -->
+      <div id="verificationFeedback" class="mt-4 hidden p-3.5 rounded-xl border text-xs sm:text-sm transition-all">
+        <!-- Result dynamically injected here -->
+      </div>
+    </div>
+  </section>
+
+  <!-- Section 4: คำถามนำเพื่อค้นพบ -->
+  <section class="max-w-6xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 -mt-6 sm:-mt-8">
+    <div class="bg-gradient-to-r from-amber-500/10 via-amber-500/5 to-transparent rounded-xl p-4 sm:p-5 border border-amber-300/80 shadow-sm">
+      <div class="flex items-start gap-3">
+        <div class="w-9 h-9 rounded-lg bg-amber-500 text-white flex-shrink-0 flex items-center justify-center font-bold text-lg shadow-sm">
+          <i class="fa-solid fa-lightbulb"></i>
+        </div>
+        <div class="flex-1">
+          <span class="text-[11px] font-bold uppercase tracking-wider text-amber-800">คำถามนำเพื่อค้นพบ (Guided Discovery Question)</span>
+          <h2 class="text-base sm:text-lg font-bold text-slate-900 mt-0.5">
+            "หากทราบค่าของ $T$ บนเวกเตอร์แต่ละตัวแล้ว เหตุใดจึงสามารถหาค่าของ $T$ บนการรวมเชิงเส้นของเวกเตอร์เหล่านั้นได้เสมอ?"
+          </h2>
+          <p class="text-xs sm:text-sm text-slate-600 mt-1">
+            ลองพิจารณา: หากเรารู้เพียงค่า $T(\mathbf{v}_1)$ และ $T(\mathbf{v}_2)$ เราจะสามารถหา $T(3\mathbf{v}_1 - 5\mathbf{v}_2)$ ได้ทันทีโดยไม่ต้องรู้นิพจน์เต็มของ $T(x,y)$ หรือไม่?
+          </p>
+
+          <div class="mt-3">
+            <button type="button" onclick="toggleDiscoverySection()" id="btnDiscoveryToggle" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-amber-600 hover:bg-amber-700 text-white font-medium text-xs sm:text-sm transition-all shadow-sm cursor-pointer">
+              <span>💡 คลิกเพื่อดูแนวคิดและหลักการ Superposition</span>
+              <i id="discoveryIcon" class="fa-solid fa-chevron-down text-xs transition-transform duration-200"></i>
+            </button>
+          </div>
+
+          <div id="discoveryAnswerBox" class="hidden mt-3 pt-3 border-t border-amber-200/80 space-y-2">
+            <div class="bg-white rounded-lg p-3.5 border border-amber-200 text-slate-700 text-xs sm:text-sm leading-relaxed space-y-2.5 shadow-sm">
+              <p>
+                <strong>1. สมบัติการคงสภาพการรวมเชิงเส้น (Preservation of Linear Combinations):</strong><br>
+                เนื่องจากการแปลงเชิงเส้นสอดคล้องกับทั้งสองสัจพจน์พร้อมกัน เราจึงสามารถ "แยกการคำนวณ" และ "ดึงสเกลาร์ออกมาด้านหน้า" ได้เสมอ:
+                $$T(c_1\mathbf{v}_1 + c_2\mathbf{v}_2) = c_1 T(\mathbf{v}_1) + c_2 T(\mathbf{v}_2)$$
+              </p>
+              <p>
+                <strong>2. หัวใจของการนำไปสู่เมทริกซ์มาตรฐาน (Matrix Representation):</strong><br>
+                เนื่องจากทุกเวกเตอร์ $\mathbf{x} \in \mathbb{R}^n$ สามารถเขียนเป็นการรวมเชิงเส้นของเวกเตอร์ฐานหลักมาตรฐาน $\mathbf{e}_1, \mathbf{e}_2, \dots, \mathbf{e}_n$ ได้ เช่น $\mathbf{x} = x_1\mathbf{e}_1 + x_2\mathbf{e}_2$
+                ดังนั้น:
+                $$T(\mathbf{x}) = x_1 T(\mathbf{e}_1) + x_2 T(\mathbf{e}_2)$$
+                นั่นหมายความว่า <em>"หากเราทราบเพียงแค่ว่าเวกเตอร์ฐานหลักถูกส่งไปที่ใด เราจะทราบพฤติกรรมของ $T$ บนทุก ๆ จุดในปริภูมิเวกเตอร์ทันที!"</em> นี่คือที่มาของเมทริกซ์การแปลง $[T] = [T(\mathbf{e}_1) \mid T(\mathbf{e}_2)]$
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Section 5: แบบฝึกหัดสำหรับนักศึกษา -->
+  <section class="max-w-6xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 -mt-6 sm:-mt-8">
+    <div class="bg-white rounded-xl p-4 sm:p-5 shadow-sm border border-slate-200/80">
+      <div class="flex items-center gap-2.5 border-b border-slate-100 pb-3 mb-4">
+        <div class="w-8 h-8 rounded-lg bg-violet-50 text-violet-600 flex items-center justify-center font-bold text-sm">
+          <i class="fa-solid fa-pencil text-base"></i>
+        </div>
+        <div>
+          <h2 class="text-base sm:text-lg font-bold text-slate-900">5. แบบฝึกหัดสำหรับนักศึกษาและแนวทางการพิสูจน์</h2>
+          <p class="text-[11px] text-slate-400">Student Rigorous Exercises & Complete Solutions</p>
+        </div>
+      </div>
+
+      <div class="bg-slate-50 rounded-xl p-4 border border-slate-200 space-y-3">
+        <div class="inline-block px-2.5 py-0.5 rounded text-[11px] font-bold bg-violet-100 text-violet-800">
+          โจทย์แบบฝึกหัด (Formal Practice Exercise)
+        </div>
+        <p class="text-xs sm:text-sm font-semibold text-slate-900 leading-relaxed">
+          ให้ $V$ และ $W$ เป็นปริภูมิเวกเตอร์ และ $T: V \to W$ เป็นการแปลงเชิงเส้น จงพิสูจน์ข้อความต่อไปนี้โดยอาศัยเพียงนิยามของการแปลงเชิงเส้นและสัจพจน์ของปริภูมิเวกเตอร์:
+        </p>
+        
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs sm:text-sm">
+          <div class="bg-white p-2.5 rounded-lg border border-slate-200 font-mono text-center text-indigo-900 font-bold">
+            (ก) $T(\mathbf{0}_V) = \mathbf{0}_W$
+          </div>
+          <div class="bg-white p-2.5 rounded-lg border border-slate-200 font-mono text-center text-indigo-900 font-bold">
+            (ข) $T(a\mathbf{u} + b\mathbf{v}) = aT(\mathbf{u}) + bT(\mathbf{v})$
+          </div>
+        </div>
+
+        <div class="pt-2">
+          <button type="button" onclick="toggleSolutionAccordion()" id="btnToggleSolution" class="px-3.5 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white font-medium text-xs sm:text-sm transition-all shadow-sm flex items-center gap-1.5 cursor-pointer">
+            <i class="fa-solid fa-book-open"></i>
+            <span>แสดงแนวทางการพิสูจน์อย่างเป็นทางการทั้ง 2 ข้อ</span>
+            <i id="solutionChevronIcon" class="fa-solid fa-chevron-down text-xs ml-1 transition-transform duration-200"></i>
+          </button>
+        </div>
+
+        <!-- Full Solution Area -->
+        <div id="fullSolutionBox" class="hidden mt-3 pt-3 border-t border-dashed border-indigo-200 space-y-3 text-xs sm:text-sm">
+          
+          <!-- Proof Part A -->
+          <div class="bg-white p-3.5 rounded-lg border border-slate-200 space-y-2">
+            <div class="flex items-center gap-1.5 font-bold text-indigo-950">
+              <span class="w-5 h-5 rounded bg-indigo-100 text-indigo-700 text-xs flex items-center justify-center font-bold">ก</span>
+              <span>บทพิสูจน์ข้อ (ก): $T(\mathbf{0}_V) = \mathbf{0}_W$</span>
+            </div>
+            <p class="text-slate-600 text-xs leading-relaxed">
+              <strong>วิธีที่ 1 (ใช้สเกลาร์ $0$):</strong><br>
+              จากสมบัติของปริภูมิเวกเตอร์ เราทราบว่าสำหรับเวกเตอร์ $\mathbf{v} \in V$ ใด ๆ จะได้ $0 \cdot \mathbf{v} = \mathbf{0}_V$<br>
+              จากนิยามสมบัติการคูณสเกลาร์ของการแปลงเชิงเส้น $T(c\mathbf{v}) = cT(\mathbf{v})$ เมื่อแทน $c = 0$ จะได้:
+              $$T(\mathbf{0}_V) = T(0 \cdot \mathbf{v}) = 0 \cdot T(\mathbf{v})$$
+              เนื่องจากสเกลาร์ $0$ คูณกับเวกเตอร์ใด ๆ ใน $W$ ย่อมได้เวกเตอร์ศูนย์ของ $W$ นั่นคือ $0 \cdot T(\mathbf{v}) = \mathbf{0}_W$<br>
+              ดังนั้นจึงสรุปได้ว่า $T(\mathbf{0}_V) = \mathbf{0}_W$
+            </p>
+            <div class="bg-slate-50 p-2.5 rounded border border-slate-200 text-slate-600 text-[11px]">
+              <strong>วิธีที่ 2 (ใช้สมบัติการบวก):</strong> เพราะว่า $\mathbf{0}_V + \mathbf{0}_V = \mathbf{0}_V$ ดังนั้น $T(\mathbf{0}_V + \mathbf{0}_V) = T(\mathbf{0}_V)$<br>
+              โดยสมบัติการบวกจะได้ $T(\mathbf{0}_V) + T(\mathbf{0}_V) = T(\mathbf{0}_V) + \mathbf{0}_W$ เมื่อบวกด้วยอินเวิร์ส $-T(\mathbf{0}_V)$ ทั้งสองข้าง จะได้ $T(\mathbf{0}_V) = \mathbf{0}_W$
+            </div>
+          </div>
+
+          <!-- Proof Part B -->
+          <div class="bg-white p-3.5 rounded-lg border border-slate-200 space-y-2">
+            <div class="flex items-center gap-1.5 font-bold text-indigo-950">
+              <span class="w-5 h-5 rounded bg-indigo-100 text-indigo-700 text-xs flex items-center justify-center font-bold">ข</span>
+              <span>บทพิสูจน์ข้อ (ข): $T(a\mathbf{u} + b\mathbf{v}) = aT(\mathbf{u}) + bT(\mathbf{v})$</span>
+            </div>
+            <p class="text-slate-600 text-xs leading-relaxed">
+              ให้ $\mathbf{u}, \mathbf{v} \in V$ และ $a, b \in \mathbb{R}$ เป็นสเกลาร์ใด ๆ:<br>
+              สังเกตว่า $a\mathbf{u}$ และ $b\mathbf{v}$ ต่างก็เป็นสมาชิกของปริภูมิเวกเตอร์ $V$ (สมบัติปิดการคูณสเกลาร์)
+            </p>
+            <div class="p-2.5 bg-slate-50 rounded font-mono text-xs text-slate-800">
+              $$\begin{aligned}
+              T(a\mathbf{u} + b\mathbf{v}) &= T(a\mathbf{u}) + T(b\mathbf{v}) && \text{(จากสมบัติการบวกของการแปลงเชิงเส้น)} \\
+              &= aT(\mathbf{u}) + bT(\mathbf{v}) && \text{(จากสมบัติการคูณด้วยสเกลาร์ของการแปลงเชิงเส้น)}
+              \end{aligned}$$
+            </div>
+            <p class="text-slate-600 text-xs leading-relaxed">
+              ดังนั้น การแปลงเชิงเส้นจึงคงสภาพการรวมเชิงเส้นของเวกเตอร์เสมอ
+            </p>
+            <div class="flex justify-end pt-1">
+              <span class="font-serif font-bold text-indigo-600 text-sm">Q.E.D. ∎</span>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Logic & Interactive Verification Script -->
+  <script>
+    // Database of Proof Theorems for the Sandbox
+    const theoremsData = {
+      zero: {
+        title: "พิสูจน์ว่า T(0) = 0",
+        objective: "พิสูจน์ว่าเวกเตอร์ศูนย์ในโดเมน $V$ จะต้องส่งไปยังเวกเตอร์ศูนย์ในโคโดเมน $W$ โดยใช้นิยามการคูณสเกลาร์ $T(c\\mathbf{v}) = cT(\\mathbf{v})$ เมื่อ $c = 0$",
+        correctSteps: [
+          {
+            id: "step-z1",
+            text: "ให้ $\\mathbf{v} \\in V$ ใด ๆ จากสมบัติของปริภูมิเวกเตอร์ ทราบว่า $0\\mathbf{v} = \\mathbf{0}_V$",
+            math: "0\\mathbf{v} = \\mathbf{0}_V"
+          },
+          {
+            id: "step-z2",
+            text: "แทนค่าลงในฟังก์ชัน $T$ จะได้ $T(\\mathbf{0}_V) = T(0\\mathbf{v})$",
+            math: "T(\\mathbf{0}_V) = T(0\\mathbf{v})"
+          },
+          {
+            id: "step-z3",
+            text: "ใช้นิยามสมบัติการคูณด้วยสเกลาร์ของการแปลงเชิงเส้น $T(c\\mathbf{v}) = cT(\\mathbf{v})$ โดยให้ $c = 0$",
+            math: "T(0\\mathbf{v}) = 0 \\cdot T(\\mathbf{v})"
+          },
+          {
+            id: "step-z4",
+            text: "เนื่องจากสเกลาร์ $0$ คูณกับเวกเตอร์ใด ๆ ใน $W$ ย่อมได้เวกเตอร์ศูนย์ ดังนั้น $0 \\cdot T(\\mathbf{v}) = \\mathbf{0}_W$",
+            math: "0 \\cdot T(\\mathbf{v}) = \\mathbf{0}_W"
+          },
+          {
+            id: "step-z5",
+            text: "สรุปผลลัพธ์ $T(\\mathbf{0}_V) = \\mathbf{0}_W$ (Q.E.D.)",
+            math: "T(\\mathbf{0}_V) = \\mathbf{0}_W"
+          }
+        ]
+      },
+      inverse: {
+        title: "พิสูจน์ว่า T(-v) = -T(v)",
+        objective: "พิสูจน์ว่าภาพของอินเวิร์สการบวก $-\\mathbf{v}$ เท่ากับอินเวิร์สการบวกของ $T(\\mathbf{v})$ โดยมองว่า $-\\mathbf{v} = (-1)\\mathbf{v}$",
+        correctSteps: [
+          {
+            id: "step-i1",
+            text: "ให้ $\\mathbf{v} \\in V$ จากสมบัติของปริภูมิเวกเตอร์ ตัวผกผันการบวกเขียนได้เป็น $-\\mathbf{v} = (-1)\\mathbf{v}$",
+            math: "-\\mathbf{v} = (-1)\\mathbf{v}"
+          },
+          {
+            id: "step-i2",
+            text: "พิจารณาการแปลง $T(-\\mathbf{v}) = T((-1)\\mathbf{v})$",
+            math: "T(-\\mathbf{v}) = T((-1)\\mathbf{v})"
+          },
+          {
+            id: "step-i3",
+            text: "ใช้นิยามการแปลงเชิงเส้นสำหรับการคูณสเกลาร์ $T(c\\mathbf{v}) = cT(\\mathbf{v})$ โดยให้ $c = -1$",
+            math: "T((-1)\\mathbf{v}) = (-1)T(\\mathbf{v})"
+          },
+          {
+            id: "step-i4",
+            text: "จากสมบัติของเวกเตอร์ใน $W$ จะได้ว่า $(-1)T(\\mathbf{v}) = -T(\\mathbf{v})$",
+            math: "(-1)T(\\mathbf{v}) = -T(\\mathbf{v})"
+          },
+          {
+            id: "step-i5",
+            text: "สรุปได้ว่า $T(-\\mathbf{v}) = -T(\\mathbf{v})$ ตามต้องการ",
+            math: "T(-\\mathbf{v}) = -T(\\mathbf{v})"
+          }
+        ]
+      },
+      linear_comb: {
+        title: "พิสูจน์ว่า T(au + bv) = aT(u) + bT(v)",
+        objective: "พิสูจน์การรักษาการรวมเชิงเส้น 2 เวกเตอร์ โดยใช้นิยามสมบัติการบวกและสมบัติการคูณด้วยสเกลาร์",
+        correctSteps: [
+          {
+            id: "step-l1",
+            text: "ให้ $\\mathbf{u}, \\mathbf{v} \\in V$ และ $a, b \\in \\mathbb{R}$ โดยสมบัติปิดการคูณสเกลาร์จะได้ $a\\mathbf{u}, b\\mathbf{v} \\in V$",
+            math: "a\\mathbf{u}, b\\mathbf{v} \\in V"
+          },
+          {
+            id: "step-l2",
+            text: "ใช้สมบัติการบวกของการแปลงเชิงเส้น $T(\\mathbf{x} + \\mathbf{y}) = T(\\mathbf{x}) + T(\\mathbf{y})$ กับเวกเตอร์ $a\\mathbf{u}$ และ $b\\mathbf{v}$",
+            math: "T(a\\mathbf{u} + b\\mathbf{v}) = T(a\\mathbf{u}) + T(b\\mathbf{v})"
+          },
+          {
+            id: "step-l3",
+            text: "ใช้สมบัติการคูณสเกลาร์ของการแปลงเชิงเส้น $T(c\\mathbf{w}) = cT(\\mathbf{w})$ กับแต่ละพจน์",
+            math: "T(a\\mathbf{u}) = aT(\\mathbf{u}) \\quad \\text{และ} \\quad T(b\\mathbf{v}) = bT(\\mathbf{v})"
+          },
+          {
+            id: "step-l4",
+            text: "แทนค่ากลับลงไปในสมการ จะได้ $T(a\\mathbf{u} + b\\mathbf{v}) = aT(\\mathbf{u}) + bT(\\mathbf{v})$ (Q.E.D.)",
+            math: "T(a\\mathbf{u} + b\\mathbf{v}) = aT(\\mathbf{u}) + bT(\\mathbf{v})"
+          }
+        ]
+      }
+    };
+
+    // State of active steps in sandbox
+    let currentTheoremKey = 'zero';
+    let currentWorkingSteps = [];
+
+    // Helper: Fisher-Yates Shuffle that guarantees not in exact correct order if length > 1
+    function shuffleArray(array) {
+      const arr = [...array];
+      for (let i = arr.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+      }
+      return arr;
+    }
+
+    // Load selected theorem into working state
+    function loadSelectedTheorem() {
+      const select = document.getElementById('proofSelect');
+      currentTheoremKey = select.value;
+      const theorem = theoremsData[currentTheoremKey];
+
+      // Update objective text
+      const objBox = document.getElementById('theoremObjectiveBox');
+      objBox.innerHTML = `<span class="font-bold text-indigo-800">เป้าหมาย:</span> ${theorem.objective}`;
+
+      // Reset and shuffle
+      resetCurrentTheorem(true);
+
+      // Re-render math inside objective
+      if (window.MathJax && MathJax.typesetPromise) {
+        MathJax.typesetPromise([objBox]).catch(e => console.log(e));
+      }
+    }
+
+    // Reset current theorem steps (optionally shuffle)
+    function resetCurrentTheorem(shouldShuffle = true) {
+      const theorem = theoremsData[currentTheoremKey];
+      if (shouldShuffle) {
+        let shuffled = shuffleArray(theorem.correctSteps);
+        // ensure not by chance strictly sorted
+        let isSame = true;
+        for (let i = 0; i < shuffled.length; i++) {
+          if (shuffled[i].id !== theorem.correctSteps[i].id) {
+            isSame = false;
+            break;
+          }
+        }
+        if (isSame && shuffled.length > 1) {
+          [shuffled[0], shuffled[1]] = [shuffled[1], shuffled[0]];
+        }
+        currentWorkingSteps = shuffled;
+      } else {
+        currentWorkingSteps = [...theorem.correctSteps];
+      }
+
+      // Hide feedback
+      const feedback = document.getElementById('verificationFeedback');
+      feedback.className = "mt-4 hidden p-3.5 rounded-xl border text-xs sm:text-sm";
+      feedback.innerHTML = "";
+
+      renderWorkingSteps();
+    }
+
+    // Render cards into UI
+    function renderWorkingSteps() {
+      const container = document.getElementById('stepsContainer');
+      const counter = document.getElementById('stepCounter');
+      counter.innerText = `${currentWorkingSteps.length} ขั้นตอน`;
+      container.innerHTML = "";
+
+      currentWorkingSteps.forEach((step, index) => {
+        const card = document.createElement('div');
+        card.className = "proof-step-card bg-white p-3 rounded-lg border border-slate-200 shadow-sm flex items-center justify-between gap-3";
+        card.id = `step-node-${index}`;
+
+        const isFirst = index === 0;
+        const isLast = index === currentWorkingSteps.length - 1;
+
+        card.innerHTML = `
+          <div class="flex items-start gap-2.5">
+            <span class="w-6 h-6 rounded bg-slate-100 text-slate-700 font-mono font-bold text-xs flex items-center justify-center flex-shrink-0 mt-0.5 border border-slate-300">
+              ${index + 1}
+            </span>
+            <div class="text-xs sm:text-sm text-slate-800 leading-snug">
+              <p>${step.text}</p>
+            </div>
+          </div>
+          <div class="flex items-center gap-1 flex-shrink-0">
+            <button type="button" onclick="moveStep(${index}, -1)" ${isFirst ? 'disabled' : ''} class="w-7 h-7 rounded border border-slate-200 bg-slate-50 text-slate-600 hover:bg-slate-100 disabled:opacity-30 disabled:pointer-events-none flex items-center justify-center text-xs transition cursor-pointer" title="เลื่อนขึ้น">
+              <i class="fa-solid fa-arrow-up"></i>
+            </button>
+            <button type="button" onclick="moveStep(${index}, 1)" ${isLast ? 'disabled' : ''} class="w-7 h-7 rounded border border-slate-200 bg-slate-50 text-slate-600 hover:bg-slate-100 disabled:opacity-30 disabled:pointer-events-none flex items-center justify-center text-xs transition cursor-pointer" title="เลื่อนลง">
+              <i class="fa-solid fa-arrow-down"></i>
+            </button>
+          </div>
+        `;
+        container.appendChild(card);
+      });
+
+      // Typeset math inside rendered steps
+      if (window.MathJax && MathJax.typesetPromise) {
+        MathJax.typesetPromise([container]).catch(e => console.log(e));
+      }
+    }
+
+    // Move step position
+    function moveStep(fromIndex, delta) {
+      const toIndex = fromIndex + delta;
+      if (toIndex < 0 || toIndex >= currentWorkingSteps.length) return;
+
+      const temp = currentWorkingSteps[fromIndex];
+      currentWorkingSteps[fromIndex] = currentWorkingSteps[toIndex];
+      currentWorkingSteps[toIndex] = temp;
+
+      renderWorkingSteps();
+    }
+
+    // Verify ordering and diagnose flaws
+    function verifyProofOrder() {
+      const theorem = theoremsData[currentTheoremKey];
+      const correct = theorem.correctSteps;
+      const feedback = document.getElementById('verificationFeedback');
+
+      let isFullyCorrect = true;
+      let firstErrorIdx = -1;
+
+      for (let i = 0; i < currentWorkingSteps.length; i++) {
+        if (currentWorkingSteps[i].id !== correct[i].id) {
+          isFullyCorrect = false;
+          firstErrorIdx = i;
+          break;
+        }
+      }
+
+      feedback.classList.remove('hidden');
+
+      if (isFullyCorrect) {
+        feedback.className = "mt-4 p-3.5 rounded-xl border bg-emerald-50 border-emerald-300 text-emerald-950 flex items-start gap-3";
+        feedback.innerHTML = `
+          <div class="w-7 h-7 rounded-full bg-emerald-600 text-white flex items-center justify-center flex-shrink-0 font-bold text-xs mt-0.5">
+            <i class="fa-solid fa-check"></i>
+          </div>
+          <div class="space-y-1">
+            <h4 class="font-bold text-emerald-900 text-xs sm:text-sm">ยอดเยี่ยมมาก! ลำดับการพิสูจน์ถูกต้องสมบูรณ์ (Rigorous Logical Proof)</h4>
+            <p class="text-xs text-emerald-800 leading-relaxed">
+              คุณได้ให้เหตุผลเริ่มต้นจากสมมติฐานและสัจพจน์ของปริภูมิเวกเตอร์ แล้วนำนิยามของการแปลงเชิงเส้นมาประยุกต์ใช้อย่างเป็นขั้นตอนจนได้ข้อสรุปที่ถูกต้องตามหลักตรรกศาสตร์
+            </p>
+          </div>
+        `;
+      } else {
+        feedback.className = "mt-4 p-3.5 rounded-xl border bg-rose-50 border-rose-300 text-rose-950 flex items-start gap-3";
+        
+        let hintMsg = "ลำดับขั้นตอนยังไม่ถูกต้องตามสายตรรกะทางคณิตศาสตร์";
+        // Specific tailored pedagogical diagnosis
+        const misplacedStep = currentWorkingSteps[firstErrorIdx];
+        if (firstErrorIdx === 0 && misplacedStep.id.includes('4') || misplacedStep.id.includes('5')) {
+          hintMsg = "คุณนำข้อสรุปหรือผลลัพธ์สุดท้ายมาวางไว้ที่ขั้นตอนแรก ซึ่งขัดกับหลักการพิสูจน์ (ต้องเริ่มต้นจากสมมติฐานหรือสัจพจน์ก่อน)";
+        } else if (firstErrorIdx === 0) {
+          hintMsg = "ขั้นตอนแรกควรเป็นการนิยามเวกเตอร์และการอ้างอิงสัจพจน์ปริภูมิเวกเตอร์เริ่มต้น";
+        } else {
+          hintMsg = `ตรวจพบข้อผิดพลาดที่ตำแหน่งขั้นตอนที่ ${firstErrorIdx + 1}: การอ้างอิงเหตุผลยังไม่สอดรับกับขั้นตอนก่อนหน้า`;
+        }
+
+        feedback.innerHTML = `
+          <div class="w-7 h-7 rounded-full bg-rose-600 text-white flex items-center justify-center flex-shrink-0 font-bold text-xs mt-0.5">
+            <i class="fa-solid fa-xmark"></i>
+          </div>
+          <div class="space-y-1">
+            <h4 class="font-bold text-rose-900 text-xs sm:text-sm">ลำดับขั้นตอนยังไม่สมบูรณ์</h4>
+            <p class="text-xs text-rose-800 leading-relaxed">${hintMsg}</p>
+            <p class="text-[11px] text-rose-700 mt-1">
+              คำแนะนำ: ลองพิจารณาว่าขั้นตอนใดคือ "สิ่งที่กำหนดให้" ขั้นตอนใดคือ "การนำนิยาม $T$ มากระจาย" และขั้นตอนใดคือ "ข้อสรุปสุดท้าย"
+            </p>
+          </div>
+        `;
+      }
+
+      if (window.MathJax && MathJax.typesetPromise) {
+        MathJax.typesetPromise([feedback]).catch(e => console.log(e));
+      }
+    }
+
+    // Solve and show correct sequence directly
+    function solveTheoremDirectly() {
+      const theorem = theoremsData[currentTheoremKey];
+      currentWorkingSteps = [...theorem.correctSteps];
+      renderWorkingSteps();
+
+      const feedback = document.getElementById('verificationFeedback');
+      feedback.classList.remove('hidden');
+      feedback.className = "mt-4 p-3 rounded-xl border bg-indigo-50 border-indigo-300 text-indigo-950 flex items-center gap-2.5 text-xs sm:text-sm";
+      feedback.innerHTML = `
+        <i class="fa-solid fa-circle-info text-indigo-600 text-base"></i>
+        <span>ระบบได้จัดเรียงลำดับขั้นตอนที่ถูกต้องตามหลักระเบียบวิธีพิสูจน์ให้เรียบร้อยแล้ว</span>
+      `;
+    }
+
+    // Toggle discovery section
+    function toggleDiscoverySection() {
+      const box = document.getElementById('discoveryAnswerBox');
+      const icon = document.getElementById('discoveryIcon');
+      const isHidden = box.classList.contains('hidden');
+
+      if (isHidden) {
+        box.classList.remove('hidden');
+        icon.classList.add('rotate-180');
+        if (window.MathJax && MathJax.typesetPromise) {
+          MathJax.typesetPromise([box]).catch(e => console.log(e));
+        }
+      } else {
+        box.classList.add('hidden');
+        icon.classList.remove('rotate-180');
+      }
+    }
+
+    // Toggle solution accordion
+    function toggleSolutionAccordion() {
+      const box = document.getElementById('fullSolutionBox');
+      const icon = document.getElementById('solutionChevronIcon');
+      const isHidden = box.classList.contains('hidden');
+
+      if (isHidden) {
+        box.classList.remove('hidden');
+        icon.classList.add('rotate-180');
+        if (window.MathJax && MathJax.typesetPromise) {
+          MathJax.typesetPromise([box]).catch(e => console.log(e));
+        }
+      } else {
+        box.classList.add('hidden');
+        icon.classList.remove('rotate-180');
+      }
+    }
+
+    // Initialize sandbox on window load
+    window.onload = function() {
+      loadSelectedTheorem();
+    };
+  </script>
+</body>
+</html>
