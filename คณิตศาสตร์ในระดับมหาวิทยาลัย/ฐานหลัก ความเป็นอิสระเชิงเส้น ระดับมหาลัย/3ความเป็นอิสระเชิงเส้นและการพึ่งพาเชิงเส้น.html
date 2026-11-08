@@ -1,0 +1,1022 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>เรื่องที่ 3: ความเป็นอิสระเชิงเส้นและการพึ่งพาเชิงเส้น (Linear Independence & Dependence)</title>
+  
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- Google Fonts: Sarabun & Kanit -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com">
+  <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@400;500;600;700&family=Sarabun:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+  
+  <!-- MathJax 3 for mathematical formula rendering -->
+  <script>
+    window.MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']],
+        displayMath: [['$$', '$$'], ['\\[', '\\]']]
+      },
+      svg: { fontCache: 'global' }
+    };
+  </script>
+  <script type="text/javascript" id="MathJax-script" async
+    src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+  </script>
+
+  <style>
+    body {
+      font-family: 'Sarabun', sans-serif;
+    }
+    h1, h2, h3, h4, .font-heading {
+      font-family: 'Kanit', sans-serif;
+    }
+    .pivot-cell {
+      background-color: #dbeafe !important;
+      color: #1e40af !important;
+      font-weight: 700;
+      border: 2px solid #3b82f6 !important;
+    }
+    .zero-row {
+      background-color: #fef2f2 !important;
+    }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-800 antialiased min-h-screen">
+
+  <!-- Main Container strictly conforming to dimensions -->
+  <div class="max-w-6xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 space-y-10">
+
+    <!-- Header Section -->
+    <header class="bg-gradient-to-r from-emerald-950 via-teal-900 to-slate-900 text-white rounded-3xl p-6 sm:p-10 shadow-xl relative overflow-hidden">
+      <div class="absolute -right-12 -top-12 w-72 h-72 bg-emerald-500/15 rounded-full blur-3xl pointer-events-none"></div>
+      <div class="relative z-10">
+
+        <h1 class="text-2xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-white mb-3">
+          เรื่องที่ 3: ความเป็นอิสระเชิงเส้นและการพึ่งพาเชิงเส้น
+        </h1>
+        <p class="text-emerald-200 text-base sm:text-lg max-w-3xl leading-relaxed">
+          ตรวจจับ "ความซ้ำซ้อน" ในชุดข้อมูลเวกเตอร์ ผ่านสมการเอกพันธ์ $c_1\mathbf{v}_1 + \cdots + c_k\mathbf{v}_k = \mathbf{0}$ สู่การวิเคราะห์ตำแหน่งตัวนำ (Pivot Positions) ในเมทริกซ์ $A\mathbf{c} = \mathbf{0}$
+        </p>
+      </div>
+    </header>
+
+    <!-- ส่วนที่ 1: วัตถุประสงค์การเรียนรู้ -->
+    <section class="bg-white rounded-2xl p-6 sm:p-8 shadow-sm border border-slate-200 transition-all hover:shadow-md">
+      <div class="flex items-start gap-4">
+        <div class="p-3 bg-emerald-50 text-emerald-600 rounded-xl flex-shrink-0">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+          </svg>
+        </div>
+        <div class="space-y-2">
+          <h2 class="text-xl sm:text-2xl font-bold text-slate-900">1. วัตถุประสงค์การเรียนรู้</h2>
+          <ul class="space-y-1.5 text-slate-700 text-base sm:text-lg leading-relaxed list-disc list-inside">
+            <li>นักศึกษาสามารถ<strong>ตรวจสอบความเป็นอิสระเชิงเส้น (Linear Independence)</strong> ของเวกเตอร์ชุดหนึ่งได้อย่างถูกต้องเป็นขั้นตอน</li>
+            <li>นักศึกษาสามารถ<strong>อธิบายความหมายของการพึ่งพาเชิงเส้น (Linear Dependence)</strong> ในเชิงความซ้ำซ้อนของข้อมูลและเชิงเรขาคณิตได้</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- ส่วนที่ 2: เนื้อหาหลัก -->
+    <section class="bg-white rounded-2xl p-6 sm:p-8 shadow-sm border border-slate-200 space-y-6">
+      <div>
+        <h2 class="text-xl sm:text-2xl font-bold text-slate-900 flex items-center gap-2">
+          <span class="w-2 h-7 bg-emerald-600 rounded-full inline-block"></span>
+          2. เนื้อหาหลัก (Core Mathematical Concepts)
+        </h2>
+        <p class="text-slate-600 text-sm sm:text-base mt-1">
+          การวิเคราะห์สมการเวกเตอร์เอกพันธ์และเงื่อนไขการมีคำตอบศูนย์เพียงคำตอบเดียว
+        </p>
+      </div>
+
+      <!-- 4 Core Concept Cards -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+        <!-- Card 1: Definition of Independence -->
+        <div class="bg-slate-50 rounded-xl p-5 border border-slate-200/90 hover:border-emerald-300 transition-colors">
+          <h3 class="text-lg font-bold text-emerald-800 mb-2 flex items-center gap-2">
+            <span class="flex items-center justify-center w-6 h-6 rounded-md bg-emerald-100 text-emerald-700 text-xs font-bold">1</span>
+            นิยามความเป็นอิสระเชิงเส้น (Linear Independence)
+          </h3>
+          <p class="text-slate-700 text-sm sm:text-base leading-relaxed mb-3">
+            เซตของเวกเตอร์ $\{\mathbf{v}_1, \mathbf{v}_2, \dots, \mathbf{v}_k\}$ ใน $\mathbb{R}^n$ จะเรียกว่า <strong>เป็นอิสระเชิงเส้นต่อกัน</strong> ก็ต่อเมื่อ สมการเอกพันธ์:
+          </p>
+          <div class="p-3 bg-white rounded-lg border border-slate-200 text-center font-medium shadow-inner overflow-x-auto text-slate-900">
+            $$c_1\mathbf{v}_1 + c_2\mathbf{v}_2 + \cdots + c_k\mathbf{v}_k = \mathbf{0}$$
+          </div>
+          <p class="text-xs sm:text-sm text-slate-600 mt-2 font-medium">
+            มีเพียง <span class="text-emerald-700 font-bold">"คำตอบศูนย์ทั้งหมด" (Trivial Solution)</span> เท่านั้น นั่นคือ $c_1 = c_2 = \cdots = c_k = 0$
+          </p>
+        </div>
+
+        <!-- Card 2: Linear Dependence & Non-trivial Solution -->
+        <div class="bg-slate-50 rounded-xl p-5 border border-slate-200/90 hover:border-emerald-300 transition-colors">
+          <h3 class="text-lg font-bold text-emerald-800 mb-2 flex items-center gap-2">
+            <span class="flex items-center justify-center w-6 h-6 rounded-md bg-emerald-100 text-emerald-700 text-xs font-bold">2</span>
+            การพึ่งพาเชิงเส้น (Linear Dependence)
+          </h3>
+          <p class="text-slate-700 text-sm sm:text-base leading-relaxed mb-3">
+            เซตของเวกเตอร์จะเรียกว่า <strong>พึ่งพาเชิงเส้นต่อกัน</strong> ถ้ามีค่าสเกลาร์ $c_1, c_2, \dots, c_k$ <em>ที่ไม่เป็นศูนย์พร้อมกันทุกตัว</em> (Non-trivial Solution) ที่ทำให้:
+          </p>
+          <div class="p-3 bg-white rounded-lg border border-slate-200 text-center font-medium shadow-inner overflow-x-auto text-slate-900">
+            $$c_1\mathbf{v}_1 + c_2\mathbf{v}_2 + \cdots + c_k\mathbf{v}_k = \mathbf{0} \quad (\exists c_i \neq 0)$$
+          </div>
+          <p class="text-xs sm:text-sm text-slate-600 mt-2">
+            หมายความว่า เราสามารถรวมเวกเตอร์เหล่านี้ให้กลับมาที่จุดกำเนิด $\mathbf{0}$ ได้ โดยไม่ต้องตั้งค่าสัมประสิทธิ์ให้เป็นศูนย์ทั้งหมด
+          </p>
+        </div>
+
+        <!-- Card 3: Redundant Vectors Relation -->
+        <div class="bg-slate-50 rounded-xl p-5 border border-slate-200/90 hover:border-emerald-300 transition-colors">
+          <h3 class="text-lg font-bold text-emerald-800 mb-2 flex items-center gap-2">
+            <span class="flex items-center justify-center w-6 h-6 rounded-md bg-emerald-100 text-emerald-700 text-xs font-bold">3</span>
+            เวกเตอร์ที่ซ้ำซ้อน (Redundancy)
+          </h3>
+          <p class="text-slate-700 text-sm sm:text-base leading-relaxed mb-2">
+            ทฤษฎีบทการพึ่งพาเชิงเส้นระบุว่า: เซต $\{\mathbf{v}_1, \dots, \mathbf{v}_k\}$ (เมื่อ $k \ge 2$) จะพึ่งพาเชิงเส้นก็ต่อเมื่อ:
+          </p>
+          <div class="p-2.5 bg-white rounded-lg border border-slate-200 text-xs sm:text-sm text-slate-800 font-medium">
+            "มีเวกเตอร์อย่างน้อย 1 ตัวในเซต สามารถเขียนเป็นการรวมเชิงเส้นของเวกเตอร์ตัวที่เหลือได้"
+          </div>
+          <p class="text-xs text-slate-500 mt-2">
+            เวกเตอร์ตัวนั้นเปรียบเสมือน <em>"ข้อมูลซ้ำซ้อน"</em> หากตัดออกไป ค่า $\operatorname{span}$ ก็จะยังคงเท่าเดิมไม่ลดลง
+          </p>
+        </div>
+
+        <!-- Card 4: Matrix Equation & Pivot Analysis -->
+        <div class="bg-slate-50 rounded-xl p-5 border border-slate-200/90 hover:border-emerald-300 transition-colors">
+          <h3 class="text-lg font-bold text-emerald-800 mb-2 flex items-center gap-2">
+            <span class="flex items-center justify-center w-6 h-6 rounded-md bg-emerald-100 text-emerald-700 text-xs font-bold">4</span>
+            การตรวจสอบผ่านเมทริกซ์ $A\mathbf{c} = \mathbf{0}$
+          </h3>
+          <p class="text-slate-700 text-sm sm:text-base leading-relaxed mb-2">
+            นำเวกเตอร์มาตั้งเป็นคอลัมน์ของเมทริกซ์ $A = [\mathbf{v}_1\ \mathbf{v}_2\ \cdots\ \mathbf{v}_k]$ แล้วลดรูปสู่ขั้นบันไดแถวลดรูป (RREF):
+          </p>
+          <ul class="list-disc list-inside text-xs sm:text-sm text-slate-700 space-y-1">
+            <li><strong>อิสระเชิงเส้น:</strong> ทุกคอลัมน์มีตำแหน่งตัวนำ (Pivot Column ครบทุกคอลัมน์) ไม่มีตัวแปรเสรี (No Free Variable) $\implies \mathbf{c} = \mathbf{0}$ ตัวเดียว</li>
+            <li><strong>พึ่งพาเชิงเส้น:</strong> มีอย่างน้อยหนึ่งคอลัมน์ที่ไม่มี Pivot (มีตัวแปรเสรี Free Variable) $\implies$ มีผลเฉลยที่ไม่เป็นศูนย์นับไม่ถ้วน</li>
+          </ul>
+        </div>
+
+      </div>
+
+      <!-- Comparison Table -->
+      <div class="bg-slate-50 rounded-xl p-4 sm:p-5 border border-slate-200 overflow-x-auto">
+        <h4 class="font-bold text-slate-900 text-sm mb-3">สรุปเปรียบเทียบ: อิสระเชิงเส้น vs พึ่งพาเชิงเส้น</h4>
+        <table class="w-full text-left text-xs sm:text-sm border-collapse">
+          <thead>
+            <tr class="border-b border-slate-300 text-slate-700 bg-white">
+              <th class="p-2 sm:p-3 font-bold">คุณสมบัติ</th>
+              <th class="p-2 sm:p-3 font-bold text-emerald-700">เป็นอิสระเชิงเส้น (Linearly Independent)</th>
+              <th class="p-2 sm:p-3 font-bold text-rose-700">พึ่งพาเชิงเส้น (Linearly Dependent)</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-slate-200 text-slate-700">
+            <tr>
+              <td class="p-2.5 font-medium">คำตอบของ $A\mathbf{c} = \mathbf{0}$</td>
+              <td class="p-2.5 font-semibold text-emerald-800">มีเฉพาะ Trivial Solution ($\mathbf{c}=\mathbf{0}$)</td>
+              <td class="p-2.5 font-semibold text-rose-800">มี Non-trivial Solutions นับไม่ถ้วน</td>
+            </tr>
+            <tr>
+              <td class="p-2.5 font-medium">ตำแหน่ง Pivot ใน RREF</td>
+              <td class="p-2.5">ครบทุกคอลัมน์ (Pivot in every column)</td>
+              <td class="p-2.5">มีคอลัมน์ที่ไม่มี Pivot (เกิด Free Variable)</td>
+            </tr>
+            <tr>
+              <td class="p-2.5 font-medium">ความซ้ำซ้อนของข้อมูล</td>
+              <td class="p-2.5">ไม่มีเวกเตอร์ใดซ้ำซ้อน ทุกตัวให้ทิศทางใหม่</td>
+              <td class="p-2.5">มีเวกเตอร์ซ้ำซ้อน (เขียนเป็นผลรวมของตัวอื่นได้)</td>
+            </tr>
+            <tr>
+              <td class="p-2.5 font-medium">ในระนาบ 2 มิติ (2 เวกเตอร์)</td>
+              <td class="p-2.5">ไม่ขนานกัน (Not Collinear, $\det \neq 0$)</td>
+              <td class="p-2.5">ขนานกัน หรือมีเวกเตอร์ศูนย์ ($\det = 0$)</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ส่วนที่ 3: แบบจำลองโต้ตอบ (Interactive Model) -->
+    <section class="bg-white rounded-2xl p-6 sm:p-8 shadow-sm border border-slate-200 space-y-6">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-200">
+        <div>
+          <h2 class="text-xl sm:text-2xl font-bold text-slate-900 flex items-center gap-2">
+            <span class="w-2 h-7 bg-emerald-600 rounded-full inline-block"></span>
+            3. แบบจำลองโต้ตอบ: ตรวจสอบระบบ $A\mathbf{c} = \mathbf{0}$ ด้วยการดำเนินการตามแถว
+          </h2>
+          <p class="text-slate-600 text-sm mt-1">
+            นำเวกเตอร์มาเป็นคอลัมน์ของเมทริกซ์ $A$ ปรับค่าตัวเลข หรือเลือก Presets แล้วดูการคำนวณขั้นบันไดแถวลดรูป (RREF) และสถานะความเป็นอิสระทันที
+          </p>
+        </div>
+
+        <!-- Quick Dimension Selector -->
+        <div class="flex items-center gap-2">
+          <span class="text-xs font-semibold text-slate-500">มิติเมทริกซ์:</span>
+          <select id="matrixDimSelect" class="bg-slate-100 border border-slate-300 text-slate-800 text-xs sm:text-sm rounded-lg px-3 py-1.5 font-semibold focus:outline-none focus:ring-2 focus:ring-emerald-500">
+            <option value="2x2" selected>2 แถว × 2 คอลัมน์ (เวกเตอร์ใน R²)</option>
+            <option value="3x3">3 แถว × 3 คอลัมน์ (เวกเตอร์ใน R³)</option>
+            <option value="3x2">3 แถว × 2 คอลัมน์ (2 เวกเตอร์ใน R³)</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Presets Row -->
+      <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-2">
+        <span class="text-xs font-bold text-slate-500 uppercase tracking-wider block">ชุดทดลองมาตรฐาน (Presets):</span>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2 text-xs">
+          <button id="presetIndep2D" class="p-2.5 bg-white hover:bg-emerald-50 border border-slate-300 hover:border-emerald-400 rounded-lg font-medium text-slate-800 text-left transition shadow-xs">
+            <span class="font-bold text-emerald-700">🟢 อิสระเชิงเส้นใน R²</span><br>
+            <span class="text-[11px] text-slate-500">$\mathbf{v}_1=(1,2), \mathbf{v}_2=(3,1)$</span>
+          </button>
+          <button id="presetDep2D" class="p-2.5 bg-white hover:bg-rose-50 border border-slate-300 hover:border-rose-400 rounded-lg font-medium text-slate-800 text-left transition shadow-xs">
+            <span class="font-bold text-rose-700">🔴 พึ่งพาเชิงเส้นใน R²</span><br>
+            <span class="text-[11px] text-slate-500">$\mathbf{v}_1=(1,2), \mathbf{v}_2=(2,4)$ (ขนานกัน)</span>
+          </button>
+          <button id="presetIndep3D" class="p-2.5 bg-white hover:bg-emerald-50 border border-slate-300 hover:border-emerald-400 rounded-lg font-medium text-slate-800 text-left transition shadow-xs">
+            <span class="font-bold text-emerald-700">🟢 อิสระเชิงเส้นใน R³</span><br>
+            <span class="text-[11px] text-slate-500">ฐานหลักมาตรฐาน $\mathbf{e}_1, \mathbf{e}_2, \mathbf{e}_3$</span>
+          </button>
+          <button id="presetDep3D" class="p-2.5 bg-white hover:bg-rose-50 border border-slate-300 hover:border-rose-400 rounded-lg font-medium text-slate-800 text-left transition shadow-xs">
+            <span class="font-bold text-rose-700">🔴 พึ่งพาเชิงเส้นใน R³</span><br>
+            <span class="text-[11px] text-slate-500">$(1,1,0), (0,1,1), (1,2,1)$</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Interactive Layout: Matrix Inputs & Step-by-Step Gauss-Jordan -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        
+        <!-- Left: Matrix Input & Vector Visualizer (5 cols) -->
+        <div class="lg:col-span-5 space-y-4">
+          <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-3">
+            <div class="flex items-center justify-between">
+              <h4 class="font-bold text-slate-800 text-sm">เมทริกซ์ $A = [\mathbf{v}_1 \mid \mathbf{v}_2 \mid \cdots]$:</h4>
+              <span class="text-[11px] text-slate-500">สามารถแก้ไขตัวเลขในช่องได้</span>
+            </div>
+
+            <!-- Dynamic Input Grid for Matrix A -->
+            <div id="matrixInputContainer" class="p-3 bg-white rounded-lg border border-slate-300 overflow-x-auto">
+              <!-- Dynamically populated -->
+            </div>
+
+            <div class="flex gap-2 pt-1">
+              <button id="btnComputeRREF" class="w-full py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-medium rounded-lg text-xs sm:text-sm transition flex items-center justify-center gap-1.5 shadow-sm">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                คำนวณการดำเนินการตามแถว (ERO)
+              </button>
+            </div>
+          </div>
+
+          <!-- 2D Mini Visualizer for R^2 Vectors -->
+          <div id="vectorVisualizerBox" class="bg-slate-900 rounded-xl p-4 text-white border border-slate-800 space-y-2">
+            <div class="flex items-center justify-between text-xs">
+              <span class="font-semibold text-slate-300">ภาพเวกเตอร์คอลัมน์บนระนาบ 2D:</span>
+              <span id="visualCollinearLabel" class="text-emerald-400 font-bold">ไม่ขนานกัน (ชี้คนละแนว)</span>
+            </div>
+            <div class="w-full aspect-video bg-slate-950 rounded-lg overflow-hidden border border-slate-800 relative">
+              <canvas id="miniVectorCanvas" class="w-full h-full block"></canvas>
+            </div>
+            <p class="text-[11px] text-slate-400 text-center">
+              สังเกต: หากเวกเตอร์ขนานกันหรือทับเส้นเดียวกัน จะเกิดการพึ่งพาเชิงเส้นทันที
+            </p>
+          </div>
+        </div>
+
+        <!-- Right: Step-by-Step RREF and Final Conclusion (7 cols) -->
+        <div class="lg:col-span-7 space-y-4">
+          
+          <!-- Diagnosis Summary Banner -->
+          <div id="statusBanner" class="p-4 rounded-xl border transition-all space-y-2 bg-emerald-50 border-emerald-300 text-emerald-950">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-2">
+                <span id="statusIcon" class="w-3 h-3 rounded-full bg-emerald-500"></span>
+                <span id="statusTitle" class="font-bold text-base sm:text-lg">เวกเตอร์ชุดนี้ "เป็นอิสระเชิงเส้น" (Linearly Independent)</span>
+              </div>
+              <span id="solutionTypeBadge" class="px-2.5 py-1 rounded text-xs font-bold bg-emerald-200 text-emerald-800">
+                Trivial Solution Only
+              </span>
+            </div>
+            <p id="statusExplanation" class="text-xs sm:text-sm leading-relaxed text-slate-700">
+              ทุกคอลัมน์ของเมทริกซ์ $A$ มีตำแหน่งตัวนำ (Pivot Column) ครบถ้วน ไม่มีตัวแปรเสรี ทำให้สมการ $A\mathbf{c} = \mathbf{0}$ มีเพียงคำตอบเดียวคือ $c_1 = 0, c_2 = 0$
+            </p>
+          </div>
+
+          <!-- Pivot & Free Variables Analysis Card -->
+          <div class="grid grid-cols-2 gap-3 text-xs sm:text-sm">
+            <div class="bg-slate-50 p-3 rounded-xl border border-slate-200">
+              <span class="text-slate-500 block text-xs">ตำแหน่งคอลัมน์ตัวนำ (Pivot Columns):</span>
+              <span id="pivotCountText" class="font-bold text-slate-800 font-mono text-base">คอลัมน์ 1, คอลัมน์ 2</span>
+            </div>
+            <div class="bg-slate-50 p-3 rounded-xl border border-slate-200">
+              <span class="text-slate-500 block text-xs">ตัวแปรเสรี (Free Variables):</span>
+              <span id="freeVarText" class="font-bold text-emerald-700 font-mono text-base">ไม่มี (0 ตัวแปร)</span>
+            </div>
+          </div>
+
+          <!-- Step-by-Step Row Operation Accordion / Box -->
+          <div class="bg-white rounded-xl border border-slate-200 p-4 space-y-3 shadow-xs">
+            <div class="flex items-center justify-between">
+              <h4 class="font-bold text-slate-900 text-sm flex items-center gap-2">
+                <svg class="w-4 h-4 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path></svg>
+                ขั้นตอนการดำเนินการตามแถวขั้นมูลฐาน (Row Operations to RREF):
+              </h4>
+            </div>
+            
+            <div id="stepsContainer" class="space-y-3 max-h-80 overflow-y-auto pr-1 text-xs sm:text-sm">
+              <!-- Dynamically rendered steps -->
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ส่วนที่ 4: คำถามนำเพื่อค้นพบ -->
+    <section class="bg-white rounded-2xl p-6 sm:p-8 shadow-sm border border-slate-200 space-y-4">
+      <div class="flex items-center gap-2">
+        <span class="w-2 h-7 bg-emerald-600 rounded-full inline-block"></span>
+        <h2 class="text-xl sm:text-2xl font-bold text-slate-900">4. คำถามนำเพื่อค้นพบ (Guided Discovery Question)</h2>
+      </div>
+
+      <div class="bg-gradient-to-r from-emerald-50 via-teal-50 to-slate-50 border border-emerald-200 rounded-2xl p-5 sm:p-7 space-y-4">
+        <div class="flex items-start gap-3">
+          <div class="p-2.5 bg-emerald-600 text-white rounded-xl flex-shrink-0 mt-0.5">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
+          </div>
+          <div class="space-y-3 w-full">
+            <h3 class="text-lg sm:text-xl font-bold text-emerald-950">
+              "ถ้าเวกเตอร์ตัวหนึ่งเขียนเป็นการรวมเชิงเส้นของเวกเตอร์ตัวอื่นในชุดเดียวกันได้ จะสรุปอะไรเกี่ยวกับความเป็นอิสระเชิงเส้นของชุดนั้น?"
+            </h3>
+            <p class="text-slate-700 text-sm sm:text-base leading-relaxed">
+              สมมติเรามีเซต $\{\mathbf{v}_1, \mathbf{v}_2, \mathbf{v}_3\}$ และพบว่าเวกเตอร์ตัวที่ 3 เกิดจากสองตัวแรกรวมกัน นั่นคือ $\mathbf{v}_3 = 2\mathbf{v}_1 + 5\mathbf{v}_2$ เราจะจัดรูปสมการเข้าสู่นิยาม $c_1\mathbf{v}_1 + c_2\mathbf{v}_2 + c_3\mathbf{v}_3 = \mathbf{0}$ เพื่อดูคำตอบได้อย่างไร?
+            </p>
+
+            <button id="btnRevealProof" class="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded-xl text-sm transition shadow-sm flex items-center gap-2">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
+              <span>คลิกเพื่อดูการพิสูจน์เชิงพีชคณิตและการสรุปผล</span>
+            </button>
+
+            <!-- Discovery Reveal Panel -->
+            <div id="discoveryProofBox" class="hidden mt-4 bg-white p-5 rounded-xl border border-emerald-200 space-y-3 text-sm sm:text-base text-slate-800 shadow-sm">
+              <p class="font-bold text-rose-600 text-base">
+                ข้อสรุป: เซตของเวกเตอร์ชุดนั้นจะ "พึ่งพาเชิงเส้นต่อกัน (Linearly Dependent)" ทันที!
+              </p>
+
+              <div class="border-l-4 border-emerald-600 pl-4 space-y-2 text-sm text-slate-700">
+                <p><strong>การพิสูจน์ด้วยการย้ายข้างเชิงพีชคณิต:</strong></p>
+                <p>สมมติว่าเวกเตอร์ $\mathbf{v}_k$ เขียนเป็นการรวมเชิงเส้นของตัวอื่นได้:</p>
+                <div class="p-2 bg-slate-50 rounded border border-slate-200 text-center font-mono my-1">
+                  $$\mathbf{v}_k = c_1\mathbf{v}_1 + c_2\mathbf{v}_2 + \cdots + c_{k-1}\mathbf{v}_{k-1}$$
+                </div>
+                <p>เมื่อเราย้ายข้าง $\mathbf{v}_k$ มาไว้ฝั่งเดียวกันของสมการ จะได้:</p>
+                <div class="p-2 bg-slate-50 rounded border border-slate-200 text-center font-mono my-1">
+                  $$c_1\mathbf{v}_1 + c_2\mathbf{v}_2 + \cdots + c_{k-1}\mathbf{v}_{k-1} + (-1)\mathbf{v}_k = \mathbf{0}$$
+                </div>
+                <p>
+                  สังเกตสัมประสิทธิ์หน้า $\mathbf{v}_k$ คือ <strong class="text-rose-600">$-1 \neq 0$</strong>
+                  นี่คือหลักฐานชัดเจนว่าเราได้สร้างสมการเอกพันธ์ $= \mathbf{0}$ ที่มี <em>สัมประสิทธิ์อย่างน้อยหนึ่งตัวที่ไม่เป็นศูนย์</em> สำเร็จแล้ว!
+                </p>
+              </div>
+
+              <div class="p-3 bg-emerald-50 rounded-lg border border-emerald-200 text-emerald-900 text-xs sm:text-sm font-medium">
+                💡 <strong>หัวใจสำคัญ:</strong> "ความเป็นอิสระเชิงเส้น" หมายถึง <em>ไม่มีเวกเตอร์ตัวใดเป็นภาระหรือซ้ำซ้อน</em> แต่ละตัวทำหน้าที่เปิดมิติใหม่ของทิศทางเสมอ
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ส่วนที่ 5: แบบฝึกหัดสำหรับนักศึกษา -->
+    <section class="bg-white rounded-2xl p-6 sm:p-8 shadow-sm border border-slate-200 space-y-6">
+      <div class="flex items-center gap-2">
+        <span class="w-2 h-7 bg-emerald-600 rounded-full inline-block"></span>
+        <h2 class="text-xl sm:text-2xl font-bold text-slate-900">5. แบบฝึกหัดสำหรับนักศึกษา (Interactive Exercises)</h2>
+      </div>
+
+      <div class="bg-slate-50 border border-slate-200 rounded-2xl p-5 sm:p-6 space-y-6">
+        <div class="border-l-4 border-emerald-600 pl-4 py-1">
+          <span class="text-xs font-bold text-emerald-700 uppercase tracking-wider">โจทย์ประจำโมดูล:</span>
+          <p class="text-slate-900 font-semibold text-base sm:text-lg mt-1">
+            จงตรวจสอบว่าเซตของเวกเตอร์ $S_1 = \{(1,2), (2,4)\}$ เป็นอิสระเชิงเส้นหรือไม่ และเปรียบเทียบกับชุด $S_2 = \{(1,0), (0,1)\}$ โดยแสดงวิธีแก้ระบบสมการ $A\mathbf{c} = \mathbf{0}$
+          </p>
+        </div>
+
+        <!-- Student Interactive Quiz -->
+        <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm space-y-4">
+          <p class="text-sm font-semibold text-slate-800">เลือกข้อสรุปที่ถูกต้องตามหลักคณิตศาสตร์:</p>
+          
+          <div class="space-y-2.5 text-xs sm:text-sm">
+            <label class="flex items-start gap-3 p-3 rounded-lg border border-slate-200 hover:bg-slate-50 cursor-pointer transition">
+              <input type="radio" name="exerciseQuiz" value="1" class="mt-1 text-emerald-600">
+              <span><strong>ก.</strong> ทั้ง $S_1$ และ $S_2$ เป็นอิสระเชิงเส้นทั้งคู่ เพราะมี 2 เวกเตอร์เท่ากันใน $\mathbb{R}^2$</span>
+            </label>
+            <label class="flex items-start gap-3 p-3 rounded-lg border border-slate-200 hover:bg-slate-50 cursor-pointer transition">
+              <input type="radio" name="exerciseQuiz" value="2" class="mt-1 text-emerald-600">
+              <span><strong>ข.</strong> $S_1$ พึ่งพาเชิงเส้น (เพราะ $(2,4) = 2(1,2)$) ส่วน $S_2$ เป็นอิสระเชิงเส้น (มีเพียง Trivial Solution $c_1=c_2=0$)</span>
+            </label>
+            <label class="flex items-start gap-3 p-3 rounded-lg border border-slate-200 hover:bg-slate-50 cursor-pointer transition">
+              <input type="radio" name="exerciseQuiz" value="3" class="mt-1 text-emerald-600">
+              <span><strong>ค.</strong> $S_1$ เป็นอิสระเชิงเส้น ส่วน $S_2$ พึ่งพาเชิงเส้น</span>
+            </label>
+          </div>
+
+          <div class="flex items-center gap-3 pt-2">
+            <button id="btnCheckQuiz" class="px-5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-medium rounded-lg text-xs sm:text-sm transition shadow-sm">
+              ตรวจคำตอบ
+            </button>
+            <div id="exerciseResultAlert" class="text-xs sm:text-sm font-semibold"></div>
+          </div>
+        </div>
+
+        <!-- Step-by-Step Detailed Solution Accordion -->
+        <div>
+          <button id="btnToggleSolutionAccordion" class="text-sm font-semibold text-emerald-700 hover:text-emerald-900 flex items-center gap-1.5 transition">
+            <span id="accordionLabel">แสดงวิธีแก้ระบบสมการ $A\mathbf{c} = \mathbf{0}$ อย่างละเอียด</span>
+            <svg id="accordionIcon" class="w-4 h-4 transition-transform transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+          </button>
+
+          <div id="solutionAccordionContent" class="hidden mt-4 bg-white p-6 rounded-xl border border-emerald-200 space-y-6 text-sm sm:text-base text-slate-800 shadow-sm">
+            
+            <h4 class="font-bold text-emerald-950 pb-2 border-b border-emerald-100 flex items-center gap-2">
+              <svg class="w-5 h-5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+              การแสดงวิธีทำเปรียบเทียบระบบสมการ
+            </h4>
+
+            <!-- Part 1: S1 Analysis -->
+            <div class="space-y-3">
+              <p class="font-bold text-slate-900">ตอนที่ 1: ตรวจสอบชุด $S_1 = \{(1,2), (2,4)\}$</p>
+              <p class="text-slate-700">
+                ตั้งสมการเวกเตอร์เอกพันธ์ $c_1\begin{bmatrix} 1 \\ 2 \end{bmatrix} + c_2\begin{bmatrix} 2 \\ 4 \end{bmatrix} = \begin{bmatrix} 0 \\ 0 \end{bmatrix}$ ซึ่งเขียนเป็นเมทริกซ์แต่งเติม (Augmented Matrix) ได้เป็น:
+              </p>
+              <div class="p-2.5 bg-slate-50 rounded border border-slate-200 text-center font-mono my-2 overflow-x-auto">
+                $$\left[\begin{array}{cc|c} 1 & 2 & 0 \\ 2 & 4 & 0 \end{array}\right] \xrightarrow{R_2 \to R_2 - 2R_1} \left[\begin{array}{cc|c} \mathbf{1} & 2 & 0 \\ 0 & 0 & 0 \end{array}\right]$$
+              </div>
+              <div class="pl-4 border-l-2 border-rose-400 space-y-1 text-slate-700 text-sm">
+                <p>• ตำแหน่ง Pivot มีเพียงคอลัมน์ที่ 1 (ตัวแปรหลักคือ $c_1$)</p>
+                <p>• คอลัมน์ที่ 2 <strong>ไม่มีตำแหน่งตัวนำ $\implies c_2$ เป็นตัวแปรเสรี (Free Variable)</strong></p>
+                <p>• จากแถวที่ 1 จะได้ $c_1 + 2c_2 = 0 \implies c_1 = -2c_2$</p>
+                <p>• หากกำหนดให้ $c_2 = 1$ จะได้ $c_1 = -2$ ซึ่งทำให้ $(-2)(1,2) + 1(2,4) = (0,0)$</p>
+                <p class="font-bold text-rose-700">
+                  $\implies$ ระบบสมการมีคำตอบที่ไม่เป็นศูนย์ (Non-trivial solution) ดังนั้น $S_1$ จึงเป็น <u>เซตที่พึ่งพาเชิงเส้น (Linearly Dependent)</u>
+                </p>
+              </div>
+            </div>
+
+            <!-- Part 2: S2 Analysis -->
+            <div class="space-y-3">
+              <p class="font-bold text-slate-900">ตอนที่ 2: ตรวจสอบชุด $S_2 = \{(1,0), (0,1)\}$</p>
+              <p class="text-slate-700">
+                ตั้งสมการเวกเตอร์เอกพันธ์ $c_1\begin{bmatrix} 1 \\ 0 \end{bmatrix} + c_2\begin{bmatrix} 0 \\ 1 \end{bmatrix} = \begin{bmatrix} 0 \\ 0 \end{bmatrix}$ เขียนเป็นเมทริกซ์แต่งเติม:
+              </p>
+              <div class="p-2.5 bg-slate-50 rounded border border-slate-200 text-center font-mono my-2 overflow-x-auto">
+                $$\left[\begin{array}{cc|c} \mathbf{1} & 0 & 0 \\ 0 & \mathbf{1} & 0 \end{array}\right]$$
+              </div>
+              <div class="pl-4 border-l-2 border-emerald-500 space-y-1 text-slate-700 text-sm">
+                <p>• เมทริกซ์อยู่ในรูป RREF อยู่แล้ว และมี Pivot ครบทั้ง 2 คอลัมน์</p>
+                <p>• <strong>ไม่มีตัวแปรเสรี (No Free Variable)</strong></p>
+                <p>• คำตอบเดียวของระบบสมการคือ $c_1 = 0$ และ $c_2 = 0$ (Trivial Solution Only)</p>
+                <p class="font-bold text-emerald-700">
+                  $\implies$ ดังนั้น $S_2$ จึงเป็น <u>เซตที่เป็นอิสระเชิงเส้น (Linearly Independent)</u>
+                </p>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+  </div>
+
+  <!-- Interactive JavaScript Engine -->
+  <script>
+    /* =====================================================================
+       1. MATRIX STATE & PRESETS
+       ===================================================================== */
+    let currentRows = 2;
+    let currentCols = 2;
+    // Stored as 2D array [row][col]
+    let matrixData = [
+      [1, 3],
+      [2, 1]
+    ];
+
+    const matrixDimSelect = document.getElementById('matrixDimSelect');
+    const matrixInputContainer = document.getElementById('matrixInputContainer');
+    const btnComputeRREF = document.getElementById('btnComputeRREF');
+    const stepsContainer = document.getElementById('stepsContainer');
+
+    const statusBanner = document.getElementById('statusBanner');
+    const statusIcon = document.getElementById('statusIcon');
+    const statusTitle = document.getElementById('statusTitle');
+    const statusExplanation = document.getElementById('statusExplanation');
+    const solutionTypeBadge = document.getElementById('solutionTypeBadge');
+    const pivotCountText = document.getElementById('pivotCountText');
+    const freeVarText = document.getElementById('freeVarText');
+
+    const vectorVisualizerBox = document.getElementById('vectorVisualizerBox');
+    const visualCollinearLabel = document.getElementById('visualCollinearLabel');
+    const miniVectorCanvas = document.getElementById('miniVectorCanvas');
+    const miniCtx = miniVectorCanvas.getContext('2d');
+
+    // Preset configurations
+    const presets = {
+      indep2D: {
+        dim: '2x2',
+        data: [[1, 3], [2, 1]]
+      },
+      dep2D: {
+        dim: '2x2',
+        data: [[1, 2], [2, 4]]
+      },
+      indep3D: {
+        dim: '3x3',
+        data: [[1, 0, 0], [0, 1, 0], [0, 0, 1]]
+      },
+      dep3D: {
+        dim: '3x3',
+        data: [[1, 0, 1], [1, 1, 2], [0, 1, 1]]
+      }
+    };
+
+    function renderMatrixInputs() {
+      let html = '<table class="mx-auto border-collapse">';
+      // Table Header (Vector names)
+      html += '<thead><tr>';
+      for (let j = 0; j < currentCols; j++) {
+        html += `<th class="px-2 py-1 text-center font-mono text-xs font-bold text-emerald-800">\\(\\mathbf{v}_${j+1}\\)</th>`;
+      }
+      html += '<th class="px-2 py-1 text-center font-mono text-xs text-slate-400">| \\(\\mathbf{0}\\)</th>';
+      html += '</tr></thead><tbody>';
+
+      for (let i = 0; i < currentRows; i++) {
+        html += '<tr>';
+        for (let j = 0; j < currentCols; j++) {
+          const val = matrixData[i] && matrixData[i][j] !== undefined ? matrixData[i][j] : 0;
+          html += `
+            <td class="p-1">
+              <input type="number" step="any" data-r="${i}" data-c="${j}" value="${val}"
+                class="mat-cell w-14 sm:w-16 px-1.5 py-1 text-center font-mono text-sm border rounded bg-slate-50 focus:bg-white focus:ring-2 focus:ring-emerald-500 focus:outline-none">
+            </td>
+          `;
+        }
+        html += '<td class="px-2 text-center font-mono text-xs text-slate-400 font-bold">0</td>';
+        html += '</tr>';
+      }
+      html += '</tbody></table>';
+
+      matrixInputContainer.innerHTML = html;
+
+      // Attach input event listeners
+      const inputs = matrixInputContainer.querySelectorAll('.mat-cell');
+      inputs.forEach(input => {
+        input.addEventListener('input', (e) => {
+          const r = parseInt(e.target.dataset.r);
+          const c = parseInt(e.target.dataset.c);
+          matrixData[r][c] = parseFloat(e.target.value) || 0;
+          runGaussJordanAnalysis();
+        });
+      });
+
+      if (window.MathJax) {
+        MathJax.typesetPromise([matrixInputContainer]);
+      }
+    }
+
+    function setDimension(dimStr) {
+      if (dimStr === '2x2') {
+        currentRows = 2; currentCols = 2;
+        matrixData = [
+          [matrixData[0]?.[0] ?? 1, matrixData[0]?.[1] ?? 3],
+          [matrixData[1]?.[0] ?? 2, matrixData[1]?.[1] ?? 1]
+        ];
+        vectorVisualizerBox.classList.remove('hidden');
+      } else if (dimStr === '3x3') {
+        currentRows = 3; currentCols = 3;
+        matrixData = [
+          [1, 0, 1],
+          [1, 1, 2],
+          [0, 1, 1]
+        ];
+        vectorVisualizerBox.classList.add('hidden'); // Canvas optimized for 2D vectors
+      } else if (dimStr === '3x2') {
+        currentRows = 3; currentCols = 2;
+        matrixData = [
+          [1, 2],
+          [0, 1],
+          [1, 0]
+        ];
+        vectorVisualizerBox.classList.add('hidden');
+      }
+      renderMatrixInputs();
+      runGaussJordanAnalysis();
+    }
+
+    /* =====================================================================
+       2. GAUSS-JORDAN ELIMINATION ALGORITHM
+       ===================================================================== */
+    function formatNum(n) {
+      if (Math.abs(n) < 1e-9) return '0';
+      if (Number.isInteger(n)) return n.toString();
+      return Number(n.toFixed(2)).toString();
+    }
+
+    function matrixToLatex(mat, numRows, numCols) {
+      let code = '\\begin{bmatrix} ';
+      for (let i = 0; i < numRows; i++) {
+        let rowStr = [];
+        for (let j = 0; j < numCols; j++) {
+          rowStr.push(formatNum(mat[i][j]));
+        }
+        code += rowStr.join(' & ');
+        if (i < numRows - 1) code += ' \\\\ ';
+      }
+      code += ' \\end{bmatrix}';
+      return code;
+    }
+
+    function runGaussJordanAnalysis() {
+      // Clone matrixData
+      let A = matrixData.map(row => [...row]);
+      const m = currentRows;
+      const n = currentCols;
+
+      let steps = [];
+      let pivotColumns = [];
+      let lead = 0;
+
+      steps.push({
+        desc: "เมทริกซ์เริ่มต้น $A$ จากคอลัมน์เวกเตอร์:",
+        latex: matrixToLatex(A, m, n)
+      });
+
+      for (let r = 0; r < m; r++) {
+        if (n <= lead) break;
+        let i = r;
+
+        while (Math.abs(A[i][lead]) < 1e-7) {
+          i++;
+          if (m === i) {
+            i = r;
+            lead++;
+            if (n === lead) break;
+          }
+        }
+        if (n === lead) break;
+
+        // Swap rows if needed
+        if (i !== r) {
+          let temp = A[i];
+          A[i] = A[r];
+          A[r] = temp;
+          steps.push({
+            desc: `สลับแถวที่ ${r + 1} กับแถวที่ ${i + 1} ($R_{${r + 1}} \\leftrightarrow R_{${i + 1}}$):`,
+            latex: matrixToLatex(A, m, n)
+          });
+        }
+
+        // Scale pivot to 1
+        let val = A[r][lead];
+        if (Math.abs(val - 1) > 1e-7 && Math.abs(val) > 1e-7) {
+          for (let j = 0; j < n; j++) {
+            A[r][j] /= val;
+          }
+          steps.push({
+            desc: `ปรับตัวนำแถวที่ ${r + 1} ให้เป็น 1 ($R_{${r + 1}} \\to \\frac{1}{${formatNum(val)}} R_{${r + 1}}$):`,
+            latex: matrixToLatex(A, m, n)
+          });
+        }
+
+        // Eliminate column entries above and below
+        for (let k = 0; k < m; k++) {
+          if (k !== r) {
+            let factor = A[k][lead];
+            if (Math.abs(factor) > 1e-7) {
+              for (let j = 0; j < n; j++) {
+                A[k][j] -= factor * A[r][j];
+              }
+              const sign = factor > 0 ? '-' : '+';
+              const absF = Math.abs(factor);
+              steps.push({
+                desc: `กำจัดสมาชิกแถวที่ ${k + 1} ($R_{${k + 1}} \\to R_{${k + 1}} ${sign} ${formatNum(absF)} R_{${r + 1}}$):`,
+                latex: matrixToLatex(A, m, n)
+              });
+            }
+          }
+        }
+
+        pivotColumns.push(lead);
+        lead++;
+      }
+
+      // Cleanup small floats
+      for (let i = 0; i < m; i++) {
+        for (let j = 0; j < n; j++) {
+          if (Math.abs(A[i][j]) < 1e-7) A[i][j] = 0;
+        }
+      }
+
+      steps.push({
+        desc: "ได้รูปขั้นบันไดแถวลดรูป (Reduced Row Echelon Form - RREF) สมบูรณ์:",
+        latex: matrixToLatex(A, m, n)
+      });
+
+      // Render Steps
+      renderSteps(steps);
+
+      // Evaluate Independence
+      const numPivots = pivotColumns.length;
+      const freeVariablesCount = n - numPivots;
+      const isIndependent = (numPivots === n);
+
+      updateDiagnosisUI(isIndependent, pivotColumns, freeVariablesCount, n);
+
+      // Render 2D Canvas if applicable
+      if (currentRows === 2 && currentCols === 2) {
+        drawMini2DCanvas();
+      }
+    }
+
+    function renderSteps(steps) {
+      let html = '';
+      steps.forEach((s, idx) => {
+        html += `
+          <div class="p-2.5 bg-slate-50 rounded-lg border border-slate-200">
+            <div class="font-medium text-slate-700 mb-1">${idx + 1}. ${s.desc}</div>
+            <div class="overflow-x-auto text-center font-mono py-1">
+              $$${s.latex}$$
+            </div>
+          </div>
+        `;
+      });
+      stepsContainer.innerHTML = html;
+
+      if (window.MathJax) {
+        MathJax.typesetPromise([stepsContainer]);
+      }
+    }
+
+    function updateDiagnosisUI(isIndep, pivotCols, freeVars, totalCols) {
+      const pivotNames = pivotCols.map(c => `คอลัมน์ ${c + 1}`).join(', ') || 'ไม่มี';
+
+      pivotCountText.textContent = `${pivotNames} (${pivotCols.length} คอลัมน์)`;
+      freeVarText.textContent = freeVars > 0 ? `มี ${freeVars} ตัวแปรเสรี` : 'ไม่มี (0 ตัวแปร)';
+      freeVarText.className = freeVars > 0 ? 'font-bold text-rose-600 font-mono text-base' : 'font-bold text-emerald-700 font-mono text-base';
+
+      if (isIndep) {
+        statusBanner.className = 'p-4 rounded-xl border transition-all space-y-2 bg-emerald-50 border-emerald-300 text-emerald-950';
+        statusIcon.className = 'w-3 h-3 rounded-full bg-emerald-500';
+        statusTitle.textContent = 'เวกเตอร์ชุดนี้ "เป็นอิสระเชิงเส้น" (Linearly Independent)';
+        solutionTypeBadge.className = 'px-2.5 py-1 rounded text-xs font-bold bg-emerald-200 text-emerald-800';
+        solutionTypeBadge.textContent = 'Trivial Solution Only (c = 0)';
+        statusExplanation.innerHTML = `
+          เนื่องจากทุกคอลัมน์ของเมทริกซ์ $A$ มีตำแหน่งตัวนำ (Pivot) ครบทั้ง ${totalCols} คอลัมน์ จึง<strong>ไม่มีตัวแปรเสรี (No Free Variable)</strong> 
+          ทำให้สมการ $A\\mathbf{c} = \\mathbf{0}$ มีเพียงผลเฉลยเดียวคือ $\\mathbf{c} = \\mathbf{0}$ เวกเตอร์ชุดนี้จึงไม่มีตัวใดซ้ำซ้อน
+        `;
+      } else {
+        statusBanner.className = 'p-4 rounded-xl border transition-all space-y-2 bg-rose-50 border-rose-300 text-rose-950';
+        statusIcon.className = 'w-3 h-3 rounded-full bg-rose-500';
+        statusTitle.textContent = 'เวกเตอร์ชุดนี้ "พึ่งพาเชิงเส้นต่อกัน" (Linearly Dependent)';
+        solutionTypeBadge.className = 'px-2.5 py-1 rounded text-xs font-bold bg-rose-200 text-rose-800';
+        solutionTypeBadge.textContent = 'Non-trivial Solutions Exist';
+        statusExplanation.innerHTML = `
+          พบว่ามีคอลัมน์ที่ไม่มีตำแหน่งตัวนำ จึงเกิด<strong>ตัวแปรเสรี (${freeVars} Free Variable)</strong> 
+          ส่งผลให้สมการ $A\\mathbf{c} = \\mathbf{0}$ มีคำตอบที่ไม่เป็นศูนย์นับไม่ถ้วน สามารถเขียนเวกเตอร์ตัวหนึ่งในรูปของตัวอื่นได้
+        `;
+      }
+
+      if (window.MathJax) {
+        MathJax.typesetPromise([statusExplanation]);
+      }
+    }
+
+    /* =====================================================================
+       3. 2D VECTOR MINI-CANVAS VISUALIZER
+       ===================================================================== */
+    function drawMini2DCanvas() {
+      const w = miniVectorCanvas.parentElement.clientWidth;
+      const h = miniVectorCanvas.parentElement.clientHeight;
+      const dpr = window.devicePixelRatio || 1;
+      miniVectorCanvas.width = w * dpr;
+      miniVectorCanvas.height = h * dpr;
+      miniCtx.resetTransform();
+      miniCtx.scale(dpr, dpr);
+
+      miniCtx.clearRect(0, 0, w, h);
+
+      const originX = w / 2;
+      const originY = h / 2;
+      const scale = 22; // pixels per unit
+
+      // Draw Grid & Axes
+      miniCtx.strokeStyle = '#1e293b';
+      miniCtx.lineWidth = 1;
+      for (let x = -8; x <= 8; x++) {
+        miniCtx.beginPath();
+        miniCtx.moveTo(originX + x * scale, 0);
+        miniCtx.lineTo(originX + x * scale, h);
+        miniCtx.stroke();
+      }
+      for (let y = -8; y <= 8; y++) {
+        miniCtx.beginPath();
+        miniCtx.moveTo(0, originY + y * scale);
+        miniCtx.lineTo(w, originY + y * scale);
+        miniCtx.stroke();
+      }
+
+      // Main Axes
+      miniCtx.strokeStyle = '#475569';
+      miniCtx.lineWidth = 1.5;
+      miniCtx.beginPath();
+      miniCtx.moveTo(0, originY); miniCtx.lineTo(w, originY);
+      miniCtx.moveTo(originX, 0); miniCtx.lineTo(originX, h);
+      miniCtx.stroke();
+
+      const v1 = { x: matrixData[0][0], y: matrixData[1][0] };
+      const v2 = { x: matrixData[0][1], y: matrixData[1][1] };
+
+      // Helper function for arrows
+      function drawVec(vec, color, width = 3) {
+        const toX = originX + vec.x * scale;
+        const toY = originY - vec.y * scale;
+        const dx = toX - originX;
+        const dy = toY - originY;
+        const len = Math.hypot(dx, dy);
+        if (len < 2) return;
+        const angle = Math.atan2(dy, dx);
+        const headlen = 8;
+
+        miniCtx.strokeStyle = color;
+        miniCtx.fillStyle = color;
+        miniCtx.lineWidth = width;
+
+        miniCtx.beginPath();
+        miniCtx.moveTo(originX, originY);
+        miniCtx.lineTo(toX, toY);
+        miniCtx.stroke();
+
+        miniCtx.beginPath();
+        miniCtx.moveTo(toX, toY);
+        miniCtx.lineTo(toX - headlen * Math.cos(angle - Math.PI / 6), toY - headlen * Math.sin(angle - Math.PI / 6));
+        miniCtx.lineTo(toX - headlen * Math.cos(angle + Math.PI / 6), toY - headlen * Math.sin(angle + Math.PI / 6));
+        miniCtx.closePath();
+        miniCtx.fill();
+      }
+
+      // Check Collinearity
+      const det = (v1.x * v2.y) - (v1.y * v2.x);
+      const isCollinear = Math.abs(det) < 1e-4;
+
+      if (isCollinear) {
+        visualCollinearLabel.textContent = '⚠️ ขนานกัน/ทับแนวเดียวกัน (พึ่งพาเชิงเส้น)';
+        visualCollinearLabel.className = 'text-rose-400 font-bold';
+
+        // Draw collinear guide line
+        const base = (Math.hypot(v1.x, v1.y) > 0.01) ? v1 : v2;
+        miniCtx.strokeStyle = 'rgba(244, 63, 94, 0.3)';
+        miniCtx.lineWidth = 4;
+        miniCtx.beginPath();
+        miniCtx.moveTo(originX - base.x * 200, originY + base.y * 200);
+        miniCtx.lineTo(originX + base.x * 200, originY - base.y * 200);
+        miniCtx.stroke();
+      } else {
+        visualCollinearLabel.textContent = '🟢 ชี้คนละแนว (เป็นอิสระเชิงเส้น)';
+        visualCollinearLabel.className = 'text-emerald-400 font-bold';
+      }
+
+      drawVec(v1, '#3b82f6', 3.5); // v1 Blue
+      drawVec(v2, '#f59e0b', 3.5); // v2 Amber
+
+      // Center Dot
+      miniCtx.fillStyle = '#f8fafc';
+      miniCtx.beginPath();
+      miniCtx.arc(originX, originY, 3, 0, Math.PI * 2);
+      miniCtx.fill();
+    }
+
+    /* =====================================================================
+       4. EVENT LISTENERS & PRESETS
+       ===================================================================== */
+    matrixDimSelect.addEventListener('change', (e) => {
+      setDimension(e.target.value);
+    });
+
+    btnComputeRREF.addEventListener('click', runGaussJordanAnalysis);
+
+    document.getElementById('presetIndep2D').addEventListener('click', () => {
+      matrixDimSelect.value = '2x2';
+      currentRows = 2; currentCols = 2;
+      matrixData = presets.indep2D.data.map(r => [...r]);
+      vectorVisualizerBox.classList.remove('hidden');
+      renderMatrixInputs();
+      runGaussJordanAnalysis();
+    });
+
+    document.getElementById('presetDep2D').addEventListener('click', () => {
+      matrixDimSelect.value = '2x2';
+      currentRows = 2; currentCols = 2;
+      matrixData = presets.dep2D.data.map(r => [...r]);
+      vectorVisualizerBox.classList.remove('hidden');
+      renderMatrixInputs();
+      runGaussJordanAnalysis();
+    });
+
+    document.getElementById('presetIndep3D').addEventListener('click', () => {
+      matrixDimSelect.value = '3x3';
+      currentRows = 3; currentCols = 3;
+      matrixData = presets.indep3D.data.map(r => [...r]);
+      vectorVisualizerBox.classList.add('hidden');
+      renderMatrixInputs();
+      runGaussJordanAnalysis();
+    });
+
+    document.getElementById('presetDep3D').addEventListener('click', () => {
+      matrixDimSelect.value = '3x3';
+      currentRows = 3; currentCols = 3;
+      matrixData = presets.dep3D.data.map(r => [...r]);
+      vectorVisualizerBox.classList.add('hidden');
+      renderMatrixInputs();
+      runGaussJordanAnalysis();
+    });
+
+    // Discovery Reveal Button
+    const btnRevealProof = document.getElementById('btnRevealProof');
+    const discoveryProofBox = document.getElementById('discoveryProofBox');
+    btnRevealProof.addEventListener('click', () => {
+      const isHidden = discoveryProofBox.classList.toggle('hidden');
+      if (!isHidden && window.MathJax) {
+        MathJax.typesetPromise([discoveryProofBox]);
+      }
+    });
+
+    // Quiz Check Button
+    const btnCheckQuiz = document.getElementById('btnCheckQuiz');
+    const exerciseResultAlert = document.getElementById('exerciseResultAlert');
+    btnCheckQuiz.addEventListener('click', () => {
+      const selected = document.querySelector('input[name="exerciseQuiz"]:checked');
+      if (!selected) {
+        exerciseResultAlert.className = 'text-amber-600 font-semibold text-xs sm:text-sm';
+        exerciseResultAlert.textContent = '⚠️ กรุณาเลือกข้อที่คิดว่าถูกต้องก่อนตรวจ';
+        return;
+      }
+
+      if (selected.value === '2') {
+        exerciseResultAlert.className = 'text-emerald-700 font-bold text-xs sm:text-sm';
+        exerciseResultAlert.textContent = '🎉 ถูกต้องสมบูรณ์แบบ! S1 มี Free Variable จึงพึ่งพาเชิงเส้น ส่วน S2 มีเฉพาะ Trivial Solution จึงเป็นอิสระเชิงเส้น';
+      } else {
+        exerciseResultAlert.className = 'text-rose-600 font-bold text-xs sm:text-sm';
+        exerciseResultAlert.textContent = '❌ ยังไม่ถูกต้อง ลองพิจารณาความสัมพันธ์ของ (1,2) กับ (2,4) ดูใหม่อีกครั้ง';
+      }
+    });
+
+    // Accordion Toggle
+    const btnToggleSolutionAccordion = document.getElementById('btnToggleSolutionAccordion');
+    const solutionAccordionContent = document.getElementById('solutionAccordionContent');
+    const accordionLabel = document.getElementById('accordionLabel');
+    const accordionIcon = document.getElementById('accordionIcon');
+
+    btnToggleSolutionAccordion.addEventListener('click', () => {
+      const isHidden = solutionAccordionContent.classList.toggle('hidden');
+      if (isHidden) {
+        accordionLabel.textContent = 'แสดงวิธีแก้ระบบสมการ A c = 0 อย่างละเอียด';
+        accordionIcon.classList.remove('rotate-180');
+      } else {
+        accordionLabel.textContent = 'ซ่อนการแสดงวิธีทำ';
+        accordionIcon.classList.add('rotate-180');
+        if (window.MathJax) {
+          MathJax.typesetPromise([solutionAccordionContent]);
+        }
+      }
+    });
+
+    /* =====================================================================
+       5. INITIALIZATION
+       ===================================================================== */
+    window.addEventListener('load', () => {
+      renderMatrixInputs();
+      runGaussJordanAnalysis();
+      if (window.MathJax) {
+        MathJax.typesetPromise();
+      }
+    });
+
+    window.addEventListener('resize', () => {
+      if (currentRows === 2 && currentCols === 2) {
+        drawMini2DCanvas();
+      }
+    });
+  </script>
+</body>
+</html>

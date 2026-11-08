@@ -1,0 +1,1220 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>เรื่องที่ 2: ปริภูมิเวกเตอร์ที่แผ่ทั่วและเซตตัวกำเนิด (Span & Spanning Sets)</title>
+  
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- Google Fonts: Sarabun & Kanit -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com">
+  <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@400;500;600;700&family=Sarabun:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+  
+  <!-- MathJax 3 for mathematical formulas -->
+  <script>
+    window.MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']],
+        displayMath: [['$$', '$$'], ['\\[', '\\]']]
+      },
+      svg: { fontCache: 'global' }
+    };
+  </script>
+  <script type="text/javascript" id="MathJax-script" async
+    src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+  </script>
+
+  <!-- Three.js & OrbitControls for interactive 3D subspace visualization -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+
+  <style>
+    body {
+      font-family: 'Sarabun', sans-serif;
+    }
+    h1, h2, h3, h4, .font-heading {
+      font-family: 'Kanit', sans-serif;
+    }
+    input[type=range]::-webkit-slider-thumb {
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-800 antialiased min-h-screen">
+
+  <!-- Main Container strictly conforming to dimensions -->
+  <div class="max-w-6xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 space-y-10">
+
+    <!-- Header Section -->
+    <header class="bg-gradient-to-r from-violet-950 via-indigo-900 to-slate-900 text-white rounded-3xl p-6 sm:p-10 shadow-xl relative overflow-hidden">
+      <div class="absolute -right-12 -top-12 w-72 h-72 bg-violet-500/15 rounded-full blur-3xl pointer-events-none"></div>
+      <div class="relative z-10">
+        <h1 class="text-2xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-white mb-3">
+          เรื่องที่ 2: ปริภูมิเวกเตอร์ที่แผ่ทั่วและเซตตัวกำเนิด
+        </h1>
+        <p class="text-violet-200 text-base sm:text-lg max-w-3xl leading-relaxed">
+          ทำความเข้าใจแนวคิด <strong>Span (การแผ่ทั่ว)</strong> และ <strong>Spanning Set (เซตตัวกำเนิด)</strong> ผ่านการมองเห็นเชิงมิติ (0D, 1D, 2D, 3D) และเชื่อมโยงกับการมีผลเฉลยของระบบสมการเชิงเส้น $A\mathbf{x} = \mathbf{b}$
+        </p>
+      </div>
+    </header>
+
+    <!-- ส่วนที่ 1: วัตถุประสงค์การเรียนรู้ -->
+    <section class="bg-white rounded-2xl p-6 sm:p-8 shadow-sm border border-slate-200 transition-all hover:shadow-md">
+      <div class="flex items-start gap-4">
+        <div class="p-3 bg-violet-50 text-violet-600 rounded-xl flex-shrink-0">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>
+          </svg>
+        </div>
+        <div class="space-y-2">
+          <h2 class="text-xl sm:text-2xl font-bold text-slate-900">1. วัตถุประสงค์การเรียนรู้</h2>
+          <ul class="space-y-1.5 text-slate-700 text-base sm:text-lg leading-relaxed list-disc list-inside">
+            <li>นักศึกษาสามารถ<strong>หาและอธิบายความหมายของปริภูมิที่แผ่ทั่ว (Span)</strong> โดยเวกเตอร์ชุดหนึ่งทั้งในเชิงเรขาคณิตและเชิงพีชคณิต</li>
+            <li>นักศึกษาสามารถ<strong>เชื่อมโยงเซตตัวกำเนิด (Spanning Set) กับระบบสมการเชิงเส้น</strong> และตรวจสอบว่าเวกเตอร์ชุดหนึ่งแผ่ทั่วปริภูมิทั้งหมดหรือเพียงปริภูมิย่อยได้</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- ส่วนที่ 2: เนื้อหาหลัก -->
+    <section class="bg-white rounded-2xl p-6 sm:p-8 shadow-sm border border-slate-200 space-y-6">
+      <div>
+        <h2 class="text-xl sm:text-2xl font-bold text-slate-900 flex items-center gap-2">
+          <span class="w-2 h-7 bg-violet-600 rounded-full inline-block"></span>
+          2. เนื้อหาหลัก (Core Concepts)
+        </h2>
+        <p class="text-slate-600 text-sm sm:text-base mt-1">
+          นิยามทางคณิตศาสตร์ โครงสร้างของปริภูมิย่อย (Subspace) และการวิเคราะห์ระบบสมการ
+        </p>
+      </div>
+
+      <!-- Grid of Concept Cards -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+        <!-- Card 1: Definition of Span -->
+        <div class="bg-slate-50 rounded-xl p-5 border border-slate-200/90 hover:border-violet-300 transition-colors">
+          <h3 class="text-lg font-bold text-violet-800 mb-2 flex items-center gap-2">
+            <span class="flex items-center justify-center w-6 h-6 rounded-md bg-violet-100 text-violet-700 text-xs font-bold">1</span>
+            ปริภูมิที่แผ่ทั่ว (The Span)
+          </h3>
+          <p class="text-slate-700 text-sm sm:text-base leading-relaxed mb-3">
+            ให้ $S = \{\mathbf{v}_1, \mathbf{v}_2, \dots, \mathbf{v}_k\}$ เป็นเซตของเวกเตอร์ใน $\mathbb{R}^n$ <strong>ปริภูมิที่แผ่ทั่วโดย $S$</strong> คือ <em>เซตของผลรวมเชิงเส้นที่เป็นไปได้ทั้งหมด</em> ของเวกเตอร์ชุดนี้:
+          </p>
+          <div class="p-3 bg-white rounded-lg border border-slate-200 text-center font-medium shadow-inner overflow-x-auto text-slate-900">
+            $$\operatorname{span}\{\mathbf{v}_1, \dots, \mathbf{v}_k\} = \{ c_1\mathbf{v}_1 + \cdots + c_k\mathbf{v}_k \mid c_1, \dots, c_k \in \mathbb{R} \}$$
+          </div>
+          <p class="text-xs text-slate-500 mt-2">
+            $\operatorname{span}(S)$ จะเป็น <strong>ปริภูมิย่อย (Subspace)</strong> ของ $\mathbb{R}^n$ เสมอ และต้องมีเวกเตอร์ศูนย์ $\mathbf{0}$ อยู่ด้วยเสมอ
+          </p>
+        </div>
+
+        <!-- Card 2: Spanning Set -->
+        <div class="bg-slate-50 rounded-xl p-5 border border-slate-200/90 hover:border-violet-300 transition-colors">
+          <h3 class="text-lg font-bold text-violet-800 mb-2 flex items-center gap-2">
+            <span class="flex items-center justify-center w-6 h-6 rounded-md bg-violet-100 text-violet-700 text-xs font-bold">2</span>
+            เซตตัวกำเนิด (Spanning Set)
+          </h3>
+          <p class="text-slate-700 text-sm sm:text-base leading-relaxed mb-3">
+            ถ้าปริภูมิเวกเตอร์ $V$ มีค่าเท่ากับ $\operatorname{span}\{\mathbf{v}_1, \dots, \mathbf{v}_k\}$ พอดี เราจะกล่าวว่าเซต $\{\mathbf{v}_1, \dots, \mathbf{v}_k\}$ เป็น <strong>เซตตัวกำเนิดของ $V$ (Spanning Set for $V$)</strong>
+          </p>
+          <div class="p-2.5 bg-white rounded-lg border border-slate-200 text-xs sm:text-sm text-slate-700 space-y-1">
+            <p>• ตัวอย่าง: $\{\mathbf{e}_1 = (1, 0), \mathbf{e}_2 = (0, 1)\}$ แผ่ทั่ว $\mathbb{R}^2$ ทั้งหมด</p>
+            <p>• จึงเรียก $\{\mathbf{e}_1, \mathbf{e}_2\}$ ว่าเป็นเซตตัวกำเนิดมาตรฐานของ $\mathbb{R}^2$</p>
+          </div>
+        </div>
+
+        <!-- Card 3: Geometric Subspaces -->
+        <div class="bg-slate-50 rounded-xl p-5 border border-slate-200/90 hover:border-violet-300 transition-colors">
+          <h3 class="text-lg font-bold text-violet-800 mb-2 flex items-center gap-2">
+            <span class="flex items-center justify-center w-6 h-6 rounded-md bg-violet-100 text-violet-700 text-xs font-bold">3</span>
+            กรณีครอบคลุมปริภูมิทั้งหมดหรือเพียงปริภูมิย่อย
+          </h3>
+          <p class="text-slate-700 text-sm sm:text-base leading-relaxed mb-2">
+            ในเชิงเรขาคณิต รูปร่างของ Span จะขึ้นอยู่กับทิศทางและความเป็นอิสระเชิงเส้น:
+          </p>
+          <div class="grid grid-cols-2 gap-2 text-xs">
+            <div class="bg-white p-2 rounded border border-slate-200">
+              <span class="font-bold text-slate-800">จุด (0 มิติ):</span> $\operatorname{span}\{\mathbf{0}\} = \{\mathbf{0}\}$
+            </div>
+            <div class="bg-white p-2 rounded border border-slate-200">
+              <span class="font-bold text-slate-800">เส้นตรง (1 มิติ):</span> เวกเตอร์ 1 ตัว $(\neq \mathbf{0})$ หรือเวกเตอร์ขนานกัน
+            </div>
+            <div class="bg-white p-2 rounded border border-slate-200">
+              <span class="font-bold text-slate-800">ระนาบ (2 มิติ):</span> เวกเตอร์ 2 ตัวที่ไม่ขนานกัน (ใน $\mathbb{R}^2$ คือเต็มพื้นที่, ใน $\mathbb{R}^3$ คือแผ่นระนาบ)
+            </div>
+            <div class="bg-white p-2 rounded border border-slate-200">
+              <span class="font-bold text-slate-800">ปริภูมิ 3 มิติ:</span> เวกเตอร์ 3 ตัวใน $\mathbb{R}^3$ ที่ไม่อยู่ในระนาบเดียวกัน
+            </div>
+          </div>
+        </div>
+
+        <!-- Card 4: Connection with Linear Systems -->
+        <div class="bg-slate-50 rounded-xl p-5 border border-slate-200/90 hover:border-violet-300 transition-colors">
+          <h3 class="text-lg font-bold text-violet-800 mb-2 flex items-center gap-2">
+            <span class="flex items-center justify-center w-6 h-6 rounded-md bg-violet-100 text-violet-700 text-xs font-bold">4</span>
+            การเชื่อมโยงกับระบบสมการเชิงเส้น ($A\mathbf{x} = \mathbf{b}$)
+          </h3>
+          <p class="text-slate-700 text-sm sm:text-base leading-relaxed mb-2">
+            ให้ $A = \begin{bmatrix} \mathbf{v}_1 & \mathbf{v}_2 & \cdots & \mathbf{v}_k \end{bmatrix}$ ข้อความต่อไปนี้มีความหมายเทียบเท่ากัน:
+          </p>
+          <ul class="list-disc list-inside text-xs sm:text-sm text-slate-700 space-y-1">
+            <li>$\mathbf{b} \in \operatorname{span}\{\mathbf{v}_1, \dots, \mathbf{v}_k\}$</li>
+            <li>ระบบสมการ $A\mathbf{x} = \mathbf{b}$ มีคำตอบ (Consistent)</li>
+            <li><strong>ทฤษฎีบทการแผ่ทั่ว $\mathbb{R}^m$:</strong> คอลัมน์ของ $A$ จะแผ่ทั่ว $\mathbb{R}^m$ ก็ต่อเมื่อ $A$ มี <em>ตำแหน่งตัวนำ (Pivot position) ครบทุกแถว</em></li>
+          </ul>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ส่วนที่ 3: แบบจำลองโต้ตอบ (Interactive Visual Simulation Sandbox) -->
+    <section class="bg-white rounded-2xl p-6 sm:p-8 shadow-sm border border-slate-200 space-y-6">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-200">
+        <div>
+          <h2 class="text-xl sm:text-2xl font-bold text-slate-900 flex items-center gap-2">
+            <span class="w-2 h-7 bg-violet-600 rounded-full inline-block"></span>
+            3. แบบจำลองโต้ตอบ: สำรวจมิติของ Span
+          </h2>
+          <p class="text-slate-600 text-sm mt-1">
+            เลือกเวกเตอร์ใน $\mathbb{R}^2$ หรือ $\mathbb{R}^3$ แล้วปรับจำนวนและทิศทางเพื่อสังเกตว่าผลรวมเชิงเส้นสร้าง จุด, เส้นตรง, ระนาบ หรือเต็มปริภูมิ
+          </p>
+        </div>
+
+        <!-- Dimension Tabs -->
+        <div class="flex p-1 bg-slate-100 rounded-xl self-start sm:self-auto border border-slate-200">
+          <button id="tab2DBtn" class="px-5 py-2 rounded-lg font-bold text-sm bg-white text-violet-700 shadow-sm transition">
+            ระนาบ 2 มิติ ($\mathbb{R}^2$)
+          </button>
+          <button id="tab3DBtn" class="px-5 py-2 rounded-lg font-bold text-sm text-slate-600 hover:text-slate-900 transition">
+            ปริภูมิ 3 มิติ ($\mathbb{R}^3$)
+          </button>
+        </div>
+      </div>
+
+      <!-- ================= 2D SIMULATION VIEW ================= -->
+      <div id="view2D" class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        
+        <!-- 2D Canvas Display (7 cols) -->
+        <div class="lg:col-span-7 flex flex-col items-center">
+          <div class="w-full relative bg-slate-950 rounded-2xl overflow-hidden shadow-inner border border-slate-800 aspect-square max-h-[480px]">
+            <canvas id="canvas2D" class="w-full h-full block cursor-crosshair"></canvas>
+            
+            <!-- Dynamic Subspace Badge -->
+            <div class="absolute top-4 left-4 bg-slate-900/90 backdrop-blur-md px-3.5 py-2 rounded-xl text-xs border border-slate-700 text-white space-y-1">
+              <div class="flex items-center gap-2">
+                <span class="text-slate-400">รูปทรงของ Span:</span>
+                <span id="badgeSpanType2D" class="px-2 py-0.5 rounded font-bold bg-violet-600 text-white">ทั้งระนาบ $\mathbb{R}^2$</span>
+              </div>
+              <div class="flex items-center gap-2 text-slate-300">
+                <span>มิติ (Dimension):</span>
+                <span id="badgeDim2D" class="font-mono font-bold text-violet-300">2</span>
+                <span class="text-slate-500">•</span>
+                <span>แรงก์ (Rank):</span>
+                <span id="badgeRank2D" class="font-mono font-bold text-emerald-400">2</span>
+              </div>
+            </div>
+
+            <!-- Legend Overlay -->
+            <div class="absolute bottom-3 right-3 bg-slate-900/80 backdrop-blur-md px-3 py-2 rounded-xl text-xs text-white border border-slate-800 space-y-1">
+              <div class="flex items-center gap-2">
+                <span class="w-3 h-1 bg-blue-500 rounded-sm"></span>
+                <span>$\mathbf{v}_1$ (น้ำเงิน)</span>
+              </div>
+              <div id="v2LegendItem" class="flex items-center gap-2">
+                <span class="w-3 h-1 bg-amber-500 rounded-sm"></span>
+                <span>$\mathbf{v}_2$ (ส้ม)</span>
+              </div>
+              <div class="flex items-center gap-2">
+                <span class="w-3 h-3 bg-violet-500/30 border border-violet-400 inline-block rounded-sm"></span>
+                <span>พื้นที่ที่ถูกแผ่ทั่ว (Span)</span>
+              </div>
+            </div>
+          </div>
+          <p class="text-xs text-slate-500 mt-2 text-center">
+            พื้นที่สีม่วงแสดงอาณาเขตทั้งหมดที่เกิดจากการรวมเชิงเส้น $c_1\mathbf{v}_1 + c_2\mathbf{v}_2$ ทุกคู่สเกลาร์
+          </p>
+        </div>
+
+        <!-- 2D Controls (5 cols) -->
+        <div class="lg:col-span-5 flex flex-col justify-between space-y-4">
+          
+          <!-- Presets -->
+          <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-2">
+            <span class="text-xs font-bold text-slate-500 uppercase tracking-wider block">ชุดการทดลองสำเร็จรูป (Presets):</span>
+            <div class="grid grid-cols-2 gap-2 text-xs">
+              <button id="preset2DStandard" class="px-2.5 py-2 bg-white hover:bg-slate-100 border border-slate-300 rounded-lg font-medium text-slate-800 text-left transition">
+                🌟 ฐานหลักมาตรฐาน<br><span class="text-[10px] text-slate-500">Span = ระนาบ $\mathbb{R}^2$</span>
+              </button>
+              <button id="preset2DCollinear" class="px-2.5 py-2 bg-white hover:bg-slate-100 border border-slate-300 rounded-lg font-medium text-slate-800 text-left transition">
+                ⚠️ ขนานกัน (Collinear)<br><span class="text-[10px] text-slate-500">Span = เส้นตรง (1D)</span>
+              </button>
+              <button id="preset2DOneVector" class="px-2.5 py-2 bg-white hover:bg-slate-100 border border-slate-300 rounded-lg font-medium text-slate-800 text-left transition">
+                📍 ใช้เวกเตอร์ตัวเดียว<br><span class="text-[10px] text-slate-500">Span = เส้นตรง (1D)</span>
+              </button>
+              <button id="preset2DZero" class="px-2.5 py-2 bg-white hover:bg-slate-100 border border-slate-300 rounded-lg font-medium text-slate-800 text-left transition">
+                ⭕ เวกเตอร์ศูนย์คู่<br><span class="text-[10px] text-slate-500">Span = จุดกำเนิด $\{\mathbf{0}\}$</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Coordinate Inputs -->
+          <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-3">
+            <h4 class="font-bold text-slate-800 text-sm">กำหนดพิกัดเวกเตอร์ในระนาบ:</h4>
+            
+            <!-- Vector 1 -->
+            <div class="bg-white p-3 rounded-lg border border-blue-200">
+              <div class="flex justify-between items-center text-xs font-semibold text-blue-700 mb-1">
+                <span>เวกเตอร์ $\mathbf{v}_1 = (x_1, y_1)$</span>
+              </div>
+              <div class="flex items-center gap-3">
+                <span class="text-xs text-slate-500">x:</span>
+                <input type="range" id="v1x_2d" min="-4" max="4" step="0.5" value="2" class="w-full accent-blue-600">
+                <span id="v1x_2d_val" class="font-mono text-xs w-8 text-right font-bold text-blue-800">2</span>
+              </div>
+              <div class="flex items-center gap-3 mt-1">
+                <span class="text-xs text-slate-500">y:</span>
+                <input type="range" id="v1y_2d" min="-4" max="4" step="0.5" value="1" class="w-full accent-blue-600">
+                <span id="v1y_2d_val" class="font-mono text-xs w-8 text-right font-bold text-blue-800">1</span>
+              </div>
+            </div>
+
+            <!-- Vector 2 -->
+            <div class="bg-white p-3 rounded-lg border border-amber-200">
+              <div class="flex justify-between items-center text-xs font-semibold text-amber-700 mb-1">
+                <span>เวกเตอร์ $\mathbf{v}_2 = (x_2, y_2)$</span>
+                <label class="flex items-center gap-1 cursor-pointer">
+                  <input type="checkbox" id="enableV2_2d" checked class="rounded text-amber-600">
+                  <span class="text-[11px] text-slate-500">เปิดใช้งาน</span>
+                </label>
+              </div>
+              <div class="flex items-center gap-3">
+                <span class="text-xs text-slate-500">x:</span>
+                <input type="range" id="v2x_2d" min="-4" max="4" step="0.5" value="1" class="w-full accent-amber-600">
+                <span id="v2x_2d_val" class="font-mono text-xs w-8 text-right font-bold text-amber-800">1</span>
+              </div>
+              <div class="flex items-center gap-3 mt-1">
+                <span class="text-xs text-slate-500">y:</span>
+                <input type="range" id="v2y_2d" min="-4" max="4" step="0.5" value="2" class="w-full accent-amber-600">
+                <span id="v2y_2d_val" class="font-mono text-xs w-8 text-right font-bold text-amber-800">2</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Analytical Diagnostic Card -->
+          <div class="p-4 bg-slate-900 text-white rounded-xl space-y-2 text-xs">
+            <span class="text-slate-400 font-semibold uppercase tracking-wider block">บทวิเคราะห์ระบบสมการเชิงเส้น:</span>
+            <div id="diagnostic2D" class="font-mono text-slate-200 leading-relaxed">
+              กำลังวิเคราะห์...
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- ================= 3D SIMULATION VIEW ================= -->
+      <div id="view3D" class="hidden grid grid-cols-1 lg:grid-cols-12 gap-6">
+        
+        <!-- 3D Three.js Canvas Container (7 cols) -->
+        <div class="lg:col-span-7 flex flex-col items-center">
+          <div id="container3D" class="w-full relative bg-slate-950 rounded-2xl overflow-hidden shadow-inner border border-slate-800 aspect-square max-h-[480px]">
+            <!-- Three.js will inject canvas here -->
+
+            <!-- Dynamic Subspace Badge 3D -->
+            <div class="absolute top-4 left-4 bg-slate-900/90 backdrop-blur-md px-3.5 py-2 rounded-xl text-xs border border-slate-700 text-white space-y-1 pointer-events-none">
+              <div class="flex items-center gap-2">
+                <span class="text-slate-400">Span Subspace:</span>
+                <span id="badgeSpanType3D" class="px-2 py-0.5 rounded font-bold bg-violet-600 text-white">แผ่นระนาบใน 3D (2 มิติ)</span>
+              </div>
+              <div class="flex items-center gap-2 text-slate-300">
+                <span>มิติของ Span:</span>
+                <span id="badgeDim3D" class="font-mono font-bold text-violet-300">2</span>
+                <span class="text-slate-500">•</span>
+                <span>ครอบคลุม $\mathbb{R}^3$?:</span>
+                <span id="badgeFull3D" class="font-bold text-rose-400">ไม่เต็ม (เพียง Subspace)</span>
+              </div>
+            </div>
+
+            <div class="absolute bottom-3 left-3 bg-slate-900/80 backdrop-blur-md px-3 py-1.5 rounded-lg text-[11px] text-slate-400 pointer-events-none">
+              🖱️ คลิกซ้ายค้างแล้วลากเพื่อหมุนมุมมอง | กลิ้งลูกกลิ้งเพื่อย่อ-ขยาย
+            </div>
+          </div>
+          <p class="text-xs text-slate-500 mt-2 text-center">
+            หมุนดูรอบทิศทางเพื่อสังเกตว่าเวกเตอร์ชุดนี้แบนอยู่ในระนาบเดียวกัน หรือแผ่คลุมมิติเชิงลึกได้
+          </p>
+        </div>
+
+        <!-- 3D Controls (5 cols) -->
+        <div class="lg:col-span-5 flex flex-col justify-between space-y-4">
+          
+          <!-- 3D Presets -->
+          <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-2">
+            <span class="text-xs font-bold text-slate-500 uppercase tracking-wider block">ชุดการทดลองใน 3 มิติ (3D Presets):</span>
+            <div class="grid grid-cols-2 gap-2 text-xs">
+              <button id="preset3DPlane" class="px-2.5 py-2 bg-white hover:bg-slate-100 border border-slate-300 rounded-lg font-medium text-slate-800 text-left transition">
+                🟪 เวกเตอร์ 2 ตัวสร้างระนาบ<br><span class="text-[10px] text-slate-500">Span = ระนาบ 2D ใน $\mathbb{R}^3$</span>
+              </button>
+              <button id="preset3DFull" class="px-2.5 py-2 bg-white hover:bg-slate-100 border border-slate-300 rounded-lg font-medium text-slate-800 text-left transition">
+                🧊 เวกเตอร์ 3 ตัวอิสระต่อกัน<br><span class="text-[10px] text-emerald-600 font-semibold">Span = เต็มทั้ง $\mathbb{R}^3$</span>
+              </button>
+              <button id="preset3DCoplanar" class="px-2.5 py-2 bg-white hover:bg-slate-100 border border-slate-300 rounded-lg font-medium text-slate-800 text-left transition">
+                ⚠️ เวกเตอร์ 3 ตัวอยู่ในระนาบเดียวกัน<br><span class="text-[10px] text-amber-600 font-semibold">Span = ระนาบ (ไม่เต็ม $\mathbb{R}^3$)</span>
+              </button>
+              <button id="preset3DLine" class="px-2.5 py-2 bg-white hover:bg-slate-100 border border-slate-300 rounded-lg font-medium text-slate-800 text-left transition">
+                📏 เวกเตอร์ขนานกันทุกตัว<br><span class="text-[10px] text-slate-500">Span = เส้นตรง 1 มิติ</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- 3D Vector Selection Selector -->
+          <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-3">
+            <h4 class="font-bold text-slate-800 text-sm">เวกเตอร์ที่ใช้งานใน $\mathbb{R}^3$:</h4>
+            
+            <div class="space-y-2 text-xs">
+              <div class="flex items-center justify-between p-2 bg-white rounded-lg border border-blue-200">
+                <span class="font-bold text-blue-700">$\mathbf{v}_1 = (2, 0, 1)$</span>
+                <span class="text-slate-500 text-[11px]">เวกเตอร์แกน 1</span>
+              </div>
+              <div class="flex items-center justify-between p-2 bg-white rounded-lg border border-amber-200">
+                <span class="font-bold text-amber-700">$\mathbf{v}_2 = (0, 2, 1)$</span>
+                <span class="text-slate-500 text-[11px]">เวกเตอร์แกน 2</span>
+              </div>
+              <div class="flex items-center justify-between p-2 bg-white rounded-lg border border-emerald-200">
+                <div class="flex items-center gap-2">
+                  <input type="checkbox" id="enableV3_3d" checked class="rounded text-emerald-600">
+                  <span class="font-bold text-emerald-700" id="labelV3_3d">$\mathbf{v}_3 = (1, 1, 1)$</span>
+                </div>
+                <span class="text-slate-500 text-[11px]">เวกเตอร์ที่ 3</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- 3D Diagnostic Summary -->
+          <div class="p-4 bg-slate-900 text-white rounded-xl space-y-2 text-xs">
+            <span class="text-slate-400 font-semibold uppercase tracking-wider block">การวิเคราะห์เมทริกซ์ 3 มิติ:</span>
+            <div id="diagnostic3D" class="font-mono text-slate-200 leading-relaxed">
+              กำลังวิเคราะห์...
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+    </section>
+
+    <!-- ส่วนที่ 4: คำถามนำเพื่อค้นพบ -->
+    <section class="bg-white rounded-2xl p-6 sm:p-8 shadow-sm border border-slate-200 space-y-4">
+      <div class="flex items-center gap-2">
+        <span class="w-2 h-7 bg-violet-600 rounded-full inline-block"></span>
+        <h2 class="text-xl sm:text-2xl font-bold text-slate-900">4. คำถามนำเพื่อค้นพบ (Guided Discovery Question)</h2>
+      </div>
+
+      <!-- Question Card -->
+      <div class="bg-gradient-to-r from-violet-50 via-indigo-50 to-purple-50 border border-violet-200 rounded-2xl p-5 sm:p-7 space-y-4">
+        <div class="flex items-start gap-3">
+          <div class="p-2.5 bg-violet-600 text-white rounded-xl flex-shrink-0 mt-0.5">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
+          </div>
+          <div class="space-y-3">
+            <h3 class="text-lg sm:text-xl font-bold text-violet-950">
+              "เหตุใดเวกเตอร์สองตัวที่ไม่เป็นศูนย์ จึงอาจสร้างได้เพียงเส้นตรง แทนที่จะสร้างทั้งระนาบ?"
+            </h3>
+            <p class="text-slate-700 text-sm sm:text-base leading-relaxed">
+              โดยทั่วไป เรามักคิดว่าเวกเตอร์ 2 ตัวควรสร้าง 2 มิติ (ระนาบ) ได้เสมอ แต่ในบางกรณี ผลรวมเชิงเส้นของพวกมันกลับถูกขังอยู่บนเส้นตรงเส้นเดียวเท่านั้น เพราะเหตุใด?
+            </p>
+
+            <!-- Reveal Button -->
+            <button id="btnRevealDiscovery" class="px-5 py-2.5 bg-violet-600 hover:bg-violet-700 text-white font-semibold rounded-xl text-sm transition shadow-sm flex items-center gap-2">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
+              <span>กดเพื่อดูการวิเคราะห์เชิงลึก (ทั้งทางเรขาคณิตและพีชคณิต)</span>
+            </button>
+
+            <!-- Discovery Answer Panel -->
+            <div id="discoveryContent" class="hidden mt-4 bg-white p-5 rounded-xl border border-violet-200 space-y-4 shadow-sm text-sm sm:text-base text-slate-800">
+              
+              <div class="border-l-4 border-violet-600 pl-4 space-y-1">
+                <h4 class="font-bold text-violet-900">1. การวิเคราะห์เชิงพีชคณิต (Algebraic View):</h4>
+                <p class="text-slate-700 text-sm leading-relaxed">
+                  หากเวกเตอร์ตัวที่สองเป็นเพียงผลคูณสเกลาร์ของตัวแรก นั่นคือ $\mathbf{v}_2 = k\mathbf{v}_1$ เมื่อเราทำการรวมเชิงเส้นใดๆ:
+                </p>
+                <div class="p-2 bg-slate-50 rounded border border-slate-200 font-mono text-center text-xs sm:text-sm my-1">
+                  $$c_1\mathbf{v}_1 + c_2\mathbf{v}_2 = c_1\mathbf{v}_1 + c_2(k\mathbf{v}_1) = (c_1 + k c_2)\mathbf{v}_1 = c_{\text{รวม}}\mathbf{v}_1$$
+                </div>
+                <p class="text-slate-700 text-xs sm:text-sm leading-relaxed">
+                  จะเห็นว่าผลลัพธ์สุดท้ายยังคงเป็นเพียง <strong>พหุคูณสเกลาร์ของ $\mathbf{v}_1$ เพียงตัวเดียว</strong> เสมอ! เวกเตอร์ $\mathbf{v}_2$ ไม่ได้ให้ "ข้อมูลทิศทางใหม่ (New Direction)" แก่ระบบเลย
+                </p>
+              </div>
+
+              <div class="border-l-4 border-indigo-600 pl-4 space-y-1">
+                <h4 class="font-bold text-indigo-900">2. การวิเคราะห์เชิงเรขาคณิต (Geometric View):</h4>
+                <p class="text-slate-700 text-sm leading-relaxed">
+                  เวกเตอร์ทั้งสอง <strong>วางตัวอยู่บนแนวเส้นตรงเดียวกัน (Collinear / ขนานกัน)</strong> การเดินไปข้างหน้า ถอยหลัง หรือยืดหดลูกศรทั้งสองตัว ก็ยังคงจำกัดการเคลื่อนที่ให้อยู่บนเส้นตรงเส้นนั้น ไม่สามารถก้าวออกไปสู่มิติที่สองด้านข้างได้
+                </p>
+              </div>
+
+              <div class="p-3 bg-violet-50 rounded-lg border border-violet-200 text-violet-950 font-medium text-xs sm:text-sm">
+                💡 <strong>บทสรุปสำคัญ:</strong> จำนวนเวกเตอร์ไม่ได้การันตีมิติของ Span เสมอไป มิติของ $\operatorname{span}\{\mathbf{v}_1, \dots, \mathbf{v}_k\}$ ขึ้นอยู่กับ <em>จำนวนเวกเตอร์ที่เป็นอิสระเชิงเส้นต่อกัน (Linearly Independent Vectors)</em> เท่านั้น
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ส่วนที่ 5: แบบฝึกหัดสำหรับนักศึกษา -->
+    <section class="bg-white rounded-2xl p-6 sm:p-8 shadow-sm border border-slate-200 space-y-6">
+      <div class="flex items-center gap-2">
+        <span class="w-2 h-7 bg-violet-600 rounded-full inline-block"></span>
+        <h2 class="text-xl sm:text-2xl font-bold text-slate-900">5. แบบฝึกหัดสำหรับนักศึกษา (Interactive Exercises)</h2>
+      </div>
+
+      <!-- Problem Statement Card -->
+      <div class="bg-slate-50 border border-slate-200 rounded-2xl p-5 sm:p-6 space-y-6">
+        <div class="border-l-4 border-violet-600 pl-4 py-1">
+          <span class="text-xs font-bold text-violet-700 uppercase tracking-wider">โจทย์ประจำหัวข้อ:</span>
+          <p class="text-slate-900 font-semibold text-base sm:text-lg mt-1">
+            จงหา $\operatorname{span}\{(1,0),(0,1)\}$ และ $\operatorname{span}\{(1,2),(2,4)\}$ ใน $\mathbb{R}^2$ พร้อมทั้งเปรียบเทียบและอธิบายความแตกต่าง
+          </p>
+        </div>
+
+        <!-- Student Self-Check Quiz -->
+        <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm space-y-4">
+          <p class="text-sm font-semibold text-slate-800">เลือกข้อสรุปที่ถูกต้องที่สุด:</p>
+          
+          <div class="space-y-2.5 text-xs sm:text-sm">
+            <label class="flex items-start gap-3 p-3 rounded-lg border border-slate-200 hover:bg-slate-50 cursor-pointer transition">
+              <input type="radio" name="exerciseOption" value="1" class="mt-1 text-violet-600">
+              <span><strong>ก.</strong> ทั้งสองเซตสร้างได้ทั้งระนาบ $\mathbb{R}^2$ เหมือนกัน เนื่องจากมีเวกเตอร์ 2 ตัวเท่ากัน</span>
+            </label>
+            <label class="flex items-start gap-3 p-3 rounded-lg border border-slate-200 hover:bg-slate-50 cursor-pointer transition">
+              <input type="radio" name="exerciseOption" value="2" class="mt-1 text-violet-600">
+              <span><strong>ข.</strong> $\operatorname{span}\{(1,0),(0,1)\} = \mathbb{R}^2$ (ระนาบ 2 มิติ) ขณะที่ $\operatorname{span}\{(1,2),(2,4)\}$ เป็นเพียงเส้นตรง $y = 2x$ (1 มิติ)</span>
+            </label>
+            <label class="flex items-start gap-3 p-3 rounded-lg border border-slate-200 hover:bg-slate-50 cursor-pointer transition">
+              <input type="radio" name="exerciseOption" value="3" class="mt-1 text-violet-600">
+              <span><strong>ค.</strong> ทั้งสองเซตสร้างได้เพียงเส้นตรง 1 มิติเท่านั้น เพราะยังขาดเวกเตอร์ตัวที่ 3</span>
+            </label>
+          </div>
+
+          <div class="flex items-center gap-3 pt-2">
+            <button id="btnCheckAnswer" class="px-5 py-2 bg-violet-600 hover:bg-violet-700 text-white font-medium rounded-lg text-xs sm:text-sm transition shadow-sm">
+              ตรวจคำตอบ
+            </button>
+            <div id="quizResultMsg" class="text-xs sm:text-sm font-semibold"></div>
+          </div>
+        </div>
+
+        <!-- Step-by-Step Detailed Solution Accordion -->
+        <div class="pt-2">
+          <button id="btnToggleDetailedSolution" class="text-sm font-semibold text-violet-700 hover:text-violet-900 flex items-center gap-1.5 transition">
+            <span id="solutionBtnText">คลิกเพื่อดูวิธีทำและคำอธิบายทางคณิตศาสตร์อย่างละเอียด</span>
+            <svg id="solutionBtnIcon" class="w-4 h-4 transition-transform transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+          </button>
+
+          <div id="fullSolutionBlock" class="hidden mt-4 bg-white p-6 rounded-xl border border-violet-200 space-y-5 text-sm sm:text-base text-slate-800 shadow-sm">
+            
+            <h4 class="font-bold text-violet-950 pb-2 border-b border-violet-100 flex items-center gap-2">
+              <svg class="w-5 h-5 text-violet-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+              การพิสูจน์และแสดงวิธีทำทีละขั้นตอน
+            </h4>
+
+            <!-- Part 1 -->
+            <div class="space-y-2">
+              <p class="font-bold text-slate-900">ตอนที่ 1: พิจารณา $\operatorname{span}\{(1,0),(0,1)\}$</p>
+              <p class="text-slate-700">
+                ให้ $\mathbf{b} = (x, y)$ เป็นเวกเตอร์ใดๆ ใน $\mathbb{R}^2$ เราต้องการตรวจสอบว่าสามารถเขียน $\mathbf{b}$ ในรูปผลรวมเชิงเส้นได้เสมอหรือไม่:
+              </p>
+              <div class="p-2 bg-slate-50 rounded border border-slate-200 text-center font-mono my-1">
+                $$c_1\begin{bmatrix} 1 \\ 0 \end{bmatrix} + c_2\begin{bmatrix} 0 \\ 1 \end{bmatrix} = \begin{bmatrix} x \\ y \end{bmatrix} \implies \begin{bmatrix} c_1 \\ c_2 \end{bmatrix} = \begin{bmatrix} x \\ y \end{bmatrix}$$
+              </div>
+              <p class="text-slate-700">
+                เห็นได้ชัดเจนว่า สำหรับทุกๆ $(x, y) \in \mathbb{R}^2$ เราสามารถเลือก $c_1 = x$ และ $c_2 = y$ ได้เสมอ เมทริกซ์ $\begin{bmatrix} 1 & 0 \\ 0 & 1 \end{bmatrix}$ มีดีเทอร์มิแนนต์ $= 1 \neq 0$ และมี Pivot 2 ตำแหน่ง
+                <br><strong>สรุป:</strong> $\operatorname{span}\{(1,0),(0,1)\} = \mathbb{R}^2$ (เป็นเซตตัวกำเนิดที่แผ่ทั่วทั้งระนาบ 2 มิติ)
+              </p>
+            </div>
+
+            <!-- Part 2 -->
+            <div class="space-y-2">
+              <p class="font-bold text-slate-900">ตอนที่ 2: พิจารณา $\operatorname{span}\{(1,2),(2,4)\}$</p>
+              <p class="text-slate-700">
+                สังเกตความสัมพันธ์ระหว่างเวกเตอร์ทั้งสอง:
+              </p>
+              <div class="p-2 bg-slate-50 rounded border border-slate-200 text-center font-mono my-1">
+                $$\begin{bmatrix} 2 \\ 4 \end{bmatrix} = 2 \begin{bmatrix} 1 \\ 2 \end{bmatrix}$$
+              </div>
+              <p class="text-slate-700">
+                ดังนั้น ผลรวมเชิงเส้นใดๆ คือ:
+              </p>
+              <div class="p-2 bg-slate-50 rounded border border-slate-200 text-center font-mono my-1">
+                $$c_1\begin{bmatrix} 1 \\ 2 \end{bmatrix} + c_2\begin{bmatrix} 2 \\ 4 \end{bmatrix} = c_1\begin{bmatrix} 1 \\ 2 \end{bmatrix} + 2c_2\begin{bmatrix} 1 \\ 2 \end{bmatrix} = (c_1 + 2c_2)\begin{bmatrix} 1 \\ 2 \end{bmatrix} = t\begin{bmatrix} 1 \\ 2 \end{bmatrix} = \begin{bmatrix} t \\ 2t \end{bmatrix}$$
+              </div>
+              <p class="text-slate-700">
+                พิกัดที่เป็นไปได้จะต้องมีค่า $y = 2x$ เสมอ ไม่สามารถสร้างจุดที่ไม่สอดคล้องกับความสัมพันธ์นี้ได้ เช่น จุด $(1, 0)$ จะไม่สามารถเขียนเป็นการรวมเชิงเส้นของสองเวกเตอร์นี้ได้เลย
+                <br><strong>สรุป:</strong> $\operatorname{span}\{(1,2),(2,4)\} = \{ (x, y) \in \mathbb{R}^2 \mid y = 2x \}$ ซึ่งเป็นเพียง <strong>เส้นตรงผ่านจุดกำเนิด (มิติ = 1)</strong>
+              </p>
+            </div>
+
+            <!-- Comparison Summary -->
+            <div class="p-4 bg-indigo-50 rounded-xl border border-indigo-200 space-y-1.5 text-xs sm:text-sm text-indigo-950">
+              <p class="font-bold">✨ ตารางเปรียบเทียบความแตกต่างที่เห็นได้ชัด:</p>
+              <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse mt-2">
+                  <thead>
+                    <tr class="border-b border-indigo-200 text-indigo-900">
+                      <th class="py-1">ชุดเวกเตอร์</th>
+                      <th class="py-1">ความเป็นอิสระ</th>
+                      <th class="py-1">ลักษณะทางเรขาคณิต</th>
+                      <th class="py-1">มิติ (Dimension)</th>
+                    </tr>
+                  </thead>
+                  <tbody class="divide-y divide-indigo-100">
+                    <tr>
+                      <td class="py-1.5 font-mono">{(1,0), (0,1)}</td>
+                      <td class="py-1.5 text-emerald-700 font-semibold">เป็นอิสระเชิงเส้น</td>
+                      <td class="py-1.5">ระนาบเต็ม $\mathbb{R}^2$</td>
+                      <td class="py-1.5 font-bold">2</td>
+                    </tr>
+                    <tr>
+                      <td class="py-1.5 font-mono">{(1,2), (2,4)}</td>
+                      <td class="py-1.5 text-rose-700 font-semibold">ไม่อิสระเชิงเส้น (ขนานกัน)</td>
+                      <td class="py-1.5">เส้นตรง $y = 2x$</td>
+                      <td class="py-1.5 font-bold">1</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+
+  </div>
+
+  <!-- JavaScript Application Logic -->
+  <script>
+    /* =====================================================================
+       1. 2D SIMULATION ENGINE (Canvas)
+       ===================================================================== */
+    const canvas2D = document.getElementById('canvas2D');
+    const ctx2D = canvas2D.getContext('2d');
+
+    const v1xInput = document.getElementById('v1x_2d');
+    const v1yInput = document.getElementById('v1y_2d');
+    const v2xInput = document.getElementById('v2x_2d');
+    const v2yInput = document.getElementById('v2y_2d');
+    const enableV2Checkbox = document.getElementById('enableV2_2d');
+
+    const v1xVal = document.getElementById('v1x_2d_val');
+    const v1yVal = document.getElementById('v1y_2d_val');
+    const v2xVal = document.getElementById('v2x_2d_val');
+    const v2yVal = document.getElementById('v2y_2d_val');
+
+    const badgeSpanType2D = document.getElementById('badgeSpanType2D');
+    const badgeDim2D = document.getElementById('badgeDim2D');
+    const badgeRank2D = document.getElementById('badgeRank2D');
+    const diagnostic2D = document.getElementById('diagnostic2D');
+    const v2LegendItem = document.getElementById('v2LegendItem');
+
+    const gridExtent2D = 6; // Coordinate boundary [-6, 6]
+
+    function resizeCanvas2D() {
+      const rect = canvas2D.parentElement.getBoundingClientRect();
+      const dpr = window.devicePixelRatio || 1;
+      canvas2D.width = rect.width * dpr;
+      canvas2D.height = rect.height * dpr;
+      ctx2D.resetTransform();
+      ctx2D.scale(dpr, dpr);
+      render2D();
+    }
+
+    function toScreen2D(x, y) {
+      const w = canvas2D.parentElement.clientWidth;
+      const h = canvas2D.parentElement.clientHeight;
+      const originX = w / 2;
+      const originY = h / 2;
+      const scale = w / (gridExtent2D * 2);
+      return {
+        x: originX + x * scale,
+        y: originY - y * scale
+      };
+    }
+
+    function drawArrow2D(from, to, color, width = 3) {
+      const headlen = 9;
+      const dx = to.x - from.x;
+      const dy = to.y - from.y;
+      const len = Math.hypot(dx, dy);
+      if (len < 2) return;
+      const angle = Math.atan2(dy, dx);
+
+      ctx2D.save();
+      ctx2D.strokeStyle = color;
+      ctx2D.fillStyle = color;
+      ctx2D.lineWidth = width;
+
+      ctx2D.beginPath();
+      ctx2D.moveTo(from.x, from.y);
+      ctx2D.lineTo(to.x, to.y);
+      ctx2D.stroke();
+
+      ctx2D.beginPath();
+      ctx2D.moveTo(to.x, to.y);
+      ctx2D.lineTo(to.x - headlen * Math.cos(angle - Math.PI / 6), to.y - headlen * Math.sin(angle - Math.PI / 6));
+      ctx2D.lineTo(to.x - headlen * Math.cos(angle + Math.PI / 6), to.y - headlen * Math.sin(angle + Math.PI / 6));
+      ctx2D.closePath();
+      ctx2D.fill();
+      ctx2D.restore();
+    }
+
+    function render2D() {
+      const w = canvas2D.parentElement.clientWidth;
+      const h = canvas2D.parentElement.clientHeight;
+      ctx2D.clearRect(0, 0, w, h);
+
+      const origin = toScreen2D(0, 0);
+
+      // 1. Draw Grid
+      ctx2D.lineWidth = 1;
+      ctx2D.strokeStyle = '#1e293b';
+      ctx2D.font = '10px monospace';
+      ctx2D.fillStyle = '#64748b';
+      ctx2D.textAlign = 'center';
+      ctx2D.textBaseline = 'middle';
+
+      for (let i = -gridExtent2D; i <= gridExtent2D; i++) {
+        if (i === 0) continue;
+        const pX = toScreen2D(i, 0);
+        const pY = toScreen2D(0, i);
+
+        ctx2D.beginPath();
+        ctx2D.moveTo(pX.x, 0);
+        ctx2D.lineTo(pX.x, h);
+        ctx2D.stroke();
+
+        ctx2D.beginPath();
+        ctx2D.moveTo(0, pY.y);
+        ctx2D.lineTo(w, pY.y);
+        ctx2D.stroke();
+
+        ctx2D.fillText(i, pX.x, origin.y + 12);
+        ctx2D.fillText(i, origin.x - 12, pY.y);
+      }
+
+      // Main Axes
+      ctx2D.strokeStyle = '#475569';
+      ctx2D.lineWidth = 2;
+      ctx2D.beginPath();
+      ctx2D.moveTo(0, origin.y); ctx2D.lineTo(w, origin.y);
+      ctx2D.moveTo(origin.x, 0); ctx2D.lineTo(origin.x, h);
+      ctx2D.stroke();
+
+      // Read Vector Values
+      const v1 = { x: parseFloat(v1xInput.value), y: parseFloat(v1yInput.value) };
+      const hasV2 = enableV2Checkbox.checked;
+      const v2 = hasV2 ? { x: parseFloat(v2xInput.value), y: parseFloat(v2yInput.value) } : { x: 0, y: 0 };
+
+      v1xVal.textContent = v1.x;
+      v1yVal.textContent = v1.y;
+      v2xVal.textContent = v2.x;
+      v2yVal.textContent = v2.y;
+      v2LegendItem.style.display = hasV2 ? 'flex' : 'none';
+
+      const isV1Zero = (Math.abs(v1.x) < 1e-4 && Math.abs(v1.y) < 1e-4);
+      const isV2Zero = (!hasV2) || (Math.abs(v2.x) < 1e-4 && Math.abs(v2.y) < 1e-4);
+
+      // Compute Determinant / Collinearity
+      const det = (v1.x * v2.y) - (v1.y * v2.x);
+      const isCollinear = Math.abs(det) < 1e-3;
+
+      let dim = 0;
+      let spanDesc = '';
+
+      if (isV1Zero && isV2Zero) {
+        dim = 0;
+        spanDesc = 'จุดกำเนิด {0} (0 มิติ)';
+        badgeSpanType2D.className = 'px-2 py-0.5 rounded font-bold bg-slate-600 text-white';
+        // Draw 0D Point
+        ctx2D.fillStyle = '#a855f7';
+        ctx2D.beginPath();
+        ctx2D.arc(origin.x, origin.y, 6, 0, Math.PI * 2);
+        ctx2D.fill();
+      } else if (isV1Zero || isV2Zero || isCollinear) {
+        dim = 1;
+        spanDesc = 'เส้นตรง 1 มิติ (Line Subspace)';
+        badgeSpanType2D.className = 'px-2 py-0.5 rounded font-bold bg-amber-600 text-white';
+
+        // Draw Line spanning across screen
+        const baseVec = !isV1Zero ? v1 : v2;
+        const lineLen = 14;
+        const pt1 = toScreen2D(-baseVec.x * lineLen, -baseVec.y * lineLen);
+        const pt2 = toScreen2D(baseVec.x * lineLen, baseVec.y * lineLen);
+
+        ctx2D.save();
+        ctx2D.strokeStyle = 'rgba(168, 85, 247, 0.45)';
+        ctx2D.lineWidth = 6;
+        ctx2D.beginPath();
+        ctx2D.moveTo(pt1.x, pt1.y);
+        ctx2D.lineTo(pt2.x, pt2.y);
+        ctx2D.stroke();
+        ctx2D.restore();
+      } else {
+        dim = 2;
+        spanDesc = 'ทั้งระนาบ 2 มิติ (Full R^2)';
+        badgeSpanType2D.className = 'px-2 py-0.5 rounded font-bold bg-violet-600 text-white';
+
+        // Fill Entire Canvas with translucent span color
+        ctx2D.fillStyle = 'rgba(139, 92, 246, 0.15)';
+        ctx2D.fillRect(0, 0, w, h);
+
+        // Draw multiple linear combination grid mesh hints
+        ctx2D.save();
+        ctx2D.strokeStyle = 'rgba(196, 181, 253, 0.1)';
+        ctx2D.lineWidth = 1;
+        for (let s1 = -3; s1 <= 3; s1++) {
+          const startPt = toScreen2D(s1 * v1.x - 4 * v2.x, s1 * v1.y - 4 * v2.y);
+          const endPt = toScreen2D(s1 * v1.x + 4 * v2.x, s1 * v1.y + 4 * v2.y);
+          ctx2D.beginPath();
+          ctx2D.moveTo(startPt.x, startPt.y);
+          ctx2D.lineTo(endPt.x, endPt.y);
+          ctx2D.stroke();
+        }
+        ctx2D.restore();
+      }
+
+      // Draw Base Vectors
+      if (!isV1Zero) {
+        drawArrow2D(origin, toScreen2D(v1.x, v1.y), '#3b82f6', 3.5);
+      }
+      if (hasV2 && !isV2Zero) {
+        drawArrow2D(origin, toScreen2D(v2.x, v2.y), '#f59e0b', 3.5);
+      }
+
+      // Center Dot
+      ctx2D.fillStyle = '#f8fafc';
+      ctx2D.beginPath();
+      ctx2D.arc(origin.x, origin.y, 3.5, 0, Math.PI * 2);
+      ctx2D.fill();
+
+      // Update Badges & Diagnostics
+      badgeSpanType2D.textContent = spanDesc;
+      badgeDim2D.textContent = dim;
+      badgeRank2D.textContent = dim;
+
+      if (dim === 2) {
+        diagnostic2D.innerHTML = `
+          <div>• เมทริกซ์ $A = [\\mathbf{v}_1\\ \\mathbf{v}_2]$: ดีเทอร์มิแนนต์ $\\det(A) = ${det.toFixed(2)} \\neq 0$</div>
+          <div class="text-emerald-400">• เวกเตอร์ทั้งสองเป็นอิสระเชิงเส้นต่อกัน จึงสามารถสร้างจุดทุกจุดใน $\\mathbb{R}^2$ ได้เสมอ</div>
+        `;
+      } else if (dim === 1) {
+        diagnostic2D.innerHTML = `
+          <div>• ดีเทอร์มิแนนต์ $\\det(A) = 0$ (เวกเตอร์ขนานกันหรือมีเวกเตอร์ศูนย์)</div>
+          <div class="text-amber-300">• มิติของ Span เท่ากับ 1 เท่านั้น เวกเตอร์ชุดนี้ไม่สามารถครอบคลุมทั้ง $\\mathbb{R}^2$ ได้</div>
+        `;
+      } else {
+        diagnostic2D.innerHTML = `
+          <div>• เวกเตอร์ทั้งหมดเป็นเวกเตอร์ศูนย์ $\\mathbf{0}$</div>
+          <div class="text-rose-400">• Span ประกอบด้วยสมาชิกเพียงตัวเดียวคือจุดกำเนิด $\\{\\mathbf{0}\\}$ (มิติ = 0)</div>
+        `;
+      }
+
+      if (window.MathJax) {
+        MathJax.typesetPromise([diagnostic2D]);
+      }
+    }
+
+    // 2D Event Listeners
+    [v1xInput, v1yInput, v2xInput, v2yInput].forEach(inp => {
+      inp.addEventListener('input', render2D);
+    });
+    enableV2Checkbox.addEventListener('change', render2D);
+
+    // 2D Preset Buttons
+    document.getElementById('preset2DStandard').addEventListener('click', () => {
+      v1xInput.value = 2; v1yInput.value = 0;
+      v2xInput.value = 0; v2yInput.value = 2;
+      enableV2Checkbox.checked = true;
+      render2D();
+    });
+    document.getElementById('preset2DCollinear').addEventListener('click', () => {
+      v1xInput.value = 1.5; v1yInput.value = 1.5;
+      v2xInput.value = -1.5; v2yInput.value = -1.5;
+      enableV2Checkbox.checked = true;
+      render2D();
+    });
+    document.getElementById('preset2DOneVector').addEventListener('click', () => {
+      v1xInput.value = 2; v1yInput.value = 1;
+      enableV2Checkbox.checked = false;
+      render2D();
+    });
+    document.getElementById('preset2DZero').addEventListener('click', () => {
+      v1xInput.value = 0; v1yInput.value = 0;
+      v2xInput.value = 0; v2yInput.value = 0;
+      enableV2Checkbox.checked = true;
+      render2D();
+    });
+
+
+    /* =====================================================================
+       2. 3D SIMULATION ENGINE (Three.js)
+       ===================================================================== */
+    let scene3D, camera3D, renderer3D, controls3D;
+    let arrowV1, arrowV2, arrowV3;
+    let spanMeshPlane, spanLineMesh;
+    let is3DInitialized = false;
+
+    const container3D = document.getElementById('container3D');
+    const badgeSpanType3D = document.getElementById('badgeSpanType3D');
+    const badgeDim3D = document.getElementById('badgeDim3D');
+    const badgeFull3D = document.getElementById('badgeFull3D');
+    const diagnostic3D = document.getElementById('diagnostic3D');
+    const enableV3Checkbox = document.getElementById('enableV3_3d');
+
+    // Default 3D vectors
+    let vec3D_1 = new THREE.Vector3(2, 0, 1);
+    let vec3D_2 = new THREE.Vector3(0, 2, 1);
+    let vec3D_3 = new THREE.Vector3(1, 1, 1);
+
+    function init3D() {
+      if (is3DInitialized) return;
+      const width = container3D.clientWidth;
+      const height = container3D.clientHeight;
+
+      // Scene
+      scene3D = new THREE.Scene();
+      scene3D.background = new THREE.Color(0x020617); // slate-950
+
+      // Camera
+      camera3D = new THREE.PerspectiveCamera(45, width / height, 0.1, 100);
+      camera3D.position.set(6, 5, 8);
+
+      // Renderer
+      renderer3D = new THREE.WebGLRenderer({ antialias: true });
+      renderer3D.setSize(width, height);
+      renderer3D.setPixelRatio(window.devicePixelRatio || 1);
+      container3D.appendChild(renderer3D.domElement);
+
+      // OrbitControls
+      controls3D = new THREE.OrbitControls(camera3D, renderer3D.domElement);
+      controls3D.enableDamping = true;
+      controls3D.dampingFactor = 0.05;
+
+      // Ambient & Directional Lights
+      const ambientLight = new THREE.AmbientLight(0xffffff, 0.85);
+      scene3D.add(ambientLight);
+      const dirLight = new THREE.DirectionalLight(0xffffff, 0.7);
+      dirLight.position.set(5, 10, 7);
+      scene3D.add(dirLight);
+
+      // Coordinate Grid on XZ plane
+      const gridHelper = new THREE.GridHelper(10, 10, 0x475569, 0x1e293b);
+      scene3D.add(gridHelper);
+
+      // Axes Helper (RGB = XYZ)
+      const axesHelper = new THREE.AxesHelper(5);
+      scene3D.add(axesHelper);
+
+      // Dynamic Span Subspace Mesh (Double-sided plane)
+      const planeGeo = new THREE.PlaneGeometry(12, 12);
+      const planeMat = new THREE.MeshStandardMaterial({
+        color: 0x8b5cf6, // violet-500
+        transparent: true,
+        opacity: 0.35,
+        side: THREE.DoubleSide
+      });
+      spanMeshPlane = new THREE.Mesh(planeGeo, planeMat);
+      scene3D.add(spanMeshPlane);
+
+      // Line mesh for 1D span case
+      const lineGeo = new THREE.BufferGeometry().setFromPoints([
+        new THREE.Vector3(-10, 0, 0),
+        new THREE.Vector3(10, 0, 0)
+      ]);
+      const lineMat = new THREE.LineBasicMaterial({ color: 0xf59e0b, linewidth: 3 });
+      spanLineMesh = new THREE.Line(lineGeo, lineMat);
+      spanLineMesh.visible = false;
+      scene3D.add(spanLineMesh);
+
+      // Vector Arrows
+      arrowV1 = create3DArrow(vec3D_1, 0x3b82f6); // blue
+      arrowV2 = create3DArrow(vec3D_2, 0xf59e0b); // amber
+      arrowV3 = create3DArrow(vec3D_3, 0x10b981); // emerald
+
+      is3DInitialized = true;
+      update3DScene();
+      animate3D();
+    }
+
+    function create3DArrow(vec, hexColor) {
+      const dir = vec.clone().normalize();
+      const length = vec.length() || 0.001;
+      const arrow = new THREE.ArrowHelper(dir, new THREE.Vector3(0,0,0), length, hexColor, 0.4, 0.25);
+      scene3D.add(arrow);
+      return arrow;
+    }
+
+    function updateArrow(arrow, vec) {
+      const length = vec.length();
+      if (length < 0.001) {
+        arrow.visible = false;
+      } else {
+        arrow.visible = true;
+        arrow.setDirection(vec.clone().normalize());
+        arrow.setLength(length, 0.35, 0.2);
+      }
+    }
+
+    function update3DScene() {
+      if (!is3DInitialized) return;
+
+      updateArrow(arrowV1, vec3D_1);
+      updateArrow(arrowV2, vec3D_2);
+
+      const hasV3 = enableV3Checkbox.checked;
+      arrowV3.visible = hasV3;
+      if (hasV3) {
+        updateArrow(arrowV3, vec3D_3);
+      }
+
+      // Compute Normal vector for the 2D plane (Cross product of v1 and v2)
+      const normal = new THREE.Vector3().crossVectors(vec3D_1, vec3D_2);
+      const crossLen = normal.length();
+
+      // Check collinearity of v1 and v2
+      if (crossLen < 1e-3) {
+        // 1D Line Subspace
+        spanMeshPlane.visible = false;
+        spanLineMesh.visible = true;
+        const dir = (vec3D_1.length() > 0.01 ? vec3D_1 : vec3D_2).clone().normalize();
+        spanLineMesh.geometry.setFromPoints([
+          dir.clone().multiplyScalar(-10),
+          dir.clone().multiplyScalar(10)
+        ]);
+
+        badgeSpanType3D.textContent = 'เส้นตรง 1 มิติ (Line)';
+        badgeSpanType3D.className = 'px-2 py-0.5 rounded font-bold bg-amber-600 text-white';
+        badgeDim3D.textContent = '1';
+        badgeFull3D.textContent = 'ไม่เต็ม (เพียงเส้นตรง)';
+        badgeFull3D.className = 'font-bold text-rose-400';
+
+        diagnostic3D.innerHTML = `
+          <div>• เวกเตอร์ขนานกัน: ผลคูณไขว้ $\\mathbf{v}_1 \\times \\mathbf{v}_2 \\approx \\mathbf{0}$</div>
+          <div class="text-amber-300">• ไม่สามารถสร้างระนาบได้ ผลลัพธ์จึงเป็นเพียงเส้นตรง 1 มิติใน $\\mathbb{R}^3$</div>
+        `;
+      } else {
+        // v1 and v2 form a valid plane
+        normal.normalize();
+
+        // Check if v3 is also in this plane (Scalar triple product / Determinant)
+        let det3 = 0;
+        if (hasV3) {
+          det3 = vec3D_3.dot(normal);
+        }
+
+        if (hasV3 && Math.abs(det3) > 0.15) {
+          // Span is the entire R^3!
+          spanMeshPlane.visible = true;
+          spanLineMesh.visible = false;
+          spanMeshPlane.material.opacity = 0.15;
+          spanMeshPlane.material.color.setHex(0x10b981); // emerald tint
+
+          badgeSpanType3D.textContent = 'แผ่ทั่วทั้งปริภูมิ 3 มิติ (Full R^3)';
+          badgeSpanType3D.className = 'px-2 py-0.5 rounded font-bold bg-emerald-600 text-white';
+          badgeDim3D.textContent = '3';
+          badgeFull3D.textContent = 'ครอบคลุมทั่วทั้ง R^3!';
+          badgeFull3D.className = 'font-bold text-emerald-400';
+
+          diagnostic3D.innerHTML = `
+            <div>• เมทริกซ์ $3 \\times 3$ มี $\\det(A) \\neq 0$ (ดีเทอร์มิแนนต์ไม่เป็นศูนย์)</div>
+            <div class="text-emerald-400">• เวกเตอร์ทั้ง 3 ตัวเป็นอิสระเชิงเส้น ไม่อยู่ในระนาบเดียวกัน จึงสร้างเวกเตอร์ใดๆ ใน $\\mathbb{R}^3$ ได้ทั้งหมด</div>
+          `;
+        } else {
+          // Span is a 2D Plane in R^3
+          spanMeshPlane.visible = true;
+          spanLineMesh.visible = false;
+          spanMeshPlane.material.opacity = 0.4;
+          spanMeshPlane.material.color.setHex(0x8b5cf6); // violet
+
+          // Orient the plane to match the normal vector
+          const up = new THREE.Vector3(0, 0, 1);
+          const quaternion = new THREE.Quaternion().setFromUnitVectors(up, normal);
+          spanMeshPlane.setRotationFromQuaternion(quaternion);
+
+          badgeSpanType3D.textContent = 'แผ่นระนาบ 2 มิติ (2D Subspace in R^3)';
+          badgeSpanType3D.className = 'px-2 py-0.5 rounded font-bold bg-violet-600 text-white';
+          badgeDim3D.textContent = '2';
+          badgeFull3D.textContent = 'ไม่เต็ม (เป็นเพียงระนาบแผ่นเรียบ)';
+          badgeFull3D.className = 'font-bold text-rose-400';
+
+          diagnostic3D.innerHTML = hasV3
+            ? `<div>• $\\mathbf{v}_3$ ตกอยู่บนระนาบเดียวกับ $\\mathbf{v}_1, \\mathbf{v}_2$ (Coplanar)</div>
+               <div class="text-amber-300">• แม้จะมี 3 เวกเตอร์ แต่ Span ก็ยังเป็นแค่ระนาบ 2 มิติ (Rank = 2)</div>`
+            : `<div>• เวกเตอร์ 2 ตัวที่ไม่ขนานกันจะแผ่ทั่วระนาบ 2 มิติที่ผ่านจุดกำเนิด</div>
+               <div class="text-violet-300">• มิติของ Span เท่ากับ 2</div>`;
+        }
+      }
+
+      if (window.MathJax) {
+        MathJax.typesetPromise([diagnostic3D]);
+      }
+    }
+
+    function animate3D() {
+      requestAnimationFrame(animate3D);
+      if (controls3D) controls3D.update();
+      if (renderer3D && scene3D && camera3D) {
+        renderer3D.render(scene3D, camera3D);
+      }
+    }
+
+    function resize3D() {
+      if (!is3DInitialized || !renderer3D) return;
+      const width = container3D.clientWidth;
+      const height = container3D.clientHeight;
+      camera3D.aspect = width / height;
+      camera3D.updateProjectionMatrix();
+      renderer3D.setSize(width, height);
+    }
+
+    // 3D Preset Button Handlers
+    document.getElementById('preset3DPlane').addEventListener('click', () => {
+      vec3D_1.set(2, 0, 1);
+      vec3D_2.set(0, 2, 1);
+      enableV3Checkbox.checked = false;
+      update3DScene();
+    });
+
+    document.getElementById('preset3DFull').addEventListener('click', () => {
+      vec3D_1.set(2, 0, 0);
+      vec3D_2.set(0, 2, 0);
+      vec3D_3.set(0, 0, 2);
+      enableV3Checkbox.checked = true;
+      document.getElementById('labelV3_3d').textContent = 'v3 = (0, 0, 2)';
+      update3DScene();
+    });
+
+    document.getElementById('preset3DCoplanar').addEventListener('click', () => {
+      // v3 = v1 + v2 => lies exactly in the plane
+      vec3D_1.set(2, 0, 1);
+      vec3D_2.set(0, 2, 1);
+      vec3D_3.set(2, 2, 2);
+      enableV3Checkbox.checked = true;
+      document.getElementById('labelV3_3d').textContent = 'v3 = (2, 2, 2)';
+      update3DScene();
+    });
+
+    document.getElementById('preset3DLine').addEventListener('click', () => {
+      vec3D_1.set(1.5, 1.5, 1.5);
+      vec3D_2.set(-1, -1, -1);
+      enableV3Checkbox.checked = false;
+      update3DScene();
+    });
+
+    enableV3Checkbox.addEventListener('change', update3DScene);
+
+    // Tab Switching Logic
+    const tab2DBtn = document.getElementById('tab2DBtn');
+    const tab3DBtn = document.getElementById('tab3DBtn');
+    const view2D = document.getElementById('view2D');
+    const view3D = document.getElementById('view3D');
+
+    tab2DBtn.addEventListener('click', () => {
+      tab2DBtn.className = 'px-5 py-2 rounded-lg font-bold text-sm bg-white text-violet-700 shadow-sm transition';
+      tab3DBtn.className = 'px-5 py-2 rounded-lg font-bold text-sm text-slate-600 hover:text-slate-900 transition';
+      view2D.classList.remove('hidden');
+      view3D.classList.add('hidden');
+      resizeCanvas2D();
+    });
+
+    tab3DBtn.addEventListener('click', () => {
+      tab3DBtn.className = 'px-5 py-2 rounded-lg font-bold text-sm bg-white text-violet-700 shadow-sm transition';
+      tab2DBtn.className = 'px-5 py-2 rounded-lg font-bold text-sm text-slate-600 hover:text-slate-900 transition';
+      view3D.classList.remove('hidden');
+      view2D.classList.add('hidden');
+      if (!is3DInitialized) {
+        init3D();
+      } else {
+        resize3D();
+      }
+    });
+
+    /* =====================================================================
+       3. GUIDED DISCOVERY HANDLER
+       ===================================================================== */
+    const btnRevealDiscovery = document.getElementById('btnRevealDiscovery');
+    const discoveryContent = document.getElementById('discoveryContent');
+
+    btnRevealDiscovery.addEventListener('click', () => {
+      const isHidden = discoveryContent.classList.toggle('hidden');
+      if (!isHidden && window.MathJax) {
+        MathJax.typesetPromise([discoveryContent]);
+      }
+    });
+
+    /* =====================================================================
+       4. PRACTICE EXERCISE & ACCORDION
+       ===================================================================== */
+    const btnCheckAnswer = document.getElementById('btnCheckAnswer');
+    const quizResultMsg = document.getElementById('quizResultMsg');
+
+    btnCheckAnswer.addEventListener('click', () => {
+      const selected = document.querySelector('input[name="exerciseOption"]:checked');
+      if (!selected) {
+        quizResultMsg.className = 'text-amber-600 font-medium text-xs sm:text-sm';
+        quizResultMsg.textContent = 'กรุณาเลือกคำตอบ 1 ข้อก่อนตรวจ';
+        return;
+      }
+
+      if (selected.value === '2') {
+        quizResultMsg.className = 'text-emerald-600 font-bold text-xs sm:text-sm';
+        quizResultMsg.textContent = '🎉 ถูกต้องแม่นยำ! เซตแรกแผ่ทั่วทั้งระนาบ 2D ส่วนเซตหลังเวกเตอร์ขนานกันจึงสร้างได้เพียงเส้นตรง 1D';
+      } else {
+        quizResultMsg.className = 'text-rose-600 font-bold text-xs sm:text-sm';
+        quizResultMsg.textContent = '❌ ยังไม่ถูกต้อง ลองสังเกตความสัมพันธ์ของ (1,2) กับ (2,4) ดูอีกครั้ง!';
+      }
+    });
+
+    const btnToggleDetailedSolution = document.getElementById('btnToggleDetailedSolution');
+    const fullSolutionBlock = document.getElementById('fullSolutionBlock');
+    const solutionBtnText = document.getElementById('solutionBtnText');
+    const solutionBtnIcon = document.getElementById('solutionBtnIcon');
+
+    btnToggleDetailedSolution.addEventListener('click', () => {
+      const isHidden = fullSolutionBlock.classList.toggle('hidden');
+      if (isHidden) {
+        solutionBtnText.textContent = 'คลิกเพื่อดูวิธีทำและคำอธิบายทางคณิตศาสตร์อย่างละเอียด';
+        solutionBtnIcon.classList.remove('rotate-180');
+      } else {
+        solutionBtnText.textContent = 'ซ่อนคำอธิบายอย่างละเอียด';
+        solutionBtnIcon.classList.add('rotate-180');
+        if (window.MathJax) {
+          MathJax.typesetPromise([fullSolutionBlock]);
+        }
+      }
+    });
+
+    /* =====================================================================
+       WINDOW EVENTS
+       ===================================================================== */
+    window.addEventListener('resize', () => {
+      resizeCanvas2D();
+      resize3D();
+    });
+
+    window.addEventListener('load', () => {
+      resizeCanvas2D();
+      if (window.MathJax) {
+        MathJax.typesetPromise();
+      }
+    });
+  </script>
+</body>
+</html>

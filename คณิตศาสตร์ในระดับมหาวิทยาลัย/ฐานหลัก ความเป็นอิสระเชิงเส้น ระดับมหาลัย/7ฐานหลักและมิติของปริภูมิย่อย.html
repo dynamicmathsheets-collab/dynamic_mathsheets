@@ -1,0 +1,1050 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>เรื่องที่ 7: ฐานหลักและมิติของปริภูมิย่อย (Basis and Dimension of Subspaces)</title>
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- Google Fonts: Sarabun & Kanit -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@400;500;600;700&family=Sarabun:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+  
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <!-- MathJax 3 Configuration -->
+  <script>
+    window.MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']],
+        displayMath: [['$$', '$$'], ['\\[', '\\]']]
+      },
+      svg: { fontCache: 'global' }
+    };
+  </script>
+  <script type="text/javascript" id="MathJax-script" async
+    src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+  </script>
+
+  <style>
+    body {
+      font-family: 'Sarabun', sans-serif;
+    }
+    h1, h2, h3, h4, .font-heading {
+      font-family: 'Kanit', sans-serif;
+    }
+    .pivot-col-highlight {
+      background-color: #ede9fe !important; /* purple-100 */
+      border-color: #8b5cf6 !important; /* purple-500 */
+    }
+    .free-col-highlight {
+      background-color: #fef3c7 !important; /* amber-100 */
+      border-color: #f59e0b !important; /* amber-500 */
+    }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-800 antialiased min-h-screen">
+
+  <!-- Main Container strictly conforming to dimensions (max-w-6xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8) -->
+  <div class="max-w-6xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 space-y-10">
+
+    <!-- Header Section -->
+    <header class="bg-gradient-to-r from-purple-950 via-slate-900 to-indigo-950 text-white rounded-3xl p-6 sm:p-10 shadow-xl relative overflow-hidden">
+      <div class="absolute -right-12 -top-12 w-80 h-80 bg-purple-500/15 rounded-full blur-3xl pointer-events-none"></div>
+      <div class="relative z-10">
+        <h1 class="text-2xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-white mb-3">
+          เรื่องที่ 7: ฐานหลักและมิติของปริภูมิย่อย (Subspaces)
+        </h1>
+        <p class="text-purple-200 text-base sm:text-lg max-w-3xl leading-relaxed">
+          เชื่อมโยง 4 ปริภูมิย่อยหลักของเมทริกซ์: ปริภูมิแถว (Row Space), ปริภูมิคอลัมน์ (Column Space), และปริภูมิว่าง (Null Space) ผ่านกระบวนการลดรูปแถวและทฤษฎีบทอันดับ-มิติ (Rank-Nullity Theorem)
+        </p>
+      </div>
+    </header>
+
+    <!-- ส่วนที่ 1: วัตถุประสงค์การเรียนรู้ -->
+    <section class="bg-white rounded-2xl p-6 sm:p-8 shadow-sm border border-slate-200 transition-all hover:shadow-md">
+      <div class="flex items-start gap-4">
+        <div class="p-3.5 bg-purple-50 text-purple-600 rounded-xl flex-shrink-0 text-xl">
+          <i class="fa-solid fa-bullseye"></i>
+        </div>
+        <div class="space-y-2">
+          <h2 class="text-xl sm:text-2xl font-bold text-slate-900">1. วัตถุประสงค์การเรียนรู้ (Learning Objectives)</h2>
+          <ul class="space-y-1.5 text-slate-700 text-base sm:text-lg leading-relaxed list-disc list-inside">
+            <li>นักศึกษาสามารถ<strong>หาฐานหลักและมิติของปริภูมิย่อย</strong>ที่กำหนดโดยเซตของเวกเตอร์ตัวกำเนิดได้ โดยใช้การกำจัดตัวแปรส่วนเกิน</li>
+            <li>นักศึกษาสามารถ<strong>หาฐานหลักของ $\operatorname{Col}(A)$, $\operatorname{Row}(A)$, และ $\operatorname{Null}(A)$</strong> พร้อมระบุที่มาของเวกเตอร์ได้อย่างถูกต้องแม่นยำ</li>
+            <li>นักศึกษาสามารถ<strong>อธิบายและประยุกต์ใช้ทฤษฎีบทอันดับ-มิติ (Rank-Nullity Theorem)</strong> ในการหาความสัมพันธ์ระหว่างจำนวนตัวแปรและมิติของปริภูมิคำตอบได้</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- ส่วนที่ 2: เนื้อหาหลัก -->
+    <section class="bg-white rounded-2xl p-6 sm:p-8 shadow-sm border border-slate-200 space-y-6">
+      <div>
+        <h2 class="text-xl sm:text-2xl font-bold text-slate-900 flex items-center gap-2">
+          <span class="w-2 h-7 bg-purple-600 rounded-full inline-block"></span>
+          2. เนื้อหาหลัก (Core Mathematical Concepts)
+        </h2>
+        <p class="text-slate-600 text-sm sm:text-base mt-1">
+          การวิเคราะห์โครงสร้างปริภูมิย่อย 4 ประการที่เกี่ยวข้องกับเมทริกซ์ $A_{m\times n}$
+        </p>
+      </div>
+
+      <!-- Core Cards Grid -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+        <!-- Card 1: Column Space & Casting-out -->
+        <div class="bg-slate-50 rounded-xl p-5 border border-slate-200/90 hover:border-purple-300 transition-colors">
+          <h3 class="text-lg font-bold text-purple-950 mb-2 flex items-center gap-2">
+            <span class="flex items-center justify-center w-6 h-6 rounded-md bg-purple-100 text-purple-700 text-xs font-bold">1</span>
+            ปริภูมิคอลัมน์ $\operatorname{Col}(A)$ และการคัดเลือกฐานหลัก
+          </h3>
+          <p class="text-slate-700 text-sm sm:text-base leading-relaxed mb-3">
+            $\operatorname{Col}(A)$ คือปริภูมิที่แผ่ทั่วโดยคอลัมน์ทั้งหมดของ $A$ (เป็นปริภูมิย่อยของ $\mathbb{R}^m$):
+          </p>
+          <div class="p-3 bg-white rounded-lg border border-purple-200 text-center font-medium shadow-inner text-slate-900 text-xs sm:text-sm">
+            $$\operatorname{Col}(A) = \operatorname{span}\{\mathbf{a}_1, \mathbf{a}_2, \dots, \mathbf{a}_n\} \subseteq \mathbb{R}^m$$
+          </div>
+          <div class="mt-2.5 p-2.5 bg-purple-50 rounded-lg border border-purple-200 text-xs text-purple-900 space-y-1">
+            <p class="font-bold"><i class="fa-solid fa-triangle-exclamation mr-1 text-amber-600"></i> กฎเกณฑ์ที่ต้องระวังเป็นพิเศษ:</p>
+            <p>ฐานหลักของ $\operatorname{Col}(A)$ คือ <strong>คอลัมน์ที่มีตำแหน่งตัวนำ (Pivot Columns) ที่ดึงมาจาก "เมทริกซ์เดิม $A$" เท่านั้น</strong> ห้ามนำคอลัมน์จากเมทริกซ์ที่ลดรูปแล้วมาใช้เด็ดขาด!</p>
+          </div>
+        </div>
+
+        <!-- Card 2: Row Space -->
+        <div class="bg-slate-50 rounded-xl p-5 border border-slate-200/90 hover:border-purple-300 transition-colors">
+          <h3 class="text-lg font-bold text-purple-950 mb-2 flex items-center gap-2">
+            <span class="flex items-center justify-center w-6 h-6 rounded-md bg-purple-100 text-purple-700 text-xs font-bold">2</span>
+            ปริภูมิแถว $\operatorname{Row}(A)$
+          </h3>
+          <p class="text-slate-700 text-sm sm:text-base leading-relaxed mb-3">
+            $\operatorname{Row}(A)$ คือปริภูมิที่แผ่ทั่วโดยแถวทั้งหมดของ $A$ หรือเท่ากับ $\operatorname{Col}(A^T)$ (เป็นปริภูมิย่อยของ $\mathbb{R}^n$):
+          </p>
+          <div class="p-3 bg-white rounded-lg border border-slate-200 text-center font-medium shadow-inner text-slate-900 text-xs sm:text-sm">
+            $$\operatorname{Row}(A) = \operatorname{span}\{\mathbf{r}_1, \mathbf{r}_2, \dots, \mathbf{r}_m\} \subseteq \mathbb{R}^n$$
+          </div>
+          <p class="text-xs sm:text-sm text-slate-700 mt-2">
+            <strong>ที่มาของฐานหลัก:</strong> การดำเนินการตามแถวขั้นมูลฐาน (ERO) ไม่เปลี่ยนปริภูมิแถว! ดังนั้นฐานหลักของ $\operatorname{Row}(A)$ คือ <strong>แถวที่ไม่เป็นศูนย์ทั้งหมดในเมทริกซ์ที่ลดรูปแล้ว (REF หรือ RREF)</strong>
+          </p>
+        </div>
+
+        <!-- Card 3: Null Space -->
+        <div class="bg-slate-50 rounded-xl p-5 border border-slate-200/90 hover:border-purple-300 transition-colors">
+          <h3 class="text-lg font-bold text-purple-950 mb-2 flex items-center gap-2">
+            <span class="flex items-center justify-center w-6 h-6 rounded-md bg-purple-100 text-purple-700 text-xs font-bold">3</span>
+            ปริภูมิว่าง $\operatorname{Null}(A)$ (Null Space / Kernel)
+          </h3>
+          <p class="text-slate-700 text-sm sm:text-base leading-relaxed mb-2">
+            $\operatorname{Null}(A)$ คือเซตของผลเฉลยทั้งหมดของสมการเอกพันธ์ $A\mathbf{x} = \mathbf{0}$ (เป็นปริภูมิย่อยของ $\mathbb{R}^n$):
+          </p>
+          <div class="p-2.5 bg-white rounded-lg border border-slate-200 text-center font-medium shadow-inner text-slate-900 text-xs sm:text-sm">
+            $$\operatorname{Null}(A) = \{ \mathbf{x} \in \mathbb{R}^n \mid A\mathbf{x} = \mathbf{0} \}$$
+          </div>
+          <p class="text-xs text-slate-600 mt-2 leading-relaxed">
+            <strong>วิธีหาฐานหลัก:</strong> ลดรูปเมทริกซ์สู่รูป RREF กำหนดตัวแปรเสริม (Parameters) ให้กับ <em>ตัวแปรเสรี (Free Variables)</em> แต่ละตัว แล้วแยกเขียนผลเฉลยในรูปเวกเตอร์เวียนเกิด (Parametric Vector Form) เวกเตอร์ที่คูณกับตัวแปรเสรีแต่ละตัวจะเป็นฐานหลักของ $\operatorname{Null}(A)$
+          </p>
+        </div>
+
+        <!-- Card 4: Rank-Nullity Theorem -->
+        <div class="bg-slate-50 rounded-xl p-5 border border-slate-200/90 hover:border-purple-300 transition-colors">
+          <h3 class="text-lg font-bold text-purple-950 mb-2 flex items-center gap-2">
+            <span class="flex items-center justify-center w-6 h-6 rounded-md bg-purple-100 text-purple-700 text-xs font-bold">4</span>
+            ทฤษฎีบทอันดับ-มิติ (Rank-Nullity Theorem)
+          </h3>
+          <p class="text-slate-700 text-sm sm:text-base leading-relaxed mb-2">
+            สำหรับเมทริกซ์ $A$ ขนาด $m \times n$ (มี $n$ คอลัมน์/ตัวแปร) จะมีความสัมพันธ์ที่ตายตัวเสมอ:
+          </p>
+          <div class="p-3 bg-purple-900 text-white rounded-lg text-center font-bold text-sm sm:text-base shadow-md">
+            $$\operatorname{rank}(A) + \operatorname{nullity}(A) = n$$
+          </div>
+          <div class="mt-2 text-xs text-slate-700 space-y-1">
+            <p>• $\operatorname{rank}(A) = \dim(\operatorname{Col} A) = \dim(\operatorname{Row} A) =$ จำนวนตำแหน่งตัวนำ (Pivots)</p>
+            <p>• $\operatorname{nullity}(A) = \dim(\operatorname{Null} A) =$ จำนวนตัวแปรเสรี (Free Variables)</p>
+            <p>• $n =$ จำนวนคอลัมน์ทั้งหมดของเมทริกซ์ $A$</p>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Comparative Summary Table -->
+      <div class="bg-slate-50 rounded-xl p-4 sm:p-5 border border-slate-200 overflow-x-auto">
+        <h4 class="font-bold text-slate-900 text-sm mb-3 flex items-center gap-2">
+          <i class="fa-solid fa-table-list text-purple-600"></i>
+          ตารางเปรียบเทียบที่มาของฐานหลักและมิติของแต่ละปริภูมิย่อย (สำหรับเมทริกซ์ $A_{m\times n}$)
+        </h4>
+        <table class="w-full text-left text-xs sm:text-sm border-collapse">
+          <thead>
+            <tr class="border-b border-slate-300 bg-white text-slate-700">
+              <th class="p-2.5 font-bold">ปริภูมิย่อย</th>
+              <th class="p-2.5 font-bold">เป็นสับเซตของ</th>
+              <th class="p-2.5 font-bold">มิติ (Dimension)</th>
+              <th class="p-2.5 font-bold text-purple-900">แหล่งที่มาของเวกเตอร์ฐานหลัก (Basis Source)</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-slate-200 text-slate-700">
+            <tr>
+              <td class="p-2.5 font-bold text-purple-700">$\operatorname{Col}(A)$ (Column Space)</td>
+              <td class="p-2.5">$\mathbb{R}^m$</td>
+              <td class="p-2.5 font-mono font-bold">$\operatorname{rank}(A) = r$</td>
+              <td class="p-2.5 font-semibold text-purple-800 bg-purple-50/50">
+                <i class="fa-solid fa-file-circle-check text-purple-600 mr-1"></i>คอลัมน์ตัวนำจาก <strong>เมทริกซ์เดิม $A$</strong>
+              </td>
+            </tr>
+            <tr>
+              <td class="p-2.5 font-bold text-indigo-700">$\operatorname{Row}(A)$ (Row Space)</td>
+              <td class="p-2.5">$\mathbb{R}^n$</td>
+              <td class="p-2.5 font-mono font-bold">$\operatorname{rank}(A) = r$</td>
+              <td class="p-2.5 font-semibold text-indigo-800 bg-indigo-50/50">
+                <i class="fa-solid fa-arrows-split-up-and-left text-indigo-600 mr-1"></i>แถวที่ไม่เป็นศูนย์จาก <strong>เมทริกซ์ลดรูป (RREF)</strong>
+              </td>
+            </tr>
+            <tr>
+              <td class="p-2.5 font-bold text-amber-700">$\operatorname{Null}(A)$ (Null Space)</td>
+              <td class="p-2.5">$\mathbb{R}^n$</td>
+              <td class="p-2.5 font-mono font-bold">$\operatorname{nullity}(A) = n - r$</td>
+              <td class="p-2.5 font-semibold text-amber-800 bg-amber-50/50">
+                <i class="fa-solid fa-sliders text-amber-600 mr-1"></i>เวกเตอร์สัมประสิทธิ์ของ <strong>ตัวแปรเสรีจากสมการ $R\mathbf{x}=\mathbf{0}$</strong>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ส่วนที่ 3: แบบจำลองโต้ตอบ (Interactive 4-Subspaces Explorer) -->
+    <section class="bg-white rounded-2xl p-6 sm:p-8 shadow-sm border border-slate-200 space-y-6">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-200">
+        <div>
+          <h2 class="text-xl sm:text-2xl font-bold text-slate-900 flex items-center gap-2">
+            <span class="w-2 h-7 bg-purple-600 rounded-full inline-block"></span>
+            3. แบบจำลองโต้ตอบ: สำรวจฐานหลักและมิติของปริภูมิย่อย (Subspace Explorer)
+          </h2>
+          <p class="text-slate-600 text-sm mt-1">
+            ป้อนเมทริกซ์ $A$ หรือเลือก Presets เพื่อดูขั้นตอนการลดรูปสู่ RREF การแยกแยะที่มาของฐานหลัก และการตรวจสอบสมการ Rank-Nullity
+          </p>
+        </div>
+
+        <!-- Matrix Dimension Selector -->
+        <div class="flex items-center gap-2">
+          <label for="dimSelect" class="text-xs font-semibold text-slate-500">ขนาดเมทริกซ์:</label>
+          <select id="dimSelect" class="bg-slate-100 border border-slate-300 text-slate-800 text-xs sm:text-sm rounded-lg px-3 py-1.5 font-semibold focus:outline-none focus:ring-2 focus:ring-purple-500">
+            <option value="2x3" selected>2 แถว × 3 คอลัมน์</option>
+            <option value="3x3">3 แถว × 3 คอลัมน์</option>
+            <option value="3x4">3 แถว × 4 คอลัมน์</option>
+            <option value="2x2">2 แถว × 2 คอลัมน์</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Presets Toolbar -->
+      <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-2">
+        <span class="text-xs font-bold text-slate-500 uppercase tracking-wider block">ชุดเมทริกซ์ตัวอย่างสำเร็จรูป (Presets):</span>
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs">
+          <button id="presetExercise" class="p-2.5 bg-white hover:bg-purple-50 border border-slate-300 hover:border-purple-400 rounded-lg font-medium text-slate-800 text-left transition shadow-xs">
+            <span class="font-bold text-purple-700">📘 เมทริกซ์แบบฝึกหัด (2x3)</span><br>
+            <span class="text-[11px] text-slate-500">[[1,2,3],[2,4,6]] (Rank 1)</span>
+          </button>
+          <button id="presetStandard2x3" class="p-2.5 bg-white hover:bg-purple-50 border border-slate-300 hover:border-purple-400 rounded-lg font-medium text-slate-800 text-left transition shadow-xs">
+            <span class="font-bold text-indigo-700">⚡ ทั่วไป (2x3 Rank 2)</span><br>
+            <span class="text-[11px] text-slate-500">[[1,0,2],[0,1,3]]</span>
+          </button>
+          <button id="presetRank2_3x3" class="p-2.5 bg-white hover:bg-purple-50 border border-slate-300 hover:border-purple-400 rounded-lg font-medium text-slate-800 text-left transition shadow-xs">
+            <span class="font-bold text-emerald-700">📐 3x3 อันดับ 2</span><br>
+            <span class="text-[11px] text-slate-500">[[1,2,1],[2,4,2],[1,1,3]]</span>
+          </button>
+          <button id="presetRank2_3x4" class="p-2.5 bg-white hover:bg-purple-50 border border-slate-300 hover:border-purple-400 rounded-lg font-medium text-slate-800 text-left transition shadow-xs">
+            <span class="font-bold text-amber-700">🧊 3x4 ตัวแปรเสรี 2 ตัว</span><br>
+            <span class="text-[11px] text-slate-500">[[1,2,0,1],[0,0,1,2],[0,0,0,0]]</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Matrix Inputs & Calculation Display -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        
+        <!-- Left: Input Matrix Editor (5 cols) -->
+        <div class="lg:col-span-5 space-y-4">
+          <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-3">
+            <div class="flex items-center justify-between">
+              <h4 class="font-bold text-slate-800 text-sm">ป้อนเมทริกซ์ต้นฉบับ $A$:</h4>
+              <span class="text-[11px] text-slate-500">แก้ไขค่าในช่องได้อิสระ</span>
+            </div>
+
+            <!-- Dynamic Table for Input Matrix A -->
+            <div id="matrixInputContainer" class="p-3 bg-white rounded-lg border border-slate-300 overflow-x-auto">
+              <!-- Rendered via JS -->
+            </div>
+
+            <button id="btnComputeSubspaces" class="w-full py-2.5 bg-purple-600 hover:bg-purple-700 text-white font-medium rounded-lg text-xs sm:text-sm transition flex items-center justify-center gap-1.5 shadow-sm">
+              <i class="fa-solid fa-calculator"></i>
+              คำนวณและวิเคราะห์ปริภูมิย่อย (Compute Subspaces)
+            </button>
+          </div>
+
+          <!-- Rank-Nullity Live Balance Card -->
+          <div class="p-4 bg-slate-900 text-white rounded-xl space-y-3 border border-slate-800">
+            <div class="flex items-center justify-between text-xs">
+              <span class="text-slate-400 font-semibold uppercase tracking-wider">
+                <i class="fa-solid fa-scale-balanced mr-1.5 text-purple-400"></i>การตรวจสอบ Rank-Nullity:
+              </span>
+              <span id="rnValidationBadge" class="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
+                สมดุลสมบูรณ์ (Verified)
+              </span>
+            </div>
+
+            <div class="p-3 bg-slate-800/80 rounded-lg text-center font-mono text-sm sm:text-base border border-slate-700">
+              <span class="text-purple-300 font-bold" id="rnRankVal">rank(A) = 1</span> + 
+              <span class="text-amber-300 font-bold" id="rnNullityVal">nullity(A) = 2</span> = 
+              <span class="text-emerald-400 font-bold" id="rnTotalCols">n = 3 คอลัมน์</span>
+            </div>
+
+            <!-- Visual Bar Split -->
+            <div>
+              <div class="w-full bg-slate-800 rounded-full h-3 overflow-hidden flex">
+                <div id="barRank" class="bg-purple-500 h-full transition-all duration-300" style="width: 33.3%;"></div>
+                <div id="barNullity" class="bg-amber-400 h-full transition-all duration-300" style="width: 66.7%;"></div>
+              </div>
+              <div class="flex justify-between text-[11px] text-slate-400 mt-1 font-mono">
+                <span class="text-purple-300">■ Pivots: <span id="barRankLabel">1</span></span>
+                <span class="text-amber-300">■ Free Vars: <span id="barNullityLabel">2</span></span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right: RREF & Basis Extraction Displays (7 cols) -->
+        <div class="lg:col-span-7 space-y-4">
+          
+          <!-- RREF Matrix View with Column Highlighting -->
+          <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-xs space-y-2">
+            <div class="flex items-center justify-between border-b border-slate-100 pb-2">
+              <h4 class="font-bold text-slate-900 text-sm">
+                <i class="fa-solid fa-table-cells text-indigo-600 mr-1.5"></i>รูปขั้นบันไดแถวลดรูป $\operatorname{RREF}(A)$:
+              </h4>
+              <div class="flex items-center gap-2 text-[11px]">
+                <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-purple-100 text-purple-800 font-semibold">
+                  <span class="w-2 h-2 rounded-full bg-purple-600"></span> Pivot Column
+                </span>
+                <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-amber-100 text-amber-800 font-semibold">
+                  <span class="w-2 h-2 rounded-full bg-amber-500"></span> Free Column
+                </span>
+              </div>
+            </div>
+            <div id="rrefLatexDisplay" class="p-3 bg-slate-50 rounded-lg text-center font-mono overflow-x-auto text-sm">
+              <!-- Rendered via MathJax -->
+            </div>
+          </div>
+
+          <!-- The 3 Crucial Subspace Basis Results (Categorized with Origin Flags) -->
+          <div class="space-y-3">
+            
+            <!-- 1. Col(A) Result -->
+            <div class="p-3.5 bg-purple-50/70 border border-purple-200 rounded-xl space-y-1.5">
+              <div class="flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                  <span class="w-2 h-2 rounded-full bg-purple-600"></span>
+                  <span class="font-bold text-purple-950 text-sm">ฐานหลักของ $\operatorname{Col}(A)$ (Column Space Basis)</span>
+                </div>
+                <span class="text-xs px-2 py-0.5 bg-purple-200 text-purple-900 rounded font-bold font-mono" id="dimColBadge">
+                  dim = 1
+                </span>
+              </div>
+              <p class="text-xs text-purple-900 font-semibold flex items-center gap-1">
+                <i class="fa-solid fa-circle-check text-purple-600"></i>
+                <span id="colOriginText">ดึงจากคอลัมน์ที่ 1 ของ "เมทริกซ์เดิม $A$":</span>
+              </p>
+              <div id="colBasisDisplay" class="p-2.5 bg-white rounded-lg border border-purple-200 text-center font-mono overflow-x-auto text-xs sm:text-sm text-slate-800">
+                <!-- Rendered -->
+              </div>
+            </div>
+
+            <!-- 2. Row(A) Result -->
+            <div class="p-3.5 bg-indigo-50/70 border border-indigo-200 rounded-xl space-y-1.5">
+              <div class="flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                  <span class="w-2 h-2 rounded-full bg-indigo-600"></span>
+                  <span class="font-bold text-indigo-950 text-sm">ฐานหลักของ $\operatorname{Row}(A)$ (Row Space Basis)</span>
+                </div>
+                <span class="text-xs px-2 py-0.5 bg-indigo-200 text-indigo-900 rounded font-bold font-mono" id="dimRowBadge">
+                  dim = 1
+                </span>
+              </div>
+              <p class="text-xs text-indigo-900 font-semibold flex items-center gap-1">
+                <i class="fa-solid fa-circle-check text-indigo-600"></i>
+                <span>ดึงแถวที่ไม่เป็นศูนย์จาก "เมทริกซ์ลดรูป $\operatorname{RREF}(A)$":</span>
+              </p>
+              <div id="rowBasisDisplay" class="p-2.5 bg-white rounded-lg border border-indigo-200 text-center font-mono overflow-x-auto text-xs sm:text-sm text-slate-800">
+                <!-- Rendered -->
+              </div>
+            </div>
+
+            <!-- 3. Null(A) Result -->
+            <div class="p-3.5 bg-amber-50/70 border border-amber-200 rounded-xl space-y-1.5">
+              <div class="flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                  <span class="w-2 h-2 rounded-full bg-amber-600"></span>
+                  <span class="font-bold text-amber-950 text-sm">ฐานหลักของ $\operatorname{Null}(A)$ (Null Space Basis)</span>
+                </div>
+                <span class="text-xs px-2 py-0.5 bg-amber-200 text-amber-900 rounded font-bold font-mono" id="dimNullBadge">
+                  dim = 2
+                </span>
+              </div>
+              <p class="text-xs text-amber-900 font-semibold flex items-center gap-1">
+                <i class="fa-solid fa-circle-check text-amber-600"></i>
+                <span id="nullParamText">แยกตัวประกอบจากตัวแปรเสรี $x_2, x_3$:</span>
+              </p>
+              <div id="nullBasisDisplay" class="p-2.5 bg-white rounded-lg border border-amber-200 text-center font-mono overflow-x-auto text-xs sm:text-sm text-slate-800">
+                <!-- Rendered -->
+              </div>
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ส่วนที่ 4: คำถามนำเพื่อค้นพบ -->
+    <section class="bg-white rounded-2xl p-6 sm:p-8 shadow-sm border border-slate-200 space-y-4">
+      <div class="flex items-center gap-2">
+        <span class="w-2 h-7 bg-purple-600 rounded-full inline-block"></span>
+        <h2 class="text-xl sm:text-2xl font-bold text-slate-900">4. คำถามนำเพื่อค้นพบ (Guided Discovery Question)</h2>
+      </div>
+
+      <div class="bg-gradient-to-r from-purple-50 via-indigo-50 to-slate-50 border border-purple-200 rounded-2xl p-5 sm:p-7 space-y-4">
+        <div class="flex items-start gap-3">
+          <div class="p-2.5 bg-purple-600 text-white rounded-xl flex-shrink-0 mt-0.5">
+            <i class="fa-solid fa-circle-question text-xl"></i>
+          </div>
+          <div class="space-y-3 w-full">
+            <h3 class="text-lg sm:text-xl font-bold text-purple-950">
+              "เพราะเหตุใดการหาฐานหลักของปริภูมิคอลัมน์ $\operatorname{Col}(A)$ จึงต้องเลือกคอลัมน์หลักจากเมทริกซ์เดิม $A$ ไม่ใช่คอลัมน์จากเมทริกซ์ที่ลดรูปแล้ว?"
+            </h3>
+            <p class="text-slate-700 text-sm sm:text-base leading-relaxed">
+              ในเมื่อปริภูมิแถว $\operatorname{Row}(A)$ สามารถดึงแถวจากเมทริกซ์ที่ลดรูปแล้วได้ ทำไมปริภูมิคอลัมน์จึงทำแบบเดียวกันไม่ได้? การดำเนินการตามแถว (Row Operations) ส่งผลกระทบต่อคอลัมน์อย่างไร?
+            </p>
+
+            <button id="btnRevealDiscovery" class="px-5 py-2.5 bg-purple-600 hover:bg-purple-700 text-white font-semibold rounded-xl text-sm transition shadow-sm flex items-center gap-2">
+              <i class="fa-solid fa-lightbulb"></i>
+              <span>คลิกเพื่อดูการวิเคราะห์เปรียบเทียบเชิงลึก: ทำไม $\operatorname{Col}(A) \neq \operatorname{Col}(\operatorname{RREF}(A))$</span>
+            </button>
+
+            <!-- Discovery Reveal Panel -->
+            <div id="discoveryContentBox" class="hidden mt-4 bg-white p-5 rounded-xl border border-purple-200 space-y-4 text-sm sm:text-base text-slate-800 shadow-sm">
+              
+              <div class="border-l-4 border-rose-500 pl-4 space-y-2">
+                <h4 class="font-bold text-rose-800 text-base">
+                  1. การดำเนินการตามแถว (ERO) เปลี่ยนแปลงปริภูมิคอลัมน์! ($\operatorname{Col}(A) \neq \operatorname{Col}(R)$)
+                </h4>
+                <p class="text-slate-700 text-sm leading-relaxed">
+                  พิจารณาตัวอย่างง่ายๆ: $A = \begin{bmatrix} 1 \\ 2 \end{bmatrix} \xrightarrow{R_2 \to R_2 - 2R_1} R = \begin{bmatrix} 1 \\ 0 \end{bmatrix}$
+                </p>
+                <div class="p-2 bg-slate-50 rounded border border-slate-200 text-xs sm:text-sm font-mono space-y-1">
+                  <p>• $\operatorname{Col}(A)$ คือเส้นตรงที่ผ่านจุดกำเนิดและเวกเตอร์ $(1, 2)$ นั่นคือเส้นตรง $y = 2x$</p>
+                  <p>• $\operatorname{Col}(R)$ คือเส้นตรงที่ผ่านจุดกำเนิดและเวกเตอร์ $(1, 0)$ นั่นคือแกน $x$ ($y = 0$)</p>
+                </div>
+                <p class="text-rose-700 text-xs sm:text-sm font-semibold">
+                  เห็นได้ชัดเจนว่า ทั้งสองปริภูมิต่างกันอย่างสิ้นเชิง! เวกเตอร์ $\begin{bmatrix} 1 \\ 0 \end{bmatrix}$ ไม่ได้อยู่ใน $\operatorname{Col}(A)$ เลยแม้แต่น้อย
+                </p>
+              </div>
+
+              <div class="border-l-4 border-purple-600 pl-4 space-y-2">
+                <h4 class="font-bold text-purple-900 text-base">
+                  2. สิ่งที่การดำเนินการตามแถว "รักษาไว้" คือ ความสัมพันธ์เชิงเส้นระหว่างคอลัมน์
+                </h4>
+                <p class="text-slate-700 text-sm leading-relaxed">
+                  แม้การดำเนินการตามแถวจะเปลี่ยนปริภูมิคอลัมน์ แต่สมการเอกพันธ์ $A\mathbf{x} = \mathbf{0}$ และ $R\mathbf{x} = \mathbf{0}$ <strong>มีเซตผลเฉลยเดียวกันทุกประการ</strong>
+                </p>
+                <p class="text-slate-700 text-sm leading-relaxed">
+                  ซึ่งหมายความว่า <em>"คอลัมน์ใดใน $R$ ที่เป็นอิสระเชิงเส้นต่อกัน คอลัมน์ที่ตรงกันใน $A$ ก็จะเป็นอิสระเชิงเส้นต่อกันด้วย"</em>
+                </p>
+              </div>
+
+              <div class="p-3 bg-purple-50 rounded-xl border border-purple-200 text-purple-950 text-xs sm:text-sm font-medium">
+                💡 <strong>ข้อสรุปสำคัญ:</strong> เราจึงใช้รูปบันไดแถว $R$ <strong>เพียงเพื่อ "ชี้เป้าหมาย" (Identify)</strong> ว่าคอลัมน์ใดเป็น Pivot Columns แต่ต้องย้อนกลับไป <strong>"หยิบตัวเวกเตอร์จริงจากเมทริกซ์เดิม $A$"</strong> มาเป็นฐานหลักเสมอ
+              </div>
+
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ส่วนที่ 5: แบบฝึกหัดสำหรับนักศึกษา -->
+    <section class="bg-white rounded-2xl p-6 sm:p-8 shadow-sm border border-slate-200 space-y-6">
+      <div class="flex items-center gap-2">
+        <span class="w-2 h-7 bg-purple-600 rounded-full inline-block"></span>
+        <h2 class="text-xl sm:text-2xl font-bold text-slate-900">5. แบบฝึกหัดสำหรับนักศึกษา (Practice Exercise)</h2>
+      </div>
+
+      <div class="bg-slate-50 border border-slate-200 rounded-2xl p-5 sm:p-6 space-y-6">
+        <div class="border-l-4 border-purple-600 pl-4 py-1">
+          <span class="text-xs font-bold text-purple-700 uppercase tracking-wider">โจทย์ฝึกปฏิบัติการ:</span>
+          <p class="text-slate-900 font-semibold text-base sm:text-lg mt-1">
+            กำหนดเมทริกซ์ $A = \begin{bmatrix} 1 & 2 & 3 \\ 2 & 4 & 6 \end{bmatrix}$ จงหา:
+          </p>
+          <div class="text-slate-700 text-sm mt-1 pl-2">
+            1) อันดับของ $A$ ($\operatorname{rank}(A)$)<br>
+            2) ฐานหลักของปริภูมิคอลัมน์ $\operatorname{Col}(A)$<br>
+            3) มิติของปริภูมิว่าง $\operatorname{dim}(\operatorname{Null}(A))$
+          </div>
+        </div>
+
+        <!-- Student Interactive Inputs -->
+        <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm space-y-4">
+          <p class="text-sm font-semibold text-slate-800">กรอกค่าผลลัพธ์ที่คุณคำนวณได้:</p>
+          
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div class="p-3 rounded-lg border border-slate-200 bg-slate-50 space-y-1">
+              <label for="inputRank" class="block font-bold text-purple-800 text-xs sm:text-sm">อันดับ $\operatorname{rank}(A)$:</label>
+              <input type="number" id="inputRank" placeholder="เช่น 1, 2" class="w-full px-3 py-1.5 border border-slate-300 rounded-lg text-center font-mono font-bold focus:ring-2 focus:ring-purple-500 focus:outline-none">
+            </div>
+
+            <div class="p-3 rounded-lg border border-slate-200 bg-slate-50 space-y-1">
+              <label for="inputNullity" class="block font-bold text-amber-800 text-xs sm:text-sm">มิติ $\operatorname{dim}(\operatorname{Null}(A))$:</label>
+              <input type="number" id="inputNullity" placeholder="เช่น 1, 2" class="w-full px-3 py-1.5 border border-slate-300 rounded-lg text-center font-mono font-bold focus:ring-2 focus:ring-purple-500 focus:outline-none">
+            </div>
+
+            <div class="p-3 rounded-lg border border-slate-200 bg-slate-50 space-y-1">
+              <label for="selectColBasis" class="block font-bold text-indigo-800 text-xs sm:text-sm">ฐานหลักของ $\operatorname{Col}(A)$:</label>
+              <select id="selectColBasis" class="w-full px-2 py-1.5 border border-slate-300 rounded-lg text-xs font-semibold focus:ring-2 focus:ring-purple-500 focus:outline-none bg-white">
+                <option value="">-- เลือกฐานหลัก --</option>
+                <option value="col1_orig">{(1, 2)} (คอลัมน์ที่ 1 จาก A เดิม)</option>
+                <option value="col1_rref">{(1, 0)} (คอลัมน์ที่ 1 จาก RREF)</option>
+                <option value="col3_orig">{(1, 2), (2, 4), (3, 6)} (ทั้ง 3 คอลัมน์)</option>
+                <option value="row_orig">{(1, 2, 3)} (แถวที่ 1)</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="flex items-center gap-3 pt-2">
+            <button id="btnCheckExercise" class="px-5 py-2.5 bg-purple-600 hover:bg-purple-700 text-white font-medium rounded-lg text-xs sm:text-sm transition shadow-sm">
+              <i class="fa-solid fa-check-double mr-1.5"></i>ตรวจคำตอบ
+            </button>
+            <div id="exerciseFeedbackMsg" class="text-xs sm:text-sm font-semibold"></div>
+          </div>
+        </div>
+
+        <!-- Step-by-Step Detailed Solution Accordion -->
+        <div>
+          <button id="btnToggleSolutionAccordion" class="text-sm font-semibold text-purple-700 hover:text-purple-900 flex items-center gap-1.5 transition">
+            <span id="solutionAccordionLabel">แสดงเฉลยวิธีทำอย่างละเอียดทุกขั้นตอน (Step-by-step Solution)</span>
+            <i id="solutionAccordionIcon" class="fa-solid fa-chevron-down transition-transform"></i>
+          </button>
+
+          <div id="solutionAccordionBox" class="hidden mt-4 bg-white p-6 rounded-xl border border-purple-200 space-y-6 text-sm sm:text-base text-slate-800 shadow-sm">
+            
+            <h4 class="font-bold text-purple-950 pb-2 border-b border-purple-100 flex items-center gap-2">
+              <i class="fa-solid fa-clipboard-check text-purple-600"></i>
+              การแสดงวิธีทำอย่างละเอียดตามกระบวนการพีชคณิตเชิงเส้น
+            </h4>
+
+            <!-- Step 1: Row Reduction -->
+            <div class="space-y-2">
+              <p class="font-bold text-slate-900">ขั้นที่ 1: ลดรูปเมทริกซ์ $A$ สู่รูปขั้นบันไดแถวลดรูป (RREF)</p>
+              <p class="text-slate-700">
+                ทำการดำเนินการตามแถวขั้นมูลฐาน $R_2 \to R_2 - 2R_1$:
+              </p>
+              <div class="p-2.5 bg-slate-50 rounded border border-slate-200 text-center font-mono my-2 overflow-x-auto text-xs sm:text-sm">
+                $$A = \begin{bmatrix} 1 & 2 & 3 \\ 2 & 4 & 6 \end{bmatrix} \xrightarrow{R_2 \to R_2 - 2R_1} \operatorname{RREF}(A) = \begin{bmatrix} \mathbf{1} & 2 & 3 \\ 0 & 0 & 0 \end{bmatrix}$$
+              </div>
+            </div>
+
+            <!-- Step 2: Pivots & Rank -->
+            <div class="space-y-2">
+              <p class="font-bold text-slate-900">ขั้นที่ 2: ระบุตำแหน่งตัวนำ (Pivot) และหาอันดับ $\operatorname{rank}(A)$</p>
+              <div class="pl-4 border-l-2 border-purple-400 space-y-1 text-slate-700 text-xs sm:text-sm">
+                <p>• ตำแหน่งตัวนำ (Pivot) มีเพียงตำแหน่งเดียว คือที่แถวที่ 1 คอลัมน์ที่ 1 (ตัวแปรหลักคือ $x_1$)</p>
+                <p>• ดังนั้น <strong>$\operatorname{rank}(A) = 1$</strong></p>
+              </div>
+            </div>
+
+            <!-- Step 3: Basis of Col(A) -->
+            <div class="space-y-2">
+              <p class="font-bold text-slate-900">ขั้นที่ 3: หาฐานหลักของปริภูมิคอลัมน์ $\operatorname{Col}(A)$</p>
+              <div class="pl-4 border-l-2 border-purple-400 space-y-1 text-slate-700 text-xs sm:text-sm">
+                <p>• คอลัมน์ตัวนำคือ <strong>คอลัมน์ที่ 1</strong></p>
+                <p>• เลือกคอลัมน์ที่ 1 จาก <strong>เมทริกซ์เดิม $A$</strong> ได้แก่ เวกเตอร์ $\begin{bmatrix} 1 \\ 2 \end{bmatrix}$</p>
+                <p class="font-bold text-purple-800 bg-purple-50 p-2 rounded border border-purple-200">
+                  $\implies$ ฐานหลักของ $\operatorname{Col}(A)$ คือ $\left\{ \begin{bmatrix} 1 \\ 2 \end{bmatrix} \right\}$ และ $\dim(\operatorname{Col} A) = 1$
+                </p>
+              </div>
+            </div>
+
+            <!-- Step 4: Basis of Null(A) & Rank-Nullity -->
+            <div class="space-y-2">
+              <p class="font-bold text-slate-900">ขั้นที่ 4: หาฐานหลักและมิติของปริภูมิว่าง $\operatorname{Null}(A)$</p>
+              <div class="pl-4 border-l-2 border-amber-400 space-y-1.5 text-slate-700 text-xs sm:text-sm">
+                <p>จากสมการ $R\mathbf{x} = \mathbf{0} \implies 1x_1 + 2x_2 + 3x_3 = 0$</p>
+                <p>คอลัมน์ที่ 2 และ 3 ไม่มี Pivot ทำให้ $x_2, x_3$ เป็น <strong>ตัวแปรเสรี (Free Variables)</strong></p>
+                <p>จัดรูป $x_1 = -2x_2 - 3x_3$ เขียนผลเฉลยในรูปเวกเตอร์เวียนเกิด:</p>
+                <div class="p-2 bg-slate-50 rounded border border-slate-200 text-center font-mono my-1 text-xs">
+                  $$\mathbf{x} = \begin{bmatrix} x_1 \\ x_2 \\ x_3 \end{bmatrix} = \begin{bmatrix} -2x_2 - 3x_3 \\ x_2 \\ x_3 \end{bmatrix} = x_2 \begin{bmatrix} -2 \\ 1 \\ 0 \end{bmatrix} + x_3 \begin{bmatrix} -3 \\ 0 \\ 1 \end{bmatrix}$$
+                </div>
+                <p class="font-bold text-amber-800 bg-amber-50 p-2 rounded border border-amber-200">
+                  $\implies$ ฐานหลักของ $\operatorname{Null}(A)$ คือ $\left\{ \begin{bmatrix} -2 \\ 1 \\ 0 \end{bmatrix}, \begin{bmatrix} -3 \\ 0 \\ 1 \end{bmatrix} \right\}$ และ $\dim(\operatorname{Null} A) = 2$
+                </p>
+              </div>
+            </div>
+
+            <!-- Step 5: Verification -->
+            <div class="p-4 bg-emerald-50 rounded-xl border border-emerald-200 text-emerald-950 text-xs sm:text-sm space-y-1">
+              <span class="font-bold"><i class="fa-solid fa-circle-check text-emerald-600 mr-1"></i>ตรวจสอบทฤษฎีบทอันดับ-มิติ:</span>
+              <p class="font-mono">
+                $\operatorname{rank}(A) + \operatorname{nullity}(A) = 1 + 2 = 3 = n$ (จำนวนคอลัมน์ทั้งหมดของเมทริกซ์ $A$) ถูกต้องสมบูรณ์แบบ
+              </p>
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+  </div>
+
+  <!-- Interactive Logic Engine -->
+  <script>
+    /* =====================================================================
+       1. MATRIX PRESETS & DATA
+       ===================================================================== */
+    let currentRows = 2;
+    let currentCols = 3;
+
+    // Default Matrix: Exercise Problem [[1,2,3],[2,4,6]]
+    let matrixA = [
+      [1, 2, 3],
+      [2, 4, 6]
+    ];
+
+    const presetsData = {
+      exercise: {
+        r: 2, c: 3,
+        data: [[1, 2, 3], [2, 4, 6]]
+      },
+      standard2x3: {
+        r: 2, c: 3,
+        data: [[1, 0, 2], [0, 1, 3]]
+      },
+      rank2_3x3: {
+        r: 3, c: 3,
+        data: [[1, 2, 1], [2, 4, 2], [1, 1, 3]]
+      },
+      rank2_3x4: {
+        r: 3, c: 4,
+        data: [[1, 2, 0, 1], [0, 0, 1, 2], [0, 0, 0, 0]]
+      }
+    };
+
+    // DOM Elements
+    const dimSelect = document.getElementById('dimSelect');
+    const matrixInputContainer = document.getElementById('matrixInputContainer');
+    const btnComputeSubspaces = document.getElementById('btnComputeSubspaces');
+
+    const rrefLatexDisplay = document.getElementById('rrefLatexDisplay');
+    const colBasisDisplay = document.getElementById('colBasisDisplay');
+    const rowBasisDisplay = document.getElementById('rowBasisDisplay');
+    const nullBasisDisplay = document.getElementById('nullBasisDisplay');
+
+    const dimColBadge = document.getElementById('dimColBadge');
+    const dimRowBadge = document.getElementById('dimRowBadge');
+    const dimNullBadge = document.getElementById('dimNullBadge');
+    const colOriginText = document.getElementById('colOriginText');
+    const nullParamText = document.getElementById('nullParamText');
+
+    const rnRankVal = document.getElementById('rnRankVal');
+    const rnNullityVal = document.getElementById('rnNullityVal');
+    const rnTotalCols = document.getElementById('rnTotalCols');
+    const barRank = document.getElementById('barRank');
+    const barNullity = document.getElementById('barNullity');
+    const barRankLabel = document.getElementById('barRankLabel');
+    const barNullityLabel = document.getElementById('barNullityLabel');
+    const rnValidationBadge = document.getElementById('rnValidationBadge');
+
+    /* =====================================================================
+       2. MATRIX INPUT RENDERING
+       ===================================================================== */
+    function renderInputGrid() {
+      let html = '<table class="mx-auto border-collapse">';
+      // Header for Columns
+      html += '<thead><tr>';
+      for (let j = 0; j < currentCols; j++) {
+        html += `<th class="px-2 py-1 text-center font-mono text-xs font-bold text-purple-800">\\(\\mathbf{a}_${j+1}\\)</th>`;
+      }
+      html += '</tr></thead><tbody>';
+
+      for (let i = 0; i < currentRows; i++) {
+        html += '<tr>';
+        for (let j = 0; j < currentCols; j++) {
+          const val = matrixA[i] && matrixA[i][j] !== undefined ? matrixA[i][j] : 0;
+          html += `
+            <td class="p-1">
+              <input type="number" step="any" data-r="${i}" data-c="${j}" value="${val}"
+                class="mat-cell w-14 sm:w-16 px-1.5 py-1 text-center font-mono text-sm border rounded bg-slate-50 focus:bg-white focus:ring-2 focus:ring-purple-500 focus:outline-none">
+            </td>
+          `;
+        }
+        html += '</tr>';
+      }
+      html += '</tbody></table>';
+
+      matrixInputContainer.innerHTML = html;
+
+      // Event listener for inputs
+      matrixInputContainer.querySelectorAll('.mat-cell').forEach(inp => {
+        inp.addEventListener('input', (e) => {
+          const r = parseInt(e.target.dataset.r);
+          const c = parseInt(e.target.dataset.c);
+          matrixA[r][c] = parseFloat(e.target.value) || 0;
+          calculateAllSubspaces();
+        });
+      });
+
+      if (window.MathJax) {
+        MathJax.typesetPromise([matrixInputContainer]);
+      }
+    }
+
+    function setDimensions(r, c) {
+      currentRows = r;
+      currentCols = c;
+      let newMat = [];
+      for (let i = 0; i < r; i++) {
+        let row = [];
+        for (let j = 0; j < c; j++) {
+          if (matrixA[i] && matrixA[i][j] !== undefined) {
+            row.push(matrixA[i][j]);
+          } else {
+            row.push(i === j ? 1 : 0);
+          }
+        }
+        newMat.push(row);
+      }
+      matrixA = newMat;
+      renderInputGrid();
+      calculateAllSubspaces();
+    }
+
+    /* =====================================================================
+       3. NUMERICAL ALGORITHM: GAUSS-JORDAN TO RREF & NULL SPACE
+       ===================================================================== */
+    function formatNumber(n) {
+      if (Math.abs(n) < 1e-9) return '0';
+      if (Number.isInteger(n)) return n.toString();
+      return Number(n.toFixed(2)).toString();
+    }
+
+    function computeRREF(mat, m, n) {
+      let A = mat.map(row => [...row]);
+      let lead = 0;
+      let pivotColumns = [];
+      let pivotRows = [];
+
+      for (let r = 0; r < m; r++) {
+        if (n <= lead) break;
+        let i = r;
+
+        while (Math.abs(A[i][lead]) < 1e-7) {
+          i++;
+          if (m === i) {
+            i = r;
+            lead++;
+            if (n === lead) break;
+          }
+        }
+        if (n === lead) break;
+
+        // Swap rows
+        if (i !== r) {
+          [A[i], A[r]] = [A[r], A[i]];
+        }
+
+        // Normalize pivot
+        let val = A[r][lead];
+        if (Math.abs(val) > 1e-7) {
+          for (let j = 0; j < n; j++) {
+            A[r][j] /= val;
+          }
+        }
+
+        // Eliminate column entries in other rows
+        for (let k = 0; k < m; k++) {
+          if (k !== r) {
+            let factor = A[k][lead];
+            if (Math.abs(factor) > 1e-7) {
+              for (let j = 0; j < n; j++) {
+                A[k][j] -= factor * A[r][j];
+              }
+            }
+          }
+        }
+
+        pivotColumns.push(lead);
+        pivotRows.push(r);
+        lead++;
+      }
+
+      // Cleanup near-zero floats
+      for (let i = 0; i < m; i++) {
+        for (let j = 0; j < n; j++) {
+          if (Math.abs(A[i][j]) < 1e-7) A[i][j] = 0;
+        }
+      }
+
+      return {
+        rref: A,
+        pivotColumns: pivotColumns,
+        rank: pivotColumns.length
+      };
+    }
+
+    function calculateAllSubspaces() {
+      const m = currentRows;
+      const n = currentCols;
+
+      const { rref, pivotColumns, rank } = computeRREF(matrixA, m, n);
+      const freeColumns = [];
+      for (let j = 0; j < n; j++) {
+        if (!pivotColumns.includes(j)) {
+          freeColumns.push(j);
+        }
+      }
+      const nullity = freeColumns.length;
+
+      // 1. RREF LaTeX Rendering
+      let rrefCode = '\\operatorname{RREF}(A) = \\begin{bmatrix} ';
+      for (let i = 0; i < m; i++) {
+        let rowStr = [];
+        for (let j = 0; j < n; j++) {
+          const numStr = formatNumber(rref[i][j]);
+          if (pivotColumns.includes(j) && Math.abs(rref[i][j] - 1) < 1e-5 && i === pivotColumns.indexOf(j)) {
+            rowStr.push(`\\mathbf{${numStr}}`);
+          } else {
+            rowStr.push(numStr);
+          }
+        }
+        rrefCode += rowStr.join(' & ');
+        if (i < m - 1) rrefCode += ' \\\\ ';
+      }
+      rrefCode += ' \\end{bmatrix}';
+      rrefLatexDisplay.innerHTML = `$$${rrefCode}$$`;
+
+      // 2. Col(A) Basis (Pivots from Original Matrix A)
+      dimColBadge.textContent = `dim = ${rank}`;
+      if (pivotColumns.length === 0) {
+        colBasisDisplay.innerHTML = `$$\\operatorname{Basis}(\\operatorname{Col} A) = \\emptyset \\quad (\\text{เมทริกซ์ศูนย์})$$`;
+        colOriginText.textContent = "ไม่มีคอลัมน์ตัวนำ";
+      } else {
+        const colIndicesStr = pivotColumns.map(idx => `คอลัมน์ที่ ${idx + 1}`).join(', ');
+        colOriginText.textContent = `ดึงจาก ${colIndicesStr} ของ "เมทริกซ์เดิม A":`;
+
+        let colVecsLatex = [];
+        pivotColumns.forEach(cIdx => {
+          let vecEntries = [];
+          for (let rIdx = 0; rIdx < m; rIdx++) {
+            vecEntries.push(formatNumber(matrixA[rIdx][cIdx]));
+          }
+          colVecsLatex.push(`\\begin{bmatrix} ${vecEntries.join(' \\\\ ')} \\end{bmatrix}`);
+        });
+
+        colBasisDisplay.innerHTML = `$$\\operatorname{Basis}(\\operatorname{Col} A) = \\left\\{ ${colVecsLatex.join(', ')} \\right\\}$$`;
+      }
+
+      // 3. Row(A) Basis (Non-zero rows from RREF)
+      dimRowBadge.textContent = `dim = ${rank}`;
+      let nonZeroRows = [];
+      for (let i = 0; i < m; i++) {
+        const isNonZero = rref[i].some(val => Math.abs(val) > 1e-6);
+        if (isNonZero) {
+          nonZeroRows.push(rref[i]);
+        }
+      }
+
+      if (nonZeroRows.length === 0) {
+        rowBasisDisplay.innerHTML = `$$\\operatorname{Basis}(\\operatorname{Row} A) = \\emptyset$$`;
+      } else {
+        let rowVecsLatex = [];
+        nonZeroRows.forEach(rowArr => {
+          let entries = rowArr.map(formatNumber);
+          rowVecsLatex.push(`\\begin{bmatrix} ${entries.join(' & ')} \\end{bmatrix}^T`);
+        });
+        rowBasisDisplay.innerHTML = `$$\\operatorname{Basis}(\\operatorname{Row} A) = \\left\\{ ${rowVecsLatex.join(', ')} \\right\\}$$`;
+      }
+
+      // 4. Null(A) Basis (Parametric Form from Free Variables)
+      dimNullBadge.textContent = `dim = ${nullity}`;
+      if (nullity === 0) {
+        nullBasisDisplay.innerHTML = `$$\\operatorname{Basis}(\\operatorname{Null} A) = \\emptyset \\implies \\operatorname{Null}(A) = \\{\\mathbf{0}\\}$$`;
+        nullParamText.textContent = "ไม่มีตัวแปรเสรี (มีเฉพาะ Trivial Solution x = 0)";
+      } else {
+        const freeNames = freeColumns.map(idx => `x_{${idx + 1}}`).join(', ');
+        nullParamText.textContent = `แยกตัวประกอบตามตัวแปรเสรี: $${freeNames}$`;
+
+        // Compute basis vector for each free variable
+        let nullVecsLatex = [];
+        freeColumns.forEach(freeCol => {
+          let vec = new Array(n).fill(0);
+          vec[freeCol] = 1; // set free var = 1
+
+          // Express each pivot variable in terms of free variable
+          pivotColumns.forEach((pCol, pRow) => {
+            vec[pCol] = -rref[pRow][freeCol];
+          });
+
+          let entries = vec.map(formatNumber);
+          nullVecsLatex.push(`\\begin{bmatrix} ${entries.join(' \\\\ ')} \\end{bmatrix}`);
+        });
+
+        nullBasisDisplay.innerHTML = `$$\\operatorname{Basis}(\\operatorname{Null} A) = \\left\\{ ${nullVecsLatex.join(', ')} \\right\\}$$`;
+      }
+
+      // 5. Update Rank-Nullity Verification Display
+      rnRankVal.textContent = `rank(A) = ${rank}`;
+      rnNullityVal.textContent = `nullity(A) = ${nullity}`;
+      rnTotalCols.textContent = `n = ${n} คอลัมน์`;
+      barRankLabel.textContent = `${rank}`;
+      barNullityLabel.textContent = `${nullity}`;
+
+      const rankPct = (rank / n) * 100;
+      const nullPct = (nullity / n) * 100;
+      barRank.style.width = `${rankPct}%`;
+      barNullity.style.width = `${nullPct}%`;
+
+      if (rank + nullity === n) {
+        rnValidationBadge.innerHTML = `<i class="fa-solid fa-check mr-1"></i>สมดุล (${rank} + ${nullity} = ${n})`;
+        rnValidationBadge.className = 'px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30';
+      }
+
+      if (window.MathJax) {
+        MathJax.typesetPromise([rrefLatexDisplay, colBasisDisplay, rowBasisDisplay, nullBasisDisplay, nullParamText]);
+      }
+    }
+
+    /* =====================================================================
+       4. EVENT LISTENERS & PRESETS
+       ===================================================================== */
+    dimSelect.addEventListener('change', (e) => {
+      const [r, c] = e.target.value.split('x').map(Number);
+      setDimensions(r, c);
+    });
+
+    btnComputeSubspaces.addEventListener('click', calculateAllSubspaces);
+
+    // Preset Buttons
+    document.getElementById('presetExercise').addEventListener('click', () => {
+      dimSelect.value = '2x3';
+      currentRows = presetsData.exercise.r;
+      currentCols = presetsData.exercise.c;
+      matrixA = presetsData.exercise.data.map(row => [...row]);
+      renderInputGrid();
+      calculateAllSubspaces();
+    });
+
+    document.getElementById('presetStandard2x3').addEventListener('click', () => {
+      dimSelect.value = '2x3';
+      currentRows = presetsData.standard2x3.r;
+      currentCols = presetsData.standard2x3.c;
+      matrixA = presetsData.standard2x3.data.map(row => [...row]);
+      renderInputGrid();
+      calculateAllSubspaces();
+    });
+
+    document.getElementById('presetRank2_3x3').addEventListener('click', () => {
+      dimSelect.value = '3x3';
+      currentRows = presetsData.rank2_3x3.r;
+      currentCols = presetsData.rank2_3x3.c;
+      matrixA = presetsData.rank2_3x3.data.map(row => [...row]);
+      renderInputGrid();
+      calculateAllSubspaces();
+    });
+
+    document.getElementById('presetRank2_3x4').addEventListener('click', () => {
+      dimSelect.value = '3x4';
+      currentRows = presetsData.rank2_3x4.r;
+      currentCols = presetsData.rank2_3x4.c;
+      matrixA = presetsData.rank2_3x4.data.map(row => [...row]);
+      renderInputGrid();
+      calculateAllSubspaces();
+    });
+
+    // Guided Discovery Toggle
+    const btnRevealDiscovery = document.getElementById('btnRevealDiscovery');
+    const discoveryContentBox = document.getElementById('discoveryContentBox');
+    btnRevealDiscovery.addEventListener('click', () => {
+      const isHidden = discoveryContentBox.classList.toggle('hidden');
+      if (!isHidden && window.MathJax) {
+        MathJax.typesetPromise([discoveryContentBox]);
+      }
+    });
+
+    // Exercise Verification
+    const btnCheckExercise = document.getElementById('btnCheckExercise');
+    const inputRank = document.getElementById('inputRank');
+    const inputNullity = document.getElementById('inputNullity');
+    const selectColBasis = document.getElementById('selectColBasis');
+    const exerciseFeedbackMsg = document.getElementById('exerciseFeedbackMsg');
+
+    btnCheckExercise.addEventListener('click', () => {
+      const rankVal = parseInt(inputRank.value);
+      const nullityVal = parseInt(inputNullity.value);
+      const colVal = selectColBasis.value;
+
+      if (isNaN(rankVal) || isNaN(nullityVal) || !colVal) {
+        exerciseFeedbackMsg.className = 'text-amber-600 font-semibold text-xs sm:text-sm';
+        exerciseFeedbackMsg.innerHTML = '<i class="fa-solid fa-triangle-exclamation mr-1"></i>กรุณากรอกและเลือกคำตอบให้ครบทั้ง 3 ช่อง';
+        return;
+      }
+
+      if (rankVal === 1 && nullityVal === 2 && colVal === 'col1_orig') {
+        exerciseFeedbackMsg.className = 'text-emerald-700 font-bold text-xs sm:text-sm';
+        exerciseFeedbackMsg.innerHTML = '<i class="fa-solid fa-circle-check mr-1"></i>ถูกต้องยอดเยี่ยม! rank(A) = 1, dim(Null A) = 2 และฐานหลักของ Col(A) ต้องดึงจากเมทริกซ์เดิม คือ {(1, 2)}';
+      } else {
+        let errs = [];
+        if (rankVal !== 1) errs.push('อันดับต้องเท่ากับ 1 (มี 1 Pivot)');
+        if (nullityVal !== 2) errs.push('มิติ Null space ต้องเท่ากับ 2 (3 - 1 = 2)');
+        if (colVal !== 'col1_orig') errs.push('ฐานหลัก Col(A) ต้องเลือกจากเมทริกซ์เดิม ไม่ใช่จาก RREF');
+
+        exerciseFeedbackMsg.className = 'text-rose-600 font-bold text-xs sm:text-sm';
+        exerciseFeedbackMsg.innerHTML = `<i class="fa-solid fa-circle-xmark mr-1"></i>ยังไม่ถูกต้อง: ${errs.join(', ')}`;
+      }
+    });
+
+    // Detailed Solution Accordion Toggle
+    const btnToggleSolutionAccordion = document.getElementById('btnToggleSolutionAccordion');
+    const solutionAccordionBox = document.getElementById('solutionAccordionBox');
+    const solutionAccordionLabel = document.getElementById('solutionAccordionLabel');
+    const solutionAccordionIcon = document.getElementById('solutionAccordionIcon');
+
+    btnToggleSolutionAccordion.addEventListener('click', () => {
+      const isHidden = solutionAccordionBox.classList.toggle('hidden');
+      if (isHidden) {
+        solutionAccordionLabel.textContent = 'แสดงเฉลยวิธีทำอย่างละเอียดทุกขั้นตอน (Step-by-step Solution)';
+        solutionAccordionIcon.classList.remove('rotate-180');
+      } else {
+        solutionAccordionLabel.textContent = 'ซ่อนเฉลยวิธีทำอย่างละเอียด';
+        solutionAccordionIcon.classList.add('rotate-180');
+        if (window.MathJax) {
+          MathJax.typesetPromise([solutionAccordionBox]);
+        }
+      }
+    });
+
+    /* =====================================================================
+       5. INITIALIZATION
+       ===================================================================== */
+    window.addEventListener('load', () => {
+      renderInputGrid();
+      calculateAllSubspaces();
+      if (window.MathJax) {
+        MathJax.typesetPromise();
+      }
+    });
+  </script>
+</body>
+</html>

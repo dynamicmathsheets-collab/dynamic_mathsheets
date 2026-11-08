@@ -1,0 +1,895 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>เรื่องที่ 8: ทฤษฎีบทและการประยุกต์เกี่ยวกับฐานหลักและมิติ</title>
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- Google Fonts: Sarabun, Kanit & Prompt -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@400;500;600;700&family=Prompt:wght@300;400;500;600;700&family=Sarabun:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+  
+  <!-- FontAwesome 6 Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <!-- MathJax 3 Configuration -->
+  <script>
+    window.MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']],
+        displayMath: [['$$', '$$'], ['\\[', '\\]']]
+      },
+      svg: { fontCache: 'global' }
+    };
+  </script>
+  <script type="text/javascript" id="MathJax-script" async
+    src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+  </script>
+
+  <style>
+    body {
+      font-family: 'Sarabun', sans-serif;
+    }
+    h1, h2, h3, h4, .font-heading {
+      font-family: 'Kanit', sans-serif;
+    }
+    .font-prompt {
+      font-family: 'Prompt', sans-serif;
+    }
+    .glass-card {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(10px);
+    }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-800 antialiased min-h-screen">
+
+  <!-- Main Container strictly conforming to dimensions (max-w-6xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8) -->
+  <div class="max-w-6xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 space-y-10">
+
+    <!-- Header Section -->
+    <header class="bg-gradient-to-r from-indigo-950 via-slate-900 to-violet-950 text-white rounded-3xl p-6 sm:p-10 shadow-2xl relative overflow-hidden border border-indigo-800/40">
+      <div class="absolute -right-12 -top-12 w-80 h-80 bg-indigo-500/15 rounded-full blur-3xl pointer-events-none"></div>
+      <div class="absolute right-1/3 -bottom-16 w-60 h-60 bg-violet-500/10 rounded-full blur-2xl pointer-events-none"></div>
+      
+      <div class="relative z-10">
+        <h1 class="text-2xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-white mb-3">
+          เรื่องที่ 8: ทฤษฎีบทและการประยุกต์เกี่ยวกับฐานหลักและมิติ
+        </h1>
+        <p class="text-indigo-200 text-base sm:text-lg max-w-3xl leading-relaxed">
+          ยกระดับความเข้าใจจาก "การคำนวณแบบตรง" สู่ "การใช้ทฤษฎีบททรงพลัง": ทฤษฎีบทการขยาย, ทฤษฎีบทการลดทอน, The Basis Theorem สำหรับปริภูมิมิติ $n$, และการวิเคราะห์ข้อผิดพลาดในการพิสูจน์
+        </p>
+      </div>
+    </header>
+
+    <!-- ส่วนที่ 1: วัตถุประสงค์การเรียนรู้ -->
+    <section class="bg-white rounded-2xl p-6 sm:p-8 shadow-sm border border-slate-200 hover:shadow-md transition-shadow">
+      <div class="flex items-start gap-4">
+        <div class="p-3.5 bg-indigo-50 text-indigo-600 rounded-2xl flex-shrink-0 text-xl border border-indigo-100 shadow-xs">
+          <i class="fa-solid fa-compass-drafting"></i>
+        </div>
+        <div class="space-y-2">
+          <h2 class="text-xl sm:text-2xl font-bold text-slate-900">1. วัตถุประสงค์การเรียนรู้ (Learning Objectives)</h2>
+          <p class="text-slate-700 text-base sm:text-lg leading-relaxed">
+            นักศึกษาสามารถ<strong>ประยุกต์ทฤษฎีบทเกี่ยวกับฐานหลักและมิติ</strong> (Basis Extension, Spanning Set Reduction, The Basis Theorem) ในการพิสูจน์ ตรวจสอบความถูกต้อง วิเคราะห์โครงสร้างปริภูมิย่อย และแก้ปัญหาทางพีชคณิตเชิงเส้นได้อย่างมีตรรกะและรัดกุม
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ส่วนที่ 2: เนื้อหาหลัก (Core Theorems & Theory) -->
+    <section class="bg-white rounded-2xl p-6 sm:p-8 shadow-sm border border-slate-200 space-y-8">
+      <div>
+        <h2 class="text-xl sm:text-2xl font-bold text-slate-900 flex items-center gap-2.5">
+          <span class="w-2.5 h-8 bg-indigo-600 rounded-full inline-block"></span>
+          2. เนื้อหาหลัก (Core Theorems & Analytical Framework)
+        </h2>
+        <p class="text-slate-600 text-sm sm:text-base mt-1 font-prompt">
+          4 ทฤษฎีบทหลักที่เป็นรากฐานของพีชคณิตเชิงเส้น พร้อมแนวทางการวิเคราะห์ข้อผิดพลาดที่พบบ่อย
+        </p>
+      </div>
+
+      <!-- 4 Core Theorems Cards Grid -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+        <!-- Theorem 1: Basis Extension Theorem -->
+        <div class="bg-slate-50 rounded-2xl p-5 sm:p-6 border border-slate-200/90 hover:border-indigo-300 transition-all flex flex-col justify-between shadow-xs">
+          <div>
+            <div class="flex items-center justify-between mb-2">
+              <span class="px-2.5 py-1 rounded-md bg-indigo-100 text-indigo-800 text-xs font-bold font-prompt">ทฤษฎีบทที่ 1</span>
+              <span class="text-xs text-slate-400 font-mono">k &lt; n</span>
+            </div>
+            <h3 class="text-lg font-bold text-indigo-950 mb-2 flex items-center gap-2">
+              <i class="fa-solid fa-maximize text-indigo-600 text-base"></i>
+              ทฤษฎีบทการขยายเซตอิสระเชิงเส้น (Basis Extension Theorem)
+            </h3>
+            <p class="text-slate-700 text-sm leading-relaxed mb-3">
+              ให้ $V$ เป็นปริภูมิเวกเตอร์มิติจำกัดที่มี $\dim(V) = n$ ถ้า $S = \{\mathbf{u}_1, \dots, \mathbf{u}_k\}$ เป็นเซตของเวกเตอร์ที่เป็น <strong>อิสระเชิงเส้นใน $V$</strong> โดยที่ $k < n$ แล้ว:
+            </p>
+            <div class="p-3 bg-white rounded-xl border border-indigo-200 text-slate-900 text-xs sm:text-sm font-medium shadow-inner text-center font-mono">
+              "เราสามารถหาเวกเตอร์ $\mathbf{v}_{k+1}, \dots, \mathbf{v}_n \in V$ มาเติมลงใน $S$ เพื่อให้กลายเป็นฐานหลักของ $V$ ได้เสมอ"
+            </div>
+          </div>
+          <p class="text-xs text-slate-500 mt-4 border-t border-slate-200 pt-2.5">
+            <strong>ความหมายเชิงประยุกต์:</strong> เวกเตอร์อิสระเชิงเส้นที่ยังขาดอยู่ สามารถเลือกเวกเตอร์ภายนอก $\operatorname{span}(S)$ มาเติมจนเต็มมิติได้เสมอ
+          </p>
+        </div>
+
+        <!-- Theorem 2: Spanning Set Reduction Theorem -->
+        <div class="bg-slate-50 rounded-2xl p-5 sm:p-6 border border-slate-200/90 hover:border-violet-300 transition-all flex flex-col justify-between shadow-xs">
+          <div>
+            <div class="flex items-center justify-between mb-2">
+              <span class="px-2.5 py-1 rounded-md bg-violet-100 text-violet-800 text-xs font-bold font-prompt">ทฤษฎีบทที่ 2</span>
+              <span class="text-xs text-slate-400 font-mono">k &gt; n</span>
+            </div>
+            <h3 class="text-lg font-bold text-violet-950 mb-2 flex items-center gap-2">
+              <i class="fa-solid fa-minimize text-violet-600 text-base"></i>
+              ทฤษฎีบทการลดทอนเซตตัวกำเนิด (Reduction / Shrinking Theorem)
+            </h3>
+            <p class="text-slate-700 text-sm leading-relaxed mb-3">
+              ให้ $S = \{\mathbf{v}_1, \dots, \mathbf{v}_k\}$ เป็นเซตที่ <strong>แผ่ทั่วปริภูมิ $V$</strong> ($\operatorname{span}(S) = V$) โดยที่ $V \neq \{\mathbf{0}\}$:
+            </p>
+            <div class="p-3 bg-white rounded-xl border border-violet-200 text-slate-900 text-xs sm:text-sm font-medium shadow-inner text-center font-mono">
+              "จะมีสับเซตของ $S$ ที่เป็นฐานหลักของ $V$ เสมอ (สามารถคัดเวกเตอร์ที่ซ้ำซ้อนออกทีละตัวจนเหลือเฉพาะฐานหลัก)"
+            </div>
+          </div>
+          <p class="text-xs text-slate-500 mt-4 border-t border-slate-200 pt-2.5">
+            <strong>ความหมายเชิงประยุกต์:</strong> ใช้เทคนิคกำจัดแบบเกาส์ (Casting-out method) เพื่อขจัด Free variables ให้เหลือเฉพาะ Pivot columns
+          </p>
+        </div>
+
+        <!-- Theorem 3: The Basis Theorem for n-dimensional Spaces -->
+        <div class="bg-slate-50 rounded-2xl p-5 sm:p-6 border border-slate-200/90 hover:border-emerald-300 transition-all flex flex-col justify-between shadow-xs">
+          <div>
+            <div class="flex items-center justify-between mb-2">
+              <span class="px-2.5 py-1 rounded-md bg-emerald-100 text-emerald-800 text-xs font-bold font-prompt">ทฤษฎีบทที่ 3 (หัวใจสำคัญ)</span>
+              <span class="text-xs text-emerald-700 font-mono font-bold">k = n (พอดีเป๊ะ)</span>
+            </div>
+            <h3 class="text-lg font-bold text-emerald-950 mb-2 flex items-center gap-2">
+              <i class="fa-solid fa-gem text-emerald-600 text-base"></i>
+              เกณฑ์การเป็นฐานหลักในปริภูมิมิติ $n$ (The Basis Theorem)
+            </h3>
+            <p class="text-slate-700 text-sm leading-relaxed mb-2">
+              ให้ $V$ เป็นปริภูมิเวกเตอร์มิติ $n$ ($\dim(V) = n$) และ $B = \{\mathbf{v}_1, \dots, \mathbf{v}_n\}$ เป็นเซตที่มี <strong>เวกเตอร์ $n$ ตัวพอดี</strong>:
+            </p>
+            <div class="space-y-1.5 mt-2">
+              <div class="p-2 bg-white rounded-lg border border-emerald-200 text-emerald-950 text-xs sm:text-sm font-semibold flex items-center gap-2">
+                <i class="fa-solid fa-circle-check text-emerald-600"></i>
+                <span>ถ้า $B$ เป็นอิสระเชิงเส้น $\implies B$ จะแผ่ทั่ว $V$ โดยอัตโนมัติ (เป็นฐานหลักทันที)</span>
+              </div>
+              <div class="p-2 bg-white rounded-lg border border-emerald-200 text-emerald-950 text-xs sm:text-sm font-semibold flex items-center gap-2">
+                <i class="fa-solid fa-circle-check text-emerald-600"></i>
+                <span>ถ้า $B$ แผ่ทั่ว $V$ $\implies B$ จะเป็นอิสระเชิงเส้นโดยอัตโนมัติ (เป็นฐานหลักทันที)</span>
+              </div>
+            </div>
+          </div>
+          <p class="text-xs text-emerald-800 mt-4 border-t border-slate-200 pt-2.5 font-medium">
+            <strong>ทางลัดสุดยอด:</strong> ตรวจสอบเพียงเงื่อนไขเดียว ไม่จำเป็นต้องตรวจทั้งสองเงื่อนไข!
+          </p>
+        </div>
+
+        <!-- Theorem 4: Rank-Nullity Connection -->
+        <div class="bg-slate-50 rounded-2xl p-5 sm:p-6 border border-slate-200/90 hover:border-amber-300 transition-all flex flex-col justify-between shadow-xs">
+          <div>
+            <div class="flex items-center justify-between mb-2">
+              <span class="px-2.5 py-1 rounded-md bg-amber-100 text-amber-800 text-xs font-bold font-prompt">ทฤษฎีบทที่ 4</span>
+              <span class="text-xs text-slate-400 font-mono">Rank + Nullity = n</span>
+            </div>
+            <h3 class="text-lg font-bold text-amber-950 mb-2 flex items-center gap-2">
+              <i class="fa-solid fa-scale-balanced text-amber-600 text-base"></i>
+              ความสัมพันธ์ระหว่างอันดับและมิติปริภูมิว่าง
+            </h3>
+            <p class="text-slate-700 text-sm leading-relaxed mb-3">
+              สำหรับเมทริกซ์การแปลง $A$ ขนาด $m \times n$ ทุกเมทริกซ์:
+            </p>
+            <div class="p-3 bg-white rounded-xl border border-amber-200 text-slate-900 text-xs sm:text-sm font-bold shadow-inner text-center font-mono">
+              $$\operatorname{rank}(A) + \operatorname{nullity}(A) = n \quad (\text{จำนวนคอลัมน์})$$
+            </div>
+            <p class="text-xs text-slate-600 mt-2 leading-relaxed">
+              หากเมทริกซ์จัตุรัส $n \times n$ มี $\operatorname{rank}(A) = n \implies \operatorname{nullity}(A) = 0$ คอลัมน์ทั้งหมดจะเป็นอิสระเชิงเส้นและแผ่ทั่ว $\mathbb{R}^n$ พร้อมกัน
+            </p>
+          </div>
+          <p class="text-xs text-slate-500 mt-4 border-t border-slate-200 pt-2.5">
+            <strong>สะพานเชื่อมโยง:</strong> เชื่อมการมีผลเฉลยเดียวของ $A\mathbf{x} = \mathbf{0}$ เข้ากับทฤษฎีบทฐานหลัก
+          </p>
+        </div>
+
+      </div>
+
+      <!-- Proof Pitfalls Diagnostic Analysis Box -->
+      <div class="bg-gradient-to-r from-rose-50 via-amber-50 to-orange-50 border border-rose-200 rounded-2xl p-5 sm:p-6 space-y-3">
+        <h3 class="text-base sm:text-lg font-bold text-rose-950 flex items-center gap-2">
+          <i class="fa-solid fa-triangle-exclamation text-rose-600"></i>
+          การวิเคราะห์ข้อผิดพลาดทั่วไปในการพิสูจน์ (Common Proof Pitfalls Analysis)
+        </h3>
+        <p class="text-xs sm:text-sm text-slate-700 leading-relaxed">
+          ในการสอบและงานวิจัย มักพบข้อผิดพลาดเชิงตรรกะ 3 รูปแบบหลักที่ทำให้นักศึกษาเสียคะแนน:
+        </p>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-3.5 pt-1">
+          <div class="bg-white/90 p-3.5 rounded-xl border border-rose-200 space-y-1 text-xs">
+            <span class="font-bold text-rose-800 flex items-center gap-1.5">
+              <i class="fa-solid fa-xmark text-rose-600"></i>
+              ข้อผิดพลาดที่ 1: ลืมตรวจเงื่อนไข $k = n$
+            </span>
+            <p class="text-slate-600 leading-relaxed">
+              ไปใช้ The Basis Theorem สรุปว่า "เวกเตอร์เป็นอิสระเชิงเส้นจึงแผ่ทั่วทันที" <em>โดยลืมตรวจสอบว่าเซตนั้นมีเวกเตอร์ $n$ ตัวพอดีหรือไม่</em> (ถ้ามีแค่ 2 เวกเตอร์ใน $\mathbb{R}^3$ แม้เป็นอิสระต่อกันก็ไม่แผ่ทั่ว!)
+            </p>
+          </div>
+
+          <div class="bg-white/90 p-3.5 rounded-xl border border-rose-200 space-y-1 text-xs">
+            <span class="font-bold text-rose-800 flex items-center gap-1.5">
+              <i class="fa-solid fa-xmark text-rose-600"></i>
+              ข้อผิดพลาดที่ 2: สรุปว่าแผ่ทั่วโดยไม่รู้มิติ
+            </span>
+            <p class="text-slate-600 leading-relaxed">
+              สรุปว่าเซตใดๆ แผ่ทั่วปริภูมิ $V$ โดยไม่ได้ทราบหรือพิสูจน์ค่า $\dim(V)$ ล่วงหน้า ทำให้ข้อสรุปขาดการอ้างอิงฐานทางมิติที่ถูกต้อง
+            </p>
+          </div>
+
+          <div class="bg-white/90 p-3.5 rounded-xl border border-rose-200 space-y-1 text-xs">
+            <span class="font-bold text-rose-800 flex items-center gap-1.5">
+              <i class="fa-solid fa-xmark text-rose-600"></i>
+              ข้อผิดพลาดที่ 3: สับสนระหว่างเซตตัวกำเนิดกับฐานหลัก
+            </span>
+            <p class="text-slate-600 leading-relaxed">
+              คิดว่าเซตที่แผ่ทั่ว (Spanning Set) จะเป็นฐานหลักได้เสมอ โดยลืมคัดเวกเตอร์ที่พึ่งพากันออก (ลืมใช้ Reduction Theorem)
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ส่วนที่ 3: แบบจำลองโต้ตอบ (Interactive Theorem Matcher & Diagnostic Tool) -->
+    <section class="bg-white rounded-2xl p-6 sm:p-8 shadow-sm border border-slate-200 space-y-6">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-200">
+        <div>
+          <h2 class="text-xl sm:text-2xl font-bold text-slate-900 flex items-center gap-2">
+            <span class="w-2.5 h-8 bg-indigo-600 rounded-full inline-block"></span>
+            3. แบบจำลองโต้ตอบ: เครื่องมือจับคู่ทฤษฎีบทและวินิจฉัยฐานหลัก (Theorem Matcher)
+          </h2>
+          <p class="text-slate-600 text-sm mt-1 font-prompt">
+            เลือกกรณีศึกษาจากชุดเวกเตอร์ แล้วทดลองเลือกว่า "ควรใช้ทฤษฎีบทใด" เพื่อสรุปสถานะการเป็นฐานหลักอย่างแม่นยำ
+          </p>
+        </div>
+
+        <span class="px-3 py-1 bg-indigo-50 text-indigo-700 rounded-xl text-xs font-bold border border-indigo-200 self-start sm:self-auto">
+          <i class="fa-solid fa-bolt mr-1"></i>Active Decision Maker
+        </span>
+      </div>
+
+      <!-- Case Study Selector Tabs -->
+      <div class="space-y-2">
+        <label class="text-xs font-bold text-slate-500 uppercase tracking-wider block">เลือกชุดเวกเตอร์กรณีศึกษา (Vector Scenarios):</label>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2.5 text-xs">
+          
+          <button id="scenarioBtn1" class="scenario-btn p-3 bg-white hover:bg-indigo-50 border-2 border-indigo-600 text-indigo-950 rounded-xl text-left transition font-prompt shadow-xs">
+            <div class="flex items-center justify-between mb-1">
+              <span class="font-bold">กรณีที่ 1: เวกเตอร์ 2 ตัวใน $\mathbb{R}^3$</span>
+              <span class="text-[10px] px-1.5 py-0.5 rounded bg-amber-100 text-amber-800 font-mono">k &lt; n</span>
+            </div>
+            <p class="text-[11px] text-slate-500 font-mono">{(1,0,2), (0,1,1)} ใน ℝ³</p>
+          </button>
+
+          <button id="scenarioBtn2" class="scenario-btn p-3 bg-white hover:bg-slate-50 border border-slate-300 text-slate-700 rounded-xl text-left transition font-prompt shadow-xs">
+            <div class="flex items-center justify-between mb-1">
+              <span class="font-bold">กรณีที่ 2: เวกเตอร์ 4 ตัวใน $\mathbb{R}^3$</span>
+              <span class="text-[10px] px-1.5 py-0.5 rounded bg-rose-100 text-rose-800 font-mono">k &gt; n</span>
+            </div>
+            <p class="text-[11px] text-slate-500 font-mono">4 เวกเตอร์ที่แผ่ทั่ว ℝ³</p>
+          </button>
+
+          <button id="scenarioBtn3" class="scenario-btn p-3 bg-white hover:bg-slate-50 border border-slate-300 text-slate-700 rounded-xl text-left transition font-prompt shadow-xs">
+            <div class="flex items-center justify-between mb-1">
+              <span class="font-bold">กรณีที่ 3: 3 เวกเตอร์ใน $\mathbb{R}^3$ ($\det \neq 0$)</span>
+              <span class="text-[10px] px-1.5 py-0.5 rounded bg-emerald-100 text-emerald-800 font-mono">k = n (LI)</span>
+            </div>
+            <p class="text-[11px] text-slate-500 font-mono">{(1,0,0), (1,1,0), (1,1,1)}</p>
+          </button>
+
+          <button id="scenarioBtn4" class="scenario-btn p-3 bg-white hover:bg-slate-50 border border-slate-300 text-slate-700 rounded-xl text-left transition font-prompt shadow-xs">
+            <div class="flex items-center justify-between mb-1">
+              <span class="font-bold">กรณีที่ 4: 3 เวกเตอร์ใน $\mathbb{R}^3$ ($\det = 0$)</span>
+              <span class="text-[10px] px-1.5 py-0.5 rounded bg-purple-100 text-purple-800 font-mono">k = n (LD)</span>
+            </div>
+            <p class="text-[11px] text-slate-500 font-mono">{(1,2,3), (2,4,6), (0,1,0)}</p>
+          </button>
+
+        </div>
+      </div>
+
+      <!-- Main Interactive Workstation Grid -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        
+        <!-- Left: Case Overview & User Theorem Selection (6 cols) -->
+        <div class="lg:col-span-6 space-y-4">
+          
+          <!-- Scenario Info Card -->
+          <div class="p-4 bg-slate-50 rounded-xl border border-slate-200 space-y-3">
+            <div class="flex items-center justify-between">
+              <h4 class="font-bold text-slate-900 text-sm flex items-center gap-2">
+                <i class="fa-solid fa-cube text-indigo-600"></i>
+                <span id="activeScenarioTitle">ข้อมูลกรณีศึกษา:</span>
+              </h4>
+              <span id="activeDimPill" class="text-xs px-2.5 py-0.5 rounded-full font-bold bg-indigo-100 text-indigo-800 font-mono">
+                dim(V) = 3, k = 2
+              </span>
+            </div>
+            <div id="activeScenarioDesc" class="text-xs sm:text-sm text-slate-700 leading-relaxed">
+              <!-- Dynamically populated -->
+            </div>
+          </div>
+
+          <!-- User Interactive Decision Prompt -->
+          <div class="p-4 bg-white rounded-xl border-2 border-indigo-200 shadow-sm space-y-3">
+            <h4 class="font-bold text-indigo-950 text-sm flex items-center gap-2">
+              <i class="fa-solid fa-hand-pointer text-indigo-600"></i>
+              เลือกทฤษฎีบทที่เหมาะสมที่สุดเพื่อใช้วิเคราะห์กรณีนี้:
+            </h4>
+
+            <div class="space-y-2 text-xs sm:text-sm">
+              <label class="flex items-start gap-2.5 p-3 rounded-lg border border-slate-200 hover:bg-indigo-50/50 cursor-pointer transition">
+                <input type="radio" name="theoremChoice" value="extension" class="mt-0.5 text-indigo-600 focus:ring-indigo-500">
+                <div>
+                  <strong class="text-indigo-900">ทฤษฎีบทการขยาย (Basis Extension Theorem)</strong>
+                  <p class="text-slate-500 text-xs">ใช้เมื่อเวกเตอร์เป็นอิสระเชิงเส้นแต่ $k < n$ (แผ่ไม่ทั่ว จึงต้องขยายเพิ่ม)</p>
+                </div>
+              </label>
+
+              <label class="flex items-start gap-2.5 p-3 rounded-lg border border-slate-200 hover:bg-indigo-50/50 cursor-pointer transition">
+                <input type="radio" name="theoremChoice" value="reduction" class="mt-0.5 text-indigo-600 focus:ring-indigo-500">
+                <div>
+                  <strong class="text-violet-900">ทฤษฎีบทการลดทอน (Spanning Set Reduction Theorem)</strong>
+                  <p class="text-slate-500 text-xs">ใช้เมื่อเวกเตอร์แผ่ทั่วแต่ $k > n$ (มีเวกเตอร์ซ้ำซ้อน ต้องคัดออก)</p>
+                </div>
+              </label>
+
+              <label class="flex items-start gap-2.5 p-3 rounded-lg border border-slate-200 hover:bg-indigo-50/50 cursor-pointer transition">
+                <input type="radio" name="theoremChoice" value="basisTheorem" class="mt-0.5 text-indigo-600 focus:ring-indigo-500">
+                <div>
+                  <strong class="text-emerald-900">เกณฑ์การเป็นฐานหลักในมิติ $n$ (The Basis Theorem)</strong>
+                  <p class="text-slate-500 text-xs">ใช้เมื่อ $k = n$ พอดี (ตรวจเพียงเงื่อนไขเดียวเพื่อสรุปผลทันที)</p>
+                </div>
+              </label>
+            </div>
+
+            <button id="btnEvaluateTheorem" class="w-full py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-lg text-xs sm:text-sm transition flex items-center justify-center gap-1.5 shadow-sm">
+              <i class="fa-solid fa-circle-check"></i>
+              ตรวจสอบการเลือกทฤษฎีบทและประมวลผล
+            </button>
+          </div>
+
+        </div>
+
+        <!-- Right: Diagnostic Breakdown & Visual Capacity Bar (6 cols) -->
+        <div class="lg:col-span-6 space-y-4">
+          
+          <!-- Diagnosis Result Card -->
+          <div id="diagnosticCard" class="p-5 rounded-xl border transition-all space-y-3 bg-slate-100 border-slate-300 text-slate-800">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-2">
+                <span id="diagnosticIcon" class="w-3.5 h-3.5 rounded-full bg-slate-400"></span>
+                <span id="diagnosticTitle" class="font-bold text-base">รอการตรวจสอบ...</span>
+              </div>
+              <span id="diagnosticBadge" class="px-2.5 py-0.5 rounded text-xs font-bold bg-slate-200 text-slate-700">
+                Status
+              </span>
+            </div>
+            <p id="diagnosticBody" class="text-xs sm:text-sm leading-relaxed text-slate-600">
+              กรุณาเลือกทฤษฎีบททางซ้ายมือแล้วกดปุ่ม "ตรวจสอบ" เพื่อดูผลการวิเคราะห์
+            </p>
+          </div>
+
+          <!-- Dimension Meter Visualizer -->
+          <div class="p-4 bg-slate-900 text-white rounded-xl space-y-3 border border-slate-800 shadow-xs">
+            <div class="flex items-center justify-between text-xs">
+              <span class="text-slate-400 uppercase tracking-wider font-semibold">
+                <i class="fa-solid fa-chart-column mr-1.5 text-indigo-400"></i>สถานะความจุเชิงมิติ (Dimension Balance):
+              </span>
+              <span id="scenarioBalanceText" class="font-mono text-amber-400 font-bold">k = 2 / n = 3</span>
+            </div>
+
+            <!-- Segmented Bar -->
+            <div>
+              <div class="w-full bg-slate-800 rounded-full h-3 overflow-hidden flex">
+                <div id="barFilled" class="bg-indigo-500 h-full transition-all duration-300" style="width: 66.6%;"></div>
+              </div>
+              <div class="flex justify-between text-[11px] text-slate-400 mt-1.5 font-mono">
+                <span>0</span>
+                <span id="barTargetLabel" class="text-indigo-300 font-bold">มิติเป้าหมาย n = 3</span>
+                <span>ขีดจำกัด</span>
+              </div>
+            </div>
+
+            <!-- Mathematical Reason Text -->
+            <div id="mathReasonContainer" class="p-3 bg-slate-800/80 rounded-lg text-xs text-slate-300 leading-relaxed border border-slate-700 font-mono">
+              กำลังวิเคราะห์...
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ส่วนที่ 4: คำถามนำเพื่อค้นพบ (Guided Discovery) -->
+    <section class="bg-white rounded-2xl p-6 sm:p-8 shadow-sm border border-slate-200 space-y-4">
+      <div class="flex items-center gap-2">
+        <span class="w-2.5 h-8 bg-indigo-600 rounded-full inline-block"></span>
+        <h2 class="text-xl sm:text-2xl font-bold text-slate-900">4. คำถามนำเพื่อค้นพบ (Guided Discovery Question)</h2>
+      </div>
+
+      <div class="bg-gradient-to-r from-indigo-50 via-slate-50 to-violet-50 border border-indigo-200 rounded-2xl p-5 sm:p-7 space-y-4">
+        <div class="flex items-start gap-3.5">
+          <div class="p-3 bg-indigo-600 text-white rounded-2xl flex-shrink-0 mt-0.5 shadow-sm text-lg">
+            <i class="fa-solid fa-question"></i>
+          </div>
+          <div class="space-y-3.5 w-full">
+            <h3 class="text-lg sm:text-xl font-bold text-indigo-950">
+              "หากมีเวกเตอร์ที่เป็นอิสระเชิงเส้น $n$ ตัวในปริภูมิที่มีมิติ $n$ จำเป็นต้องตรวจสอบการแผ่ทั่ว (Span) อีกครั้งหรือไม่ เพราะเหตุใด?"
+            </h3>
+            <p class="text-slate-700 text-sm sm:text-base leading-relaxed">
+              ในนิยามของฐานหลักระบุไว้ชัดเจนว่าต้องผ่านทั้ง 2 เงื่อนไข (1. เป็นอิสระเชิงเส้น และ 2. แผ่ทั่ว) เหตุใดในกรณีที่มีเวกเตอร์ $n$ ตัวพอดีในปริภูมิมิติ $n$ เราจึงสามารถละเว้นการตรวจสอบการแผ่ทั่วได้โดยสิ้นเชิง?
+            </p>
+
+            <button id="btnRevealDiscovery" class="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-xl text-sm transition shadow-sm flex items-center gap-2">
+              <i class="fa-solid fa-key"></i>
+              <span>คลิกเพื่อดูการพิสูจน์โดยข้อขัดแย้ง (Proof by Contradiction & Steinitz Lemma)</span>
+            </button>
+
+            <!-- Discovery Content Reveal Panel -->
+            <div id="discoveryContentBox" class="hidden mt-4 bg-white p-5 sm:p-6 rounded-2xl border border-indigo-200 space-y-4 text-sm sm:text-base text-slate-800 shadow-sm">
+              <div class="border-l-4 border-indigo-600 pl-4 space-y-2">
+                <h4 class="font-bold text-indigo-950 text-base">
+                  คำตอบ: <span class="text-emerald-700 font-extrabold">"ไม่จำเป็นต้องตรวจสอบอีกเด็ดขาด!"</span> (เป็นฐานหลักได้ทันที 100%)
+                </h4>
+                <p class="text-slate-700 text-sm leading-relaxed">
+                  เราสามารถพิสูจน์ข้อความนี้ได้อย่างรัดกุมโดยใช้ <strong>วิธีการพิสูจน์โดยข้อขัดแย้ง (Proof by Contradiction)</strong> ร่วมกับ <strong>ทฤษฎีบทการขยายฐานหลัก (Extension Theorem)</strong>:
+                </p>
+              </div>
+
+              <div class="p-4 bg-slate-50 rounded-xl border border-slate-200 text-xs sm:text-sm font-mono space-y-2 text-slate-800">
+                <p>1. สมมติให้ $S = \{\mathbf{v}_1, \dots, \mathbf{v}_n\}$ เป็นเซตอิสระเชิงเส้นใน $V$ แต่ <em>สมมติในทางตรงกันข้ามว่า $S$ ไม่แผ่ทั่ว $V$</em> ($\operatorname{span}(S) \neq V$)</p>
+                <p>2. นั่นหมายความว่า จะต้องมีเวกเตอร์ $\mathbf{v}_{n+1} \in V$ ที่ไม่อยู่ใน $\operatorname{span}(S)$</p>
+                <p>3. เมื่อเรานำ $\mathbf{v}_{n+1}$ เข้ามารวมกับ $S$ จะได้เซตใหม่ $S' = \{\mathbf{v}_1, \dots, \mathbf{v}_n, \mathbf{v}_{n+1}\}$ ซึ่ง <strong>ยังคงเป็นอิสระเชิงเส้นต่อกัน</strong> (ตามทฤษฎีบทการขยาย)</p>
+                <p>4. สังเกตว่า $S'$ มีจำนวนสมาชิกทั้งหมด <strong class="text-rose-600">n + 1 ตัว</strong> ที่เป็นอิสระเชิงเส้นใน $V$</p>
+                <p class="text-rose-700 font-bold border-t border-slate-300 pt-1.5">
+                  5. เกิดข้อขัดแย้ง (Contradiction!): เพราะมิติของ $V$ คือ $n$ ซึ่งหมายความว่า เซตอิสระเชิงเส้นใน $V$ จะมีสมาชิกเกิน $n$ ตัวไม่ได้อย่างเด็ดขาด!
+                </p>
+              </div>
+
+              <div class="p-3 bg-indigo-50 rounded-xl border border-indigo-200 text-indigo-950 text-xs sm:text-sm font-medium">
+                ✨ <strong>บทสรุปเชิงมโนทัศน์:</strong> การที่เซตอิสระเชิงเส้นมีขนาด $n$ เต็มความจุของมิติแล้ว มันถูกบีบทางเรขาคณิตและพีชคณิตให้ "ต้องแผ่ทั่วทั้งปริภูมิไปโดยปริยาย" โดยไม่เหลือช่องว่างใดๆ ให้เวกเตอร์อื่นหลุดรอดไปได้อีก
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ส่วนที่ 5: แบบฝึกหัดสำหรับนักศึกษา (Interactive Exercises & Proofs) -->
+    <section class="bg-white rounded-2xl p-6 sm:p-8 shadow-sm border border-slate-200 space-y-6">
+      <div class="flex items-center gap-2">
+        <span class="w-2.5 h-8 bg-indigo-600 rounded-full inline-block"></span>
+        <h2 class="text-xl sm:text-2xl font-bold text-slate-900">5. แบบฝึกหัดสำหรับนักศึกษา (Interactive Exercises)</h2>
+      </div>
+
+      <!-- Part 1: Interactive Proof Step Ordering -->
+      <div class="bg-slate-50 border border-slate-200 rounded-2xl p-5 sm:p-6 space-y-5">
+        <div class="border-l-4 border-indigo-600 pl-4 py-1">
+          <span class="text-xs font-bold text-indigo-700 uppercase tracking-wider font-prompt">ตอนที่ 1: การเรียงลำดับขั้นตอนการพิสูจน์ (Interactive Proof Construction)</span>
+          <p class="text-slate-900 font-semibold text-sm sm:text-base mt-1">
+            จงเรียงลำดับตรรกะการพิสูจน์ข้อความ: <em>"ถ้า $\dim(V) = n$ และ $S = \{\mathbf{v}_1, \dots, \mathbf{v}_n\}$ แผ่ทั่ว $V$ แล้ว $S$ จะต้องเป็นอิสระเชิงเส้นเสมอ"</em>
+          </p>
+        </div>
+
+        <div class="bg-white p-4 sm:p-5 rounded-xl border border-slate-200 space-y-3">
+          <p class="text-xs sm:text-sm font-semibold text-slate-800">
+            เลือกหมายเลขลำดับ (1, 2, 3, 4) ให้ถูกต้องตามสายธารตรรกะ:
+          </p>
+
+          <div class="space-y-2.5 text-xs sm:text-sm">
+            <div class="flex items-center gap-3 p-2.5 bg-slate-50 rounded-lg border border-slate-200">
+              <select id="proofStepA" class="w-14 px-2 py-1 border rounded font-mono font-bold text-center bg-white">
+                <option value="">?</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option>
+              </select>
+              <span>ข้อความ ก: หาก $S$ พึ่งพาเชิงเส้น จะมีสับเซตแท้ $S_0 \subset S$ ที่แผ่ทั่ว $V$ และเป็นฐานหลักของ $V$ (ตาม Spanning Set Reduction Theorem)</span>
+            </div>
+
+            <div class="flex items-center gap-3 p-2.5 bg-slate-50 rounded-lg border border-slate-200">
+              <select id="proofStepB" class="w-14 px-2 py-1 border rounded font-mono font-bold text-center bg-white">
+                <option value="">?</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option>
+              </select>
+              <span>ข้อความ ข: สมมติในทางตรงกันข้ามว่า $S$ ไม่เป็นอิสระเชิงเส้น (นั่นคือ $S$ พึ่งพาเชิงเส้นต่อกัน)</span>
+            </div>
+
+            <div class="flex items-center gap-3 p-2.5 bg-slate-50 rounded-lg border border-slate-200">
+              <select id="proofStepC" class="w-14 px-2 py-1 border rounded font-mono font-bold text-center bg-white">
+                <option value="">?</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option>
+              </select>
+              <span>ข้อความ ค: แต่เนื่องจาก $S_0$ เป็นสับเซตแท้ ทำให้จำนวนสมาชิก $|S_0| < n$ ขัดแย้งกับข้อเท็จจริงที่ว่า $\dim(V) = n$ (ฐานหลักทุกชุดต้องมี $n$ ตัวเสมอ)</span>
+            </div>
+
+            <div class="flex items-center gap-3 p-2.5 bg-slate-50 rounded-lg border border-slate-200">
+              <select id="proofStepD" class="w-14 px-2 py-1 border rounded font-mono font-bold text-center bg-white">
+                <option value="">?</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option>
+              </select>
+              <span>ข้อความ ง: ข้อสมมติที่ว่า $S$ พึ่งพาเชิงเส้นจึงเป็นเท็จ สรุปได้ว่า $S$ ต้องเป็นอิสระเชิงเส้น และเป็นฐานหลักของ $V$</span>
+            </div>
+          </div>
+
+          <div class="flex items-center gap-3 pt-2">
+            <button id="btnCheckProofSteps" class="px-5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-xs sm:text-sm font-semibold transition shadow-xs">
+              ตรวจลำดับขั้นตอน
+            </button>
+            <div id="proofOrderFeedback" class="text-xs sm:text-sm font-bold"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Part 2: Application in R^3 using Determinant Shortcut -->
+      <div class="bg-slate-50 border border-slate-200 rounded-2xl p-5 sm:p-6 space-y-5">
+        <div class="border-l-4 border-emerald-600 pl-4 py-1">
+          <span class="text-xs font-bold text-emerald-700 uppercase tracking-wider font-prompt">ตอนที่ 2: การประยุกต์เกณฑ์นี้กับ $\mathbb{R}^3$ (Matrix & Basis Shortcut)</span>
+          <p class="text-slate-900 font-semibold text-sm sm:text-base mt-1">
+            กำหนดเซต $B = \{(1, 2, 3), (0, 1, 4), (5, 6, 0)\}$ ใน $\mathbb{R}^3$ จงใช้ The Basis Theorem ตรวจสอบว่า $B$ เป็นฐานหลักของ $\mathbb{R}^3$ หรือไม่ โดยคำนวณผ่านดีเทอร์มิแนนต์ของเมทริกซ์ $A = [\mathbf{v}_1\ \mathbf{v}_2\ \mathbf{v}_3]$
+          </p>
+        </div>
+
+        <div class="bg-white p-4 sm:p-5 rounded-xl border border-slate-200 space-y-4">
+          <p class="text-xs sm:text-sm font-semibold text-slate-800">
+            กรอกค่าดีเทอร์มิแนนต์และเลือกข้อสรุป:
+          </p>
+
+          <div class="flex flex-wrap items-center gap-4">
+            <div class="flex items-center gap-2">
+              <label for="inputDetExercise" class="font-bold text-indigo-900 text-xs sm:text-sm font-mono">$\det(A) =$</label>
+              <input type="number" id="inputDetExercise" placeholder="เช่น 1, -1" class="w-28 px-3 py-1.5 border border-slate-300 rounded-lg text-center font-mono font-bold focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+            </div>
+
+            <div class="flex items-center gap-2">
+              <label for="selectBasisVerdict" class="font-bold text-indigo-900 text-xs sm:text-sm">ข้อสรุป:</label>
+              <select id="selectBasisVerdict" class="px-3 py-1.5 border border-slate-300 rounded-lg text-xs font-semibold focus:ring-2 focus:ring-indigo-500 focus:outline-none bg-white">
+                <option value="">-- เลือกข้อสรุป --</option>
+                <option value="basis">เป็นฐานหลักของ ℝ³ ทันที (เพราะ det ≠ 0 และ k = 3)</option>
+                <option value="not_basis">ไม่เป็นฐานหลัก (เพราะพึ่งพาเชิงเส้น det = 0)</option>
+                <option value="need_span">ยังสรุปไม่ได้ ต้องไปทดสอบการแผ่ทั่ว (Span) ต่อ</option>
+              </select>
+            </div>
+
+            <button id="btnCheckDetExercise" class="px-5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs sm:text-sm font-semibold transition shadow-xs">
+              ตรวจคำตอบ
+            </button>
+          </div>
+
+          <div id="exerciseDetFeedback" class="text-xs sm:text-sm font-bold"></div>
+        </div>
+
+        <!-- Toggle Step-by-Step Solution Accordion -->
+        <div>
+          <button id="btnToggleFullExerciseSolution" class="text-sm font-semibold text-indigo-700 hover:text-indigo-900 flex items-center gap-1.5 transition">
+            <span id="solutionBtnText">แสดงวิธีทำและคำอธิบายอย่างละเอียดทุกขั้นตอน</span>
+            <i id="solutionBtnIcon" class="fa-solid fa-chevron-down transition-transform"></i>
+          </button>
+
+          <div id="fullExerciseSolutionBox" class="hidden mt-4 bg-white p-5 sm:p-6 rounded-xl border border-indigo-200 space-y-4 text-xs sm:text-sm text-slate-800 shadow-sm leading-relaxed">
+            <h4 class="font-bold text-indigo-950 pb-2 border-b border-indigo-100 flex items-center gap-2">
+              <i class="fa-solid fa-calculator text-indigo-600"></i>
+              การแสดงวิธีทำอย่างละเอียดตาม The Basis Theorem
+            </h4>
+
+            <div>
+              <p class="font-bold text-slate-900">ขั้นที่ 1: ตรวจสอบจำนวนเวกเตอร์เทียบกับมิติ ($k$ vs $n$)</p>
+              <p>ปริภูมิเป้าหมายคือ $\mathbb{R}^3$ ซึ่งมีมิติ $\dim(\mathbb{R}^3) = 3$</p>
+              <p>เซต $B$ มีเวกเตอร์จำนวน $k = 3$ ตัวพอดี ($k = n = 3$) $\implies$ <strong>สามารถใช้ The Basis Theorem ได้อย่างถูกต้อง</strong></p>
+            </div>
+
+            <div>
+              <p class="font-bold text-slate-900">ขั้นที่ 2: ตั้งเมทริกซ์และคำนวณค่าดีเทอร์มิแนนต์</p>
+              <div class="my-2 p-2 bg-slate-50 rounded border border-slate-200 text-center font-mono overflow-x-auto">
+                $$A = \begin{bmatrix} 1 & 0 & 5 \\ 2 & 1 & 6 \\ 3 & 4 & 0 \end{bmatrix}$$
+              </div>
+              <p>กระจายโคแฟกเตอร์ตามแถวที่ 1 (หรือใช้วิธีคูณทแยง):</p>
+              <div class="my-1.5 p-2 bg-slate-50 rounded border border-slate-200 font-mono text-center overflow-x-auto text-xs">
+                $$\det(A) = 1\begin{vmatrix} 1 & 6 \\ 4 & 0 \end{vmatrix} - 0 + 5\begin{vmatrix} 2 & 1 \\ 3 & 4 \end{vmatrix} = 1(0 - 24) + 5(8 - 3) = -24 + 5(5) = -24 + 25 = 1$$
+              </div>
+            </div>
+
+            <div>
+              <p class="font-bold text-slate-900">ขั้นที่ 3: สรุปผลลัพธ์โดยอาศัย The Basis Theorem</p>
+              <div class="p-3 bg-emerald-50 rounded-lg border border-emerald-200 text-emerald-950 space-y-1">
+                <p>• เนื่องจาก $\det(A) = 1 \neq 0$ แสดงว่าเวกเตอร์ทั้ง 3 ตัว <strong>เป็นอิสระเชิงเส้นต่อกัน (Linearly Independent)</strong></p>
+                <p>• และเนื่องจากมีเวกเตอร์ 3 ตัวในปริภูมิมิติ 3 อาศัย <strong>The Basis Theorem</strong> เวกเตอร์ชุดนี้จะ <u>แผ่ทั่ว $\mathbb{R}^3$ โดยอัตโนมัติ</u> โดยไม่จำเป็นต้องตั้งสมการแก้หา $\operatorname{span}$ ให้เสียเวลา</p>
+                <p class="font-bold text-emerald-800 pt-1 border-t border-emerald-200">
+                  $\implies$ สรุปเด็ดขาด: $B$ เป็นฐานหลัก (Basis) ของ $\mathbb{R}^3$
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+  </div>
+
+  <!-- Interactive JavaScript Engine -->
+  <script>
+    /* =====================================================================
+       1. SCENARIOS DATABASE FOR THEOREM MATCHER
+       ===================================================================== */
+    const scenarios = {
+      1: {
+        title: "กรณีที่ 1: เวกเตอร์ 2 ตัวใน ℝ³",
+        dimPill: "dim(V) = 3, k = 2 (k < n)",
+        dim: 3,
+        k: 2,
+        desc: `กำหนด $S = \\{(1,0,2), (0,1,1)\\}$ ใน $\\mathbb{R}^3$ เวกเตอร์ทั้งสองตัวไม่ขนานกัน (เป็นอิสระเชิงเส้น) แต่มีเพียง 2 ตัวในปริภูมิมิติ 3`,
+        correctTheorem: "extension",
+        statusBadge: "ไม่เป็นฐานหลัก (ขาดเวกเตอร์)",
+        badgeClass: "bg-amber-100 text-amber-800",
+        mathReason: "k = 2 < dim(V) = 3: เวกเตอร์ชุดนี้สร้างได้เพียงระนาบ 2D ใน ℝ³ ไม่แผ่ทั่วทั้งปริภูมิ จึงต้องประยุกต์ใช้ 'ทฤษฎีบทการขยาย (Extension Theorem)' เพื่อเติมเวกเตอร์อิสระตัวที่ 3 ให้กลายเป็นฐานหลัก",
+        verdictTitle: "ประยุกต์: ทฤษฎีบทการขยาย (Basis Extension Theorem)",
+        verdictBody: "ถูกต้อง! เมื่อ $k < n$ เวกเตอร์ที่เป็นอิสระเชิงเส้นจะไม่มีทางแผ่ทั่วปริภูมิได้ จึงต้องหาเวกเตอร์ที่ไม่อยู่ใน $\\operatorname{span}(S)$ มาขยายเซตเพิ่มจนครบ 3 ตัว"
+      },
+      2: {
+        title: "กรณีที่ 2: เวกเตอร์ 4 ตัวใน ℝ³ ที่แผ่ทั่ว",
+        dimPill: "dim(V) = 3, k = 4 (k > n)",
+        dim: 3,
+        k: 4,
+        desc: `กำหนดเซต $S$ มี 4 เวกเตอร์ใน $\\mathbb{R}^3$ โดยที่ $\\operatorname{span}(S) = \\mathbb{R}^3$ แต่เนื่องจากมี 4 เวกเตอร์ในมิติ 3`,
+        correctTheorem: "reduction",
+        statusBadge: "เซตตัวกำเนิดแต่ไม่ใช่ฐานหลัก",
+        badgeClass: "bg-rose-100 text-rose-800",
+        mathReason: "k = 4 > dim(V) = 3: เวกเตอร์ชุดนี้มีเวกเตอร์ซ้ำซ้อนแน่นอน (พึ่งพาเชิงเส้น) จึงต้องประยุกต์ใช้ 'ทฤษฎีบทการลดทอน (Reduction Theorem)' เพื่อคัดเวกเตอร์ส่วนเกินออก 1 ตัว ให้เหลือฐานหลัก 3 ตัว",
+        verdictTitle: "ประยุกต์: ทฤษฎีบทการลดทอน (Reduction Theorem)",
+        verdictBody: "ถูกต้อง! เมื่อ $k > n$ แม้เซตจะแผ่ทั่วปริภูมิ แต่ก็จะมีตัวแปรเสรีและเวกเตอร์ซ้ำซ้อนเสมอ ต้องใช้กระบวนการลดรูปแถวตัดเวกเตอร์ที่ไม่ใช่ Pivot ออกจนเหลือเฉพาะฐานหลัก"
+      },
+      3: {
+        title: "กรณีที่ 3: เวกเตอร์ 3 ตัวใน ℝ³ ที่เป็นอิสระเชิงเส้น (det ≠ 0)",
+        dimPill: "dim(V) = 3, k = 3 (k = n, det ≠ 0)",
+        dim: 3,
+        k: 3,
+        desc: `กำหนด $B = \\{(1,0,0), (1,1,0), (1,1,1)\\}$ ใน $\\mathbb{R}^3$ คำนวณดีเทอร์มิแนนต์ได้ $\\det = 1 \\neq 0$ เวกเตอร์เป็นอิสระเชิงเส้นต่อกัน`,
+        correctTheorem: "basisTheorem",
+        statusBadge: "เป็นฐานหลักสมบูรณ์ (Basis)",
+        badgeClass: "bg-emerald-100 text-emerald-800",
+        mathReason: "k = 3 = dim(V) และเป็นอิสระเชิงเส้น: สอดคล้องกับ 'The Basis Theorem' โดยตรง จึงสรุปได้ทันทีว่าแผ่ทั่ว ℝ³ ด้วย และเป็นฐานหลักโดยไม่ต้องตรวจ span แยก",
+        verdictTitle: "ประยุกต์: The Basis Theorem (k = n ทางลัด)",
+        verdictBody: "ถูกต้องแม่นยำ! เนื่องจาก $k = n = 3$ พอดี เมื่อตรวจสอบพบว่าดีเทอร์มิแนนต์ไม่เป็นศูนย์ (เป็นอิสระเชิงเส้น) ทฤษฎีบทรับประกันทันทีว่าเซตนี้เป็นฐานหลักแน่นอน"
+      },
+      4: {
+        title: "กรณีที่ 4: เวกเตอร์ 3 ตัวใน ℝ³ ที่พึ่งพาเชิงเส้น (det = 0)",
+        dimPill: "dim(V) = 3, k = 3 (k = n, det = 0)",
+        dim: 3,
+        k: 3,
+        desc: `กำหนด $B = \\{(1,2,3), (2,4,6), (0,1,0)\\}$ ใน $\\mathbb{R}^3$ สังเกตว่าเวกเตอร์ที่สองเป็นสองเท่าของตัวแรก (ขนานกัน) ทำให้ $\\det = 0$`,
+        correctTheorem: "basisTheorem",
+        statusBadge: "ไม่เป็นฐานหลัก (พึ่งพาเชิงเส้น)",
+        badgeClass: "bg-purple-100 text-purple-800",
+        mathReason: "k = 3 = dim(V) แต่ไม่เป็นอิสระเชิงเส้น: จาก The Basis Theorem หากเงื่อนไขความเป็นอิสระเชิงเส้นตก ย่อมส่งผลให้เงื่อนไขการแผ่ทั่วตกไปด้วยพร้อมกัน จึงไม่เป็นฐานหลัก",
+        verdictTitle: "ประยุกต์: The Basis Theorem (k = n ตรวจสอบความล้มเหลว)",
+        verdictBody: "ถูกต้อง! The Basis Theorem ใช้งานได้ทั้งสองทาง: หากมี $n$ เวกเตอร์ในมิติ $n$ แล้วพบว่า 'ไม่เป็นอิสระเชิงเส้น' เราสามารถสรุปได้ทันทีว่ามัน 'ไม่แผ่ทั่ว' ด้วยเช่นกัน"
+      }
+    };
+
+    let activeScenarioId = 1;
+
+    // DOM Elements
+    const activeScenarioTitle = document.getElementById('activeScenarioTitle');
+    const activeDimPill = document.getElementById('activeDimPill');
+    const activeScenarioDesc = document.getElementById('activeScenarioDesc');
+    const scenarioBalanceText = document.getElementById('scenarioBalanceText');
+    const barFilled = document.getElementById('barFilled');
+    const barTargetLabel = document.getElementById('barTargetLabel');
+    const mathReasonContainer = document.getElementById('mathReasonContainer');
+
+    const diagnosticCard = document.getElementById('diagnosticCard');
+    const diagnosticIcon = document.getElementById('diagnosticIcon');
+    const diagnosticTitle = document.getElementById('diagnosticTitle');
+    const diagnosticBadge = document.getElementById('diagnosticBadge');
+    const diagnosticBody = document.getElementById('diagnosticBody');
+    const btnEvaluateTheorem = document.getElementById('btnEvaluateTheorem');
+
+    function loadScenario(id) {
+      activeScenarioId = id;
+      const data = scenarios[id];
+
+      // Update Tab Styles
+      document.querySelectorAll('.scenario-btn').forEach((btn, idx) => {
+        if (idx + 1 === id) {
+          btn.className = "scenario-btn p-3 bg-white hover:bg-indigo-50 border-2 border-indigo-600 text-indigo-950 rounded-xl text-left transition font-prompt shadow-xs";
+        } else {
+          btn.className = "scenario-btn p-3 bg-white hover:bg-slate-50 border border-slate-300 text-slate-700 rounded-xl text-left transition font-prompt shadow-xs";
+        }
+      });
+
+      // Update Texts
+      activeScenarioTitle.textContent = data.title;
+      activeDimPill.textContent = data.dimPill;
+      activeScenarioDesc.innerHTML = data.desc;
+      scenarioBalanceText.textContent = `k = ${data.k} / n = ${data.dim}`;
+      mathReasonContainer.innerHTML = data.mathReason;
+
+      // Update Bar Width
+      const pct = Math.min(100, (data.k / 4) * 100);
+      barFilled.style.width = `${pct}%`;
+      barTargetLabel.textContent = `มิติเป้าหมาย n = ${data.dim}`;
+
+      if (data.k === data.dim) {
+        barFilled.className = "bg-emerald-500 h-full transition-all duration-300";
+      } else if (data.k < data.dim) {
+        barFilled.className = "bg-amber-500 h-full transition-all duration-300";
+      } else {
+        barFilled.className = "bg-rose-500 h-full transition-all duration-300";
+      }
+
+      // Reset Diagnosis Box
+      diagnosticCard.className = "p-5 rounded-xl border transition-all space-y-3 bg-slate-100 border-slate-300 text-slate-800";
+      diagnosticIcon.className = "w-3.5 h-3.5 rounded-full bg-slate-400";
+      diagnosticTitle.textContent = "รอการเลือกทฤษฎีบท...";
+      diagnosticBadge.className = "px-2.5 py-0.5 rounded text-xs font-bold bg-slate-200 text-slate-700";
+      diagnosticBadge.textContent = "Pending";
+      diagnosticBody.textContent = "เลือกทฤษฎีบททางซ้ายแล้วกดปุ่มตรวจสอบเพื่อประเมินความถูกต้อง";
+
+      // Clear radio selection
+      document.querySelectorAll('input[name="theoremChoice"]').forEach(r => r.checked = false);
+
+      if (window.MathJax) {
+        MathJax.typesetPromise([activeScenarioDesc, mathReasonContainer]);
+      }
+    }
+
+    // Bind Scenario Buttons
+    document.getElementById('scenarioBtn1').addEventListener('click', () => loadScenario(1));
+    document.getElementById('scenarioBtn2').addEventListener('click', () => loadScenario(2));
+    document.getElementById('scenarioBtn3').addEventListener('click', () => loadScenario(3));
+    document.getElementById('scenarioBtn4').addEventListener('click', () => loadScenario(4));
+
+    // Evaluate Theorem Choice
+    btnEvaluateTheorem.addEventListener('click', () => {
+      const selected = document.querySelector('input[name="theoremChoice"]:checked');
+      if (!selected) {
+        alert("กรุณาเลือกทฤษฎีบท 1 ข้อก่อนทำการตรวจสอบ");
+        return;
+      }
+
+      const userChoice = selected.value;
+      const data = scenarios[activeScenarioId];
+
+      if (userChoice === data.correctTheorem) {
+        diagnosticCard.className = "p-5 rounded-xl border transition-all space-y-3 bg-emerald-50 border-emerald-300 text-emerald-950";
+        diagnosticIcon.className = "w-3.5 h-3.5 rounded-full bg-emerald-500";
+        diagnosticTitle.textContent = `ถูกต้องสมบูรณ์แบบ: ${data.verdictTitle}`;
+        diagnosticBadge.className = `px-2.5 py-0.5 rounded text-xs font-bold ${data.badgeClass}`;
+        diagnosticBadge.textContent = data.statusBadge;
+        diagnosticBody.innerHTML = data.verdictBody;
+      } else {
+        diagnosticCard.className = "p-5 rounded-xl border transition-all space-y-3 bg-rose-50 border-rose-300 text-rose-950";
+        diagnosticIcon.className = "w-3.5 h-3.5 rounded-full bg-rose-500";
+        diagnosticTitle.textContent = "ยังไม่ใช่ทฤษฎีบทที่เหมาะสมที่สุด";
+        diagnosticBadge.className = "px-2.5 py-0.5 rounded text-xs font-bold bg-rose-200 text-rose-800";
+        diagnosticBadge.textContent = "Incorrect Choice";
+        diagnosticBody.innerHTML = `
+          ลองสังเกตความสัมพันธ์ระหว่างจำนวนเวกเตอร์ ($k = ${data.k}$) กับมิติของปริภูมิ ($n = ${data.dim}$):
+          <br>• ถ้า $k < n$ ให้คิดถึงการขยาย (Extension)
+          <br>• ถ้า $k > n$ ให้คิดถึงการลดทอน (Reduction)
+          <br>• ถ้า $k = n$ ให้ใช้ The Basis Theorem
+        `;
+      }
+
+      if (window.MathJax) {
+        MathJax.typesetPromise([diagnosticBody]);
+      }
+    });
+
+    /* =====================================================================
+       2. GUIDED DISCOVERY TOGGLE
+       ===================================================================== */
+    const btnRevealDiscovery = document.getElementById('btnRevealDiscovery');
+    const discoveryContentBox = document.getElementById('discoveryContentBox');
+
+    btnRevealDiscovery.addEventListener('click', () => {
+      const isHidden = discoveryContentBox.classList.toggle('hidden');
+      if (!isHidden && window.MathJax) {
+        MathJax.typesetPromise([discoveryContentBox]);
+      }
+    });
+
+    /* =====================================================================
+       3. INTERACTIVE EXERCISE PART 1 (PROOF ORDERING)
+       ===================================================================== */
+    const btnCheckProofSteps = document.getElementById('btnCheckProofSteps');
+    const proofOrderFeedback = document.getElementById('proofOrderFeedback');
+
+    btnCheckProofSteps.addEventListener('click', () => {
+      const a = document.getElementById('proofStepA').value;
+      const b = document.getElementById('proofStepB').value;
+      const c = document.getElementById('proofStepC').value;
+      const d = document.getElementById('proofStepD').value;
+
+      if (!a || !b || !c || !d) {
+        proofOrderFeedback.className = "text-amber-600";
+        proofOrderFeedback.textContent = "กรุณาเลือกลำดับให้ครบทั้ง 4 ข้อความ";
+        return;
+      }
+
+      // Correct logical order:
+      // 1: Step B (สมมติทางตรงข้ามว่าพึ่งพาเชิงเส้น)
+      // 2: Step A (ตาม Reduction Theorem จะมีสับเซตแท้ S0 เป็นฐานหลัก)
+      // 3: Step C (ขัดแย้ง เพราะ |S0| < n แต่ dim = n)
+      // 4: Step D (สรุปว่าต้องเป็นอิสระเชิงเส้น)
+      if (b === '1' && a === '2' && c === '3' && d === '4') {
+        proofOrderFeedback.className = "text-emerald-700";
+        proofOrderFeedback.innerHTML = '<i class="fa-solid fa-circle-check mr-1"></i>ลำดับตรรกะถูกต้องยอดเยี่ยม! (ข -> ก -> ค -> ง)';
+      } else {
+        proofOrderFeedback.className = "text-rose-600";
+        proofOrderFeedback.innerHTML = '<i class="fa-solid fa-circle-xmark mr-1"></i>ยังไม่ถูกต้อง: เริ่มต้นด้วยการสมมติทางตรงข้าม (ข) แล้วใช้ Reduction Theorem (ก)';
+      }
+    });
+
+    /* =====================================================================
+       4. INTERACTIVE EXERCISE PART 2 (R^3 DETERMINANT SHORTCUT)
+       ===================================================================== */
+    const btnCheckDetExercise = document.getElementById('btnCheckDetExercise');
+    const inputDetExercise = document.getElementById('inputDetExercise');
+    const selectBasisVerdict = document.getElementById('selectBasisVerdict');
+    const exerciseDetFeedback = document.getElementById('exerciseDetFeedback');
+
+    btnCheckDetExercise.addEventListener('click', () => {
+      const detVal = parseFloat(inputDetExercise.value);
+      const verdict = selectBasisVerdict.value;
+
+      if (isNaN(detVal) || !verdict) {
+        exerciseDetFeedback.className = "text-amber-600";
+        exerciseDetFeedback.textContent = "กรุณากรอกตัวเลขดีเทอร์มิแนนต์และเลือกข้อสรุป";
+        return;
+      }
+
+      // Matrix: [[1,0,5],[2,1,6],[3,4,0]] -> det = 1
+      if (Math.abs(detVal - 1) < 1e-4 && verdict === 'basis') {
+        exerciseDetFeedback.className = "text-emerald-700";
+        exerciseDetFeedback.innerHTML = '<i class="fa-solid fa-circle-check mr-1"></i>ถูกต้องสมบูรณ์แบบ! det(A) = 1 ≠ 0 และ k = 3 ใน ℝ³ อาศัย The Basis Theorem สรุปเป็นฐานหลักได้ทันทีโดยไม่ต้องตรวจ span';
+      } else {
+        exerciseDetFeedback.className = "text-rose-600";
+        exerciseDetFeedback.innerHTML = '<i class="fa-solid fa-circle-xmark mr-1"></i>ยังไม่ถูกต้อง ลองตรวจการกระจายโคแฟกเตอร์แถวที่ 1 อีกครั้ง (det ต้องได้ 1)';
+      }
+    });
+
+    // Solution Accordion Toggle
+    const btnToggleFullExerciseSolution = document.getElementById('btnToggleFullExerciseSolution');
+    const fullExerciseSolutionBox = document.getElementById('fullExerciseSolutionBox');
+    const solutionBtnIcon = document.getElementById('solutionBtnIcon');
+    const solutionBtnText = document.getElementById('solutionBtnText');
+
+    btnToggleFullExerciseSolution.addEventListener('click', () => {
+      const isHidden = fullExerciseSolutionBox.classList.toggle('hidden');
+      if (isHidden) {
+        solutionBtnText.textContent = "แสดงวิธีทำและคำอธิบายอย่างละเอียดทุกขั้นตอน";
+        solutionBtnIcon.classList.remove('rotate-180');
+      } else {
+        solutionBtnText.textContent = "ซ่อนวิธีทำอย่างละเอียด";
+        solutionBtnIcon.classList.add('rotate-180');
+        if (window.MathJax) {
+          MathJax.typesetPromise([fullExerciseSolutionBox]);
+        }
+      }
+    });
+
+    /* =====================================================================
+       5. INITIALIZATION
+       ===================================================================== */
+    window.addEventListener('load', () => {
+      loadScenario(1);
+      if (window.MathJax) {
+        MathJax.typesetPromise();
+      }
+    });
+  </script>
+</body>
+</html>

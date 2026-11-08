@@ -1,0 +1,1057 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>เรื่องที่ 4: วิธีตรวจสอบความเป็นอิสระเชิงเส้นด้วยเมทริกซ์</title>
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- Google Fonts: Sarabun & Kanit -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com">
+  <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@400;500;600;700&family=Sarabun:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+  
+  <!-- MathJax 3 configuration -->
+  <script>
+    window.MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']],
+        displayMath: [['$$', '$$'], ['\\[', '\\]']]
+      },
+      svg: { fontCache: 'global' }
+    };
+  </script>
+  <script type="text/javascript" id="MathJax-script" async
+    src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+  </script>
+
+  <style>
+    body {
+      font-family: 'Sarabun', sans-serif;
+    }
+    h1, h2, h3, h4, .font-heading {
+      font-family: 'Kanit', sans-serif;
+    }
+    .pivot-highlight {
+      background-color: #dbeafe !important;
+      color: #1e3a8a !important;
+      font-weight: 700;
+      border: 2px solid #2563eb !important;
+    }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-800 antialiased min-h-screen">
+
+  <!-- Main Container strictly conforming to dimensions -->
+  <div class="max-w-6xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 space-y-10">
+
+    <!-- Header Section -->
+    <header class="bg-gradient-to-r from-blue-950 via-slate-900 to-indigo-950 text-white rounded-3xl p-6 sm:p-10 shadow-xl relative overflow-hidden">
+      <div class="absolute -right-12 -top-12 w-80 h-80 bg-blue-500/15 rounded-full blur-3xl pointer-events-none"></div>
+      <div class="relative z-10">
+
+        <h1 class="text-2xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-white mb-3">
+          เรื่องที่ 4: วิธีตรวจสอบความเป็นอิสระเชิงเส้นด้วยเมทริกซ์
+        </h1>
+        <p class="text-blue-200 text-base sm:text-lg max-w-3xl leading-relaxed">
+          บูรณาการเครื่องมือเมทริกซ์: การดำเนินการตามแถวขั้นมูลฐาน (ERO), อันดับของเมทริกซ์ (Rank), และดีเทอร์มิแนนต์ (Determinant) สู่กระบวนการตัดสินใจทางคณิตศาสตร์ที่เป็นระบบ
+        </p>
+      </div>
+    </header>
+
+    <!-- ส่วนที่ 1: วัตถุประสงค์การเรียนรู้ -->
+    <section class="bg-white rounded-2xl p-6 sm:p-8 shadow-sm border border-slate-200 transition-all hover:shadow-md">
+      <div class="flex items-start gap-4">
+        <div class="p-3 bg-blue-50 text-blue-600 rounded-xl flex-shrink-0">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+          </svg>
+        </div>
+        <div class="space-y-2">
+          <h2 class="text-xl sm:text-2xl font-bold text-slate-900">1. วัตถุประสงค์การเรียนรู้ (Learning Objectives)</h2>
+          <ul class="space-y-1.5 text-slate-700 text-base sm:text-lg leading-relaxed list-disc list-inside">
+            <li>นักศึกษาสามารถ<strong>ใช้การดำเนินการตามแถวขั้นมูลฐาน (Elementary Row Operations: ERO)</strong> เพื่อหาอันดับของเมทริกซ์ (Rank) ในการตรวจสอบความเป็นอิสระเชิงเส้นของเวกเตอร์ชุดใดๆ ได้</li>
+            <li>นักศึกษาสามารถ<strong>เลือกใช้และอธิบายเกณฑ์ดีเทอร์มิแนนต์ (Determinant Criterion) ในกรณีเมทริกซ์จัตุรัส</strong> รวมถึงเข้าใจข้อจำกัดเมื่อใช้กับเมทริกซ์ที่ไม่เป็นจัตุรัสได้อย่างถูกต้อง</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- ส่วนที่ 2: เนื้อหาหลัก -->
+    <section class="bg-white rounded-2xl p-6 sm:p-8 shadow-sm border border-slate-200 space-y-6">
+      <div>
+        <h2 class="text-xl sm:text-2xl font-bold text-slate-900 flex items-center gap-2">
+          <span class="w-2 h-7 bg-blue-600 rounded-full inline-block"></span>
+          2. เนื้อหาหลัก (Core Mathematical Concepts)
+        </h2>
+        <p class="text-slate-600 text-sm sm:text-base mt-1">
+          การแปลงปัญหาเวกเตอร์เป็นระบบสมการเชิงเส้นและการเลือกใช้เกณฑ์ตัดสินทางเมทริกซ์
+        </p>
+      </div>
+
+      <!-- Core Cards Grid -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+        <!-- Card 1: Matrix Construction & Homogeneous System -->
+        <div class="bg-slate-50 rounded-xl p-5 border border-slate-200/90 hover:border-blue-300 transition-colors">
+          <h3 class="text-lg font-bold text-blue-900 mb-2 flex items-center gap-2">
+            <span class="flex items-center justify-center w-6 h-6 rounded-md bg-blue-100 text-blue-700 text-xs font-bold">1</span>
+            การสร้างเมทริกซ์และการแก้สมการ $A\mathbf{c} = \mathbf{0}$
+          </h3>
+          <p class="text-slate-700 text-sm sm:text-base leading-relaxed mb-3">
+            เมื่อกำหนดเวกเตอร์ $k$ ตัวใน $\mathbb{R}^n$ คือ $\{\mathbf{v}_1, \dots, \mathbf{v}_k\}$ เราจะนำเวกเตอร์แต่ละตัวมาจัดเรียงเป็น <strong>คอลัมน์ (Columns)</strong> ของเมทริกซ์ $A$ ขนาด $n \times k$:
+          </p>
+          <div class="p-3 bg-white rounded-lg border border-slate-200 text-center font-medium shadow-inner overflow-x-auto text-slate-900 text-sm">
+            $$A = \begin{bmatrix} \mathbf{v}_1 & \mathbf{v}_2 & \cdots & \mathbf{v}_k \end{bmatrix} \quad \implies \quad A\mathbf{c} = \mathbf{0}$$
+          </div>
+          <p class="text-xs sm:text-sm text-slate-600 mt-2">
+            • <strong>Trivial Solution ($\mathbf{c} = \mathbf{0}$ เท่านั้น):</strong> เวกเตอร์เป็นอิสระเชิงเส้น (LI)<br>
+            • <strong>Non-trivial Solution (มี $c_i \neq 0$):</strong> เวกเตอร์พึ่งพาเชิงเส้น (LD)
+          </p>
+        </div>
+
+        <!-- Card 2: Rank & Vector Count Relationship -->
+        <div class="bg-slate-50 rounded-xl p-5 border border-slate-200/90 hover:border-blue-300 transition-colors">
+          <h3 class="text-lg font-bold text-blue-900 mb-2 flex items-center gap-2">
+            <span class="flex items-center justify-center w-6 h-6 rounded-md bg-blue-100 text-blue-700 text-xs font-bold">2</span>
+            ความสัมพันธ์ระหว่างอันดับ (Rank) กับจำนวนเวกเตอร์ ($k$)
+          </h3>
+          <p class="text-slate-700 text-sm sm:text-base leading-relaxed mb-2">
+            อันดับของเมทริกซ์ $\operatorname{rank}(A)$ คือจำนวนแถวที่ไม่เป็นศูนย์ในรูปขั้นบันไดแถว (REF) หรือจำนวนตำแหน่งตัวนำ (Pivots):
+          </p>
+          <div class="space-y-2 mt-3">
+            <div class="p-2.5 bg-emerald-50 rounded-lg border border-emerald-200 text-emerald-900 text-xs sm:text-sm">
+              <strong class="font-bold">✓ กรณี $\operatorname{rank}(A) = k$:</strong> จำนวน Pivot ครบทุกคอลัมน์ ไม่มีตัวแปรเสรี (No Free Variables) $\implies$ <strong>เป็นอิสระเชิงเส้น (Linearly Independent)</strong>
+            </div>
+            <div class="p-2.5 bg-rose-50 rounded-lg border border-rose-200 text-rose-900 text-xs sm:text-sm">
+              <strong class="font-bold">✗ กรณี $\operatorname{rank}(A) < k$:</strong> มีอย่างน้อยหนึ่งคอลัมน์ที่ไม่มี Pivot ทำให้เกิดตัวแปรเสรี $\implies$ <strong>พึ่งพาเชิงเส้น (Linearly Dependent)</strong>
+            </div>
+          </div>
+        </div>
+
+        <!-- Card 3: Determinant Criterion for Square Matrices -->
+        <div class="bg-slate-50 rounded-xl p-5 border border-slate-200/90 hover:border-blue-300 transition-colors">
+          <h3 class="text-lg font-bold text-blue-900 mb-2 flex items-center gap-2">
+            <span class="flex items-center justify-center w-6 h-6 rounded-md bg-blue-100 text-blue-700 text-xs font-bold">3</span>
+            เกณฑ์ดีเทอร์มิแนนต์สำหรับเมทริกซ์จัตุรัส ($n = k$)
+          </h3>
+          <p class="text-slate-700 text-sm sm:text-base leading-relaxed mb-2">
+            ในกรณีพิเศษที่มีเวกเตอร์ $n$ ตัวในปริภูมิ $\mathbb{R}^n$ เมทริกซ์ $A$ จะเป็นเมทริกซ์จัตุรัส $n \times n$ เราสามารถใช้ดีเทอร์มิแนนต์ตัดสินได้ทันที:
+          </p>
+          <div class="p-3 bg-white rounded-lg border border-slate-200 text-center font-medium shadow-inner overflow-x-auto text-slate-900 text-sm">
+            $$\det(A) \neq 0 \iff \text{เวกเตอร์เป็นอิสระเชิงเส้น (Linearly Independent)}$$
+            $$\det(A) = 0 \iff \text{เวกเตอร์พึ่งพาเชิงเส้น (Linearly Dependent)}$$
+          </div>
+          <p class="text-xs text-slate-500 mt-2">
+            *เหตุผล:* เมื่อ $\det(A) \neq 0$ เมทริกซ์จะมีตัวผกผัน $A^{-1}$ ส่งผลให้ $\mathbf{c} = A^{-1}\mathbf{0} = \mathbf{0}$ เพียงคำตอบเดียวเสมอ
+          </p>
+        </div>
+
+        <!-- Card 4: Limitations of Determinant -->
+        <div class="bg-slate-50 rounded-xl p-5 border border-slate-200/90 hover:border-blue-300 transition-colors">
+          <h3 class="text-lg font-bold text-blue-900 mb-2 flex items-center gap-2">
+            <span class="flex items-center justify-center w-6 h-6 rounded-md bg-blue-100 text-blue-700 text-xs font-bold">4</span>
+            ข้อจำกัดของดีเทอร์มิแนนต์และกรณี $k > n$
+          </h3>
+          <p class="text-slate-700 text-sm sm:text-base leading-relaxed mb-2">
+            ดีเทอร์มิแนนต์ <strong>นิยามเฉพาะเมทริกซ์จัตุรัสเท่านั้น ($n \times n$)</strong> หากเมทริกซ์มีมิติ $n \times k$ ที่ $n \neq k$:
+          </p>
+          <ul class="list-disc list-inside text-xs sm:text-sm text-slate-700 space-y-1.5">
+            <li><strong>ห้ามคำนวณดีเทอร์มิแนนต์โดยตรง</strong> จะต้องใช้วิธีการลดรูปแถวหา $\operatorname{rank}(A)$ เสมอ</li>
+            <li><strong>ทฤษฎีบทกรณี $k > n$:</strong> หากมีจำนวนเวกเตอร์ ($k$) มากกว่ามิติของปริภูมิ ($n$) เช่น เวกเตอร์ 3 ตัวใน $\mathbb{R}^2$ เวกเตอร์ชุดนั้นจะ <strong>พึ่งพาเชิงเส้นเสมอ</strong> เพราะ $\operatorname{rank}(A) \le n < k$ จึงเกิด Free Variable เสมอ</li>
+          </ul>
+        </div>
+
+      </div>
+
+      <!-- Quick Decision Matrix Summary Table -->
+      <div class="bg-slate-50 rounded-xl p-4 sm:p-5 border border-slate-200 overflow-x-auto">
+        <h4 class="font-bold text-slate-900 text-sm mb-3">ตารางเกณฑ์การเลือกใช้วิธีตรวจสอบ</h4>
+        <table class="w-full text-left text-xs sm:text-sm border-collapse">
+          <thead>
+            <tr class="border-b border-slate-300 bg-white text-slate-700">
+              <th class="p-2 sm:p-3 font-bold">ลักษณะเมทริกซ์ $A$ ($n \times k$)</th>
+              <th class="p-2 sm:p-3 font-bold">ใช้ Determinant ได้หรือไม่?</th>
+              <th class="p-2 sm:p-3 font-bold">วิธีตรวจสอบที่เหมาะสม</th>
+              <th class="p-2 sm:p-3 font-bold">เกณฑ์ตัดสินความเป็นอิสระเชิงเส้น (LI)</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-slate-200 text-slate-700">
+            <tr>
+              <td class="p-2.5 font-medium">จัตุรัส ($n = k$ เช่น 3 เวกเตอร์ใน $\mathbb{R}^3$)</td>
+              <td class="p-2.5 text-emerald-700 font-bold">ได้ (สะดวกรวดเร็ว)</td>
+              <td class="p-2.5">คำนวณ $\det(A)$ หรือ ERO</td>
+              <td class="p-2.5 font-semibold">$\det(A) \neq 0$ หรือ $\operatorname{rank}(A) = n$</td>
+            </tr>
+            <tr>
+              <td class="p-2.5 font-medium">คอลัมน์น้อยกว่าแถว ($k < n$ เช่น 2 เวกเตอร์ใน $\mathbb{R}^3$)</td>
+              <td class="p-2.5 text-rose-600 font-bold">ไม่ได้ (ไม่จัตุรัส)</td>
+              <td class="p-2.5">การดำเนินการตามแถว (ERO)</td>
+              <td class="p-2.5 font-semibold">$\operatorname{rank}(A) = k$ (Pivot ครบทุกคอลัมน์)</td>
+            </tr>
+            <tr>
+              <td class="p-2.5 font-medium">คอลัมน์มากกว่าแถว ($k > n$ เช่น 4 เวกเตอร์ใน $\mathbb{R}^3$)</td>
+              <td class="p-2.5 text-rose-600 font-bold">ไม่ได้ (ไม่จัตุรัส)</td>
+              <td class="p-2.5">ใช้ทฤษฎีบท $k > n$ ทันที</td>
+              <td class="p-2.5 text-rose-700 font-semibold">ไม่มีทางเป็น LI (พึ่งพาเชิงเส้นเสมอ)</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ส่วนที่ 3: แบบจำลองโต้ตอบ (Interactive Matrix Lab) -->
+    <section class="bg-white rounded-2xl p-6 sm:p-8 shadow-sm border border-slate-200 space-y-6">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-200">
+        <div>
+          <h2 class="text-xl sm:text-2xl font-bold text-slate-900 flex items-center gap-2">
+            <span class="w-2 h-7 bg-blue-600 rounded-full inline-block"></span>
+            3. แบบจำลองโต้ตอบ: ห้องทดลองเมทริกซ์ (Interactive Matrix Lab)
+          </h2>
+          <p class="text-slate-600 text-sm mt-1">
+            ป้อนเวกเตอร์เป็นคอลัมน์ของเมทริกซ์ $A$ หรือเลือก Presets เพื่อดูการลดรูปแถว (REF/RREF) ตำแหน่ง Pivot ค่า Rank และ Determinant พร้อมขั้นตอนอย่างละเอียด
+          </p>
+        </div>
+
+        <!-- Dimension Controls -->
+        <div class="flex items-center gap-2">
+          <label for="matrixPresetSelect" class="text-xs font-semibold text-slate-500">ขนาด $n \times k$:</label>
+          <select id="matrixDimPicker" class="bg-slate-100 border border-slate-300 text-slate-800 text-xs sm:text-sm rounded-lg px-3 py-1.5 font-semibold focus:outline-none focus:ring-2 focus:ring-blue-500">
+            <option value="3x3" selected>3 แถว × 3 คอลัมน์ (เวกเตอร์ใน R³ 3 ตัว)</option>
+            <option value="2x2">2 แถว × 2 คอลัมน์ (เวกเตอร์ใน R² 2 ตัว)</option>
+            <option value="3x2">3 แถว × 2 คอลัมน์ (เวกเตอร์ใน R³ 2 ตัว)</option>
+            <option value="2x3">2 แถว × 3 คอลัมน์ (เวกเตอร์ใน R² 3 ตัว - k > n)</option>
+            <option value="4x3">4 แถว × 3 คอลัมน์ (เวกเตอร์ใน R⁴ 3 ตัว)</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Presets Toolbar -->
+      <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-2">
+        <span class="text-xs font-bold text-slate-500 uppercase tracking-wider block">ชุดการทดลองและกรณีศึกษา (Presets):</span>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2 text-xs">
+          <button id="presetExercise" class="p-2.5 bg-white hover:bg-blue-50 border border-slate-300 hover:border-blue-400 rounded-lg font-medium text-slate-800 text-left transition shadow-xs">
+            <span class="font-bold text-blue-700">📘 เวกเตอร์ตามแบบฝึกหัด</span><br>
+            <span class="text-[11px] text-slate-500">(1,0,1), (0,1,1), (1,1,0)</span>
+          </button>
+          <button id="presetCoplanar" class="p-2.5 bg-white hover:bg-rose-50 border border-slate-300 hover:border-rose-400 rounded-lg font-medium text-slate-800 text-left transition shadow-xs">
+            <span class="font-bold text-rose-700">⚠️ เวกเตอร์ระนาบเดียวกัน (LD)</span><br>
+            <span class="text-[11px] text-slate-500">(1,2,3), (2,4,6), (1,0,1)</span>
+          </button>
+          <button id="presetRectangularKlessN" class="p-2.5 bg-white hover:bg-blue-50 border border-slate-300 hover:border-blue-400 rounded-lg font-medium text-slate-800 text-left transition shadow-xs">
+            <span class="font-bold text-indigo-700">📐 2 เวกเตอร์ใน R³ (3x2)</span><br>
+            <span class="text-[11px] text-slate-500">ไม่จัตุรัส แต่เป็น LI ได้</span>
+          </button>
+          <button id="presetMoreColumns" class="p-2.5 bg-white hover:bg-rose-50 border border-slate-300 hover:border-rose-400 rounded-lg font-medium text-slate-800 text-left transition shadow-xs">
+            <span class="font-bold text-amber-700">⚡ 3 เวกเตอร์ใน R² (2x3)</span><br>
+            <span class="text-[11px] text-slate-500">k > n พึ่งพาเชิงเส้นเสมอ</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Matrix Inputs & Live Status Grid -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        
+        <!-- Left: Matrix Input Editor (5 cols) -->
+        <div class="lg:col-span-5 space-y-4">
+          <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-3">
+            <div class="flex items-center justify-between">
+              <h4 class="font-bold text-slate-800 text-sm">เมทริกซ์ $A = [\mathbf{v}_1 \mid \mathbf{v}_2 \mid \cdots \mid \mathbf{v}_k]$:</h4>
+              <span class="text-[11px] text-slate-500">ปรับเปลี่ยนตัวเลขได้อิสระ</span>
+            </div>
+
+            <!-- Dynamic Table for Matrix A Input -->
+            <div id="matrixInputContainer" class="p-3 bg-white rounded-lg border border-slate-300 overflow-x-auto">
+              <!-- Dynamically generated -->
+            </div>
+
+            <div class="flex gap-2 pt-1">
+              <button id="btnAnalyzeMatrix" class="w-full py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg text-xs sm:text-sm transition flex items-center justify-center gap-1.5 shadow-sm">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path></svg>
+                คำนวณและวิเคราะห์ผลลัพธ์ (Analyze)
+              </button>
+            </div>
+          </div>
+
+          <!-- Determinant Status Card (Active only if Square) -->
+          <div id="determinantCard" class="bg-slate-900 rounded-xl p-4 text-white border border-slate-800 space-y-2">
+            <div class="flex items-center justify-between text-xs">
+              <span class="text-slate-400 font-semibold uppercase tracking-wider">เกณฑ์ดีเทอร์มิแนนต์ (Determinant Criterion):</span>
+              <span id="detApplicableBadge" class="px-2 py-0.5 rounded text-[10px] font-bold bg-blue-600 text-white">เมทริกซ์จัตุรัส</span>
+            </div>
+            <div class="flex items-baseline justify-between pt-1">
+              <span class="text-sm font-medium text-slate-300">$\det(A) =$</span>
+              <span id="detValueDisplay" class="font-mono text-2xl font-bold text-amber-400">กำลังคำนวณ...</span>
+            </div>
+            <p id="detExplanationText" class="text-xs text-slate-300 leading-relaxed pt-1 border-t border-slate-800">
+              กำลังวิเคราะห์...
+            </p>
+          </div>
+        </div>
+
+        <!-- Right: Diagnostic Report, REF/RREF, and ERO Steps (7 cols) -->
+        <div class="lg:col-span-7 space-y-4">
+          
+          <!-- Comprehensive Conclusion Banner -->
+          <div id="labConclusionBanner" class="p-4 rounded-xl border transition-all space-y-2 bg-blue-50 border-blue-300 text-blue-950">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-2">
+                <span id="labStatusIcon" class="w-3.5 h-3.5 rounded-full bg-blue-500"></span>
+                <span id="labStatusTitle" class="font-bold text-base sm:text-lg">ผลการวิเคราะห์</span>
+              </div>
+              <span id="labStatusBadge" class="px-2.5 py-1 rounded text-xs font-bold bg-blue-200 text-blue-800">
+                LI / LD
+              </span>
+            </div>
+            <p id="labStatusReason" class="text-xs sm:text-sm leading-relaxed text-slate-700">
+              คำอธิบายผลลัพธ์เชิงทฤษฎี...
+            </p>
+          </div>
+
+          <!-- Matrix Metrics Strip -->
+          <div class="grid grid-cols-3 gap-2.5 text-xs sm:text-sm">
+            <div class="bg-slate-50 p-3 rounded-xl border border-slate-200 text-center">
+              <span class="text-slate-500 block text-[11px]">จำนวนเวกเตอร์ ($k$)</span>
+              <span id="metricK" class="font-bold text-slate-800 font-mono text-base">3</span>
+            </div>
+            <div class="bg-slate-50 p-3 rounded-xl border border-slate-200 text-center">
+              <span class="text-slate-500 block text-[11px]">อันดับ $\operatorname{rank}(A)$</span>
+              <span id="metricRank" class="font-bold text-blue-700 font-mono text-base">3</span>
+            </div>
+            <div class="bg-slate-50 p-3 rounded-xl border border-slate-200 text-center">
+              <span class="text-slate-500 block text-[11px]">ตัวแปรเสรี (Free Vars)</span>
+              <span id="metricFree" class="font-bold text-emerald-700 font-mono text-base">0</span>
+            </div>
+          </div>
+
+          <!-- Forms Box: REF & RREF with Pivot Highlighting -->
+          <div class="bg-white rounded-xl border border-slate-200 p-4 space-y-3">
+            <div class="flex items-center justify-between border-b border-slate-100 pb-2">
+              <h4 class="font-bold text-slate-900 text-sm">รูปแบบขั้นบันไดแถวลดรูป (RREF) และตำแหน่ง Pivot:</h4>
+              <span class="text-xs text-blue-600 font-semibold" id="pivotColsSummary">Pivot Columns: 1, 2, 3</span>
+            </div>
+            <div id="rrefDisplayContainer" class="p-3 bg-slate-50 rounded-lg border border-slate-200 text-center font-mono overflow-x-auto text-sm sm:text-base">
+              <!-- Rendered via MathJax -->
+            </div>
+          </div>
+
+          <!-- Step-by-Step ERO Accordion -->
+          <div class="bg-white rounded-xl border border-slate-200 p-4 space-y-3 shadow-xs">
+            <button id="btnToggleERODrawer" class="w-full flex items-center justify-between text-left text-sm font-bold text-slate-800 hover:text-blue-700 transition">
+              <span class="flex items-center gap-2">
+                <svg class="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
+                ดูขั้นตอนการดำเนินการตามแถว (ERO Step-by-step)
+              </span>
+              <svg id="eroDrawerArrow" class="w-4 h-4 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+            </button>
+
+            <div id="eroStepsContent" class="hidden space-y-3 max-h-72 overflow-y-auto pr-1 text-xs sm:text-sm pt-2 border-t border-slate-100">
+              <!-- Dynamically populated ERO steps -->
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ส่วนที่ 4: คำถามนำเพื่อค้นพบ -->
+    <section class="bg-white rounded-2xl p-6 sm:p-8 shadow-sm border border-slate-200 space-y-4">
+      <div class="flex items-center gap-2">
+        <span class="w-2 h-7 bg-blue-600 rounded-full inline-block"></span>
+        <h2 class="text-xl sm:text-2xl font-bold text-slate-900">4. คำถามนำเพื่อค้นพบ (Guided Discovery Question)</h2>
+      </div>
+
+      <div class="bg-gradient-to-r from-blue-50 via-indigo-50 to-slate-50 border border-blue-200 rounded-2xl p-5 sm:p-7 space-y-4">
+        <div class="flex items-start gap-3">
+          <div class="p-2.5 bg-blue-600 text-white rounded-xl flex-shrink-0 mt-0.5">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
+          </div>
+          <div class="space-y-3 w-full">
+            <h3 class="text-lg sm:text-xl font-bold text-blue-950">
+              "หากเมทริกซ์มีจำนวนคอลัมน์มากกว่าอันดับของเมทริกซ์ ($k > \operatorname{rank}(A)$) จะสรุปได้อย่างไรเกี่ยวกับเวกเตอร์คอลัมน์?"
+            </h3>
+            <p class="text-slate-700 text-sm sm:text-base leading-relaxed">
+              พิจารณาความหมายของจำนวนตัวแปรในสมการ $A\mathbf{c} = \mathbf{0}$ เทียบกับจำนวนสมการอิสระที่แท้จริงหลังจากตัดแถวศูนย์ออกไปแล้ว
+            </p>
+
+            <button id="btnRevealDiscovery" class="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl text-sm transition shadow-sm flex items-center gap-2">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+              <span>คลิกเพื่อดูข้อสรุปเชิงทฤษฎี (Rank-Nullity & Free Variables)</span>
+            </button>
+
+            <!-- Discovery Reveal Panel -->
+            <div id="discoveryContentBox" class="hidden mt-4 bg-white p-5 rounded-xl border border-blue-200 space-y-3 text-sm sm:text-base text-slate-800 shadow-sm">
+              <p class="font-bold text-rose-600 text-base">
+                ข้อสรุป: เวกเตอร์คอลัมน์เหล่านั้นจะต้อง "พึ่งพาเชิงเส้นต่อกัน (Linearly Dependent)" เสมออย่างไม่มีข้อยกเว้น!
+              </p>
+
+              <div class="border-l-4 border-blue-600 pl-4 space-y-2 text-sm text-slate-700">
+                <p><strong>คำอธิบายเชิงคณิตศาสตร์ผ่าน Rank-Nullity Theorem:</strong></p>
+                <div class="p-2.5 bg-slate-50 rounded border border-slate-200 font-mono text-center text-xs sm:text-sm my-1">
+                  $$\text{จำนวนตัวแปรทั้งหมด } (k) = \operatorname{rank}(A) + \text{จำนวนตัวแปรเสรี (Nullity)}$$
+                </div>
+                <p>
+                  เมื่อ $k > \operatorname{rank}(A)$ ย่อมส่งผลให้ <strong>จำนวนตัวแปรเสรี (Free Variables) $= k - \operatorname{rank}(A) > 0$ เสมอ</strong>
+                </p>
+                <p>
+                  การมีตัวแปรเสรีอย่างน้อย 1 ตัว หมายความว่าในระบบสมการเอกพันธ์ $A\mathbf{c} = \mathbf{0}$ เราสามารถกำหนดค่าให้ตัวแปรเสรีเป็นค่าคงที่ใดๆ ที่ไม่เท่ากับศูนย์ได้ ส่งผลให้เกิด <strong>คำตอบที่ไม่เป็นศูนย์ (Non-trivial Solutions) อย่างนับไม่ถ้วน</strong>
+                </p>
+              </div>
+
+              <div class="p-3 bg-blue-50 rounded-lg border border-blue-200 text-blue-950 text-xs sm:text-sm font-medium">
+                💡 <strong>ตัวอย่างคลาสสิก:</strong> เมื่อนำเวกเตอร์ $4$ ตัวใน $\mathbb{R}^3$ ($k=4, n=3$) มาพิจารณา เนื่องจากอันดับ $\operatorname{rank}(A)$ ไม่มีทางเกินจำนวนแถว ($3$) ดังนั้น $k > \operatorname{rank}(A)$ เสมอ เวกเตอร์ 4 ตัวใน $\mathbb{R}^3$ จึงต้องพึ่งพาเชิงเส้นเสมอโดยไม่ต้องคำนวณตัวเลข
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ส่วนที่ 5: แบบฝึกหัดสำหรับนักศึกษา -->
+    <section class="bg-white rounded-2xl p-6 sm:p-8 shadow-sm border border-slate-200 space-y-6">
+      <div class="flex items-center gap-2">
+        <span class="w-2 h-7 bg-blue-600 rounded-full inline-block"></span>
+        <h2 class="text-xl sm:text-2xl font-bold text-slate-900">5. แบบฝึกหัดสำหรับนักศึกษา (Interactive Exercise)</h2>
+      </div>
+
+      <div class="bg-slate-50 border border-slate-200 rounded-2xl p-5 sm:p-6 space-y-6">
+        <div class="border-l-4 border-blue-600 pl-4 py-1">
+          <span class="text-xs font-bold text-blue-700 uppercase tracking-wider">โจทย์ฝึกปฏิบัติการ:</span>
+          <p class="text-slate-900 font-semibold text-base sm:text-lg mt-1">
+            จงตรวจสอบความเป็นอิสระเชิงเส้นของเวกเตอร์สามตัว $\mathbf{v}_1 = (1,0,1)$, $\mathbf{v}_2 = (0,1,1)$, $\mathbf{v}_3 = (1,1,0)$ โดยใช้ทั้งการแก้ระบบสมการ (Row Operations / Rank) และดีเทอร์มิแนนต์ (Determinant)
+          </p>
+        </div>
+
+        <!-- Student Quiz Interface -->
+        <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm space-y-4">
+          <p class="text-sm font-semibold text-slate-800">ทดสอบคำนวณด้วยตนเองแล้วเลือกคำตอบที่ถูกต้อง:</p>
+          
+          <div class="space-y-2.5 text-xs sm:text-sm">
+            <label class="flex items-start gap-3 p-3 rounded-lg border border-slate-200 hover:bg-slate-50 cursor-pointer transition">
+              <input type="radio" name="exerciseCheck" value="1" class="mt-1 text-blue-600">
+              <span><strong>ก.</strong> เป็นอิสระเชิงเส้น (LI) เพราะ $\det(A) = -2 \neq 0$ และ $\operatorname{rank}(A) = 3$ (Pivot ครบทุกคอลัมน์)</span>
+            </label>
+            <label class="flex items-start gap-3 p-3 rounded-lg border border-slate-200 hover:bg-slate-50 cursor-pointer transition">
+              <input type="radio" name="exerciseCheck" value="2" class="mt-1 text-blue-600">
+              <span><strong>ข.</strong> พึ่งพาเชิงเส้น (LD) เพราะ $\det(A) = 0$ และมีแถวศูนย์เกิดขึ้นในรูป REF</span>
+            </label>
+            <label class="flex items-start gap-3 p-3 rounded-lg border border-slate-200 hover:bg-slate-50 cursor-pointer transition">
+              <input type="radio" name="exerciseCheck" value="3" class="mt-1 text-blue-600">
+              <span><strong>ค.</strong> เป็นอิสระเชิงเส้น (LI) แต่ไม่สามารถใช้ดีเทอร์มิแนนต์ได้เนื่องจากเวกเตอร์ไม่เป็นฐานหลักมาตรฐาน</span>
+            </label>
+          </div>
+
+          <div class="flex items-center gap-3 pt-2">
+            <button id="btnCheckExerciseQuiz" class="px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg text-xs sm:text-sm transition shadow-sm">
+              ตรวจคำตอบ
+            </button>
+            <div id="exerciseQuizFeedback" class="text-xs sm:text-sm font-semibold"></div>
+          </div>
+        </div>
+
+        <!-- Dual-Method Step-by-Step Solution Accordion -->
+        <div>
+          <button id="btnToggleFullExerciseSolution" class="text-sm font-semibold text-blue-700 hover:text-blue-900 flex items-center gap-1.5 transition">
+            <span id="exerciseSolutionBtnText">แสดงเฉลยวิธีทำอย่างละเอียดทั้ง 2 วิธี (Step-by-step Solution)</span>
+            <svg id="exerciseSolutionBtnIcon" class="w-4 h-4 transition-transform transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+          </button>
+
+          <div id="dualMethodSolutionBlock" class="hidden mt-4 bg-white p-6 rounded-xl border border-blue-200 space-y-6 text-sm sm:text-base text-slate-800 shadow-sm">
+            
+            <h4 class="font-bold text-blue-950 pb-2 border-b border-blue-100 flex items-center gap-2">
+              <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+              การแสดงวิธีทำเปรียบเทียบ 2 วิธีอย่างละเอียด
+            </h4>
+
+            <!-- Setup Matrix -->
+            <div>
+              <p class="text-slate-700">นำเวกเตอร์มาเขียนเป็นคอลัมน์ของเมทริกซ์ $A$ ขนาด $3 \times 3$:</p>
+              <div class="my-2 p-2.5 bg-slate-50 rounded border border-slate-200 text-center font-mono">
+                $$A = \begin{bmatrix} \mathbf{v}_1 & \mathbf{v}_2 & \mathbf{v}_3 \end{bmatrix} = \begin{bmatrix} 1 & 0 & 1 \\ 0 & 1 & 1 \\ 1 & 1 & 0 \end{bmatrix}$$
+              </div>
+            </div>
+
+            <!-- Side by Side / Stacked Methods -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 pt-2">
+              
+              <!-- Method 1: Row Reduction -->
+              <div class="p-4 rounded-xl bg-slate-50 border border-slate-200 space-y-3">
+                <div class="font-bold text-blue-900 border-b border-slate-200 pb-1.5 flex items-center gap-1.5">
+                  <span class="w-2 h-2 rounded-full bg-blue-600"></span>
+                  วิธีที่ 1: การดำเนินการตามแถว (ERO) & อันดับ (Rank)
+                </div>
+                <p class="text-xs sm:text-sm text-slate-700">
+                  ตั้งเมทริกซ์แต่งเติมสำหรับสมการเอกพันธ์ $[A \mid \mathbf{0}]$ แล้วลดรูป:
+                </p>
+                <div class="p-2 bg-white rounded border border-slate-200 text-center font-mono text-xs overflow-x-auto">
+                  $$\left[\begin{array}{ccc|c} 1 & 0 & 1 & 0 \\ 0 & 1 & 1 & 0 \\ 1 & 1 & 0 & 0 \end{array}\right] \xrightarrow{R_3 \to R_3 - R_1} \left[\begin{array}{ccc|c} 1 & 0 & 1 & 0 \\ 0 & 1 & 1 & 0 \\ 0 & 1 & -1 & 0 \end{array}\right]$$
+                  $$\xrightarrow{R_3 \to R_3 - R_2} \left[\begin{array}{ccc|c} \mathbf{1} & 0 & 1 & 0 \\ 0 & \mathbf{1} & 1 & 0 \\ 0 & 0 & \mathbf{-2} & 0 \end{array}\right]$$
+                </div>
+                <div class="text-xs text-slate-700 space-y-1">
+                  <p>• มีตำแหน่งตัวนำ (Pivot) อยู่ในคอลัมน์ที่ 1, 2, และ 3 ครบทุกคอลัมน์</p>
+                  <p>• ดังนั้น $\operatorname{rank}(A) = 3$ เท่ากับจำนวนเวกเตอร์ ($k = 3$)</p>
+                  <p>• <strong>ไม่มีตัวแปรเสรี</strong> ทำให้มีเพียงคำตอบ $c_1=c_2=c_3=0$</p>
+                  <p class="font-bold text-emerald-700">$\implies$ สรุป: เป็นอิสระเชิงเส้น (LI)</p>
+                </div>
+              </div>
+
+              <!-- Method 2: Determinant -->
+              <div class="p-4 rounded-xl bg-slate-50 border border-slate-200 space-y-3">
+                <div class="font-bold text-blue-900 border-b border-slate-200 pb-1.5 flex items-center gap-1.5">
+                  <span class="w-2 h-2 rounded-full bg-indigo-600"></span>
+                  วิธีที่ 2: เกณฑ์ดีเทอร์มิแนนต์ (Determinant)
+                </div>
+                <p class="text-xs sm:text-sm text-slate-700">
+                  เนื่องจาก $A$ เป็นเมทริกซ์จัตุรัส $3 \times 3$ จึงคำนวณ $\det(A)$ โดยกระจายโคแฟกเตอร์ตามแถวที่ 1:
+                </p>
+                <div class="p-2 bg-white rounded border border-slate-200 text-center font-mono text-xs overflow-x-auto">
+                  $$\det(A) = 1 \begin{vmatrix} 1 & 1 \\ 1 & 0 \end{vmatrix} - 0 + 1 \begin{vmatrix} 0 & 1 \\ 1 & 1 \end{vmatrix}$$
+                  $$= 1(0 - 1) + 1(0 - 1) = -1 + (-1) = -2$$
+                </div>
+                <div class="text-xs text-slate-700 space-y-1">
+                  <p>• เนื่องจาก $\det(A) = -2 \neq 0$</p>
+                  <p>• จากเกณฑ์ของเมทริกซ์จัตุรัส: เมทริกซ์มีตัวผกผัน $A^{-1}$ ส่งผลให้ระบบสมการ $A\mathbf{c} = \mathbf{0}$ มีคำตอบศูนย์ $\mathbf{c} = \mathbf{0}$ เพียงหนึ่งเดียว</p>
+                  <p class="font-bold text-emerald-700">$\implies$ สรุป: เป็นอิสระเชิงเส้น (LI)</p>
+                </div>
+              </div>
+
+            </div>
+
+            <!-- Unified Comparison Note -->
+            <div class="p-3 bg-emerald-50 rounded-xl border border-emerald-200 text-emerald-950 text-xs sm:text-sm font-medium">
+              ✨ <strong>บทเรียนสรุป:</strong> ทั้งสองวิธีให้ข้อสรุปตรงกันอย่างสมบูรณ์แบบ! ในข้อสอบหรือการปฏิบัติจริง เมื่อโจทย์เป็นเวกเตอร์ $n$ ตัวใน $\mathbb{R}^n$ การใช้ดีเทอร์มิแนนต์มักจะรวดเร็วกว่า แต่การใช้ ERO จะให้ข้อมูลเชิงลึกถึงความสัมพันธ์ระหว่างเวกเตอร์และตัวแปรเสรีได้ครบถ้วนกว่า
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+
+  </div>
+
+  <!-- Interactive JavaScript Engine -->
+  <script>
+    /* =====================================================================
+       1. MATRIX LAB STATE & CONFIGURATION
+       ===================================================================== */
+    let numRows = 3;
+    let numCols = 3;
+
+    // Default Matrix: Exercise vectors [(1,0,1), (0,1,1), (1,1,0)]
+    let matrixData = [
+      [1, 0, 1],
+      [0, 1, 1],
+      [1, 1, 0]
+    ];
+
+    const matrixDimPicker = document.getElementById('matrixDimPicker');
+    const matrixInputContainer = document.getElementById('matrixInputContainer');
+    const btnAnalyzeMatrix = document.getElementById('btnAnalyzeMatrix');
+    
+    const determinantCard = document.getElementById('determinantCard');
+    const detValueDisplay = document.getElementById('detValueDisplay');
+    const detExplanationText = document.getElementById('detExplanationText');
+    const detApplicableBadge = document.getElementById('detApplicableBadge');
+
+    const labConclusionBanner = document.getElementById('labConclusionBanner');
+    const labStatusIcon = document.getElementById('labStatusIcon');
+    const labStatusTitle = document.getElementById('labStatusTitle');
+    const labStatusBadge = document.getElementById('labStatusBadge');
+    const labStatusReason = document.getElementById('labStatusReason');
+
+    const metricK = document.getElementById('metricK');
+    const metricRank = document.getElementById('metricRank');
+    const metricFree = document.getElementById('metricFree');
+    const pivotColsSummary = document.getElementById('pivotColsSummary');
+    const rrefDisplayContainer = document.getElementById('rrefDisplayContainer');
+
+    const btnToggleERODrawer = document.getElementById('btnToggleERODrawer');
+    const eroDrawerArrow = document.getElementById('eroDrawerArrow');
+    const eroStepsContent = document.getElementById('eroStepsContent');
+
+    // Preset Data
+    const presetsMap = {
+      exercise: {
+        dim: '3x3',
+        rows: 3, cols: 3,
+        data: [[1, 0, 1], [0, 1, 1], [1, 1, 0]]
+      },
+      coplanar: {
+        dim: '3x3',
+        rows: 3, cols: 3,
+        data: [[1, 2, 1], [2, 4, 0], [3, 6, 1]]
+      },
+      rectKlessN: {
+        dim: '3x2',
+        rows: 3, cols: 2,
+        data: [[1, 0], [2, 1], [0, 2]]
+      },
+      moreCols: {
+        dim: '2x3',
+        rows: 2, cols: 3,
+        data: [[1, 2, 3], [0, 1, 4]]
+      }
+    };
+
+    function renderMatrixInputs() {
+      let html = '<table class="mx-auto border-collapse">';
+      // Header: Vector Labels
+      html += '<thead><tr>';
+      for (let j = 0; j < numCols; j++) {
+        html += `<th class="px-2 py-1 text-center font-mono text-xs font-bold text-blue-800">\\(\\mathbf{v}_${j+1}\\)</th>`;
+      }
+      html += '</tr></thead><tbody>';
+
+      for (let i = 0; i < numRows; i++) {
+        html += '<tr>';
+        for (let j = 0; j < numCols; j++) {
+          const val = (matrixData[i] && matrixData[i][j] !== undefined) ? matrixData[i][j] : 0;
+          html += `
+            <td class="p-1">
+              <input type="number" step="any" data-r="${i}" data-c="${j}" value="${val}"
+                class="mat-input w-14 sm:w-16 px-1.5 py-1 text-center font-mono text-sm border rounded bg-slate-50 focus:bg-white focus:ring-2 focus:ring-blue-500 focus:outline-none">
+            </td>
+          `;
+        }
+        html += '</tr>';
+      }
+      html += '</tbody></table>';
+
+      matrixInputContainer.innerHTML = html;
+
+      // Event listener for user inputs
+      const inputs = matrixInputContainer.querySelectorAll('.mat-input');
+      inputs.forEach(input => {
+        input.addEventListener('input', (e) => {
+          const r = parseInt(e.target.dataset.r);
+          const c = parseInt(e.target.dataset.c);
+          matrixData[r][c] = parseFloat(e.target.value) || 0;
+          analyzeCurrentMatrix();
+        });
+      });
+
+      if (window.MathJax) {
+        MathJax.typesetPromise([matrixInputContainer]);
+      }
+    }
+
+    function setDimensions(r, c) {
+      numRows = r;
+      numCols = c;
+      let newData = [];
+      for (let i = 0; i < r; i++) {
+        let row = [];
+        for (let j = 0; j < c; j++) {
+          if (matrixData[i] && matrixData[i][j] !== undefined) {
+            row.push(matrixData[i][j]);
+          } else {
+            row.push(i === j ? 1 : 0);
+          }
+        }
+        newData.push(row);
+      }
+      matrixData = newData;
+      renderMatrixInputs();
+      analyzeCurrentMatrix();
+    }
+
+    /* =====================================================================
+       2. NUMERICAL ALGORITHMS: ROW REDUCTION & DETERMINANT
+       ===================================================================== */
+    function formatNumber(n) {
+      if (Math.abs(n) < 1e-9) return '0';
+      if (Number.isInteger(n)) return n.toString();
+      return Number(n.toFixed(2)).toString();
+    }
+
+    function matrixToLatex(mat, rCount, cCount, pivotList = []) {
+      let code = '\\begin{bmatrix} ';
+      for (let i = 0; i < rCount; i++) {
+        let rowStrs = [];
+        for (let j = 0; j < cCount; j++) {
+          let numStr = formatNumber(mat[i][j]);
+          // Check if this position is a pivot
+          const isPivot = pivotList.some(p => p.r === i && p.c === j);
+          if (isPivot) {
+            rowStrs.push(`\\mathbf{${numStr}}`);
+          } else {
+            rowStrs.push(numStr);
+          }
+        }
+        code += rowStrs.join(' & ');
+        if (i < rCount - 1) code += ' \\\\ ';
+      }
+      code += ' \\end{bmatrix}';
+      return code;
+    }
+
+    // Determinant for 2x2 and 3x3 (and general via LU / Row swaps)
+    function calculateDeterminant(mat) {
+      const n = mat.length;
+      if (n !== mat[0].length) return null; // non-square
+
+      if (n === 2) {
+        return (mat[0][0] * mat[1][1]) - (mat[0][1] * mat[1][0]);
+      }
+
+      if (n === 3) {
+        return mat[0][0] * (mat[1][1] * mat[2][2] - mat[1][2] * mat[2][1])
+             - mat[0][1] * (mat[1][0] * mat[2][2] - mat[1][2] * mat[2][0])
+             + mat[0][2] * (mat[1][0] * mat[2][1] - mat[1][1] * mat[2][0]);
+      }
+
+      // General n x n via Gaussian Elimination with sign tracking
+      let temp = mat.map(row => [...row]);
+      let det = 1;
+      for (let i = 0; i < n; i++) {
+        let pivotRow = i;
+        for (let k = i + 1; k < n; k++) {
+          if (Math.abs(temp[k][i]) > Math.abs(temp[pivotRow][i])) {
+            pivotRow = k;
+          }
+        }
+        if (Math.abs(temp[pivotRow][i]) < 1e-9) return 0;
+
+        if (pivotRow !== i) {
+          [temp[i], temp[pivotRow]] = [temp[pivotRow], temp[i]];
+          det = -det;
+        }
+
+        det *= temp[i][i];
+        for (let k = i + 1; k < n; k++) {
+          let factor = temp[k][i] / temp[i][i];
+          for (let j = i; j < n; j++) {
+            temp[k][j] -= factor * temp[i][j];
+          }
+        }
+      }
+      return det;
+    }
+
+    // Perform Gauss-Jordan with full ERO tracking
+    function performGaussJordan(rawMat, m, n) {
+      let A = rawMat.map(row => [...row]);
+      let steps = [];
+      let pivotPositions = [];
+      let pivotColumns = [];
+      let lead = 0;
+
+      steps.push({
+        desc: "เมทริกซ์เริ่มต้น $A$:",
+        latex: matrixToLatex(A, m, n)
+      });
+
+      for (let r = 0; r < m; r++) {
+        if (n <= lead) break;
+        let i = r;
+
+        while (Math.abs(A[i][lead]) < 1e-7) {
+          i++;
+          if (m === i) {
+            i = r;
+            lead++;
+            if (n === lead) break;
+          }
+        }
+        if (n === lead) break;
+
+        // Swap rows
+        if (i !== r) {
+          let temp = A[i];
+          A[i] = A[r];
+          A[r] = temp;
+          steps.push({
+            desc: `สลับแถวที่ ${r + 1} กับแถวที่ ${i + 1} ($R_{${r + 1}} \\leftrightarrow R_{${i + 1}}$):`,
+            latex: matrixToLatex(A, m, n)
+          });
+        }
+
+        // Normalize leading pivot to 1
+        let pivotVal = A[r][lead];
+        if (Math.abs(pivotVal - 1) > 1e-7 && Math.abs(pivotVal) > 1e-7) {
+          for (let j = 0; j < n; j++) {
+            A[r][j] /= pivotVal;
+          }
+          steps.push({
+            desc: `ปรับตัวนำแถวที่ ${r + 1} ให้เป็น 1 ($R_{${r + 1}} \\to \\frac{1}{${formatNumber(pivotVal)}} R_{${r + 1}}$):`,
+            latex: matrixToLatex(A, m, n)
+          });
+        }
+
+        // Eliminate column entries in other rows
+        for (let k = 0; k < m; k++) {
+          if (k !== r) {
+            let factor = A[k][lead];
+            if (Math.abs(factor) > 1e-7) {
+              for (let j = 0; j < n; j++) {
+                A[k][j] -= factor * A[r][j];
+              }
+              const sign = factor > 0 ? '-' : '+';
+              const absF = Math.abs(factor);
+              steps.push({
+                desc: `กำจัดสมาชิกแถวที่ ${k + 1} ($R_{${k + 1}} \\to R_{${k + 1}} ${sign} ${formatNumber(absF)} R_{${r + 1}}$):`,
+                latex: matrixToLatex(A, m, n)
+              });
+            }
+          }
+        }
+
+        pivotPositions.push({ r: r, c: lead });
+        pivotColumns.push(lead);
+        lead++;
+      }
+
+      // Cleanup floating precision
+      for (let i = 0; i < m; i++) {
+        for (let j = 0; j < n; j++) {
+          if (Math.abs(A[i][j]) < 1e-7) A[i][j] = 0;
+        }
+      }
+
+      steps.push({
+        desc: "รูปขั้นบันไดแถวลดรูป (RREF) ขั้นสุดท้าย:",
+        latex: matrixToLatex(A, m, n, pivotPositions)
+      });
+
+      return {
+        rrefMatrix: A,
+        pivotPositions: pivotPositions,
+        pivotColumns: pivotColumns,
+        steps: steps,
+        rank: pivotColumns.length
+      };
+    }
+
+    /* =====================================================================
+       3. ANALYSIS & UI UPDATES
+       ===================================================================== */
+    function analyzeCurrentMatrix() {
+      const m = numRows;
+      const k = numCols;
+      const isSquare = (m === k);
+
+      // Perform Gauss-Jordan
+      const gjResult = performGaussJordan(matrixData, m, k);
+      const rank = gjResult.rank;
+      const freeVars = k - rank;
+      const isIndependent = (rank === k);
+
+      // Update Metrics
+      metricK.textContent = k;
+      metricRank.textContent = rank;
+      metricFree.textContent = freeVars;
+      metricFree.className = freeVars > 0 ? 'font-bold text-rose-600 font-mono text-base' : 'font-bold text-emerald-700 font-mono text-base';
+
+      // Pivot Summary
+      if (gjResult.pivotColumns.length > 0) {
+        pivotColsSummary.textContent = `Pivot Columns: ${gjResult.pivotColumns.map(c => c + 1).join(', ')}`;
+      } else {
+        pivotColsSummary.textContent = 'ไม่มีตำแหน่ง Pivot (เมทริกซ์ศูนย์)';
+      }
+
+      // Render RREF Container
+      rrefDisplayContainer.innerHTML = `$$\\operatorname{RREF}(A) = ${matrixToLatex(gjResult.rrefMatrix, m, k, gjResult.pivotPositions)}$$`;
+
+      // Render ERO Steps
+      let stepsHtml = '';
+      gjResult.steps.forEach((step, idx) => {
+        stepsHtml += `
+          <div class="p-2 bg-slate-50 rounded border border-slate-200">
+            <span class="font-medium text-slate-700 block mb-1">${idx + 1}. ${step.desc}</span>
+            <div class="text-center font-mono py-0.5 overflow-x-auto text-xs">$$${step.latex}$$</div>
+          </div>
+        `;
+      });
+      eroStepsContent.innerHTML = stepsHtml;
+
+      // Handle Determinant UI
+      if (isSquare) {
+        determinantCard.classList.remove('opacity-60');
+        detApplicableBadge.textContent = `จัตุรัส ${m}x${k}`;
+        detApplicableBadge.className = 'px-2 py-0.5 rounded text-[10px] font-bold bg-blue-600 text-white';
+
+        const detVal = calculateDeterminant(matrixData);
+        detValueDisplay.textContent = formatNumber(detVal);
+
+        if (Math.abs(detVal) > 1e-6) {
+          detValueDisplay.className = 'font-mono text-2xl font-bold text-emerald-400';
+          detExplanationText.innerHTML = `
+            เนื่องจาก $\\det(A) = ${formatNumber(detVal)} \\neq 0$ สอดคล้องกับเกณฑ์: เวกเตอร์ทั้ง ${k} ตัว <strong>เป็นอิสระเชิงเส้น (LI)</strong>
+          `;
+        } else {
+          detValueDisplay.className = 'font-mono text-2xl font-bold text-rose-400';
+          detExplanationText.innerHTML = `
+            เนื่องจาก $\\det(A) = 0$ สอดคล้องกับเกณฑ์: เวกเตอร์ชุดนี้ <strong>พึ่งพาเชิงเส้น (LD)</strong> มีความซ้ำซ้อนในมิติ
+          `;
+        }
+      } else {
+        detApplicableBadge.textContent = `ไม่เป็นจัตุรัส (${m}x${k})`;
+        detApplicableBadge.className = 'px-2 py-0.5 rounded text-[10px] font-bold bg-amber-600 text-white';
+        detValueDisplay.textContent = 'N/A';
+        detValueDisplay.className = 'font-mono text-2xl font-bold text-slate-400';
+        detExplanationText.innerHTML = `
+          เมทริกซ์ขนาด $${m} \\times ${k}$ ไม่เป็นจัตุรัส <strong>ไม่สามารถคำนวณดีเทอร์มิแนนต์ได้</strong> ต้องใช้การพิจารณาอันดับ $\\operatorname{rank}(A)$ แทน
+        `;
+      }
+
+      // Update Overall Conclusion Banner
+      if (isIndependent) {
+        labConclusionBanner.className = 'p-4 rounded-xl border transition-all space-y-2 bg-emerald-50 border-emerald-300 text-emerald-950';
+        labStatusIcon.className = 'w-3.5 h-3.5 rounded-full bg-emerald-500';
+        labStatusTitle.textContent = 'เวกเตอร์ชุดนี้ "เป็นอิสระเชิงเส้น" (Linearly Independent)';
+        labStatusBadge.className = 'px-2.5 py-1 rounded text-xs font-bold bg-emerald-200 text-emerald-800';
+        labStatusBadge.textContent = 'Linearly Independent (LI)';
+        labStatusReason.innerHTML = `
+          อันดับของเมทริกซ์ $\\operatorname{rank}(A) = ${rank}$ มีค่าเท่ากับจำนวนเวกเตอร์ ($k = ${k}$) พอดี 
+          ทุกคอลัมน์เป็นคอลัมน์ตัวนำ (Pivot Columns ครบ) จึง<strong>ไม่มีตัวแปรเสรี</strong> ระบบสมการ $A\\mathbf{c} = \\mathbf{0}$ มีเพียงคำตอบศูนย์เท่านั้น
+        `;
+      } else {
+        labConclusionBanner.className = 'p-4 rounded-xl border transition-all space-y-2 bg-rose-50 border-rose-300 text-rose-950';
+        labStatusIcon.className = 'w-3.5 h-3.5 rounded-full bg-rose-500';
+        labStatusTitle.textContent = 'เวกเตอร์ชุดนี้ "พึ่งพาเชิงเส้นต่อกัน" (Linearly Dependent)';
+        labStatusBadge.className = 'px-2.5 py-1 rounded text-xs font-bold bg-rose-200 text-rose-800';
+        labStatusBadge.textContent = 'Linearly Dependent (LD)';
+
+        let extraNote = '';
+        if (k > m) {
+          extraNote = ` (เนื่องจากจำนวนคอลัมน์ $k=${k}$ มากกว่าจำนวนแถว $n=${m}$ ทำให้เกิดตัวแปรเสรีอย่างแน่นอน)`;
+        }
+
+        labStatusReason.innerHTML = `
+          อันดับของเมทริกซ์ $\\operatorname{rank}(A) = ${rank}$ มีค่าน้อยกว่าจำนวนเวกเตอร์ ($k = ${k}$) 
+          จึงมีคอลัมน์ที่ไม่มีตำแหน่งตัวนำ เกิด<strong>ตัวแปรเสรีจำนวน ${freeVars} ตัว</strong>${extraNote} ทำให้ระบบ $A\\mathbf{c} = \\mathbf{0}$ มีคำตอบที่ไม่เป็นศูนย์
+        `;
+      }
+
+      if (window.MathJax) {
+        MathJax.typesetPromise([rrefDisplayContainer, eroStepsContent, detExplanationText, labStatusReason]);
+      }
+    }
+
+    /* =====================================================================
+       4. EVENT LISTENERS
+       ===================================================================== */
+    matrixDimPicker.addEventListener('change', (e) => {
+      const [r, c] = e.target.value.split('x').map(Number);
+      setDimensions(r, c);
+    });
+
+    btnAnalyzeMatrix.addEventListener('click', analyzeCurrentMatrix);
+
+    // ERO Drawer toggle
+    btnToggleERODrawer.addEventListener('click', () => {
+      const isHidden = eroStepsContent.classList.toggle('hidden');
+      if (isHidden) {
+        eroDrawerArrow.classList.remove('rotate-180');
+      } else {
+        eroDrawerArrow.classList.add('rotate-180');
+        if (window.MathJax) {
+          MathJax.typesetPromise([eroStepsContent]);
+        }
+      }
+    });
+
+    // Preset Handlers
+    document.getElementById('presetExercise').addEventListener('click', () => {
+      matrixDimPicker.value = '3x3';
+      numRows = 3; numCols = 3;
+      matrixData = presetsMap.exercise.data.map(r => [...r]);
+      renderMatrixInputs();
+      analyzeCurrentMatrix();
+    });
+
+    document.getElementById('presetCoplanar').addEventListener('click', () => {
+      matrixDimPicker.value = '3x3';
+      numRows = 3; numCols = 3;
+      matrixData = presetsMap.coplanar.data.map(r => [...r]);
+      renderMatrixInputs();
+      analyzeCurrentMatrix();
+    });
+
+    document.getElementById('presetRectangularKlessN').addEventListener('click', () => {
+      matrixDimPicker.value = '3x2';
+      numRows = 3; numCols = 2;
+      matrixData = presetsMap.rectKlessN.data.map(r => [...r]);
+      renderMatrixInputs();
+      analyzeCurrentMatrix();
+    });
+
+    document.getElementById('presetMoreColumns').addEventListener('click', () => {
+      matrixDimPicker.value = '2x3';
+      numRows = 2; numCols = 3;
+      matrixData = presetsMap.moreCols.data.map(r => [...r]);
+      renderMatrixInputs();
+      analyzeCurrentMatrix();
+    });
+
+    // Guided Discovery Toggle
+    const btnRevealDiscovery = document.getElementById('btnRevealDiscovery');
+    const discoveryContentBox = document.getElementById('discoveryContentBox');
+    btnRevealDiscovery.addEventListener('click', () => {
+      const isHidden = discoveryContentBox.classList.toggle('hidden');
+      if (!isHidden && window.MathJax) {
+        MathJax.typesetPromise([discoveryContentBox]);
+      }
+    });
+
+    // Practice Quiz Check
+    const btnCheckExerciseQuiz = document.getElementById('btnCheckExerciseQuiz');
+    const exerciseQuizFeedback = document.getElementById('exerciseQuizFeedback');
+    btnCheckExerciseQuiz.addEventListener('click', () => {
+      const selected = document.querySelector('input[name="exerciseCheck"]:checked');
+      if (!selected) {
+        exerciseQuizFeedback.className = 'text-amber-600 font-semibold text-xs sm:text-sm';
+        exerciseQuizFeedback.textContent = 'กรุณาเลือกคำตอบก่อนตรวจคำตอบ';
+        return;
+      }
+
+      if (selected.value === '1') {
+        exerciseQuizFeedback.className = 'text-emerald-700 font-bold text-xs sm:text-sm';
+        exerciseQuizFeedback.textContent = '🎉 ถูกต้องยอดเยี่ยม! เมทริกซ์มี det = -2 ≠ 0 และ rank = 3 จึงเป็นอิสระเชิงเส้น (LI)';
+      } else {
+        exerciseQuizFeedback.className = 'text-rose-600 font-bold text-xs sm:text-sm';
+        exerciseQuizFeedback.textContent = '❌ ยังไม่ถูกต้อง ลองตรวจสอบการหา det(A) หรือสังเกตขั้นตอน ERO ด้านล่าง';
+      }
+    });
+
+    // Full Detailed Solution Accordion
+    const btnToggleFullExerciseSolution = document.getElementById('btnToggleFullExerciseSolution');
+    const dualMethodSolutionBlock = document.getElementById('dualMethodSolutionBlock');
+    const exerciseSolutionBtnText = document.getElementById('exerciseSolutionBtnText');
+    const exerciseSolutionBtnIcon = document.getElementById('exerciseSolutionBtnIcon');
+
+    btnToggleFullExerciseSolution.addEventListener('click', () => {
+      const isHidden = dualMethodSolutionBlock.classList.toggle('hidden');
+      if (isHidden) {
+        exerciseSolutionBtnText.textContent = 'แสดงเฉลยวิธีทำอย่างละเอียดทั้ง 2 วิธี (Step-by-step Solution)';
+        exerciseSolutionBtnIcon.classList.remove('rotate-180');
+      } else {
+        exerciseSolutionBtnText.textContent = 'ซ่อนเฉลยวิธีทำอย่างละเอียด';
+        exerciseSolutionBtnIcon.classList.add('rotate-180');
+        if (window.MathJax) {
+          MathJax.typesetPromise([dualMethodSolutionBlock]);
+        }
+      }
+    });
+
+    /* =====================================================================
+       5. INITIALIZATION
+       ===================================================================== */
+    window.addEventListener('load', () => {
+      renderMatrixInputs();
+      analyzeCurrentMatrix();
+      if (window.MathJax) {
+        MathJax.typesetPromise();
+      }
+    });
+  </script>
+</body>
+</html>
