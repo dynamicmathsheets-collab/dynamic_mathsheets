@@ -1,0 +1,1077 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>เรื่องที่ 1: ความหมายและการดำเนินการขั้นมูลฐานตามแถว</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Sarabun & Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- MathJax for rendering LaTeX -->
+    <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']],
+                displayMath: [['$$', '$$'], ['\\[', '\\]']]
+            },
+            svg: {
+                fontCache: 'global'
+            }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        body {
+            font-family: 'Sarabun', 'Inter', sans-serif;
+            background-color: #f8fafc;
+            color: #1e293b;
+        }
+        .math-font {
+            font-family: 'Inter', serif;
+        }
+        /* Matrix bracket styling */
+        .matrix-bracket {
+            position: relative;
+            padding: 0 10px;
+        }
+        .matrix-bracket::before, .matrix-bracket::after {
+            content: "";
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            width: 8px;
+            border-style: solid;
+            border-color: #334155;
+        }
+        .matrix-bracket::before {
+            left: 0;
+            border-width: 2px 0 2px 2px;
+            border-top-left-radius: 4px;
+            border-bottom-left-radius: 4px;
+        }
+        .matrix-bracket::after {
+            right: 0;
+            border-width: 2px 2px 2px 0;
+            border-top-right-radius: 4px;
+            border-bottom-right-radius: 4px;
+        }
+        input[type=number]::-webkit-inner-spin-button, 
+        input[type=number]::-webkit-outer-spin-button { 
+            -webkit-appearance: none; 
+            margin: 0; 
+        }
+        input[type=number] {
+            -moz-appearance: textfield;
+        }
+    </style>
+</head>
+<body class="min-h-screen">
+
+    <!-- Header Banner -->
+    <header class="bg-gradient-to-r from-blue-900 via-indigo-800 to-blue-950 text-white shadow-lg border-b border-indigo-700">
+        <div class="max-w-6xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <div class="flex flex-wrap items-center justify-between gap-4">
+                <div>
+                    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-blue-500/30 text-blue-200 border border-blue-400/30 mb-2">
+                        <i class="fa-solid fa-graduation-cap"></i> พีชคณิตเชิงเส้น (Linear Algebra)
+                    </span>
+                    <h1 class="text-2xl sm:text-3xl lg:text-4xl font-bold tracking-tight">
+                        เรื่องที่ 1: ความหมายและการดำเนินการขั้นมูลฐานตามแถว
+                    </h1>
+                    <p class="text-indigo-200 mt-1 text-sm sm:text-base font-light">
+                        Elementary Row Operations (EROs) และการแปลงระบบสมการเชิงเส้น
+                    </p>
+                </div>
+                <div class="hidden md:flex items-center gap-2 bg-white/10 backdrop-blur-sm px-4 py-2.5 rounded-xl border border-white/20 text-xs">
+                    <i class="fa-solid fa-calculator text-blue-300 text-lg"></i>
+                    <div>
+                        <div class="font-semibold text-white">แบบจำลองโต้ตอบ</div>
+                        <div class="text-blue-200">Interactive Visualizer Included</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Container Fixed Width Requirement -->
+    <main class="max-w-6xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 space-y-10">
+
+        <!-- 1. วัตถุประสงค์การเรียนรู้ -->
+        <section class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 sm:p-8 transition-all hover:shadow-md">
+            <div class="flex items-center gap-3 border-b border-slate-100 pb-4 mb-5">
+                <div class="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center text-blue-600 font-bold text-lg">
+                    <i class="fa-solid fa-bullseye"></i>
+                </div>
+                <div>
+                    <h2 class="text-xl sm:text-2xl font-bold text-slate-900">1. วัตถุประสงค์การเรียนรู้</h2>
+                    <p class="text-xs sm:text-sm text-slate-500">สิ่งที่นักศึกษาจะได้รับหลังศึกษาจบหัวข้อนี้</p>
+                </div>
+            </div>
+            
+            <div class="bg-blue-50/70 border-l-4 border-blue-600 rounded-r-xl p-4 sm:p-5">
+                <p class="text-slate-800 leading-relaxed font-medium">
+                    เมื่อสิ้นสุดการเรียนรู้นี้ นักศึกษาสามารถ:
+                </p>
+                <ul class="mt-3 space-y-2.5 text-slate-700">
+                    <li class="flex items-start gap-2.5">
+                        <i class="fa-solid fa-circle-check text-emerald-600 mt-1"></i>
+                        <span><strong>อธิบาย</strong> การดำเนินการขั้นมูลฐานตามแถวทั้งสามชนิดได้อย่างถูกต้องชัดเจน</span>
+                    </li>
+                    <li class="flex items-start gap-2.5">
+                        <i class="fa-solid fa-circle-check text-emerald-600 mt-1"></i>
+                        <span><strong>ดำเนินการกับเมทริกซ์</strong> ด้วยการดำเนินการตามแถวได้อย่างแม่นยำและถูกต้องตามหลักคณิตศาสตร์</span>
+                    </li>
+                    <li class="flex items-start gap-2.5">
+                        <i class="fa-solid fa-circle-check text-emerald-600 mt-1"></i>
+                        <span><strong>อธิบายผล</strong> ของการดำเนินการแต่ละชนิดต่อระบบสมการเชิงเส้น และทำความเข้าใจคุณสมบัติการย้อนกลับได้</span>
+                    </li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- 2. เนื้อหาหลัก -->
+        <section class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 sm:p-8 space-y-6">
+            <div class="flex items-center gap-3 border-b border-slate-100 pb-4">
+                <div class="w-10 h-10 rounded-xl bg-indigo-50 flex items-center justify-center text-indigo-600 font-bold text-lg">
+                    <i class="fa-solid fa-book-open"></i>
+                </div>
+                <div>
+                    <h2 class="text-xl sm:text-2xl font-bold text-slate-900">2. เนื้อหาหลัก (Core Content)</h2>
+                    <p class="text-xs sm:text-sm text-slate-500">การดำเนินการขั้นมูลฐานตามแถวและทฤษฎีบทการย้อนกลับ</p>
+                </div>
+            </div>
+
+            <p class="text-slate-700 leading-relaxed">
+                การดำเนินการขั้นมูลฐานตามแถว (<span class="font-semibold text-indigo-900">Elementary Row Operations: EROs</span>) คือการแปลงแถวของเมทริกซ์ที่เป็นเครื่องมือสำคัญในการแก้ระบบสมการเชิงเส้นและการหาเมทริกซ์ผกผัน มีทั้งหมด 3 ชนิด ดังนี้:
+            </p>
+
+            <!-- 3 ERO Cards -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6">
+                <!-- Type 1 -->
+                <div class="p-5 rounded-xl border border-indigo-100 bg-indigo-50/40 hover:bg-indigo-50/80 transition-colors">
+                    <div class="flex items-center justify-between mb-3">
+                        <span class="text-xs font-bold uppercase tracking-wider text-indigo-700 bg-indigo-100 px-2.5 py-1 rounded-md">ชนิดที่ 1</span>
+                        <i class="fa-solid fa-arrows-up-down text-indigo-500"></i>
+                    </div>
+                    <h3 class="font-bold text-slate-900 mb-1">การสลับแถว</h3>
+                    <p class="text-sm text-slate-600 mb-3">สลับตำแหน่งระหว่างสองแถวใดๆ</p>
+                    <div class="bg-white rounded-lg p-3 text-center border border-indigo-100 shadow-xs font-medium text-indigo-900">
+                        $$R_i \leftrightarrow R_j$$
+                    </div>
+                </div>
+
+                <!-- Type 2 -->
+                <div class="p-5 rounded-xl border border-blue-100 bg-blue-50/40 hover:bg-blue-50/80 transition-colors">
+                    <div class="flex items-center justify-between mb-3">
+                        <span class="text-xs font-bold uppercase tracking-wider text-blue-700 bg-blue-100 px-2.5 py-1 rounded-md">ชนิดที่ 2</span>
+                        <i class="fa-solid fa-xmark text-blue-500"></i>
+                    </div>
+                    <h3 class="font-bold text-slate-900 mb-1">การคูณแถวด้วยสเกลาร์</h3>
+                    <p class="text-sm text-slate-600 mb-3">คูณทุกสมาชิกในแถวด้วยค่าคงที่ที่ไม่เป็นศูนย์</p>
+                    <div class="bg-white rounded-lg p-3 text-center border border-blue-100 shadow-xs font-medium text-blue-900">
+                        $$R_i \leftarrow cR_i,\quad c \neq 0$$
+                    </div>
+                </div>
+
+                <!-- Type 3 -->
+                <div class="p-5 rounded-xl border border-emerald-100 bg-emerald-50/40 hover:bg-emerald-50/80 transition-colors">
+                    <div class="flex items-center justify-between mb-3">
+                        <span class="text-xs font-bold uppercase tracking-wider text-emerald-700 bg-emerald-100 px-2.5 py-1 rounded-md">ชนิดที่ 3</span>
+                        <i class="fa-solid fa-plus-minus text-emerald-500"></i>
+                    </div>
+                    <h3 class="font-bold text-slate-900 mb-1">การบวกพหุคูณของแถว</h3>
+                    <p class="text-sm text-slate-600 mb-3">บวกพหุคูณของแถวหนึ่งเข้ากับอีกแถวหนึ่ง</p>
+                    <div class="bg-white rounded-lg p-3 text-center border border-emerald-100 shadow-xs font-medium text-emerald-900">
+                        $$R_i \leftarrow R_i + cR_j,\quad i \neq j$$
+                    </div>
+                </div>
+            </div>
+
+            <!-- Example Section -->
+            <div class="mt-6 bg-slate-50 rounded-xl p-5 sm:p-6 border border-slate-200">
+                <h3 class="font-bold text-slate-800 text-lg mb-3 flex items-center gap-2">
+                    <span class="w-6 h-6 rounded-full bg-indigo-600 text-white flex items-center justify-center text-xs">Ex</span>
+                    ตัวอย่างการดำเนินการ
+                </h3>
+                
+                <div class="flex flex-col md:flex-row items-center justify-center gap-4 py-2">
+                    <div class="text-center">
+                        <p class="text-xs text-slate-500 mb-1">เมทริกซ์เริ่มต้น $A$</p>
+                        <div class="text-lg">
+                            $$A = \begin{bmatrix} 1 & 2 & 3 \\ 2 & 5 & 8 \end{bmatrix}$$
+                        </div>
+                    </div>
+                    
+                    <div class="flex flex-col items-center px-4 py-2 bg-indigo-100/70 rounded-lg text-indigo-900">
+                        <span class="text-xs font-semibold text-indigo-700 uppercase">ดำเนินการ</span>
+                        <span class="font-bold">$$R_2 \leftarrow R_2 - 2R_1$$</span>
+                        <i class="fa-solid fa-arrow-right hidden md:block text-indigo-600 mt-1"></i>
+                        <i class="fa-solid fa-arrow-down md:hidden text-indigo-600 mt-1"></i>
+                    </div>
+
+                    <div class="text-center">
+                        <p class="text-xs text-slate-500 mb-1">เมทริกซ์ผลลัพธ์</p>
+                        <div class="text-lg">
+                            $$\begin{bmatrix} 1 & 2 & 3 \\ 0 & 1 & 2 \end{bmatrix}$$
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-4 p-3.5 bg-amber-50 border-l-4 border-amber-500 rounded-r-lg text-sm text-amber-900 flex items-start gap-2.5">
+                    <i class="fa-solid fa-lightbulb text-amber-600 mt-0.5"></i>
+                    <span>
+                        <strong>ข้อสังเกตสำคัญ:</strong> การดำเนินการนี้เปลี่ยนค่าของสมาชิกในเมทริกซ์ แต่ <em>ไม่ทำลายความสัมพันธ์เชิงเส้นที่สำคัญระหว่างแถว</em> และเซตของคำตอบของระบบสมการเชิงเส้นที่สมนัยกันยังคงเท่าเดิมทุกประการ
+                    </span>
+                </div>
+            </div>
+
+            <!-- Theorem 3.1 -->
+            <div class="bg-gradient-to-r from-indigo-900 to-slate-900 text-white rounded-xl p-6 shadow-md">
+                <div class="flex items-center gap-2 text-indigo-300 text-sm font-semibold uppercase tracking-wider mb-2">
+                    <i class="fa-solid fa-certificate"></i> ทฤษฎีบท 3.1 (Theorem 3.1)
+                </div>
+                <h4 class="text-lg sm:text-xl font-bold mb-3 text-white">
+                    การดำเนินการขั้นมูลฐานตามแถวแต่ละชนิดสามารถย้อนกลับได้ (Invertible)
+                </h4>
+                <p class="text-slate-200 text-sm sm:text-base leading-relaxed">
+                    "การดำเนินการขั้นมูลฐานตามแถวแต่ละชนิดสามารถย้อนกลับได้เสมอด้วยการดำเนินการขั้นมูลฐานชนิดเดียวกัน"
+                </p>
+                <div class="mt-4 pt-4 border-t border-indigo-700/60 flex flex-wrap items-center gap-3 text-sm text-indigo-200">
+                    <span class="font-semibold text-white">ตัวอย่างการย้อนกลับ:</span>
+                    <span>การดำเนินการ $R_2 \leftarrow R_2 - 2R_1$ ย้อนกลับได้ด้วยการบวกกลับคือ $R_2 \leftarrow R_2 + 2R_1$</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- 3. แบบจำลองโต้ตอบ (Interactive Simulator) -->
+        <section class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 sm:p-8">
+            <div class="flex flex-wrap items-center justify-between gap-4 border-b border-slate-100 pb-4 mb-6">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-xl bg-purple-50 flex items-center justify-center text-purple-600 font-bold text-lg">
+                        <i class="fa-solid fa-sliders"></i>
+                    </div>
+                    <div>
+                        <h2 class="text-xl sm:text-2xl font-bold text-slate-900">3. แบบจำลองโต้ตอบ (Interactive Simulator)</h2>
+                        <p class="text-xs sm:text-sm text-slate-500">ทดลองดำเนินการและสังเกตการย้อนกลับของเมทริกซ์แบบไดนามิก</p>
+                    </div>
+                </div>
+
+                <!-- Matrix Dimension Controls -->
+                <div class="flex items-center gap-2 bg-slate-100 p-1.5 rounded-lg text-sm">
+                    <span class="text-slate-600 font-medium px-2">ขนาด:</span>
+                    <button id="btn-size-2x3" onclick="setMatrixDimensions(2, 3)" class="px-3 py-1 rounded bg-white font-medium text-slate-800 shadow-xs hover:bg-slate-50 transition">2 × 3</button>
+                    <button id="btn-size-3x3" onclick="setMatrixDimensions(3, 3)" class="px-3 py-1 rounded text-slate-600 hover:text-slate-900 transition">3 × 3</button>
+                    <button onclick="resetToInitialPreset()" class="px-2.5 py-1 text-slate-500 hover:text-slate-800 ml-1" title="คืนค่าเริ่มต้น">
+                        <i class="fa-solid fa-rotate-left"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Simulator Grid Layout -->
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+                
+                <!-- Left: Controls & Current Matrix Editor -->
+                <div class="lg:col-span-5 space-y-6">
+                    <!-- Matrix Input Grid -->
+                    <div class="bg-slate-50 p-5 rounded-xl border border-slate-200">
+                        <div class="flex justify-between items-center mb-3">
+                            <label class="text-sm font-bold text-slate-700 flex items-center gap-1.5">
+                                <i class="fa-solid fa-table-cells text-indigo-500"></i> กำหนดค่าเมทริกซ์ปัจจุบัน $A$
+                            </label>
+                            <span class="text-xs text-slate-400">(สามารถพิมพ์แก้ไขตัวเลขได้)</span>
+                        </div>
+                        
+                        <div id="matrix-inputs-container" class="flex justify-center p-3">
+                            <!-- Dynamic Matrix Input Rows -->
+                        </div>
+                    </div>
+
+                    <!-- Operation Selector -->
+                    <div class="bg-slate-50 p-5 rounded-xl border border-slate-200 space-y-4">
+                        <label class="text-sm font-bold text-slate-700 block">
+                            <i class="fa-solid fa-wand-magic-sparkles text-indigo-500"></i> เลือกชนิดการดำเนินการตามแถว
+                        </label>
+                        
+                        <!-- Radio Tabs -->
+                        <div class="grid grid-cols-3 gap-2">
+                            <button type="button" onclick="selectOpType(1)" id="op-tab-1" class="py-2 px-1 text-center text-xs sm:text-sm font-semibold rounded-lg border border-indigo-600 bg-indigo-600 text-white transition">
+                                1. สลับแถว
+                            </button>
+                            <button type="button" onclick="selectOpType(2)" id="op-tab-2" class="py-2 px-1 text-center text-xs sm:text-sm font-semibold rounded-lg border border-slate-200 bg-white text-slate-700 hover:bg-slate-100 transition">
+                                2. คูณสเกลาร์
+                            </button>
+                            <button type="button" onclick="selectOpType(3)" id="op-tab-3" class="py-2 px-1 text-center text-xs sm:text-sm font-semibold rounded-lg border border-slate-200 bg-white text-slate-700 hover:bg-slate-100 transition">
+                                3. บวกพหุคูณ
+                            </button>
+                        </div>
+
+                        <!-- Param Area for Type 1 -->
+                        <div id="op-panel-1" class="space-y-3 pt-2">
+                            <div class="text-xs text-slate-600 bg-white p-2.5 rounded border border-slate-200">
+                                การสลับแถว: $R_i \leftrightarrow R_j$
+                            </div>
+                            <div class="flex items-center gap-3">
+                                <div class="flex-1">
+                                    <label class="text-xs font-semibold text-slate-600 block mb-1">แถวที่ $i$</label>
+                                    <select id="type1-row-i" class="w-full bg-white border border-slate-300 rounded-lg p-2 text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
+                                        <!-- row options -->
+                                    </select>
+                                </div>
+                                <div class="pt-5 text-slate-400 font-bold">
+                                    <i class="fa-solid fa-arrows-left-right"></i>
+                                </div>
+                                <div class="flex-1">
+                                    <label class="text-xs font-semibold text-slate-600 block mb-1">แถวที่ $j$</label>
+                                    <select id="type1-row-j" class="w-full bg-white border border-slate-300 rounded-lg p-2 text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
+                                        <!-- row options -->
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Param Area for Type 2 -->
+                        <div id="op-panel-2" class="space-y-3 pt-2 hidden">
+                            <div class="text-xs text-slate-600 bg-white p-2.5 rounded border border-slate-200">
+                                การคูณแถวด้วยสเกลาร์: $R_i \leftarrow c R_i$ โดยที่ $c \neq 0$
+                            </div>
+                            <div class="grid grid-cols-2 gap-3">
+                                <div>
+                                    <label class="text-xs font-semibold text-slate-600 block mb-1">แถวเป้าหมาย $R_i$</label>
+                                    <select id="type2-row-i" class="w-full bg-white border border-slate-300 rounded-lg p-2 text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
+                                        <!-- row options -->
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="text-xs font-semibold text-slate-600 block mb-1">ค่าสเกลาร์ $c$ ($c \neq 0$)</label>
+                                    <input type="number" step="any" id="type2-c" value="2" class="w-full bg-white border border-slate-300 rounded-lg p-2 text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Param Area for Type 3 -->
+                        <div id="op-panel-3" class="space-y-3 pt-2 hidden">
+                            <div class="text-xs text-slate-600 bg-white p-2.5 rounded border border-slate-200">
+                                การบวกพหุคูณ: $R_i \leftarrow R_i + c R_j$ ($i \neq j$)
+                            </div>
+                            <div class="grid grid-cols-3 gap-2">
+                                <div>
+                                    <label class="text-xs font-semibold text-slate-600 block mb-1">เป้าหมาย $R_i$</label>
+                                    <select id="type3-row-i" class="w-full bg-white border border-slate-300 rounded-lg p-2 text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
+                                        <!-- row options -->
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="text-xs font-semibold text-slate-600 block mb-1">ตัวคูณ $c$</label>
+                                    <input type="number" step="any" id="type3-c" value="-2" class="w-full bg-white border border-slate-300 rounded-lg p-2 text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
+                                </div>
+                                <div>
+                                    <label class="text-xs font-semibold text-slate-600 block mb-1">จากแถว $R_j$</label>
+                                    <select id="type3-row-j" class="w-full bg-white border border-slate-300 rounded-lg p-2 text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
+                                        <!-- row options -->
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Error Message Toast inside panel -->
+                        <div id="error-box" class="hidden p-3 bg-rose-50 border border-rose-200 rounded-lg text-xs text-rose-700 flex items-center gap-2">
+                            <i class="fa-solid fa-triangle-exclamation"></i>
+                            <span id="error-message">ข้อผิดพลาด</span>
+                        </div>
+
+                        <!-- Execute Button -->
+                        <button onclick="executeOperation()" class="w-full py-3 bg-indigo-600 hover:bg-indigo-700 active:scale-[0.99] transition text-white font-semibold rounded-xl shadow-md flex items-center justify-center gap-2">
+                            <i class="fa-solid fa-calculator"></i> คำนวณดำเนินการ
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Right: Step-by-Step Matrix Result Display & Inverse Operation -->
+                <div class="lg:col-span-7 flex flex-col justify-between space-y-6">
+                    
+                    <!-- Transformation Display Card -->
+                    <div class="bg-slate-900 text-white p-6 rounded-2xl shadow-md flex-1">
+                        <div class="flex items-center justify-between border-b border-slate-800 pb-3 mb-5">
+                            <h3 class="font-bold text-slate-200 text-sm flex items-center gap-2">
+                                <i class="fa-solid fa-chart-line text-blue-400"></i> ผลลัพธ์การดำเนินการตามแถว
+                            </h3>
+                            <span id="step-badge" class="px-2.5 py-0.5 rounded-full text-xs font-medium bg-indigo-900 text-indigo-300 border border-indigo-700">
+                                พร้อมดำเนินการ
+                            </span>
+                        </div>
+
+                        <!-- Before -> Step -> After Container -->
+                        <div class="flex flex-col sm:flex-row items-center justify-center gap-6 py-4">
+                            <!-- Matrix Before -->
+                            <div class="text-center w-full sm:w-auto">
+                                <span class="text-xs uppercase tracking-wider text-slate-400 font-semibold mb-2 block">ก่อนดำเนินการ</span>
+                                <div id="display-matrix-before" class="flex justify-center p-2 bg-slate-800/80 rounded-xl border border-slate-700/80">
+                                    <!-- Dynamic Math Render -->
+                                </div>
+                            </div>
+
+                            <!-- Operation Arrow and Label -->
+                            <div class="flex flex-col items-center justify-center px-2 py-1 text-center">
+                                <span id="display-operation-label" class="text-sm font-semibold text-emerald-400 bg-emerald-950/80 border border-emerald-800 px-3 py-1.5 rounded-lg mb-1 shadow-inner">
+                                    -
+                                </span>
+                                <i class="fa-solid fa-arrow-right text-indigo-400 text-xl hidden sm:block mt-1"></i>
+                                <i class="fa-solid fa-arrow-down text-indigo-400 text-xl sm:hidden my-1"></i>
+                            </div>
+
+                            <!-- Matrix After -->
+                            <div class="text-center w-full sm:w-auto">
+                                <span class="text-xs uppercase tracking-wider text-slate-400 font-semibold mb-2 block">หลังดำเนินการ</span>
+                                <div id="display-matrix-after" class="flex justify-center p-2 bg-slate-800/80 rounded-xl border border-slate-700/80">
+                                    <!-- Dynamic Math Render -->
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Explanation of what happened -->
+                        <div id="operation-explanation" class="mt-4 p-3 bg-slate-800/50 rounded-lg text-xs text-slate-300 border border-slate-700">
+                            ยังไม่มีการดำเนินการ กรุณาเลือกชนิดและกด "คำนวณดำเนินการ"
+                        </div>
+                    </div>
+
+                    <!-- Inverse Operation Card (ทฤษฎีบท 3.1 Demonstration) -->
+                    <div class="bg-indigo-50/80 border border-indigo-200 rounded-2xl p-5 sm:p-6 transition-all">
+                        <div class="flex flex-wrap items-center justify-between gap-3 mb-3">
+                            <h4 class="font-bold text-indigo-950 text-sm sm:text-base flex items-center gap-2">
+                                <i class="fa-solid fa-rotate-left text-indigo-600"></i> การดำเนินการย้อนกลับ (Inverse Operation)
+                            </h4>
+                            <span class="text-xs font-semibold px-2.5 py-1 rounded bg-indigo-200/70 text-indigo-800">
+                                ตามทฤษฎีบท 3.1
+                            </span>
+                        </div>
+
+                        <p class="text-xs sm:text-sm text-slate-700 mb-3" id="inverse-desc">
+                            เมื่อดำเนินการกับเมทริกซ์ คุณสามารถย้อนกลับไปยังสถานะก่อนหน้าได้เสมอด้วยการดำเนินการชนิดเดียวกัน
+                        </p>
+
+                        <div class="flex flex-col sm:flex-row items-center justify-between gap-3 bg-white p-3.5 rounded-xl border border-indigo-100">
+                            <div class="text-sm font-semibold text-indigo-900" id="inverse-op-math">
+                                $$R_i \leftarrow \dots$$
+                            </div>
+                            <button id="btn-undo-op" onclick="applyInverseOperation()" disabled class="w-full sm:w-auto px-4 py-2 bg-emerald-600 hover:bg-emerald-700 disabled:bg-slate-300 disabled:cursor-not-allowed text-white text-xs sm:text-sm font-medium rounded-lg transition shadow-xs flex items-center justify-center gap-1.5">
+                                <i class="fa-solid fa-backward"></i> ทดสอบดำเนินการย้อนกลับ (Reverse)
+                            </button>
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+        </section>
+
+        <!-- 4. คำถามนำเพื่อค้นพบ (Guided Discovery Questions) -->
+        <section class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 sm:p-8">
+            <div class="flex items-center gap-3 border-b border-slate-100 pb-4 mb-6">
+                <div class="w-10 h-10 rounded-xl bg-amber-50 flex items-center justify-center text-amber-600 font-bold text-lg">
+                    <i class="fa-solid fa-compass"></i>
+                </div>
+                <div>
+                    <h2 class="text-xl sm:text-2xl font-bold text-slate-900">4. คำถามนำเพื่อค้นพบ (Guided Discovery Questions)</h2>
+                    <p class="text-xs sm:text-sm text-slate-500">คลิกที่แต่ละคำถามเพื่อคิดวิเคราะห์และเปิดดูแนวคิดเชิงลึก</p>
+                </div>
+            </div>
+
+            <div class="space-y-4">
+                
+                <!-- Question 1 -->
+                <div class="border border-slate-200 rounded-xl overflow-hidden transition-all">
+                    <button onclick="toggleAccordion('disc-1')" class="w-full flex items-center justify-between p-4 sm:p-5 text-left bg-slate-50/70 hover:bg-slate-100/70 transition">
+                        <span class="font-bold text-slate-800 text-sm sm:text-base flex items-center gap-3">
+                            <span class="w-7 h-7 rounded-full bg-amber-100 text-amber-800 text-xs flex items-center justify-center font-bold flex-shrink-0">1</span>
+                            เหตุใดการคูณแถวด้วยศูนย์ ($c = 0$) จึงไม่ใช่การดำเนินการขั้นมูลฐาน?
+                        </span>
+                        <i id="icon-disc-1" class="fa-solid fa-chevron-down text-slate-400 text-sm transition-transform duration-200"></i>
+                    </button>
+                    <div id="disc-1" class="hidden p-5 bg-white border-t border-slate-200 text-sm text-slate-700 leading-relaxed space-y-2">
+                        <p class="font-medium text-slate-900">
+                            <strong>แนวคิดและเหตุผล:</strong>
+                        </p>
+                        <p>
+                            หากเราคูณแถวใดแถวหนึ่งด้วยศูนย์ ทุกสมาชิกในแถวนั้นจะกลายเป็น $0$ ทั้งหมด ซึ่งสอดคล้องกับสมการ $0 = 0$ 
+                        </p>
+                        <ul class="list-disc list-inside space-y-1 text-slate-600 pl-2">
+                            <li><strong>การสูญเสียข้อมูล:</strong> ข้อมูลความสัมพันธ์เดิมในแถวนั้นจะถูกลบหายไปอย่างถาวร</li>
+                            <li><strong>ไม่สามารถย้อนกลับได้ (Irreversible):</strong> ไม่มีสเกลาร์ตัวใดสามารถคูณ $0$ เพื่อนำแถวเดิมกลับคืนมาได้ ซึ่งขัดแย้งกับคุณสมบัติของ EROs ตามทฤษฎีบท 3.1 ที่ทุกการดำเนินการต้องสามารถย้อนกลับได้</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Question 2 -->
+                <div class="border border-slate-200 rounded-xl overflow-hidden transition-all">
+                    <button onclick="toggleAccordion('disc-2')" class="w-full flex items-center justify-between p-4 sm:p-5 text-left bg-slate-50/70 hover:bg-slate-100/70 transition">
+                        <span class="font-bold text-slate-800 text-sm sm:text-base flex items-center gap-3">
+                            <span class="w-7 h-7 rounded-full bg-amber-100 text-amber-800 text-xs flex items-center justify-center font-bold flex-shrink-0">2</span>
+                            การดำเนินการแต่ละชนิดย้อนกลับได้อย่างไร?
+                        </span>
+                        <i id="icon-disc-2" class="fa-solid fa-chevron-down text-slate-400 text-sm transition-transform duration-200"></i>
+                    </button>
+                    <div id="disc-2" class="hidden p-5 bg-white border-t border-slate-200 text-sm text-slate-700 leading-relaxed space-y-3">
+                        <p>การดำเนินการแต่ละชนิดมีตัวดำเนินการผกผัน (Inverse Operation) ชนิดเดียวกันที่ชัดเจน ดังนี้:</p>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+                            <div class="p-3 bg-slate-50 rounded-lg border border-slate-200">
+                                <span class="font-semibold text-slate-900 block text-xs mb-1">1. สลับแถว</span>
+                                $R_i \leftrightarrow R_j$ ย้อนกลับโดยใช้การสลับแถวเดิมอีกครั้ง:
+                                <div class="mt-1 text-indigo-700 font-mono text-xs">$R_i \leftrightarrow R_j$</div>
+                            </div>
+                            <div class="p-3 bg-slate-50 rounded-lg border border-slate-200">
+                                <span class="font-semibold text-slate-900 block text-xs mb-1">2. คูณด้วยสเกลาร์</span>
+                                $R_i \leftarrow cR_i$ ย้อนกลับโดยการคูณด้วยส่วนกลับ:
+                                <div class="mt-1 text-indigo-700 font-mono text-xs">$R_i \leftarrow \frac{1}{c}R_i$ (เนื่องจาก $c \neq 0$)</div>
+                            </div>
+                            <div class="p-3 bg-slate-50 rounded-lg border border-slate-200">
+                                <span class="font-semibold text-slate-900 block text-xs mb-1">3. บวกพหุคูณ</span>
+                                $R_i \leftarrow R_i + cR_j$ ย้อนกลับโดยการลบพหุคูณเดิมออก:
+                                <div class="mt-1 text-indigo-700 font-mono text-xs">$R_i \leftarrow R_i - cR_j$</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Question 3 -->
+                <div class="border border-slate-200 rounded-xl overflow-hidden transition-all">
+                    <button onclick="toggleAccordion('disc-3')" class="w-full flex items-center justify-between p-4 sm:p-5 text-left bg-slate-50/70 hover:bg-slate-100/70 transition">
+                        <span class="font-bold text-slate-800 text-sm sm:text-base flex items-center gap-3">
+                            <span class="w-7 h-7 rounded-full bg-amber-100 text-amber-800 text-xs flex items-center justify-center font-bold flex-shrink-0">3</span>
+                            การเปลี่ยนแปลงสมาชิกในแถวส่งผลต่อความสัมพันธ์เชิงเส้นระหว่างแถวอย่างไร?
+                        </span>
+                        <i id="icon-disc-3" class="fa-solid fa-chevron-down text-slate-400 text-sm transition-transform duration-200"></i>
+                    </button>
+                    <div id="disc-3" class="hidden p-5 bg-white border-t border-slate-200 text-sm text-slate-700 leading-relaxed space-y-2">
+                        <p>
+                            การดำเนินการขั้นมูลฐานตามแถวเป็นการแปลงที่คงสภาพ (Equivalence-preserving):
+                        </p>
+                        <ul class="list-disc list-inside space-y-1 text-slate-600 pl-2">
+                            <li><strong>ปริภูมิแถว (Row Space) คงเดิม:</strong> การดำเนินการขั้นมูลฐานไม่เปลี่ยน Linear Span ของเวกเตอร์แถว</li>
+                            <li><strong>คำตอบของระบบสมการเหมือนเดิม (Row Equivalence):</strong> หากเมทริกซ์แทนระบบสมการเชิงเส้น $[A|b]$ คำตอบของระบบสมการก่อนและหลังการดำเนินการจะเท่ากันทุกประการ</li>
+                            <li><strong>การพึ่งพาเชิงเส้นไม่ถูกทำลาย:</strong> ความสัมพันธ์ในการรวมเชิงเส้นจะถูกรักษาไว้เสมอ</li>
+                        </ul>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- 5. แบบฝึกหัดสำหรับนักศึกษา -->
+        <section class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 sm:p-8">
+            <div class="flex items-center gap-3 border-b border-slate-100 pb-4 mb-6">
+                <div class="w-10 h-10 rounded-xl bg-emerald-50 flex items-center justify-center text-emerald-600 font-bold text-lg">
+                    <i class="fa-solid fa-pen-ruler"></i>
+                </div>
+                <div>
+                    <h2 class="text-xl sm:text-2xl font-bold text-slate-900">5. แบบฝึกหัดสำหรับนักศึกษา (Exercises)</h2>
+                    <p class="text-xs sm:text-sm text-slate-500">ทบทวนและฝึกฝนความเข้าใจด้วยตนเอง พร้อมเฉลยแนวทางและบทพิสูจน์</p>
+                </div>
+            </div>
+
+            <div class="space-y-6">
+                
+                <!-- Exercise 1 -->
+                <div class="p-5 sm:p-6 rounded-xl border border-slate-200 bg-slate-50/50">
+                    <div class="flex items-start justify-between gap-4">
+                        <div>
+                            <span class="text-xs font-bold text-emerald-700 bg-emerald-100 px-2.5 py-1 rounded">ข้อที่ 1</span>
+                            <h3 class="font-bold text-slate-900 mt-2 text-base sm:text-lg">
+                                ดำเนินการขั้นมูลฐานตามแถวทั้งสามชนิดกับเมทริกซ์ที่กำหนด
+                            </h3>
+                            <p class="text-slate-700 text-sm mt-1">
+                                กำหนดให้ $B = \begin{bmatrix} 2 & 4 & 6 \\ 1 & 1 & 1 \\ 0 & 3 & 5 \end{bmatrix}$ จงหาผลลัพธ์ของลำดับขั้นตอนต่อไปนี้:
+                            </p>
+                            <ol class="list-decimal list-inside text-xs sm:text-sm text-slate-600 mt-2 space-y-1 font-mono pl-2">
+                                <li>$R_1 \leftarrow \frac{1}{2} R_1$</li>
+                                <li>$R_2 \leftarrow R_2 - R_1$</li>
+                                <li>$R_2 \leftrightarrow R_3$</li>
+                            </ol>
+                        </div>
+                    </div>
+
+                    <div class="mt-4 pt-3 border-t border-slate-200">
+                        <button onclick="toggleExercise('ans-1')" class="text-xs sm:text-sm font-semibold text-indigo-600 hover:text-indigo-800 flex items-center gap-1.5 transition">
+                            <i class="fa-regular fa-eye"></i> <span id="label-ans-1">ดูแนวทางคำตอบ</span>
+                        </button>
+                        <div id="ans-1" class="hidden mt-3 p-4 bg-white rounded-lg border border-indigo-100 text-sm space-y-2 text-slate-700">
+                            <p class="font-semibold text-slate-900">ขั้นตอนการคำนวณ:</p>
+                            <div class="text-xs sm:text-sm space-y-2">
+                                <div>1. $R_1 \leftarrow \frac{1}{2}R_1$: $\begin{bmatrix} 1 & 2 & 3 \\ 1 & 1 & 1 \\ 0 & 3 & 5 \end{bmatrix}$</div>
+                                <div>2. $R_2 \leftarrow R_2 - R_1$: $\begin{bmatrix} 1 & 2 & 3 \\ 0 & -1 & -2 \\ 0 & 3 & 5 \end{bmatrix}$</div>
+                                <div>3. $R_2 \leftrightarrow R_3$: $\begin{bmatrix} 1 & 2 & 3 \\ 0 & 3 & 5 \\ 0 & -1 & -2 \end{bmatrix}$</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Exercise 2 -->
+                <div class="p-5 sm:p-6 rounded-xl border border-slate-200 bg-slate-50/50">
+                    <div>
+                        <span class="text-xs font-bold text-emerald-700 bg-emerald-100 px-2.5 py-1 rounded">ข้อที่ 2</span>
+                        <h3 class="font-bold text-slate-900 mt-2 text-base sm:text-lg">
+                            ระบุการดำเนินการย้อนกลับของแต่ละขั้น
+                        </h3>
+                        <p class="text-slate-700 text-sm mt-1">
+                            จากลำดับการดำเนินการในข้อที่ 1 จงระบุการดำเนินการย้อนกลับทีละขั้นตอนตามลำดับ เพื่อแปลงเมทริกซ์ผลลัพธ์สุดท้ายกลับคืนสู่เมทริกซ์ $B$ เริ่มต้น
+                        </p>
+                    </div>
+
+                    <div class="mt-4 pt-3 border-t border-slate-200">
+                        <button onclick="toggleExercise('ans-2')" class="text-xs sm:text-sm font-semibold text-indigo-600 hover:text-indigo-800 flex items-center gap-1.5 transition">
+                            <i class="fa-regular fa-eye"></i> <span id="label-ans-2">ดูแนวทางคำตอบ</span>
+                        </button>
+                        <div id="ans-2" class="hidden mt-3 p-4 bg-white rounded-lg border border-indigo-100 text-sm space-y-2 text-slate-700">
+                            <p class="font-semibold text-slate-900">การดำเนินการย้อนกลับตามลำดับย้อน (Reverse Order):</p>
+                            <ol class="list-decimal list-inside text-xs sm:text-sm text-slate-700 space-y-1.5 pl-2">
+                                <li>ย้อนกลับขั้นตอนที่ 3 ($R_2 \leftrightarrow R_3$): ดำเนินการด้วย <strong>$R_2 \leftrightarrow R_3$</strong></li>
+                                <li>ย้อนกลับขั้นตอนที่ 2 ($R_2 \leftarrow R_2 - R_1$): ดำเนินการด้วย <strong>$R_2 \leftarrow R_2 + R_1$</strong></li>
+                                <li>ย้อนกลับขั้นตอนที่ 1 ($R_1 \leftarrow \frac{1}{2} R_1$): ดำเนินการด้วย <strong>$R_1 \leftarrow 2 R_1$</strong></li>
+                            </ol>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Exercise 3 -->
+                <div class="p-5 sm:p-6 rounded-xl border border-slate-200 bg-slate-50/50">
+                    <div>
+                        <span class="text-xs font-bold text-emerald-700 bg-emerald-100 px-2.5 py-1 rounded">ข้อที่ 3</span>
+                        <h3 class="font-bold text-slate-900 mt-2 text-base sm:text-lg">
+                            พิสูจน์ว่าการดำเนินการแต่ละชนิดสามารถย้อนกลับได้ (ทฤษฎีบท 3.1)
+                        </h3>
+                        <p class="text-slate-700 text-sm mt-1">
+                            จงแสดงการพิสูจน์ทางคณิตศาสตร์อย่างเป็นทางการว่าการดำเนินการชนิดที่ 3: $R_i \leftarrow R_i + cR_j$ ($i \neq j$) สามารถย้อนกลับได้ด้วยการดำเนินการชนิดเดียวกัน
+                        </p>
+                    </div>
+
+                    <div class="mt-4 pt-3 border-t border-slate-200">
+                        <button onclick="toggleExercise('ans-3')" class="text-xs sm:text-sm font-semibold text-indigo-600 hover:text-indigo-800 flex items-center gap-1.5 transition">
+                            <i class="fa-regular fa-eye"></i> <span id="label-ans-3">ดูบทพิสูจน์</span>
+                        </button>
+                        <div id="ans-3" class="hidden mt-3 p-4 bg-white rounded-lg border border-indigo-100 text-sm space-y-3 text-slate-700">
+                            <p class="font-semibold text-slate-900">บทพิสูจน์ (Proof):</p>
+                            <div class="text-slate-700 space-y-2 text-xs sm:text-sm leading-relaxed">
+                                <p>
+                                    สมมติให้เวกเตอร์แถวเริ่มต้นเป็น $r_1, r_2, \dots, r_m$ <br>
+                                    เมื่อกระทำ ERO ชนิดที่ 3 คือ $R_i \leftarrow R_i + cR_j$ แถวที่ $i$ จะกลายเป็น:
+                                    $$r_i' = r_i + c r_j$$ 
+                                    ขณะที่แถวอื่นๆ ทั้งหมดคงเดิม โดยเฉพาะ $r_j' = r_j$ (เนื่องจาก $i \neq j$)
+                                </p>
+                                <p>
+                                    พิจารณาการดำเนินการขั้นมูลฐานตามแถวชนิดที่ 3 ซ้ำอีกครั้งกับเมทริกซ์ใหม่ โดยใช้สเกลาร์เป็น $-c$:
+                                    $$R_i \leftarrow R_i + (-c)R_j$$
+                                    จะได้แถวที่ $i$ ใหม่คือ:
+                                    $$r_i'' = r_i' - c r_j' = (r_i + c r_j) - c r_j = r_i$$
+                                </p>
+                                <p class="text-emerald-800 font-medium">
+                                    $\therefore$ แถวที่ $i$ กลับมาเป็น $r_i$ ดั้งเดิมทุกประการ ทำให้การแปลงนี้มีตัวผกผันที่เป็นการดำเนินการขั้นมูลฐานตามแถวชนิดเดียวกันเสมอ $\blacksquare$
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="text-center text-xs text-slate-400 py-6 border-t border-slate-200">
+            <p>สื่อการเรียนการสอนรายวิชาพีชคณิตเชิงเส้น (Linear Algebra) • พัฒนาเพื่อการเรียนรู้แบบมีส่วนร่วม</p>
+        </footer>
+
+    </main>
+
+    <!-- JavaScript Interactive Simulator Logic -->
+    <script>
+        // State
+        let numRows = 2;
+        let numCols = 3;
+        let currentMatrix = [
+            [1, 2, 3],
+            [2, 5, 8]
+        ];
+        let previousMatrix = null;
+        let currentOpType = 1;
+        let lastInverseAction = null; // store info to reverse
+
+        // Preset initial matrices
+        const presets = {
+            '2x3': [
+                [1, 2, 3],
+                [2, 5, 8]
+            ],
+            '3x3': [
+                [1, 2, 3],
+                [2, 5, 8],
+                [0, 1, 4]
+            ]
+        };
+
+        window.onload = function() {
+            renderMatrixInputs();
+            updateRowDropdowns();
+            renderResultDisplays();
+        };
+
+        function setMatrixDimensions(rows, cols) {
+            numRows = rows;
+            numCols = cols;
+            
+            // update tab buttons style
+            const btn2x3 = document.getElementById('btn-size-2x3');
+            const btn3x3 = document.getElementById('btn-size-3x3');
+            if (rows === 2) {
+                btn2x3.className = "px-3 py-1 rounded bg-white font-medium text-slate-800 shadow-xs hover:bg-slate-50 transition";
+                btn3x3.className = "px-3 py-1 rounded text-slate-600 hover:text-slate-900 transition";
+                currentMatrix = JSON.parse(JSON.stringify(presets['2x3']));
+            } else {
+                btn3x3.className = "px-3 py-1 rounded bg-white font-medium text-slate-800 shadow-xs hover:bg-slate-50 transition";
+                btn2x3.className = "px-3 py-1 rounded text-slate-600 hover:text-slate-900 transition";
+                currentMatrix = JSON.parse(JSON.stringify(presets['3x3']));
+            }
+
+            previousMatrix = null;
+            lastInverseAction = null;
+            document.getElementById('btn-undo-op').disabled = true;
+            document.getElementById('step-badge').innerText = "พร้อมดำเนินการ";
+            document.getElementById('display-operation-label').innerText = "-";
+            document.getElementById('operation-explanation').innerText = "เปลี่ยนขนาดเมทริกซ์เรียบร้อย";
+            document.getElementById('inverse-op-math').innerHTML = "$$R_i \\leftarrow \\dots$$";
+
+            renderMatrixInputs();
+            updateRowDropdowns();
+            renderResultDisplays();
+            triggerMathJax();
+        }
+
+        function resetToInitialPreset() {
+            setMatrixDimensions(numRows, numCols);
+        }
+
+        // Render editable matrix input boxes
+        function renderMatrixInputs() {
+            const container = document.getElementById('matrix-inputs-container');
+            container.innerHTML = '';
+
+            const wrapper = document.createElement('div');
+            wrapper.className = "matrix-bracket flex flex-col gap-2 p-2";
+
+            for (let r = 0; r < numRows; r++) {
+                const rowDiv = document.createElement('div');
+                rowDiv.className = "flex items-center gap-2";
+
+                const label = document.createElement('span');
+                label.className = "text-xs font-semibold text-slate-400 w-5 text-right";
+                label.innerText = `R${r+1}`;
+                rowDiv.appendChild(label);
+
+                for (let c = 0; c < numCols; c++) {
+                    const input = document.createElement('input');
+                    input.type = "number";
+                    input.step = "any";
+                    input.value = currentMatrix[r][c];
+                    input.dataset.row = r;
+                    input.dataset.col = c;
+                    input.className = "w-12 h-9 text-center bg-white border border-slate-300 rounded font-semibold text-slate-800 focus:border-indigo-600 focus:ring-1 focus:ring-indigo-600 outline-none text-sm transition";
+                    input.oninput = function() {
+                        const val = parseFloat(this.value);
+                        currentMatrix[r][c] = isNaN(val) ? 0 : val;
+                        renderResultDisplays();
+                    };
+                    rowDiv.appendChild(input);
+                }
+                wrapper.appendChild(rowDiv);
+            }
+            container.appendChild(wrapper);
+        }
+
+        function syncInputValuesFromMatrix() {
+            const inputs = document.querySelectorAll('#matrix-inputs-container input');
+            inputs.forEach(input => {
+                const r = parseInt(input.dataset.row);
+                const c = parseInt(input.dataset.col);
+                if (currentMatrix[r] && currentMatrix[r][c] !== undefined) {
+                    input.value = Number(currentMatrix[r][c].toFixed(3));
+                }
+            });
+        }
+
+        function updateRowDropdowns() {
+            const selects = [
+                'type1-row-i', 'type1-row-j',
+                'type2-row-i',
+                'type3-row-i', 'type3-row-j'
+            ];
+
+            selects.forEach(id => {
+                const el = document.getElementById(id);
+                if (!el) return;
+                const prevVal = el.value;
+                el.innerHTML = '';
+                for (let i = 1; i <= numRows; i++) {
+                    const opt = document.createElement('option');
+                    opt.value = i;
+                    opt.text = `แถวที่ ${i} (R${i})`;
+                    el.appendChild(opt);
+                }
+                // default selections
+                if (id === 'type1-row-j' && numRows >= 2) el.value = 2;
+                else if (id === 'type3-row-i' && numRows >= 2) el.value = 2;
+                else if (id === 'type3-row-j') el.value = 1;
+                else if (prevVal && prevVal <= numRows) el.value = prevVal;
+            });
+        }
+
+        function selectOpType(type) {
+            currentOpType = type;
+            [1, 2, 3].forEach(t => {
+                const tab = document.getElementById(`op-tab-${t}`);
+                const panel = document.getElementById(`op-panel-${t}`);
+                if (t === type) {
+                    tab.className = "py-2 px-1 text-center text-xs sm:text-sm font-semibold rounded-lg border border-indigo-600 bg-indigo-600 text-white transition";
+                    panel.classList.remove('hidden');
+                } else {
+                    tab.className = "py-2 px-1 text-center text-xs sm:text-sm font-semibold rounded-lg border border-slate-200 bg-white text-slate-700 hover:bg-slate-100 transition";
+                    panel.classList.add('hidden');
+                }
+            });
+            hideError();
+        }
+
+        function showError(msg) {
+            const errBox = document.getElementById('error-box');
+            document.getElementById('error-message').innerText = msg;
+            errBox.classList.remove('hidden');
+        }
+
+        function hideError() {
+            document.getElementById('error-box').classList.add('hidden');
+        }
+
+        // Format a LaTeX matrix
+        function matrixToLatex(mat) {
+            if (!mat || mat.length === 0) return "\\begin{bmatrix}\\end{bmatrix}";
+            let latex = "\\begin{bmatrix}";
+            for (let r = 0; r < mat.length; r++) {
+                const rowStr = mat[r].map(v => {
+                    const rounded = Math.round(v * 1000) / 1000;
+                    return rounded;
+                }).join(" & ");
+                latex += rowStr;
+                if (r < mat.length - 1) latex += " \\\\ ";
+            }
+            latex += "\\end{bmatrix}";
+            return latex;
+        }
+
+        function triggerMathJax() {
+            if (window.MathJax && window.MathJax.typesetPromise) {
+                window.MathJax.typesetPromise().catch(err => console.error(err));
+            }
+        }
+
+        function renderResultDisplays() {
+            const beforeContainer = document.getElementById('display-matrix-before');
+            const afterContainer = document.getElementById('display-matrix-after');
+
+            const beforeMat = previousMatrix || currentMatrix;
+            const afterMat = currentMatrix;
+
+            beforeContainer.innerHTML = `$$${matrixToLatex(beforeMat)}$$`;
+            afterContainer.innerHTML = `$$${matrixToLatex(afterMat)}$$`;
+
+            triggerMathJax();
+        }
+
+        // Calculation execution
+        function executeOperation() {
+            hideError();
+            
+            // Deep copy current matrix before modification
+            const before = JSON.parse(JSON.stringify(currentMatrix));
+            const after = JSON.parse(JSON.stringify(currentMatrix));
+
+            let operationSymbol = "";
+            let explanation = "";
+            let inverseSymbol = "";
+            let inverseActionFunc = null;
+
+            if (currentOpType === 1) {
+                // Type 1: Swap
+                const i = parseInt(document.getElementById('type1-row-i').value) - 1;
+                const j = parseInt(document.getElementById('type1-row-j').value) - 1;
+
+                if (i === j) {
+                    showError("กรุณาเลือกสองแถวที่ต่างกันสำหรับการสลับแถว");
+                    return;
+                }
+
+                const temp = after[i];
+                after[i] = after[j];
+                after[j] = temp;
+
+                operationSymbol = `R_${i+1} \\leftrightarrow R_${j+1}`;
+                explanation = `สลับตำแหน่งระหว่างแถวที่ ${i+1} และแถวที่ ${j+1}`;
+                inverseSymbol = `$$R_${i+1} \\leftrightarrow R_${j+1}$$`;
+
+                inverseActionFunc = () => {
+                    executeSpecificOperation(1, { i, j });
+                };
+
+            } else if (currentOpType === 2) {
+                // Type 2: Scalar Mult
+                const i = parseInt(document.getElementById('type2-row-i').value) - 1;
+                const cVal = parseFloat(document.getElementById('type2-c').value);
+
+                if (isNaN(cVal)) {
+                    showError("กรุณากรอกค่าคงที่สเกลาร์ c ให้ถูกต้อง");
+                    return;
+                }
+                if (cVal === 0) {
+                    showError("ตามนิยาม EROs ชนิดที่ 2: สเกลาร์ c ต้องไม่เท่ากับ 0 (c ≠ 0)");
+                    return;
+                }
+
+                for (let k = 0; k < numCols; k++) {
+                    after[i][k] = after[i][k] * cVal;
+                }
+
+                const cText = cVal === -1 ? "-" : (cVal === 1 ? "" : cVal);
+                operationSymbol = `R_${i+1} \\leftarrow ${cText} R_${i+1}`;
+                explanation = `คูณทุกสมาชิกในแถวที่ ${i+1} ด้วยสเกลาร์ c = ${cVal}`;
+
+                const invC = 1 / cVal;
+                const invCRounded = Math.round(invC * 1000) / 1000;
+                inverseSymbol = `$$R_${i+1} \\leftarrow \\left(\\frac{1}{${cVal}}\\right) R_${i+1} = ${invCRounded} R_${i+1}$$`;
+
+                inverseActionFunc = () => {
+                    executeSpecificOperation(2, { i, c: 1 / cVal });
+                };
+
+            } else if (currentOpType === 3) {
+                // Type 3: Add multiple
+                const i = parseInt(document.getElementById('type3-row-i').value) - 1;
+                const j = parseInt(document.getElementById('type3-row-j').value) - 1;
+                const cVal = parseFloat(document.getElementById('type3-c').value);
+
+                if (isNaN(cVal)) {
+                    showError("กรุณากรอกค่าพหุคูณ c");
+                    return;
+                }
+                if (i === j) {
+                    showError("แถวเป้าหมายและแถวต้นทางต้องไม่ใช่แถวเดียวกัน (i ≠ j)");
+                    return;
+                }
+
+                for (let k = 0; k < numCols; k++) {
+                    after[i][k] = after[i][k] + (cVal * after[j][k]);
+                }
+
+                const cFormatted = cVal > 0 ? `+ ${cVal}` : `- ${Math.abs(cVal)}`;
+                operationSymbol = `R_${i+1} \\leftarrow R_${i+1} ${cFormatted}R_${j+1}`;
+                explanation = `บวกแถวที่ ${i+1} ด้วย ${cVal} เท่าของแถวที่ ${j+1}`;
+
+                const invCFormatted = (-cVal) > 0 ? `+ ${Math.abs(cVal)}` : `- ${Math.abs(cVal)}`;
+                inverseSymbol = `$$R_${i+1} \\leftarrow R_${i+1} ${invCFormatted}R_${j+1}$$`;
+
+                inverseActionFunc = () => {
+                    executeSpecificOperation(3, { i, j, c: -cVal });
+                };
+            }
+
+            // Update App State
+            previousMatrix = before;
+            currentMatrix = after;
+            lastInverseAction = inverseActionFunc;
+
+            // Update UI
+            document.getElementById('step-badge').innerText = "คำนวณสำเร็จ";
+            document.getElementById('display-operation-label').innerHTML = `$$${operationSymbol}$$`;
+            document.getElementById('operation-explanation').innerText = explanation;
+            
+            document.getElementById('inverse-op-math').innerHTML = inverseSymbol;
+            document.getElementById('btn-undo-op').disabled = false;
+
+            syncInputValuesFromMatrix();
+            renderResultDisplays();
+        }
+
+        // Direct helper to perform inverse
+        function executeSpecificOperation(type, params) {
+            const before = JSON.parse(JSON.stringify(currentMatrix));
+            const after = JSON.parse(JSON.stringify(currentMatrix));
+            let opSym = "";
+
+            if (type === 1) {
+                const temp = after[params.i];
+                after[params.i] = after[params.j];
+                after[params.j] = temp;
+                opSym = `R_${params.i+1} \\leftrightarrow R_${params.j+1}`;
+            } else if (type === 2) {
+                for (let k = 0; k < numCols; k++) {
+                    after[params.i][k] = after[params.i][k] * params.c;
+                }
+                const cRounded = Math.round(params.c * 1000) / 1000;
+                opSym = `R_${params.i+1} \\leftarrow ${cRounded} R_${params.i+1}`;
+            } else if (type === 3) {
+                for (let k = 0; k < numCols; k++) {
+                    after[params.i][k] = after[params.i][k] + (params.c * after[params.j][k]);
+                }
+                const sign = params.c > 0 ? `+ ${Math.round(params.c*1000)/1000}` : `- ${Math.round(Math.abs(params.c)*1000)/1000}`;
+                opSym = `R_${params.i+1} \\leftarrow R_${params.i+1} ${sign} R_${params.j+1}`;
+            }
+
+            previousMatrix = before;
+            currentMatrix = after;
+
+            document.getElementById('display-operation-label').innerHTML = `$$${opSym}$$`;
+            document.getElementById('operation-explanation').innerText = "ทำการย้อนกลับคืนสู่สถานะก่อนหน้าสำเร็จ";
+            document.getElementById('step-badge').innerText = "ย้อนกลับแล้ว";
+            
+            // disable until another forward step is taken
+            document.getElementById('btn-undo-op').disabled = true;
+
+            syncInputValuesFromMatrix();
+            renderResultDisplays();
+        }
+
+        function applyInverseOperation() {
+            if (lastInverseAction) {
+                lastInverseAction();
+                lastInverseAction = null;
+            }
+        }
+
+        // UI Helpers
+        function toggleAccordion(id) {
+            const content = document.getElementById(id);
+            const icon = document.getElementById(`icon-${id}`);
+            if (content.classList.contains('hidden')) {
+                content.classList.remove('hidden');
+                icon.classList.add('rotate-180');
+            } else {
+                content.classList.add('hidden');
+                icon.classList.remove('rotate-180');
+            }
+        }
+
+        function toggleExercise(id) {
+            const el = document.getElementById(id);
+            const label = document.getElementById(`label-${id}`);
+            if (el.classList.contains('hidden')) {
+                el.classList.remove('hidden');
+                label.innerText = "ซ่อนแนวทางคำตอบ";
+                triggerMathJax();
+            } else {
+                el.classList.add('hidden');
+                label.innerText = id === 'ans-3' ? "ดูบทพิสูจน์" : "ดูแนวทางคำตอบ";
+            }
+        }
+    </script>
+</body>
+</html>

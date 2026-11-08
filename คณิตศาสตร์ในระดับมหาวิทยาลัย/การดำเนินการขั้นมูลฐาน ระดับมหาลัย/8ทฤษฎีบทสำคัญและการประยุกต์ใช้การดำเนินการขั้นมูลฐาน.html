@@ -1,0 +1,864 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>เรื่องที่ 8: ทฤษฎีบทสำคัญและการประยุกต์ใช้การดำเนินการขั้นมูลฐาน</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Sarabun, Prompt & Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Prompt:wght@400;500;600;700&family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- MathJax v3 -->
+    <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']],
+                displayMath: [['$$', '$$'], ['\\[', '\\]']]
+            },
+            svg: {
+                fontCache: 'global'
+            }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        body {
+            font-family: 'Sarabun', 'Inter', sans-serif;
+            background-color: #f8fafc;
+            color: #1e293b;
+        }
+        h1, h2, h3, h4, .font-heading {
+            font-family: 'Prompt', 'Inter', sans-serif;
+        }
+        .math-font {
+            font-family: 'Inter', serif;
+        }
+        .matrix-bracket {
+            position: relative;
+            padding: 4px 10px;
+        }
+        .matrix-bracket::before, .matrix-bracket::after {
+            content: "";
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            width: 8px;
+            border-style: solid;
+            border-color: #334155;
+        }
+        .matrix-bracket::before {
+            left: 0;
+            border-width: 2px 0 2px 2px;
+            border-top-left-radius: 6px;
+            border-bottom-left-radius: 6px;
+        }
+        .matrix-bracket::after {
+            right: 0;
+            border-width: 2px 2px 2px 0;
+            border-top-right-radius: 6px;
+            border-bottom-right-radius: 6px;
+        }
+        input[type=number]::-webkit-inner-spin-button, 
+        input[type=number]::-webkit-outer-spin-button { 
+            -webkit-appearance: none; 
+            margin: 0; 
+        }
+        input[type=number] {
+            -moz-appearance: textfield;
+        }
+    </style>
+</head>
+<body class="min-h-screen">
+
+    <!-- Header Banner -->
+    <header class="bg-gradient-to-r from-slate-950 via-indigo-950 to-slate-900 text-white shadow-lg border-b border-indigo-800/40">
+        <div class="max-w-6xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <div class="flex flex-wrap items-center justify-between gap-4">
+                <div>
+                    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-indigo-500/30 text-indigo-200 border border-indigo-400/30 mb-2">
+                        <i class="fa-solid fa-graduation-cap"></i> บทที่ 3 • เรื่องที่ 8 (บทสรุปและทฤษฎีบทหลัก)
+                    </span>
+                    <h1 class="text-2xl sm:text-3xl lg:text-4xl font-bold tracking-tight">
+                        เรื่องที่ 8: ทฤษฎีบทสำคัญและการประยุกต์ใช้การดำเนินการขั้นมูลฐาน
+                    </h1>
+                    <p class="text-indigo-200 mt-1 text-sm sm:text-base font-light">
+                        Fundamental Theorems & Applications: เอกลักษณ์ของ RREF, เมทริกซ์ผกผัน และเกณฑ์ Rouché–Capelli
+                    </p>
+                </div>
+                <div class="hidden md:flex items-center gap-3 bg-white/10 backdrop-blur-sm px-4 py-2.5 rounded-xl border border-white/20 text-xs">
+                    <div class="w-10 h-10 rounded-lg bg-emerald-500/20 text-emerald-300 flex items-center justify-center font-bold text-lg">
+                        <i class="fa-solid fa-scale-balanced"></i>
+                    </div>
+                    <div>
+                        <div class="font-semibold text-white">เครื่องมือวิเคราะห์ทฤษฎีบท</div>
+                        <div class="text-emerald-200">Interactive Theorem Analyzer</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Container: Fixed width constraint max-w-6xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 -->
+    <main class="max-w-6xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 space-y-10">
+
+        <!-- 1. วัตถุประสงค์การเรียนรู้ -->
+        <section class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 sm:p-8 transition-all hover:shadow-md">
+            <div class="flex items-center gap-3 border-b border-slate-100 pb-4 mb-5">
+                <div class="w-10 h-10 rounded-xl bg-indigo-50 flex items-center justify-center text-indigo-600 font-bold text-lg">
+                    <i class="fa-solid fa-bullseye"></i>
+                </div>
+                <div>
+                    <h2 class="text-xl sm:text-2xl font-bold text-slate-900">1. วัตถุประสงค์การเรียนรู้</h2>
+                    <p class="text-xs sm:text-sm text-slate-500">ผลการเรียนรู้ที่คาดหวังประจำหัวข้อที่ 8</p>
+                </div>
+            </div>
+            
+            <div class="bg-gradient-to-r from-indigo-50/90 to-emerald-50/60 border-l-4 border-indigo-600 rounded-r-xl p-5">
+                <p class="text-slate-800 leading-relaxed font-semibold mb-3">
+                    เมื่อศึกษาจบหัวข้อนี้ นักศึกษาสามารถ:
+                </p>
+                <ul class="space-y-3 text-slate-700 text-sm sm:text-base">
+                    <li class="flex items-start gap-3">
+                        <span class="w-6 h-6 rounded-full bg-indigo-100 text-indigo-700 flex items-center justify-center text-xs font-bold mt-0.5 flex-shrink-0">
+                            <i class="fa-solid fa-check"></i>
+                        </span>
+                        <span><strong>ประยุกต์ใช้การดำเนินการขั้นมูลฐานตามแถว (EROs)</strong> ในการพิสูจน์สมบัติสำคัญของเมทริกซ์และตรวจสอบความสมมูลตามแถวได้อย่างเป็นทางการ</span>
+                    </li>
+                    <li class="flex items-start gap-3">
+                        <span class="w-6 h-6 rounded-full bg-indigo-100 text-indigo-700 flex items-center justify-center text-xs font-bold mt-0.5 flex-shrink-0">
+                            <i class="fa-solid fa-check"></i>
+                        </span>
+                        <span><strong>ใช้เกณฑ์พิจารณาการผกผันได้ (Invertibility Criterion)</strong> เพื่อตรวจสอบว่าเมทริกซ์จัตุรัสหาตัวผกผันได้หรือไม่ พร้อมหา $A^{-1}$ ผ่านการขยาย $[A \mid I_n]$</span>
+                    </li>
+                    <li class="flex items-start gap-3">
+                        <span class="w-6 h-6 rounded-full bg-emerald-100 text-emerald-800 flex items-center justify-center text-xs font-bold mt-0.5 flex-shrink-0">
+                            <i class="fa-solid fa-check"></i>
+                        </span>
+                        <span><strong>วิเคราะห์ระบบสมการเชิงเส้น</strong> โดยเปรียบเทียบอันดับของเมทริกซ์สัมประสิทธิ์กับเมทริกซ์แต่งเติม ($\operatorname{rank}(A)$ vs $\operatorname{rank}([A \mid \mathbf{b}])$) และเชื่อมโยงความรู้เข้ากับบทที่ 2 และบทที่ 3 อย่างบูรณาการ</span>
+                    </li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- 2. เนื้อหาหลัก -->
+        <section class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 sm:p-8 space-y-7">
+            <div class="flex items-center gap-3 border-b border-slate-100 pb-4">
+                <div class="w-10 h-10 rounded-xl bg-purple-50 flex items-center justify-center text-purple-600 font-bold text-lg">
+                    <i class="fa-solid fa-landmark"></i>
+                </div>
+                <div>
+                    <h2 class="text-xl sm:text-2xl font-bold text-slate-900">2. เนื้อหาหลัก (Core Mathematical Theorems)</h2>
+                    <p class="text-xs sm:text-sm text-slate-500">สามเสาหลักทฤษฎีบทการแปลงเมทริกซ์และการประยุกต์</p>
+                </div>
+            </div>
+
+            <!-- Card 1: ทฤษฎีบท 3.5 -->
+            <div class="p-6 rounded-2xl border border-indigo-200 bg-gradient-to-br from-indigo-50/60 to-slate-50 space-y-3">
+                <div class="flex items-center justify-between">
+                    <span class="px-3 py-1 rounded-full text-xs font-bold bg-indigo-200/80 text-indigo-900 uppercase tracking-wider">
+                        ทฤษฎีบท 3.5 (Theorem 3.5)
+                    </span>
+                    <i class="fa-solid fa-fingerprint text-indigo-500 text-xl"></i>
+                </div>
+                <h3 class="text-lg sm:text-xl font-bold text-slate-900">
+                    ความเป็นเอกลักษณ์ของรูปขั้นบันไดลดรูป (Uniqueness of RREF)
+                </h3>
+                <p class="text-sm sm:text-base text-slate-700 leading-relaxed">
+                    "เมทริกซ์ทุกเมทริกซ์มีรูปขั้นบันไดลดรูป (RREF) ที่กำหนดได้ <strong>เพียงรูปเดียวเท่านั้น (Unique)</strong> แม้ลำดับการดำเนินการขั้นมูลฐานที่เลือกใช้ในการแปลงจะแตกต่างกัน"
+                </p>
+                <div class="p-4 bg-white rounded-xl border border-indigo-100 text-xs sm:text-sm text-slate-600 space-y-2">
+                    <div class="font-bold text-indigo-950 flex items-center gap-2">
+                        <i class="fa-solid fa-compass-drafting text-indigo-600"></i> แนวทางการพิสูจน์เชิงทฤษฎี:
+                    </div>
+                    <p class="leading-relaxed">
+                        การพิสูจน์ทฤษฎีบทนี้อาศัย <strong>ความเป็นอิสระเชิงเส้นของเวกเตอร์คอลัมน์</strong>: ถ้า $A \sim R_1$ และ $A \sim R_2$ โดยที่ทั้งคู่เป็น RREF ระบบสมการเอกพันธุ์ $A\mathbf{x} = \mathbf{0}$, $R_1\mathbf{x} = \mathbf{0}$, และ $R_2\mathbf{x} = \mathbf{0}$ ต้องมีเซตคำตอบเดียวกันทุกประการ ความสัมพันธ์เชิงเส้นของคอลัมน์ใน $R_1$ และ $R_2$ จึงต้องเหมือนกันทุกคอลัมน์ ซึ่งบังคับให้ตำแหน่งหลัก (Pivot positions) และสัมประสิทธิ์ทุกตำแหน่งต้องเท่ากันทุกประการ <em>(การพิสูจน์ต้องกระทำอย่างเป็นระบบ ไม่เพียงอาศัยการสุ่มทดลองตัวเลข)</em>
+                    </p>
+                </div>
+            </div>
+
+            <!-- Card 2: ทฤษฎีบท 3.6 -->
+            <div class="p-6 rounded-2xl border border-emerald-200 bg-gradient-to-br from-emerald-50/60 to-slate-50 space-y-3">
+                <div class="flex items-center justify-between">
+                    <span class="px-3 py-1 rounded-full text-xs font-bold bg-emerald-200/80 text-emerald-900 uppercase tracking-wider">
+                        ทฤษฎีบท 3.6 (Theorem 3.6)
+                    </span>
+                    <i class="fa-solid fa-arrows-spin text-emerald-600 text-xl"></i>
+                </div>
+                <h3 class="text-lg sm:text-xl font-bold text-slate-900">
+                    เกณฑ์พิจารณาเมทริกซ์ผกผัน (Invertibility Criterion)
+                </h3>
+                <p class="text-sm sm:text-base text-slate-700 leading-relaxed">
+                    "สำหรับเมทริกซ์จัตุรัส $A$ ขนาด $n \times n$ ใดๆ เมทริกซ์ $A$ จะผกผันได้ (Invertible / Non-singular) ก็ต่อเมื่อรูปขั้นบันไดลดรูปของ $A$ คือเมทริกซ์เอกลักษณ์ $I_n$"
+                </p>
+                <div class="p-3 bg-white rounded-lg border border-emerald-100 text-center font-bold text-emerald-950 text-sm sm:text-base">
+                    $$A \text{ ผกผันได้} \iff \operatorname{rref}(A) = I_n \iff \operatorname{rank}(A) = n \text{ (มีตำแหน่งหลักครบทุกคอลัมน์)}$$
+                </div>
+                <div class="p-3.5 bg-emerald-950/5 rounded-xl border border-emerald-200/70 text-xs text-slate-700 leading-relaxed">
+                    <strong>อัลกอริทึมการหาตัวผกผัน:</strong> สร้างเมทริกซ์คู่ขนาน $[A \mid I_n]$ แล้วดำเนินการขั้นมูลฐานตามแถวจนด้านซ้ายกลายเป็น $I_n$ ด้านขวาจะกลายเป็น $A^{-1}$ โดยอัตโนมัติ:
+                    <div class="text-center font-bold font-mono text-indigo-900 text-xs sm:text-sm my-1">
+                        $$[A \mid I_n] \xrightarrow{\text{EROs}} [I_n \mid A^{-1}]$$
+                    </div>
+                    หากระหว่างการดำเนินการพบแถวศูนย์ในฝั่งซ้าย แสดงว่า $A$ มีตำแหน่งหลักไม่ครบ $n$ คอลัมน์ และ <strong>ไม่มีตัวผกผัน ($A$ เป็น Singular Matrix)</strong> ทันที
+                </div>
+            </div>
+
+            <!-- Card 3: ทฤษฎีบท 3.7 -->
+            <div class="p-6 rounded-2xl border border-amber-200 bg-gradient-to-br from-amber-50/60 to-slate-50 space-y-4">
+                <div class="flex items-center justify-between">
+                    <span class="px-3 py-1 rounded-full text-xs font-bold bg-amber-200/80 text-amber-900 uppercase tracking-wider">
+                        ทฤษฎีบท 3.7 (Theorem 3.7)
+                    </span>
+                    <i class="fa-solid fa-diagram-project text-amber-600 text-xl"></i>
+                </div>
+                <h3 class="text-lg sm:text-xl font-bold text-slate-900">
+                    ความสัมพันธ์ระหว่างอันดับกับระบบสมการ (Rouché–Capelli Theorem)
+                </h3>
+                <p class="text-sm sm:text-base text-slate-700 leading-relaxed">
+                    "ระบบสมการเชิงเส้น $A\mathbf{x} = \mathbf{b}$ ที่มีตัวแปร $n$ ตัว จะมีคำตอบ (Consistent) ก็ต่อเมื่ออันดับของเมทริกซ์สัมประสิทธิ์เท่ากับอันดับของเมทริกซ์แต่งเติม"
+                </p>
+                <div class="p-3 bg-white rounded-lg border border-amber-200 text-center font-bold text-amber-950 text-sm sm:text-base">
+                    $$\text{ระบบมีคำตอบ (Consistent)} \iff \operatorname{rank}(A) = \operatorname{rank}([A \mid \mathbf{b}])$$
+                </div>
+
+                <!-- Tree classification -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs sm:text-sm">
+                    <div class="p-4 bg-white rounded-xl border border-slate-200 space-y-2">
+                        <div class="font-bold text-rose-700 flex items-center gap-1.5">
+                            <i class="fa-solid fa-circle-xmark"></i> กรณีไม่มีคำตอบ (Inconsistent):
+                        </div>
+                        <p class="text-slate-600">
+                            $\operatorname{rank}(A) < \operatorname{rank}([A \mid \mathbf{b}])$ เกิดแถวขัดแย้งในรูป $[0 \ 0 \ \dots \ 0 \mid c]$ เมื่อ $c \neq 0$
+                        </p>
+                    </div>
+                    <div class="p-4 bg-white rounded-xl border border-slate-200 space-y-2">
+                        <div class="font-bold text-emerald-700 flex items-center gap-1.5">
+                            <i class="fa-solid fa-circle-check"></i> กรณีมีคำตอบ ($\operatorname{rank}(A) = \operatorname{rank}([A \mid \mathbf{b}]) = r$):
+                        </div>
+                        <ul class="list-disc list-inside space-y-1 text-slate-600">
+                            <li><strong>ถ้า $r = n$ (เท่ากับจำนวนตัวแปร):</strong> มีคำตอบเดียว (Unique solution)</li>
+                            <li><strong>ถ้า $r < n$ (น้อยกว่าจำนวนตัวแปร):</strong> มีคำตอบอนันต์ (Infinitely many solutions) มี $n - r$ ตัวแปรอิสระ</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="p-3 bg-indigo-50 border border-indigo-200 rounded-xl text-xs text-indigo-900 flex items-start gap-2">
+                    <i class="fa-solid fa-link text-indigo-600 mt-0.5"></i>
+                    <span><strong>การเชื่อมโยงกับบทที่ 2:</strong> เนื้อหานี้เป็นการอธิบายเชิงรูปนัยของระบบสมการเชิงเส้นผ่านมุมมองของ <em>ปริภูมิย่อย อันดับของเมทริกซ์ และการดำเนินการตามแถว</em> ช่วยให้ไม่ต้องแก้สมการจนจบก็สามารถทำนายพฤติกรรมของคำตอบได้</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- 3. แบบจำลองโต้ตอบ (Interactive Multi-Theorem Analyzer) -->
+        <section class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 sm:p-8 space-y-6">
+            <div class="flex flex-wrap items-center justify-between gap-4 border-b border-slate-100 pb-4">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-xl bg-purple-50 flex items-center justify-center text-purple-600 font-bold text-lg">
+                        <i class="fa-solid fa-microchip"></i>
+                    </div>
+                    <div>
+                        <h2 class="text-xl sm:text-2xl font-bold text-slate-900">3. แบบจำลองโต้ตอบ: ผู้ประเมินทฤษฎีบท 3.5 – 3.7 อัตโนมัติ</h2>
+                        <p class="text-xs sm:text-sm text-slate-500">เลือกตัวอย่างสถานการณ์หรือป้อนค่า เพื่อตรวจสอบตำแหน่งหลัก การผกผันได้ และลักษณะคำตอบ</p>
+                    </div>
+                </div>
+
+                <!-- Preset Menu -->
+                <div class="flex flex-wrap items-center gap-2">
+                    <span class="text-xs font-semibold text-slate-500">สถานการณ์:</span>
+                    <select id="preset-selector" onchange="loadPresetCase(this.value)" class="bg-slate-50 border border-slate-300 rounded-lg p-1.5 text-xs font-semibold text-slate-800 outline-none focus:ring-2 focus:ring-indigo-500">
+                        <option value="inv-3x3">1. เมทริกซ์ผกผันได้ 3×3 (Invertible)</option>
+                        <option value="sing-3x3">2. เมทริกซ์เอกฐาน 3×3 (Singular / แถวไม่อิสระ)</option>
+                        <option value="sys-unique">3. ระบบสมการ 3×3 คำตอบเดียว (Unique Solution)</option>
+                        <option value="sys-infinite">4. ระบบสมการ 3×4 คำตอบอนันต์ (Infinitely Many)</option>
+                        <option value="sys-inconsistent">5. ระบบสมการขัดแย้ง (Inconsistent / No Solution)</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Workbench: Matrix Inputs and Inspector Controls -->
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+                
+                <!-- Left: Matrix Editor Form -->
+                <div class="lg:col-span-5 bg-slate-50 p-5 rounded-xl border border-slate-200 space-y-4">
+                    <div class="flex justify-between items-center">
+                        <label class="text-xs sm:text-sm font-bold text-slate-700 flex items-center gap-1.5">
+                            <i class="fa-solid fa-table-cells text-indigo-500"></i> เมทริกซ์ทดสอบ $[A \mid \mathbf{b}]$
+                        </label>
+                        <span class="text-[11px] text-slate-400" id="matrix-size-label">ขนาด 3 × 3</span>
+                    </div>
+
+                    <div class="flex justify-center p-2 overflow-x-auto">
+                        <div id="interactive-matrix-inputs" class="matrix-bracket flex flex-col gap-2 p-1">
+                            <!-- Populated dynamically -->
+                        </div>
+                    </div>
+
+                    <button onclick="runTheoremAnalysis()" class="w-full py-3 bg-indigo-600 hover:bg-indigo-700 active:scale-[0.99] text-white rounded-xl text-xs sm:text-sm font-bold shadow-md transition flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-wand-magic-sparkles"></i> ประมวลผลและวิเคราะห์ด้วยทฤษฎีบท 3.5 – 3.7
+                    </button>
+                </div>
+
+                <!-- Right: Theorem Analysis Diagnostic Results -->
+                <div class="lg:col-span-7 space-y-4">
+                    
+                    <!-- Transformation RREF Box -->
+                    <div class="bg-slate-900 text-white p-5 rounded-2xl border border-slate-800 shadow-sm space-y-3">
+                        <div class="flex items-center justify-between border-b border-slate-800 pb-2.5">
+                            <span class="text-xs uppercase tracking-wider text-slate-400 font-semibold flex items-center gap-2">
+                                <i class="fa-solid fa-code text-indigo-400"></i> รูปขั้นบันไดลดรูป (RREF) ตามทฤษฎีบท 3.5:
+                            </span>
+                            <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-indigo-500/30 text-indigo-300 border border-indigo-500/40">
+                                UNIQUE
+                            </span>
+                        </div>
+                        <div id="sim-rref-math" class="text-center py-2 text-base sm:text-lg">
+                            <!-- RREF Render -->
+                        </div>
+                        <div id="sim-pivot-info" class="text-xs text-slate-300 font-mono bg-slate-800/60 p-2.5 rounded-lg border border-slate-700">
+                            ตำแหน่งหลัก: คอลัมน์ 1, 2, 3
+                        </div>
+                    </div>
+
+                    <!-- Diagnostic Cards for Theorem 3.6 and 3.7 -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
+                        
+                        <!-- Theorem 3.6 Card -->
+                        <div id="diag-card-th36" class="p-4 rounded-xl border transition space-y-2">
+                            <div class="flex items-center justify-between">
+                                <span class="font-bold uppercase tracking-wider text-[11px]" id="diag-title-th36">ทฤษฎีบท 3.6: การผกผันได้</span>
+                                <span id="diag-badge-th36" class="px-2 py-0.5 rounded text-[10px] font-bold">-</span>
+                            </div>
+                            <p id="diag-desc-th36" class="text-slate-600 leading-relaxed">
+                                รอการประมวลผล...
+                            </p>
+                            <div id="diag-sub-th36" class="text-[11px] font-mono pt-1 border-t border-slate-200 hidden">
+                                <!-- Extra info or inverse matrix preview -->
+                            </div>
+                        </div>
+
+                        <!-- Theorem 3.7 Card -->
+                        <div id="diag-card-th37" class="p-4 rounded-xl border transition space-y-2">
+                            <div class="flex items-center justify-between">
+                                <span class="font-bold uppercase tracking-wider text-[11px]" id="diag-title-th37">ทฤษฎีบท 3.7: ระบบสมการ</span>
+                                <span id="diag-badge-th37" class="px-2 py-0.5 rounded text-[10px] font-bold">-</span>
+                            </div>
+                            <p id="diag-desc-th37" class="text-slate-600 leading-relaxed">
+                                รอการประมวลผล...
+                            </p>
+                            <div id="diag-sub-th37" class="text-[11px] font-mono pt-1 border-t border-slate-200 hidden">
+                                <!-- Rank comparison text -->
+                            </div>
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+        </section>
+
+        <!-- 4. คำถามนำเพื่อค้นพบ (Guided Discovery Questions) -->
+        <section class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 sm:p-8">
+            <div class="flex items-center gap-3 border-b border-slate-100 pb-4 mb-6">
+                <div class="w-10 h-10 rounded-xl bg-amber-50 flex items-center justify-center text-amber-600 font-bold text-lg">
+                    <i class="fa-solid fa-compass"></i>
+                </div>
+                <div>
+                    <h2 class="text-xl sm:text-2xl font-bold text-slate-900">4. คำถามนำเพื่อค้นพบ (Guided Discovery Questions)</h2>
+                    <p class="text-xs sm:text-sm text-slate-500">ใคร่ครวญความเชื่อมโยงเชิงโครงสร้าง แล้วคลิกเพื่อเปิดดูบทวิเคราะห์</p>
+                </div>
+            </div>
+
+            <div class="space-y-4">
+                
+                <!-- Question 1 -->
+                <div class="border border-slate-200 rounded-xl overflow-hidden transition-all">
+                    <button onclick="toggleAccordion('disc-1')" class="w-full flex items-center justify-between p-4 sm:p-5 text-left bg-slate-50/70 hover:bg-slate-100/70 transition">
+                        <span class="font-bold text-slate-800 text-sm sm:text-base flex items-center gap-3">
+                            <span class="w-7 h-7 rounded-full bg-amber-100 text-amber-800 text-xs flex items-center justify-center font-bold flex-shrink-0">1</span>
+                            เพราะเหตุใดเมทริกซ์จัตุรัสที่มีตำแหน่งหลักครบทุกคอลัมน์จึงผกผันได้?
+                        </span>
+                        <i id="icon-disc-1" class="fa-solid fa-chevron-down text-slate-400 text-sm transition-transform duration-200"></i>
+                    </button>
+                    <div id="disc-1" class="hidden p-5 bg-white border-t border-slate-200 text-sm text-slate-700 leading-relaxed space-y-2">
+                        <p class="font-semibold text-slate-900">บทวิเคราะห์ผ่านเมทริกซ์ขั้นมูลฐาน (Elementary Matrices):</p>
+                        <p>
+                            ถ้าเมทริกซ์จัตุรัส $A \in \mathbb{R}^{n \times n}$ มีตำแหน่งหลักครบทั้ง $n$ คอลัมน์ รูปขั้นบันไดลดรูปของ $A$ ย่อมเป็นเมทริกซ์เอกลักษณ์ $I_n$ หมายความว่ามีลำดับของเมทริกซ์ขั้นมูลฐาน $E_1, E_2, \dots, E_k$ ซึ่ง:
+                        </p>
+                        <div class="p-2.5 bg-slate-50 rounded border border-slate-200 text-center font-mono text-xs sm:text-sm my-1">
+                            $$E_k E_{k-1} \cdots E_2 E_1 A = I_n$$
+                        </div>
+                        <p class="text-xs sm:text-sm text-slate-600">
+                            เนื่องจากเมทริกซ์ขั้นมูลฐานทุกตัวสามารถผกผันได้ ผลคูณของพวกมันย่อมผกผันได้ด้วย จึงทำให้ $A^{-1} = E_k \cdots E_1$ และในเชิงการแปลงเชิงเส้น การมีตำแหน่งหลักครบทุกคอลัมน์หมายถึงฟังก์ชัน $T(\mathbf{x}) = A\mathbf{x}$ เป็นฟังก์ชันแบบหนึ่งต่อหนึ่งและทั่วถึง (Bijective) จึงมีฟังก์ชันผกผัน $T^{-1}$ เสมอ
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Question 2 -->
+                <div class="border border-slate-200 rounded-xl overflow-hidden transition-all">
+                    <button onclick="toggleAccordion('disc-2')" class="w-full flex items-center justify-between p-4 sm:p-5 text-left bg-slate-50/70 hover:bg-slate-100/70 transition">
+                        <span class="font-bold text-slate-800 text-sm sm:text-base flex items-center gap-3">
+                            <span class="w-7 h-7 rounded-full bg-amber-100 text-amber-800 text-xs flex items-center justify-center font-bold flex-shrink-0">2</span>
+                            การมีอันดับของเมทริกซ์สัมประสิทธิ์เท่ากับอันดับของเมทริกซ์เสริมบอกอะไรเกี่ยวกับระบบสมการ?
+                        </span>
+                        <i id="icon-disc-2" class="fa-solid fa-chevron-down text-slate-400 text-sm transition-transform duration-200"></i>
+                    </button>
+                    <div id="disc-2" class="hidden p-5 bg-white border-t border-slate-200 text-sm text-slate-700 leading-relaxed space-y-2">
+                        <p class="font-semibold text-emerald-800">
+                            <i class="fa-solid fa-circle-check"></i> บ่งบอกว่าเวกเตอร์ $\mathbf{b}$ อยู่ในปริภูมิคอลัมน์ของ $A$ ($\mathbf{b} \in \operatorname{Col}(A)$)
+                        </p>
+                        <p>
+                            การที่ $\operatorname{rank}([A \mid \mathbf{b}]) = \operatorname{rank}(A)$ หมายความว่าการเพิ่มคอลัมน์ $\mathbf{b}$ เข้าไป <strong>ไม่ได้เพิ่มมิติใหม่</strong> หรือทิศทางใหม่ให้กับปริภูมิที่แผ่คลุมโดยคอลัมน์ของ $A$ นั่นคือเวกเตอร์ $\mathbf{b}$ สามารถเขียนเป็นการรวมเชิงเส้น (Linear Combination) ของคอลัมน์ใน $A$ ได้อย่างแน่นอน ซึ่งก็คือนิยามของการมีคำตอบของสมการ $A\mathbf{x} = \mathbf{b}$ นั่นเอง
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Question 3 -->
+                <div class="border border-slate-200 rounded-xl overflow-hidden transition-all">
+                    <button onclick="toggleAccordion('disc-3')" class="w-full flex items-center justify-between p-4 sm:p-5 text-left bg-slate-50/70 hover:bg-slate-100/70 transition">
+                        <span class="font-bold text-slate-800 text-sm sm:text-base flex items-center gap-3">
+                            <span class="w-7 h-7 rounded-full bg-amber-100 text-amber-800 text-xs flex items-center justify-center font-bold flex-shrink-0">3</span>
+                            ข้อสรุปใดได้จากการทดลอง และข้อสรุปใดต้องพิสูจน์ทางคณิตศาสตร์?
+                        </span>
+                        <i id="icon-disc-3" class="fa-solid fa-chevron-down text-slate-400 text-sm transition-transform duration-200"></i>
+                    </button>
+                    <div id="disc-3" class="hidden p-5 bg-white border-t border-slate-200 text-sm text-slate-700 leading-relaxed space-y-2">
+                        <p class="font-semibold text-slate-900">กระบวนการทางคณิตศาสตร์ (Conjecture vs Formal Proof):</p>
+                        <ul class="list-disc list-inside space-y-1.5 text-slate-600 pl-2">
+                            <li><strong>การทดลองคำนวณ (Empirical Experimentation):</strong> ช่วยให้เกิดการสังเกตแบบแผน (Pattern Recognition) และนำไปสู่การตั้ง <em>ข้อความคาดการณ์ (Conjecture)</em> เช่น สังเกตว่าเมทริกซ์ที่มีแถวศูนย์จะหาตัวผกผันไม่ได้</li>
+                            <li><strong>การพิสูจน์ทางคณิตศาสตร์ (Mathematical Proof):</strong> เป็นสิ่งจำเป็นอย่างยิ่งในการยืนยันว่าข้อสรุปนั้นเป็น <em>สัจนิรันดร์และเป็นจริงสากล</em> ครอบคลุมเมทริกซ์ทุกขนาดและทุกมิติ ไม่จำกัดเฉพาะตัวเลขที่สุ่มทดสอบ</li>
+                        </ul>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- 5. แบบฝึกหัดสำหรับนักศึกษา -->
+        <section class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 sm:p-8">
+            <div class="flex items-center gap-3 border-b border-slate-100 pb-4 mb-6">
+                <div class="w-10 h-10 rounded-xl bg-teal-50 flex items-center justify-center text-teal-600 font-bold text-lg">
+                    <i class="fa-solid fa-pen-ruler"></i>
+                </div>
+                <div>
+                    <h2 class="text-xl sm:text-2xl font-bold text-slate-900">5. แบบฝึกหัดสำหรับนักศึกษา (Exercises & Structured Proofs)</h2>
+                    <p class="text-xs sm:text-sm text-slate-500">ฝึกฝนการเขียนบทพิสูจน์เชิงตรรกะและการวิเคราะห์ระบบสมการขนาด 4–5 ตัวแปร</p>
+                </div>
+            </div>
+
+            <div class="space-y-6">
+                
+                <!-- Exercise 1 -->
+                <div class="p-5 sm:p-6 rounded-xl border border-slate-200 bg-slate-50/50">
+                    <span class="text-xs font-bold text-teal-800 bg-teal-100 px-2.5 py-1 rounded">ข้อที่ 1</span>
+                    <h3 class="font-bold text-slate-900 mt-2 text-base sm:text-lg">
+                        พิสูจน์เกณฑ์การมีเมทริกซ์ผกผันโดยใช้รูปขั้นบันไดลดรูป (ทฤษฎีบท 3.6)
+                    </h3>
+                    <p class="text-slate-700 text-sm mt-1">
+                        จงแสดงบทพิสูจน์ทั้งสองทิศทาง ($\iff$) ว่าเมทริกซ์จัตุรัส $A$ ผกผันได้ก็ต่อเมื่อ $\operatorname{rref}(A) = I_n$
+                    </p>
+
+                    <div class="mt-4 pt-3 border-t border-slate-200">
+                        <button onclick="toggleExercise('ans-ex-1')" class="text-xs sm:text-sm font-semibold text-indigo-600 hover:text-indigo-800 flex items-center gap-1.5 transition">
+                            <i class="fa-regular fa-eye"></i> <span id="label-ans-ex-1">ดูบทพิสูจน์ฉบับสมบูรณ์</span>
+                        </button>
+                        <div id="ans-ex-1" class="hidden mt-3 p-4 bg-white rounded-lg border border-indigo-100 text-sm space-y-3 text-slate-700">
+                            <div>
+                                <span class="font-bold text-indigo-900">($\implies$) สมมติว่า $A$ ผกผันได้:</span>
+                                <p class="text-xs sm:text-sm text-slate-600 mt-1 pl-2">
+                                    ระบบสมการ $A\mathbf{x} = \mathbf{0}$ มีเพียงผลเฉลยชัด (Trivial solution) คือ $\mathbf{x} = A^{-1}\mathbf{0} = \mathbf{0}$ เพียงคำตอบเดียวเท่านั้น ส่งผลให้ไม่มีตัวแปรอิสระ ดังนั้นตำแหน่งหลักของ $A$ ต้องมีครบทุกคอลัมน์ ($n$ ตำแหน่ง) เมทริกซ์จัตุรัสขนาด $n \times n$ ที่มีตำแหน่งหลัก $n$ ตำแหน่งในรูป RREF มีเพียงเมทริกซ์เดียวคือ $I_n$ ดังนั้น $\operatorname{rref}(A) = I_n$
+                                </p>
+                            </div>
+                            <div class="border-t border-slate-100 pt-2">
+                                <span class="font-bold text-indigo-900">($\impliedby$) สมมติว่า $\operatorname{rref}(A) = I_n$:</span>
+                                <p class="text-xs sm:text-sm text-slate-600 mt-1 pl-2">
+                                    ย่อมมีลำดับของเมทริกซ์ขั้นมูลฐาน $E_1, \dots, E_k$ ที่ทำให้ $E_k \cdots E_1 A = I_n$ ให้ $B = E_k \cdots E_1$ จะได้ $BA = I_n$ และเนื่องจากเมทริกซ์ขั้นมูลฐานผกผันได้ ผลคูณ $B$ จึงผกผันได้และเป็นตัวผกผันของ $A$ โดยสมบูรณ์ ดังนั้น $A$ ผกผันได้ $\blacksquare$
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Exercise 2 -->
+                <div class="p-5 sm:p-6 rounded-xl border border-slate-200 bg-slate-50/50">
+                    <span class="text-xs font-bold text-teal-800 bg-teal-100 px-2.5 py-1 rounded">ข้อที่ 2</span>
+                    <h3 class="font-bold text-slate-900 mt-2 text-base sm:text-lg">
+                        วิเคราะห์ระบบสมการที่มีตัวแปร 4–5 ตัวด้วยอันดับของเมทริกซ์
+                    </h3>
+                    <p class="text-slate-700 text-sm mt-1">
+                        กำหนดระบบสมการ 3 สมการ 5 ตัวแปรที่มีเมทริกซ์แต่งเติมคือ $[A \mid \mathbf{b}]$ จงวิเคราะห์ความเป็นไปได้ของคำตอบโดยใช้ทฤษฎีบท 3.7
+                    </p>
+
+                    <div class="mt-4 pt-3 border-t border-slate-200">
+                        <button onclick="toggleExercise('ans-ex-2')" class="text-xs sm:text-sm font-semibold text-indigo-600 hover:text-indigo-800 flex items-center gap-1.5 transition">
+                            <i class="fa-regular fa-eye"></i> <span id="label-ans-ex-2">ดูบทวิเคราะห์</span>
+                        </button>
+                        <div id="ans-ex-2" class="hidden mt-3 p-4 bg-white rounded-lg border border-indigo-100 text-sm space-y-3 text-slate-700">
+                            <p class="font-semibold text-slate-900">บทวิเคราะห์เชิงมิติ (Dimensional Analysis):</p>
+                            <div class="space-y-2 text-xs sm:text-sm text-slate-600">
+                                <div>• จำนวนตัวแปร $n = 5$ และจำนวนแถว $m = 3$ ดังนั้น $\operatorname{rank}(A) \le \min(3, 5) = 3$</div>
+                                <div>• <strong>กรณีที่ 1 ($\operatorname{rank}(A) < \operatorname{rank}([A \mid \mathbf{b}])$):</strong> ระบบจะไม่มีผลเฉลย (Inconsistent) เช่น เมื่อแถวสุดท้ายของ RREF คือ $[0 \ 0 \ 0 \ 0 \ 0 \mid 1]$</div>
+                                <div>• <strong>กรณีที่ 2 ($\operatorname{rank}(A) = \operatorname{rank}([A \mid \mathbf{b}]) = r$):</strong> เนื่องจาก $r \le 3 < 5$ (อันดับน้อยกว่าจำนวนตัวแปรอย่างแน่นอน) ระบบจึง <strong>ไม่มีโอกาสมีคำตอบเดียว</strong> แต่จะมีคำตอบอนันต์เสมอ โดยมีตัวแปรอิสระอย่างน้อย $5 - 3 = 2$ ตัว</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Exercise 3 -->
+                <div class="p-5 sm:p-6 rounded-xl border border-slate-200 bg-slate-50/50">
+                    <span class="text-xs font-bold text-teal-800 bg-teal-100 px-2.5 py-1 rounded">ข้อที่ 3</span>
+                    <h3 class="font-bold text-slate-900 mt-2 text-base sm:text-lg">
+                        เขียนข้อพิสูจน์โดยระบุสมมติฐาน ทฤษฎีบทที่ใช้ และข้อสรุปอย่างครบถ้วน
+                    </h3>
+                    <p class="text-slate-700 text-sm mt-1">
+                        จงเขียนโครงสร้างการพิสูจน์ทางคณิตศาสตร์ 3 ส่วน เพื่อพิสูจน์ว่า: <em>"ถ้า $A$ และ $B$ เป็นเมทริกซ์จัตุรัสขนาด $n \times n$ ที่ผกผันได้ แล้วผลคูณ $AB$ ย่อมมีอันดับเท่ากับ $n$"</em>
+                    </p>
+
+                    <div class="mt-4 pt-3 border-t border-slate-200">
+                        <button onclick="toggleExercise('ans-ex-3')" class="text-xs sm:text-sm font-semibold text-indigo-600 hover:text-indigo-800 flex items-center gap-1.5 transition">
+                            <i class="fa-regular fa-eye"></i> <span id="label-ans-ex-3">ดูโครงสร้างข้อพิสูจน์</span>
+                        </button>
+                        <div id="ans-ex-3" class="hidden mt-3 p-4 bg-white rounded-lg border border-indigo-100 text-sm space-y-3 text-slate-700 font-mono text-xs sm:text-sm">
+                            <div class="p-2.5 bg-slate-50 rounded border border-slate-200">
+                                <strong class="text-indigo-900">1. สมมติฐาน (Hypothesis):</strong>
+                                <p class="text-slate-600 mt-0.5">กำหนดให้ $A, B \in \mathbb{R}^{n \times n}$ โดยที่ $A$ และ $B$ เป็นเมทริกซ์ที่ผกผันได้ทั้งคู่</p>
+                            </div>
+                            <div class="p-2.5 bg-slate-50 rounded border border-slate-200">
+                                <strong class="text-indigo-900">2. ทฤษฎีบทที่ใช้ (Theorems Applied):</strong>
+                                <p class="text-slate-600 mt-0.5">• สมบัติการผกผันของผลคูณ: $(AB)^{-1} = B^{-1} A^{-1}$</p>
+                                <p class="text-slate-600">• ทฤษฎีบท 3.6 (Invertibility Criterion): เมทริกซ์จัตุรัส $M$ ผกผันได้ $\iff \operatorname{rank}(M) = n$</p>
+                            </div>
+                            <div class="p-2.5 bg-slate-50 rounded border border-slate-200">
+                                <strong class="text-indigo-900">3. ข้อสรุปและการอนุมาน (Deduction & Conclusion):</strong>
+                                <p class="text-slate-600 mt-0.5">เนื่องจาก $A^{-1}$ และ $B^{-1}$ มีอยู่จริง เมทริกซ์ $B^{-1}A^{-1}$ จึงเป็นตัวผกผันของ $AB$ ส่งผลให้ $AB$ ผกผันได้ จากทฤษฎีบท 3.6 จึงสรุปได้โดยตรงว่า $\operatorname{rank}(AB) = n \ \blacksquare$</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="text-center text-xs text-slate-400 py-6 border-t border-slate-200">
+            <p>เรื่องที่ 8: ทฤษฎีบทสำคัญและการประยุกต์ใช้การดำเนินการขั้นมูลฐาน • พัฒนาเพื่อการเรียนรู้แบบมีส่วนร่วม</p>
+        </footer>
+
+    </main>
+
+    <!-- JavaScript Interactive Analyzer Logic -->
+    <script>
+        // Preset Scenarios
+        const presetCases = {
+            'inv-3x3': {
+                name: "เมทริกซ์ผกผันได้ 3×3",
+                rows: 3, cols: 3,
+                matrix: [
+                    [1, 2, 1],
+                    [0, 1, 3],
+                    [2, 1, 0]
+                ],
+                isSquare: true,
+                hasVectorB: false
+            },
+            'sing-3x3': {
+                name: "เมทริกซ์เอกฐาน 3×3 (Singular)",
+                rows: 3, cols: 3,
+                matrix: [
+                    [1, 2, 3],
+                    [2, 4, 6],
+                    [1, 1, 1]
+                ],
+                isSquare: true,
+                hasVectorB: false
+            },
+            'sys-unique': {
+                name: "ระบบสมการ 3×3 คำตอบเดียว",
+                rows: 3, cols: 4,
+                matrix: [
+                    [1, 1, 1, 6],
+                    [0, 2, 5, -4],
+                    [2, 5, -1, 27]
+                ],
+                isSquare: false,
+                hasVectorB: true
+            },
+            'sys-infinite': {
+                name: "ระบบสมการ 3×4 คำตอบอนันต์",
+                rows: 3, cols: 5,
+                matrix: [
+                    [1, 0, 2, 0, 3],
+                    [0, 1, -1, 0, 4],
+                    [0, 0, 0, 1, 5]
+                ],
+                isSquare: false,
+                hasVectorB: true
+            },
+            'sys-inconsistent': {
+                name: "ระบบสมการขัดแย้ง (ไม่มีคำตอบ)",
+                rows: 3, cols: 4,
+                matrix: [
+                    [1, 2, -1, 2],
+                    [2, 5, 1, 7],
+                    [1, 3, 2, 1] // R3 = R2 - R1 has rhs 7-2=5, but we put 1 -> contradiction
+                ],
+                isSquare: false,
+                hasVectorB: true
+            }
+        };
+
+        let currentActiveCase = presetCases['inv-3x3'];
+        let activeMatrixData = [];
+
+        window.onload = function() {
+            loadPresetCase('inv-3x3');
+        };
+
+        function loadPresetCase(key) {
+            currentActiveCase = presetCases[key];
+            activeMatrixData = JSON.parse(JSON.stringify(currentActiveCase.matrix));
+            document.getElementById('matrix-size-label').innerText = `ขนาด ${currentActiveCase.rows} × ${currentActiveCase.cols}`;
+            renderMatrixInputs();
+            runTheoremAnalysis();
+        }
+
+        function renderMatrixInputs() {
+            const container = document.getElementById('interactive-matrix-inputs');
+            container.innerHTML = '';
+
+            for (let r = 0; r < currentActiveCase.rows; r++) {
+                const rowDiv = document.createElement('div');
+                rowDiv.className = "flex items-center gap-1.5";
+
+                const label = document.createElement('span');
+                label.className = "text-xs font-semibold text-slate-400 w-5 text-right";
+                label.innerText = `R${r+1}`;
+                rowDiv.appendChild(label);
+
+                for (let c = 0; c < currentActiveCase.cols; c++) {
+                    const input = document.createElement('input');
+                    input.type = "number";
+                    input.step = "any";
+                    input.value = activeMatrixData[r][c];
+                    input.className = "w-11 h-9 text-center bg-white border border-slate-300 rounded font-semibold text-xs sm:text-sm text-slate-800 focus:border-indigo-600 focus:ring-1 focus:ring-indigo-600 outline-none transition";
+                    
+                    if (currentActiveCase.hasVectorB && c === currentActiveCase.cols - 1) {
+                        input.classList.add('bg-blue-50', 'border-blue-300', 'text-blue-900');
+                    }
+
+                    input.oninput = function() {
+                        const val = parseFloat(this.value);
+                        activeMatrixData[r][c] = isNaN(val) ? 0 : val;
+                    };
+
+                    rowDiv.appendChild(input);
+                }
+                container.appendChild(rowDiv);
+            }
+        }
+
+        // Gauss-Jordan RREF computation and Theorem diagnostics
+        function runTheoremAnalysis() {
+            const m = currentActiveCase.rows;
+            const n = currentActiveCase.cols;
+            const A = JSON.parse(JSON.stringify(activeMatrixData));
+
+            let lead = 0;
+            const pivotCols = [];
+
+            for (let r = 0; r < m; r++) {
+                if (lead >= n) break;
+                let i = r;
+
+                while (Math.abs(A[i][lead]) < 1e-9) {
+                    i++;
+                    if (i === m) {
+                        i = r;
+                        lead++;
+                        if (lead === n) break;
+                    }
+                }
+                if (lead >= n) break;
+
+                const temp = A[i];
+                A[i] = A[r];
+                A[r] = temp;
+
+                const val = A[r][lead];
+                if (Math.abs(val) > 1e-9) {
+                    for (let j = 0; j < n; j++) {
+                        A[r][j] /= val;
+                    }
+                }
+
+                for (let k = 0; k < m; k++) {
+                    if (k !== r) {
+                        const factor = A[k][lead];
+                        for (let j = 0; j < n; j++) {
+                            A[k][j] -= factor * A[r][j];
+                        }
+                    }
+                }
+
+                pivotCols.push(lead);
+                lead++;
+            }
+
+            // Clean numerical roundoffs
+            for (let r = 0; r < m; r++) {
+                for (let c = 0; c < n; c++) {
+                    if (Math.abs(A[r][c]) < 1e-8) A[r][c] = 0;
+                }
+            }
+
+            // Display RREF
+            document.getElementById('sim-rref-math').innerHTML = `$$${matrixToLatex(A, currentActiveCase.hasVectorB)}$$`;
+            document.getElementById('sim-pivot-info').innerText = `ตำแหน่งหลักที่พบ: ${pivotCols.length > 0 ? pivotCols.map(c => `คอลัมน์ ${c+1}`).join(', ') : 'ไม่มี'}`;
+
+            // Theorem 3.6 Diagnostic
+            const card36 = document.getElementById('diag-card-th36');
+            const badge36 = document.getElementById('diag-badge-th36');
+            const desc36 = document.getElementById('diag-desc-th36');
+            const sub36 = document.getElementById('diag-sub-th36');
+
+            if (currentActiveCase.isSquare) {
+                const isFullRank = (pivotCols.length === m);
+                if (isFullRank) {
+                    card36.className = "p-4 rounded-xl border border-emerald-300 bg-emerald-50/60 space-y-2";
+                    badge36.className = "px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-200 text-emerald-900";
+                    badge36.innerText = "ผกผันได้ (Invertible)";
+                    desc36.innerText = `มีตำแหน่งหลักครบทุกคอลัมน์ (${m} ตำแหน่ง) และ RREF = I_${m} ตามทฤษฎีบท 3.6 จึงมีเมทริกซ์ผกผัน A^(-1)`;
+                    sub36.classList.remove('hidden');
+                    sub36.innerText = `✓ rank(A) = ${m} (Full Rank)`;
+                } else {
+                    card36.className = "p-4 rounded-xl border border-rose-300 bg-rose-50/60 space-y-2";
+                    badge36.className = "px-2 py-0.5 rounded text-[10px] font-bold bg-rose-200 text-rose-900";
+                    badge36.innerText = "ไม่สามารถผกผันได้ (Singular)";
+                    desc36.innerText = `ตำแหน่งหลักมีเพียง ${pivotCols.length} ตำแหน่ง (ไม่ครบ ${m} คอลัมน์) RREF มีแถวศูนย์ จึงไม่มีเมทริกซ์ผกผัน`;
+                    sub36.classList.remove('hidden');
+                    sub36.innerText = `✗ rank(A) = ${pivotCols.length} < ${m}`;
+                }
+            } else {
+                card36.className = "p-4 rounded-xl border border-slate-200 bg-slate-50 space-y-2";
+                badge36.className = "px-2 py-0.5 rounded text-[10px] font-bold bg-slate-200 text-slate-700";
+                badge36.innerText = "ไม่เข้าเกณฑ์ (ไม่ใช่เมทริกซ์จัตุรัส)";
+                desc36.innerText = "ทฤษฎีบท 3.6 บังคับใช้กับเมทริกซ์จัตุรัส n × n เท่านั้น สำหรับเมทริกซ์แต่งเติมให้พิจารณาตามทฤษฎีบท 3.7";
+                sub36.classList.add('hidden');
+            }
+
+            // Theorem 3.7 Diagnostic (Rouché-Capelli)
+            const card37 = document.getElementById('diag-card-th37');
+            const badge37 = document.getElementById('diag-badge-th37');
+            const desc37 = document.getElementById('diag-desc-th37');
+            const sub37 = document.getElementById('diag-sub-th37');
+
+            if (currentActiveCase.hasVectorB) {
+                const coefCols = n - 1;
+                let rankA = 0;
+                let rankAb = pivotCols.length;
+
+                // check pivots that lie strictly in coef columns
+                pivotCols.forEach(c => {
+                    if (c < coefCols) rankA++;
+                });
+
+                const isContradiction = pivotCols.includes(coefCols);
+
+                if (isContradiction) {
+                    card37.className = "p-4 rounded-xl border border-rose-300 bg-rose-50/60 space-y-2";
+                    badge37.className = "px-2 py-0.5 rounded text-[10px] font-bold bg-rose-200 text-rose-900";
+                    badge37.innerText = "ไม่มีคำตอบ (Inconsistent)";
+                    desc37.innerText = `เกิดแถวขัดแย้ง [0 ... 0 | 1] ใน RREF เนื่องจาก rank(A) = ${rankA} < rank([A|b]) = ${rankAb}`;
+                    sub37.classList.remove('hidden');
+                    sub37.innerText = `✗ rank(A) = ${rankA} ≠ rank([A|b]) = ${rankAb}`;
+                } else if (rankA === coefCols) {
+                    card37.className = "p-4 rounded-xl border border-emerald-300 bg-emerald-50/60 space-y-2";
+                    badge37.className = "px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-200 text-emerald-900";
+                    badge37.innerText = "มีคำตอบเดียว (Unique Solution)";
+                    desc37.innerText = `rank(A) = rank([A|b]) = ${rankA} ซึ่งเท่ากับจำนวนตัวแปร (${coefCols} ตัวแปร) ไม่มีตัวแปรอิสระ`;
+                    sub37.classList.remove('hidden');
+                    sub37.innerText = `✓ rank(A) = rank([A|b]) = n = ${coefCols}`;
+                } else {
+                    const freeVars = coefCols - rankA;
+                    card37.className = "p-4 rounded-xl border border-amber-300 bg-amber-50/60 space-y-2";
+                    badge37.className = "px-2 py-0.5 rounded text-[10px] font-bold bg-amber-200 text-amber-900";
+                    badge37.innerText = "มีคำตอบอนันต์ (Infinitely Many)";
+                    desc37.innerText = `rank(A) = rank([A|b]) = ${rankA} แต่น้อยกว่าจำนวนตัวแปร (${coefCols}) จึงมีตัวแปรอิสระ ${freeVars} ตัว`;
+                    sub37.classList.remove('hidden');
+                    sub37.innerText = `✓ ระบบมีคำตอบพร้อม ${freeVars} ตัวแปรอิสระ`;
+                }
+            } else {
+                card37.className = "p-4 rounded-xl border border-slate-200 bg-slate-50 space-y-2";
+                badge37.className = "px-2 py-0.5 rounded text-[10px] font-bold bg-slate-200 text-slate-700";
+                badge37.innerText = "เมทริกซ์สัมประสิทธิ์เดี่ยว";
+                desc37.innerText = "หากตั้งสมการเอกพันธุ์ Ax = 0 ระบบจะมีเพียงคำตอบศูนย์ (เมื่อ rank = n) หรือมีคำตอบอนันต์ (เมื่อ rank < n)";
+                sub37.classList.add('hidden');
+            }
+
+            triggerMathJax();
+        }
+
+        function matrixToLatex(mat, isAugmented) {
+            const rows = mat.length;
+            const cols = mat[0].length;
+            let latex = "";
+
+            if (isAugmented) {
+                const align = "c".repeat(cols - 1) + "|c";
+                latex = `\\left[\\begin{array}{${align}} `;
+            } else {
+                latex = "\\begin{bmatrix}";
+            }
+
+            for (let r = 0; r < rows; r++) {
+                const rowStr = mat[r].map(v => Math.round(v * 100) / 100).join(" & ");
+                latex += rowStr;
+                if (r < rows - 1) latex += " \\\\ ";
+            }
+
+            if (isAugmented) {
+                latex += " \\end{array}\\right]";
+            } else {
+                latex += "\\end{bmatrix}";
+            }
+            return latex;
+        }
+
+        function triggerMathJax() {
+            if (window.MathJax && window.MathJax.typesetPromise) {
+                window.MathJax.typesetPromise().catch(err => console.error(err));
+            }
+        }
+
+        function toggleAccordion(id) {
+            const content = document.getElementById(id);
+            const icon = document.getElementById(`icon-${id}`);
+            if (content.classList.contains('hidden')) {
+                content.classList.remove('hidden');
+                icon.classList.add('rotate-180');
+                triggerMathJax();
+            } else {
+                content.classList.add('hidden');
+                icon.classList.remove('rotate-180');
+            }
+        }
+
+        function toggleExercise(id) {
+            const el = document.getElementById(id);
+            const label = document.getElementById(`label-${id}`);
+            if (el.classList.contains('hidden')) {
+                el.classList.remove('hidden');
+                label.innerText = "ซ่อนเฉลย / บทพิสูจน์";
+                triggerMathJax();
+            } else {
+                el.classList.add('hidden');
+                label.innerText = id === 'ans-ex-1' ? "ดูบทพิสูจน์ฉบับสมบูรณ์" : (id === 'ans-ex-2' ? "ดูบทวิเคราะห์" : "ดูโครงสร้างข้อพิสูจน์");
+            }
+        }
+    </script>
+</body>
+</html>

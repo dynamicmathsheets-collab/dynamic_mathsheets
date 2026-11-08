@@ -1,0 +1,863 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>เรื่องที่ 7: อันดับของเมทริกซ์และสมบัติภายใต้การดำเนินการขั้นมูลฐาน</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Sarabun, Prompt & Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Prompt:wght@400;500;600;700&family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- MathJax v3 -->
+    <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']],
+                displayMath: [['$$', '$$'], ['\\[', '\\]']]
+            },
+            svg: {
+                fontCache: 'global'
+            }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        body {
+            font-family: 'Sarabun', 'Inter', sans-serif;
+            background-color: #f8fafc;
+            color: #1e293b;
+        }
+        h1, h2, h3, h4, .font-heading {
+            font-family: 'Prompt', 'Inter', sans-serif;
+        }
+        .math-font {
+            font-family: 'Inter', serif;
+        }
+        .matrix-bracket {
+            position: relative;
+            padding: 4px 10px;
+        }
+        .matrix-bracket::before, .matrix-bracket::after {
+            content: "";
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            width: 8px;
+            border-style: solid;
+            border-color: #334155;
+        }
+        .matrix-bracket::before {
+            left: 0;
+            border-width: 2px 0 2px 2px;
+            border-top-left-radius: 6px;
+            border-bottom-left-radius: 6px;
+        }
+        .matrix-bracket::after {
+            right: 0;
+            border-width: 2px 2px 2px 0;
+            border-top-right-radius: 6px;
+            border-bottom-right-radius: 6px;
+        }
+        input[type=number]::-webkit-inner-spin-button, 
+        input[type=number]::-webkit-outer-spin-button { 
+            -webkit-appearance: none; 
+            margin: 0; 
+        }
+        input[type=number] {
+            -moz-appearance: textfield;
+        }
+    </style>
+</head>
+<body class="min-h-screen">
+
+    <!-- Header Banner -->
+    <header class="bg-gradient-to-r from-slate-900 via-indigo-950 to-emerald-950 text-white shadow-lg border-b border-indigo-800/40">
+        <div class="max-w-6xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <div class="flex flex-wrap items-center justify-between gap-4">
+                <div>
+                    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-emerald-500/20 text-emerald-300 border border-emerald-400/30 mb-2">
+                        <i class="fa-solid fa-graduation-cap"></i> บทเรียนที่ 7 • พีชคณิตเชิงเส้น (Linear Algebra)
+                    </span>
+                    <h1 class="text-2xl sm:text-3xl lg:text-4xl font-bold tracking-tight">
+                        เรื่องที่ 7: อันดับของเมทริกซ์และสมบัติภายใต้การดำเนินการขั้นมูลฐาน
+                    </h1>
+                    <p class="text-indigo-200 mt-1 text-sm sm:text-base font-light">
+                        Rank of a Matrix • ทฤษฎีบท 3.4 การคงที่ของอันดับ (Rank Invariance) และมิติของปริภูมิแถว-คอลัมน์
+                    </p>
+                </div>
+                <div class="hidden md:flex items-center gap-3 bg-white/10 backdrop-blur-sm px-4 py-2.5 rounded-xl border border-white/20 text-xs">
+                    <div class="w-10 h-10 rounded-lg bg-emerald-500/20 text-emerald-300 flex items-center justify-center font-bold text-lg">
+                        $\operatorname{rk}$
+                    </div>
+                    <div>
+                        <div class="font-semibold text-white">เครื่องมือตรวจสอบอันดับ</div>
+                        <div class="text-emerald-200">Rank Invariance Inspector</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Container Fixed Width Requirement -->
+    <main class="max-w-6xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 space-y-10">
+
+        <!-- 1. วัตถุประสงค์การเรียนรู้ -->
+        <section class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 sm:p-8 transition-all hover:shadow-md">
+            <div class="flex items-center gap-3 border-b border-slate-100 pb-4 mb-5">
+                <div class="w-10 h-10 rounded-xl bg-indigo-50 flex items-center justify-center text-indigo-600 font-bold text-lg">
+                    <i class="fa-solid fa-bullseye"></i>
+                </div>
+                <div>
+                    <h2 class="text-xl sm:text-2xl font-bold text-slate-900">1. วัตถุประสงค์การเรียนรู้</h2>
+                    <p class="text-xs sm:text-sm text-slate-500">ผลการเรียนรู้ที่คาดหวังเมื่อศึกษาจบหัวข้อนี้</p>
+                </div>
+            </div>
+            
+            <div class="bg-gradient-to-r from-indigo-50/90 to-emerald-50/60 border-l-4 border-indigo-600 rounded-r-xl p-5">
+                <p class="text-slate-800 leading-relaxed font-semibold mb-3">
+                    เมื่อศึกษาจบหัวข้อนี้ นักศึกษาสามารถ:
+                </p>
+                <ul class="space-y-3 text-slate-700 text-sm sm:text-base">
+                    <li class="flex items-start gap-3">
+                        <span class="w-6 h-6 rounded-full bg-indigo-100 text-indigo-700 flex items-center justify-center text-xs font-bold mt-0.5 flex-shrink-0">
+                            <i class="fa-solid fa-check"></i>
+                        </span>
+                        <span><strong>หาอันดับของเมทริกซ์ (Rank)</strong> ได้อย่างถูกต้องโดยใช้รูปขั้นบันได (REF) หรือรูปขั้นบันไดลดรูป (RREF)</span>
+                    </li>
+                    <li class="flex items-start gap-3">
+                        <span class="w-6 h-6 rounded-full bg-indigo-100 text-indigo-700 flex items-center justify-center text-xs font-bold mt-0.5 flex-shrink-0">
+                            <i class="fa-solid fa-check"></i>
+                        </span>
+                        <span><strong>อธิบายความสัมพันธ์</strong> ระหว่างอันดับของเมทริกซ์กับจำนวนตำแหน่งหลัก (Pivot Positions) และจำนวนแถวที่ไม่เป็นศูนย์ได้อย่างเป็นระบบ</span>
+                    </li>
+                    <li class="flex items-start gap-3">
+                        <span class="w-6 h-6 rounded-full bg-emerald-100 text-emerald-800 flex items-center justify-center text-xs font-bold mt-0.5 flex-shrink-0">
+                            <i class="fa-solid fa-check"></i>
+                        </span>
+                        <span><strong>พิสูจน์สมบัติสำคัญ</strong> ได้แก่ ทฤษฎีบทการคงที่ของอันดับภายใต้การดำเนินการขั้นมูลฐานตามแถว (ทฤษฎีบท 3.4) และขอบเขตอันดับ $\operatorname{rank}(A) \le \min(m, n)$</span>
+                    </li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- 2. เนื้อหาหลัก -->
+        <section class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 sm:p-8 space-y-7">
+            <div class="flex items-center gap-3 border-b border-slate-100 pb-4">
+                <div class="w-10 h-10 rounded-xl bg-emerald-50 flex items-center justify-center text-emerald-600 font-bold text-lg">
+                    <i class="fa-solid fa-book-bookmark"></i>
+                </div>
+                <div>
+                    <h2 class="text-xl sm:text-2xl font-bold text-slate-900">2. เนื้อหาหลัก (Core Content)</h2>
+                    <p class="text-xs sm:text-sm text-slate-500">บทนิยามอันดับของเมทริกซ์ ความสัมพันธ์เชิงมิติ และทฤษฎีบท 3.4</p>
+                </div>
+            </div>
+
+            <!-- Definition Box -->
+            <div class="bg-slate-50 border border-slate-200 rounded-xl p-5 sm:p-6 space-y-3">
+                <h3 class="text-base sm:text-lg font-bold text-slate-900 flex items-center gap-2">
+                    <i class="fa-solid fa-quote-left text-emerald-600"></i> บทนิยาม: อันดับของเมทริกซ์ (Rank of a Matrix)
+                </h3>
+                <p class="text-slate-700 leading-relaxed text-sm sm:text-base">
+                    อันดับของเมทริกซ์ $A$ เขียนแทนด้วย $\operatorname{rank}(A)$ หมายถึง <strong>มิติของปริภูมิที่เกิดจากการรวมเชิงเส้นของแถวของ $A$ (Row Space Dimension)</strong> ซึ่งมีความมหัศจรรย์ทางพีชคณิตเชิงเส้นคือ <em>มีค่าเท่ากับมิติของปริภูมิที่เกิดจากคอลัมน์ของ $A$ (Column Space Dimension) เสมอ</em>
+                </p>
+                <div class="mt-3 p-3 bg-white rounded-lg border border-slate-200 text-center font-bold text-indigo-900 text-base sm:text-lg">
+                    $$\operatorname{rank}(A) = \dim(\operatorname{Row}(A)) = \dim(\operatorname{Col}(A))$$
+                </div>
+                <p class="text-xs sm:text-sm text-slate-600 pt-1">
+                    <i class="fa-solid fa-circle-info text-indigo-600 mr-1"></i> เมื่อแปลงเมทริกซ์ให้อยู่ในรูปขั้นบันได (REF) หรือรูปขั้นบันไดลดรูป (RREF) <strong>อันดับจะเท่ากับจำนวนแถวที่ไม่เป็นแถวศูนย์ หรือเท่ากับจำนวนตำแหน่งหลัก (Pivot positions) พอดี</strong>
+                </p>
+            </div>
+
+            <!-- Theorem 3.4 & Proof Idea -->
+            <div class="bg-gradient-to-br from-slate-900 via-indigo-950 to-slate-900 text-white rounded-2xl p-6 sm:p-7 shadow-md border border-slate-800 space-y-4">
+                <div class="flex items-center gap-2 text-emerald-300 text-xs sm:text-sm font-semibold uppercase tracking-wider">
+                    <i class="fa-solid fa-shield-halved"></i> ทฤษฎีบท 3.4 (Theorem 3.4)
+                </div>
+                <h4 class="text-lg sm:text-xl font-bold text-white">
+                    การดำเนินการขั้นมูลฐานตามแถวไม่เปลี่ยนอันดับของเมทริกซ์ (Invariance of Rank)
+                </h4>
+                <p class="text-slate-200 text-sm sm:text-base leading-relaxed">
+                    "ถ้าเมทริกซ์ $B$ ได้มาจากเมทริกซ์ $A$ ด้วยการดำเนินการขั้นมูลฐานตามแถวจำนวนจำกัดครั้ง ($A \sim B$) แล้ว ย่อมได้ว่า 
+                    <span class="text-emerald-300 font-bold underline decoration-emerald-400 decoration-2">$\operatorname{rank}(A) = \operatorname{rank}(B)$</span> เสมอ"
+                </p>
+
+                <div class="pt-4 border-t border-slate-700/80 text-xs sm:text-sm text-slate-300 space-y-2">
+                    <span class="font-bold text-indigo-300 block">แนวทางการพิสูจน์ (Idea of Proof):</span>
+                    <p class="leading-relaxed">
+                        การดำเนินการขั้นมูลฐานตามแถวแต่ละชนิด ($R_i \leftrightarrow R_j$, $R_i \leftarrow cR_i$, $R_i \leftarrow R_i + cR_j$) ล้วนสามารถ <strong>ย้อนกลับได้เสมอ (Invertible)</strong> ตามทฤษฎีบท 3.1 ส่งผลให้เวกเตอร์แถวของเมทริกซ์ใหม่เกิดจากการรวมเชิงเส้นของเวกเตอร์แถวเดิม และในทางกลับกันเวกเตอร์แถวเดิมก็เกิดจากการรวมเชิงเส้นของเวกเตอร์แถวใหม่
+                    </p>
+                    <p class="leading-relaxed text-emerald-200">
+                        ดังนั้น ปริภูมิแถวก่อนและหลังดำเนินการจึงเป็นปริภูมิเดียวกันทุกประการ ($\operatorname{Row}(A) = \operatorname{Row}(B)$) ทำให้มิติของปริภูมิแถวไม่เปลี่ยนแปลง นั่นคือ <strong>อันดับจึงคงเดิมทุกครั้งที่ดำเนินการ</strong> $\blacksquare$
+                    </p>
+                </div>
+            </div>
+
+            <!-- Walkthrough Example from Prompt -->
+            <div class="bg-slate-50 rounded-xl p-5 sm:p-6 border border-slate-200 space-y-4">
+                <h3 class="font-bold text-slate-900 text-base sm:text-lg flex items-center gap-2">
+                    <span class="w-6 h-6 rounded-full bg-indigo-600 text-white flex items-center justify-center text-xs font-bold">Ex</span>
+                    ตัวอย่างการหาอันดับ: เมทริกซ์ $A$ ขนาด $3 \times 3$
+                </h3>
+
+                <p class="text-xs sm:text-sm text-slate-600">
+                    กำหนดเมทริกซ์ $A$ เริ่มต้น และดำเนินการตามแถวเพื่อหาตำแหน่งหลัก:
+                </p>
+
+                <div class="flex flex-col md:flex-row items-center justify-around gap-4 py-2">
+                    <div class="text-center">
+                        <span class="text-xs font-semibold text-slate-500 mb-1 block">เมทริกซ์เริ่มต้น $A$</span>
+                        <div class="text-lg">
+                            $$A = \begin{bmatrix} 1 & 2 & 3 \\ 2 & 4 & 6 \\ 1 & 1 & 1 \end{bmatrix}$$
+                        </div>
+                    </div>
+
+                    <div class="flex flex-col items-center px-4 py-2 bg-indigo-100/70 rounded-lg text-indigo-900 text-xs">
+                        <span class="font-bold">ดำเนินการพร้อมกัน:</span>
+                        <span class="font-mono mt-0.5">$R_2 \leftarrow R_2 - 2R_1$</span>
+                        <span class="font-mono">$R_3 \leftarrow R_3 - R_1$</span>
+                        <i class="fa-solid fa-arrow-right hidden md:block text-indigo-600 mt-1"></i>
+                        <i class="fa-solid fa-arrow-down md:hidden text-indigo-600 mt-1"></i>
+                    </div>
+
+                    <div class="text-center">
+                        <span class="text-xs font-semibold text-slate-500 mb-1 block">เมทริกซ์หลังกำจัด</span>
+                        <div class="text-lg">
+                            $$\begin{bmatrix} 1 & 2 & 3 \\ 0 & 0 & 0 \\ 0 & -1 & -2 \end{bmatrix}$$
+                        </div>
+                    </div>
+
+                    <div class="flex flex-col items-center px-4 py-2 bg-emerald-100/70 rounded-lg text-emerald-900 text-xs">
+                        <span class="font-bold">สลับแถวสู่ REF:</span>
+                        <span class="font-mono mt-0.5">$R_2 \leftrightarrow R_3$</span>
+                        <i class="fa-solid fa-arrow-right hidden md:block text-emerald-600 mt-1"></i>
+                        <i class="fa-solid fa-arrow-down md:hidden text-emerald-600 mt-1"></i>
+                    </div>
+
+                    <div class="text-center">
+                        <span class="text-xs font-semibold text-emerald-700 font-bold mb-1 block">รูปขั้นบันได (REF)</span>
+                        <div class="text-lg">
+                            $$\begin{bmatrix} \mathbf{\underline{1}} & 2 & 3 \\ 0 & \mathbf{\underline{-1}} & -2 \\ 0 & 0 & 0 \end{bmatrix}$$
+                        </div>
+                    </div>
+                </div>
+
+                <div class="p-3.5 bg-emerald-50 border-l-4 border-emerald-600 rounded-r-lg text-xs sm:text-sm text-emerald-950 space-y-1">
+                    <div class="font-bold flex items-center gap-2">
+                        <i class="fa-solid fa-circle-check text-emerald-600"></i> สรุปผลการวิเคราะห์อันดับ:
+                    </div>
+                    <p class="leading-relaxed">
+                        เมื่อจัดให้อยู่ในรูปขั้นบันได จะพบ <strong>แถวที่ไม่เป็นศูนย์ 2 แถว</strong> และมีตำแหน่งหลัก 2 ตำแหน่ง (หลักที่ 1 และ 2) ดังนั้น 
+                        <span class="font-bold text-emerald-800 font-mono text-base">$$\operatorname{rank}(A) = 2$$</span>
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- 3. แบบจำลองโต้ตอบ (Interactive Simulator) -->
+        <section class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 sm:p-8 space-y-6">
+            <div class="flex flex-wrap items-center justify-between gap-4 border-b border-slate-100 pb-4">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-xl bg-purple-50 flex items-center justify-center text-purple-600 font-bold text-lg">
+                        <i class="fa-solid fa-calculator"></i>
+                    </div>
+                    <div>
+                        <h2 class="text-xl sm:text-2xl font-bold text-slate-900">3. แบบจำลองโต้ตอบ: ผู้ตรวจสอบอันดับและการคงที่ (Rank Simulator)</h2>
+                        <p class="text-xs sm:text-sm text-slate-500">ทดสอบป้อนเมทริกซ์ขนาดต่างๆ ดำเนินการตามแถว และตรวจสอบว่าอันดับคงเดิมในทุกขั้น</p>
+                    </div>
+                </div>
+
+                <!-- Dimension Presets -->
+                <div class="flex items-center gap-2 bg-slate-100 p-1.5 rounded-xl text-xs">
+                    <span class="text-slate-600 font-medium px-2">ขนาด:</span>
+                    <button id="btn-size-3x3" onclick="setMatrixPreset('3x3')" class="px-2.5 py-1 rounded-lg bg-white font-bold text-slate-800 shadow-xs">3 × 3 (ตัวอย่าง)</button>
+                    <button id="btn-size-3x4" onclick="setMatrixPreset('3x4')" class="px-2.5 py-1 rounded-lg text-slate-600 hover:text-slate-900">3 × 4</button>
+                    <button id="btn-size-4x5" onclick="setMatrixPreset('4x5')" class="px-2.5 py-1 rounded-lg text-slate-600 hover:text-slate-900">4 × 5</button>
+                </div>
+            </div>
+
+            <!-- Workbench: Matrix Inputs and Rank Meter -->
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+                
+                <!-- Left: Editable Matrix Input Grid -->
+                <div class="lg:col-span-6 bg-slate-50 p-5 rounded-xl border border-slate-200 space-y-4">
+                    <div class="flex justify-between items-center">
+                        <label class="text-xs sm:text-sm font-bold text-slate-700 flex items-center gap-1.5">
+                            <i class="fa-solid fa-table-cells text-indigo-500"></i> สมาชิกเมทริกซ์เริ่มต้น $A$
+                        </label>
+                        <div class="flex items-center gap-2">
+                            <button onclick="randomizeCurrentMatrix()" class="text-xs px-2.5 py-1 bg-white hover:bg-slate-100 border border-slate-300 text-slate-600 rounded flex items-center gap-1">
+                                <i class="fa-solid fa-shuffle text-indigo-500"></i> สุ่มเลข
+                            </button>
+                            <button onclick="resetCurrentPreset()" class="text-xs px-2.5 py-1 bg-white hover:bg-slate-100 border border-slate-300 text-slate-600 rounded">
+                                รีเซ็ต
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="flex justify-center p-2 overflow-x-auto">
+                        <div id="matrix-input-table" class="matrix-bracket flex flex-col gap-2 p-1">
+                            <!-- Matrix inputs generated by JS -->
+                        </div>
+                    </div>
+
+                    <p class="text-[11px] text-slate-500 text-center">
+                        * คุณสามารถคลิกเปลี่ยนตัวเลขในช่องตารางด้านบนได้ทันที ระบบจะคำนวณอันดับใหม่แบบอัตโนมัติ
+                    </p>
+                </div>
+
+                <!-- Right: Rank Invariance Dashboard -->
+                <div class="lg:col-span-6 space-y-4">
+                    
+                    <!-- Primary Rank Indicator Card -->
+                    <div class="bg-gradient-to-br from-indigo-950 to-slate-900 text-white p-5 rounded-2xl shadow-sm border border-indigo-800/50 flex items-center justify-between">
+                        <div>
+                            <span class="text-xs font-semibold uppercase tracking-wider text-indigo-300 block">อันดับของเมทริกซ์ (Matrix Rank)</span>
+                            <div class="flex items-baseline gap-2 mt-1">
+                                <span class="text-3xl sm:text-4xl font-extrabold text-emerald-400 font-mono" id="stat-rank-val">2</span>
+                                <span class="text-xs text-slate-400" id="stat-rank-formula">จากขนาด 3 × 3</span>
+                            </div>
+                        </div>
+                        <div class="text-right">
+                            <div class="px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-400/30 text-xs font-bold inline-flex items-center gap-1.5">
+                                <i class="fa-solid fa-equals"></i> Rank Invariant
+                            </div>
+                            <div class="text-[11px] text-slate-400 mt-1">อันดับคงที่ทุกขั้นตอน ERO</div>
+                        </div>
+                    </div>
+
+                    <!-- Dimension Bounds Check Card -->
+                    <div class="grid grid-cols-2 gap-3 text-xs">
+                        <div class="p-3 bg-slate-50 border border-slate-200 rounded-xl">
+                            <span class="text-slate-500 block mb-0.5">ขอบเขตสูงสุดที่เป็นไปได้:</span>
+                            <span class="font-bold text-slate-800 text-sm font-mono" id="stat-rank-bound">$\min(3, 3) = 3$</span>
+                        </div>
+                        <div class="p-3 bg-slate-50 border border-slate-200 rounded-xl">
+                            <span class="text-slate-500 block mb-0.5">จำนวนตำแหน่งหลัก (Pivots):</span>
+                            <span class="font-bold text-indigo-700 text-sm font-mono" id="stat-pivot-count">2 ตำแหน่ง</span>
+                        </div>
+                    </div>
+
+                    <!-- Step-by-Step ERO Transformation Sequence View -->
+                    <div class="p-4 bg-slate-50 border border-slate-200 rounded-xl space-y-3">
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs font-bold text-slate-700 uppercase tracking-wider">
+                                <i class="fa-solid fa-timeline text-indigo-600 mr-1"></i> ลำดับการแปลงสู่รูปขั้นบันได (REF):
+                            </span>
+                            <span class="text-[11px] text-slate-500" id="step-count-badge">2 ขั้นตอน</span>
+                        </div>
+
+                        <!-- Step Carousel / Accordion List -->
+                        <div id="ero-steps-container" class="space-y-2 text-xs font-mono max-h-64 overflow-y-auto pr-1">
+                            <!-- Filled dynamically by JS -->
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+        </section>
+
+        <!-- 4. คำถามนำเพื่อค้นพบ (Guided Discovery Questions) -->
+        <section class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 sm:p-8">
+            <div class="flex items-center gap-3 border-b border-slate-100 pb-4 mb-6">
+                <div class="w-10 h-10 rounded-xl bg-amber-50 flex items-center justify-center text-amber-600 font-bold text-lg">
+                    <i class="fa-solid fa-compass"></i>
+                </div>
+                <div>
+                    <h2 class="text-xl sm:text-2xl font-bold text-slate-900">4. คำถามนำเพื่อค้นพบ (Guided Discovery Questions)</h2>
+                    <p class="text-xs sm:text-sm text-slate-500">ใคร่ครวญความหมายของอันดับและสมบัติความคงที่ แล้วคลิกเพื่อตรวจสอบแนวคิด</p>
+                </div>
+            </div>
+
+            <div class="space-y-4">
+                
+                <!-- Question 1 -->
+                <div class="border border-slate-200 rounded-xl overflow-hidden transition-all">
+                    <button onclick="toggleAccordion('disc-1')" class="w-full flex items-center justify-between p-4 sm:p-5 text-left bg-slate-50/70 hover:bg-slate-100/70 transition">
+                        <span class="font-bold text-slate-800 text-sm sm:text-base flex items-center gap-3">
+                            <span class="w-7 h-7 rounded-full bg-amber-100 text-amber-800 text-xs flex items-center justify-center font-bold flex-shrink-0">1</span>
+                            เหตุใดการสลับแถว ($R_i \leftrightarrow R_j$) จึงไม่เปลี่ยนอันดับของเมทริกซ์?
+                        </span>
+                        <i id="icon-disc-1" class="fa-solid fa-chevron-down text-slate-400 text-sm transition-transform duration-200"></i>
+                    </button>
+                    <div id="disc-1" class="hidden p-5 bg-white border-t border-slate-200 text-sm text-slate-700 leading-relaxed space-y-2">
+                        <p class="font-semibold text-slate-900">เหตุผลทางมิติของปริภูมิแถว (Row Space):</p>
+                        <p>
+                            การสลับแถวเป็นเพียงการ <strong>เปลี่ยนลำดับการจัดเรียงเวกเตอร์แถว</strong> ในเซต $\{r_1, r_2, \dots, r_m\}$ เท่านั้น ซึ่งการสลับลำดับไม่ได้เปลี่ยนแปลงเซตของการรวมเชิงเส้นทั้งหมด (Linear Span) แต่อย่างใด:
+                        </p>
+                        <div class="p-2.5 bg-slate-50 rounded border border-slate-200 text-center font-mono text-xs sm:text-sm">
+                            $$\operatorname{span}\{r_1, \dots, r_i, \dots, r_j, \dots, r_m\} = \operatorname{span}\{r_1, \dots, r_j, \dots, r_i, \dots, r_m\}$$
+                        </div>
+                        <p class="text-xs text-slate-600">
+                            เมื่อเซตที่แผ่คลุม (Span) เป็นปริภูมิเดียวกัน มิติของปริภูมิจึงเท่าเดิมเสมอ ดังนั้นอันดับของเมทริกซ์จึงไม่เปลี่ยนแปลง
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Question 2 -->
+                <div class="border border-slate-200 rounded-xl overflow-hidden transition-all">
+                    <button onclick="toggleAccordion('disc-2')" class="w-full flex items-center justify-between p-4 sm:p-5 text-left bg-slate-50/70 hover:bg-slate-100/70 transition">
+                        <span class="font-bold text-slate-800 text-sm sm:text-base flex items-center gap-3">
+                            <span class="w-7 h-7 rounded-full bg-amber-100 text-amber-800 text-xs flex items-center justify-center font-bold flex-shrink-0">2</span>
+                            การคูณแถวด้วยสเกลาร์ที่ไม่เป็นศูนย์ ($R_i \leftarrow cR_i,\ c \ne 0$) ส่งผลต่ออันดับอย่างไร?
+                        </span>
+                        <i id="icon-disc-2" class="fa-solid fa-chevron-down text-slate-400 text-sm transition-transform duration-200"></i>
+                    </button>
+                    <div id="disc-2" class="hidden p-5 bg-white border-t border-slate-200 text-sm text-slate-700 leading-relaxed space-y-2">
+                        <p class="font-semibold text-emerald-800">
+                            <i class="fa-solid fa-circle-check"></i> ไม่ส่งผลกระทบใดๆ ต่ออันดับ (อันดับคงเดิมทุกประการ)
+                        </p>
+                        <p>
+                            เนื่องจาก $c \ne 0$ เวกเตอร์ $c r_i$ จึงเป็นเพียงการขยายหรือหดขนาด (Rescaling) ทิศทางเดิมของเวกเตอร์แถว $r_i$ โดยไม่ได้ทำลายความเป็นอิสระเชิงเส้น และเนื่องจากเราสามารถคูณย้อนกลับด้วยส่วนกลับ $\frac{1}{c}$ ได้เสมอ ทำให้เวกเตอร์ชุดใหม่ยังคงสแปนปริภูมิแถวเดิมได้อย่างสมบูรณ์
+                        </p>
+                        <p class="text-xs text-rose-600">
+                            * ข้อควรระวัง: หาก $c = 0$ เวกเตอร์แถวนั้นจะกลายเป็นเวกเตอร์ศูนย์ทั้งหมด ซึ่งจะทำลายมิติและทำให้อันดับลดลงทันที จึงเป็นเหตุผลที่นิยามของ EROs บังคับให้ $c \ne 0$ เสมอ
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Question 3 -->
+                <div class="border border-slate-200 rounded-xl overflow-hidden transition-all">
+                    <button onclick="toggleAccordion('disc-3')" class="w-full flex items-center justify-between p-4 sm:p-5 text-left bg-slate-50/70 hover:bg-slate-100/70 transition">
+                        <span class="font-bold text-slate-800 text-sm sm:text-base flex items-center gap-3">
+                            <span class="w-7 h-7 rounded-full bg-amber-100 text-amber-800 text-xs flex items-center justify-center font-bold flex-shrink-0">3</span>
+                            อันดับของเมทริกซ์สัมพันธ์กับจำนวนแถว ($m$) และจำนวนคอลัมน์ ($n$) อย่างไร?
+                        </span>
+                        <i id="icon-disc-3" class="fa-solid fa-chevron-down text-slate-400 text-sm transition-transform duration-200"></i>
+                    </button>
+                    <div id="disc-3" class="hidden p-5 bg-white border-t border-slate-200 text-sm text-slate-700 leading-relaxed space-y-2">
+                        <p class="font-semibold text-indigo-900">ความสัมพันธ์เชิงอสมการขอบเขต (Dimension Bound):</p>
+                        <p>
+                            สำหรับเมทริกซ์ $A$ ใดๆ ที่มีมิติ $m \times n$ (มี $m$ แถว และ $n$ คอลัมน์):
+                        </p>
+                        <div class="p-3 bg-slate-50 rounded-lg border border-slate-200 text-center font-bold text-indigo-900 text-base">
+                            $$\operatorname{rank}(A) \le \min(m, n)$$
+                        </div>
+                        <p class="text-xs text-slate-600 leading-relaxed">
+                            <strong>เหตุผล:</strong> ตำแหน่งหลัก (Pivot) ในเมทริกซ์รูปขั้นบันได แต่ละแถวจะมีตำแหน่งหลักได้ไม่เกิน 1 ตำแหน่ง (ทำให้ $\operatorname{rank} \le m$) และในแต่ละคอลัมน์ก็มีตำแหน่งหลักได้ไม่เกิน 1 ตำแหน่งเช่นกัน (ทำให้ $\operatorname{rank} \le n$) ดังนั้นอันดับจึงไม่มีทางเกินค่าที่น้อยกว่าระหว่าง $m$ กับ $n$
+                        </p>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- 5. แบบฝึกหัดสำหรับนักศึกษา -->
+        <section class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 sm:p-8">
+            <div class="flex items-center gap-3 border-b border-slate-100 pb-4 mb-6">
+                <div class="w-10 h-10 rounded-xl bg-teal-50 flex items-center justify-center text-teal-600 font-bold text-lg">
+                    <i class="fa-solid fa-pen-ruler"></i>
+                </div>
+                <div>
+                    <h2 class="text-xl sm:text-2xl font-bold text-slate-900">5. แบบฝึกหัดสำหรับนักศึกษา (Exercises & Solutions)</h2>
+                    <p class="text-xs sm:text-sm text-slate-500">ฝึกฝนการหาอันดับและพิสูจน์สมบัติทางคณิตศาสตร์อย่างเป็นทางการ</p>
+                </div>
+            </div>
+
+            <div class="space-y-6">
+                
+                <!-- Exercise 1 -->
+                <div class="p-5 sm:p-6 rounded-xl border border-slate-200 bg-slate-50/50">
+                    <span class="text-xs font-bold text-teal-800 bg-teal-100 px-2.5 py-1 rounded">ข้อที่ 1</span>
+                    <h3 class="font-bold text-slate-900 mt-2 text-base sm:text-lg">
+                        หาอันดับของเมทริกซ์ขนาด $3 \times 4$ และ $4 \times 5$
+                    </h3>
+                    <p class="text-slate-700 text-sm mt-1">
+                        จงหาอันดับของเมทริกซ์ $M_1$ ขนาด $3 \times 4$ และ $M_2$ ขนาด $4 \times 5$ ต่อไปนี้:
+                    </p>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 my-3 text-center">
+                        <div class="p-3 bg-white rounded-lg border border-slate-200">
+                            <span class="text-xs font-semibold text-slate-500">เมทริกซ์ $M_1$:</span>
+                            <div class="my-1">
+                                $$M_1 = \begin{bmatrix} 1 & -2 & 0 & 3 \\ 2 & -4 & 1 & 5 \\ 3 & -6 & 1 & 8 \end{bmatrix}$$
+                            </div>
+                        </div>
+                        <div class="p-3 bg-white rounded-lg border border-slate-200">
+                            <span class="text-xs font-semibold text-slate-500">เมทริกซ์ $M_2$:</span>
+                            <div class="my-1">
+                                $$M_2 = \begin{bmatrix} 1 & 2 & 0 & -1 & 2 \\ 2 & 4 & 1 & 0 & 5 \\ 0 & 0 & 2 & 2 & 2 \\ 1 & 2 & 1 & 1 & 3 \end{bmatrix}$$
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-4 pt-3 border-t border-slate-200">
+                        <button onclick="toggleExercise('ans-ex-1')" class="text-xs sm:text-sm font-semibold text-indigo-600 hover:text-indigo-800 flex items-center gap-1.5 transition">
+                            <i class="fa-regular fa-eye"></i> <span id="label-ans-ex-1">ดูขั้นตอนการหาอันดับ</span>
+                        </button>
+                        <div id="ans-ex-1" class="hidden mt-3 p-4 bg-white rounded-lg border border-indigo-100 text-sm space-y-3 text-slate-700">
+                            <div>
+                                <span class="font-bold text-indigo-900">1. การหาอันดับของ $M_1$:</span>
+                                <div class="text-xs sm:text-sm pl-2 space-y-1 mt-1">
+                                    <div>• กำจัดสดมภ์ที่ 1: $R_2 \leftarrow R_2 - 2R_1$ และ $R_3 \leftarrow R_3 - 3R_1$ ได้ $\begin{bmatrix} 1 & -2 & 0 & 3 \\ 0 & 0 & 1 & -1 \\ 0 & 0 & 1 & -1 \end{bmatrix}$</div>
+                                    <div>• กำจัดสดมภ์ที่ 3: $R_3 \leftarrow R_3 - R_2$ ได้ $\begin{bmatrix} 1 & -2 & 0 & 3 \\ 0 & 0 & 1 & -1 \\ 0 & 0 & 0 & 0 \end{bmatrix}$</div>
+                                    <div class="text-emerald-700 font-bold">• มีแถวที่ไม่เป็นศูนย์ 2 แถว $\implies \mathbf{\operatorname{rank}(M_1) = 2}$</div>
+                                </div>
+                            </div>
+                            <div class="border-t border-slate-100 pt-2">
+                                <span class="font-bold text-indigo-900">2. การหาอันดับของ $M_2$:</span>
+                                <div class="text-xs sm:text-sm pl-2 space-y-1 mt-1">
+                                    <div>• กำจัดสดมภ์ที่ 1: $R_2 \leftarrow R_2 - 2R_1$ และ $R_4 \leftarrow R_4 - R_1$ ได้ $\begin{bmatrix} 1 & 2 & 0 & -1 & 2 \\ 0 & 0 & 1 & 2 & 1 \\ 0 & 0 & 2 & 2 & 2 \\ 0 & 0 & 1 & 2 & 1 \end{bmatrix}$</div>
+                                    <div>• กำจัดสดมภ์ที่ 3: $R_3 \leftarrow R_3 - 2R_2$ และ $R_4 \leftarrow R_4 - R_2$ ได้ $\begin{bmatrix} 1 & 2 & 0 & -1 & 2 \\ 0 & 0 & 1 & 2 & 1 \\ 0 & 0 & 0 & -2 & 0 \\ 0 & 0 & 0 & 0 & 0 \end{bmatrix}$</div>
+                                    <div class="text-emerald-700 font-bold">• มีแถวที่ไม่เป็นศูนย์ 3 แถว (แถวที่ 4 เป็นแถวศูนย์ทั้งหมด) $\implies \mathbf{\operatorname{rank}(M_2) = 3}$</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Exercise 2 -->
+                <div class="p-5 sm:p-6 rounded-xl border border-slate-200 bg-slate-50/50">
+                    <span class="text-xs font-bold text-teal-800 bg-teal-100 px-2.5 py-1 rounded">ข้อที่ 2</span>
+                    <h3 class="font-bold text-slate-900 mt-2 text-base sm:text-lg">
+                        ใช้ทฤษฎีบทอธิบายว่าเหตุใดอันดับไม่เปลี่ยนภายใต้การดำเนินการขั้นมูลฐาน
+                    </h3>
+                    <p class="text-slate-700 text-sm mt-1">
+                        จงอธิบายความเชื่อมโยงระหว่างการดำเนินการขั้นมูลฐานตามแถว ปริภูมิแถว (Row Space) และเมทริกซ์ขั้นมูลฐาน (Elementary Matrices)
+                    </p>
+
+                    <div class="mt-4 pt-3 border-t border-slate-200">
+                        <button onclick="toggleExercise('ans-ex-2')" class="text-xs sm:text-sm font-semibold text-indigo-600 hover:text-indigo-800 flex items-center gap-1.5 transition">
+                            <i class="fa-regular fa-eye"></i> <span id="label-ans-ex-2">ดูคำอธิบายเชิงทฤษฎี</span>
+                        </button>
+                        <div id="ans-ex-2" class="hidden mt-3 p-4 bg-white rounded-lg border border-indigo-100 text-sm space-y-3 text-slate-700">
+                            <p class="font-semibold text-slate-900">การอธิบายเชิงทฤษฎี (Theoretical Justification):</p>
+                            <div class="space-y-2 text-xs sm:text-sm leading-relaxed text-slate-600">
+                                <p>
+                                    1. <strong>ในแง่ของปริภูมิแถว (Row Space):</strong> การดำเนินการขั้นมูลฐานตามแถวแต่ละครั้งทำให้แถวใหม่ของเมทริกซ์เป็นการรวมเชิงเส้นของแถวเดิมเสมอ และเนื่องจากการดำเนินการทุกชนิดสามารถย้อนกลับได้ด้วยการดำเนินการชนิดเดียวกัน ทำให้แถวเดิมก็เป็นการรวมเชิงเส้นของแถวใหม่เช่นกัน ดังนั้นปริภูมิแถวจึงคงสภาพเดิมทุกประการ $\operatorname{Row}(A) = \operatorname{Row}(E A)$ ส่งผลให้มิติของปริภูมิแถวคงเดิม นั่นคือ $\operatorname{rank}(A) = \operatorname{rank}(E A)$
+                                </p>
+                                <p>
+                                    2. <strong>ในแง่ของเมทริกซ์ขั้นมูลฐาน (Invertible Matrix Multiplication):</strong> การดำเนินการขั้นมูลฐานตามแถวเทียบเท่ากับการคูณทางซ้ายด้วยเมทริกซ์ไม่เอกฐาน $E$ (Invertible matrix, $\det(E) \ne 0$) ตามสมบัติของพีชคณิตเชิงเส้น การคูณด้วยเมทริกซ์ไม่เอกฐานจะไม่เปลี่ยนแปลงอันดับของเมทริกซ์:
+                                    $$\operatorname{rank}(EA) = \operatorname{rank}(A)$$
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Exercise 3 -->
+                <div class="p-5 sm:p-6 rounded-xl border border-slate-200 bg-slate-50/50">
+                    <span class="text-xs font-bold text-teal-800 bg-teal-100 px-2.5 py-1 rounded">ข้อที่ 3</span>
+                    <h3 class="font-bold text-slate-900 mt-2 text-base sm:text-lg">
+                        พิสูจน์ว่าอันดับของเมทริกซ์ไม่เกินค่าที่น้อยกว่าระหว่างจำนวนแถวกับจำนวนคอลัมน์
+                    </h3>
+                    <p class="text-slate-700 text-sm mt-1">
+                        จงพิสูจน์อย่างเป็นทางการว่าสำหรับเมทริกซ์ $A \in \mathbb{R}^{m \times n}$ ใดๆ ย่อมได้ว่า $\operatorname{rank}(A) \le \min(m, n)$
+                    </p>
+
+                    <div class="mt-4 pt-3 border-t border-slate-200">
+                        <button onclick="toggleExercise('ans-ex-3')" class="text-xs sm:text-sm font-semibold text-indigo-600 hover:text-indigo-800 flex items-center gap-1.5 transition">
+                            <i class="fa-regular fa-eye"></i> <span id="label-ans-ex-3">ดูบทพิสูจน์</span>
+                        </button>
+                        <div id="ans-ex-3" class="hidden mt-3 p-4 bg-white rounded-lg border border-indigo-100 text-sm space-y-3 text-slate-700">
+                            <p class="font-semibold text-slate-900">บทพิสูจน์อย่างเป็นทางการ (Proof):</p>
+                            <div class="space-y-2 text-xs sm:text-sm leading-relaxed text-slate-600">
+                                <p>
+                                    ให้ $A$ เป็นเมทริกซ์ขนาด $m \times n$
+                                </p>
+                                <p>
+                                    1. <strong>พิจารณาจากปริภูมิแถว ($\operatorname{Row}(A)$):</strong> ปริภูมิแถวของ $A$ ถูกแผ่คลุม (spanned) โดยเวกเตอร์แถวจำนวน $m$ เวกเตอร์ ดังนั้น มิติของปริภูมิแถวจึงไม่สามารถเกินจำนวนเวกเตอร์ที่แผ่คลุมได้:
+                                    $$\operatorname{rank}(A) = \dim(\operatorname{Row}(A)) \le m$$
+                                </p>
+                                <p>
+                                    2. <strong>พิจารณาจากปริภูมิคอลัมน์ ($\operatorname{Col}(A)$):</strong> ปริภูมิคอลัมน์ของ $A$ ถูกแผ่คลุมโดยเวกเตอร์คอลัมน์จำนวน $n$ เวกเตอร์ใน $\mathbb{R}^m$ ดังนั้น มิติของปริภูมิคอลัมน์จึงไม่สามารถเกินจำนวนเวกเตอร์คอลัมน์ได้:
+                                    $$\operatorname{rank}(A) = \dim(\operatorname{Col}(A)) \le n$$
+                                </p>
+                                <p>
+                                    เนื่องจาก $\operatorname{rank}(A)$ มีค่าเท่ากับทั้ง $\dim(\operatorname{Row}(A))$ และ $\dim(\operatorname{Col}(A))$ พร้อมกัน ทำให้ $\operatorname{rank}(A)$ ต้องน้อยกว่าหรือเท่ากับทั้ง $m$ และ $n$:
+                                </p>
+                                <p class="text-emerald-800 font-bold pt-1">
+                                    $\therefore \operatorname{rank}(A) \le \min(m, n) \quad \blacksquare$
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="text-center text-xs text-slate-400 py-6 border-t border-slate-200">
+            <p>เรื่องที่ 7: อันดับของเมทริกซ์และสมบัติภายใต้การดำเนินการขั้นมูลฐาน • สื่อการเรียนรู้คณิตศาสตร์เชิงปฏิสัมพันธ์</p>
+        </footer>
+
+    </main>
+
+    <!-- JavaScript Interactive Simulation Logic -->
+    <script>
+        // Preset configurations
+        const samplePresets = {
+            '3x3': {
+                rows: 3, cols: 3,
+                matrix: [
+                    [1, 2, 3],
+                    [2, 4, 6],
+                    [1, 1, 1]
+                ]
+            },
+            '3x4': {
+                rows: 3, cols: 4,
+                matrix: [
+                    [1, -2, 0, 3],
+                    [2, -4, 1, 5],
+                    [3, -6, 1, 8]
+                ]
+            },
+            '4x5': {
+                rows: 4, cols: 5,
+                matrix: [
+                    [1, 2, 0, -1, 2],
+                    [2, 4, 1, 0, 5],
+                    [0, 0, 2, 2, 2],
+                    [1, 2, 1, 1, 3]
+                ]
+            }
+        };
+
+        let currentKey = '3x3';
+        let currentRows = 3;
+        let currentCols = 3;
+        let userMatrix = [];
+
+        window.onload = function() {
+            setMatrixPreset('3x3');
+        };
+
+        function setMatrixPreset(key) {
+            currentKey = key;
+            const p = samplePresets[key];
+            currentRows = p.rows;
+            currentCols = p.cols;
+            userMatrix = JSON.parse(JSON.stringify(p.matrix));
+
+            // update button states
+            ['3x3', '3x4', '4x5'].forEach(k => {
+                const btn = document.getElementById(`btn-size-${k}`);
+                if (k === key) {
+                    btn.className = "px-2.5 py-1 rounded-lg bg-white font-bold text-slate-800 shadow-xs";
+                } else {
+                    btn.className = "px-2.5 py-1 rounded-lg text-slate-600 hover:text-slate-900";
+                }
+            });
+
+            renderInputMatrix();
+            analyzeAndComputeRank();
+        }
+
+        function resetCurrentPreset() {
+            setMatrixPreset(currentKey);
+        }
+
+        function randomizeCurrentMatrix() {
+            for (let r = 0; r < currentRows; r++) {
+                for (let c = 0; c < currentCols; c++) {
+                    // biased towards some linear dependency
+                    if (r === currentRows - 1 && Math.random() > 0.4) {
+                        userMatrix[r][c] = userMatrix[0][c] + (userMatrix[1] ? userMatrix[1][c] : 0);
+                    } else {
+                        userMatrix[r][c] = Math.floor(Math.random() * 7) - 2; // -2 to 4
+                    }
+                }
+            }
+            renderInputMatrix();
+            analyzeAndComputeRank();
+        }
+
+        function renderInputMatrix() {
+            const container = document.getElementById('matrix-input-table');
+            container.innerHTML = '';
+
+            for (let r = 0; r < currentRows; r++) {
+                const rowDiv = document.createElement('div');
+                rowDiv.className = "flex items-center gap-1.5";
+
+                const label = document.createElement('span');
+                label.className = "text-xs font-semibold text-slate-400 w-5 text-right";
+                label.innerText = `R${r+1}`;
+                rowDiv.appendChild(label);
+
+                for (let c = 0; c < currentCols; c++) {
+                    const input = document.createElement('input');
+                    input.type = "number";
+                    input.step = "any";
+                    input.value = userMatrix[r][c];
+                    input.dataset.r = r;
+                    input.dataset.c = c;
+                    input.className = "w-11 h-9 text-center bg-white border border-slate-300 rounded font-semibold text-xs sm:text-sm text-slate-800 focus:border-indigo-600 focus:ring-1 focus:ring-indigo-600 outline-none transition";
+                    
+                    input.oninput = function() {
+                        const val = parseFloat(this.value);
+                        userMatrix[r][c] = isNaN(val) ? 0 : val;
+                        analyzeAndComputeRank();
+                    };
+
+                    rowDiv.appendChild(input);
+                }
+                container.appendChild(rowDiv);
+            }
+        }
+
+        // Gaussian Elimination to identify pivots and compute rank
+        function analyzeAndComputeRank() {
+            const m = currentRows;
+            const n = currentCols;
+            const A = JSON.parse(JSON.stringify(userMatrix));
+
+            let lead = 0;
+            let rank = 0;
+            const pivotPositions = [];
+            const steps = [];
+
+            steps.push({
+                desc: "เมทริกซ์เริ่มต้น $A$",
+                matrix: JSON.parse(JSON.stringify(A)),
+                rankCurrent: "?"
+            });
+
+            for (let r = 0; r < m; r++) {
+                if (lead >= n) break;
+                let i = r;
+
+                // Find non-zero pivot
+                while (Math.abs(A[i][lead]) < 1e-9) {
+                    i++;
+                    if (i === m) {
+                        i = r;
+                        lead++;
+                        if (lead === n) break;
+                    }
+                }
+                if (lead >= n) break;
+
+                // Swap rows if necessary
+                if (i !== r) {
+                    const temp = A[i];
+                    A[i] = A[r];
+                    A[r] = temp;
+                    steps.push({
+                        desc: `สลับแถว: $R_{${r+1}} \\leftrightarrow R_{${i+1}}$`,
+                        matrix: JSON.parse(JSON.stringify(A))
+                    });
+                }
+
+                // Eliminate rows below
+                for (let below = r + 1; below < m; below++) {
+                    if (Math.abs(A[below][lead]) > 1e-9) {
+                        const factor = A[below][lead] / A[r][lead];
+                        for (let col = lead; col < n; col++) {
+                            A[below][col] -= factor * A[r][col];
+                        }
+                        const roundedFactor = Math.round(factor * 100) / 100;
+                        const factorStr = roundedFactor >= 0 ? `- ${roundedFactor}` : `+ ${Math.abs(roundedFactor)}`;
+                        steps.push({
+                            desc: `กำจัด: $R_{${below+1}} \\leftarrow R_{${below+1}} ${factorStr}R_{${r+1}}$`,
+                            matrix: JSON.parse(JSON.stringify(A))
+                        });
+                    }
+                }
+
+                pivotPositions.push({ row: r, col: lead });
+                lead++;
+                rank++;
+            }
+
+            // Clean numerical roundoffs
+            for (let r = 0; r < m; r++) {
+                for (let c = 0; c < n; c++) {
+                    if (Math.abs(A[r][c]) < 1e-8) A[r][c] = 0;
+                }
+            }
+
+            // Update UI indicators
+            document.getElementById('stat-rank-val').innerText = rank;
+            document.getElementById('stat-rank-formula').innerText = `จากขนาด ${m} × ${n}`;
+            document.getElementById('stat-rank-bound').innerHTML = `$\\min(${m}, ${n}) = ${Math.min(m, n)}$`;
+            document.getElementById('stat-pivot-count').innerText = `${rank} ตำแหน่ง`;
+            document.getElementById('step-count-badge').innerText = `${steps.length} ขั้นตอน`;
+
+            // Render steps timeline
+            renderStepsTimeline(steps, rank);
+            triggerMathJax();
+        }
+
+        function renderStepsTimeline(steps, finalRank) {
+            const container = document.getElementById('ero-steps-container');
+            container.innerHTML = '';
+
+            steps.forEach((step, idx) => {
+                const isFinal = (idx === steps.length - 1);
+                const stepEl = document.createElement('div');
+                stepEl.className = `p-2.5 rounded-lg border transition ${
+                    isFinal 
+                        ? 'bg-emerald-50 border-emerald-300 text-emerald-950 font-semibold' 
+                        : 'bg-white border-slate-200 text-slate-700'
+                }`;
+
+                const latexMat = matrixToLatex(step.matrix);
+                stepEl.innerHTML = `
+                    <div class="flex items-center justify-between mb-1 text-[11px]">
+                        <span class="font-bold text-indigo-700">ขั้นตอนที่ ${idx}: ${step.desc}</span>
+                        <span class="px-1.5 py-0.5 rounded bg-slate-100 text-slate-600 font-mono text-[10px]">
+                            ${isFinal ? 'REF สุดท้าย' : 'อันดับคงที่'}
+                        </span>
+                    </div>
+                    <div class="text-center overflow-x-auto py-1">
+                        $$${latexMat}$$
+                    </div>
+                    ${isFinal ? `<div class="text-[11px] text-emerald-700 text-right mt-1 font-bold">✓ จำนวนแถวไม่เป็นศูนย์ = ${finalRank} แถว $\\implies \\operatorname{rank}(A) = ${finalRank}$</div>` : ''}
+                `;
+                container.appendChild(stepEl);
+            });
+        }
+
+        function matrixToLatex(mat) {
+            let latex = "\\begin{bmatrix}";
+            for (let r = 0; r < mat.length; r++) {
+                const rowStr = mat[r].map(v => Math.round(v * 100) / 100).join(" & ");
+                latex += rowStr;
+                if (r < mat.length - 1) latex += " \\\\ ";
+            }
+            latex += "\\end{bmatrix}";
+            return latex;
+        }
+
+        function triggerMathJax() {
+            if (window.MathJax && window.MathJax.typesetPromise) {
+                window.MathJax.typesetPromise().catch(err => console.error(err));
+            }
+        }
+
+        // Accordion Helpers
+        function toggleAccordion(id) {
+            const content = document.getElementById(id);
+            const icon = document.getElementById(`icon-${id}`);
+            if (content.classList.contains('hidden')) {
+                content.classList.remove('hidden');
+                icon.classList.add('rotate-180');
+                triggerMathJax();
+            } else {
+                content.classList.add('hidden');
+                icon.classList.remove('rotate-180');
+            }
+        }
+
+        function toggleExercise(id) {
+            const el = document.getElementById(id);
+            const label = document.getElementById(`label-${id}`);
+            if (el.classList.contains('hidden')) {
+                el.classList.remove('hidden');
+                label.innerText = "ซ่อนเฉลย / คำอธิบาย";
+                triggerMathJax();
+            } else {
+                el.classList.add('hidden');
+                label.innerText = id === 'ans-ex-1' ? "ดูขั้นตอนการหาอันดับ" : (id === 'ans-ex-2' ? "ดูคำอธิบายเชิงทฤษฎี" : "ดูบทพิสูจน์");
+            }
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,997 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>เรื่องที่ 3: เมทริกซ์รูปขั้นบันได (Row Echelon Form: REF)</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Sarabun & Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- MathJax for rendering LaTeX -->
+    <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']],
+                displayMath: [['$$', '$$'], ['\\[', '\\]']]
+            },
+            svg: {
+                fontCache: 'global'
+            }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        body {
+            font-family: 'Sarabun', 'Inter', sans-serif;
+            background-color: #f8fafc;
+            color: #1e293b;
+        }
+        .matrix-bracket {
+            position: relative;
+            padding: 4px 10px;
+        }
+        .matrix-bracket::before, .matrix-bracket::after {
+            content: "";
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            width: 8px;
+            border-style: solid;
+            border-color: #334155;
+        }
+        .matrix-bracket::before {
+            left: 0;
+            border-width: 2px 0 2px 2px;
+            border-top-left-radius: 6px;
+            border-bottom-left-radius: 6px;
+        }
+        .matrix-bracket::after {
+            right: 0;
+            border-width: 2px 2px 2px 0;
+            border-top-right-radius: 6px;
+            border-bottom-right-radius: 6px;
+        }
+        input[type=number]::-webkit-inner-spin-button, 
+        input[type=number]::-webkit-outer-spin-button { 
+            -webkit-appearance: none; 
+            margin: 0; 
+        }
+        input[type=number] {
+            -moz-appearance: textfield;
+        }
+    </style>
+</head>
+<body class="min-h-screen">
+
+    <!-- Header Banner -->
+    <header class="bg-gradient-to-r from-slate-900 via-violet-950 to-indigo-900 text-white shadow-lg border-b border-violet-800/50">
+        <div class="max-w-6xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <div class="flex flex-wrap items-center justify-between gap-4">
+                <div>
+                    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-violet-500/30 text-violet-200 border border-violet-400/30 mb-2">
+                        <i class="fa-solid fa-graduation-cap"></i> พีชคณิตเชิงเส้น (Linear Algebra)
+                    </span>
+                    <h1 class="text-2xl sm:text-3xl lg:text-4xl font-bold tracking-tight">
+                        เรื่องที่ 3: เมทริกซ์รูปขั้นบันได (Row Echelon Form)
+                    </h1>
+                    <p class="text-violet-200 mt-1 text-sm sm:text-base font-light">
+                        ลักษณะเฉพาะของรูปขั้นบันได (REF), สมาชิกนำ (Leading Entry) และการตรวจสอบเงื่อนไข
+                    </p>
+                </div>
+                <div class="hidden md:flex items-center gap-3 bg-white/10 backdrop-blur-sm px-4 py-2.5 rounded-xl border border-white/20 text-xs">
+                    <div class="w-10 h-10 rounded-lg bg-violet-500/30 text-violet-300 flex items-center justify-center font-bold text-lg">
+                        <i class="fa-solid fa-stairs"></i>
+                    </div>
+                    <div>
+                        <div class="font-semibold text-white">เครื่องมือตรวจสอบ REF</div>
+                        <div class="text-violet-200">Real-Time Condition Validator</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Container: Max Width 6xl Requirement -->
+    <main class="max-w-6xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 space-y-10">
+
+        <!-- 1. วัตถุประสงค์การเรียนรู้ -->
+        <section class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 sm:p-8 transition-all hover:shadow-md">
+            <div class="flex items-center gap-3 border-b border-slate-100 pb-4 mb-5">
+                <div class="w-10 h-10 rounded-xl bg-violet-50 flex items-center justify-center text-violet-600 font-bold text-lg">
+                    <i class="fa-solid fa-bullseye"></i>
+                </div>
+                <div>
+                    <h2 class="text-xl sm:text-2xl font-bold text-slate-900">1. วัตถุประสงค์การเรียนรู้</h2>
+                    <p class="text-xs sm:text-sm text-slate-500">ผลการเรียนรู้ที่คาดหวัง</p>
+                </div>
+            </div>
+            
+            <div class="bg-gradient-to-r from-violet-50/90 to-indigo-50/60 border-l-4 border-violet-600 rounded-r-xl p-5">
+                <p class="text-slate-800 leading-relaxed font-semibold mb-3">
+                    เมื่อสิ้นสุดบทเรียนนี้นักศึกษาสามารถ:
+                </p>
+                <ul class="space-y-3 text-slate-700 text-sm sm:text-base">
+                    <li class="flex items-start gap-3">
+                        <span class="w-6 h-6 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center text-xs font-bold mt-0.5 flex-shrink-0">
+                            <i class="fa-solid fa-check"></i>
+                        </span>
+                        <span><strong>จำแนกเมทริกซ์รูปขั้นบันได (Row Echelon Form)</strong> ได้อย่างแม่นยำตามเงื่อนไขทั้ง 3 ข้อ</span>
+                    </li>
+                    <li class="flex items-start gap-3">
+                        <span class="w-6 h-6 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center text-xs font-bold mt-0.5 flex-shrink-0">
+                            <i class="fa-solid fa-check"></i>
+                        </span>
+                        <span><strong>สร้างเมทริกซ์รูปขั้นบันได</strong> จากเมทริกซ์ที่กำหนดให้โดยใช้การดำเนินการขั้นมูลฐานตามแถว</span>
+                    </li>
+                    <li class="flex items-start gap-3">
+                        <span class="w-6 h-6 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center text-xs font-bold mt-0.5 flex-shrink-0">
+                            <i class="fa-solid fa-check"></i>
+                        </span>
+                        <span><strong>อธิบายบทบาทของตำแหน่งนำ (Leading Entry / Pivot)</strong> ในการวิเคราะห์โครงสร้างของระบบสมการเชิงเส้น</span>
+                    </li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- 2. เนื้อหาหลัก -->
+        <section class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 sm:p-8 space-y-7">
+            <div class="flex items-center gap-3 border-b border-slate-100 pb-4">
+                <div class="w-10 h-10 rounded-xl bg-indigo-50 flex items-center justify-center text-indigo-600 font-bold text-lg">
+                    <i class="fa-solid fa-book-open-reader"></i>
+                </div>
+                <div>
+                    <h2 class="text-xl sm:text-2xl font-bold text-slate-900">2. เนื้อหาหลัก (Core Content)</h2>
+                    <p class="text-xs sm:text-sm text-slate-500">นิยามและเงื่อนไขของเมทริกซ์รูปขั้นบันได</p>
+                </div>
+            </div>
+
+            <div class="bg-slate-50 border border-slate-200 rounded-xl p-5 sm:p-6">
+                <h3 class="text-base sm:text-lg font-bold text-slate-900 mb-2 flex items-center gap-2">
+                    <i class="fa-solid fa-stairs text-violet-600"></i> นิยาม: เมทริกซ์รูปขั้นบันได (Row Echelon Form: REF)
+                </h3>
+                <p class="text-slate-700 leading-relaxed text-sm sm:text-base">
+                    เมทริกซ์ใดๆ จะเรียกว่าอยู่ใน <strong>รูปขั้นบันได (Row Echelon Form)</strong> เมื่อสอดคล้องกับเงื่อนไขทั้ง 3 ประการต่อไปนี้อย่างครบถ้วน:
+                </p>
+            </div>
+
+            <!-- 3 เงื่อนไข Card -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6">
+                <!-- Condition 1 -->
+                <div class="p-5 rounded-xl border border-violet-100 bg-violet-50/50 hover:bg-violet-50/90 transition shadow-xs">
+                    <div class="flex items-center justify-between mb-3">
+                        <span class="text-xs font-bold uppercase tracking-wider text-violet-800 bg-violet-100 px-2.5 py-1 rounded">เงื่อนไขที่ 1</span>
+                        <i class="fa-solid fa-arrow-down-wide-short text-violet-500"></i>
+                    </div>
+                    <h4 class="font-bold text-slate-900 text-base mb-1">แถวศูนย์อยู่ด้านล่างสุด</h4>
+                    <p class="text-xs sm:text-sm text-slate-600 leading-relaxed">
+                        แถวที่มีสมาชิกเป็นศูนย์ทั้งหมด (Zero rows) จะต้องอยู่ <strong>ใต้แถว</strong> ที่มีสมาชิกไม่เป็นศูนย์ทั้งหมดเสมอ
+                    </p>
+                </div>
+
+                <!-- Condition 2 -->
+                <div class="p-5 rounded-xl border border-blue-100 bg-blue-50/50 hover:bg-blue-50/90 transition shadow-xs">
+                    <div class="flex items-center justify-between mb-3">
+                        <span class="text-xs font-bold uppercase tracking-wider text-blue-800 bg-blue-100 px-2.5 py-1 rounded">เงื่อนไขที่ 2</span>
+                        <i class="fa-solid fa-arrow-turn-down text-blue-500"></i>
+                    </div>
+                    <h4 class="font-bold text-slate-900 text-base mb-1">ตำแหน่งนำเยื้องไปทางขวา</h4>
+                    <p class="text-xs sm:text-sm text-slate-600 leading-relaxed">
+                        สมาชิกตัวแรกที่ไม่เป็นศูนย์ของแต่ละแถว (ตำแหน่งนำ หรือ Leading Entry) ต้องอยู่ <strong>ทางขวา</strong> ของตำแหน่งนำของแถวก่อนหน้า
+                    </p>
+                </div>
+
+                <!-- Condition 3 -->
+                <div class="p-5 rounded-xl border border-emerald-100 bg-emerald-50/50 hover:bg-emerald-50/90 transition shadow-xs">
+                    <div class="flex items-center justify-between mb-3">
+                        <span class="text-xs font-bold uppercase tracking-wider text-emerald-800 bg-emerald-100 px-2.5 py-1 rounded">เงื่อนไขที่ 3</span>
+                        <i class="fa-solid fa-zero text-emerald-500"></i>
+                    </div>
+                    <h4 class="font-bold text-slate-900 text-base mb-1">ใต้ตำแหน่งนำต้องเป็นศูนย์</h4>
+                    <p class="text-xs sm:text-sm text-slate-600 leading-relaxed">
+                        สมาชิกทุกตัวที่อยู่ <strong>ข้างใต้ตำแหน่งนำ</strong> ในสดมภ์เดียวกัน ต้องมีค่าเท่ากับศูนย์ทั้งหมด ($0$)
+                    </p>
+                </div>
+            </div>
+
+            <!-- Example Section -->
+            <div class="bg-slate-50 rounded-xl p-5 sm:p-6 border border-slate-200">
+                <h3 class="font-bold text-slate-900 text-base sm:text-lg mb-3 flex items-center gap-2">
+                    <span class="w-6 h-6 rounded-full bg-violet-600 text-white flex items-center justify-center text-xs">Ex</span>
+                    ตัวอย่างเมทริกซ์ในรูปขั้นบันได (REF) ขนาด $4 \times 4$
+                </h3>
+
+                <div class="flex flex-col md:flex-row items-center justify-around gap-6 py-3">
+                    <div class="text-center">
+                        <div class="text-xl sm:text-2xl font-bold text-slate-800">
+                            $$\begin{bmatrix}
+                            \mathbf{\underline{1}} & 2 & 3 & 4 \\
+                            0 & \mathbf{\underline{1}} & 5 & 6 \\
+                            0 & 0 & \mathbf{\underline{2}} & 7 \\
+                            0 & 0 & 0 & 0
+                            \end{bmatrix}$$
+                        </div>
+                        <span class="text-xs text-violet-700 font-semibold bg-violet-100 px-3 py-1 rounded-full mt-2 inline-block">
+                            ตัวเลขตัวหนาขีดเส้นใต้คือตำแหน่งนำ (Leading entries)
+                        </span>
+                    </div>
+
+                    <div class="space-y-2 text-xs sm:text-sm text-slate-700 max-w-md">
+                        <div class="flex items-start gap-2">
+                            <i class="fa-solid fa-check text-emerald-600 mt-1"></i>
+                            <span><strong>แถวที่ 4</strong> เป็นแถวศูนย์ทั้งหมด อยู่ใต้แถวที่ไม่ใช่ศูนย์ (ผ่านเงื่อนไข 1)</span>
+                        </div>
+                        <div class="flex items-start gap-2">
+                            <i class="fa-solid fa-check text-emerald-600 mt-1"></i>
+                            <span>ตำแหน่งนำคือ $1$ (หลัก 1), $1$ (หลัก 2), และ $2$ (หลัก 3) เรียงเยื้องขวาเป็นขั้นบันได (ผ่านเงื่อนไข 2)</span>
+                        </div>
+                        <div class="flex items-start gap-2">
+                            <i class="fa-solid fa-check text-emerald-600 mt-1"></i>
+                            <span>สมาชิกใต้ตำแหน่งนำทุกตัวเป็น $0$ (ผ่านเงื่อนไข 3)</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Callout: Leading entry doesn't need to be 1 -->
+                <div class="mt-4 p-4 bg-amber-50 border-l-4 border-amber-500 rounded-r-lg text-xs sm:text-sm text-amber-900 flex items-start gap-3">
+                    <i class="fa-solid fa-circle-exclamation text-amber-600 text-base mt-0.5"></i>
+                    <div class="leading-relaxed">
+                        <strong>ข้อสังเกตสำคัญมาก:</strong> เมทริกซ์นี้อยู่ในรูปขั้นบันได (Row Echelon Form) แล้ว 
+                        <em>แม้ว่าตำแหน่งนำจะไม่จำเป็นต้องเท่ากับ 1 ทุกตำแหน่ง</em> (สังเกตแถวที่ 3 มีตำแหน่งนำเป็น 2) 
+                        เพราะการที่ตำแหน่งนำต้องเป็น 1 เสมอนั้นเป็นเงื่อนไขเพิ่มเติมของ <strong>รูปขั้นบันไดลดรูป (Reduced Row Echelon Form: RREF)</strong>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 3. แบบจำลองโต้ตอบ (Interactive Row Echelon Form Inspector & Validator) -->
+        <section class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 sm:p-8 space-y-6">
+            <div class="flex flex-wrap items-center justify-between gap-4 border-b border-slate-100 pb-4">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-xl bg-purple-50 flex items-center justify-center text-purple-600 font-bold text-lg">
+                        <i class="fa-solid fa-microchip"></i>
+                    </div>
+                    <div>
+                        <h2 class="text-xl sm:text-2xl font-bold text-slate-900">3. แบบจำลองโต้ตอบ: ผู้ตรวจสอบรูปขั้นบันได (REF Inspector)</h2>
+                        <p class="text-xs sm:text-sm text-slate-500">แก้ไขค่าสมาชิกในเมทริกซ์ หรือเลือกชุดข้อมูลทดสอบ เพื่อตรวจเงื่อนไข 3 ข้อแบบ Real-time</p>
+                    </div>
+                </div>
+
+                <!-- Dimension Switcher -->
+                <div class="flex items-center gap-2 bg-slate-100 p-1.5 rounded-lg text-xs">
+                    <span class="text-slate-600 font-medium px-2">ขนาด:</span>
+                    <button id="btn-dim-3x3" onclick="setDimension(3, 3)" class="px-3 py-1 rounded text-slate-600 hover:text-slate-900 transition">3 × 3</button>
+                    <button id="btn-dim-3x4" onclick="setDimension(3, 4)" class="px-3 py-1 rounded text-slate-600 hover:text-slate-900 transition">3 × 4</button>
+                    <button id="btn-dim-4x4" onclick="setDimension(4, 4)" class="px-3 py-1 rounded bg-white text-slate-800 font-bold shadow-xs">4 × 4</button>
+                </div>
+            </div>
+
+            <!-- Preset Tester Buttons -->
+            <div>
+                <label class="text-xs font-bold text-slate-600 uppercase tracking-wider block mb-2">
+                    <i class="fa-solid fa-vial-circle-check text-violet-500 mr-1"></i> เลือกชุดตัวอย่างทดสอบ (Presets):
+                </label>
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                    <button onclick="loadPreset('valid-standard')" class="px-3 py-2 text-xs font-semibold rounded-lg bg-emerald-50 text-emerald-800 border border-emerald-200 hover:bg-emerald-100 transition text-left flex items-center gap-1.5">
+                        <i class="fa-solid fa-check text-emerald-600"></i> 1. เป็น REF ถูกต้อง
+                    </button>
+                    <button onclick="loadPreset('fail-zero-row')" class="px-3 py-2 text-xs font-semibold rounded-lg bg-rose-50 text-rose-800 border border-rose-200 hover:bg-rose-100 transition text-left flex items-center gap-1.5">
+                        <i class="fa-solid fa-xmark text-rose-600"></i> 2. แถวศูนย์อยู่บน
+                    </button>
+                    <button onclick="loadPreset('fail-leading-pos')" class="px-3 py-2 text-xs font-semibold rounded-lg bg-amber-50 text-amber-800 border border-amber-200 hover:bg-amber-100 transition text-left flex items-center gap-1.5">
+                        <i class="fa-solid fa-xmark text-amber-600"></i> 3. นำไม่อยู่ทางขวา
+                    </button>
+                    <button onclick="loadPreset('fail-below-pivot')" class="px-3 py-2 text-xs font-semibold rounded-lg bg-indigo-50 text-indigo-800 border border-indigo-200 hover:bg-indigo-100 transition text-left flex items-center gap-1.5">
+                        <i class="fa-solid fa-xmark text-indigo-600"></i> 4. ใต้นำไม่เป็นศูนย์
+                    </button>
+                </div>
+            </div>
+
+            <!-- Matrix Visual Editor & Realtime Diagnostics Grid -->
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+                
+                <!-- Left: Matrix Cell Grid (Inputs) -->
+                <div class="lg:col-span-6 bg-slate-50 border border-slate-200 rounded-2xl p-5 space-y-4">
+                    <div class="flex items-center justify-between">
+                        <span class="text-sm font-bold text-slate-800 flex items-center gap-2">
+                            <i class="fa-solid fa-table text-violet-600"></i> ปรับค่าตัวเลขในเมทริกซ์
+                        </span>
+                        <div class="flex gap-2">
+                            <button onclick="fillZeros()" class="px-2.5 py-1 text-xs bg-white hover:bg-slate-100 border border-slate-300 text-slate-600 rounded">ศูนย์ทั้งหมด</button>
+                            <button onclick="randomizeMatrix()" class="px-2.5 py-1 text-xs bg-white hover:bg-slate-100 border border-slate-300 text-slate-600 rounded flex items-center gap-1">
+                                <i class="fa-solid fa-shuffle"></i> สุ่มตัวเลข
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Dynamic Input Grid -->
+                    <div class="flex justify-center p-3 overflow-x-auto">
+                        <div id="matrix-grid-container" class="matrix-bracket flex flex-col gap-2 p-2">
+                            <!-- Populated by JS -->
+                        </div>
+                    </div>
+
+                    <!-- Visual Legend -->
+                    <div class="pt-3 border-t border-slate-200 grid grid-cols-3 gap-2 text-center text-xs">
+                        <div class="flex items-center gap-1.5 justify-center">
+                            <span class="w-4 h-4 rounded bg-violet-100 border-2 border-violet-600"></span>
+                            <span class="text-slate-600">ตำแหน่งนำ (Pivot)</span>
+                        </div>
+                        <div class="flex items-center gap-1.5 justify-center">
+                            <span class="w-4 h-4 rounded bg-slate-200 border border-slate-300"></span>
+                            <span class="text-slate-600">แถวศูนย์ทั้งหมด</span>
+                        </div>
+                        <div class="flex items-center gap-1.5 justify-center">
+                            <span class="w-4 h-4 rounded bg-rose-100 border-2 border-rose-500"></span>
+                            <span class="text-slate-600">ผิดเงื่อนไข</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right: 3 Conditions Diagnostic Checklist -->
+                <div class="lg:col-span-6 space-y-4">
+                    
+                    <!-- Overall Status Banner -->
+                    <div id="overall-status-banner" class="p-4 rounded-xl border flex items-center justify-between transition-all">
+                        <div class="flex items-center gap-3">
+                            <div id="overall-status-icon" class="w-10 h-10 rounded-lg flex items-center justify-center text-xl">
+                                <!-- Dynamic Icon -->
+                            </div>
+                            <div>
+                                <h3 id="overall-status-title" class="font-bold text-base">กำลังตรวจสอบ...</h3>
+                                <p id="overall-status-desc" class="text-xs">ผลการตรวจสอบเงื่อนไขรูปขั้นบันได</p>
+                            </div>
+                        </div>
+                        <span id="overall-status-badge" class="text-xs font-bold px-3 py-1 rounded-full uppercase">
+                            -
+                        </span>
+                    </div>
+
+                    <!-- Condition Cards -->
+                    <div class="space-y-3">
+                        
+                        <!-- Condition 1 Check -->
+                        <div id="card-cond-1" class="p-3.5 rounded-xl border transition-all flex items-start gap-3">
+                            <div id="icon-cond-1" class="w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold mt-0.5 flex-shrink-0">
+                                <!-- Check/Cross -->
+                            </div>
+                            <div class="flex-1">
+                                <div class="flex items-center justify-between">
+                                    <h4 class="font-bold text-slate-800 text-xs sm:text-sm">เงื่อนไข 1: แถวศูนย์อยู่ใต้แถวที่ไม่ใช่ศูนย์</h4>
+                                    <span id="badge-cond-1" class="text-[11px] font-semibold px-2 py-0.5 rounded">ผ่าน</span>
+                                </div>
+                                <p id="desc-cond-1" class="text-xs text-slate-600 mt-1 leading-relaxed">
+                                    แถวที่มีสมาชิกเป็นศูนย์ทั้งหมดถูกจัดวางอยู่ด้านล่างสุดเรียบร้อย
+                                </p>
+                            </div>
+                        </div>
+
+                        <!-- Condition 2 Check -->
+                        <div id="card-cond-2" class="p-3.5 rounded-xl border transition-all flex items-start gap-3">
+                            <div id="icon-cond-2" class="w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold mt-0.5 flex-shrink-0">
+                                <!-- Check/Cross -->
+                            </div>
+                            <div class="flex-1">
+                                <div class="flex items-center justify-between">
+                                    <h4 class="font-bold text-slate-800 text-xs sm:text-sm">เงื่อนไข 2: ตำแหน่งนำเยื้องไปทางขวาของแถวก่อน</h4>
+                                    <span id="badge-cond-2" class="text-[11px] font-semibold px-2 py-0.5 rounded">ผ่าน</span>
+                                </div>
+                                <p id="desc-cond-2" class="text-xs text-slate-600 mt-1 leading-relaxed">
+                                    ตำแหน่งนำของแต่ละแถวอยู่คอลัมน์ที่มากกว่าแถวก่อนหน้าเสมอ
+                                </p>
+                            </div>
+                        </div>
+
+                        <!-- Condition 3 Check -->
+                        <div id="card-cond-3" class="p-3.5 rounded-xl border transition-all flex items-start gap-3">
+                            <div id="icon-cond-3" class="w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold mt-0.5 flex-shrink-0">
+                                <!-- Check/Cross -->
+                            </div>
+                            <div class="flex-1">
+                                <div class="flex items-center justify-between">
+                                    <h4 class="font-bold text-slate-800 text-xs sm:text-sm">เงื่อนไข 3: สมาชิกใต้ตำแหน่งนำเป็นศูนย์</h4>
+                                    <span id="badge-cond-3" class="text-[11px] font-semibold px-2 py-0.5 rounded">ผ่าน</span>
+                                </div>
+                                <p id="desc-cond-3" class="text-xs text-slate-600 mt-1 leading-relaxed">
+                                    ไม่มีสมาชิกที่ไม่ใช่ศูนย์อยู่ข้างใต้ตำแหน่งนำในหลักเดียวกัน
+                                </p>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <!-- Leading Entries Summary Info -->
+                    <div class="p-3 bg-violet-50/70 border border-violet-100 rounded-xl text-xs text-violet-950 flex items-center justify-between">
+                        <span><i class="fa-solid fa-list-ol text-violet-600 mr-1.5"></i> ตำแหน่งนำที่พบ:</span>
+                        <span id="leading-entries-list" class="font-bold text-violet-800 font-mono">
+                            แถว 1 (คอลัมน์ 1), แถว 2 (คอลัมน์ 2)
+                        </span>
+                    </div>
+
+                </div>
+
+            </div>
+        </section>
+
+        <!-- 4. คำถามนำเพื่อค้นพบ (Guided Discovery Questions) -->
+        <section class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 sm:p-8">
+            <div class="flex items-center gap-3 border-b border-slate-100 pb-4 mb-6">
+                <div class="w-10 h-10 rounded-xl bg-amber-50 flex items-center justify-center text-amber-600 font-bold text-lg">
+                    <i class="fa-solid fa-compass"></i>
+                </div>
+                <div>
+                    <h2 class="text-xl sm:text-2xl font-bold text-slate-900">4. คำถามนำเพื่อค้นพบ (Guided Discovery Questions)</h2>
+                    <p class="text-xs sm:text-sm text-slate-500">คิดไตร่ตรองเพื่อทำความเข้าใจโครงสร้างขั้นบันได จากนั้นคลิกเพื่อดูบทวิเคราะห์</p>
+                </div>
+            </div>
+
+            <div class="space-y-4">
+                
+                <!-- Question 1 -->
+                <div class="border border-slate-200 rounded-xl overflow-hidden transition-all">
+                    <button onclick="toggleAccordion('disc-1')" class="w-full flex items-center justify-between p-4 sm:p-5 text-left bg-slate-50/70 hover:bg-slate-100/70 transition">
+                        <span class="font-bold text-slate-800 text-sm sm:text-base flex items-center gap-3">
+                            <span class="w-7 h-7 rounded-full bg-amber-100 text-amber-800 text-xs flex items-center justify-center font-bold flex-shrink-0">1</span>
+                            เหตุใดตำแหน่งนำของแถวถัดไปต้องอยู่ทางขวาของแถวก่อนหน้า?
+                        </span>
+                        <i id="icon-disc-1" class="fa-solid fa-chevron-down text-slate-400 text-sm transition-transform duration-200"></i>
+                    </button>
+                    <div id="disc-1" class="hidden p-5 bg-white border-t border-slate-200 text-sm text-slate-700 leading-relaxed space-y-2">
+                        <p class="font-semibold text-slate-900">เหตุผลทางพีชคณิต:</p>
+                        <p>
+                            การที่ตำแหน่งนำของแถวถัดไปต้องเยื้องไปทางขวาเสมอ เพื่อให้ระบบสมการเชิงเส้นเกิดโครงสร้างแบบ <strong>รูปสามเหลี่ยมบน (Upper Triangular Structure)</strong> ซึ่งเป็นหัวใจสำคัญของ <strong>การกำจัดแบบเกาส์ (Gaussian Elimination)</strong>
+                        </p>
+                        <p class="text-slate-600">
+                            โครงสร้างนี้ทำให้ตัวแปรในสมการด้านล่างถูกกำจัดออกไปทีละตัว ทำให้เราสามารถหาผลเฉลยของระบบสมการได้อย่างง่ายดายผ่านกระบวนการ <em>การแทนค่าย้อนกลับ (Back Substitution)</em> จากสมการล่างสุดขึ้นไปยังสมการบนสุด
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Question 2 -->
+                <div class="border border-slate-200 rounded-xl overflow-hidden transition-all">
+                    <button onclick="toggleAccordion('disc-2')" class="w-full flex items-center justify-between p-4 sm:p-5 text-left bg-slate-50/70 hover:bg-slate-100/70 transition">
+                        <span class="font-bold text-slate-800 text-sm sm:text-base flex items-center gap-3">
+                            <span class="w-7 h-7 rounded-full bg-amber-100 text-amber-800 text-xs flex items-center justify-center font-bold flex-shrink-0">2</span>
+                            ถ้าแถวศูนย์อยู่เหนือแถวที่ไม่ใช่แถวศูนย์ เมทริกซ์ยังเป็นรูปขั้นบันไดหรือไม่?
+                        </span>
+                        <i id="icon-disc-2" class="fa-solid fa-chevron-down text-slate-400 text-sm transition-transform duration-200"></i>
+                    </button>
+                    <div id="disc-2" class="hidden p-5 bg-white border-t border-slate-200 text-sm text-slate-700 leading-relaxed space-y-2">
+                        <p class="font-semibold text-rose-700">
+                            <i class="fa-solid fa-circle-xmark"></i> ไม่เป็นรูปขั้นบันได (Not in REF)
+                        </p>
+                        <p>
+                            ผิด <strong>เงื่อนไขที่ 1</strong> อย่างชัดเจน ซึ่งระบุว่าแถวที่เป็นศูนย์ทั้งหมดต้องอยู่ใต้แถวที่ไม่ใช่แถวศูนย์เสมอ
+                        </p>
+                        <p class="text-slate-600">
+                            <strong>แนวทางแก้ไข:</strong> เราสามารถทำให้กลับมาเป็นรูปขั้นบันไดได้ง่ายๆ โดยการใช้การดำเนินการขั้นมูลฐานตามแถวชนิดที่ 1 ($R_i \leftrightarrow R_j$) เพื่อ <strong>สลับแถวศูนย์</strong> นั้นลงไปไว้ด้านล่างสุดของเมทริกซ์
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Question 3 -->
+                <div class="border border-slate-200 rounded-xl overflow-hidden transition-all">
+                    <button onclick="toggleAccordion('disc-3')" class="w-full flex items-center justify-between p-4 sm:p-5 text-left bg-slate-50/70 hover:bg-slate-100/70 transition">
+                        <span class="font-bold text-slate-800 text-sm sm:text-base flex items-center gap-3">
+                            <span class="w-7 h-7 rounded-full bg-amber-100 text-amber-800 text-xs flex items-center justify-center font-bold flex-shrink-0">3</span>
+                            ตำแหน่งนำจำเป็นต้องเป็น 1 หรือไม่?
+                        </span>
+                        <i id="icon-disc-3" class="fa-solid fa-chevron-down text-slate-400 text-sm transition-transform duration-200"></i>
+                    </button>
+                    <div id="disc-3" class="hidden p-5 bg-white border-t border-slate-200 text-sm text-slate-700 leading-relaxed space-y-2">
+                        <p class="font-semibold text-emerald-700">
+                            <i class="fa-solid fa-circle-check"></i> ไม่จำเป็นสำหรับรูปขั้นบันได (REF)
+                        </p>
+                        <p>
+                            ในนิยามมาตรฐานของ <strong>Row Echelon Form (REF)</strong> ตำแหน่งนำ (Leading entry) สามารถเป็นจำนวนจริงใดๆ ก็ได้ที่ไม่ใช่ศูนย์ เช่น $2, -5, 7.5$ ฯลฯ
+                        </p>
+                        <p class="text-slate-600">
+                            อย่างไรก็ดี หากต้องการให้เป็น <strong>รูปขั้นบันไดลดรูป (Reduced Row Echelon Form: RREF)</strong> ตำแหน่งนำทุกตัวจะต้องถูกเปลี่ยนให้เป็น $1$ (โดยการหารหรือคูณด้วยส่วนกลับ $R_i \leftarrow \frac{1}{c}R_i$) และสมาชิกตัวอื่นๆ ในหลักของตำแหน่งนำต้องเป็นศูนย์ทั้งหมด
+                        </p>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- 5. แบบฝึกหัดสำหรับนักศึกษา -->
+        <section class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 sm:p-8">
+            <div class="flex items-center gap-3 border-b border-slate-100 pb-4 mb-6">
+                <div class="w-10 h-10 rounded-xl bg-teal-50 flex items-center justify-center text-teal-600 font-bold text-lg">
+                    <i class="fa-solid fa-pen-to-square"></i>
+                </div>
+                <div>
+                    <h2 class="text-xl sm:text-2xl font-bold text-slate-900">5. แบบฝึกหัดสำหรับนักศึกษา (Exercises)</h2>
+                    <p class="text-xs sm:text-sm text-slate-500">ทดสอบความเข้าใจและทักษะการวิเคราะห์เมทริกซ์รูปขั้นบันได</p>
+                </div>
+            </div>
+
+            <div class="space-y-6">
+                
+                <!-- Exercise 1 -->
+                <div class="p-5 sm:p-6 rounded-xl border border-slate-200 bg-slate-50/50">
+                    <span class="text-xs font-bold text-teal-800 bg-teal-100 px-2.5 py-1 rounded">ข้อที่ 1</span>
+                    <h3 class="font-bold text-slate-900 mt-2 text-base sm:text-lg">
+                        จงจำแนกเมทริกซ์ที่กำหนดว่าอยู่ในรูปขั้นบันไดหรือไม่ พร้อมให้เหตุผลประกอบ
+                    </h3>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-3">
+                        <div class="bg-white p-3 rounded-lg border border-slate-200 text-center">
+                            <span class="text-xs font-semibold text-slate-500">เมทริกซ์ $M_1$:</span>
+                            <div class="my-1">
+                                $$M_1 = \begin{bmatrix} 1 & 3 & 0 \\ 0 & 0 & 2 \\ 0 & 0 & 0 \end{bmatrix}$$
+                            </div>
+                        </div>
+                        <div class="bg-white p-3 rounded-lg border border-slate-200 text-center">
+                            <span class="text-xs font-semibold text-slate-500">เมทริกซ์ $M_2$:</span>
+                            <div class="my-1">
+                                $$M_2 = \begin{bmatrix} 2 & 1 & 4 \\ 0 & 0 & 0 \\ 0 & 1 & 3 \end{bmatrix}$$
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-4 pt-3 border-t border-slate-200">
+                        <button onclick="toggleExercise('ans-ex-1')" class="text-xs sm:text-sm font-semibold text-indigo-600 hover:text-indigo-800 flex items-center gap-1.5 transition">
+                            <i class="fa-regular fa-eye"></i> <span id="label-ans-ex-1">ดูแนวทางคำตอบ</span>
+                        </button>
+                        <div id="ans-ex-1" class="hidden mt-3 p-4 bg-white rounded-lg border border-indigo-100 text-sm space-y-3 text-slate-700">
+                            <div>
+                                <span class="font-bold text-emerald-700">เมทริกซ์ $M_1$: เป็นรูปขั้นบันได (REF)</span>
+                                <p class="text-xs sm:text-sm text-slate-600 mt-0.5">
+                                    เพราะแถวศูนย์ (แถว 3) อยู่ล่างสุด, ตำแหน่งนำของแถว 1 คือ $1$ (หลัก 1) และของแถว 2 คือ $2$ (หลัก 3) ซึ่งเยื้องขวา, สมาชิกใต้ตำแหน่งนำเป็นศูนย์ทั้งหมด
+                                </p>
+                            </div>
+                            <div class="border-t border-slate-100 pt-2">
+                                <span class="font-bold text-rose-700">เมทริกซ์ $M_2$: ไม่เป็นรูปขั้นบันได (Not REF)</span>
+                                <p class="text-xs sm:text-sm text-slate-600 mt-0.5">
+                                    เพราะแถวที่ 2 เป็นแถวศูนย์ แต่กลับอยู่เหนือแถวที่ 3 ซึ่งมีสมาชิกไม่เป็นศูนย์ ($[0, 1, 3]$) ซึ่งขัดแย้งกับเงื่อนไขที่ 1
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Exercise 2 -->
+                <div class="p-5 sm:p-6 rounded-xl border border-slate-200 bg-slate-50/50">
+                    <span class="text-xs font-bold text-teal-800 bg-teal-100 px-2.5 py-1 rounded">ข้อที่ 2</span>
+                    <h3 class="font-bold text-slate-900 mt-2 text-base sm:text-lg">
+                        สร้างเมทริกซ์รูปขั้นบันไดจากเมทริกซ์ขนาด $3 \times 4$
+                    </h3>
+                    <p class="text-slate-700 text-sm mt-1">
+                        กำหนดเมทริกซ์ $A = \begin{bmatrix} 1 & 2 & 1 & 3 \\ 2 & 4 & 3 & 7 \\ 1 & 2 & 2 & 4 \end{bmatrix}$ จงใช้ EROs แปลงให้เป็นเมทริกซ์รูปขั้นบันได
+                    </p>
+
+                    <div class="mt-4 pt-3 border-t border-slate-200">
+                        <button onclick="toggleExercise('ans-ex-2')" class="text-xs sm:text-sm font-semibold text-indigo-600 hover:text-indigo-800 flex items-center gap-1.5 transition">
+                            <i class="fa-regular fa-eye"></i> <span id="label-ans-ex-2">ดูแนวทางการคำนวณ</span>
+                        </button>
+                        <div id="ans-ex-2" class="hidden mt-3 p-4 bg-white rounded-lg border border-indigo-100 text-sm space-y-3 text-slate-700">
+                            <p class="font-semibold text-slate-900">ขั้นตอนการกำจัดแบบเกาส์:</p>
+                            <div class="space-y-2 text-xs sm:text-sm pl-2">
+                                <div>
+                                    <strong>ขั้นที่ 1:</strong> กำจัดสมาชิกใต้ตำแหน่งนำแถวที่ 1 โดย $R_2 \leftarrow R_2 - 2R_1$ และ $R_3 \leftarrow R_3 - R_1$
+                                    <div class="my-1 font-mono">$$\begin{bmatrix} 1 & 2 & 1 & 3 \\ 0 & 0 & 1 & 1 \\ 0 & 0 & 1 & 1 \end{bmatrix}$$</div>
+                                </div>
+                                <div>
+                                    <strong>ขั้นที่ 2:</strong> กำจัดสมาชิกใต้ตำแหน่งนำแถวที่ 2 โดย $R_3 \leftarrow R_3 - R_2$
+                                    <div class="my-1 font-mono">$$\begin{bmatrix} 1 & 2 & 1 & 3 \\ 0 & 0 & 1 & 1 \\ 0 & 0 & 0 & 0 \end{bmatrix}$$</div>
+                                </div>
+                            </div>
+                            <p class="text-xs text-emerald-700 font-semibold pt-1">
+                                $\therefore$ เมทริกซ์สุดท้ายอยู่ในรูปขั้นบันได (REF) เรียบร้อย มีตำแหน่งนำที่ $(1,1)$ และ $(2,3)$
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Exercise 3 -->
+                <div class="p-5 sm:p-6 rounded-xl border border-slate-200 bg-slate-50/50">
+                    <span class="text-xs font-bold text-teal-800 bg-teal-100 px-2.5 py-1 rounded">ข้อที่ 3</span>
+                    <h3 class="font-bold text-slate-900 mt-2 text-base sm:text-lg">
+                        อธิบายว่าทำไมเมทริกซ์รูปขั้นบันไดหนึ่งเมทริกซ์จึงอาจไม่ใช่รูปขั้นบันไดที่ลดรูปแล้ว
+                    </h3>
+                    <p class="text-slate-700 text-sm mt-1">
+                        เปรียบเทียบเงื่อนไขระหว่าง Row Echelon Form (REF) และ Reduced Row Echelon Form (RREF)
+                    </p>
+
+                    <div class="mt-4 pt-3 border-t border-slate-200">
+                        <button onclick="toggleExercise('ans-ex-3')" class="text-xs sm:text-sm font-semibold text-indigo-600 hover:text-indigo-800 flex items-center gap-1.5 transition">
+                            <i class="fa-regular fa-eye"></i> <span id="label-ans-ex-3">ดูคำอธิบายเปรียบเทียบ</span>
+                        </button>
+                        <div id="ans-ex-3" class="hidden mt-3 p-4 bg-white rounded-lg border border-indigo-100 text-sm space-y-3 text-slate-700">
+                            <p class="font-semibold text-slate-900">การเปรียบเทียบ REF และ RREF:</p>
+                            <p class="leading-relaxed text-xs sm:text-sm">
+                                เมทริกซ์ที่เป็น <strong>RREF</strong> จะต้องเป็น <strong>REF</strong> ก่อนเสมอ แต่ต้องมีเงื่อนไขเพิ่มเติมอีก 2 ประการที่เข้มงวดกว่า:
+                            </p>
+                            <ol class="list-decimal list-inside space-y-2 text-xs sm:text-sm pl-2">
+                                <li>
+                                    <strong>ตำแหน่งนำต้องเป็น 1 เสมอ (Leading 1):</strong> ใน REF ตำแหน่งนำสามารถเป็นเลขใดก็ได้ เช่น $3$ หรือ $-4$ แต่ใน RREF ต้องเป็น $1$ เท่านั้น
+                                </li>
+                                <li>
+                                    <strong>สมาชิกอื่นในหลักของตำแหน่งนำต้องเป็นศูนย์ทั้งหมด:</strong> ใน REF บังคับเฉพาะสมาชิกที่อยู่ <em>ข้างใต้</em> ตำแหน่งนำให้เป็น $0$ (สมาชิกที่อยู่ <em>เหนือ</em> ตำแหน่งนำยังมีค่าได้) แต่ใน RREF สมาชิกทั้ง <em>เหนือและใต้</em> ตำแหน่งนำต้องเป็น $0$ ทั้งหมด
+                                </li>
+                            </ol>
+                            <div class="p-2.5 bg-slate-50 rounded border border-slate-200 text-xs">
+                                <strong>ตัวอย่าง:</strong> $\begin{bmatrix} 1 & 2 \\ 0 & 3 \end{bmatrix}$ เป็น REF แต่ไม่ใช่ RREF เพราะตำแหน่งนำแถวสองคือ 3 (ไม่ใช่ 1) และสมาชิกเหนือตำแหน่งนำคือ 2 (ไม่ใช่ 0)
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="text-center text-xs text-slate-400 py-6 border-t border-slate-200">
+            <p>เรื่องที่ 3: เมทริกซ์รูปขั้นบันได (Row Echelon Form) • สื่อการเรียนรู้เชิงคณิตศาสตร์</p>
+        </footer>
+
+    </main>
+
+    <!-- JavaScript Simulator & Inspector Logic -->
+    <script>
+        let curRows = 4;
+        let curCols = 4;
+        let matrixData = [
+            [1, 2, 3, 4],
+            [0, 1, 5, 6],
+            [0, 0, 2, 7],
+            [0, 0, 0, 0]
+        ];
+
+        const presets = {
+            'valid-standard': {
+                r: 4, c: 4,
+                data: [
+                    [1, 2, 3, 4],
+                    [0, 1, 5, 6],
+                    [0, 0, 2, 7],
+                    [0, 0, 0, 0]
+                ]
+            },
+            'fail-zero-row': {
+                r: 4, c: 4,
+                data: [
+                    [1, 3, 2, 5],
+                    [0, 0, 0, 0], // Zero row in the middle!
+                    [0, 1, 4, 2],
+                    [0, 0, 0, 0]
+                ]
+            },
+            'fail-leading-pos': {
+                r: 3, c: 4,
+                data: [
+                    [0, 2, 1, 3],
+                    [1, 4, 2, 0], // Leading entry to the left of row 1!
+                    [0, 0, 3, 5]
+                ]
+            },
+            'fail-below-pivot': {
+                r: 3, c: 3,
+                data: [
+                    [1, 2, 3],
+                    [0, 4, 1],
+                    [0, 2, 5] // Below pivot (4) is 2, not zero!
+                ]
+            }
+        };
+
+        window.onload = function() {
+            renderMatrixInputs();
+            validateMatrix();
+        };
+
+        function setDimension(r, c) {
+            curRows = r;
+            curCols = c;
+            
+            // update tab buttons
+            ['3x3', '3x4', '4x4'].forEach(id => {
+                const btn = document.getElementById(`btn-dim-${id}`);
+                if (id === `${r}x${c}`) {
+                    btn.className = "px-3 py-1 rounded bg-white text-slate-800 font-bold shadow-xs";
+                } else {
+                    btn.className = "px-3 py-1 rounded text-slate-600 hover:text-slate-900 transition";
+                }
+            });
+
+            // initialize matrix with reasonable default
+            matrixData = [];
+            for (let i = 0; i < r; i++) {
+                const row = [];
+                for (let j = 0; j < c; j++) {
+                    if (i === j) row.push(1);
+                    else if (i < j) row.push(2);
+                    else row.push(0);
+                }
+                matrixData.push(row);
+            }
+
+            renderMatrixInputs();
+            validateMatrix();
+        }
+
+        function loadPreset(key) {
+            const p = presets[key];
+            if (!p) return;
+            curRows = p.r;
+            curCols = p.c;
+
+            // update dimension buttons styling
+            ['3x3', '3x4', '4x4'].forEach(id => {
+                const btn = document.getElementById(`btn-dim-${id}`);
+                if (id === `${p.r}x${p.c}`) {
+                    btn.className = "px-3 py-1 rounded bg-white text-slate-800 font-bold shadow-xs";
+                } else {
+                    btn.className = "px-3 py-1 rounded text-slate-600 hover:text-slate-900 transition";
+                }
+            });
+
+            matrixData = JSON.parse(JSON.stringify(p.data));
+            renderMatrixInputs();
+            validateMatrix();
+        }
+
+        function fillZeros() {
+            for (let i = 0; i < curRows; i++) {
+                for (let j = 0; j < curCols; j++) {
+                    matrixData[i][j] = 0;
+                }
+            }
+            renderMatrixInputs();
+            validateMatrix();
+        }
+
+        function randomizeMatrix() {
+            for (let i = 0; i < curRows; i++) {
+                for (let j = 0; j < curCols; j++) {
+                    // bias towards zeros in lower triangle
+                    if (i > j && Math.random() > 0.35) {
+                        matrixData[i][j] = 0;
+                    } else {
+                        matrixData[i][j] = Math.floor(Math.random() * 9) - 1; // -1 to 7
+                    }
+                }
+            }
+            renderMatrixInputs();
+            validateMatrix();
+        }
+
+        function renderMatrixInputs() {
+            const container = document.getElementById('matrix-grid-container');
+            container.innerHTML = '';
+
+            for (let r = 0; r < curRows; r++) {
+                const rowDiv = document.createElement('div');
+                rowDiv.className = "flex items-center gap-2";
+                rowDiv.id = `input-row-${r}`;
+
+                const label = document.createElement('span');
+                label.className = "text-xs font-semibold text-slate-400 w-5 text-right";
+                label.innerText = `R${r+1}`;
+                rowDiv.appendChild(label);
+
+                for (let c = 0; c < curCols; c++) {
+                    const input = document.createElement('input');
+                    input.type = "number";
+                    input.step = "any";
+                    input.value = matrixData[r][c];
+                    input.id = `cell-${r}-${c}`;
+                    input.dataset.row = r;
+                    input.dataset.col = c;
+                    input.className = "w-11 h-10 text-center rounded-lg font-bold text-sm bg-white border border-slate-300 text-slate-800 focus:outline-none transition-all";
+                    
+                    input.oninput = function() {
+                        const val = parseFloat(this.value);
+                        matrixData[r][c] = isNaN(val) ? 0 : val;
+                        validateMatrix();
+                    };
+
+                    rowDiv.appendChild(input);
+                }
+                container.appendChild(rowDiv);
+            }
+        }
+
+        // Full REF validation algorithm
+        function validateMatrix() {
+            const rows = curRows;
+            const cols = curCols;
+
+            // 1. Find leading entry column index for each row (-1 if all zero row)
+            const leadingIndices = [];
+            const isZeroRow = [];
+
+            for (let i = 0; i < rows; i++) {
+                let leadCol = -1;
+                for (let j = 0; j < cols; j++) {
+                    if (matrixData[i][j] !== 0) {
+                        leadCol = j;
+                        break;
+                    }
+                }
+                leadingIndices.push(leadCol);
+                isZeroRow.push(leadCol === -1);
+            }
+
+            // Diagnostic flags and issue records
+            let cond1Pass = true;
+            let cond1Reason = "แถวศูนย์ทุกแถวอยู่ใต้แถวที่ไม่ใช่ศูนย์";
+            let cond2Pass = true;
+            let cond2Reason = "ตำแหน่งนำเยื้องไปทางขวาของแถวก่อนหน้าอย่างถูกต้อง";
+            let cond3Pass = true;
+            let cond3Reason = "สมาชิกทุกตัวที่อยู่ใต้ตำแหน่งนำเป็นศูนย์ทั้งหมด";
+
+            const errorCells = new Set(); // store "r,c" of faulty cells
+
+            // Check Condition 1: All zero rows must be below all non-zero rows
+            let foundZeroRow = false;
+            for (let i = 0; i < rows; i++) {
+                if (isZeroRow[i]) {
+                    foundZeroRow = true;
+                } else if (foundZeroRow && !isZeroRow[i]) {
+                    // Non-zero row after a zero row!
+                    cond1Pass = false;
+                    cond1Reason = `แถวที่ ${i+1} ไม่ใช่แถวศูนย์ แต่อยู่ใต้แถวที่เป็นศูนย์ทั้งหมด`;
+                    break;
+                }
+            }
+
+            // Check Condition 2: Leading entry must be strictly to the right of the previous leading entry
+            let prevLead = -1;
+            for (let i = 0; i < rows; i++) {
+                const lead = leadingIndices[i];
+                if (lead !== -1) {
+                    if (lead <= prevLead) {
+                        cond2Pass = false;
+                        cond2Reason = `ตำแหน่งนำของแถว ${i+1} (หลักที่ ${lead+1}) ไม่อยู่ทางขวาของแถวก่อนหน้า (หลักที่ ${prevLead+1})`;
+                        errorCells.add(`${i},${lead}`);
+                    }
+                    prevLead = lead;
+                }
+            }
+
+            // Check Condition 3: All entries below each leading entry must be 0
+            for (let i = 0; i < rows; i++) {
+                const lead = leadingIndices[i];
+                if (lead !== -1) {
+                    for (let belowRow = i + 1; belowRow < rows; belowRow++) {
+                        if (matrixData[belowRow][lead] !== 0) {
+                            cond3Pass = false;
+                            cond3Reason = `สมาชิกที่แถว ${belowRow+1} หลักที่ ${lead+1} (ค่า=${matrixData[belowRow][lead]}) อยู่ใต้ตำแหน่งนำ แต่ไม่เป็น 0`;
+                            errorCells.add(`${belowRow},${lead}`);
+                        }
+                    }
+                }
+            }
+
+            // Apply visual styles to input cells
+            for (let i = 0; i < rows; i++) {
+                const rowEl = document.getElementById(`input-row-${i}`);
+                if (isZeroRow[i]) {
+                    rowEl.classList.add('bg-slate-200/50', 'rounded');
+                } else {
+                    rowEl.classList.remove('bg-slate-200/50', 'rounded');
+                }
+
+                for (let j = 0; j < cols; j++) {
+                    const inputEl = document.getElementById(`cell-${i}-${j}`);
+                    if (!inputEl) continue;
+
+                    const isPivot = (leadingIndices[i] === j);
+                    const isErr = errorCells.has(`${i},${j}`);
+
+                    inputEl.className = "w-11 h-10 text-center rounded-lg font-bold text-sm transition-all focus:outline-none";
+
+                    if (isErr) {
+                        inputEl.classList.add('bg-rose-100', 'border-2', 'border-rose-500', 'text-rose-900', 'animate-pulse');
+                    } else if (isPivot) {
+                        inputEl.classList.add('bg-violet-100', 'border-2', 'border-violet-600', 'text-violet-950', 'shadow-xs');
+                    } else if (isZeroRow[i]) {
+                        inputEl.classList.add('bg-slate-200/70', 'border', 'border-slate-300', 'text-slate-500');
+                    } else {
+                        inputEl.classList.add('bg-white', 'border', 'border-slate-300', 'text-slate-800');
+                    }
+                }
+            }
+
+            // Update UI Condition Cards
+            updateConditionCard(1, cond1Pass, cond1Reason);
+            updateConditionCard(2, cond2Pass, cond2Reason);
+            updateConditionCard(3, cond3Pass, cond3Reason);
+
+            // Update Leading Entries List
+            const leadListEl = document.getElementById('leading-entries-list');
+            const leadsSummary = [];
+            for (let i = 0; i < rows; i++) {
+                if (leadingIndices[i] !== -1) {
+                    leadsSummary.push(`R${i+1} : ค่า ${matrixData[i][leadingIndices[i]]} (หลัก ${leadingIndices[i]+1})`);
+                }
+            }
+            leadListEl.innerText = leadsSummary.length > 0 ? leadsSummary.join(", ") : "ไม่มีตำแหน่งนำ (เมทริกซ์ศูนย์ทั้งหมด)";
+
+            // Update Overall Status Banner
+            const isREF = cond1Pass && cond2Pass && cond3Pass;
+            const banner = document.getElementById('overall-status-banner');
+            const icon = document.getElementById('overall-status-icon');
+            const title = document.getElementById('overall-status-title');
+            const desc = document.getElementById('overall-status-desc');
+            const badge = document.getElementById('overall-status-badge');
+
+            if (isREF) {
+                banner.className = "p-4 rounded-xl border border-emerald-200 bg-emerald-50 text-emerald-950 flex items-center justify-between transition-all";
+                icon.className = "w-10 h-10 rounded-lg bg-emerald-600 text-white flex items-center justify-center text-xl shadow-xs";
+                icon.innerHTML = '<i class="fa-solid fa-check-double"></i>';
+                title.innerText = "เป็นเมทริกซ์รูปขั้นบันได (Row Echelon Form)";
+                desc.innerText = "สอดคล้องกับเงื่อนไขของ REF ครบทั้ง 3 ข้อสมบูรณ์";
+                badge.className = "text-xs font-bold px-3 py-1 rounded-full uppercase bg-emerald-200 text-emerald-800";
+                badge.innerText = "ผ่าน (Valid REF)";
+            } else {
+                banner.className = "p-4 rounded-xl border border-rose-200 bg-rose-50 text-rose-950 flex items-center justify-between transition-all";
+                icon.className = "w-10 h-10 rounded-lg bg-rose-600 text-white flex items-center justify-center text-xl shadow-xs";
+                icon.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i>';
+                title.innerText = "ไม่เป็นรูปขั้นบันได (Not in Row Echelon Form)";
+                desc.innerText = "มีเงื่อนไขที่ไม่สอดคล้อง กรุณาดูรายละเอียดด้านล่าง";
+                badge.className = "text-xs font-bold px-3 py-1 rounded-full uppercase bg-rose-200 text-rose-800";
+                badge.innerText = "ไม่ผ่าน (Invalid)";
+            }
+        }
+
+        function updateConditionCard(num, passed, reason) {
+            const card = document.getElementById(`card-cond-${num}`);
+            const icon = document.getElementById(`icon-cond-${num}`);
+            const badge = document.getElementById(`badge-cond-${num}`);
+            const desc = document.getElementById(`desc-cond-${num}`);
+
+            desc.innerText = reason;
+
+            if (passed) {
+                card.className = "p-3.5 rounded-xl border border-emerald-200 bg-emerald-50/50 flex items-start gap-3 transition-all";
+                icon.className = "w-7 h-7 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center text-xs font-bold mt-0.5 flex-shrink-0";
+                icon.innerHTML = '<i class="fa-solid fa-check"></i>';
+                badge.className = "text-[11px] font-semibold px-2 py-0.5 rounded bg-emerald-100 text-emerald-800";
+                badge.innerText = "ผ่าน";
+            } else {
+                card.className = "p-3.5 rounded-xl border border-rose-200 bg-rose-50/70 flex items-start gap-3 transition-all";
+                icon.className = "w-7 h-7 rounded-full bg-rose-100 text-rose-700 flex items-center justify-center text-xs font-bold mt-0.5 flex-shrink-0";
+                icon.innerHTML = '<i class="fa-solid fa-xmark"></i>';
+                badge.className = "text-[11px] font-semibold px-2 py-0.5 rounded bg-rose-100 text-rose-800";
+                badge.innerText = "ไม่ผ่าน";
+            }
+        }
+
+        // Accordion Helpers
+        function toggleAccordion(id) {
+            const content = document.getElementById(id);
+            const icon = document.getElementById(`icon-${id}`);
+            if (content.classList.contains('hidden')) {
+                content.classList.remove('hidden');
+                icon.classList.add('rotate-180');
+            } else {
+                content.classList.add('hidden');
+                icon.classList.remove('rotate-180');
+            }
+        }
+
+        function toggleExercise(id) {
+            const el = document.getElementById(id);
+            const label = document.getElementById(`label-${id}`);
+            if (el.classList.contains('hidden')) {
+                el.classList.remove('hidden');
+                label.innerText = "ซ่อนคำอธิบาย";
+                if (window.MathJax && window.MathJax.typesetPromise) {
+                    window.MathJax.typesetPromise().catch(err => console.error(err));
+                }
+            } else {
+                el.classList.add('hidden');
+                label.innerText = id === 'ans-ex-3' ? "ดูคำอธิบายเปรียบเทียบ" : "ดูแนวทางคำตอบ";
+            }
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,810 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>เรื่องที่ 6: ตำแหน่งหลัก ตัวแปรหลัก และตัวแปรอิสระ</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Sarabun, Prompt & Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Prompt:wght@400;500;600;700&family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- MathJax v3 -->
+    <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']],
+                displayMath: [['$$', '$$'], ['\\[', '\\]']]
+            },
+            svg: {
+                fontCache: 'global'
+            }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        body {
+            font-family: 'Sarabun', 'Inter', sans-serif;
+            background-color: #f8fafc;
+            color: #1e293b;
+        }
+        h1, h2, h3, h4, .font-heading {
+            font-family: 'Prompt', 'Inter', sans-serif;
+        }
+        .math-font {
+            font-family: 'Inter', serif;
+        }
+        .augmented-bracket {
+            position: relative;
+            padding: 4px 10px;
+        }
+        .augmented-bracket::before, .augmented-bracket::after {
+            content: "";
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            width: 8px;
+            border-style: solid;
+            border-color: #334155;
+        }
+        .augmented-bracket::before {
+            left: 0;
+            border-width: 2px 0 2px 2px;
+            border-top-left-radius: 6px;
+            border-bottom-left-radius: 6px;
+        }
+        .augmented-bracket::after {
+            right: 0;
+            border-width: 2px 2px 2px 0;
+            border-top-right-radius: 6px;
+            border-bottom-right-radius: 6px;
+        }
+        input[type=number]::-webkit-inner-spin-button, 
+        input[type=number]::-webkit-outer-spin-button { 
+            -webkit-appearance: none; 
+            margin: 0; 
+        }
+        input[type=number] {
+            -moz-appearance: textfield;
+        }
+    </style>
+</head>
+<body class="min-h-screen">
+
+    <!-- Header Banner -->
+    <header class="bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-950 text-white shadow-lg border-b border-indigo-800/40">
+        <div class="max-w-6xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <div class="flex flex-wrap items-center justify-between gap-4">
+                <div>
+                    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-indigo-500/30 text-indigo-200 border border-indigo-400/30 mb-2">
+                        <i class="fa-solid fa-graduation-cap"></i> บทเรียนที่ 6 • พีชคณิตเชิงเส้น (Linear Algebra)
+                    </span>
+                    <h1 class="text-2xl sm:text-3xl lg:text-4xl font-bold tracking-tight">
+                        เรื่องที่ 6: ตำแหน่งหลัก ตัวแปรหลัก และตัวแปรอิสระ
+                    </h1>
+                    <p class="text-indigo-200 mt-1 text-sm sm:text-base font-light">
+                        Pivot Positions, Basic Variables, Free Variables และการเขียนผลเฉลยทั่วไปในรูปเวกเตอร์พารามิเตอร์
+                    </p>
+                </div>
+                <div class="hidden md:flex items-center gap-3 bg-white/10 backdrop-blur-sm px-4 py-2.5 rounded-xl border border-white/20 text-xs">
+                    <div class="w-10 h-10 rounded-lg bg-amber-500/20 text-amber-300 flex items-center justify-center font-bold text-lg">
+                        <i class="fa-solid fa-infinity"></i>
+                    </div>
+                    <div>
+                        <div class="font-semibold text-white">ระบบผลเฉลยอนันต์</div>
+                        <div class="text-indigo-200">Parametric Vector Form Simulator</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Container Fixed Width Requirement -->
+    <main class="max-w-6xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 space-y-10">
+
+        <!-- 1. วัตถุประสงค์การเรียนรู้ -->
+        <section class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 sm:p-8 transition-all hover:shadow-md">
+            <div class="flex items-center gap-3 border-b border-slate-100 pb-4 mb-5">
+                <div class="w-10 h-10 rounded-xl bg-indigo-50 flex items-center justify-center text-indigo-600 font-bold text-lg">
+                    <i class="fa-solid fa-bullseye"></i>
+                </div>
+                <div>
+                    <h2 class="text-xl sm:text-2xl font-bold text-slate-900">1. วัตถุประสงค์การเรียนรู้</h2>
+                    <p class="text-xs sm:text-sm text-slate-500">ผลการเรียนรู้ที่คาดหวังเมื่อศึกษาจบบทเรียนนี้</p>
+                </div>
+            </div>
+            
+            <div class="bg-gradient-to-r from-indigo-50/90 to-amber-50/60 border-l-4 border-indigo-600 rounded-r-xl p-5">
+                <p class="text-slate-800 leading-relaxed font-semibold mb-3">
+                    เมื่อสิ้นสุดการเรียนรู้ในหัวข้อนี้ นักศึกษาสามารถ:
+                </p>
+                <ul class="space-y-3 text-slate-700 text-sm sm:text-base">
+                    <li class="flex items-start gap-3">
+                        <span class="w-6 h-6 rounded-full bg-indigo-100 text-indigo-700 flex items-center justify-center text-xs font-bold mt-0.5 flex-shrink-0">
+                            <i class="fa-solid fa-check"></i>
+                        </span>
+                        <span><strong>ระบุตำแหน่งหลัก (Pivot Positions) และคอลัมน์หลัก (Pivot Columns)</strong> จากเมทริกซ์ในรูปขั้นบันไดลดรูป (RREF) ได้อย่างถูกต้อง</span>
+                    </li>
+                    <li class="flex items-start gap-3">
+                        <span class="w-6 h-6 rounded-full bg-indigo-100 text-indigo-700 flex items-center justify-center text-xs font-bold mt-0.5 flex-shrink-0">
+                            <i class="fa-solid fa-check"></i>
+                        </span>
+                        <span><strong>จำแนกตัวแปรหลัก (Basic Variables) และตัวแปรอิสระ (Free Variables)</strong> ในระบบสมการเชิงเส้นที่มีคำตอบอนันต์</span>
+                    </li>
+                    <li class="flex items-start gap-3">
+                        <span class="w-6 h-6 rounded-full bg-amber-100 text-amber-800 flex items-center justify-center text-xs font-bold mt-0.5 flex-shrink-0">
+                            <i class="fa-solid fa-check"></i>
+                        </span>
+                        <span><strong>เขียนคำตอบทั่วไป (General Solution)</strong> ทั้งในรูปแบบสมการพารามิเตอร์ และรูปเวกเตอร์พารามิเตอร์ (Parametric Vector Form) ได้อย่างเป็นทางการ</span>
+                    </li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- 2. เนื้อหาหลัก -->
+        <section class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 sm:p-8 space-y-7">
+            <div class="flex items-center gap-3 border-b border-slate-100 pb-4">
+                <div class="w-10 h-10 rounded-xl bg-purple-50 flex items-center justify-center text-purple-600 font-bold text-lg">
+                    <i class="fa-solid fa-book-open"></i>
+                </div>
+                <div>
+                    <h2 class="text-xl sm:text-2xl font-bold text-slate-900">2. เนื้อหาหลัก (Core Content)</h2>
+                    <p class="text-xs sm:text-sm text-slate-500">การวิเคราะห์เมทริกซ์แต่งเติมในรูป RREF และโครงสร้างของเซตคำตอบ</p>
+                </div>
+            </div>
+
+            <!-- Matrix Display Card with Highlights -->
+            <div class="bg-slate-50 border border-slate-200 rounded-xl p-5 sm:p-6 space-y-4">
+                <h3 class="text-base sm:text-lg font-bold text-slate-900 flex items-center gap-2">
+                    <i class="fa-solid fa-table text-indigo-600"></i> พิจารณาเมทริกซ์เสริมในรูปขั้นบันไดลดรูป (RREF):
+                </h3>
+                
+                <div class="flex flex-col md:flex-row items-center justify-around gap-6 py-3">
+                    <div class="text-center">
+                        <div class="text-xl sm:text-2xl font-bold text-slate-800">
+                            $$\left[\begin{array}{cccc|c}
+                            \mathbf{\underline{1}} & 0 & 2 & 0 & 3 \\
+                            0 & \mathbf{\underline{1}} & -1 & 0 & 4 \\
+                            0 & 0 & 0 & \mathbf{\underline{1}} & 5
+                            \end{array}\right]$$
+                        </div>
+                        <div class="flex items-center justify-center gap-3 text-xs mt-3">
+                            <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded bg-indigo-100 text-indigo-800 font-semibold">
+                                <span class="w-2.5 h-2.5 rounded-full bg-indigo-600"></span> คอลัมน์ที่ 1, 2, 4 = คอลัมน์หลัก
+                            </span>
+                            <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded bg-amber-100 text-amber-800 font-semibold">
+                                <span class="w-2.5 h-2.5 rounded-full bg-amber-500"></span> คอลัมน์ที่ 3 = คอลัมน์อิสระ
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="space-y-2 text-xs sm:text-sm text-slate-700 max-w-md">
+                        <p class="leading-relaxed">
+                            • <strong>ตำแหน่งหลัก (Pivot Positions):</strong> อยู่ที่แถว 1 หลัก 1, แถว 2 หลัก 2 และ แถว 3 หลัก 4
+                        </p>
+                        <p class="leading-relaxed">
+                            • <strong>ตัวแปรหลัก (Basic Variables):</strong> คือตัวแปรที่สมนัยกับคอลัมน์หลัก ได้แก่ <span class="font-bold text-indigo-700 font-mono">$x_1, x_2, x_4$</span>
+                        </p>
+                        <p class="leading-relaxed">
+                            • <strong>ตัวแปรอิสระ (Free Variable):</strong> คือตัวแปรในคอลัมน์ที่ไม่มีตำแหน่งหลัก ได้แก่ <span class="font-bold text-amber-700 font-mono">$x_3$</span>
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- System Derivation -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Step 1: Equations -->
+                <div class="p-5 rounded-xl border border-indigo-100 bg-indigo-50/40 space-y-3">
+                    <span class="text-xs font-bold text-indigo-700 uppercase tracking-wider block">ขั้นที่ 1: ถอดสมการเชิงเส้นจาก RREF</span>
+                    <p class="text-xs text-slate-600">เนื่องจากสมาชิกเหนือและใต้ตำแหน่งนำเป็น 0 ทั้งหมด จะได้สมการที่แยกตัวแปรหลักอย่างชัดเจน:</p>
+                    <div class="bg-white p-3.5 rounded-lg border border-indigo-100 text-sm font-semibold text-slate-800 shadow-2xs">
+                        $$\begin{aligned}
+                        x_1 + 2x_3 &= 3 \\
+                        x_2 - x_3 &= 4 \\
+                        x_4 &= 5
+                        \end{aligned}$$
+                    </div>
+                </div>
+
+                <!-- Step 2: Parametric Solution -->
+                <div class="p-5 rounded-xl border border-amber-100 bg-amber-50/40 space-y-3">
+                    <span class="text-xs font-bold text-amber-800 uppercase tracking-wider block">ขั้นที่ 2: กำหนดพารามิเตอร์ให้ตัวแปรอิสระ</span>
+                    <p class="text-xs text-slate-600">กำหนดให้ $x_3 = t$ โดยที่ $t \in \mathbb{R}$ จะได้คำตอบทั่วไปของตัวแปรหลักในรูปของ $t$:</p>
+                    <div class="bg-white p-3.5 rounded-lg border border-amber-100 text-sm font-semibold text-slate-800 shadow-2xs">
+                        $$\begin{aligned}
+                        x_1 &= 3 - 2t \\
+                        x_2 &= 4 + t \\
+                        x_3 &= t \\
+                        x_4 &= 5, \qquad t \in \mathbb{R}
+                        \end{aligned}$$
+                    </div>
+                </div>
+            </div>
+
+            <!-- Parametric Vector Form Card -->
+            <div class="bg-gradient-to-br from-slate-900 via-indigo-950 to-slate-900 text-white rounded-2xl p-6 sm:p-7 shadow-md border border-slate-800 space-y-4">
+                <div class="flex items-center gap-2 text-indigo-300 text-xs sm:text-sm font-semibold uppercase tracking-wider">
+                    <i class="fa-solid fa-arrows-split-up-and-left"></i> รูปเวกเตอร์พารามิเตอร์ (Parametric Vector Form)
+                </div>
+                <h4 class="text-lg sm:text-xl font-bold text-white">
+                    การแยกเวกเตอร์คำตอบ: $\mathbf{x} = \mathbf{x}_p + t\mathbf{v}$
+                </h4>
+                <p class="text-slate-300 text-xs sm:text-sm leading-relaxed">
+                    เราสามารถแยกส่วนของค่าคงที่ (Particular Solution $\mathbf{x}_p$) ออกจากส่วนที่ขึ้นกับพารามิเตอร์ $t$ (Homogeneous Solution Basis $\mathbf{v}$) ได้อย่างสมบูรณ์:
+                </p>
+
+                <div class="py-2 text-center text-lg sm:text-xl">
+                    $$\mathbf{x} = \begin{bmatrix} x_1 \\ x_2 \\ x_3 \\ x_4 \end{bmatrix} = \begin{bmatrix} 3 - 2t \\ 4 + t \\ t \\ 5 \end{bmatrix} = \underbrace{\begin{bmatrix} 3 \\ 4 \\ 0 \\ 5 \end{bmatrix}}_{\mathbf{x}_p \text{ (เวกเตอร์เฉพาะ)}} + t \underbrace{\begin{bmatrix} -2 \\ 1 \\ 1 \\ 0 \end{bmatrix}}_{\mathbf{v} \text{ (ทิศทางอิสระ)}},\quad t \in \mathbb{R}$$
+                </div>
+
+                <!-- Callout Note -->
+                <div class="p-3.5 bg-amber-950/40 border border-amber-600/40 rounded-xl text-xs sm:text-sm text-amber-200 flex items-start gap-2.5">
+                    <i class="fa-solid fa-lightbulb text-amber-400 mt-0.5"></i>
+                    <div>
+                        <strong>ข้อสังเกตสำคัญมาก:</strong> ตัวแปรอิสระ (Free Variable) <em>ไม่ได้หมายความว่าตัวแปรนั้นไม่มีความสัมพันธ์กับตัวแปรอื่น</em> 
+                        แต่หมายความว่า เราสามารถเลือกกำหนดค่าให้แก่ตัวแปรนั้นได้อย่างอิสระตามใจชอบ ($t \in \mathbb{R}$) แล้วค่าของตัวแปรหลักทั้งหมดจะถูกกำหนดตามเงื่อนไขของระบบสมการตามมาทันที
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 3. แบบจำลองโต้ตอบ (Interactive Simulator) -->
+        <section class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 sm:p-8 space-y-7">
+            <div class="flex flex-wrap items-center justify-between gap-4 border-b border-slate-100 pb-4">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-xl bg-indigo-50 flex items-center justify-center text-indigo-600 font-bold text-lg">
+                        <i class="fa-solid fa-sliders"></i>
+                    </div>
+                    <div>
+                        <h2 class="text-xl sm:text-2xl font-bold text-slate-900">3. แบบจำลองโต้ตอบ: ผู้สำรวจผลเฉลยพารามิเตอร์และการตรวจสอบ</h2>
+                        <p class="text-xs sm:text-sm text-slate-500">ปรับค่าตัวแปรอิสระเพื่อดูเวกเตอร์คำตอบ และระบบจะแทนค่ากลับเข้าสู่สมการจริงเพื่อยืนยัน</p>
+                    </div>
+                </div>
+
+                <!-- Preset Mode Buttons -->
+                <div class="flex items-center gap-2 bg-slate-100 p-1.5 rounded-xl text-xs">
+                    <span class="text-slate-600 font-medium px-2">ชุดระบบสมการ:</span>
+                    <button id="btn-pre-1" onclick="switchPreset(1)" class="px-2.5 py-1.5 rounded-lg bg-white font-bold text-slate-800 shadow-xs">1) ตัวแปร 4 ตัว (1 ตัวแปรอิสระ $t$)</button>
+                    <button id="btn-pre-2" onclick="switchPreset(2)" class="px-2.5 py-1.5 rounded-lg text-slate-600 hover:text-slate-900">2) ตัวแปร 5 ตัว (2 ตัวแปรอิสระ $s, t$)</button>
+                </div>
+            </div>
+
+            <!-- Interactive Workbench Grid -->
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                
+                <!-- Left: Parameter Sliders & System Matrix -->
+                <div class="lg:col-span-5 space-y-5 bg-slate-50 p-5 rounded-xl border border-slate-200">
+                    <div>
+                        <span class="text-xs font-bold text-slate-500 uppercase tracking-wider block mb-1">
+                            <i class="fa-solid fa-table-list text-indigo-600 mr-1"></i> เมทริกซ์แต่งเติม RREF ของระบบ
+                        </span>
+                        <div id="sim-matrix-view" class="flex justify-center p-2 bg-white rounded-lg border border-slate-200 text-sm font-semibold">
+                            <!-- MathJax matrix -->
+                        </div>
+                    </div>
+
+                    <!-- Sliders for Free Variables -->
+                    <div class="space-y-4 pt-2 border-t border-slate-200">
+                        <label class="text-xs font-bold text-slate-700 uppercase tracking-wider flex items-center justify-between">
+                            <span><i class="fa-solid fa-gamepad text-amber-600 mr-1"></i> ปรับค่าพารามิเตอร์ของตัวแปรอิสระ</span>
+                            <button onclick="resetSliders()" class="text-[11px] text-indigo-600 hover:underline">คืนค่าเริ่มต้น (0)</button>
+                        </label>
+
+                        <!-- Slider t -->
+                        <div class="bg-white p-3.5 rounded-xl border border-slate-200 space-y-2 shadow-2xs">
+                            <div class="flex items-center justify-between text-xs font-bold">
+                                <span class="text-amber-800">พารามิเตอร์ $t$ (สำหรับ <span id="label-free-t">x_3</span>)</span>
+                                <span id="val-t" class="px-2.5 py-0.5 rounded bg-amber-100 text-amber-900 font-mono text-sm">0.00</span>
+                            </div>
+                            <input type="range" id="slider-t" min="-5" max="5" step="0.25" value="0" oninput="updateSimulation()" class="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-amber-500">
+                            <div class="flex justify-between text-[10px] text-slate-400">
+                                <span>-5.0</span>
+                                <span>0</span>
+                                <span>+5.0</span>
+                            </div>
+                        </div>
+
+                        <!-- Slider s (Visible only in preset 2) -->
+                        <div id="panel-slider-s" class="hidden bg-white p-3.5 rounded-xl border border-slate-200 space-y-2 shadow-2xs">
+                            <div class="flex items-center justify-between text-xs font-bold">
+                                <span class="text-amber-800">พารามิเตอร์ $s$ (สำหรับ $x_5$)</span>
+                                <span id="val-s" class="px-2.5 py-0.5 rounded bg-amber-100 text-amber-900 font-mono text-sm">0.00</span>
+                            </div>
+                            <input type="range" id="slider-s" min="-5" max="5" step="0.25" value="0" oninput="updateSimulation()" class="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-amber-500">
+                            <div class="flex justify-between text-[10px] text-slate-400">
+                                <span>-5.0</span>
+                                <span>0</span>
+                                <span>+5.0</span>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- Right: Computed Solution & Realtime Verification Engine -->
+                <div class="lg:col-span-7 space-y-4">
+                    
+                    <!-- Vector Solution Card -->
+                    <div class="bg-slate-900 text-white p-5 sm:p-6 rounded-2xl shadow-md space-y-4">
+                        <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+                            <h4 class="text-xs sm:text-sm font-bold text-slate-200 flex items-center gap-2">
+                                <i class="fa-solid fa-code text-indigo-400"></i> ผลเฉลยเฉพาะจุดที่คำนวณได้ (Calculated Particular Vector):
+                            </h4>
+                            <span class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/40">
+                                Realtime Evaluated
+                            </span>
+                        </div>
+
+                        <div class="flex flex-col sm:flex-row items-center justify-around gap-4 py-1">
+                            <div id="sim-solution-vector" class="text-center text-lg sm:text-xl font-bold">
+                                <!-- \mathbf{x} = [...] -->
+                            </div>
+                            <div id="sim-variables-detail" class="text-xs text-slate-300 space-y-1.5 font-mono bg-slate-800/60 p-3 rounded-xl border border-slate-700/80">
+                                <!-- list of variable values -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Solution Verification Engine -->
+                    <div class="bg-emerald-50/80 border border-emerald-200 p-5 rounded-2xl space-y-3">
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs font-bold text-emerald-950 uppercase tracking-wider flex items-center gap-2">
+                                <i class="fa-solid fa-circle-check text-emerald-600"></i> เครื่องมือตรวจสอบความถูกต้อง (Solution Verification Engine)
+                            </span>
+                            <span class="text-[11px] font-bold text-emerald-800 bg-emerald-100 px-2 py-0.5 rounded">
+                                เป็นจริงทุกสมการ
+                            </span>
+                        </div>
+                        <p class="text-xs text-slate-600">
+                            นำค่าพิกัดเวกเตอร์ $\mathbf{x}$ ข้างบนเข้าแทนที่ในสมการเดิมเพื่อทดสอบความสอดคล้อง:
+                        </p>
+
+                        <div id="verification-list" class="space-y-2 text-xs font-mono">
+                            <!-- equation check lines -->
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+        </section>
+
+        <!-- 4. คำถามนำเพื่อค้นพบ (Guided Discovery Questions) -->
+        <section class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 sm:p-8">
+            <div class="flex items-center gap-3 border-b border-slate-100 pb-4 mb-6">
+                <div class="w-10 h-10 rounded-xl bg-amber-50 flex items-center justify-center text-amber-600 font-bold text-lg">
+                    <i class="fa-solid fa-compass"></i>
+                </div>
+                <div>
+                    <h2 class="text-xl sm:text-2xl font-bold text-slate-900">4. คำถามนำเพื่อค้นพบ (Guided Discovery Questions)</h2>
+                    <p class="text-xs sm:text-sm text-slate-500">ใคร่ครวญความสัมพันธ์ทางทฤษฎี แล้วคลิกเพื่อเปิดดูบทวิเคราะห์</p>
+                </div>
+            </div>
+
+            <div class="space-y-4">
+                
+                <!-- Question 1 -->
+                <div class="border border-slate-200 rounded-xl overflow-hidden transition-all">
+                    <button onclick="toggleAccordion('disc-1')" class="w-full flex items-center justify-between p-4 sm:p-5 text-left bg-slate-50/70 hover:bg-slate-100/70 transition">
+                        <span class="font-bold text-slate-800 text-sm sm:text-base flex items-center gap-3">
+                            <span class="w-7 h-7 rounded-full bg-amber-100 text-amber-800 text-xs flex items-center justify-center font-bold flex-shrink-0">1</span>
+                            จำนวนตัวแปรอิสระสัมพันธ์กับจำนวนคอลัมน์หลักอย่างไร?
+                        </span>
+                        <i id="icon-disc-1" class="fa-solid fa-chevron-down text-slate-400 text-sm transition-transform duration-200"></i>
+                    </button>
+                    <div id="disc-1" class="hidden p-5 bg-white border-t border-slate-200 text-sm text-slate-700 leading-relaxed space-y-3">
+                        <p class="font-semibold text-indigo-900">
+                            สอดคล้องกับทฤษฎีบทแรงก์และความเป็นศูนย์ (Rank-Nullity Theorem):
+                        </p>
+                        <p>
+                            หากระบบสมการมีตัวแปรทั้งหมด $n$ ตัว (จำนวนคอลัมน์ของเมทริกซ์สัมประสิทธิ์ $A$) และมีจำนวนตำแหน่งหลัก (Rank) เท่ากับ $r$ ตำแหน่ง:
+                        </p>
+                        <div class="p-3 bg-slate-50 rounded-lg border border-slate-200 text-center font-bold text-indigo-900 text-base">
+                            $$\text{จำนวนตัวแปรอิสระ (Nullity)} = n - \text{จำนวนคอลัมน์หลัก (Rank)}$$
+                        </div>
+                        <p class="text-xs text-slate-600">
+                            เช่น ในตัวอย่างข้างต้น มีตัวแปรทั้งหมด $n = 4$ ตัว มีคอลัมน์หลัก $r = 3$ คอลัมน์ จึงได้จำนวนตัวแปรอิสระ $4 - 3 = 1$ ตัว ($x_3$) เสมอ
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Question 2 -->
+                <div class="border border-slate-200 rounded-xl overflow-hidden transition-all">
+                    <button onclick="toggleAccordion('disc-2')" class="w-full flex items-center justify-between p-4 sm:p-5 text-left bg-slate-50/70 hover:bg-slate-100/70 transition">
+                        <span class="font-bold text-slate-800 text-sm sm:text-base flex items-center gap-3">
+                            <span class="w-7 h-7 rounded-full bg-amber-100 text-amber-800 text-xs flex items-center justify-center font-bold flex-shrink-0">2</span>
+                            ถ้ามีตัวแปรอิสระ 2 ตัว เซตคำตอบอาจเขียนโดยใช้พารามิเตอร์กี่ตัว?
+                        </span>
+                        <i id="icon-disc-2" class="fa-solid fa-chevron-down text-slate-400 text-sm transition-transform duration-200"></i>
+                    </button>
+                    <div id="disc-2" class="hidden p-5 bg-white border-t border-slate-200 text-sm text-slate-700 leading-relaxed space-y-2">
+                        <p class="font-semibold text-emerald-800">
+                            <i class="fa-solid fa-circle-check"></i> ต้องใช้พารามิเตอร์อิสระ 2 ตัวเสมอ (เช่น $s, t \in \mathbb{R}$)
+                        </p>
+                        <p>
+                            เนื่องจากระดับความเป็นอิสระ (Degrees of Freedom) ของระบบเท่ากับ 2 การอธิบายเซตคำตอบทั้งหมดจึงต้องใช้ 2 ตัวแปรพารามิเตอร์แยกจากกันอย่างเป็นอิสระ
+                        </p>
+                        <div class="text-xs sm:text-sm text-slate-600 bg-slate-50 p-3 rounded-lg border border-slate-200">
+                            <strong>ความหมายทางเรขาคณิต:</strong> เซตคำตอบในกรณีนี้จะไม่ใช่เพียง "เส้นตรง" ในปริภูมิ (1 มิติ) แต่จะแผ่ขยายออกเป็น <strong>"ระนาบ 2 มิติ (2D Plane)"</strong> ในปริภูมิ $\mathbb{R}^n$ ที่เลื่อนขนานออกจากจุดกำเนิดด้วยเวกเตอร์เฉพาะ $\mathbf{x}_p$:
+                            $$\mathbf{x} = \mathbf{x}_p + s\mathbf{u} + t\mathbf{v},\quad s, t \in \mathbb{R}$$
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Question 3 -->
+                <div class="border border-slate-200 rounded-xl overflow-hidden transition-all">
+                    <button onclick="toggleAccordion('disc-3')" class="w-full flex items-center justify-between p-4 sm:p-5 text-left bg-slate-50/70 hover:bg-slate-100/70 transition">
+                        <span class="font-bold text-slate-800 text-sm sm:text-base flex items-center gap-3">
+                            <span class="w-7 h-7 rounded-full bg-amber-100 text-amber-800 text-xs flex items-center justify-center font-bold flex-shrink-0">3</span>
+                            เพราะเหตุใดระบบที่มีคำตอบอนันต์จึงสามารถเขียนคำตอบในรูปเวกเตอร์ได้?
+                        </span>
+                        <i id="icon-disc-3" class="fa-solid fa-chevron-down text-slate-400 text-sm transition-transform duration-200"></i>
+                    </button>
+                    <div id="disc-3" class="hidden p-5 bg-white border-t border-slate-200 text-sm text-slate-700 leading-relaxed space-y-2">
+                        <p class="font-semibold text-slate-900">โครงสร้างเชิงเส้นของผลเฉลย (Linear Structure of Solutions):</p>
+                        <p>
+                            ระบบสมการเชิงเส้น $A\mathbf{x} = \mathbf{b}$ มีคุณสมบัติการรวมเชิงเส้น (Superposition Principle) ผลเฉลยทั่วไปสามารถแยกออกเป็น 2 ส่วนที่แน่นอน:
+                        </p>
+                        <ul class="list-disc list-inside space-y-1.5 text-slate-600 pl-2">
+                            <li><strong>เวกเตอร์เฉพาะ ($\mathbf{x}_p$):</strong> คือคำตอบใดคำตอบหนึ่งที่ทำให้ $A\mathbf{x}_p = \mathbf{b}$</li>
+                            <li><strong>ผลเฉลยเอกพันธุ์ ($\mathbf{x}_h$):</strong> คือเซตคำตอบของ $A\mathbf{x} = \mathbf{0}$ ซึ่งเป็นปริภูมิย่อย (Null Space หรือ $\operatorname{Null}(A)$) ที่เขียนในรูป Span ของเวกเตอร์อิสระเชิงเส้น</li>
+                        </ul>
+                        <p class="text-xs text-indigo-700 font-semibold pt-1">
+                            ทำให้รูปเวกเตอร์ $\mathbf{x} = \mathbf{x}_p + \sum t_i \mathbf{v}_i$ เป็นการแสดงภาพโครงสร้างเรขาคณิตของผลเฉลยที่สมบูรณ์และแม่นยำที่สุด
+                        </p>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- 5. แบบฝึกหัดสำหรับนักศึกษา -->
+        <section class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 sm:p-8">
+            <div class="flex items-center gap-3 border-b border-slate-100 pb-4 mb-6">
+                <div class="w-10 h-10 rounded-xl bg-teal-50 flex items-center justify-center text-teal-600 font-bold text-lg">
+                    <i class="fa-solid fa-pen-ruler"></i>
+                </div>
+                <div>
+                    <h2 class="text-xl sm:text-2xl font-bold text-slate-900">5. แบบฝึกหัดสำหรับนักศึกษา (Exercises & Solutions)</h2>
+                    <p class="text-xs sm:text-sm text-slate-500">ทดสอบความเข้าใจและทักษะการวิเคราะห์ผลเฉลยพารามิเตอร์</p>
+                </div>
+            </div>
+
+            <div class="space-y-6">
+                
+                <!-- Exercise 1 -->
+                <div class="p-5 sm:p-6 rounded-xl border border-slate-200 bg-slate-50/50">
+                    <span class="text-xs font-bold text-teal-800 bg-teal-100 px-2.5 py-1 rounded">ข้อที่ 1</span>
+                    <h3 class="font-bold text-slate-900 mt-2 text-base sm:text-lg">
+                        ระบุตัวแปรหลักและตัวแปรอิสระจากเมทริกซ์ที่กำหนด
+                    </h3>
+                    <p class="text-slate-700 text-sm mt-1">
+                        กำหนดเมทริกซ์แต่งเติมในรูปขั้นบันไดลดรูป (RREF) สำหรับระบบสมการของตัวแปร $x_1, x_2, x_3, x_4, x_5$:
+                    </p>
+                    <div class="my-3 text-center">
+                        $$\left[\begin{array}{ccccc|c}
+                        1 & 3 & 0 & 0 & -2 & 4 \\
+                        0 & 0 & 1 & 0 & 5 & 1 \\
+                        0 & 0 & 0 & 1 & 1 & 3
+                        \end{array}\right]$$
+                    </div>
+
+                    <div class="mt-4 pt-3 border-t border-slate-200">
+                        <button onclick="toggleExercise('ans-ex-1')" class="text-xs sm:text-sm font-semibold text-indigo-600 hover:text-indigo-800 flex items-center gap-1.5 transition">
+                            <i class="fa-regular fa-eye"></i> <span id="label-ans-ex-1">ดูแนวทางคำตอบ</span>
+                        </button>
+                        <div id="ans-ex-1" class="hidden mt-3 p-4 bg-white rounded-lg border border-indigo-100 text-sm space-y-2 text-slate-700">
+                            <p class="font-semibold text-slate-900">การวิเคราะห์คอลัมน์:</p>
+                            <ul class="list-disc list-inside space-y-1 text-xs sm:text-sm pl-2">
+                                <li><strong>ตำแหน่งหลัก (Leading 1s):</strong> อยู่ในคอลัมน์ที่ 1, 3 และ 4</li>
+                                <li><strong>ตัวแปรหลัก (Basic Variables):</strong> <span class="font-bold text-indigo-700">$x_1, x_3, x_4$</span></li>
+                                <li><strong>คอลัมน์ที่ไม่มีตำแหน่งหลัก:</strong> คือคอลัมน์ที่ 2 และ 5</li>
+                                <li><strong>ตัวแปรอิสระ (Free Variables):</strong> <span class="font-bold text-amber-700">$x_2, x_5$</span></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Exercise 2 -->
+                <div class="p-5 sm:p-6 rounded-xl border border-slate-200 bg-slate-50/50">
+                    <span class="text-xs font-bold text-teal-800 bg-teal-100 px-2.5 py-1 rounded">ข้อที่ 2</span>
+                    <h3 class="font-bold text-slate-900 mt-2 text-base sm:text-lg">
+                        เขียนคำตอบทั่วไปของระบบที่มีตัวแปร 4–5 ตัว
+                    </h3>
+                    <p class="text-slate-700 text-sm mt-1">
+                        จากเมทริกซ์ในข้อที่ 1 จงเขียนผลเฉลยทั่วไปใน <strong>รูปสมการพารามิเตอร์</strong> และ <strong>รูปเวกเตอร์พารามิเตอร์ (Parametric Vector Form)</strong>
+                    </p>
+
+                    <div class="mt-4 pt-3 border-t border-slate-200">
+                        <button onclick="toggleExercise('ans-ex-2')" class="text-xs sm:text-sm font-semibold text-indigo-600 hover:text-indigo-800 flex items-center gap-1.5 transition">
+                            <i class="fa-regular fa-eye"></i> <span id="label-ans-ex-2">ดูขั้นตอนการเขียนผลเฉลย</span>
+                        </button>
+                        <div id="ans-ex-2" class="hidden mt-3 p-4 bg-white rounded-lg border border-indigo-100 text-sm space-y-3 text-slate-700">
+                            <div>
+                                <strong class="text-slate-900 text-xs sm:text-sm block mb-1">1. รูปสมการพารามิเตอร์:</strong>
+                                กำหนดให้ตัวแปรอิสระ $x_2 = s$ และ $x_5 = t$ ($s, t \in \mathbb{R}$) จะได้:
+                                <div class="my-1 font-mono text-xs sm:text-sm">
+                                    $$\begin{aligned}
+                                    x_1 &= 4 - 3s + 2t \\
+                                    x_2 &= s \\
+                                    x_3 &= 1 - 5t \\
+                                    x_4 &= 3 - t \\
+                                    x_5 &= t
+                                    \end{aligned}$$
+                                </div>
+                            </div>
+                            <div class="border-t border-slate-100 pt-2">
+                                <strong class="text-slate-900 text-xs sm:text-sm block mb-1">2. รูปเวกเตอร์พารามิเตอร์:</strong>
+                                <div class="my-1 text-xs sm:text-sm">
+                                    $$\mathbf{x} = \begin{bmatrix} x_1 \\ x_2 \\ x_3 \\ x_4 \\ x_5 \end{bmatrix} = \begin{bmatrix} 4 \\ 0 \\ 1 \\ 3 \\ 0 \end{bmatrix} + s \begin{bmatrix} -3 \\ 1 \\ 0 \\ 0 \\ 0 \end{bmatrix} + t \begin{bmatrix} 2 \\ 0 \\ -5 \\ -1 \\ 1 \end{bmatrix},\quad s, t \in \mathbb{R}$$
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Exercise 3 -->
+                <div class="p-5 sm:p-6 rounded-xl border border-slate-200 bg-slate-50/50">
+                    <span class="text-xs font-bold text-teal-800 bg-teal-100 px-2.5 py-1 rounded">ข้อที่ 3</span>
+                    <h3 class="font-bold text-slate-900 mt-2 text-base sm:text-lg">
+                        พิสูจน์ว่าคำตอบทั่วไปที่ได้สอดคล้องกับสมการทุกสมการ
+                    </h3>
+                    <p class="text-slate-700 text-sm mt-1">
+                        จงแสดงการพิสูจน์ทางพีชคณิตโดยนำรูปสมการพารามิเตอร์ของ $\mathbf{x}$ จากข้อ 2 เข้าไปแทนในสมการเดิมเพื่อยืนยันว่าสอดคล้องกับทุกค่า $s, t \in \mathbb{R}$
+                    </p>
+
+                    <div class="mt-4 pt-3 border-t border-slate-200">
+                        <button onclick="toggleExercise('ans-ex-3')" class="text-xs sm:text-sm font-semibold text-indigo-600 hover:text-indigo-800 flex items-center gap-1.5 transition">
+                            <i class="fa-regular fa-eye"></i> <span id="label-ans-ex-3">ดูบทพิสูจน์</span>
+                        </button>
+                        <div id="ans-ex-3" class="hidden mt-3 p-4 bg-white rounded-lg border border-indigo-100 text-sm space-y-3 text-slate-700">
+                            <p class="font-semibold text-slate-900">การแทนค่าพิสูจน์ในแต่ละสมการ:</p>
+                            <div class="space-y-2 text-xs sm:text-sm leading-relaxed text-slate-600">
+                                <div>
+                                    <strong>• สมการที่ 1:</strong> $x_1 + 3x_2 - 2x_5$
+                                    $$\begin{aligned}
+                                    &= (4 - 3s + 2t) + 3(s) - 2(t) \\
+                                    &= 4 - 3s + 2t + 3s - 2t = 4 \quad \checkmark \text{ (สอดคล้อง)}
+                                    \end{aligned}$$
+                                </div>
+                                <div class="border-t border-slate-100 pt-2">
+                                    <strong>• สมการที่ 2:</strong> $x_3 + 5x_5$
+                                    $$\begin{aligned}
+                                    &= (1 - 5t) + 5(t) = 1 \quad \checkmark \text{ (สอดคล้อง)}
+                                    \end{aligned}$$
+                                </div>
+                                <div class="border-t border-slate-100 pt-2">
+                                    <strong>• สมการที่ 3:</strong> $x_4 + x_5$
+                                    $$\begin{aligned}
+                                    &= (3 - t) + (t) = 3 \quad \checkmark \text{ (สอดคล้อง)}
+                                    \end{aligned}$$
+                                </div>
+                                <p class="text-emerald-800 font-semibold pt-1">
+                                    $\therefore$ พจน์ที่ติดตัวแปรพารามิเตอร์ $s$ และ $t$ หักล้างกันหมดเป็นศูนย์ในทุกสมการ ส่งผลให้สมการเป็นจริงเสมอทุก $s, t \in \mathbb{R} \ \blacksquare$
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="text-center text-xs text-slate-400 py-6 border-t border-slate-200">
+            <p>เรื่องที่ 6: ตำแหน่งหลัก ตัวแปรหลัก และตัวแปรอิสระ • สื่อการเรียนรู้คณิตศาสตร์เชิงปฏิสัมพันธ์</p>
+        </footer>
+
+    </main>
+
+    <!-- JavaScript Interactive Simulation Logic -->
+    <script>
+        let currentPreset = 1;
+
+        const presetConfigs = {
+            1: {
+                title: "ระบบในเนื้อหาหลัก (4 ตัวแปร, 1 ตัวแปรอิสระ)",
+                matrixLatex: "\\left[\\begin{array}{cccc|c} 1 & 0 & 2 & 0 & 3 \\\\ 0 & 1 & -1 & 0 & 4 \\\\ 0 & 0 & 0 & 1 & 5 \\end{array}\\right]",
+                hasS: false,
+                labelT: "x_3",
+                equations: [
+                    {
+                        name: "สมการที่ 1",
+                        lhsLatex: "x_1 + 2x_3",
+                        rhs: 3,
+                        calcLHS: (x) => x[0] + 2 * x[2],
+                        formatTerms: (x) => `${round2(x[0])} + 2(${round2(x[2])})`
+                    },
+                    {
+                        name: "สมการที่ 2",
+                        lhsLatex: "x_2 - x_3",
+                        rhs: 4,
+                        calcLHS: (x) => x[1] - x[2],
+                        formatTerms: (x) => `${round2(x[1])} - (${round2(x[2])})`
+                    },
+                    {
+                        name: "สมการที่ 3",
+                        lhsLatex: "x_4",
+                        rhs: 5,
+                        calcLHS: (x) => x[3],
+                        formatTerms: (x) => `${round2(x[3])}`
+                    }
+                ],
+                computeVector: (t, s) => {
+                    const x1 = 3 - 2 * t;
+                    const x2 = 4 + t;
+                    const x3 = t;
+                    const x4 = 5;
+                    return [x1, x2, x3, x4];
+                },
+                vectorLatex: (x) => `\\mathbf{x} = \\begin{bmatrix} x_1 \\\\ x_2 \\\\ x_3 \\\\ x_4 \\end{bmatrix} = \\begin{bmatrix} ${round2(x[0])} \\\\ ${round2(x[1])} \\\\ ${round2(x[2])} \\\\ ${round2(x[3])} \\end{bmatrix}`,
+                varNames: ["x_1", "x_2", "x_3", "x_4"]
+            },
+            2: {
+                title: "ระบบ 5 ตัวแปร (2 ตัวแปรอิสระ: s, t)",
+                matrixLatex: "\\left[\\begin{array}{ccccc|c} 1 & 0 & 2 & 0 & -1 & 1 \\\\ 0 & 1 & -1 & 0 & 3 & 2 \\\\ 0 & 0 & 0 & 1 & 2 & 4 \\end{array}\\right]",
+                hasS: true,
+                labelT: "x_3",
+                equations: [
+                    {
+                        name: "สมการที่ 1",
+                        lhsLatex: "x_1 + 2x_3 - x_5",
+                        rhs: 1,
+                        calcLHS: (x) => x[0] + 2 * x[2] - x[4],
+                        formatTerms: (x) => `${round2(x[0])} + 2(${round2(x[2])}) - (${round2(x[4])})`
+                    },
+                    {
+                        name: "สมการที่ 2",
+                        lhsLatex: "x_2 - x_3 + 3x_5",
+                        rhs: 2,
+                        calcLHS: (x) => x[1] - x[2] + 3 * x[4],
+                        formatTerms: (x) => `${round2(x[1])} - (${round2(x[2])}) + 3(${round2(x[4])})`
+                    },
+                    {
+                        name: "สมการที่ 3",
+                        lhsLatex: "x_4 + 2x_5",
+                        rhs: 4,
+                        calcLHS: (x) => x[3] + 2 * x[4],
+                        formatTerms: (x) => `${round2(x[3])} + 2(${round2(x[4])})`
+                    }
+                ],
+                computeVector: (t, s) => {
+                    const x1 = 1 - 2 * t + s;
+                    const x2 = 2 + t - 3 * s;
+                    const x3 = t;
+                    const x4 = 4 - 2 * s;
+                    const x5 = s;
+                    return [x1, x2, x3, x4, x5];
+                },
+                vectorLatex: (x) => `\\mathbf{x} = \\begin{bmatrix} x_1 \\\\ x_2 \\\\ x_3 \\\\ x_4 \\\\ x_5 \\end{bmatrix} = \\begin{bmatrix} ${round2(x[0])} \\\\ ${round2(x[1])} \\\\ ${round2(x[2])} \\\\ ${round2(x[3])} \\\\ ${round2(x[4])} \\end{bmatrix}`,
+                varNames: ["x_1", "x_2", "x_3", "x_4", "x_5"]
+            }
+        };
+
+        window.onload = function() {
+            switchPreset(1);
+        };
+
+        function switchPreset(num) {
+            currentPreset = num;
+            const btn1 = document.getElementById('btn-pre-1');
+            const btn2 = document.getElementById('btn-pre-2');
+            const panelS = document.getElementById('panel-slider-s');
+
+            if (num === 1) {
+                btn1.className = "px-2.5 py-1.5 rounded-lg bg-white font-bold text-slate-800 shadow-xs";
+                btn2.className = "px-2.5 py-1.5 rounded-lg text-slate-600 hover:text-slate-900";
+                panelS.classList.add('hidden');
+            } else {
+                btn2.className = "px-2.5 py-1.5 rounded-lg bg-white font-bold text-slate-800 shadow-xs";
+                btn1.className = "px-2.5 py-1.5 rounded-lg text-slate-600 hover:text-slate-900";
+                panelS.classList.remove('hidden');
+            }
+
+            const config = presetConfigs[num];
+            document.getElementById('sim-matrix-view').innerHTML = `$$${config.matrixLatex}$$`;
+            document.getElementById('label-free-t').innerText = config.labelT;
+
+            resetSliders();
+        }
+
+        function resetSliders() {
+            document.getElementById('slider-t').value = 0;
+            document.getElementById('slider-s').value = 0;
+            updateSimulation();
+        }
+
+        function round2(n) {
+            return Number(Math.round(n + "e2") + "e-2");
+        }
+
+        function updateSimulation() {
+            const config = presetConfigs[currentPreset];
+            const t = parseFloat(document.getElementById('slider-t').value);
+            const s = parseFloat(document.getElementById('slider-s').value);
+
+            document.getElementById('val-t').innerText = t.toFixed(2);
+            document.getElementById('val-s').innerText = s.toFixed(2);
+
+            const vec = config.computeVector(t, s);
+
+            // Update LaTeX Vector Display
+            document.getElementById('sim-solution-vector').innerHTML = `$$${config.vectorLatex(vec)}$$`;
+
+            // Update Details
+            const detailsDiv = document.getElementById('sim-variables-detail');
+            let detailsHtml = "";
+            config.varNames.forEach((name, idx) => {
+                const isFree = (name === "x_3" || name === "x_5");
+                const color = isFree ? "text-amber-400 font-bold" : "text-slate-200";
+                detailsHtml += `<div>${name} = <span class="${color}">${round2(vec[idx])}</span></div>`;
+            });
+            detailsDiv.innerHTML = detailsHtml;
+
+            // Verification Engine
+            const verList = document.getElementById('verification-list');
+            let verHtml = "";
+            config.equations.forEach((eq) => {
+                const calcVal = eq.calcLHS(vec);
+                const isMatch = Math.abs(calcVal - eq.rhs) < 1e-6;
+                const termsText = eq.formatTerms(vec);
+
+                verHtml += `
+                    <div class="p-2.5 rounded-lg bg-white border border-emerald-100 flex items-center justify-between">
+                        <div>
+                            <span class="text-slate-700 font-bold mr-2">${eq.name}:</span>
+                            <span class="text-slate-500">${termsText}</span>
+                            <span class="text-slate-800 font-bold"> = ${round2(calcVal)}</span>
+                        </div>
+                        <div class="flex items-center gap-1.5 ${isMatch ? 'text-emerald-600' : 'text-rose-600'} font-bold">
+                            <span>= ${eq.rhs}</span>
+                            <i class="fa-solid fa-circle-check"></i>
+                        </div>
+                    </div>
+                `;
+            });
+            verList.innerHTML = verHtml;
+
+            triggerMathJax();
+        }
+
+        function triggerMathJax() {
+            if (window.MathJax && window.MathJax.typesetPromise) {
+                window.MathJax.typesetPromise().catch(err => console.error(err));
+            }
+        }
+
+        // Accordion Helpers
+        function toggleAccordion(id) {
+            const content = document.getElementById(id);
+            const icon = document.getElementById(`icon-${id}`);
+            if (content.classList.contains('hidden')) {
+                content.classList.remove('hidden');
+                icon.classList.add('rotate-180');
+                triggerMathJax();
+            } else {
+                content.classList.add('hidden');
+                icon.classList.remove('rotate-180');
+            }
+        }
+
+        function toggleExercise(id) {
+            const el = document.getElementById(id);
+            const label = document.getElementById(`label-${id}`);
+            if (el.classList.contains('hidden')) {
+                el.classList.remove('hidden');
+                label.innerText = "ซ่อนเฉลย / คำอธิบาย";
+                triggerMathJax();
+            } else {
+                el.classList.add('hidden');
+                label.innerText = id === 'ans-ex-2' ? "ดูขั้นตอนการเขียนผลเฉลย" : (id === 'ans-ex-3' ? "ดูบทพิสูจน์" : "ดูแนวทางคำตอบ");
+            }
+        }
+    </script>
+</body>
+</html>

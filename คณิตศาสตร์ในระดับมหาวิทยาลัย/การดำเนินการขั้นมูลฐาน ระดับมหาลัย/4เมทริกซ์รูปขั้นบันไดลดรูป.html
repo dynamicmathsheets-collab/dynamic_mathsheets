@@ -1,0 +1,942 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>เรื่องที่ 4: เมทริกซ์รูปขั้นบันไดลดรูป (Reduced Row Echelon Form: RREF)</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Sarabun & Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- MathJax for rendering LaTeX -->
+    <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']],
+                displayMath: [['$$', '$$'], ['\\[', '\\]']]
+            },
+            svg: {
+                fontCache: 'global'
+            }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        body {
+            font-family: 'Sarabun', 'Inter', sans-serif;
+            background-color: #f8fafc;
+            color: #1e293b;
+        }
+        .matrix-bracket {
+            position: relative;
+            padding: 4px 10px;
+        }
+        .matrix-bracket::before, .matrix-bracket::after {
+            content: "";
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            width: 8px;
+            border-style: solid;
+            border-color: #334155;
+        }
+        .matrix-bracket::before {
+            left: 0;
+            border-width: 2px 0 2px 2px;
+            border-top-left-radius: 6px;
+            border-bottom-left-radius: 6px;
+        }
+        .matrix-bracket::after {
+            right: 0;
+            border-width: 2px 2px 2px 0;
+            border-top-right-radius: 6px;
+            border-bottom-right-radius: 6px;
+        }
+        input[type=number]::-webkit-inner-spin-button, 
+        input[type=number]::-webkit-outer-spin-button { 
+            -webkit-appearance: none; 
+            margin: 0; 
+        }
+        input[type=number] {
+            -moz-appearance: textfield;
+        }
+    </style>
+</head>
+<body class="min-h-screen">
+
+    <!-- Header Banner -->
+    <header class="bg-gradient-to-r from-slate-900 via-indigo-950 to-emerald-950 text-white shadow-lg border-b border-emerald-800/40">
+        <div class="max-w-6xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <div class="flex flex-wrap items-center justify-between gap-4">
+                <div>
+                    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-emerald-500/30 text-emerald-200 border border-emerald-400/30 mb-2">
+                        <i class="fa-solid fa-graduation-cap"></i> พีชคณิตเชิงเส้น (Linear Algebra)
+                    </span>
+                    <h1 class="text-2xl sm:text-3xl lg:text-4xl font-bold tracking-tight">
+                        เรื่องที่ 4: เมทริกซ์รูปขั้นบันไดลดรูป (RREF)
+                    </h1>
+                    <p class="text-emerald-100 mt-1 text-sm sm:text-base font-light">
+                        Reduced Row Echelon Form, ความเป็นเอกลักษณ์ (Uniqueness) และการระบุตัวแปรหลัก-ตัวแปรอิสระ
+                    </p>
+                </div>
+                <div class="hidden md:flex items-center gap-3 bg-white/10 backdrop-blur-sm px-4 py-2.5 rounded-xl border border-white/20 text-xs">
+                    <div class="w-10 h-10 rounded-lg bg-emerald-500/30 text-emerald-300 flex items-center justify-center font-bold text-lg">
+                        <i class="fa-solid fa-gem"></i>
+                    </div>
+                    <div>
+                        <div class="font-semibold text-white">รูปแบบมาตรฐานเอกลักษณ์</div>
+                        <div class="text-emerald-200">Gauss-Jordan & Unique RREF</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Container: Fixed width max-w-6xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 -->
+    <main class="max-w-6xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 space-y-10">
+
+        <!-- 1. วัตถุประสงค์การเรียนรู้ -->
+        <section class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 sm:p-8 transition-all hover:shadow-md">
+            <div class="flex items-center gap-3 border-b border-slate-100 pb-4 mb-5">
+                <div class="w-10 h-10 rounded-xl bg-emerald-50 flex items-center justify-center text-emerald-600 font-bold text-lg">
+                    <i class="fa-solid fa-bullseye"></i>
+                </div>
+                <div>
+                    <h2 class="text-xl sm:text-2xl font-bold text-slate-900">1. วัตถุประสงค์การเรียนรู้</h2>
+                    <p class="text-xs sm:text-sm text-slate-500">ผลการเรียนรู้ที่คาดหวังสำหรับเรื่องที่ 4</p>
+                </div>
+            </div>
+            
+            <div class="bg-gradient-to-r from-emerald-50/90 to-teal-50/60 border-l-4 border-emerald-600 rounded-r-xl p-5">
+                <p class="text-slate-800 leading-relaxed font-semibold mb-3">
+                    เมื่อสิ้นสุดการเรียนรู้นี้ นักศึกษาสามารถ:
+                </p>
+                <ul class="space-y-3 text-slate-700 text-sm sm:text-base">
+                    <li class="flex items-start gap-3">
+                        <span class="w-6 h-6 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center text-xs font-bold mt-0.5 flex-shrink-0">
+                            <i class="fa-solid fa-check"></i>
+                        </span>
+                        <span><strong>ตรวจสอบและจำแนก</strong> เมทริกซ์รูปขั้นบันไดลดรูป (Reduced Row Echelon Form: RREF) ได้อย่างแม่นยำ</span>
+                    </li>
+                    <li class="flex items-start gap-3">
+                        <span class="w-6 h-6 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center text-xs font-bold mt-0.5 flex-shrink-0">
+                            <i class="fa-solid fa-check"></i>
+                        </span>
+                        <span><strong>สร้างเมทริกซ์รูปขั้นบันไดลดรูป</strong> จากเมทริกซ์ต้นฉบับโดยใช้กระบวนการกำจัดแบบเกาส์-จอร์แดน (Gauss-Jordan Elimination)</span>
+                    </li>
+                    <li class="flex items-start gap-3">
+                        <span class="w-6 h-6 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center text-xs font-bold mt-0.5 flex-shrink-0">
+                            <i class="fa-solid fa-check"></i>
+                        </span>
+                        <span><strong>เปรียบเทียบความแตกต่าง</strong> ระหว่างรูปขั้นบันไดทั่วไป (REF) กับรูปขั้นบันไดลดรูป (RREF) และอธิบายความสำคัญของ <strong>รูปแบบมาตรฐานที่มีเพียงหนึ่งเดียว (Canonical & Unique Form)</strong> ได้</span>
+                    </li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- 2. เนื้อหาหลัก -->
+        <section class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 sm:p-8 space-y-7">
+            <div class="flex items-center gap-3 border-b border-slate-100 pb-4">
+                <div class="w-10 h-10 rounded-xl bg-indigo-50 flex items-center justify-center text-indigo-600 font-bold text-lg">
+                    <i class="fa-solid fa-book-bookmark"></i>
+                </div>
+                <div>
+                    <h2 class="text-xl sm:text-2xl font-bold text-slate-900">2. เนื้อหาหลัก (Core Content)</h2>
+                    <p class="text-xs sm:text-sm text-slate-500">บทนิยาม เงื่อนไข 3 ข้อ และทฤษฎีบทความเป็นเอกลักษณ์ 3.3</p>
+                </div>
+            </div>
+
+            <div class="bg-slate-50 border border-slate-200 rounded-xl p-5 sm:p-6">
+                <h3 class="text-base sm:text-lg font-bold text-slate-900 mb-2 flex items-center gap-2">
+                    <i class="fa-solid fa-check-double text-emerald-600"></i> บทนิยาม: เมทริกซ์รูปขั้นบันไดลดรูป (Reduced Row Echelon Form: RREF)
+                </h3>
+                <p class="text-slate-700 leading-relaxed text-sm sm:text-base">
+                    เมทริกซ์จะอยู่ใน <strong>รูปขั้นบันไดลดรูป (RREF)</strong> เมื่อสอดคล้องกับเงื่อนไขต่อไปนี้ครบทั้ง 3 ข้อ:
+                </p>
+            </div>
+
+            <!-- 3 เงื่อนไข Card -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6">
+                <!-- Condition 1 -->
+                <div class="p-5 rounded-xl border border-indigo-100 bg-indigo-50/50 hover:bg-indigo-50/90 transition shadow-xs">
+                    <div class="flex items-center justify-between mb-3">
+                        <span class="text-xs font-bold uppercase tracking-wider text-indigo-800 bg-indigo-100 px-2.5 py-1 rounded">เงื่อนไขที่ 1</span>
+                        <i class="fa-solid fa-stairs text-indigo-500"></i>
+                    </div>
+                    <h4 class="font-bold text-slate-900 text-base mb-1">อยู่ในรูปขั้นบันได (REF)</h4>
+                    <p class="text-xs sm:text-sm text-slate-600 leading-relaxed">
+                        ต้องผ่านเงื่อนไขของ REF ทุกประการ (แถวศูนย์อยู่ล่างสุด, ตำแหน่งนำเยื้องขวา, ใต้ตำแหน่งนำเป็นศูนย์)
+                    </p>
+                </div>
+
+                <!-- Condition 2 -->
+                <div class="p-5 rounded-xl border border-emerald-100 bg-emerald-50/50 hover:bg-emerald-50/90 transition shadow-xs">
+                    <div class="flex items-center justify-between mb-3">
+                        <span class="text-xs font-bold uppercase tracking-wider text-emerald-800 bg-emerald-100 px-2.5 py-1 rounded">เงื่อนไขที่ 2</span>
+                        <i class="fa-solid fa-1 text-emerald-600 font-bold"></i>
+                    </div>
+                    <h4 class="font-bold text-slate-900 text-base mb-1">ตำแหน่งนำต้องเท่ากับ 1</h4>
+                    <p class="text-xs sm:text-sm text-slate-600 leading-relaxed">
+                        ตำแหน่งนำ (Leading Entry / Pivot) ของทุกแถวที่ไม่ใช่แถวศูนย์ <strong>ต้องมีค่าเท่ากับ 1 เสมอ (Leading 1)</strong>
+                    </p>
+                </div>
+
+                <!-- Condition 3 -->
+                <div class="p-5 rounded-xl border border-teal-100 bg-teal-50/50 hover:bg-teal-50/90 transition shadow-xs">
+                    <div class="flex items-center justify-between mb-3">
+                        <span class="text-xs font-bold uppercase tracking-wider text-teal-800 bg-teal-100 px-2.5 py-1 rounded">เงื่อนไขที่ 3</span>
+                        <i class="fa-solid fa-arrows-up-down text-teal-600"></i>
+                    </div>
+                    <h4 class="font-bold text-slate-900 text-base mb-1">ทั้งบนและล่างนำเป็น 0</h4>
+                    <p class="text-xs sm:text-sm text-slate-600 leading-relaxed">
+                        ในคอลัมน์ที่มีตำแหน่งนำ สมาชิกอื่นทุกตัวต้องเป็นศูนย์ <strong>ทั้งด้านบนและด้านล่าง</strong> ของตำแหน่งนำ
+                    </p>
+                </div>
+            </div>
+
+            <!-- Example Section -->
+            <div class="bg-slate-50 rounded-xl p-5 sm:p-6 border border-slate-200">
+                <h3 class="font-bold text-slate-900 text-base sm:text-lg mb-3 flex items-center gap-2">
+                    <span class="w-6 h-6 rounded-full bg-emerald-600 text-white flex items-center justify-center text-xs">Ex</span>
+                    ตัวอย่างเมทริกซ์ในรูปขั้นบันไดลดรูป (RREF) ขนาด $4 \times 5$
+                </h3>
+
+                <div class="flex flex-col lg:flex-row items-center justify-around gap-6 py-3">
+                    <div class="text-center">
+                        <div class="text-xl sm:text-2xl font-bold text-slate-800">
+                            $$R = \begin{bmatrix}
+                            \mathbf{\underline{1}} & 0 & 2 & 0 & 3 \\
+                            0 & \mathbf{\underline{1}} & -1 & 0 & 4 \\
+                            0 & 0 & 0 & \mathbf{\underline{1}} & 5 \\
+                            0 & 0 & 0 & 0 & 0
+                            \end{bmatrix}$$
+                        </div>
+                        <span class="text-xs text-emerald-800 font-semibold bg-emerald-100 px-3 py-1 rounded-full mt-2 inline-block">
+                            ตัวเลข $1$ ขีดเส้นใต้คือตำแหน่งนำ (Leading 1s)
+                        </span>
+                    </div>
+
+                    <div class="space-y-3 text-xs sm:text-sm text-slate-700 max-w-md">
+                        <div class="p-3 bg-white rounded-lg border border-slate-200 shadow-2xs space-y-1.5">
+                            <div class="font-semibold text-slate-900 flex items-center gap-2">
+                                <i class="fa-solid fa-crosshairs text-emerald-600"></i> ตำแหน่งนำ (Leading 1s):
+                            </div>
+                            <p class="text-slate-600">
+                                อยู่ในคอลัมน์ที่ 1, 2 และ 4 สมาชิกตัวอื่นในคอลัมน์เหล่านี้เป็น $0$ ทั้งหมดทั้งด้านบนและล่าง
+                            </p>
+                        </div>
+                        <div class="p-3 bg-white rounded-lg border border-slate-200 shadow-2xs space-y-1.5">
+                            <div class="font-semibold text-slate-900 flex items-center gap-2">
+                                <i class="fa-solid fa-arrow-right-arrow-left text-indigo-600"></i> คอลัมน์ที่ไม่มีตำแหน่งนำ (Free Variable Columns):
+                            </div>
+                            <p class="text-slate-600">
+                                คอลัมน์ที่ 3 และ 5 ไม่มีตำแหน่งนำ ซึ่งสอดคล้องกับ <strong>ตัวแปรอิสระ (Free Variables)</strong> ในระบบสมการเชิงเส้น
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Theorem 3.3 Card -->
+            <div class="bg-gradient-to-br from-slate-900 via-indigo-950 to-emerald-950 text-white rounded-2xl p-6 sm:p-7 shadow-md border border-slate-800">
+                <div class="flex items-center gap-2 text-emerald-300 text-xs sm:text-sm font-semibold uppercase tracking-wider mb-2">
+                    <i class="fa-solid fa-crown"></i> ทฤษฎีบท 3.3 (Theorem 3.3)
+                </div>
+                <h4 class="text-lg sm:text-xl font-bold text-white mb-3">
+                    ความเป็นเอกลักษณ์ของรูปขั้นบันไดลดรูป (Uniqueness of RREF)
+                </h4>
+                <p class="text-slate-200 text-sm sm:text-base leading-relaxed">
+                    "เมทริกซ์ทุกเมทริกซ์สามารถเปลี่ยนให้เป็นรูปขั้นบันไดลดรูป (RREF) ได้ด้วยการดำเนินการขั้นมูลฐานตามแถว 
+                    และ <span class="text-emerald-300 font-bold underline decoration-emerald-400 decoration-2">รูปขั้นบันไดลดรูปที่ได้มีเพียงรูปเดียวเท่านั้น (Unique)</span> สำหรับเมทริกซ์ต้นฉบับนั้น"
+                </p>
+                
+                <div class="mt-4 pt-4 border-t border-slate-700/80 text-xs sm:text-sm text-slate-300 space-y-2">
+                    <div class="flex items-center gap-2 text-amber-300 font-bold">
+                        <i class="fa-solid fa-triangle-exclamation"></i> จุดเปรียบเทียบสำคัญที่ต้องจดจำ:
+                    </div>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-1">
+                        <div class="p-3 bg-slate-800/80 rounded-lg border border-slate-700">
+                            <strong class="text-rose-300 block mb-1">เมทริกซ์รูปขั้นบันไดทั่วไป (REF):</strong>
+                            <strong>อาจมีได้หลายรูปแบบ (Not Unique)</strong> ขึ้นอยู่กับลำดับขั้นตอนของการดำเนินการตามแถวและสเกลาร์ที่เลือกใช้
+                        </div>
+                        <div class="p-3 bg-emerald-950/60 rounded-lg border border-emerald-700/60">
+                            <strong class="text-emerald-300 block mb-1">เมทริกซ์รูปขั้นบันไดลดรูป (RREF):</strong>
+                            <strong>มีเพียงรูปแบบเดียวเสมอ (Unique)</strong> ไม่ว่าจะใช้วิธีหรือลำดับการดำเนินการแบบใด สุดท้ายจะได้ผลลัพธ์ RREF เดียวกันแน่นอน
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 3. แบบจำลองโต้ตอบ (Interactive Simulator) -->
+        <section class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 sm:p-8 space-y-7">
+            <div class="flex flex-wrap items-center justify-between gap-4 border-b border-slate-100 pb-4">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-xl bg-purple-50 flex items-center justify-center text-purple-600 font-bold text-lg">
+                        <i class="fa-solid fa-code-compare"></i>
+                    </div>
+                    <div>
+                        <h2 class="text-xl sm:text-2xl font-bold text-slate-900">3. แบบจำลองโต้ตอบ: เปรียบเทียบ REF หลายรูปแบบ กับ RREF รูปเดียว</h2>
+                        <p class="text-xs sm:text-sm text-slate-500">ทดสอบเมทริกซ์ต้นฉบับ สังเกต REF ที่หน้าตาต่างกัน แต่จะยุบรวมเป็น RREF เดียวกันเสมอ</p>
+                    </div>
+                </div>
+
+                <div class="flex items-center gap-2 bg-slate-100 p-1.5 rounded-lg text-xs">
+                    <span class="text-slate-600 font-medium px-2">ตัวอย่างเมทริกซ์:</span>
+                    <button id="btn-sample-1" onclick="loadMatrixSample(1)" class="px-2.5 py-1 rounded bg-white text-slate-800 font-bold shadow-xs">ชุดที่ 1 ($3 \times 4$)</button>
+                    <button id="btn-sample-2" onclick="loadMatrixSample(2)" class="px-2.5 py-1 rounded text-slate-600 hover:text-slate-900">ชุดที่ 2 ($3 \times 4$)</button>
+                    <button id="btn-sample-3" onclick="loadMatrixSample(3)" class="px-2.5 py-1 rounded text-slate-600 hover:text-slate-900">ชุดที่ 3 ($4 \times 5$)</button>
+                </div>
+            </div>
+
+            <!-- Matrix Source Box & Actions -->
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-center">
+                <!-- Editable Matrix Input -->
+                <div class="lg:col-span-6 bg-slate-50 p-5 rounded-xl border border-slate-200">
+                    <div class="flex justify-between items-center mb-3">
+                        <label class="text-sm font-bold text-slate-700 flex items-center gap-1.5">
+                            <i class="fa-solid fa-table-cells text-indigo-500"></i> เมทริกซ์ต้นฉบับ $A$
+                        </label>
+                        <span class="text-xs text-slate-400">(สามารถแก้ไขตัวเลขได้)</span>
+                    </div>
+                    
+                    <div class="flex justify-center p-2 overflow-x-auto">
+                        <div id="sim-matrix-inputs" class="matrix-bracket flex flex-col gap-2 p-1">
+                            <!-- Matrix inputs generated by JS -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Simulation Action Buttons -->
+                <div class="lg:col-span-6 space-y-3">
+                    <p class="text-xs text-slate-600 font-semibold mb-1">
+                        คลิกดูการแปลงแบบต่างๆ เพื่อพิสูจน์ทฤษฎีบท 3.3:
+                    </p>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                        <button onclick="showREF(1)" id="btn-ref-1" class="p-3 bg-white border border-slate-200 hover:border-indigo-400 hover:bg-indigo-50/50 rounded-xl text-left transition flex items-start gap-2.5 shadow-2xs">
+                            <span class="w-6 h-6 rounded-full bg-indigo-100 text-indigo-700 flex items-center justify-center text-xs font-bold mt-0.5">1</span>
+                            <div>
+                                <div class="text-xs font-bold text-slate-900">REF รูปแบบที่ 1</div>
+                                <div class="text-[11px] text-slate-500">ไม่ทำสเกลาร์ตำแหน่งนำ</div>
+                            </div>
+                        </button>
+
+                        <button onclick="showREF(2)" id="btn-ref-2" class="p-3 bg-white border border-slate-200 hover:border-indigo-400 hover:bg-indigo-50/50 rounded-xl text-left transition flex items-start gap-2.5 shadow-2xs">
+                            <span class="w-6 h-6 rounded-full bg-indigo-100 text-indigo-700 flex items-center justify-center text-xs font-bold mt-0.5">2</span>
+                            <div>
+                                <div class="text-xs font-bold text-slate-900">REF รูปแบบที่ 2</div>
+                                <div class="text-[11px] text-slate-500">สลับแถวหรือคูณสเกลาร์อื่น</div>
+                            </div>
+                        </button>
+                    </div>
+
+                    <!-- Gauss-Jordan Final RREF Button -->
+                    <button onclick="computeRREF()" class="w-full py-3.5 bg-emerald-600 hover:bg-emerald-700 active:scale-[0.99] transition text-white font-bold rounded-xl shadow-md flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-wand-magic-sparkles text-emerald-200"></i> คำนวณสู่รูปขั้นบันไดลดรูป RREF (หนึ่งเดียวเสมอ)
+                    </button>
+                </div>
+            </div>
+
+            <!-- Comparison Screen: REF vs RREF Showcase -->
+            <div class="bg-slate-900 text-white rounded-2xl p-6 border border-slate-800 shadow-md space-y-6">
+                <div class="flex flex-wrap items-center justify-between gap-3 border-b border-slate-800 pb-3">
+                    <div class="flex items-center gap-2">
+                        <span id="display-mode-indicator" class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                        <h4 id="display-mode-title" class="text-sm font-bold text-slate-200">
+                            ผลลัพธ์: เมทริกซ์รูปขั้นบันไดลดรูป (RREF)
+                        </h4>
+                    </div>
+                    <span id="display-mode-badge" class="px-2.5 py-1 rounded text-xs font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+                        UNIQUE RREF
+                    </span>
+                </div>
+
+                <!-- Matrix Display -->
+                <div class="flex flex-col md:flex-row items-center justify-center gap-6 py-2">
+                    <div class="text-center w-full md:w-auto">
+                        <span class="text-xs uppercase tracking-wider text-slate-400 font-semibold mb-2 block">เมทริกซ์ผลลัพธ์</span>
+                        <div id="sim-result-math" class="p-3 bg-slate-800/80 rounded-xl border border-slate-700 flex justify-center text-lg">
+                            <!-- LaTeX Matrix rendered here -->
+                        </div>
+                    </div>
+
+                    <!-- Variable & Column Analysis -->
+                    <div class="flex-1 max-w-md w-full bg-slate-800/50 p-4 rounded-xl border border-slate-700/80 text-xs space-y-3">
+                        <div class="font-bold text-slate-200 flex items-center gap-2 text-sm">
+                            <i class="fa-solid fa-magnifying-glass-chart text-emerald-400"></i> วิเคราะห์โครงสร้างหลักของเมทริกซ์:
+                        </div>
+                        <div class="space-y-2 text-slate-300">
+                            <div class="flex items-start gap-2">
+                                <span class="px-1.5 py-0.5 rounded bg-emerald-950 text-emerald-300 border border-emerald-700 font-mono font-bold">Leading 1</span>
+                                <span id="ana-pivots">พบคอลัมน์ที่มีตำแหน่งนำ: 1, 2, 4 (ตัวแปรหลัก)</span>
+                            </div>
+                            <div class="flex items-start gap-2">
+                                <span class="px-1.5 py-0.5 rounded bg-amber-950 text-amber-300 border border-amber-700 font-mono font-bold">Free Col</span>
+                                <span id="ana-free">พบคอลัมน์อิสระ: 3, 5 (ตัวแปรอิสระ)</span>
+                            </div>
+                            <div class="pt-2 border-t border-slate-700 text-slate-400 leading-relaxed" id="ana-desc">
+                                เมทริกซ์นี้อยู่ในรูปขั้นบันไดลดรูป (RREF) แล้ว ตำแหน่งนำทุกตัวเป็น 1 และสมาชิกอื่นในคอลัมน์ของตำแหน่งนำเป็น 0 ทั้งหมด
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Explanation Banner on Uniqueness -->
+                <div id="uniqueness-note" class="p-3.5 bg-emerald-950/40 border border-emerald-800/60 rounded-xl text-xs text-emerald-200 flex items-start gap-2.5">
+                    <i class="fa-solid fa-circle-info text-emerald-400 mt-0.5"></i>
+                    <div>
+                        <strong>ยืนยันตามทฤษฎีบท 3.3:</strong> 
+                        แม้เราจะเลือกเส้นทางการดำเนินการแบบใด หรือเคยแปลงให้เป็น REF หน้าตาแบบใดก็ตาม เมื่อดำเนินการต่อจนถึงรูปขั้นบันไดลดรูป จะได้เมทริกซ์ที่มีหน้าตานี้เพียง <em>หนึ่งเดียวเท่านั้น</em>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 4. คำถามนำเพื่อค้นพบ (Guided Discovery Questions) -->
+        <section class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 sm:p-8">
+            <div class="flex items-center gap-3 border-b border-slate-100 pb-4 mb-6">
+                <div class="w-10 h-10 rounded-xl bg-amber-50 flex items-center justify-center text-amber-600 font-bold text-lg">
+                    <i class="fa-solid fa-compass"></i>
+                </div>
+                <div>
+                    <h2 class="text-xl sm:text-2xl font-bold text-slate-900">4. คำถามนำเพื่อค้นพบ (Guided Discovery Questions)</h2>
+                    <p class="text-xs sm:text-sm text-slate-500">คลิกที่คำถามเพื่อร่วมคิดและค้นพบความหมายที่ลึกซึ้งของ RREF</p>
+                </div>
+            </div>
+
+            <div class="space-y-4">
+                
+                <!-- Question 1 -->
+                <div class="border border-slate-200 rounded-xl overflow-hidden transition-all">
+                    <button onclick="toggleAccordion('disc-1')" class="w-full flex items-center justify-between p-4 sm:p-5 text-left bg-slate-50/70 hover:bg-slate-100/70 transition">
+                        <span class="font-bold text-slate-800 text-sm sm:text-base flex items-center gap-3">
+                            <span class="w-7 h-7 rounded-full bg-amber-100 text-amber-800 text-xs flex items-center justify-center font-bold flex-shrink-0">1</span>
+                            เมทริกซ์ต้นฉบับเดียวกันอาจให้รูปขั้นบันได (REF) ต่างกันได้หรือไม่?
+                        </span>
+                        <i id="icon-disc-1" class="fa-solid fa-chevron-down text-slate-400 text-sm transition-transform duration-200"></i>
+                    </button>
+                    <div id="disc-1" class="hidden p-5 bg-white border-t border-slate-200 text-sm text-slate-700 leading-relaxed space-y-2">
+                        <p class="font-semibold text-emerald-800">
+                            <i class="fa-solid fa-circle-check"></i> ได้แน่นอน (REF ไม่เป็นเอกลักษณ์)
+                        </p>
+                        <p>
+                            เนื่องจากรูปขั้นบันไดทั่วไป (REF) ไม่ได้บังคับว่าตำแหน่งนำต้องมีค่าเป็น 1 และไม่ได้บังคับให้สมาชิกที่อยู่ <em>เหนือ</em> ตำแหน่งนำต้องเป็นศูนย์ ดังนั้น หากผู้เรียนคนหนึ่งคูณแถวด้วยค่าคงที่ $2$ หรือเลือกสลับแถวก่อนที่จะทำการกำจัด ค่าของสมาชิกใน REF ที่ได้จะแตกต่างกันไปตามลำดับขั้นตอน
+                        </p>
+                        <p class="text-xs text-slate-500 bg-slate-50 p-2.5 rounded border border-slate-200">
+                            ตัวอย่างเช่น เมทริกซ์ $\begin{bmatrix} 1 & 2 \\ 2 & 6 \end{bmatrix}$ สามารถลดรูปเป็น REF ได้ทั้ง $\begin{bmatrix} 1 & 2 \\ 0 & 2 \end{bmatrix}$ หรือ $\begin{bmatrix} 1 & 2 \\ 0 & 1 \end{bmatrix}$ หรือ $\begin{bmatrix} 2 & 6 \\ 0 & -1 \end{bmatrix}$ ซึ่งล้วนถูกต้องตามนิยามของ REF ทั้งสิ้น
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Question 2 -->
+                <div class="border border-slate-200 rounded-xl overflow-hidden transition-all">
+                    <button onclick="toggleAccordion('disc-2')" class="w-full flex items-center justify-between p-4 sm:p-5 text-left bg-slate-50/70 hover:bg-slate-100/70 transition">
+                        <span class="font-bold text-slate-800 text-sm sm:text-base flex items-center gap-3">
+                            <span class="w-7 h-7 rounded-full bg-amber-100 text-amber-800 text-xs flex items-center justify-center font-bold flex-shrink-0">2</span>
+                            เหตุใดรูปขั้นบันไดลดรูป (RREF) จึงมีความสำคัญต่อการหาตัวแปรหลักและตัวแปรอิสระ?
+                        </span>
+                        <i id="icon-disc-2" class="fa-solid fa-chevron-down text-slate-400 text-sm transition-transform duration-200"></i>
+                    </button>
+                    <div id="disc-2" class="hidden p-5 bg-white border-t border-slate-200 text-sm text-slate-700 leading-relaxed space-y-2">
+                        <p class="font-semibold text-slate-900">การอ่านผลเฉลยได้ทันทีโดยไม่ต้องแทนค่าย้อนกลับ (Direct Readout):</p>
+                        <ul class="list-disc list-inside space-y-1.5 text-slate-600 pl-1">
+                            <li><strong>ตัวแปรหลัก (Basic Variables):</strong> คือตัวแปรที่สมนัยกับ <em>คอลัมน์ที่มีตำแหน่งนำ (Pivot Columns)</em> เนื่องจากตำแหน่งนำเป็น 1 และสมาชิกอื่นในคอลัมน์นั้นเป็น 0 ทั้งหมด ทำให้ตัวแปรหลักแต่ละตัวแยกขาดจากกันอย่างสมบูรณ์</li>
+                            <li><strong>ตัวแปรอิสระ (Free Variables):</strong> คือตัวแปรในคอลัมน์ที่ <em>ไม่มีตำแหน่งนำ</em> ซึ่งสามารถกำหนดให้เป็นพารามิเตอร์อิสระใดๆ ได้ทันที ($s, t \in \mathbb{R}$)</li>
+                            <li>ทำให้เราสามารถเขียนผลเฉลยทั่วไปในรูปพาราเมตริก (Parametric Vector Form) ได้ทันทีจากสมการโดยไม่ต้องผ่านการแทนค่าย้อนกลับให้ยุ่งยาก</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Question 3 -->
+                <div class="border border-slate-200 rounded-xl overflow-hidden transition-all">
+                    <button onclick="toggleAccordion('disc-3')" class="w-full flex items-center justify-between p-4 sm:p-5 text-left bg-slate-50/70 hover:bg-slate-100/70 transition">
+                        <span class="font-bold text-slate-800 text-sm sm:text-base flex items-center gap-3">
+                            <span class="w-7 h-7 rounded-full bg-amber-100 text-amber-800 text-xs flex items-center justify-center font-bold flex-shrink-0">3</span>
+                            การเห็นเมทริกซ์สองเมทริกซ์ที่มีรูปขั้นบันได (REF) ต่างกัน เพียงพอหรือไม่ที่จะสรุปว่าไม่สมมูลตามแถว?
+                        </span>
+                        <i id="icon-disc-3" class="fa-solid fa-chevron-down text-slate-400 text-sm transition-transform duration-200"></i>
+                    </button>
+                    <div id="disc-3" class="hidden p-5 bg-white border-t border-slate-200 text-sm text-slate-700 leading-relaxed space-y-2">
+                        <p class="font-semibold text-rose-700">
+                            <i class="fa-solid fa-circle-xmark"></i> ไม่เพียงพออย่างยิ่ง (Not Sufficient)
+                        </p>
+                        <p>
+                            เนื่องจากเมทริกซ์เดียวกันสามารถมี REF ได้หลายรูปแบบ ดังนั้นการที่เมทริกซ์สองเมทริกซ์มี REF หน้าตาไม่เหมือนกัน <strong>ไม่ได้หมายความว่าจะไม่สมมูลกัน</strong>
+                        </p>
+                        <p class="text-slate-600">
+                            <strong>เกณฑ์ตัดสินที่แท้จริง:</strong> เราต้องลดรูปเมทริกซ์ทั้งสองจนถึง <strong>รูปขั้นบันไดลดรูป (RREF)</strong> เสียก่อน! 
+                            <br>จากทฤษฎีบท 3.3 ระบุว่า <em>"เมทริกซ์สองเมทริกซ์จะสมมูลตามแถวกัน ($A \sim B$) ก็ต่อเมื่อทั้งสองมีรูปขั้นบันไดลดรูป (RREF) เป็นเมทริกซ์เดียวกันทุกประการ"</em>
+                        </p>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- 5. แบบฝึกหัดสำหรับนักศึกษา -->
+        <section class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 sm:p-8">
+            <div class="flex items-center gap-3 border-b border-slate-100 pb-4 mb-6">
+                <div class="w-10 h-10 rounded-xl bg-teal-50 flex items-center justify-center text-teal-600 font-bold text-lg">
+                    <i class="fa-solid fa-pen-ruler"></i>
+                </div>
+                <div>
+                    <h2 class="text-xl sm:text-2xl font-bold text-slate-900">5. แบบฝึกหัดสำหรับนักศึกษา (Exercises & Solutions)</h2>
+                    <p class="text-xs sm:text-sm text-slate-500">ฝึกฝนการตรวจสอบ การคำนวณ Gauss-Jordan และการอธิบายเชิงทฤษฎี</p>
+                </div>
+            </div>
+
+            <div class="space-y-6">
+                
+                <!-- Exercise 1 -->
+                <div class="p-5 sm:p-6 rounded-xl border border-slate-200 bg-slate-50/50">
+                    <span class="text-xs font-bold text-teal-800 bg-teal-100 px-2.5 py-1 rounded">ข้อที่ 1</span>
+                    <h3 class="font-bold text-slate-900 mt-2 text-base sm:text-lg">
+                        จงตรวจสอบว่าเมทริกซ์ต่อไปนี้อยู่ในรูป REF หรือ RREF หรือไม่เป็นทั้งสอง พร้อมให้เหตุผล
+                    </h3>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-3 my-3">
+                        <div class="p-3 bg-white rounded-lg border border-slate-200 text-center">
+                            <span class="text-xs font-semibold text-slate-500">เมทริกซ์ $M_1$:</span>
+                            <div class="my-1">
+                                $$M_1 = \begin{bmatrix} 1 & 0 & 3 \\ 0 & 1 & -2 \\ 0 & 0 & 0 \end{bmatrix}$$
+                            </div>
+                        </div>
+                        <div class="p-3 bg-white rounded-lg border border-slate-200 text-center">
+                            <span class="text-xs font-semibold text-slate-500">เมทริกซ์ $M_2$:</span>
+                            <div class="my-1">
+                                $$M_2 = \begin{bmatrix} 1 & 4 & 0 \\ 0 & 1 & 2 \\ 0 & 0 & 1 \end{bmatrix}$$
+                            </div>
+                        </div>
+                        <div class="p-3 bg-white rounded-lg border border-slate-200 text-center">
+                            <span class="text-xs font-semibold text-slate-500">เมทริกซ์ $M_3$:</span>
+                            <div class="my-1">
+                                $$M_3 = \begin{bmatrix} 2 & 1 & 0 \\ 0 & 3 & 4 \\ 0 & 0 & 0 \end{bmatrix}$$
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-4 pt-3 border-t border-slate-200">
+                        <button onclick="toggleExercise('ans-ex-1')" class="text-xs sm:text-sm font-semibold text-indigo-600 hover:text-indigo-800 flex items-center gap-1.5 transition">
+                            <i class="fa-regular fa-eye"></i> <span id="label-ans-ex-1">ดูแนวทางคำตอบ</span>
+                        </button>
+                        <div id="ans-ex-1" class="hidden mt-3 p-4 bg-white rounded-lg border border-indigo-100 text-sm space-y-3 text-slate-700">
+                            <div>
+                                <span class="font-bold text-emerald-700">1. เมทริกซ์ $M_1$: อยู่ในรูป RREF</span>
+                                <p class="text-xs sm:text-sm text-slate-600">เป็น REF, ตำแหน่งนำของแถว 1 และ 2 เป็น $1$ ทั้งคู่ และในคอลัมน์ 1 และ 2 ไม่มีสมาชิกตัวอื่นที่ไม่ใช่ศูนย์เลย</p>
+                            </div>
+                            <div class="border-t border-slate-100 pt-2">
+                                <span class="font-bold text-indigo-700">2. เมทริกซ์ $M_2$: อยู่ในรูป REF แต่ไม่เป็น RREF</span>
+                                <p class="text-xs sm:text-sm text-slate-600">แม้ตำแหน่งนำทุกตัวจะเป็น 1 และเป็น REF แต่ในคอลัมน์ที่ 2 มีเลข $4$ อยู่เหนือตำแหน่งนำแถวที่สอง และในคอลัมน์ที่ 3 มีเลข $2$ อยู่เหนือตำแหน่งนำแถวที่สาม จึงไม่เป็น RREF</p>
+                            </div>
+                            <div class="border-t border-slate-100 pt-2">
+                                <span class="font-bold text-amber-700">3. เมทริกซ์ $M_3$: อยู่ในรูป REF แต่ไม่เป็น RREF</span>
+                                <p class="text-xs sm:text-sm text-slate-600">เป็น REF แต่ตำแหน่งนำในแถว 1 คือ $2$ และแถว 2 คือ $3$ (ไม่ใช่เลข 1) จึงไม่เป็น RREF</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Exercise 2 -->
+                <div class="p-5 sm:p-6 rounded-xl border border-slate-200 bg-slate-50/50">
+                    <span class="text-xs font-bold text-teal-800 bg-teal-100 px-2.5 py-1 rounded">ข้อที่ 2</span>
+                    <h3 class="font-bold text-slate-900 mt-2 text-base sm:text-lg">
+                        แปลงเมทริกซ์ที่กำหนดให้เป็นรูปขั้นบันไดลดรูป (RREF)
+                    </h3>
+                    <p class="text-slate-700 text-sm mt-1">
+                        กำหนดเมทริกซ์ $B = \begin{bmatrix} 1 & 2 & 3 \\ 2 & 5 & 8 \\ 1 & 3 & 6 \end{bmatrix}$ จงหา RREF ด้วยการกำจัดแบบเกาส์-จอร์แดน
+                    </p>
+
+                    <div class="mt-4 pt-3 border-t border-slate-200">
+                        <button onclick="toggleExercise('ans-ex-2')" class="text-xs sm:text-sm font-semibold text-indigo-600 hover:text-indigo-800 flex items-center gap-1.5 transition">
+                            <i class="fa-regular fa-eye"></i> <span id="label-ans-ex-2">ดูขั้นตอนการคำนวณ</span>
+                        </button>
+                        <div id="ans-ex-2" class="hidden mt-3 p-4 bg-white rounded-lg border border-indigo-100 text-sm space-y-3 text-slate-700">
+                            <p class="font-semibold text-slate-900">ขั้นตอนการแปลง Gauss-Jordan:</p>
+                            <div class="space-y-2 text-xs sm:text-sm pl-2">
+                                <div>
+                                    <strong>1. กำจัดใต้หลักที่ 1:</strong> $R_2 \leftarrow R_2 - 2R_1$ และ $R_3 \leftarrow R_3 - R_1$ 
+                                    $$\begin{bmatrix} 1 & 2 & 3 \\ 0 & 1 & 2 \\ 0 & 1 & 3 \end{bmatrix}$$
+                                </div>
+                                <div>
+                                    <strong>2. กำจัดใต้หลักที่ 2:</strong> $R_3 \leftarrow R_3 - R_2$ 
+                                    $$\begin{bmatrix} 1 & 2 & 3 \\ 0 & 1 & 2 \\ 0 & 0 & 1 \end{bmatrix} \quad \text{(ถึงขั้นนี้เป็น REF)}$$
+                                </div>
+                                <div>
+                                    <strong>3. กำจัดเหนือหลักที่ 3:</strong> $R_2 \leftarrow R_2 - 2R_3$ และ $R_1 \leftarrow R_1 - 3R_3$ 
+                                    $$\begin{bmatrix} 1 & 2 & 0 \\ 0 & 1 & 0 \\ 0 & 0 & 1 \end{bmatrix}$$
+                                </div>
+                                <div>
+                                    <strong>4. กำจัดเหนือหลักที่ 2:</strong> $R_1 \leftarrow R_1 - 2R_2$ 
+                                    $$\begin{bmatrix} 1 & 0 & 0 \\ 0 & 1 & 0 \\ 0 & 0 & 1 \end{bmatrix} = I_3$$
+                                </div>
+                            </div>
+                            <p class="text-xs text-emerald-700 font-semibold pt-1">
+                                $\therefore$ RREF ของเมทริกซ์ $B$ คือเมทริกซ์เอกลักษณ์ $I_3$
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Exercise 3 -->
+                <div class="p-5 sm:p-6 rounded-xl border border-slate-200 bg-slate-50/50">
+                    <span class="text-xs font-bold text-teal-800 bg-teal-100 px-2.5 py-1 rounded">ข้อที่ 3</span>
+                    <h3 class="font-bold text-slate-900 mt-2 text-base sm:text-lg">
+                        อธิบายความแตกต่างระหว่างความเป็นเอกลักษณ์ของ RREF กับความไม่เป็นเอกลักษณ์ของ REF
+                    </h3>
+                    <p class="text-slate-700 text-sm mt-1">
+                        เชื่อมโยงเชิงทฤษฎีว่าทำไม RREF จึงถูกนำมาใช้เป็นตัวแทนมาตรฐาน (Canonical Representative) ของชั้นความสมมูล
+                    </p>
+
+                    <div class="mt-4 pt-3 border-t border-slate-200">
+                        <button onclick="toggleExercise('ans-ex-3')" class="text-xs sm:text-sm font-semibold text-indigo-600 hover:text-indigo-800 flex items-center gap-1.5 transition">
+                            <i class="fa-regular fa-eye"></i> <span id="label-ans-ex-3">ดูบทวิเคราะห์</span>
+                        </button>
+                        <div id="ans-ex-3" class="hidden mt-3 p-4 bg-white rounded-lg border border-indigo-100 text-sm space-y-3 text-slate-700">
+                            <p class="font-semibold text-slate-900">บทวิเคราะห์เชิงโครงสร้าง:</p>
+                            <div class="space-y-2 text-xs sm:text-sm leading-relaxed text-slate-600">
+                                <p>
+                                    1. <strong>ความไม่เป็นเอกลักษณ์ของ REF:</strong> เกิดจากความยืดหยุ่นของขนาดสเกลาร์ในตำแหน่งนำและค่าสมาชิกที่อยู่เหนือตำแหน่งนำ ทำให้สำหรับเมทริกซ์หนึ่งๆ มี REF นับไม่ถ้วนชุดที่สมมูลกัน
+                                </p>
+                                <p>
+                                    2. <strong>ความเป็นเอกลักษณ์ของ RREF (ทฤษฎีบท 3.3):</strong> เงื่อนไขที่บังคับให้ตำแหน่งนำต้องเป็น 1 เสมอ และกำจัดสมาชิกเหนือตำแหน่งนำทั้งหมดให้เป็น 0 ทำให้ตัวแปรหลักถูกตรึงไว้กับค่าคงที่หรือตัวแปรอิสระอย่างสัมบูรณ์ ปริภูมิแถว (Row space) เดียวกันจึงมีเบสิสในรูปแบบ RREF ได้เพียงแบบเดียวเท่านั้น
+                                </p>
+                                <p class="text-emerald-800 font-medium pt-1">
+                                    $\therefore$ RREF จึงทำหน้าที่เป็น "ตัวแทนมาตรฐาน (Canonical Representative)" ในชั้นความสมมูลตามแถว ทำให้เราตรวจสอบว่าเมทริกซ์สองเมทริกซ์สมมูลกันหรือไม่ ($A \sim B$) ได้ง่ายมาก เพียงแค่ดูว่าทั้งสองมี RREF หน้าตาเหมือนกันทุกประการหรือไม่
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="text-center text-xs text-slate-400 py-6 border-t border-slate-200">
+            <p>เรื่องที่ 4: เมทริกซ์รูปขั้นบันไดลดรูป (Reduced Row Echelon Form) • สื่อการเรียนรู้เชิงปฏิสัมพันธ์</p>
+        </footer>
+
+    </main>
+
+    <!-- JavaScript Interactive Logic -->
+    <script>
+        // Matrix Samples State
+        let currentSampleId = 1;
+        let simRows = 3;
+        let simCols = 4;
+        let simMatrix = [
+            [1, 2, -1, 3],
+            [2, 4, 1, 9],
+            [3, 6, 0, 12]
+        ];
+
+        // Predefined Samples
+        const matrixSamples = {
+            1: {
+                rows: 3, cols: 4,
+                matrix: [
+                    [1, 2, -1, 3],
+                    [2, 4, 1, 9],
+                    [3, 6, 0, 12]
+                ],
+                ref1: [
+                    [1, 2, -1, 3],
+                    [0, 0, 3, 3],
+                    [0, 0, 0, 0]
+                ],
+                ref2: [
+                    [1, 2, -1, 3],
+                    [0, 0, 1, 1],
+                    [0, 0, 0, 0]
+                ],
+                rref: [
+                    [1, 2, 0, 4],
+                    [0, 0, 1, 1],
+                    [0, 0, 0, 0]
+                ],
+                pivots: [1, 3],
+                free: [2, 4]
+            },
+            2: {
+                rows: 3, cols: 4,
+                matrix: [
+                    [1, 1, 2, 8],
+                    [2, 3, 5, 19],
+                    [1, 2, 4, 13]
+                ],
+                ref1: [
+                    [1, 1, 2, 8],
+                    [0, 1, 1, 3],
+                    [0, 0, 1, 2]
+                ],
+                ref2: [
+                    [2, 2, 4, 16],
+                    [0, 1, 1, 3],
+                    [0, 0, 2, 4]
+                ],
+                rref: [
+                    [1, 0, 0, 3],
+                    [0, 1, 0, 1],
+                    [0, 0, 1, 2]
+                ],
+                pivots: [1, 2, 3],
+                free: [4]
+            },
+            3: {
+                rows: 4, cols: 5,
+                matrix: [
+                    [1, 2, 3, 4, 5],
+                    [2, 4, 5, 8, 14],
+                    [1, 2, 2, 4, 9],
+                    [3, 6, 7, 12, 23]
+                ],
+                ref1: [
+                    [1, 2, 3, 4, 5],
+                    [0, 0, -1, 0, 4],
+                    [0, 0, 0, 0, 0],
+                    [0, 0, 0, 0, 0]
+                ],
+                ref2: [
+                    [1, 2, 3, 4, 5],
+                    [0, 0, 1, 0, -4],
+                    [0, 0, 0, 0, 0],
+                    [0, 0, 0, 0, 0]
+                ],
+                rref: [
+                    [1, 2, 0, 4, 17],
+                    [0, 0, 1, 0, -4],
+                    [0, 0, 0, 0, 0],
+                    [0, 0, 0, 0, 0]
+                ],
+                pivots: [1, 3],
+                free: [2, 4, 5]
+            }
+        };
+
+        window.onload = function() {
+            loadMatrixSample(1);
+        };
+
+        function loadMatrixSample(id) {
+            currentSampleId = id;
+            const data = matrixSamples[id];
+            simRows = data.rows;
+            simCols = data.cols;
+            simMatrix = JSON.parse(JSON.stringify(data.matrix));
+
+            // update sample buttons
+            [1, 2, 3].forEach(n => {
+                const b = document.getElementById(`btn-sample-${n}`);
+                if (n === id) {
+                    b.className = "px-2.5 py-1 rounded bg-white text-slate-800 font-bold shadow-xs";
+                } else {
+                    b.className = "px-2.5 py-1 rounded text-slate-600 hover:text-slate-900";
+                }
+            });
+
+            renderMatrixInputs();
+            computeRREF();
+        }
+
+        function renderMatrixInputs() {
+            const container = document.getElementById('sim-matrix-inputs');
+            container.innerHTML = '';
+
+            for (let r = 0; r < simRows; r++) {
+                const rowDiv = document.createElement('div');
+                rowDiv.className = "flex items-center gap-1.5";
+
+                const label = document.createElement('span');
+                label.className = "text-xs font-semibold text-slate-400 w-5 text-right";
+                label.innerText = `R${r+1}`;
+                rowDiv.appendChild(label);
+
+                for (let c = 0; c < simCols; c++) {
+                    const input = document.createElement('input');
+                    input.type = "number";
+                    input.step = "any";
+                    input.value = simMatrix[r][c];
+                    input.dataset.r = r;
+                    input.dataset.c = c;
+                    input.className = "w-11 h-9 text-center bg-white border border-slate-300 rounded font-semibold text-xs sm:text-sm text-slate-800 focus:border-emerald-600 focus:ring-1 focus:ring-emerald-600 outline-none transition";
+                    
+                    input.oninput = function() {
+                        const val = parseFloat(this.value);
+                        simMatrix[r][c] = isNaN(val) ? 0 : val;
+                    };
+
+                    rowDiv.appendChild(input);
+                }
+                container.appendChild(rowDiv);
+            }
+        }
+
+        // Convert 2D array to LaTeX
+        function matrixToLatex(mat) {
+            let latex = "\\begin{bmatrix}";
+            for (let r = 0; r < mat.length; r++) {
+                const rowStr = mat[r].map(v => {
+                    const rounded = Math.round(v * 100) / 100;
+                    return rounded;
+                }).join(" & ");
+                latex += rowStr;
+                if (r < mat.length - 1) latex += " \\\\ ";
+            }
+            latex += "\\end{bmatrix}";
+            return latex;
+        }
+
+        function triggerMathJax() {
+            if (window.MathJax && window.MathJax.typesetPromise) {
+                window.MathJax.typesetPromise().catch(err => console.error(err));
+            }
+        }
+
+        function showREF(variant) {
+            const data = matrixSamples[currentSampleId];
+            const mat = variant === 1 ? data.ref1 : data.ref2;
+
+            document.getElementById('display-mode-indicator').className = "w-2.5 h-2.5 rounded-full bg-indigo-400";
+            document.getElementById('display-mode-title').innerText = `ผลลัพธ์: เมทริกซ์รูปขั้นบันได (REF รูปแบบที่ ${variant})`;
+            document.getElementById('display-mode-badge').className = "px-2.5 py-1 rounded text-xs font-bold bg-indigo-500/20 text-indigo-300 border border-indigo-500/30";
+            document.getElementById('display-mode-badge').innerText = "REF (NON-UNIQUE)";
+
+            document.getElementById('sim-result-math').innerHTML = `$$${matrixToLatex(mat)}$$`;
+
+            document.getElementById('ana-pivots').innerText = `คอลัมน์ตำแหน่งนำ: ${data.pivots.join(", ")}`;
+            document.getElementById('ana-free').innerText = `คอลัมน์อิสระ: ${data.free.join(", ")}`;
+            document.getElementById('ana-desc').innerText = `สังเกต: เมทริกซ์นี้อยู่ในรูป REF แล้ว แต่สมาชิกเหนือตำแหน่งนำยังไม่ถูกกำจัดเป็น 0 และตำแหน่งนำอาจยังไม่เท่ากับ 1`;
+
+            document.getElementById('uniqueness-note').innerHTML = `
+                <i class="fa-solid fa-triangle-exclamation text-amber-400 mt-0.5"></i>
+                <div>
+                    <strong>ข้อสังเกต:</strong> นี่คือหนึ่งในรูปแบบ REF ที่เป็นไปได้ของเมทริกซ์ต้นฉบับ หากใช้วิธีอื่นอาจได้ตัวเลขในแถวที่ต่างออกไป ซึ่งยืนยันว่า <em>REF ไม่เป็นเอกลักษณ์</em>
+                </div>
+            `;
+
+            triggerMathJax();
+        }
+
+        // Gauss-Jordan elimination algorithm for exact RREF
+        function computeRREF() {
+            // Read current matrix from inputs
+            const A = JSON.parse(JSON.stringify(simMatrix));
+            const m = A.length;
+            const n = A[0].length;
+
+            let lead = 0;
+            const pivotCols = [];
+
+            for (let r = 0; r < m; r++) {
+                if (lead >= n) break;
+                let i = r;
+
+                // Find pivot in current column
+                while (Math.abs(A[i][lead]) < 1e-9) {
+                    i++;
+                    if (i === m) {
+                        i = r;
+                        lead++;
+                        if (lead === n) break;
+                    }
+                }
+                if (lead >= n) break;
+
+                // Swap rows i and r
+                const temp = A[i];
+                A[i] = A[r];
+                A[r] = temp;
+
+                // Divide row r by pivot value
+                const val = A[r][lead];
+                if (Math.abs(val) > 1e-9) {
+                    for (let j = 0; j < n; j++) {
+                        A[r][j] /= val;
+                    }
+                }
+
+                // Eliminate other rows both above and below
+                for (let k = 0; k < m; k++) {
+                    if (k !== r) {
+                        const factor = A[k][lead];
+                        for (let j = 0; j < n; j++) {
+                            A[k][j] -= factor * A[r][j];
+                        }
+                    }
+                }
+
+                pivotCols.push(lead + 1);
+                lead++;
+            }
+
+            // Identify free columns
+            const freeCols = [];
+            for (let c = 1; c <= n; c++) {
+                if (!pivotCols.includes(c)) freeCols.push(c);
+            }
+
+            // Clean numerical roundoff
+            for (let r = 0; r < m; r++) {
+                for (let c = 0; c < n; c++) {
+                    if (Math.abs(A[r][c]) < 1e-8) A[r][c] = 0;
+                }
+            }
+
+            // Update UI
+            document.getElementById('display-mode-indicator').className = "w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse";
+            document.getElementById('display-mode-title').innerText = "ผลลัพธ์: เมทริกซ์รูปขั้นบันไดลดรูป (RREF สมบูรณ์)";
+            document.getElementById('display-mode-badge').className = "px-2.5 py-1 rounded text-xs font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30";
+            document.getElementById('display-mode-badge').innerText = "UNIQUE RREF";
+
+            document.getElementById('sim-result-math').innerHTML = `$$${matrixToLatex(A)}$$`;
+
+            document.getElementById('ana-pivots').innerText = `คอลัมน์ตำแหน่งนำ (Leading 1s): ${pivotCols.length > 0 ? pivotCols.join(", ") : 'ไม่มี'}`;
+            document.getElementById('ana-free').innerText = `คอลัมน์ตัวแปรอิสระ (Free): ${freeCols.length > 0 ? freeCols.join(", ") : 'ไม่มี'}`;
+            document.getElementById('ana-desc').innerText = `อยู่ในรูป RREF สมบูรณ์แล้ว ตำแหน่งนำทุกตำแหน่งเป็น 1 และสมาชิกอื่นในคอลัมน์นั้นเป็น 0 ทั้งด้านบนและล่าง`;
+
+            document.getElementById('uniqueness-note').innerHTML = `
+                <i class="fa-solid fa-circle-info text-emerald-400 mt-0.5"></i>
+                <div>
+                    <strong>ยืนยันตามทฤษฎีบท 3.3:</strong> 
+                    ไม่ว่าจะเริ่มต้นด้วยการกำจัดแบบใด หรือเคยแปลงไปเป็น REF แบบไหน เมื่อดำเนินการจนถึงที่สุด เมทริกซ์นี้คือรูปขั้นบันไดลดรูป (RREF) ที่มีเพียง <em>หนึ่งเดียวเท่านั้น</em> สำหรับเมทริกซ์ต้นฉบับ $A$
+                </div>
+            `;
+
+            triggerMathJax();
+        }
+
+        // Accordion Helpers
+        function toggleAccordion(id) {
+            const content = document.getElementById(id);
+            const icon = document.getElementById(`icon-${id}`);
+            if (content.classList.contains('hidden')) {
+                content.classList.remove('hidden');
+                icon.classList.add('rotate-180');
+                triggerMathJax();
+            } else {
+                content.classList.add('hidden');
+                icon.classList.remove('rotate-180');
+            }
+        }
+
+        function toggleExercise(id) {
+            const el = document.getElementById(id);
+            const label = document.getElementById(`label-${id}`);
+            if (el.classList.contains('hidden')) {
+                el.classList.remove('hidden');
+                label.innerText = "ซ่อนคำอธิบาย / ขั้นตอน";
+                triggerMathJax();
+            } else {
+                el.classList.add('hidden');
+                label.innerText = id === 'ans-ex-2' ? "ดูขั้นตอนการคำนวณ" : (id === 'ans-ex-3' ? "ดูบทวิเคราะห์" : "ดูแนวทางคำตอบ");
+            }
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,1040 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>เรื่องที่ 2: เมทริกซ์สมมูลตามแถว (Row Equivalent Matrices)</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Sarabun & Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- MathJax for rendering LaTeX -->
+    <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']],
+                displayMath: [['$$', '$$'], ['\\[', '\\]']]
+            },
+            svg: {
+                fontCache: 'global'
+            }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        body {
+            font-family: 'Sarabun', 'Inter', sans-serif;
+            background-color: #f8fafc;
+            color: #1e293b;
+        }
+        .matrix-bracket {
+            position: relative;
+            padding: 0 10px;
+        }
+        .matrix-bracket::before, .matrix-bracket::after {
+            content: "";
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            width: 7px;
+            border-style: solid;
+            border-color: #334155;
+        }
+        .matrix-bracket::before {
+            left: 0;
+            border-width: 2px 0 2px 2px;
+            border-top-left-radius: 4px;
+            border-bottom-left-radius: 4px;
+        }
+        .matrix-bracket::after {
+            right: 0;
+            border-width: 2px 2px 2px 0;
+            border-top-right-radius: 4px;
+            border-bottom-right-radius: 4px;
+        }
+        input[type=number]::-webkit-inner-spin-button, 
+        input[type=number]::-webkit-outer-spin-button { 
+            -webkit-appearance: none; 
+            margin: 0; 
+        }
+        input[type=number] {
+            -moz-appearance: textfield;
+        }
+        /* Custom horizontal scrollbar */
+        .step-timeline::-webkit-scrollbar {
+            height: 8px;
+        }
+        .step-timeline::-webkit-scrollbar-track {
+            background: #f1f5f9;
+            border-radius: 9999px;
+        }
+        .step-timeline::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 9999px;
+        }
+        .step-timeline::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+    </style>
+</head>
+<body class="min-h-screen">
+
+    <!-- Header Banner -->
+    <header class="bg-gradient-to-r from-slate-900 via-indigo-900 to-sky-950 text-white shadow-lg border-b border-indigo-700/50">
+        <div class="max-w-6xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <div class="flex flex-wrap items-center justify-between gap-4">
+                <div>
+                    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-indigo-500/30 text-indigo-200 border border-indigo-400/30 mb-2">
+                        <i class="fa-solid fa-graduation-cap"></i> พีชคณิตเชิงเส้น (Linear Algebra)
+                    </span>
+                    <h1 class="text-2xl sm:text-3xl lg:text-4xl font-bold tracking-tight">
+                        เรื่องที่ 2: เมทริกซ์สมมูลตามแถว (Row Equivalent Matrices)
+                    </h1>
+                    <p class="text-slate-300 mt-1 text-sm sm:text-base font-light">
+                        ความสัมพันธ์สมมูล (Equivalence Relation) ลำดับการดำเนินการ และคุณสมบัติสำคัญ
+                    </p>
+                </div>
+                <div class="hidden md:flex items-center gap-3 bg-white/10 backdrop-blur-sm px-4 py-2.5 rounded-xl border border-white/20 text-xs">
+                    <div class="w-9 h-9 rounded-lg bg-emerald-500/20 text-emerald-300 flex items-center justify-center font-bold text-lg">
+                        $\sim$
+                    </div>
+                    <div>
+                        <div class="font-semibold text-white">การแปลงลำดับขั้นตอน</div>
+                        <div class="text-indigo-200">Interactive Sequence & Reverse</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Container Fixed Width Requirement -->
+    <main class="max-w-6xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 space-y-10">
+
+        <!-- 1. วัตถุประสงค์การเรียนรู้ -->
+        <section class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 sm:p-8 transition-all hover:shadow-md">
+            <div class="flex items-center gap-3 border-b border-slate-100 pb-4 mb-5">
+                <div class="w-10 h-10 rounded-xl bg-indigo-50 flex items-center justify-center text-indigo-600 font-bold text-lg">
+                    <i class="fa-solid fa-bullseye"></i>
+                </div>
+                <div>
+                    <h2 class="text-xl sm:text-2xl font-bold text-slate-900">1. วัตถุประสงค์การเรียนรู้</h2>
+                    <p class="text-xs sm:text-sm text-slate-500">ผลลัพธ์การเรียนรู้ประจำหัวข้อ</p>
+                </div>
+            </div>
+            
+            <div class="bg-gradient-to-r from-indigo-50/90 to-sky-50/70 border-l-4 border-indigo-600 rounded-r-xl p-5">
+                <p class="text-slate-800 leading-relaxed font-semibold mb-3">
+                    เมื่อศึกษาจบหัวข้อนี้ นักศึกษาสามารถ:
+                </p>
+                <ul class="space-y-3 text-slate-700 text-sm sm:text-base">
+                    <li class="flex items-start gap-3">
+                        <span class="w-6 h-6 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center text-xs font-bold mt-0.5 flex-shrink-0">
+                            <i class="fa-solid fa-check"></i>
+                        </span>
+                        <span><strong>ตรวจสอบความสมมูลตามแถว</strong> ของเมทริกซ์ที่กำหนดให้ได้อย่างถูกต้อง</span>
+                    </li>
+                    <li class="flex items-start gap-3">
+                        <span class="w-6 h-6 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center text-xs font-bold mt-0.5 flex-shrink-0">
+                            <i class="fa-solid fa-check"></i>
+                        </span>
+                        <span><strong>อธิบายความสัมพันธ์</strong> ระหว่างการดำเนินการขั้นมูลฐานตามแถวและความสมมูลตามแถวได้อย่างเป็นระบบ</span>
+                    </li>
+                    <li class="flex items-start gap-3">
+                        <span class="w-6 h-6 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center text-xs font-bold mt-0.5 flex-shrink-0">
+                            <i class="fa-solid fa-check"></i>
+                        </span>
+                        <span><strong>พิสูจน์สมบัติของความสัมพันธ์นี้</strong> (สมบัติสะท้อนตัวเอง สมมาตร และถ่ายทอด) ได้อย่างเป็นทางการ</span>
+                    </li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- 2. เนื้อหาหลัก -->
+        <section class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 sm:p-8 space-y-7">
+            <div class="flex items-center gap-3 border-b border-slate-100 pb-4">
+                <div class="w-10 h-10 rounded-xl bg-sky-50 flex items-center justify-center text-sky-600 font-bold text-lg">
+                    <i class="fa-solid fa-book-bookmark"></i>
+                </div>
+                <div>
+                    <h2 class="text-xl sm:text-2xl font-bold text-slate-900">2. เนื้อหาหลัก (Core Content)</h2>
+                    <p class="text-xs sm:text-sm text-slate-500">บทนิยาม สมบัติ 3 ประการ และทฤษฎีบท 3.2</p>
+                </div>
+            </div>
+
+            <!-- นิยามหลัก -->
+            <div class="bg-slate-50 border border-slate-200 rounded-xl p-5 sm:p-6">
+                <h3 class="text-base sm:text-lg font-bold text-indigo-950 mb-2 flex items-center gap-2">
+                    <i class="fa-solid fa-quote-left text-indigo-500"></i> บทนิยาม (Definition): ความสมมูลตามแถว
+                </h3>
+                <p class="text-slate-700 leading-relaxed text-sm sm:text-base">
+                    เมทริกซ์ $A$ และ $B$ ที่มีขนาดเท่ากัน เรียกว่า <strong>สมมูลตามแถว (Row Equivalent)</strong> ก็ต่อเมื่อสามารถเปลี่ยนเมทริกซ์ $A$ ให้เป็นเมทริกซ์ $B$ ได้ด้วยการดำเนินการขั้นมูลฐานตามแถว (Elementary Row Operations: EROs) จำนวนจำกัดครั้ง 
+                </p>
+                <div class="mt-4 flex items-center justify-center py-2 bg-white rounded-lg border border-slate-200 shadow-xs">
+                    <span class="text-slate-600 text-sm mr-3">เขียนแทนด้วยสัญลักษณ์:</span>
+                    <span class="text-2xl font-bold text-indigo-600 math-font">$$A \sim B$$</span>
+                </div>
+            </div>
+
+            <!-- 3 สมบัติสำคัญ -->
+            <div>
+                <h3 class="text-base sm:text-lg font-bold text-slate-900 mb-4 flex items-center gap-2">
+                    <i class="fa-solid fa-shapes text-emerald-600"></i> สมบัติสำคัญ 3 ประการของความสมมูลตามแถว
+                </h3>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6">
+                    <!-- 1. สะท้อนตัวเอง -->
+                    <div class="p-5 rounded-xl border border-indigo-100 bg-indigo-50/50 hover:bg-indigo-50/90 transition shadow-xs">
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="text-xs font-bold uppercase tracking-wider text-indigo-800 bg-indigo-100 px-2 py-0.5 rounded">สมบัติที่ 1</span>
+                            <i class="fa-solid fa-mirror text-indigo-500"></i>
+                        </div>
+                        <h4 class="font-bold text-slate-900 text-base mb-1">สะท้อนตัวเอง (Reflexive)</h4>
+                        <p class="text-xs sm:text-sm text-slate-600 mb-3">เมทริกซ์ใดๆ ย่อมสมมูลตามแถวกับตัวเองเสมอ (โดยเลือกไม่ทำการดำเนินการใดๆ หรือคูณแถวด้วย 1)</p>
+                        <div class="bg-white rounded-lg p-2.5 text-center font-bold text-indigo-900 border border-indigo-100 shadow-xs">
+                            $$A \sim A$$
+                        </div>
+                    </div>
+
+                    <!-- 2. สมมาตร -->
+                    <div class="p-5 rounded-xl border border-emerald-100 bg-emerald-50/50 hover:bg-emerald-50/90 transition shadow-xs">
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="text-xs font-bold uppercase tracking-wider text-emerald-800 bg-emerald-100 px-2 py-0.5 rounded">สมบัติที่ 2</span>
+                            <i class="fa-solid fa-right-left text-emerald-500"></i>
+                        </div>
+                        <h4 class="font-bold text-slate-900 text-base mb-1">สมมาตร (Symmetric)</h4>
+                        <p class="text-xs sm:text-sm text-slate-600 mb-3">หาก $A$ แปลงไปเป็น $B$ ได้ ย่อมสามารถทำการดำเนินการผกผันแปลง $B$ กลับมาเป็น $A$ ได้เสมอ</p>
+                        <div class="bg-white rounded-lg p-2.5 text-center font-bold text-emerald-900 border border-emerald-100 shadow-xs">
+                            $$\text{ถ้า } A \sim B \text{ แล้ว } B \sim A$$
+                        </div>
+                    </div>
+
+                    <!-- 3. ถ่ายทอด -->
+                    <div class="p-5 rounded-xl border border-sky-100 bg-sky-50/50 hover:bg-sky-50/90 transition shadow-xs">
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="text-xs font-bold uppercase tracking-wider text-sky-800 bg-sky-100 px-2 py-0.5 rounded">สมบัติที่ 3</span>
+                            <i class="fa-solid fa-diagram-project text-sky-500"></i>
+                        </div>
+                        <h4 class="font-bold text-slate-900 text-base mb-1">ถ่ายทอด (Transitive)</h4>
+                        <p class="text-xs sm:text-sm text-slate-600 mb-3">หาก $A$ แปลงไปเป็น $B$ และ $B$ แปลงไปเป็น $C$ ได้ สามารถนำลำดับการดำเนินการมาต่อกันเพื่อแปลง $A$ ไปยัง $C$</p>
+                        <div class="bg-white rounded-lg p-2.5 text-center font-bold text-sky-900 border border-sky-100 shadow-xs">
+                            $$\text{ถ้า } A \sim B \text{ และ } B \sim C \text{ แล้ว } A \sim C$$
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ทฤษฎีบท 3.2 -->
+            <div class="bg-gradient-to-br from-slate-900 via-indigo-950 to-slate-900 text-white rounded-2xl p-6 sm:p-7 shadow-md border border-slate-800">
+                <div class="flex items-center gap-2 text-indigo-300 text-xs sm:text-sm font-semibold uppercase tracking-wider mb-2">
+                    <i class="fa-solid fa-award"></i> ทฤษฎีบท 3.2 (Theorem 3.2)
+                </div>
+                <h4 class="text-lg sm:text-xl font-bold text-white mb-3">
+                    ความสมมูลตามแถวเป็นความสัมพันธ์สมมูล (Equivalence Relation)
+                </h4>
+                <p class="text-slate-300 text-sm sm:text-base leading-relaxed">
+                    "ความสมมูลตามแถวเป็นความสัมพันธ์สมมูล (Equivalence Relation) บนเซตของเมทริกซ์ทั้งหมดที่มีขนาดเดียวกัน"
+                </p>
+                
+                <div class="mt-4 pt-4 border-t border-slate-700/80 text-xs sm:text-sm text-slate-300 space-y-2">
+                    <span class="font-bold text-indigo-300 block">แนวคิดการพิสูจน์ (Idea of Proof):</span>
+                    <p class="leading-relaxed">
+                        การพิสูจน์อาศัยข้อเท็จจริงว่า <strong>ไม่มีการดำเนินการขั้นมูลฐานตามแถวใดที่ทำให้แถวของเมทริกซ์สูญเสียความสามารถในการย้อนกลับ</strong> (ตามทฤษฎีบท 3.1) และเราสามารถนำลำดับการดำเนินการขั้นมูลฐานจำนวนจำกัดครั้งมาเชื่อมต่อกัน (Chain of Operations) ได้อย่างต่อเนื่อง ทำให้สมบัติการสะท้อน สมมาตร และถ่ายทอด เป็นจริงอย่างสมบูรณ์
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- 3. แบบจำลองโต้ตอบ (Interactive Simulator) -->
+        <section class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 sm:p-8">
+            <div class="flex flex-wrap items-center justify-between gap-4 border-b border-slate-100 pb-4 mb-6">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-xl bg-purple-50 flex items-center justify-center text-purple-600 font-bold text-lg">
+                        <i class="fa-solid fa-route"></i>
+                    </div>
+                    <div>
+                        <h2 class="text-xl sm:text-2xl font-bold text-slate-900">3. แบบจำลองโต้ตอบ: ลำดับการแปลงและความสมมูลตามแถว</h2>
+                        <p class="text-xs sm:text-sm text-slate-500">ดำเนินการทีละขั้นเพื่อสำรวจ $A = A_0 \sim A_1 \sim \dots \sim B$ และทดลองย้อนกลับ</p>
+                    </div>
+                </div>
+
+                <!-- Controls -->
+                <div class="flex items-center gap-2">
+                    <button onclick="resetChain()" class="px-3 py-1.5 rounded-lg border border-slate-300 text-slate-600 hover:bg-slate-100 text-xs font-semibold flex items-center gap-1.5 transition">
+                        <i class="fa-solid fa-arrow-rotate-left"></i> รีเซ็ตสู่ $A_0$
+                    </button>
+                    <div class="bg-slate-100 p-1 rounded-lg text-xs flex items-center">
+                        <button id="btn-mode-2x3" onclick="changeMatrixSize(2, 3)" class="px-2.5 py-1 rounded bg-white font-medium text-slate-800 shadow-xs">2 × 3</button>
+                        <button id="btn-mode-3x3" onclick="changeMatrixSize(3, 3)" class="px-2.5 py-1 rounded text-slate-600 hover:text-slate-900">3 × 3</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Top Grid: Interactive ERO Controller -->
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 mb-8">
+                
+                <!-- Initial Matrix A config & current preview -->
+                <div class="lg:col-span-5 bg-slate-50 border border-slate-200 rounded-xl p-5 space-y-4">
+                    <div class="flex items-center justify-between">
+                        <span class="text-sm font-bold text-slate-800 flex items-center gap-2">
+                            <i class="fa-solid fa-table-cells text-indigo-600"></i> กำหนดค่าเมทริกซ์ $A$
+                        </span>
+                        <span class="text-xs text-slate-400">แก้ไขค่าได้เมื่ออยู่ขั้น $A_0$</span>
+                    </div>
+
+                    <div id="editable-matrix-wrapper" class="flex justify-center p-2">
+                        <!-- Matrix Inputs -->
+                    </div>
+
+                    <div class="text-xs text-slate-500 bg-white p-3 rounded-lg border border-slate-200">
+                        <i class="fa-solid fa-circle-info text-sky-500 mr-1"></i>
+                        ทุกการดำเนินการ ERO ด้านขวาจะสร้างเมทริกซ์ใหม่ในลำดับ ซึ่งล้วน<strong>สมมูลตามแถว $(\sim)$</strong> กับเมทริกซ์ $A$
+                    </div>
+                </div>
+
+                <!-- Operation Creator Form -->
+                <div class="lg:col-span-7 bg-slate-50 border border-slate-200 rounded-xl p-5 space-y-4">
+                    <div class="flex items-center justify-between">
+                        <span class="text-sm font-bold text-slate-800">
+                            <i class="fa-solid fa-wand-magic-sparkles text-purple-600"></i> เลือกการดำเนินการขั้นมูลฐานถัดไป (Next Step)
+                        </span>
+                        <span id="current-step-counter" class="text-xs font-semibold px-2 py-0.5 rounded bg-indigo-100 text-indigo-800">
+                            ขั้นตอนที่: 0
+                        </span>
+                    </div>
+
+                    <!-- Type Selector tabs -->
+                    <div class="grid grid-cols-3 gap-2">
+                        <button type="button" onclick="selectType(1)" id="tab-type-1" class="py-2 text-xs font-semibold rounded-lg bg-indigo-600 text-white shadow-xs">
+                            1. สลับแถว $R_i \leftrightarrow R_j$
+                        </button>
+                        <button type="button" onclick="selectType(2)" id="tab-type-2" class="py-2 text-xs font-semibold rounded-lg bg-white border border-slate-200 text-slate-700 hover:bg-slate-100">
+                            2. คูณ $R_i \leftarrow cR_i$
+                        </button>
+                        <button type="button" onclick="selectType(3)" id="tab-type-3" class="py-2 text-xs font-semibold rounded-lg bg-white border border-slate-200 text-slate-700 hover:bg-slate-100">
+                            3. บวกพหุคูณ $R_i \leftarrow R_i + cR_j$
+                        </button>
+                    </div>
+
+                    <!-- Dynamic Input controls for selected type -->
+                    <div id="panel-inputs" class="bg-white p-3.5 rounded-lg border border-slate-200 min-h-[70px] flex items-center justify-center">
+                        <!-- Populated by JS -->
+                    </div>
+
+                    <!-- Action buttons -->
+                    <div class="flex flex-wrap items-center gap-3">
+                        <button onclick="applyNextStep()" class="flex-1 py-2.5 px-4 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-sm font-semibold shadow-xs flex items-center justify-center gap-2 transition active:scale-[0.99]">
+                            <i class="fa-solid fa-plus"></i> เพิ่มการดำเนินการ (Apply Step)
+                        </button>
+                        <button onclick="stepBack()" id="btn-step-back" disabled class="py-2.5 px-4 bg-slate-200 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-slate-300 text-slate-700 rounded-lg text-sm font-semibold transition flex items-center gap-1.5">
+                            <i class="fa-solid fa-reply"></i> ถอยกลับ 1 ขั้น
+                        </button>
+                    </div>
+
+                    <div id="sim-error-box" class="hidden text-xs text-rose-600 bg-rose-50 border border-rose-200 p-2.5 rounded-lg flex items-center gap-2">
+                        <i class="fa-solid fa-circle-exclamation"></i>
+                        <span id="sim-error-text"></span>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Bottom: Sequential Matrix Chain Timeline (A ~ B Display) -->
+            <div class="border border-slate-200 rounded-2xl p-5 bg-gradient-to-b from-slate-900 to-indigo-950 text-white shadow-inner">
+                <div class="flex flex-wrap items-center justify-between gap-3 border-b border-slate-800 pb-3 mb-4">
+                    <div class="flex items-center gap-2">
+                        <span class="w-3 h-3 rounded-full bg-emerald-400 animate-pulse"></span>
+                        <h4 class="text-sm font-bold text-slate-200 tracking-wide uppercase">
+                            ลำดับการแปลงเมทริกซ์ (Transformation Chain: $A \sim B$)
+                        </h4>
+                    </div>
+
+                    <!-- Reverse all transformation button to prove symmetry -->
+                    <button onclick="reverseFullChain()" id="btn-auto-reverse" disabled class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 disabled:bg-slate-800 disabled:text-slate-500 disabled:cursor-not-allowed rounded-lg text-xs font-semibold text-white transition flex items-center gap-1.5 shadow-sm">
+                        <i class="fa-solid fa-arrows-spin"></i> แปลงย้อนกลับ $B \rightarrow A$ อัตโนมัติ (พิสูจน์ $B \sim A$)
+                    </button>
+                </div>
+
+                <!-- Horizontal Scrollable Timeline -->
+                <div id="chain-container" class="step-timeline overflow-x-auto pb-4 pt-2 flex items-center gap-4">
+                    <!-- Populated dynamically: Card A0 -> Op1 -> A1 -> Op2 -> ... -->
+                </div>
+
+                <!-- Chain Summary & Equivalence Statement -->
+                <div id="chain-summary" class="mt-4 pt-4 border-t border-slate-800/80 text-xs sm:text-sm text-slate-300 flex flex-wrap items-center justify-between gap-2">
+                    <div>
+                        <span class="text-indigo-300 font-semibold">ข้อสรุปความสัมพันธ์:</span>
+                        <span id="summary-math" class="ml-1 font-bold text-white">$$A_0 \sim A_0$$</span>
+                    </div>
+                    <div id="summary-explanation" class="text-slate-400 text-xs">
+                        มีขั้นตอนการดำเนินการ 0 ครั้ง (สมบัติสะท้อนตัวเอง)
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 4. คำถามนำเพื่อค้นพบ (Guided Discovery Questions) -->
+        <section class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 sm:p-8">
+            <div class="flex items-center gap-3 border-b border-slate-100 pb-4 mb-6">
+                <div class="w-10 h-10 rounded-xl bg-amber-50 flex items-center justify-center text-amber-600 font-bold text-lg">
+                    <i class="fa-solid fa-lightbulb"></i>
+                </div>
+                <div>
+                    <h2 class="text-xl sm:text-2xl font-bold text-slate-900">4. คำถามนำเพื่อค้นพบ (Guided Discovery Questions)</h2>
+                    <p class="text-xs sm:text-sm text-slate-500">คิดไตร่ตรองคำถามเหล่านี้เพื่อสร้างความเข้าใจที่ลึกซึ้ง แล้วคลิกเพื่อดูบทวิเคราะห์</p>
+                </div>
+            </div>
+
+            <div class="space-y-4">
+                
+                <!-- Question 1 -->
+                <div class="border border-slate-200 rounded-xl overflow-hidden transition-all">
+                    <button onclick="toggleAccordion('disc-1')" class="w-full flex items-center justify-between p-4 sm:p-5 text-left bg-slate-50/70 hover:bg-slate-100/70 transition">
+                        <span class="font-bold text-slate-800 text-sm sm:text-base flex items-center gap-3">
+                            <span class="w-7 h-7 rounded-full bg-amber-100 text-amber-800 text-xs flex items-center justify-center font-bold flex-shrink-0">1</span>
+                            หาก $A \sim B$ แล้ว $B \sim A$ เสมอหรือไม่ เพราะเหตุใด?
+                        </span>
+                        <i id="icon-disc-1" class="fa-solid fa-chevron-down text-slate-400 text-sm transition-transform duration-200"></i>
+                    </button>
+                    <div id="disc-1" class="hidden p-5 bg-white border-t border-slate-200 text-sm text-slate-700 leading-relaxed space-y-3">
+                        <p class="font-semibold text-emerald-800">
+                            <i class="fa-solid fa-circle-check"></i> คำตอบ: เป็นจริงเสมอ (Always True)
+                        </p>
+                        <p>
+                            เนื่องจากการดำเนินการขั้นมูลฐานตามแถวทุกชนิดสามารถย้อนกลับได้ด้วยการดำเนินการขั้นมูลฐานชนิดเดียวกัน (Invertible) ตามทฤษฎีบท 3.1
+                        </p>
+                        <p class="text-slate-600 bg-slate-50 p-3 rounded-lg border border-slate-200 text-xs sm:text-sm">
+                            หากเราแปลง $A$ ไปเป็น $B$ ด้วยลำดับขั้นตอน $e_1, e_2, \dots, e_k$ คือ:
+                            $$B = (e_k \circ \cdots \circ e_2 \circ e_1)(A)$$
+                            เราสามารถแปลง $B$ กลับคืนสู่ $A$ ได้โดยใช้ลำดับการดำเนินการผกผันในทิศทางย้อนกลับ:
+                            $$A = (e_1^{-1} \circ e_2^{-1} \circ \cdots \circ e_k^{-1})(B)$$
+                            ดังนั้น $B \sim A$ อย่างแน่นอน นี่คือที่มาของ <strong>สมบัติสมมาตร (Symmetric Property)</strong>
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Question 2 -->
+                <div class="border border-slate-200 rounded-xl overflow-hidden transition-all">
+                    <button onclick="toggleAccordion('disc-2')" class="w-full flex items-center justify-between p-4 sm:p-5 text-left bg-slate-50/70 hover:bg-slate-100/70 transition">
+                        <span class="font-bold text-slate-800 text-sm sm:text-base flex items-center gap-3">
+                            <span class="w-7 h-7 rounded-full bg-amber-100 text-amber-800 text-xs flex items-center justify-center font-bold flex-shrink-0">2</span>
+                            เมทริกซ์สองเมทริกซ์ที่มีสมาชิกเท่ากันทุกตำแหน่งจำเป็นต้องสมมูลตามแถวหรือไม่?
+                        </span>
+                        <i id="icon-disc-2" class="fa-solid fa-chevron-down text-slate-400 text-sm transition-transform duration-200"></i>
+                    </button>
+                    <div id="disc-2" class="hidden p-5 bg-white border-t border-slate-200 text-sm text-slate-700 leading-relaxed space-y-3">
+                        <p class="font-semibold text-emerald-800">
+                            <i class="fa-solid fa-circle-check"></i> คำตอบ: จำเป็นและสมมูลตามแถวเสมอ
+                        </p>
+                        <p>
+                            หากเมทริกซ์ $A$ และ $B$ มีสมาชิกเท่ากันทุกตำแหน่ง แสดงว่า $A = B$ 
+                        </p>
+                        <p class="text-slate-600">
+                            จาก <strong>สมบัติสะท้อนตัวเอง (Reflexive Property)</strong> ที่ว่า $A \sim A$ สำหรับเมทริกซ์ใดๆ ดังนั้นเมื่อ $A = B$ จึงได้โดยตรงว่า $A \sim B$ ทันที (หรือมองได้ว่าเกิดจากการดำเนินการด้วยการคูณแถวที่หนึ่งด้วยสเกลาร์ $c = 1$)
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Question 3 -->
+                <div class="border border-slate-200 rounded-xl overflow-hidden transition-all">
+                    <button onclick="toggleAccordion('disc-3')" class="w-full flex items-center justify-between p-4 sm:p-5 text-left bg-slate-50/70 hover:bg-slate-100/70 transition">
+                        <span class="font-bold text-slate-800 text-sm sm:text-base flex items-center gap-3">
+                            <span class="w-7 h-7 rounded-full bg-amber-100 text-amber-800 text-xs flex items-center justify-center font-bold flex-shrink-0">3</span>
+                            เมทริกซ์ที่มีอันดับ (dimension / order) เท่ากันจำเป็นต้องสมมูลตามแถวหรือไม่?
+                        </span>
+                        <i id="icon-disc-3" class="fa-solid fa-chevron-down text-slate-400 text-sm transition-transform duration-200"></i>
+                    </button>
+                    <div id="disc-3" class="hidden p-5 bg-white border-t border-slate-200 text-sm text-slate-700 leading-relaxed space-y-3">
+                        <p class="font-semibold text-rose-700">
+                            <i class="fa-solid fa-circle-xmark"></i> คำตอบ: ไม่จำเป็นเสมอไป (Not Necessarily)
+                        </p>
+                        <p>
+                            แม้เมทริกซ์ทั้งสองจะมีขนาดเท่ากันทุกประการ (เช่น $2 \times 2$ เหมือนกัน) แต่ถ้ามีค่า <strong>แรงก์ (Rank)</strong> หรือโครงสร้างของปริภูมิแถวที่ต่างกัน จะไม่สามารถเปลี่ยนตัวหนึ่งให้กลายเป็นอีกตัวหนึ่งด้วย ERO ได้
+                        </p>
+                        <div class="p-3 bg-slate-50 rounded-lg border border-slate-200 text-xs sm:text-sm">
+                            <strong>ตัวอย่างค้าน:</strong>
+                            พิจารณาเมทริกซ์ขนาด $2 \times 2$:
+                            $$I = \begin{bmatrix} 1 & 0 \\ 0 & 1 \end{bmatrix} \quad \text{และ} \quad Z = \begin{bmatrix} 0 & 0 \\ 0 & 0 \end{bmatrix}$$
+                            ทั้งสองมีขนาด $2 \times 2$ เท่ากัน แต่ $I \not\sim Z$ เพราะการดำเนินการขั้นมูลฐานตามแถวไม่สามารถเปลี่ยนเมทริกซ์ศูนย์ให้มีสมาชิกที่ไม่ใช่ศูนย์ได้ (การคูณหรือบวกพหุคูณของ 0 จะได้ 0 เสมอ)
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- 5. แบบฝึกหัดสำหรับนักศึกษา -->
+        <section class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 sm:p-8">
+            <div class="flex items-center gap-3 border-b border-slate-100 pb-4 mb-6">
+                <div class="w-10 h-10 rounded-xl bg-teal-50 flex items-center justify-center text-teal-600 font-bold text-lg">
+                    <i class="fa-solid fa-pencil"></i>
+                </div>
+                <div>
+                    <h2 class="text-xl sm:text-2xl font-bold text-slate-900">5. แบบฝึกหัดสำหรับนักศึกษา (Exercises & Practice)</h2>
+                    <p class="text-xs sm:text-sm text-slate-500">ทดสอบความเข้าใจ พร้อมเฉลยและแนวทางการพิสูจน์ทางคณิตศาสตร์</p>
+                </div>
+            </div>
+
+            <div class="space-y-6">
+                
+                <!-- Exercise 1 -->
+                <div class="p-5 sm:p-6 rounded-xl border border-slate-200 bg-slate-50/50">
+                    <div class="flex items-start justify-between gap-4">
+                        <div>
+                            <span class="text-xs font-bold text-teal-800 bg-teal-100 px-2.5 py-1 rounded">ข้อที่ 1</span>
+                            <h3 class="font-bold text-slate-900 mt-2 text-base sm:text-lg">
+                                จงแสดงลำดับการดำเนินการขั้นมูลฐานตามแถวที่ทำให้ $A \sim B$
+                            </h3>
+                            <p class="text-slate-700 text-sm mt-1">
+                                กำหนดให้ $A = \begin{bmatrix} 1 & 2 \\ 3 & 8 \end{bmatrix}$ และ $B = \begin{bmatrix} 1 & 0 \\ 0 & 1 \end{bmatrix}$ (เมทริกซ์เอกลักษณ์ $I_2$)
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="mt-4 pt-3 border-t border-slate-200">
+                        <button onclick="toggleExercise('ans-ex-1')" class="text-xs sm:text-sm font-semibold text-indigo-600 hover:text-indigo-800 flex items-center gap-1.5 transition">
+                            <i class="fa-regular fa-eye"></i> <span id="label-ans-ex-1">ดูแนวทางคำตอบ</span>
+                        </button>
+                        <div id="ans-ex-1" class="hidden mt-3 p-4 bg-white rounded-lg border border-indigo-100 text-sm space-y-3 text-slate-700">
+                            <p class="font-semibold text-slate-900">ลำดับการดำเนินการ (Sequence of EROs):</p>
+                            <div class="space-y-2 text-xs sm:text-sm pl-2">
+                                <div class="flex items-center gap-3">
+                                    <span class="font-bold text-indigo-600">ขั้นที่ 1:</span>
+                                    <span>$R_2 \leftarrow R_2 - 3R_1$ จะได้ $\begin{bmatrix} 1 & 2 \\ 0 & 2 \end{bmatrix}$</span>
+                                </div>
+                                <div class="flex items-center gap-3">
+                                    <span class="font-bold text-indigo-600">ขั้นที่ 2:</span>
+                                    <span>$R_2 \leftarrow \frac{1}{2}R_2$ จะได้ $\begin{bmatrix} 1 & 2 \\ 0 & 1 \end{bmatrix}$</span>
+                                </div>
+                                <div class="flex items-center gap-3">
+                                    <span class="font-bold text-indigo-600">ขั้นที่ 3:</span>
+                                    <span>$R_1 \leftarrow R_1 - 2R_2$ จะได้ $\begin{bmatrix} 1 & 0 \\ 0 & 1 \end{bmatrix} = B$</span>
+                                </div>
+                            </div>
+                            <p class="text-xs text-slate-500 pt-1">
+                                เนื่องจากสามารถแปลง $A$ ไปเป็น $B$ ด้วย EROs จำนวน 3 ขั้น จึงสรุปได้ว่า $A \sim B$
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Exercise 2 -->
+                <div class="p-5 sm:p-6 rounded-xl border border-slate-200 bg-slate-50/50">
+                    <div>
+                        <span class="text-xs font-bold text-teal-800 bg-teal-100 px-2.5 py-1 rounded">ข้อที่ 2</span>
+                        <h3 class="font-bold text-slate-900 mt-2 text-base sm:text-lg">
+                            จงยกตัวอย่างเมทริกซ์ที่มีอันดับ (ขนาด) เท่ากัน แต่ไม่สมมูลตามแถว
+                        </h3>
+                        <p class="text-slate-700 text-sm mt-1">
+                            ให้เลือกเมทริกซ์ขนาด $2 \times 3$ หรือ $3 \times 3$ และอธิบายเหตุผลประกอบ
+                        </p>
+                    </div>
+
+                    <div class="mt-4 pt-3 border-t border-slate-200">
+                        <button onclick="toggleExercise('ans-ex-2')" class="text-xs sm:text-sm font-semibold text-indigo-600 hover:text-indigo-800 flex items-center gap-1.5 transition">
+                            <i class="fa-regular fa-eye"></i> <span id="label-ans-ex-2">ดูแนวทางคำตอบ</span>
+                        </button>
+                        <div id="ans-ex-2" class="hidden mt-3 p-4 bg-white rounded-lg border border-indigo-100 text-sm space-y-2 text-slate-700">
+                            <p class="font-semibold text-slate-900">ตัวอย่างและเหตุผล:</p>
+                            <p>
+                                กำหนดให้ $M = \begin{bmatrix} 1 & 0 & 0 \\ 0 & 1 & 0 \\ 0 & 0 & 1 \end{bmatrix}$ และ $N = \begin{bmatrix} 1 & 2 & 3 \\ 2 & 4 & 6 \\ 0 & 0 & 0 \end{bmatrix}$
+                            </p>
+                            <p class="text-xs sm:text-sm text-slate-600 leading-relaxed">
+                                เมทริกซ์ทั้งสองมีขนาด $3 \times 3$ เท่ากัน แต่ <strong>$M \not\sim N$</strong> เพราะเมทริกซ์ $M$ มี 3 แถวอิสระเชิงเส้น (Rank = 3) ในขณะที่เมทริกซ์ $N$ แถวที่สองเป็นพหุคูณของแถวที่หนึ่ง ($R_2 = 2R_1$) และมีแถวศูนย์ จึงมีแถวอิสระเชิงเส้นเพียง 1 แถว (Rank = 1) การดำเนินการตามแถวไม่สามารถเปลี่ยนแปลงจำนวนแถวอิสระเชิงเส้น (Rank) ได้ ดังนั้น $M$ จึงไม่มีทางสมมูลตามแถวกับ $N$
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Exercise 3 -->
+                <div class="p-5 sm:p-6 rounded-xl border border-slate-200 bg-slate-50/50">
+                    <div>
+                        <span class="text-xs font-bold text-teal-800 bg-teal-100 px-2.5 py-1 rounded">ข้อที่ 3</span>
+                        <h3 class="font-bold text-slate-900 mt-2 text-base sm:text-lg">
+                            จงพิสูจน์สมบัติทั้ง 3 ประการ (สะท้อนตัวเอง, สมมาตร, ถ่ายทอด) ของความสัมพันธ์สมมูลตามแถว
+                        </h3>
+                        <p class="text-slate-700 text-sm mt-1">
+                            แสดงการพิสูจน์ทฤษฎีบท 3.2 อย่างเป็นทางการทางคณิตศาสตร์
+                        </p>
+                    </div>
+
+                    <div class="mt-4 pt-3 border-t border-slate-200">
+                        <button onclick="toggleExercise('ans-ex-3')" class="text-xs sm:text-sm font-semibold text-indigo-600 hover:text-indigo-800 flex items-center gap-1.5 transition">
+                            <i class="fa-regular fa-eye"></i> <span id="label-ans-ex-3">ดูบทพิสูจน์เต็ม</span>
+                        </button>
+                        <div id="ans-ex-3" class="hidden mt-3 p-4 bg-white rounded-lg border border-indigo-100 text-sm space-y-4 text-slate-700">
+                            <div>
+                                <h4 class="font-bold text-indigo-900 text-xs sm:text-sm mb-1">1. สมบัติสะท้อนตัวเอง ($A \sim A$):</h4>
+                                <p class="text-xs sm:text-sm leading-relaxed text-slate-600">
+                                    สำหรับเมทริกซ์ $A$ ใดๆ เราสามารถดำเนินการด้วยการคูณแถวที่ 1 ด้วยสเกลาร์ $c = 1$ ($R_1 \leftarrow 1 \cdot R_1$) ซึ่งเป็นการดำเนินการขั้นมูลฐานตามแถวชนิดที่ 2 ทำให้ได้เมทริกซ์ $A$ ตัวเดิม ดังนั้น $A$ แปลงเป็น $A$ ได้ด้วย ERO จึงได้ว่า $A \sim A$
+                                </p>
+                            </div>
+
+                            <div class="border-t border-slate-100 pt-2">
+                                <h4 class="font-bold text-indigo-900 text-xs sm:text-sm mb-1">2. สมบัติสมมาตร (ถ้า $A \sim B$ แล้ว $B \sim A$):</h4>
+                                <p class="text-xs sm:text-sm leading-relaxed text-slate-600">
+                                    สมมติให้ $A \sim B$ นั่นคือมีลำดับของ EROs $e_1, e_2, \dots, e_k$ ซึ่งแปลง $A$ เป็น $B$:
+                                    $$B = e_k(e_{k-1}(\cdots e_1(A)\cdots))$$
+                                    เนื่องจากทุก ERO $e_i$ สามารถย้อนกลับได้ด้วยการดำเนินการผกผัน $e_i^{-1}$ ที่เป็น ERO ชนิดเดียวกัน เราจึงสามารถแปลง $B$ กลับคืนสู่ $A$ ได้โดยดำเนินการ:
+                                    $$A = e_1^{-1}(e_2^{-1}(\cdots e_k^{-1}(B)\cdots))$$
+                                    เนื่องจาก $e_k^{-1}, \dots, e_1^{-1}$ เป็น EROs จำนวนจำกัดครั้ง จึงสรุปได้ว่า $B \sim A$
+                                </p>
+                            </div>
+
+                            <div class="border-t border-slate-100 pt-2">
+                                <h4 class="font-bold text-indigo-900 text-xs sm:text-sm mb-1">3. สมบัติถ่ายทอด (ถ้า $A \sim B$ และ $B \sim C$ แล้ว $A \sim C$):</h4>
+                                <p class="text-xs sm:text-sm leading-relaxed text-slate-600">
+                                    สมมติให้ $A \sim B$ และ $B \sim C$ หมายความว่า:
+                                    <br>• มีลำดับ EROs $e_1, \dots, e_p$ ที่แปลง $A$ เป็น $B$
+                                    <br>• มีลำดับ EROs $f_1, \dots, f_q$ ที่แปลง $B$ เป็น $C$
+                                    <br>เมื่อนำลำดับการดำเนินการทั้งสองชุดมารวมกัน จะได้ลำดับของ EROs ทั้งหมด $p + q$ ครั้ง ซึ่งเป็นจำนวนจำกัด:
+                                    $$C = f_q(\cdots f_1(e_p(\cdots e_1(A)\cdots))\cdots)$$
+                                    ทำให้แปลง $A$ ไปเป็น $C$ ได้โดยตรง ดังนั้น $A \sim C$
+                                </p>
+                            </div>
+                            
+                            <p class="text-xs font-semibold text-emerald-800 pt-2 border-t border-slate-100">
+                                สรุป: เมื่อความสัมพันธ์มีความสมบูรณ์ทั้ง 3 สมบัติ ความสมมูลตามแถวจึงเป็นความสัมพันธ์สมมูล (Equivalence Relation) บนเซตของเมทริกซ์ขนาดเดียวกันตามทฤษฎีบท 3.2 $\blacksquare$
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="text-center text-xs text-slate-400 py-6 border-t border-slate-200">
+            <p>เรื่องที่ 2: เมทริกซ์สมมูลตามแถว (Row Equivalent Matrices) • สื่อการเรียนรู้เชิงปฏิสัมพันธ์</p>
+        </footer>
+
+    </main>
+
+    <!-- JavaScript Interactive Simulator Logic -->
+    <script>
+        // State
+        let numRows = 2;
+        let numCols = 3;
+        let selectedType = 1;
+
+        // Chain of matrices: Array of { matrix: [...], opDesc: "...", invDesc: "...", invAction: func }
+        let historyChain = [];
+
+        const defaultPresets = {
+            '2x3': [
+                [1, 2, 3],
+                [2, 5, 8]
+            ],
+            '3x3': [
+                [1, 2, 1],
+                [2, 5, 4],
+                [1, 1, 3]
+            ]
+        };
+
+        window.onload = function() {
+            initMatrix(defaultPresets['2x3']);
+            selectType(1);
+        };
+
+        function initMatrix(initialMat) {
+            numRows = initialMat.length;
+            numCols = initialMat[0].length;
+            historyChain = [{
+                matrix: JSON.parse(JSON.stringify(initialMat)),
+                opDesc: "จุดเริ่มต้น $A_0$",
+                invOp: null
+            }];
+            renderEditableInputs();
+            renderDynamicPanelInputs();
+            updateChainTimeline();
+            updateButtons();
+        }
+
+        function changeMatrixSize(r, c) {
+            const btn2x3 = document.getElementById('btn-mode-2x3');
+            const btn3x3 = document.getElementById('btn-mode-3x3');
+            if (r === 2) {
+                btn2x3.className = "px-2.5 py-1 rounded bg-white font-medium text-slate-800 shadow-xs";
+                btn3x3.className = "px-2.5 py-1 rounded text-slate-600 hover:text-slate-900";
+                initMatrix(defaultPresets['2x3']);
+            } else {
+                btn3x3.className = "px-2.5 py-1 rounded bg-white font-medium text-slate-800 shadow-xs";
+                btn2x3.className = "px-2.5 py-1 rounded text-slate-600 hover:text-slate-900";
+                initMatrix(defaultPresets['3x3']);
+            }
+        }
+
+        function getCurrentMatrix() {
+            return historyChain[historyChain.length - 1].matrix;
+        }
+
+        // Render editable inputs for the base matrix A0
+        function renderEditableInputs() {
+            const container = document.getElementById('editable-matrix-wrapper');
+            container.innerHTML = '';
+
+            const wrapper = document.createElement('div');
+            wrapper.className = "matrix-bracket flex flex-col gap-2 p-2";
+
+            const baseMat = historyChain[0].matrix;
+            const isAtRoot = historyChain.length === 1;
+
+            for (let r = 0; r < numRows; r++) {
+                const rowDiv = document.createElement('div');
+                rowDiv.className = "flex items-center gap-2";
+
+                const label = document.createElement('span');
+                label.className = "text-xs font-semibold text-slate-400 w-5 text-right";
+                label.innerText = `R${r+1}`;
+                rowDiv.appendChild(label);
+
+                for (let c = 0; c < numCols; c++) {
+                    const input = document.createElement('input');
+                    input.type = "number";
+                    input.step = "any";
+                    input.value = baseMat[r][c];
+                    input.disabled = !isAtRoot;
+                    input.className = `w-12 h-9 text-center rounded font-semibold text-sm transition outline-none ${
+                        isAtRoot 
+                            ? 'bg-white border border-slate-300 text-slate-800 focus:border-indigo-600 focus:ring-1 focus:ring-indigo-600' 
+                            : 'bg-slate-100 border border-slate-200 text-slate-500 cursor-not-allowed'
+                    }`;
+                    input.oninput = function() {
+                        const val = parseFloat(this.value);
+                        baseMat[r][c] = isNaN(val) ? 0 : val;
+                        historyChain[0].matrix = JSON.parse(JSON.stringify(baseMat));
+                        updateChainTimeline();
+                    };
+                    rowDiv.appendChild(input);
+                }
+                wrapper.appendChild(rowDiv);
+            }
+            container.appendChild(wrapper);
+        }
+
+        function selectType(t) {
+            selectedType = t;
+            [1, 2, 3].forEach(idx => {
+                const tab = document.getElementById(`tab-type-${idx}`);
+                if (idx === t) {
+                    tab.className = "py-2 text-xs font-semibold rounded-lg bg-indigo-600 text-white shadow-xs";
+                } else {
+                    tab.className = "py-2 text-xs font-semibold rounded-lg bg-white border border-slate-200 text-slate-700 hover:bg-slate-100";
+                }
+            });
+            renderDynamicPanelInputs();
+            hideSimError();
+        }
+
+        function renderDynamicPanelInputs() {
+            const panel = document.getElementById('panel-inputs');
+            let html = "";
+
+            if (selectedType === 1) {
+                html = `
+                    <div class="flex items-center gap-3 w-full">
+                        <span class="text-xs font-medium text-slate-600">สลับ</span>
+                        <select id="sel-t1-i" class="flex-1 bg-slate-50 border border-slate-300 rounded p-1.5 text-xs">
+                            ${rowOptions(1)}
+                        </select>
+                        <span class="text-xs font-bold text-slate-400"><i class="fa-solid fa-arrows-left-right"></i></span>
+                        <select id="sel-t1-j" class="flex-1 bg-slate-50 border border-slate-300 rounded p-1.5 text-xs">
+                            ${rowOptions(2)}
+                        </select>
+                    </div>
+                `;
+            } else if (selectedType === 2) {
+                html = `
+                    <div class="flex items-center gap-2 w-full">
+                        <span class="text-xs font-medium text-slate-600">คูณ</span>
+                        <select id="sel-t2-i" class="flex-1 bg-slate-50 border border-slate-300 rounded p-1.5 text-xs">
+                            ${rowOptions(1)}
+                        </select>
+                        <span class="text-xs font-medium text-slate-600">ด้วย $c =$</span>
+                        <input type="number" step="any" id="input-t2-c" value="2" class="w-16 bg-slate-50 border border-slate-300 rounded p-1.5 text-xs text-center font-bold">
+                    </div>
+                `;
+            } else if (selectedType === 3) {
+                html = `
+                    <div class="flex items-center gap-2 w-full">
+                        <select id="sel-t3-i" class="flex-1 bg-slate-50 border border-slate-300 rounded p-1.5 text-xs">
+                            ${rowOptions(2)}
+                        </select>
+                        <span class="text-xs font-bold text-slate-500">$\leftarrow R_i +$</span>
+                        <input type="number" step="any" id="input-t3-c" value="-2" class="w-14 bg-slate-50 border border-slate-300 rounded p-1.5 text-xs text-center font-bold">
+                        <span class="text-xs font-bold text-slate-500">$\times$</span>
+                        <select id="sel-t3-j" class="flex-1 bg-slate-50 border border-slate-300 rounded p-1.5 text-xs">
+                            ${rowOptions(1)}
+                        </select>
+                    </div>
+                `;
+            }
+            panel.innerHTML = html;
+            triggerMathJax();
+        }
+
+        function rowOptions(defaultSelected) {
+            let opts = "";
+            for (let i = 1; i <= numRows; i++) {
+                opts += `<option value="${i}" ${i === defaultSelected ? 'selected' : ''}>แถวที่ ${i} (R${i})</option>`;
+            }
+            return opts;
+        }
+
+        function showSimError(msg) {
+            const b = document.getElementById('sim-error-box');
+            document.getElementById('sim-error-text').innerText = msg;
+            b.classList.remove('hidden');
+        }
+
+        function hideSimError() {
+            document.getElementById('sim-error-box').classList.add('hidden');
+        }
+
+        function applyNextStep() {
+            hideSimError();
+            const currentMat = getCurrentMatrix();
+            const nextMat = JSON.parse(JSON.stringify(currentMat));
+
+            let opDesc = "";
+            let invOp = null;
+
+            if (selectedType === 1) {
+                const i = parseInt(document.getElementById('sel-t1-i').value) - 1;
+                const j = parseInt(document.getElementById('sel-t1-j').value) - 1;
+                if (i === j) {
+                    showSimError("ต้องเลือกแถวที่ไม่ซ้ำกันสำหรับการสลับแถว");
+                    return;
+                }
+                const temp = nextMat[i];
+                nextMat[i] = nextMat[j];
+                nextMat[j] = temp;
+
+                opDesc = `R_{${i+1}} \\leftrightarrow R_{${j+1}}`;
+                invOp = { type: 1, i, j, desc: `R_{${i+1}} \\leftrightarrow R_{${j+1}}` };
+
+            } else if (selectedType === 2) {
+                const i = parseInt(document.getElementById('sel-t2-i').value) - 1;
+                const c = parseFloat(document.getElementById('input-t2-c').value);
+                if (isNaN(c) || c === 0) {
+                    showSimError("สเกลาร์ c ต้องเป็นจำนวนจริงที่ไม่เท่ากับ 0 (c ≠ 0)");
+                    return;
+                }
+                for (let k = 0; k < numCols; k++) {
+                    nextMat[i][k] *= c;
+                }
+                opDesc = `R_{${i+1}} \\leftarrow ${c === 1 ? '' : c}R_{${i+1}}`;
+                invOp = { type: 2, i, c: 1 / c, desc: `R_{${i+1}} \\leftarrow \\frac{1}{${c}}R_{${i+1}}` };
+
+            } else if (selectedType === 3) {
+                const i = parseInt(document.getElementById('sel-t3-i').value) - 1;
+                const j = parseInt(document.getElementById('sel-t3-j').value) - 1;
+                const c = parseFloat(document.getElementById('input-t3-c').value);
+
+                if (i === j) {
+                    showSimError("แถวเป้าหมายและแถวที่นำมาคูณต้องไม่ใช่แถวเดียวกัน");
+                    return;
+                }
+                if (isNaN(c)) {
+                    showSimError("กรุณากรอกค่าพหุคูณ c");
+                    return;
+                }
+
+                for (let k = 0; k < numCols; k++) {
+                    nextMat[i][k] += (c * nextMat[j][k]);
+                }
+                const sign = c >= 0 ? `+ ${c}` : `- ${Math.abs(c)}`;
+                const invSign = (-c) >= 0 ? `+ ${Math.abs(c)}` : `- ${Math.abs(c)}`;
+                opDesc = `R_{${i+1}} \\leftarrow R_{${i+1}} ${sign}R_{${j+1}}`;
+                invOp = { type: 3, i, j, c: -c, desc: `R_{${i+1}} \\leftarrow R_{${i+1}} ${invSign}R_{${j+1}}` };
+            }
+
+            historyChain.push({
+                matrix: nextMat,
+                opDesc: opDesc,
+                invOp: invOp
+            });
+
+            renderEditableInputs();
+            updateChainTimeline();
+            updateButtons();
+        }
+
+        function stepBack() {
+            if (historyChain.length > 1) {
+                historyChain.pop();
+                renderEditableInputs();
+                updateChainTimeline();
+                updateButtons();
+                hideSimError();
+            }
+        }
+
+        function resetChain() {
+            const rootMat = historyChain[0].matrix;
+            initMatrix(rootMat);
+            hideSimError();
+        }
+
+        // Automatic full chain reversal to demonstrate symmetry: B ~ A
+        function reverseFullChain() {
+            if (historyChain.length <= 1) return;
+
+            // collect inverse operations in reverse order
+            const reverseOps = [];
+            for (let idx = historyChain.length - 1; idx >= 1; idx--) {
+                reverseOps.push(historyChain[idx].invOp);
+            }
+
+            // apply one by one
+            let curr = JSON.parse(JSON.stringify(getCurrentMatrix()));
+            reverseOps.forEach((op, stepIdx) => {
+                const next = JSON.parse(JSON.stringify(curr));
+                if (op.type === 1) {
+                    const temp = next[op.i];
+                    next[op.i] = next[op.j];
+                    next[op.j] = temp;
+                } else if (op.type === 2) {
+                    for (let k = 0; k < numCols; k++) {
+                        next[op.i][k] *= op.c;
+                    }
+                } else if (op.type === 3) {
+                    for (let k = 0; k < numCols; k++) {
+                        next[op.i][k] += (op.c * next[op.j][k]);
+                    }
+                }
+
+                historyChain.push({
+                    matrix: next,
+                    opDesc: `\\text{ย้อน: } ${op.desc}`,
+                    invOp: null
+                });
+                curr = next;
+            });
+
+            renderEditableInputs();
+            updateChainTimeline();
+            updateButtons();
+        }
+
+        function updateButtons() {
+            const count = historyChain.length - 1;
+            document.getElementById('current-step-counter').innerText = `ขั้นตอนที่: ${count}`;
+            document.getElementById('btn-step-back').disabled = (count === 0);
+            document.getElementById('btn-auto-reverse').disabled = (count === 0);
+        }
+
+        function matrixToLatex(mat) {
+            if (!mat || mat.length === 0) return "\\begin{bmatrix}\\end{bmatrix}";
+            let latex = "\\begin{bmatrix}";
+            for (let r = 0; r < mat.length; r++) {
+                const rowStr = mat[r].map(v => {
+                    const rounded = Math.round(v * 100) / 100;
+                    return rounded;
+                }).join(" & ");
+                latex += rowStr;
+                if (r < mat.length - 1) latex += " \\\\ ";
+            }
+            latex += "\\end{bmatrix}";
+            return latex;
+        }
+
+        function updateChainTimeline() {
+            const container = document.getElementById('chain-container');
+            container.innerHTML = "";
+
+            historyChain.forEach((item, idx) => {
+                // If not first, add operation arrow
+                if (idx > 0) {
+                    const arrowDiv = document.createElement('div');
+                    arrowDiv.className = "flex flex-col items-center justify-center flex-shrink-0 px-2";
+                    arrowDiv.innerHTML = `
+                        <div class="text-[11px] font-semibold text-sky-300 bg-sky-950/70 border border-sky-800/80 px-2 py-1 rounded shadow-xs mb-1 whitespace-nowrap">
+                            $${item.opDesc}$
+                        </div>
+                        <i class="fa-solid fa-arrow-right text-indigo-400 text-sm"></i>
+                    `;
+                    container.appendChild(arrowDiv);
+                }
+
+                // Matrix Box
+                const box = document.createElement('div');
+                const isFinal = (idx === historyChain.length - 1);
+                box.className = `flex-shrink-0 p-3 rounded-xl border text-center transition-all ${
+                    isFinal 
+                        ? 'bg-slate-800/95 border-emerald-500/80 shadow-lg ring-1 ring-emerald-500/50' 
+                        : 'bg-slate-800/50 border-slate-700/80'
+                }`;
+
+                const labelText = idx === 0 ? "A_0 (ตั้งต้น)" : (isFinal ? `B = A_{${idx}} (ล่าสุด)` : `A_{${idx}}`);
+                const labelColor = idx === 0 ? "text-indigo-300" : (isFinal ? "text-emerald-400 font-bold" : "text-slate-400");
+
+                box.innerHTML = `
+                    <div class="text-xs ${labelColor} mb-1 font-mono">${labelText}</div>
+                    <div class="text-xs sm:text-sm text-slate-100">
+                        $$${matrixToLatex(item.matrix)}$$
+                    </div>
+                `;
+                container.appendChild(box);
+            });
+
+            // Update Summary
+            const totalSteps = historyChain.length - 1;
+            const summaryMath = document.getElementById('summary-math');
+            const summaryExplanation = document.getElementById('summary-explanation');
+
+            if (totalSteps === 0) {
+                summaryMath.innerHTML = `$$A_0 \\sim A_0$$`;
+                summaryExplanation.innerText = "เมทริกซ์สมมูลกับตัวเองเสมอตามสมบัติสะท้อนตัวเอง (Reflexive)";
+            } else {
+                summaryMath.innerHTML = `$$A_0 \\sim A_{${totalSteps}}$$`;
+                summaryExplanation.innerText = `แปลงผ่าน EROs จำนวน ${totalSteps} ขั้น จึงสรุปได้ว่าเมทริกซ์เริ่มต้นสมมูลตามแถวกับเมทริกซ์สุดท้าย`;
+            }
+
+            triggerMathJax();
+            // auto scroll timeline to right
+            setTimeout(() => {
+                container.scrollLeft = container.scrollWidth;
+            }, 50);
+        }
+
+        function triggerMathJax() {
+            if (window.MathJax && window.MathJax.typesetPromise) {
+                window.MathJax.typesetPromise().catch(err => console.error(err));
+            }
+        }
+
+        // Accordion Helpers
+        function toggleAccordion(id) {
+            const content = document.getElementById(id);
+            const icon = document.getElementById(`icon-${id}`);
+            if (content.classList.contains('hidden')) {
+                content.classList.remove('hidden');
+                icon.classList.add('rotate-180');
+                triggerMathJax();
+            } else {
+                content.classList.add('hidden');
+                icon.classList.remove('rotate-180');
+            }
+        }
+
+        function toggleExercise(id) {
+            const el = document.getElementById(id);
+            const label = document.getElementById(`label-${id}`);
+            if (el.classList.contains('hidden')) {
+                el.classList.remove('hidden');
+                label.innerText = "ซ่อนคำตอบ / บทพิสูจน์";
+                triggerMathJax();
+            } else {
+                el.classList.add('hidden');
+                label.innerText = id === 'ans-ex-3' ? "ดูบทพิสูจน์เต็ม" : "ดูแนวทางคำตอบ";
+            }
+        }
+    </script>
+</body>
+</html>

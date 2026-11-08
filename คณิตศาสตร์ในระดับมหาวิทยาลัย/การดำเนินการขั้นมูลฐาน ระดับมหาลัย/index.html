@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="th" class="h-full">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ระบบการเรียนรู้ออนไลน์: การดำเนินการขั้นมูลฐานตามแถวและเมทริกซ์</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Sarabun, Prompt & Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Prompt:wght@400;500;600;700&family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        body {
+            font-family: 'Sarabun', 'Inter', sans-serif;
+        }
+        h1, h2, h3, h4, .font-heading {
+            font-family: 'Prompt', 'Inter', sans-serif;
+        }
+        /* ซ่อน scrollbar แนวนอนของแท็บเพื่อความสวยงามแต่ยังเลื่อนได้ */
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+<script>
+  // ตรวจสอบว่ามีสถานะล็อกอินและอีเมลบันทึกไว้หรือไม่
+  const isLoggedIn = localStorage.getItem("dms_is_logged_in") === "true";
+  const userEmail = localStorage.getItem("dms_user_email");
+
+  // หากไม่มี ให้ดีดกลับไปหน้าเข้าสู่ระบบทันที
+  if (!isLoggedIn || !userEmail) {
+    // ปรับ Path ให้ถอยกลับไปหาไฟล์ login.html ตามระดับโฟลเดอร์ (เช่น "../login.html" หากอยู่ในโฟลเดอร์ย่อย 1 ชั้น)
+    window.location.replace("../../login.html"); 
+  }
+</script>
+
+</head>
+<body class="h-full flex flex-col bg-slate-950 text-slate-100 overflow-hidden">
+
+    <!-- Top Navigation & Header Bar -->
+    <header class="bg-gradient-to-r from-slate-950 via-indigo-950 to-slate-900 border-b border-indigo-900/40 shadow-xl flex-shrink-0 z-20">
+        
+        <!-- Main Top Header -->
+        <div class="max-w-7xl mx-auto px-3 sm:px-6 py-2.5 sm:py-3 flex items-center justify-between gap-3">
+            
+            <!-- Branding / Course Title -->
+            <div class="flex items-center gap-3 min-w-0">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-600 to-blue-500 text-white flex items-center justify-center font-bold text-lg shadow-md shadow-indigo-600/30 flex-shrink-0">
+                    <i class="fa-solid fa-cube"></i>
+                </div>
+                <div class="min-w-0">
+                    <div class="flex items-center gap-2">
+                        <span class="px-2 py-0.5 rounded text-[10px] font-bold tracking-wider uppercase bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+                            บทที่ 3
+                        </span>
+                        <span class="text-xs text-indigo-300 font-light truncate hidden sm:inline">พีชคณิตเชิงเส้น (Linear Algebra)</span>
+                    </div>
+                    <h1 class="text-sm sm:text-base lg:text-lg font-bold text-white tracking-tight truncate font-heading">
+                        การดำเนินการขั้นมูลฐานตามแถวและเมทริกซ์
+                    </h1>
+                </div>
+            </div>
+
+            <!-- Current Lesson Badge & Quick Utilities -->
+            <div class="flex items-center gap-2 flex-shrink-0">
+                
+                <!-- Quick Navigation Controls (Prev / Next) -->
+                <div class="flex items-center bg-slate-900/90 rounded-xl border border-slate-700/80 p-0.5 shadow-inner">
+                    <button id="btn-prev" onclick="navigateStep(-1)" class="px-2.5 sm:px-3 py-1.5 rounded-lg text-slate-300 hover:text-white hover:bg-slate-800 disabled:opacity-30 disabled:cursor-not-allowed text-xs font-medium flex items-center gap-1 transition" title="เรื่องก่อนหน้า">
+                        <i class="fa-solid fa-chevron-left"></i>
+                        <span class="hidden md:inline">ก่อนหน้า</span>
+                    </button>
+                    <div class="w-px h-4 bg-slate-700 my-auto"></div>
+                    <button id="btn-next" onclick="navigateStep(1)" class="px-2.5 sm:px-3 py-1.5 rounded-lg text-slate-300 hover:text-white hover:bg-slate-800 disabled:opacity-30 disabled:cursor-not-allowed text-xs font-medium flex items-center gap-1 transition" title="เรื่องถัดไป">
+                        <span class="hidden md:inline">ถัดไป</span>
+                        <i class="fa-solid fa-chevron-right"></i>
+                    </button>
+                </div>
+
+                <!-- Open New Tab & Refresh -->
+                <button onclick="openInNewTab()" class="p-2 sm:px-3 sm:py-1.5 rounded-xl bg-slate-900/80 hover:bg-slate-800 border border-slate-700/80 text-slate-300 hover:text-white text-xs font-medium flex items-center gap-1.5 transition" title="เปิดบทเรียนนี้ในหน้าต่างใหม่">
+                    <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                    <span class="hidden lg:inline">เปิดแยกหน้า</span>
+                </button>
+                <button onclick="refreshIframe()" class="p-2 rounded-xl bg-slate-900/80 hover:bg-slate-800 border border-slate-700/80 text-slate-300 hover:text-white text-xs transition" title="โหลดบทเรียนนี้ใหม่ (Refresh)">
+                    <i class="fa-solid fa-rotate-right"></i>
+                </button>
+
+                <!-- Mobile Menu Toggle Button -->
+                <button onclick="toggleMobileDropdown()" class="md:hidden p-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs shadow-md transition" title="เลือกหัวข้อ">
+                    <i class="fa-solid fa-bars"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Horizontal Scrollable Tab Bar (Desktop/Tablet) -->
+        <nav class="border-t border-slate-800/80 bg-slate-950/60 backdrop-blur-md">
+            <div class="max-w-7xl mx-auto px-2 sm:px-6">
+                <div id="tabs-container" class="no-scrollbar flex items-center gap-1.5 py-1.5 overflow-x-auto scroll-smooth">
+                    <!-- Tab buttons populated by JavaScript -->
+                </div>
+            </div>
+        </nav>
+
+        <!-- Mobile Dropdown Menu (Hidden by default) -->
+        <div id="mobile-menu" class="hidden md:hidden border-t border-slate-800 bg-slate-900/95 backdrop-blur-xl px-4 py-3 space-y-1 max-h-72 overflow-y-auto">
+            <!-- Mobile items populated by JavaScript -->
+        </div>
+
+        <!-- Sub-bar: Active Topic Display & Progress Indicator -->
+        <div class="bg-indigo-950/40 border-t border-indigo-900/30 px-3 sm:px-6 py-1.5 text-xs flex items-center justify-between text-slate-400">
+            <div class="flex items-center gap-2 truncate">
+                <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse flex-shrink-0"></span>
+                <span class="text-slate-400 text-[11px] sm:text-xs">กำลังแสดง:</span>
+                <span id="active-topic-title" class="font-bold text-white truncate text-xs sm:text-sm">
+                    1. ความหมายและการดำเนินการขั้นมูลฐานตามแถว
+                </span>
+            </div>
+            <div id="active-progress-text" class="text-[11px] font-mono text-indigo-300 flex-shrink-0 pl-2">
+                หัวข้อ 1 / 9
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content Area: Full Height Iframe Container -->
+    <main class="flex-1 w-full relative bg-slate-900 overflow-hidden">
+        
+        <!-- Loading Spinner Overlay -->
+        <div id="iframe-loader" class="absolute inset-0 bg-slate-950/80 backdrop-blur-sm z-10 flex flex-col items-center justify-center gap-3 transition-opacity duration-300 pointer-events-none opacity-0">
+            <div class="w-10 h-10 border-4 border-indigo-600 border-t-transparent rounded-full animate-spin"></div>
+            <p class="text-xs text-indigo-300 font-medium">กำลังโหลดเนื้อหาบทเรียน...</p>
+        </div>
+
+        <!-- Single Responsive Iframe filling available space without double scrollbars -->
+        <iframe 
+            id="content-frame" 
+            name="content-frame" 
+            src="1ความหมายและการดำเนินการขั้นมูลฐานตามแถว.html" 
+            class="w-full h-full border-0 block bg-slate-900"
+            onload="handleIframeLoaded()"
+            title="เนื้อหาบทเรียน">
+        </iframe>
+    </main>
+
+    <!-- Script for Dynamic Tabs, Navigation, and Iframe Control -->
+    <script>
+        // รายการไฟล์ 9 รายการตรงตามชื่อไฟล์จริงในโฟลเดอร์
+        const lessons = [
+            {
+                id: 1,
+                num: "1",
+                title: "ความหมายและการดำเนินการขั้นมูลฐานตามแถว",
+                short: "1. นิยาม EROs",
+                file: "1ความหมายและการดำเนินการขั้นมูลฐานตามแถว.html",
+                icon: "fa-arrow-right-arrow-left",
+                isExam: false
+            },
+            {
+                id: 2,
+                num: "2",
+                title: "เมทริกซ์สมมูลตามแถว",
+                short: "2. สมมูลตามแถว (~)",
+                file: "2เมทริกซ์สมมูลตามแถว.html",
+                icon: "fa-arrows-split-up-and-left",
+                isExam: false
+            },
+            {
+                id: 3,
+                num: "3",
+                title: "เมทริกซ์รูปขั้นบันได (REF)",
+                short: "3. รูปขั้นบันได REF",
+                file: "3เมทริกซ์รูปขั้นบันได.html",
+                icon: "fa-stairs",
+                isExam: false
+            },
+            {
+                id: 4,
+                num: "4",
+                title: "เมทริกซ์รูปขั้นบันไดลดรูป (RREF)",
+                short: "4. ขั้นบันไดลดรูป RREF",
+                file: "4เมทริกซ์รูปขั้นบันไดลดรูป.html",
+                icon: "fa-gem",
+                isExam: false
+            },
+            {
+                id: 5,
+                num: "5",
+                title: "การกำจัดแบบเกาส์และการกำจัดแบบเกาส์–จอร์แดน",
+                short: "5. เกาส์ & เกาส์–จอร์แดน",
+                file: "5การกำจัดแบบเกาส์และการกำจัดแบบเกาส์–จอร์แดน.html",
+                icon: "fa-calculator",
+                isExam: false
+            },
+            {
+                id: 6,
+                num: "6",
+                title: "ตำแหน่งหลัก ตัวแปรหลัก และตัวแปรอิสระ",
+                short: "6. ตัวแปรหลัก & อิสระ",
+                file: "6ตำแหน่งหลัก ตัวแปรหลัก และตัวแปรอิสระ.html",
+                icon: "fa-infinity",
+                isExam: false
+            },
+            {
+                id: 7,
+                num: "7",
+                title: "อันดับของเมทริกซ์และสมบัติภายใต้การดำเนินการขั้นมูลฐาน",
+                short: "7. อันดับ (Rank)",
+                file: "7อันดับของเมทริกซ์และสมบัติภายใต้การดำเนินการขั้นมูลฐาน.html",
+                icon: "fa-layer-group",
+                isExam: false
+            },
+            {
+                id: 8,
+                num: "8",
+                title: "ทฤษฎีบทสำคัญและการประยุกต์ใช้การดำเนินการขั้นมูลฐาน",
+                short: "8. ทฤษฎีบทสำคัญ",
+                file: "8ทฤษฎีบทสำคัญและการประยุกต์ใช้การดำเนินการขั้นมูลฐาน.html",
+                icon: "fa-award",
+                isExam: false
+            },
+            {
+                id: 9,
+                num: "แบบทดสอบ",
+                title: "แบบทดสอบวัดผลสัมฤทธิ์ทางการเรียน (30 ข้อ)",
+                short: "แบบทดสอบ (30 ข้อ)",
+                file: "แบบทดสอบ.html",
+                icon: "fa-clipboard-check",
+                isExam: true
+            }
+        ];
+
+        let currentIndex = 0;
+
+        window.onload = function() {
+            renderTabs();
+            renderMobileMenu();
+            selectLesson(0);
+        };
+
+        // Render Desktop / Tablet Tab Buttons
+        function renderTabs() {
+            const container = document.getElementById('tabs-container');
+            container.innerHTML = '';
+
+            lessons.forEach((item, index) => {
+                const btn = document.createElement('button');
+                btn.id = `tab-btn-${index}`;
+                btn.type = 'button';
+                btn.onclick = () => selectLesson(index);
+                
+                // Style differences for standard lesson vs Exam
+                const examClass = item.isExam 
+                    ? 'border-emerald-600/70 text-emerald-300 hover:bg-emerald-950/60' 
+                    : 'border-slate-800 text-slate-300 hover:bg-slate-800/80 hover:text-white';
+
+                btn.className = `flex-shrink-0 px-3 py-1.5 rounded-lg border text-xs font-medium transition-all flex items-center gap-1.5 ${examClass}`;
+                btn.innerHTML = `
+                    <i class="fa-solid ${item.icon} text-[11px] opacity-80"></i>
+                    <span class="whitespace-nowrap">${item.short}</span>
+                `;
+                container.appendChild(btn);
+            });
+        }
+
+        // Render Mobile Dropdown List
+        function renderMobileMenu() {
+            const menu = document.getElementById('mobile-menu');
+            menu.innerHTML = '';
+
+            lessons.forEach((item, index) => {
+                const a = document.createElement('button');
+                a.id = `mobile-item-${index}`;
+                a.className = "w-full text-left px-3 py-2 rounded-lg text-xs transition flex items-center justify-between text-slate-300 hover:bg-slate-800 hover:text-white";
+                a.onclick = () => {
+                    selectLesson(index);
+                    toggleMobileDropdown();
+                };
+                a.innerHTML = `
+                    <span class="flex items-center gap-2 truncate">
+                        <i class="fa-solid ${item.icon} text-indigo-400 w-4 text-center"></i>
+                        <span class="truncate">${item.isExam ? item.title : `เรื่องที่ ${item.num}: ${item.title}`}</span>
+                    </span>
+                    ${item.isExam ? '<span class="px-1.5 py-0.5 rounded text-[10px] bg-emerald-500/20 text-emerald-300">วัดผล</span>' : ''}
+                `;
+                menu.appendChild(a);
+            });
+        }
+
+        // Select and Load a Lesson by Index
+        function selectLesson(index) {
+            if (index < 0 || index >= lessons.length) return;
+            currentIndex = index;
+            const lesson = lessons[index];
+
+            // Show Loader
+            const loader = document.getElementById('iframe-loader');
+            loader.classList.remove('pointer-events-none');
+            loader.classList.add('opacity-100');
+
+            // Load iframe with proper relative path
+            const iframe = document.getElementById('content-frame');
+            iframe.src = encodeURI(lesson.file);
+
+            // Update UI State
+            updateTabStyles();
+            updateHeaderInfo();
+            updateNavigationButtons();
+
+            // Scroll tab into view if needed
+            const activeTab = document.getElementById(`tab-btn-${index}`);
+            if (activeTab) {
+                activeTab.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+            }
+        }
+
+        function updateTabStyles() {
+            lessons.forEach((item, idx) => {
+                const tab = document.getElementById(`tab-btn-${idx}`);
+                const mItem = document.getElementById(`mobile-item-${idx}`);
+                const isActive = (idx === currentIndex);
+
+                if (tab) {
+                    if (isActive) {
+                        tab.className = item.isExam
+                            ? "flex-shrink-0 px-3 py-1.5 rounded-lg border border-emerald-500 bg-emerald-600 text-white font-bold text-xs shadow-md shadow-emerald-900/30 flex items-center gap-1.5"
+                            : "flex-shrink-0 px-3 py-1.5 rounded-lg border border-indigo-500 bg-indigo-600 text-white font-bold text-xs shadow-md shadow-indigo-900/30 flex items-center gap-1.5";
+                    } else {
+                        const baseStyle = item.isExam
+                            ? "border-emerald-700/60 text-emerald-300 hover:bg-emerald-950/60"
+                            : "border-slate-800 text-slate-300 hover:bg-slate-800/80 hover:text-white";
+                        tab.className = `flex-shrink-0 px-3 py-1.5 rounded-lg border text-xs font-medium transition-all flex items-center gap-1.5 ${baseStyle}`;
+                    }
+                }
+
+                if (mItem) {
+                    if (isActive) {
+                        mItem.classList.add('bg-indigo-600', 'text-white', 'font-bold');
+                        mItem.classList.remove('text-slate-300');
+                    } else {
+                        mItem.classList.remove('bg-indigo-600', 'text-white', 'font-bold');
+                        mItem.classList.add('text-slate-300');
+                    }
+                }
+            });
+        }
+
+        function updateHeaderInfo() {
+            const lesson = lessons[currentIndex];
+            const titleEl = document.getElementById('active-topic-title');
+            const progressEl = document.getElementById('active-progress-text');
+
+            if (lesson.isExam) {
+                titleEl.innerText = lesson.title;
+            } else {
+                titleEl.innerText = `เรื่องที่ ${lesson.num}: ${lesson.title}`;
+            }
+
+            progressEl.innerText = `หัวข้อ ${currentIndex + 1} / ${lessons.length}`;
+        }
+
+        function updateNavigationButtons() {
+            const prevBtn = document.getElementById('btn-prev');
+            const nextBtn = document.getElementById('btn-next');
+
+            prevBtn.disabled = (currentIndex === 0);
+            nextBtn.disabled = (currentIndex === lessons.length - 1);
+        }
+
+        function navigateStep(direction) {
+            selectLesson(currentIndex + direction);
+        }
+
+        function handleIframeLoaded() {
+            const loader = document.getElementById('iframe-loader');
+            loader.classList.remove('opacity-100');
+            loader.classList.add('opacity-0', 'pointer-events-none');
+        }
+
+        function refreshIframe() {
+            const iframe = document.getElementById('content-frame');
+            const loader = document.getElementById('iframe-loader');
+            loader.classList.remove('pointer-events-none');
+            loader.classList.add('opacity-100');
+            iframe.src = iframe.src;
+        }
+
+        function openInNewTab() {
+            const lesson = lessons[currentIndex];
+            window.open(encodeURI(lesson.file), '_blank');
+        }
+
+        function toggleMobileDropdown() {
+            const menu = document.getElementById('mobile-menu');
+            menu.classList.toggle('hidden');
+        }
+    </script>
+</body>
+</html>

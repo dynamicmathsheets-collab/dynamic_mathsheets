@@ -1,0 +1,1074 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>เรื่องที่ 5: การกำจัดแบบเกาส์และการกำจัดแบบเกาส์–จอร์แดน</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Sarabun & Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- MathJax for rendering LaTeX -->
+    <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']],
+                displayMath: [['$$', '$$'], ['\\[', '\\]']]
+            },
+            svg: {
+                fontCache: 'global'
+            }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        body {
+            font-family: 'Sarabun', 'Inter', sans-serif;
+            background-color: #f8fafc;
+            color: #1e293b;
+        }
+        .math-font {
+            font-family: 'Inter', serif;
+        }
+        /* Augmented Matrix Bracket with Divider */
+        .augmented-bracket {
+            position: relative;
+            padding: 4px 12px;
+        }
+        .augmented-bracket::before, .augmented-bracket::after {
+            content: "";
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            width: 8px;
+            border-style: solid;
+            border-color: #334155;
+        }
+        .augmented-bracket::before {
+            left: 0;
+            border-width: 2px 0 2px 2px;
+            border-top-left-radius: 6px;
+            border-bottom-left-radius: 6px;
+        }
+        .augmented-bracket::after {
+            right: 0;
+            border-width: 2px 2px 2px 0;
+            border-top-right-radius: 6px;
+            border-bottom-right-radius: 6px;
+        }
+        input[type=number]::-webkit-inner-spin-button, 
+        input[type=number]::-webkit-outer-spin-button { 
+            -webkit-appearance: none; 
+            margin: 0; 
+        }
+        input[type=number] {
+            -moz-appearance: textfield;
+        }
+    </style>
+</head>
+<body class="min-h-screen">
+
+    <!-- Header Banner -->
+    <header class="bg-gradient-to-r from-slate-900 via-indigo-950 to-blue-950 text-white shadow-lg border-b border-indigo-800/40">
+        <div class="max-w-6xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <div class="flex flex-wrap items-center justify-between gap-4">
+                <div>
+                    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-indigo-500/30 text-indigo-200 border border-indigo-400/30 mb-2">
+                        <i class="fa-solid fa-graduation-cap"></i> บทเรียนที่ 5 • พีชคณิตเชิงเส้น (Linear Algebra)
+                    </span>
+                    <h1 class="text-2xl sm:text-3xl lg:text-4xl font-bold tracking-tight">
+                        เรื่องที่ 5: การกำจัดแบบเกาส์และการกำจัดแบบเกาส์–จอร์แดน
+                    </h1>
+                    <p class="text-indigo-200 mt-1 text-sm sm:text-base font-light">
+                        Gaussian vs Gauss–Jordan Elimination • การแก้ระบบสมการเชิงเส้นและการเปรียบเทียบประสิทธิภาพ
+                    </p>
+                </div>
+                <div class="hidden md:flex items-center gap-3 bg-white/10 backdrop-blur-sm px-4 py-2.5 rounded-xl border border-white/20 text-xs">
+                    <div class="w-10 h-10 rounded-lg bg-indigo-500/30 text-indigo-300 flex items-center justify-center font-bold text-lg">
+                        <i class="fa-solid fa-calculator"></i>
+                    </div>
+                    <div>
+                        <div class="font-semibold text-white">เครื่องมือคำนวณทีละขั้น</div>
+                        <div class="text-indigo-200">Interactive Dual-Method Solver</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content Container with standard width constraints -->
+    <main class="max-w-6xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 space-y-10">
+
+        <!-- 1. วัตถุประสงค์การเรียนรู้ -->
+        <section class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 sm:p-8 transition-all hover:shadow-md">
+            <div class="flex items-center gap-3 border-b border-slate-100 pb-4 mb-5">
+                <div class="w-10 h-10 rounded-xl bg-indigo-50 flex items-center justify-center text-indigo-600 font-bold text-lg">
+                    <i class="fa-solid fa-bullseye"></i>
+                </div>
+                <div>
+                    <h2 class="text-xl sm:text-2xl font-bold text-slate-900">1. วัตถุประสงค์การเรียนรู้</h2>
+                    <p class="text-xs sm:text-sm text-slate-500">ผลการเรียนรู้ที่คาดหวังประจำบทเรียน</p>
+                </div>
+            </div>
+            
+            <div class="bg-gradient-to-r from-indigo-50/90 to-blue-50/60 border-l-4 border-indigo-600 rounded-r-xl p-5">
+                <p class="text-slate-800 leading-relaxed font-semibold mb-3">
+                    เมื่อสิ้นสุดบทเรียนนี้นักศึกษาสามารถ:
+                </p>
+                <ul class="space-y-3 text-slate-700 text-sm sm:text-base">
+                    <li class="flex items-start gap-3">
+                        <span class="w-6 h-6 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center text-xs font-bold mt-0.5 flex-shrink-0">
+                            <i class="fa-solid fa-check"></i>
+                        </span>
+                        <span><strong>ใช้การกำจัดแบบเกาส์ (Gaussian Elimination) และเกาส์–จอร์แดน (Gauss–Jordan Elimination)</strong> เพื่อแปลงเมทริกซ์และแก้ระบบสมการเชิงเส้นได้อย่างถูกต้องแม่นยำ</span>
+                    </li>
+                    <li class="flex items-start gap-3">
+                        <span class="w-6 h-6 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center text-xs font-bold mt-0.5 flex-shrink-0">
+                            <i class="fa-solid fa-check"></i>
+                        </span>
+                        <span><strong>อธิบายความแตกต่างเชิงขั้นตอนและโครงสร้าง</strong> ระหว่างการแปลงสู่รูปขั้นบันได (REF + Back Substitution) และรูปขั้นบันไดลดรูป (RREF)</span>
+                    </li>
+                    <li class="flex items-start gap-3">
+                        <span class="w-6 h-6 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center text-xs font-bold mt-0.5 flex-shrink-0">
+                            <i class="fa-solid fa-check"></i>
+                        </span>
+                        <span><strong>เลือกใช้วิธีการที่เหมาะสมกับปัญหาและเงื่อนไขการคำนวณ</strong> ทั้งในแง่การคำนวณด้วยมือและประสิทธิภาพการประมวลผลด้วยคอมพิวเตอร์ (Computational Complexity)</span>
+                    </li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- 2. เนื้อหาหลัก -->
+        <section class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 sm:p-8 space-y-7">
+            <div class="flex items-center gap-3 border-b border-slate-100 pb-4">
+                <div class="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center text-blue-600 font-bold text-lg">
+                    <i class="fa-solid fa-book-open-reader"></i>
+                </div>
+                <div>
+                    <h2 class="text-xl sm:text-2xl font-bold text-slate-900">2. เนื้อหาหลัก (Core Content)</h2>
+                    <p class="text-xs sm:text-sm text-slate-500">ทฤษฎีเปรียบเทียบ ขั้นตอนการดำเนินการ และตัวอย่างเมทริกซ์เสริม</p>
+                </div>
+            </div>
+
+            <!-- Two Methods Overview Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Method 1: Gaussian -->
+                <div class="p-5 sm:p-6 rounded-xl border border-blue-200 bg-blue-50/40 hover:bg-blue-50/70 transition space-y-3">
+                    <div class="flex items-center justify-between">
+                        <span class="px-2.5 py-1 rounded text-xs font-bold bg-blue-100 text-blue-800 uppercase tracking-wider">วิธีที่ 1</span>
+                        <i class="fa-solid fa-arrow-down-short-wide text-blue-500 text-lg"></i>
+                    </div>
+                    <h3 class="text-lg font-bold text-slate-900">การกำจัดแบบเกาส์ (Gaussian Elimination)</h3>
+                    <p class="text-sm text-slate-600 leading-relaxed">
+                        มุ่งเน้นการแปลงเมทริกซ์แต่งเติมให้อยู่ใน <strong>รูปขั้นบันได (Row Echelon Form: REF)</strong> โดยกำจัดเฉพาะสมาชิกที่อยู่ <em>ใต้ตำแหน่งนำ</em> ให้กลายเป็นศูนย์ จากนั้นนำระบบสมการที่ได้มาหาผลเฉลยด้วย <strong>การแทนค่าย้อนกลับ (Back Substitution)</strong>
+                    </p>
+                    <div class="bg-white p-3 rounded-lg border border-blue-100 text-xs text-blue-950 font-medium">
+                        <i class="fa-solid fa-stairs text-blue-600 mr-1.5"></i> ผลลัพธ์เมทริกซ์: เมทริกซ์สามเหลี่ยมบน (Upper Triangular / REF)
+                    </div>
+                </div>
+
+                <!-- Method 2: Gauss-Jordan -->
+                <div class="p-5 sm:p-6 rounded-xl border border-indigo-200 bg-indigo-50/40 hover:bg-indigo-50/70 transition space-y-3">
+                    <div class="flex items-center justify-between">
+                        <span class="px-2.5 py-1 rounded text-xs font-bold bg-indigo-100 text-indigo-800 uppercase tracking-wider">วิธีที่ 2</span>
+                        <i class="fa-solid fa-arrows-up-down text-indigo-500 text-lg"></i>
+                    </div>
+                    <h3 class="text-lg font-bold text-slate-900">การกำจัดแบบเกาส์–จอร์แดน (Gauss–Jordan Elimination)</h3>
+                    <p class="text-sm text-slate-600 leading-relaxed">
+                        เป็นการดำเนินการต่อยอดจากการกำจัดแบบเกาส์ โดยทำสเกลาร์ให้ตำแหน่งนำเป็น 1 และกำจัดสมาชิก <em>ทั้งด้านบนและด้านล่างตำแหน่งนำ</em> ให้เป็นศูนย์ทั้งหมด จนได้ <strong>รูปขั้นบันไดลดรูป (RREF)</strong> ทำให้สามารถ <strong>อ่านค่าคำตอบของตัวแปรหลักได้โดยตรง</strong> จากเมทริกซ์
+                    </p>
+                    <div class="bg-white p-3 rounded-lg border border-indigo-100 text-xs text-indigo-950 font-medium">
+                        <i class="fa-solid fa-gem text-indigo-600 mr-1.5"></i> ผลลัพธ์เมทริกซ์: รูปขั้นบันไดลดรูปเอกลักษณ์ (RREF)
+                    </div>
+                </div>
+            </div>
+
+            <!-- Walkthrough Example Section from Prompt -->
+            <div class="bg-slate-50 rounded-xl p-5 sm:p-6 border border-slate-200 space-y-4">
+                <h3 class="font-bold text-slate-900 text-base sm:text-lg flex items-center gap-2">
+                    <span class="w-6 h-6 rounded-full bg-indigo-600 text-white flex items-center justify-center text-xs font-bold">Ex</span>
+                    ตัวอย่างการคำนวณเปรียบเทียบ: ระบบสมการ $x + 2y = 5$ และ $2x + y = 4$
+                </h3>
+
+                <p class="text-sm text-slate-600">
+                    เขียนระบบสมการในรูปเมทริกซ์แต่งเติม (Augmented Matrix) เริ่มต้น:
+                </p>
+
+                <div class="text-center py-2">
+                    <span class="text-lg font-bold">
+                        $$\left[\begin{array}{cc|c} 1 & 2 & 5 \\ 2 & 1 & 4 \end{array}\right]$$
+                    </span>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 pt-2">
+                    <!-- Gaussian Pathway -->
+                    <div class="bg-white p-4 rounded-xl border border-blue-200 space-y-3">
+                        <div class="flex items-center gap-2 text-blue-700 font-bold text-sm">
+                            <span class="w-5 h-5 rounded-full bg-blue-100 flex items-center justify-center text-xs">G</span>
+                            เส้นทางการกำจัดแบบเกาส์ (สู่ REF)
+                        </div>
+                        <div class="text-xs text-slate-600">
+                            กำจัดสมาชิกใต้ตำแหน่งนำแถวที่ 1 ด้วย $R_2 \leftarrow R_2 - 2R_1$:
+                        </div>
+                        <div class="text-center font-semibold text-slate-800">
+                            $$\left[\begin{array}{cc|c} 1 & 2 & 5 \\ 0 & -3 & -6 \end{array}\right]$$
+                        </div>
+                        <div class="bg-blue-50 p-3 rounded-lg text-xs text-blue-900 space-y-1">
+                            <div class="font-bold">การแทนค่าย้อนกลับ (Back Substitution):</div>
+                            <div>• จากแถว 2: $-3y = -6 \implies \mathbf{y = 2}$</div>
+                            <div>• แทน $y=2$ ในแถว 1: $x + 2(2) = 5 \implies \mathbf{x = 1}$</div>
+                        </div>
+                    </div>
+
+                    <!-- Gauss-Jordan Pathway -->
+                    <div class="bg-white p-4 rounded-xl border border-indigo-200 space-y-3">
+                        <div class="flex items-center gap-2 text-indigo-700 font-bold text-sm">
+                            <span class="w-5 h-5 rounded-full bg-indigo-100 flex items-center justify-center text-xs">GJ</span>
+                            เส้นทางเกาส์–จอร์แดน (ดำเนินการต่อจนถึง RREF)
+                        </div>
+                        <div class="text-xs text-slate-600">
+                            ทำตำแหน่งนำเป็น 1 ด้วย $R_2 \leftarrow -\frac{1}{3}R_2$ จากนั้นกำจัดด้านบนด้วย $R_1 \leftarrow R_1 - 2R_2$:
+                        </div>
+                        <div class="text-center font-semibold text-slate-800">
+                            $$\left[\begin{array}{cc|c} 1 & 0 & 1 \\ 0 & 1 & 2 \end{array}\right]$$
+                        </div>
+                        <div class="bg-indigo-50 p-3 rounded-lg text-xs text-indigo-900 space-y-1">
+                            <div class="font-bold">อ่านคำตอบได้โดยตรงทันที (Direct Readout):</div>
+                            <div>• แถวที่ 1 สมนัยกับ: $1x + 0y = 1 \implies \mathbf{x = 1}$</div>
+                            <div>• แถวที่ 2 สมนัยกับ: $0x + 1y = 2 \implies \mathbf{y = 2}$</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Comparative Summary Table -->
+            <div class="overflow-x-auto border border-slate-200 rounded-xl">
+                <table class="w-full text-left text-xs sm:text-sm border-collapse">
+                    <thead>
+                        <tr class="bg-slate-100 text-slate-700 font-bold border-b border-slate-200">
+                            <th class="p-3 sm:p-4">เกณฑ์การเปรียบเทียบ</th>
+                            <th class="p-3 sm:p-4 text-blue-700 bg-blue-50/50">การกำจัดแบบเกาส์ (Gaussian)</th>
+                            <th class="p-3 sm:p-4 text-indigo-700 bg-indigo-50/50">การกำจัดแบบเกาส์–จอร์แดน (Gauss–Jordan)</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-200 text-slate-700">
+                        <tr>
+                            <td class="p-3 sm:p-4 font-semibold">1. รูปแบบเป้าหมาย</td>
+                            <td class="p-3 sm:p-4">รูปขั้นบันได (Row Echelon Form: REF)</td>
+                            <td class="p-3 sm:p-4">รูปขั้นบันไดลดรูป (Reduced REF: RREF)</td>
+                        </tr>
+                        <tr>
+                            <td class="p-3 sm:p-4 font-semibold">2. ขอบเขตการกำจัดสมาชิก</td>
+                            <td class="p-3 sm:p-4">กำจัดเฉพาะสมาชิก <em>ใต้ตำแหน่งนำ</em> ให้เป็นศูนย์</td>
+                            <td class="p-3 sm:p-4">กำจัดสมาชิก <em>ทั้งด้านบนและด้านล่าง</em> ของตำแหน่งนำ</td>
+                        </tr>
+                        <tr>
+                            <td class="p-3 sm:p-4 font-semibold">3. วิธีการหาคำตอบสุดท้าย</td>
+                            <td class="p-3 sm:p-4">ต้องใช้การแทนค่าย้อนกลับ (Back Substitution)</td>
+                            <td class="p-3 sm:p-4">อ่านค่าคำตอบของตัวแปรหลักได้จากคอลัมน์ขวาสุดทันที</td>
+                        </tr>
+                        <tr>
+                            <td class="p-3 sm:p-4 font-semibold">4. ปริมาณการคำนวณ (Flops)</td>
+                            <td class="p-3 sm:p-4 font-medium text-emerald-700">ประมาณ $\sim \frac{2}{3}n^3$ flops (คำนวณเร็วกว่า มีประสิทธิภาพสูงกว่า)</td>
+                            <td class="p-3 sm:p-4 font-medium text-slate-600">ประมาณ $\sim n^3$ flops (มีขั้นตอนมากกว่าราว 50%)</td>
+                        </tr>
+                        <tr>
+                            <td class="p-3 sm:p-4 font-semibold">5. ความเหมาะสมในการใช้งาน</td>
+                            <td class="p-3 sm:p-4">เหมาะสำหรับการ <strong>แก้ระบบสมการเชิงเส้น</strong> ที่มีขนาดใหญ่</td>
+                            <td class="p-3 sm:p-4">เหมาะสำหรับการ <strong>หาเมทริกซ์ผกผัน $[A|I] \to [I|A^{-1}]$</strong> และหารูปมาตรฐาน RREF</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- 3. แบบจำลองโต้ตอบ (Interactive Model) -->
+        <section class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 sm:p-8 space-y-6">
+            <div class="flex flex-wrap items-center justify-between gap-4 border-b border-slate-100 pb-4">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-xl bg-purple-50 flex items-center justify-center text-purple-600 font-bold text-lg">
+                        <i class="fa-solid fa-sliders"></i>
+                    </div>
+                    <div>
+                        <h2 class="text-xl sm:text-2xl font-bold text-slate-900">3. แบบจำลองโต้ตอบ: เปรียบเทียบขั้นตอนเกาส์และเกาส์–จอร์แดน</h2>
+                        <p class="text-xs sm:text-sm text-slate-500">เลือกโจทย์ สลับวิธีการ และคลิกดูขั้นตอนการดำเนินการตามแถวทีละสเต็ป</p>
+                    </div>
+                </div>
+
+                <!-- Preset Selection -->
+                <div class="flex items-center gap-2 bg-slate-100 p-1.5 rounded-xl text-xs">
+                    <span class="text-slate-600 font-medium px-2">ชุดข้อมูล:</span>
+                    <button id="btn-pre-2x2" onclick="setPreset('2x2')" class="px-2.5 py-1.5 rounded-lg bg-white font-bold text-slate-800 shadow-xs">ตัวอย่าง 2×2 (จากโจทย์)</button>
+                    <button id="btn-pre-3x3" onclick="setPreset('3x3')" class="px-2.5 py-1.5 rounded-lg text-slate-600 hover:text-slate-900">ระบบสมการ 3×3</button>
+                    <button id="btn-pre-custom" onclick="setPreset('custom')" class="px-2.5 py-1.5 rounded-lg text-slate-600 hover:text-slate-900">กำหนดค่าเอง</button>
+                </div>
+            </div>
+
+            <!-- Configuration and Method Selector Bar -->
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-center">
+                
+                <!-- Left: Method Toggle Buttons -->
+                <div class="lg:col-span-7 space-y-3">
+                    <label class="text-xs font-bold text-slate-600 uppercase tracking-wider block">
+                        <i class="fa-solid fa-code-branch text-indigo-600 mr-1"></i> เลือกวิธีการคำนวณ:
+                    </label>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <button id="btn-method-gauss" onclick="switchMethod('gauss')" class="py-3 px-4 rounded-xl border-2 border-blue-600 bg-blue-50 text-blue-900 font-bold text-xs sm:text-sm flex items-center justify-between transition shadow-xs">
+                            <span class="flex items-center gap-2">
+                                <i class="fa-solid fa-arrow-down-short-wide text-blue-600"></i> วิธีเกาส์ (REF + Back-Sub)
+                            </span>
+                            <span id="badge-gauss-steps" class="text-[11px] px-2 py-0.5 rounded-full bg-blue-200 text-blue-800">1 ขั้น</span>
+                        </button>
+                        
+                        <button id="btn-method-gj" onclick="switchMethod('gauss-jordan')" class="py-3 px-4 rounded-xl border-2 border-transparent bg-slate-100 text-slate-600 hover:bg-slate-200 font-semibold text-xs sm:text-sm flex items-center justify-between transition">
+                            <span class="flex items-center gap-2">
+                                <i class="fa-solid fa-arrows-up-down text-slate-500"></i> เกาส์–จอร์แดน (RREF)
+                            </span>
+                            <span id="badge-gj-steps" class="text-[11px] px-2 py-0.5 rounded-full bg-slate-200 text-slate-700">3 ขั้น</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Right: Step Progress & Summary Stat -->
+                <div class="lg:col-span-5 bg-slate-50 p-4 rounded-xl border border-slate-200 flex items-center justify-between">
+                    <div>
+                        <span class="text-xs font-semibold text-slate-500 block">ขั้นตอนปัจจุบัน:</span>
+                        <div class="text-lg font-bold text-slate-800" id="step-number-text">ขั้นที่ 0 / 1</div>
+                    </div>
+                    <div class="text-right">
+                        <span class="text-xs font-semibold text-slate-500 block">การเปรียบเทียบจำนวนขั้นตอน:</span>
+                        <div class="text-xs font-bold text-indigo-700" id="step-comparison-summary">เกาส์ 1 ขั้น vs เกาส์-จอร์แดน 3 ขั้น</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Custom Input Matrix Form (Hidden by default unless selected) -->
+            <div id="custom-matrix-panel" class="hidden p-4 bg-slate-50 rounded-xl border border-indigo-200 space-y-3">
+                <div class="flex items-center justify-between">
+                    <span class="text-xs font-bold text-slate-700">กำหนดสมาชิกเมทริกซ์แต่งเติม $[A|b]$:</span>
+                    <button onclick="calculateCustomSolver()" class="px-3 py-1 bg-indigo-600 hover:bg-indigo-700 text-white rounded text-xs font-semibold">
+                        ประมวลผลระบบสมการนี้
+                    </button>
+                </div>
+                <div id="custom-inputs-wrapper" class="flex justify-center p-2">
+                    <!-- generated dynamically -->
+                </div>
+            </div>
+
+            <!-- Step Visualizer Display Canvas -->
+            <div class="bg-gradient-to-br from-slate-900 to-indigo-950 text-white rounded-2xl p-6 sm:p-7 shadow-md space-y-6">
+                
+                <!-- Action / Operation Status Bar -->
+                <div class="flex flex-wrap items-center justify-between gap-3 border-b border-slate-800 pb-4">
+                    <div class="flex items-center gap-2.5">
+                        <span class="w-3 h-3 rounded-full bg-emerald-400 animate-pulse"></span>
+                        <span class="text-xs uppercase tracking-wider text-slate-400 font-semibold">การดำเนินการขั้นมูลฐานตามแถว:</span>
+                        <span id="current-ero-badge" class="px-3 py-1 rounded-lg bg-indigo-900 text-indigo-200 border border-indigo-700 text-xs sm:text-sm font-mono font-bold">
+                            เริ่มต้นเมทริกซ์
+                        </span>
+                    </div>
+                    <div id="status-phase-tag" class="px-3 py-0.5 rounded-full text-xs font-semibold bg-blue-500/20 text-blue-300 border border-blue-400/30">
+                        สถานะ: เมทริกซ์แต่งเติมเริ่มต้น
+                    </div>
+                </div>
+
+                <!-- Matrix Centered View -->
+                <div class="py-4 flex flex-col items-center justify-center">
+                    <div id="step-matrix-container" class="text-xl sm:text-2xl font-mono text-slate-100 flex items-center justify-center p-4 bg-slate-800/80 rounded-2xl border border-slate-700 shadow-inner">
+                        <!-- Rendered Augmented Matrix -->
+                    </div>
+                    
+                    <p id="step-explanation-text" class="text-xs sm:text-sm text-slate-300 mt-4 text-center max-w-xl leading-relaxed">
+                        เมทริกซ์เสริมเริ่มต้น $[A|b]$ แสดงระบบสมการเชิงเส้น
+                    </p>
+                </div>
+
+                <!-- Back Substitution Calculation Card (Visible only when Gaussian reaches REF) -->
+                <div id="back-sub-card" class="hidden p-4 rounded-xl bg-blue-950/70 border border-blue-800 text-xs sm:text-sm text-blue-100 space-y-2">
+                    <div class="flex items-center gap-2 font-bold text-blue-300">
+                        <i class="fa-solid fa-arrow-turn-up text-blue-400"></i> กระบวนการแทนค่าย้อนกลับ (Back Substitution):
+                    </div>
+                    <div id="back-sub-steps-content" class="space-y-1.5 pl-3 border-l-2 border-blue-600 font-mono text-xs">
+                        <!-- Dynamic lines of back sub -->
+                    </div>
+                </div>
+
+                <!-- Final Solution Display Card (When completed) -->
+                <div id="final-solution-banner" class="hidden p-4 rounded-xl bg-emerald-950/60 border border-emerald-800 text-emerald-200 flex items-center justify-between">
+                    <div class="flex items-center gap-2.5">
+                        <i class="fa-solid fa-circle-check text-emerald-400 text-lg"></i>
+                        <div>
+                            <div class="font-bold text-xs sm:text-sm text-white">ผลเฉลยของระบบสมการ (Solution):</div>
+                            <div id="solution-variables-text" class="text-xs text-emerald-300 font-mono mt-0.5">x = 1, y = 2</div>
+                        </div>
+                    </div>
+                    <span class="text-xs px-2.5 py-1 rounded bg-emerald-900/90 text-emerald-200 border border-emerald-700">สำเร็จสมบูรณ์</span>
+                </div>
+
+                <!-- Step Navigation Controls -->
+                <div class="flex flex-wrap items-center justify-between gap-3 pt-3 border-t border-slate-800/80">
+                    <div class="flex items-center gap-2">
+                        <button id="btn-prev-step" onclick="prevStep()" disabled class="px-4 py-2 bg-slate-800 hover:bg-slate-700 disabled:opacity-40 disabled:cursor-not-allowed text-white text-xs sm:text-sm font-semibold rounded-xl border border-slate-700 transition flex items-center gap-2">
+                            <i class="fa-solid fa-backward-step"></i> ขั้นก่อนหน้า
+                        </button>
+                        <button id="btn-next-step" onclick="nextStep()" class="px-5 py-2 bg-indigo-600 hover:bg-indigo-500 active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed text-white text-xs sm:text-sm font-semibold rounded-xl shadow-md transition flex items-center gap-2">
+                            ขั้นถัดไป <i class="fa-solid fa-forward-step"></i>
+                        </button>
+                    </div>
+
+                    <div class="flex items-center gap-2">
+                        <button onclick="jumpToFinal()" class="px-3.5 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white text-xs font-semibold rounded-xl border border-slate-700 transition flex items-center gap-1.5">
+                            <i class="fa-solid fa-forward-fast"></i> ข้ามไปขั้นตอนสุดท้าย
+                        </button>
+                        <button onclick="resetStepViewer()" class="px-3.5 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white text-xs font-semibold rounded-xl border border-slate-700 transition flex items-center gap-1.5" title="รีเซ็ต">
+                            <i class="fa-solid fa-rotate-left"></i> รีเซ็ต
+                        </button>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- 4. คำถามนำเพื่อค้นพบ (Guided Discovery Questions) -->
+        <section class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 sm:p-8">
+            <div class="flex items-center gap-3 border-b border-slate-100 pb-4 mb-6">
+                <div class="w-10 h-10 rounded-xl bg-amber-50 flex items-center justify-center text-amber-600 font-bold text-lg">
+                    <i class="fa-solid fa-compass"></i>
+                </div>
+                <div>
+                    <h2 class="text-xl sm:text-2xl font-bold text-slate-900">4. คำถามนำเพื่อค้นพบ (Guided Discovery Questions)</h2>
+                    <p class="text-xs sm:text-sm text-slate-500">คิดใคร่ครวญเพื่อสร้างความเข้าใจที่ลึกซึ้ง แล้วคลิกเพื่อตรวจสอบแนวคิด</p>
+                </div>
+            </div>
+
+            <div class="space-y-4">
+                
+                <!-- Question 1 -->
+                <div class="border border-slate-200 rounded-xl overflow-hidden transition-all">
+                    <button onclick="toggleAccordion('disc-1')" class="w-full flex items-center justify-between p-4 sm:p-5 text-left bg-slate-50/70 hover:bg-slate-100/70 transition">
+                        <span class="font-bold text-slate-800 text-sm sm:text-base flex items-center gap-3">
+                            <span class="w-7 h-7 rounded-full bg-amber-100 text-amber-800 text-xs flex items-center justify-center font-bold flex-shrink-0">1</span>
+                            ทั้งสองวิธีใช้การดำเนินการขั้นมูลฐาน (EROs) ชนิดใดบ้าง?
+                        </span>
+                        <i id="icon-disc-1" class="fa-solid fa-chevron-down text-slate-400 text-sm transition-transform duration-200"></i>
+                    </button>
+                    <div id="disc-1" class="hidden p-5 bg-white border-t border-slate-200 text-sm text-slate-700 leading-relaxed space-y-3">
+                        <p class="font-semibold text-slate-900">
+                            ทั้งการกำจัดแบบเกาส์และการกำจัดแบบเกาส์–จอร์แดน ใช้การดำเนินการขั้นมูลฐานตามแถวทั้ง 3 ชนิดเหมือนกัน ได้แก่:
+                        </p>
+                        <ul class="list-disc list-inside space-y-1.5 text-slate-600 pl-2">
+                            <li><strong>การสลับแถว ($R_i \leftrightarrow R_j$):</strong> ใช้เมื่อตำแหน่งไพวอต (Pivot) ของแถวปัจจุบันมีค่าเป็น 0 เพื่อนำแถวที่มีสมาชิกไม่เป็นศูนย์ขึ้นมาแทนที่ (Partial Pivoting)</li>
+                            <li><strong>การคูณแถวด้วยสเกลาร์ที่ไม่เป็นศูนย์ ($R_i \leftarrow cR_i$):</strong> นิยมใช้อย่างยิ่งในเกาส์–จอร์แดน เพื่อปรับให้ตำแหน่งนำกลายเป็น $1$ (Leading 1)</li>
+                            <li><strong>การบวกพหุคูณของแถว ($R_i \leftarrow R_i + cR_j$):</strong> ใช้ในการกำจัดสมาชิกอื่นให้กลายเป็นศูนย์ (เกาส์กำจัดเฉพาะด้านล่าง ส่วนเกาส์–จอร์แดนกำจัดทั้งด้านบนและล่าง)</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Question 2 -->
+                <div class="border border-slate-200 rounded-xl overflow-hidden transition-all">
+                    <button onclick="toggleAccordion('disc-2')" class="w-full flex items-center justify-between p-4 sm:p-5 text-left bg-slate-50/70 hover:bg-slate-100/70 transition">
+                        <span class="font-bold text-slate-800 text-sm sm:text-base flex items-center gap-3">
+                            <span class="w-7 h-7 rounded-full bg-amber-100 text-amber-800 text-xs flex items-center justify-center font-bold flex-shrink-0">2</span>
+                            เหตุใดวิธีเกาส์จึงต้องอาศัยการแทนค่าย้อนกลับในบางกรณี?
+                        </span>
+                        <i id="icon-disc-2" class="fa-solid fa-chevron-down text-slate-400 text-sm transition-transform duration-200"></i>
+                    </button>
+                    <div id="disc-2" class="hidden p-5 bg-white border-t border-slate-200 text-sm text-slate-700 leading-relaxed space-y-2">
+                        <p class="font-semibold text-slate-900">เหตุผลทางโครงสร้างพีชคณิต:</p>
+                        <p>
+                            เนื่องจากการกำจัดแบบเกาส์หยุดการดำเนินการตามแถวเมื่อเมทริกซ์ถึง <strong>รูปขั้นบันได (REF)</strong> เท่านั้น ซึ่งทำให้สมาชิกที่อยู่ <em>เหนือตำแหน่งนำ</em> ยังคงมีค่าอยู่ (ยังไม่ถูกกำจัดเป็นศูนย์) ส่งผลให้สมการในแถวบนยังคงติดตัวแปรของแถวล่างอยู่
+                        </p>
+                        <p class="text-slate-600">
+                            ดังนั้น เมื่อแถวล่างสุดสามารถแก้หาตัวแปรตัวสุดท้ายได้ก่อน เราจึงจำเป็นต้อง <strong>แทนค่าย้อนกลับ (Back Substitution)</strong> ขึ้นไปในสมการแถวบนทีละขั้นเพื่อปลดตัวแปรออกตามลำดับ
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Question 3 -->
+                <div class="border border-slate-200 rounded-xl overflow-hidden transition-all">
+                    <button onclick="toggleAccordion('disc-3')" class="w-full flex items-center justify-between p-4 sm:p-5 text-left bg-slate-50/70 hover:bg-slate-100/70 transition">
+                        <span class="font-bold text-slate-800 text-sm sm:text-base flex items-center gap-3">
+                            <span class="w-7 h-7 rounded-full bg-amber-100 text-amber-800 text-xs flex items-center justify-center font-bold flex-shrink-0">3</span>
+                            วิธีใดเหมาะกับการหาคำตอบ และวิธีใดเหมาะกับการหารูปขั้นบันไดลดรูปของเมทริกซ์?
+                        </span>
+                        <i id="icon-disc-3" class="fa-solid fa-chevron-down text-slate-400 text-sm transition-transform duration-200"></i>
+                    </button>
+                    <div id="disc-3" class="hidden p-5 bg-white border-t border-slate-200 text-sm text-slate-700 leading-relaxed space-y-3">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-3 pt-1">
+                            <div class="p-3 bg-blue-50/80 rounded-lg border border-blue-200">
+                                <strong class="text-blue-900 block mb-1">การหาผลเฉลยของระบบสมการ ($Ax = b$):</strong>
+                                <span class="text-slate-700"><strong>การกำจัดแบบเกาส์ + แทนค่าย้อนกลับ เหมาะสมที่สุด</strong> เพราะใช้จำนวนขั้นตอนการคำนวณ (Floating-point Operations หรือ Flops) น้อยกว่าราว $\sim 50\%$ ช่วยประหยัดเวลาและลดการสะสมความคลาดเคลื่อนจากการปัดเศษในคอมพิวเตอร์</span>
+                            </div>
+                            <div class="p-3 bg-indigo-50/80 rounded-lg border border-indigo-200">
+                                <strong class="text-indigo-900 block mb-1">การหารูป RREF และเมทริกซ์ผกผัน ($A^{-1}$):</strong>
+                                <span class="text-slate-700"><strong>การกำจัดแบบเกาส์–จอร์แดน เหมาะสมที่สุด</strong> เพราะเป็นกระบวนการที่กำจัดสมาชิกจนเหลือเฉพาะเมทริกซ์เอกลักษณ์ $I$ ด้านซ้าย ทำให้ได้รูปมาตรฐานสากล RREF และได้เมทริกซ์ผกผัน $A^{-1}$ ปรากฏในคอลัมน์ด้านขวาโดยอัตโนมัติ</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- 5. แบบฝึกหัดสำหรับนักศึกษา -->
+        <section class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 sm:p-8">
+            <div class="flex items-center gap-3 border-b border-slate-100 pb-4 mb-6">
+                <div class="w-10 h-10 rounded-xl bg-teal-50 flex items-center justify-center text-teal-600 font-bold text-lg">
+                    <i class="fa-solid fa-pen-ruler"></i>
+                </div>
+                <div>
+                    <h2 class="text-xl sm:text-2xl font-bold text-slate-900">5. แบบฝึกหัดสำหรับนักศึกษา (Exercises & Analysis)</h2>
+                    <p class="text-xs sm:text-sm text-slate-500">ฝึกฝนทักษะการคำนวณและวิเคราะห์ข้อดีข้อจำกัดของแต่ละวิธี</p>
+                </div>
+            </div>
+
+            <div class="space-y-6">
+                
+                <!-- Exercise 1 -->
+                <div class="p-5 sm:p-6 rounded-xl border border-slate-200 bg-slate-50/50">
+                    <span class="text-xs font-bold text-teal-800 bg-teal-100 px-2.5 py-1 rounded">ข้อที่ 1</span>
+                    <h3 class="font-bold text-slate-900 mt-2 text-base sm:text-lg">
+                        แก้ระบบสมการขนาด $3 \times 3$ ด้วยทั้งสองวิธี
+                    </h3>
+                    <p class="text-slate-700 text-sm mt-1">
+                        จงหาผลเฉลยของระบบสมการเชิงเส้นต่อไปนี้ โดยแสดงทั้งวิธีของเกาส์และเกาส์–จอร์แดน:
+                    </p>
+                    <div class="p-3 bg-white rounded-lg border border-slate-200 font-mono text-xs sm:text-sm my-2 text-center text-slate-800">
+                        $$\begin{aligned}
+                        x + 2y - z &= 2 \\
+                        2x + 5y + z &= 7 \\
+                        -x - y + 4z &= 3
+                        \end{aligned}$$
+                    </div>
+
+                    <div class="mt-4 pt-3 border-t border-slate-200">
+                        <button onclick="toggleExercise('ans-ex-1')" class="text-xs sm:text-sm font-semibold text-indigo-600 hover:text-indigo-800 flex items-center gap-1.5 transition">
+                            <i class="fa-regular fa-eye"></i> <span id="label-ans-ex-1">ดูเฉลยละเอียดทั้งสองวิธี</span>
+                        </button>
+                        <div id="ans-ex-1" class="hidden mt-3 p-4 bg-white rounded-lg border border-indigo-100 text-sm space-y-4 text-slate-700">
+                            <div>
+                                <span class="font-bold text-blue-800">1. วิธีการกำจัดแบบเกาส์ (สู่ REF):</span>
+                                <div class="text-xs sm:text-sm space-y-1.5 mt-1 pl-2">
+                                    <div>• เขียนเมทริกซ์แต่งเติม: $\left[\begin{array}{ccc|c} 1 & 2 & -1 & 2 \\ 2 & 5 & 1 & 7 \\ -1 & -1 & 4 & 3 \end{array}\right]$</div>
+                                    <div>• กำจัดสดมภ์ที่ 1: $R_2 \leftarrow R_2 - 2R_1$ และ $R_3 \leftarrow R_3 + R_1$ ได้ $\left[\begin{array}{ccc|c} 1 & 2 & -1 & 2 \\ 0 & 1 & 3 & 3 \\ 0 & 1 & 3 & 5 \end{array}\right]$</div>
+                                    <div>• กำจัดสดมภ์ที่ 2: $R_3 \leftarrow R_3 - R_2$ ได้ $\left[\begin{array}{ccc|c} 1 & 2 & -1 & 2 \\ 0 & 1 & 3 & 3 \\ 0 & 0 & 0 & 2 \end{array}\right]$</div>
+                                    <div class="text-rose-700 font-semibold">• วิเคราะห์แถว 3: แถวสุดท้ายสมนัยกับ $0x + 0y + 0z = 2$ ซึ่งเป็น $0 = 2$ (ข้อความเท็จ / ขัดแย้ง)</div>
+                                    <div class="text-emerald-800 font-bold">• สรุป: ระบบสมการนี้ <strong>ไม่มีผลเฉลย (Inconsistent / No Solution)</strong></div>
+                                </div>
+                            </div>
+
+                            <div class="border-t border-slate-100 pt-3">
+                                <span class="font-bold text-indigo-800">2. วิธีการกำจัดแบบเกาส์–จอร์แดน:</span>
+                                <p class="text-xs sm:text-sm text-slate-600 mt-1 pl-2">
+                                    เมื่อดำเนินการมาถึงแถว $[0 \ 0 \ 0 \ | \ 2]$ ก็จะพบข้อขัดแย้ง $0=2$ ทันที จึงยุติการคำนวณและสรุปได้ผลลัพธ์เดียวกันว่าไม่มีผลเฉลย
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Exercise 2 -->
+                <div class="p-5 sm:p-6 rounded-xl border border-slate-200 bg-slate-50/50">
+                    <span class="text-xs font-bold text-teal-800 bg-teal-100 px-2.5 py-1 rounded">ข้อที่ 2</span>
+                    <h3 class="font-bold text-slate-900 mt-2 text-base sm:text-lg">
+                        เปรียบเทียบขั้นตอนและอธิบายข้อดีของแต่ละวิธี
+                    </h3>
+                    <p class="text-slate-700 text-sm mt-1">
+                        วิเคราะห์ในแง่ของจำนวนการดำเนินการทางคณิตศาสตร์ (Operation Count) และความเหมาะสมในการเขียนโปรแกรมคอมพิวเตอร์
+                    </p>
+
+                    <div class="mt-4 pt-3 border-t border-slate-200">
+                        <button onclick="toggleExercise('ans-ex-2')" class="text-xs sm:text-sm font-semibold text-indigo-600 hover:text-indigo-800 flex items-center gap-1.5 transition">
+                            <i class="fa-regular fa-eye"></i> <span id="label-ans-ex-2">ดูบทเปรียบเทียบเชิงลึก</span>
+                        </button>
+                        <div id="ans-ex-2" class="hidden mt-3 p-4 bg-white rounded-lg border border-indigo-100 text-sm space-y-3 text-slate-700">
+                            <p class="font-semibold text-slate-900">การวิเคราะห์ทางวิทยาการคำนวณ (Computational Complexity):</p>
+                            <ul class="list-disc list-inside space-y-2 text-xs sm:text-sm pl-2">
+                                <li>
+                                    <strong>การกำจัดแบบเกาส์ (Gaussian):</strong> ใช้การดำเนินการคูณ/หารและบวก/ลบ รวมประมาณ $\frac{2}{3}n^3 + 2n^2$ ครั้งสำหรับการแก้ระบบสมการขนาด $n \times n$ ถือเป็นวิธีมาตรฐานในซอฟต์แวร์ทางวิทยาศาสตร์ (เช่น LAPACK, NumPy) เพราะประหยัดรอบสัญญาณนาฬิกาของซีพียูได้มากกว่า
+                                </li>
+                                <li>
+                                    <strong>การกำจัดแบบเกาส์–จอร์แดน (Gauss–Jordan):</strong> ต้องกำจัดสมาชิกทั้งแถวบนและล่าง ทำให้ต้องใช้การดำเนินการประมาณ $n^3$ ครั้ง ซึ่งมากกว่าการกำจัดแบบเกาส์ประมาณ $50\%$ แต่มีข้อดีคือโค้ดลอจิกการเขียนโปรแกรมตรงไปตรงมา ไม่ต้องเขียนโมดูล Back Substitution แยกต่างหาก
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Exercise 3 -->
+                <div class="p-5 sm:p-6 rounded-xl border border-slate-200 bg-slate-50/50">
+                    <span class="text-xs font-bold text-teal-800 bg-teal-100 px-2.5 py-1 rounded">ข้อที่ 3</span>
+                    <h3 class="font-bold text-slate-900 mt-2 text-base sm:text-lg">
+                        อธิบายว่าเหตุใดการดำเนินการขั้นมูลฐานทุกขั้นจึงต้องบันทึกอย่างถูกต้อง
+                    </h3>
+                    <p class="text-slate-700 text-sm mt-1">
+                        เชื่อมโยงสู่เรื่องเมทริกซ์ขั้นมูลฐาน (Elementary Matrix) และการแยกตัวประกอบเมทริกซ์ (LU Decomposition)
+                    </p>
+
+                    <div class="mt-4 pt-3 border-t border-slate-200">
+                        <button onclick="toggleExercise('ans-ex-3')" class="text-xs sm:text-sm font-semibold text-indigo-600 hover:text-indigo-800 flex items-center gap-1.5 transition">
+                            <i class="fa-regular fa-eye"></i> <span id="label-ans-ex-3">ดูเหตุผลและความสำคัญทางทฤษฎี</span>
+                        </button>
+                        <div id="ans-ex-3" class="hidden mt-3 p-4 bg-white rounded-lg border border-indigo-100 text-sm space-y-3 text-slate-700">
+                            <p class="font-semibold text-slate-900">เหตุผลสำคัญ 3 ประการในการบันทึก EROs ทุกขั้นตอน:</p>
+                            <ol class="list-decimal list-inside space-y-2 text-xs sm:text-sm pl-2">
+                                <li>
+                                    <strong>การสร้างเมทริกซ์ขั้นมูลฐาน (Elementary Matrices):</strong> ทุกการดำเนินการตามแถว $e_k$ สมนัยกับการคูณทางซ้ายด้วยเมทริกซ์ขั้นมูลฐาน $E_k$ ทำให้เราสามารถแทนกระบวนการทั้งหมดในรูปพีชคณิต $E_k \cdots E_2 E_1 A = R$ ได้
+                                </li>
+                                <li>
+                                    <strong>การแยกตัวประกอบ $LU$ (LU Factorization):</strong> สเกลาร์ตัวคูณที่ใช้ในการกำจัดสมาชิกใต้ตำแหน่งนำของการกำจัดแบบเกาส์ จะถูกนำไปบรรจุลงในเมทริกซ์สามเหลี่ยมล่าง $L$ (Lower Triangular Matrix) โดยตรง เพื่อแยก $A = LU$ สำหรับนำไปแก้ระบบสมการอื่นๆ ที่มีเวกเตอร์ $b$ ต่างกันได้อย่างรวดเร็ว
+                                </li>
+                                <li>
+                                    <strong>การย้อนกลับและการตรวจทาน (Invertibility & Verification):</strong> การบันทึกช่วยให้สามารถดำเนินการผกผัน (Inverse operations) เพื่อคืนค่าเมทริกซ์ดั้งเดิม หรือตรวจหาจุดผิดพลาดในกระบวนการคำนวณได้อย่างแม่นยำ
+                                </li>
+                            </ol>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="text-center text-xs text-slate-400 py-6 border-t border-slate-200">
+            <p>เรื่องที่ 5: การกำจัดแบบเกาส์และการกำจัดแบบเกาส์–จอร์แดน (Gaussian vs Gauss–Jordan Elimination) • พัฒนาเพื่อการเรียนรู้แบบมีส่วนร่วม</p>
+        </footer>
+
+    </main>
+
+    <!-- JavaScript Interactive Dual Solver Logic -->
+    <script>
+        // Preset Datasets
+        const presets = {
+            '2x2': {
+                rows: 2, cols: 2,
+                matrix: [
+                    [1, 2, 5],
+                    [2, 1, 4]
+                ],
+                varNames: ['x', 'y'],
+                gauss: [
+                    {
+                        matrix: [[1, 2, 5], [2, 1, 4]],
+                        ero: "\\text{เริ่มต้น}",
+                        phase: "เมทริกซ์แต่งเติม $[A|b]$ เริ่มต้น",
+                        explanation: "ระบบสมการ: $1x + 2y = 5$ และ $2x + 1y = 4$"
+                    },
+                    {
+                        matrix: [[1, 2, 5], [0, -3, -6]],
+                        ero: "R_2 \\leftarrow R_2 - 2R_1",
+                        phase: "กำจัดสมาชิกใต้ตำแหน่งนำแถว 1 (ได้ REF)",
+                        explanation: "แถวที่ 2 ลบด้วย 2 เท่าของแถวที่ 1 ทำให้สมาชิกใต้ตำแหน่งนำเป็น 0 และถึงรูปขั้นบันได (REF) เรียบร้อย",
+                        backSub: [
+                            "จากแถวที่ 2: -3y = -6 \\implies y = \\frac{-6}{-3} = 2",
+                            "แทนค่า y = 2 ลงในแถวที่ 1: x + 2(2) = 5 \\implies x = 5 - 4 = 1"
+                        ],
+                        solution: "x = 1, y = 2"
+                    }
+                ],
+                gj: [
+                    {
+                        matrix: [[1, 2, 5], [2, 1, 4]],
+                        ero: "\\text{เริ่มต้น}",
+                        phase: "เมทริกซ์แต่งเติม $[A|b]$ เริ่มต้น",
+                        explanation: "ระบบสมการเริ่มต้น"
+                    },
+                    {
+                        matrix: [[1, 2, 5], [0, -3, -6]],
+                        ero: "R_2 \\leftarrow R_2 - 2R_1",
+                        phase: "กำจัดสมาชิกใต้ตำแหน่งนำ",
+                        explanation: "แถว 2 ลบด้วย 2 เท่าของแถว 1"
+                    },
+                    {
+                        matrix: [[1, 2, 5], [0, 1, 2]],
+                        ero: "R_2 \\leftarrow -\\frac{1}{3}R_2",
+                        phase: "ทำตำแหน่งนำแถวที่ 2 ให้เป็น 1",
+                        explanation: "คูณแถวที่ 2 ด้วย $-\\frac{1}{3}$ เพื่อให้ได้ Leading 1"
+                    },
+                    {
+                        matrix: [[1, 0, 1], [0, 1, 2]],
+                        ero: "R_1 \\leftarrow R_1 - 2R_2",
+                        phase: "กำจัดสมาชิกเหนือตำแหน่งนำแถวที่ 2 (ได้ RREF)",
+                        explanation: "แถวที่ 1 ลบด้วย 2 เท่าของแถวที่ 2 ทำให้ได้รูปขั้นบันไดลดรูป (RREF) และอ่านค่าผลเฉลยได้ทันที",
+                        solution: "x = 1, y = 2"
+                    }
+                ]
+            },
+            '3x3': {
+                rows: 3, cols: 3,
+                matrix: [
+                    [1, 1, 2, 9],
+                    [2, 4, -3, 1],
+                    [3, 6, -5, 0]
+                ],
+                varNames: ['x', 'y', 'z'],
+                gauss: [
+                    {
+                        matrix: [[1, 1, 2, 9], [2, 4, -3, 1], [3, 6, -5, 0]],
+                        ero: "\\text{เริ่มต้น}",
+                        phase: "เมทริกซ์เสริมขนาด 3×3",
+                        explanation: "ระบบสมการ 3 ตัวแปรเริ่มต้น"
+                    },
+                    {
+                        matrix: [[1, 1, 2, 9], [0, 2, -7, -17], [3, 6, -5, 0]],
+                        ero: "R_2 \\leftarrow R_2 - 2R_1",
+                        phase: "กำจัดสมาชิกใต้ตำแหน่งนำคอลัมน์ 1",
+                        explanation: "แถวที่ 2 ลบด้วย 2 เท่าของแถวที่ 1"
+                    },
+                    {
+                        matrix: [[1, 1, 2, 9], [0, 2, -7, -17], [0, 3, -11, -27]],
+                        ero: "R_3 \\leftarrow R_3 - 3R_1",
+                        phase: "กำจัดสมาชิกใต้ตำแหน่งนำคอลัมน์ 1 ต่อเนื่อง",
+                        explanation: "แถวที่ 3 ลบด้วย 3 เท่าของแถวที่ 1"
+                    },
+                    {
+                        matrix: [[1, 1, 2, 9], [0, 2, -7, -17], [0, 0, -0.5, -1.5]],
+                        ero: "R_3 \\leftarrow R_3 - 1.5R_2",
+                        phase: "กำจัดใต้ตำแหน่งนำแถว 2 (บรรลุ REF)",
+                        explanation: "แถวที่ 3 ลบด้วย 1.5 เท่าของแถวที่ 2 ได้รูปขั้นบันได (REF)",
+                        backSub: [
+                            "จากแถว 3: -0.5z = -1.5 \\implies z = 3",
+                            "แทน z = 3 ในแถว 2: 2y - 7(3) = -17 \\implies 2y = 4 \\implies y = 2",
+                            "แทน y = 2, z = 3 ในแถว 1: x + 2 + 2(3) = 9 \\implies x = 1"
+                        ],
+                        solution: "x = 1, y = 2, z = 3"
+                    }
+                ],
+                gj: [
+                    {
+                        matrix: [[1, 1, 2, 9], [2, 4, -3, 1], [3, 6, -5, 0]],
+                        ero: "\\text{เริ่มต้น}",
+                        phase: "เริ่มต้นระบบสมการ",
+                        explanation: "เมทริกซ์เสริมเริ่มต้น"
+                    },
+                    {
+                        matrix: [[1, 1, 2, 9], [0, 2, -7, -17], [3, 6, -5, 0]],
+                        ero: "R_2 \\leftarrow R_2 - 2R_1",
+                        phase: "กำจัดใต้ไพวอต 1",
+                        explanation: "แถว 2 ลบด้วย 2 เท่าของแถว 1"
+                    },
+                    {
+                        matrix: [[1, 1, 2, 9], [0, 2, -7, -17], [0, 3, -11, -27]],
+                        ero: "R_3 \\leftarrow R_3 - 3R_1",
+                        phase: "กำจัดใต้ไพวอต 1",
+                        explanation: "แถว 3 ลบด้วย 3 เท่าของแถว 1"
+                    },
+                    {
+                        matrix: [[1, 1, 2, 9], [0, 1, -3.5, -8.5], [0, 3, -11, -27]],
+                        ero: "R_2 \\leftarrow 0.5R_2",
+                        phase: "ทำตำแหน่งนำแถว 2 เป็น 1",
+                        explanation: "หารแถว 2 ด้วย 2 เพื่อสร้าง Leading 1"
+                    },
+                    {
+                        matrix: [[1, 1, 2, 9], [0, 1, -3.5, -8.5], [0, 0, -0.5, -1.5]],
+                        ero: "R_3 \\leftarrow R_3 - 3R_2",
+                        phase: "กำจัดใต้ไพวอตแถว 2",
+                        explanation: "แถว 3 ลบด้วย 3 เท่าของแถว 2"
+                    },
+                    {
+                        matrix: [[1, 1, 2, 9], [0, 1, -3.5, -8.5], [0, 0, 1, 3]],
+                        ero: "R_3 \\leftarrow -2R_3",
+                        phase: "ทำตำแหน่งนำแถว 3 เป็น 1",
+                        explanation: "คูณแถว 3 ด้วย -2 ได้ Leading 1"
+                    },
+                    {
+                        matrix: [[1, 1, 0, 3], [0, 1, 0, 2], [0, 0, 1, 3]],
+                        ero: "R_2 \\leftarrow R_2 + 3.5R_3,\\ R_1 \\leftarrow R_1 - 2R_3",
+                        phase: "กำจัดเหนือไพวอตแถว 3",
+                        explanation: "กำจัดสมาชิกเหนือตำแหน่งนำของแถวที่ 3 ให้เป็นศูนย์"
+                    },
+                    {
+                        matrix: [[1, 0, 0, 1], [0, 1, 0, 2], [0, 0, 1, 3]],
+                        ero: "R_1 \\leftarrow R_1 - R_2",
+                        phase: "กำจัดเหนือไพวอตแถว 2 (บรรลุ RREF)",
+                        explanation: "แถวที่ 1 ลบแถวที่ 2 ได้เมทริกซ์รูปขั้นบันไดลดรูป (RREF) สมบูรณ์ อ่านค่าคำตอบได้ทันที",
+                        solution: "x = 1, y = 2, z = 3"
+                    }
+                ]
+            }
+        };
+
+        // App State
+        let currentPresetKey = '2x2';
+        let currentMethod = 'gauss'; // 'gauss' or 'gauss-jordan'
+        let currentStepIndex = 0;
+        let activeSteps = [];
+
+        window.onload = function() {
+            setPreset('2x2');
+        };
+
+        function setPreset(key) {
+            currentPresetKey = key;
+            currentStepIndex = 0;
+
+            // update preset buttons
+            ['2x2', '3x3', 'custom'].forEach(k => {
+                const b = document.getElementById(`btn-pre-${k}`);
+                if (k === key) {
+                    b.className = "px-2.5 py-1.5 rounded-lg bg-white font-bold text-slate-800 shadow-xs";
+                } else {
+                    b.className = "px-2.5 py-1.5 rounded-lg text-slate-600 hover:text-slate-900";
+                }
+            });
+
+            const customPanel = document.getElementById('custom-matrix-panel');
+            if (key === 'custom') {
+                customPanel.classList.remove('hidden');
+                renderCustomMatrixInputs();
+                calculateCustomSolver();
+            } else {
+                customPanel.classList.add('hidden');
+                updateActiveSteps();
+                renderCurrentStep();
+            }
+        }
+
+        function switchMethod(method) {
+            currentMethod = method;
+            currentStepIndex = 0;
+
+            const btnGauss = document.getElementById('btn-method-gauss');
+            const btnGJ = document.getElementById('btn-method-gj');
+
+            if (method === 'gauss') {
+                btnGauss.className = "py-3 px-4 rounded-xl border-2 border-blue-600 bg-blue-50 text-blue-900 font-bold text-xs sm:text-sm flex items-center justify-between transition shadow-xs";
+                btnGJ.className = "py-3 px-4 rounded-xl border-2 border-transparent bg-slate-100 text-slate-600 hover:bg-slate-200 font-semibold text-xs sm:text-sm flex items-center justify-between transition";
+            } else {
+                btnGJ.className = "py-3 px-4 rounded-xl border-2 border-indigo-600 bg-indigo-50 text-indigo-900 font-bold text-xs sm:text-sm flex items-center justify-between transition shadow-xs";
+                btnGauss.className = "py-3 px-4 rounded-xl border-2 border-transparent bg-slate-100 text-slate-600 hover:bg-slate-200 font-semibold text-xs sm:text-sm flex items-center justify-between transition";
+            }
+
+            updateActiveSteps();
+            renderCurrentStep();
+        }
+
+        function updateActiveSteps() {
+            const data = presets[currentPresetKey];
+            if (!data) return;
+
+            const gaussSteps = data.gauss.length - 1;
+            const gjSteps = data.gj.length - 1;
+
+            document.getElementById('badge-gauss-steps').innerText = `${gaussSteps} ขั้น`;
+            document.getElementById('badge-gj-steps').innerText = `${gjSteps} ขั้น`;
+            document.getElementById('step-comparison-summary').innerText = `เกาส์ ${gaussSteps} ขั้น vs เกาส์-จอร์แดน ${gjSteps} ขั้น`;
+
+            activeSteps = currentMethod === 'gauss' ? data.gauss : data.gj;
+        }
+
+        function renderCurrentStep() {
+            if (!activeSteps || activeSteps.length === 0) return;
+            const step = activeSteps[currentStepIndex];
+            const totalSteps = activeSteps.length - 1;
+
+            // Update Progress Text
+            document.getElementById('step-number-text').innerText = `ขั้นที่ ${currentStepIndex} / ${totalSteps}`;
+            document.getElementById('current-ero-badge').innerHTML = `$$${step.ero}$$`;
+            document.getElementById('status-phase-tag').innerText = `สถานะ: ${step.phase}`;
+            document.getElementById('step-explanation-text').innerHTML = step.explanation;
+
+            // Render Augmented Matrix
+            document.getElementById('step-matrix-container').innerHTML = `$$${augmentedToLatex(step.matrix)}$$`;
+
+            // Back Substitution Display (if applicable in this step)
+            const backSubCard = document.getElementById('back-sub-card');
+            const backSubContent = document.getElementById('back-sub-steps-content');
+            if (currentMethod === 'gauss' && step.backSub && step.backSub.length > 0) {
+                backSubContent.innerHTML = step.backSub.map(s => `<div>$$${s}$$</div>`).join('');
+                backSubCard.classList.remove('hidden');
+            } else {
+                backSubCard.classList.add('hidden');
+            }
+
+            // Final Solution Banner
+            const finalSolBanner = document.getElementById('final-solution-banner');
+            const solVarText = document.getElementById('solution-variables-text');
+            if (step.solution) {
+                solVarText.innerText = step.solution;
+                finalSolBanner.classList.remove('hidden');
+            } else {
+                finalSolBanner.classList.add('hidden');
+            }
+
+            // Update Navigation Buttons state
+            document.getElementById('btn-prev-step').disabled = (currentStepIndex === 0);
+            document.getElementById('btn-next-step').disabled = (currentStepIndex === totalSteps);
+
+            triggerMathJax();
+        }
+
+        function nextStep() {
+            if (currentStepIndex < activeSteps.length - 1) {
+                currentStepIndex++;
+                renderCurrentStep();
+            }
+        }
+
+        function prevStep() {
+            if (currentStepIndex > 0) {
+                currentStepIndex--;
+                renderCurrentStep();
+            }
+        }
+
+        function jumpToFinal() {
+            currentStepIndex = activeSteps.length - 1;
+            renderCurrentStep();
+        }
+
+        function resetStepViewer() {
+            currentStepIndex = 0;
+            renderCurrentStep();
+        }
+
+        // Custom Matrix Inputs & Solver generator
+        function renderCustomMatrixInputs() {
+            const wrapper = document.getElementById('custom-inputs-wrapper');
+            wrapper.innerHTML = `
+                <div class="augmented-bracket flex flex-col gap-2 p-1 font-mono">
+                    <div class="flex items-center gap-1.5">
+                        <input id="c-00" type="number" value="1" class="w-12 h-8 text-center bg-white border border-slate-300 rounded text-xs font-bold">
+                        <input id="c-01" type="number" value="1" class="w-12 h-8 text-center bg-white border border-slate-300 rounded text-xs font-bold">
+                        <span class="text-slate-400 font-bold px-1">|</span>
+                        <input id="c-02" type="number" value="3" class="w-12 h-8 text-center bg-blue-50 border border-blue-300 rounded text-xs font-bold">
+                    </div>
+                    <div class="flex items-center gap-1.5">
+                        <input id="c-10" type="number" value="2" class="w-12 h-8 text-center bg-white border border-slate-300 rounded text-xs font-bold">
+                        <input id="c-11" type="number" value="4" class="w-12 h-8 text-center bg-white border border-slate-300 rounded text-xs font-bold">
+                        <span class="text-slate-400 font-bold px-1">|</span>
+                        <input id="c-12" type="number" value="8" class="w-12 h-8 text-center bg-blue-50 border border-blue-300 rounded text-xs font-bold">
+                    </div>
+                </div>
+            `;
+        }
+
+        function calculateCustomSolver() {
+            const a11 = parseFloat(document.getElementById('c-00').value) || 1;
+            const a12 = parseFloat(document.getElementById('c-01').value) || 0;
+            const b1 = parseFloat(document.getElementById('c-02').value) || 0;
+            const a21 = parseFloat(document.getElementById('c-10').value) || 0;
+            const a22 = parseFloat(document.getElementById('c-11').value) || 1;
+            const b2 = parseFloat(document.getElementById('c-12').value) || 0;
+
+            const factor = a21 / a11;
+            const newA22 = a22 - factor * a12;
+            const newB2 = b2 - factor * b1;
+
+            const yVal = newA22 !== 0 ? newB2 / newA22 : 0;
+            const xVal = (b1 - a12 * yVal) / a11;
+
+            // Generate custom Gauss & GJ Steps dynamically
+            presets['custom'] = {
+                rows: 2, cols: 2,
+                gauss: [
+                    {
+                        matrix: [[a11, a12, b1], [a21, a22, b2]],
+                        ero: "\\text{เริ่มต้น}",
+                        phase: "เมทริกซ์แต่งเติมที่กำหนดเอง",
+                        explanation: "ระบบสมการที่ผู้เรียนกำหนดค่าเอง"
+                    },
+                    {
+                        matrix: [[a11, a12, b1], [0, roundNum(newA22), roundNum(newB2)]],
+                        ero: `R_2 \\leftarrow R_2 - (${roundNum(factor)})R_1`,
+                        phase: "กำจัดสมาชิกใต้ตำแหน่งนำแถว 1 (ได้ REF)",
+                        explanation: `แถวที่ 2 ลบด้วย ${roundNum(factor)} เท่าของแถวที่ 1`,
+                        backSub: [
+                            `จากแถว 2: ${roundNum(newA22)}y = ${roundNum(newB2)} \\implies y = ${roundNum(yVal)}`,
+                            `แทน y ลงในแถว 1: ${a11}x + ${a12}(${roundNum(yVal)}) = ${b1} \\implies x = ${roundNum(xVal)}`
+                        ],
+                        solution: `x = ${roundNum(xVal)}, y = ${roundNum(yVal)}`
+                    }
+                ],
+                gj: [
+                    {
+                        matrix: [[a11, a12, b1], [a21, a22, b2]],
+                        ero: "\\text{เริ่มต้น}",
+                        phase: "เมทริกซ์แต่งเติมเริ่มต้น",
+                        explanation: "ระบบสมการเริ่มต้น"
+                    },
+                    {
+                        matrix: [[a11, a12, b1], [0, roundNum(newA22), roundNum(newB2)]],
+                        ero: `R_2 \\leftarrow R_2 - (${roundNum(factor)})R_1`,
+                        phase: "กำจัดใต้ตำแหน่งนำ",
+                        explanation: "ทำให้สมาชิกใต้ตำแหน่งนำเป็น 0"
+                    },
+                    {
+                        matrix: [[1, 0, roundNum(xVal)], [0, 1, roundNum(yVal)]],
+                        ero: "\\text{ปรับสู่ RREF}",
+                        phase: "ทำตำแหน่งนำเป็น 1 และกำจัดเหนือตำแหน่งนำ (ได้ RREF)",
+                        explanation: "แปลงจนได้รูปขั้นบันไดลดรูป (RREF) สมบูรณ์",
+                        solution: `x = ${roundNum(xVal)}, y = ${roundNum(yVal)}`
+                    }
+                ]
+            };
+
+            updateActiveSteps();
+            currentStepIndex = 0;
+            renderCurrentStep();
+        }
+
+        function roundNum(n) {
+            return Math.round(n * 100) / 100;
+        }
+
+        // Format Augmented Matrix into LaTeX array with vertical bar
+        function augmentedToLatex(mat) {
+            if (!mat || mat.length === 0) return "";
+            const rows = mat.length;
+            const cols = mat[0].length;
+            const coefCols = cols - 1;
+
+            let colAlign = "c".repeat(coefCols) + "|c";
+            let latex = `\\left[\\begin{array}{${colAlign}} `;
+
+            for (let r = 0; r < rows; r++) {
+                const rowItems = mat[r].map(v => roundNum(v));
+                latex += rowItems.join(" & ");
+                if (r < rows - 1) latex += " \\\\ ";
+            }
+
+            latex += " \\end{array}\\right]";
+            return latex;
+        }
+
+        function triggerMathJax() {
+            if (window.MathJax && window.MathJax.typesetPromise) {
+                window.MathJax.typesetPromise().catch(err => console.error(err));
+            }
+        }
+
+        // Accordion Helpers
+        function toggleAccordion(id) {
+            const content = document.getElementById(id);
+            const icon = document.getElementById(`icon-${id}`);
+            if (content.classList.contains('hidden')) {
+                content.classList.remove('hidden');
+                icon.classList.add('rotate-180');
+                triggerMathJax();
+            } else {
+                content.classList.add('hidden');
+                icon.classList.remove('rotate-180');
+            }
+        }
+
+        function toggleExercise(id) {
+            const el = document.getElementById(id);
+            const label = document.getElementById(`label-${id}`);
+            if (el.classList.contains('hidden')) {
+                el.classList.remove('hidden');
+                label.innerText = "ซ่อนเฉลย / คำอธิบาย";
+                triggerMathJax();
+            } else {
+                el.classList.add('hidden');
+                label.innerText = id === 'ans-ex-1' ? "ดูเฉลยละเอียดทั้งสองวิธี" : (id === 'ans-ex-2' ? "ดูบทเปรียบเทียบเชิงลึก" : "ดูเหตุผลและความสำคัญทางทฤษฎี");
+            }
+        }
+    </script>
+</body>
+</html>
