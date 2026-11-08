@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>บทเรียนพีชคณิตเชิงเส้น: ปริภูมิเวกเตอร์และปริภูมิย่อย</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <style>
+    body {
+      font-family: 'Sarabun', sans-serif;
+    }
+    h1, h2, h3, h4, .font-heading {
+      font-family: 'Prompt', sans-serif;
+    }
+    .custom-scrollbar::-webkit-scrollbar {
+      height: 5px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-track {
+      background: rgba(15, 23, 42, 0.6);
+      border-radius: 9999px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+      background: #4338ca;
+      border-radius: 9999px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+      background: #6366f1;
+    }
+  </style>
+<script>
+  // ตรวจสอบว่ามีสถานะล็อกอินและอีเมลบันทึกไว้หรือไม่
+  const isLoggedIn = localStorage.getItem("dms_is_logged_in") === "true";
+  const userEmail = localStorage.getItem("dms_user_email");
+
+  // หากไม่มี ให้ดีดกลับไปหน้าเข้าสู่ระบบทันที
+  if (!isLoggedIn || !userEmail) {
+    // ปรับ Path ให้ถอยกลับไปหาไฟล์ login.html ตามระดับโฟลเดอร์ (เช่น "../login.html" หากอยู่ในโฟลเดอร์ย่อย 1 ชั้น)
+    window.location.replace("../../login.html"); 
+  }
+</script>
+
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col">
+
+  <!-- Header & Navigation Menu -->
+  <header class="sticky top-0 z-50 bg-slate-900/95 backdrop-blur-md border-b border-slate-800 shadow-xl">
+    <div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-3">
+      
+      <div class="flex items-center justify-between mb-2.5">
+        <div class="flex items-center gap-2.5 sm:gap-3">
+          <div class="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-indigo-600 flex items-center justify-center text-white shadow-lg shadow-indigo-500/25 shrink-0">
+            <i data-lucide="layers" class="w-4 h-4 sm:w-5 sm:h-5"></i>
+          </div>
+          <div>
+            <h1 class="text-sm sm:text-base lg:text-lg font-bold text-white font-heading tracking-wide leading-tight">
+              พีชคณิตเชิงเส้น: ปริภูมิเวกเตอร์และปริภูมิย่อย
+            </h1>
+            <p class="text-[11px] sm:text-xs text-indigo-400 font-medium">Linear Algebra Interactive Course Portal</p>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- แถบเมนูพร้อมปุ่มเลื่อน ซ้าย-ขวา -->
+      <div class="relative flex items-center group">
+        <button onclick="scrollNav(-200)" 
+                id="btn-scroll-left"
+                class="hidden sm:flex shrink-0 w-8 h-8 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-300 hover:text-white items-center justify-center mr-1 shadow-md transition z-10" 
+                title="เลื่อนไปทางซ้าย">
+          <i data-lucide="chevron-left" class="w-4 h-4"></i>
+        </button>
+
+        <nav id="nav-container" class="flex-1 flex items-center gap-2 overflow-x-auto pb-2 custom-scrollbar text-xs scroll-smooth">
+          <button onclick="loadPage('1ความหมายและนิยามของปริภูมิเวกเตอร์.html', this)" 
+                  class="menu-btn shrink-0 px-3.5 py-2 rounded-xl whitespace-nowrap font-medium transition bg-indigo-600 text-white shadow-md shadow-indigo-600/30">
+            1. ความหมายและนิยาม
+          </button>
+          <button onclick="loadPage('2ตัวอย่างปริภูมิเวกเตอร์.html', this)" 
+                  class="menu-btn shrink-0 px-3.5 py-2 rounded-xl whitespace-nowrap font-medium transition bg-slate-800 hover:bg-slate-700 text-slate-300">
+            2. ตัวอย่างปริภูมิ
+          </button>
+          <button onclick="loadPage('3สมบัติและเอกลักษณ์ในปริภูมิเวกเตอร์.html', this)" 
+                  class="menu-btn shrink-0 px-3.5 py-2 rounded-xl whitespace-nowrap font-medium transition bg-slate-800 hover:bg-slate-700 text-slate-300">
+            3. สมบัติและเอกลักษณ์
+          </button>
+          <button onclick="loadPage('4ความหมายและนิยามของปริภูมิย่อย.html', this)" 
+                  class="menu-btn shrink-0 px-3.5 py-2 rounded-xl whitespace-nowrap font-medium transition bg-slate-800 hover:bg-slate-700 text-slate-300">
+            4. นิยามปริภูมิย่อย
+          </button>
+          <button onclick="loadPage('5ทฤษฎีบทการตรวจสอบปริภูมิย่อย.html', this)" 
+                  class="menu-btn shrink-0 px-3.5 py-2 rounded-xl whitespace-nowrap font-medium transition bg-slate-800 hover:bg-slate-700 text-slate-300">
+            5. ทฤษฎีบทตรวจสอบ
+          </button>
+          <button onclick="loadPage('6ปริภูมิย่อยที่กำหนดด้วยสมการและเงื่อนไข.html', this)" 
+                  class="menu-btn shrink-0 px-3.5 py-2 rounded-xl whitespace-nowrap font-medium transition bg-slate-800 hover:bg-slate-700 text-slate-300">
+            6. สมการและเงื่อนไข
+          </button>
+          <button onclick="loadPage('7ผลบวกและจุดตัดของปริภูมิย่อย.html', this)" 
+                  class="menu-btn shrink-0 px-3.5 py-2 rounded-xl whitespace-nowrap font-medium transition bg-slate-800 hover:bg-slate-700 text-slate-300">
+            7. ผลบวกและจุดตัด
+          </button>
+          <button onclick="loadPage('8การพิสูจน์และการประยุกต์ปริภูมิย่อย.html', this)" 
+                  class="menu-btn shrink-0 px-3.5 py-2 rounded-xl whitespace-nowrap font-medium transition bg-slate-800 hover:bg-slate-700 text-slate-300">
+            8. การพิสูจน์และประยุกต์
+          </button>
+          <button onclick="loadPage('แบบทดสอบ.html', this)" 
+                  class="menu-btn shrink-0 px-4 py-2 rounded-xl whitespace-nowrap font-bold transition bg-emerald-600/30 hover:bg-emerald-600/50 text-emerald-300 border border-emerald-500/40">
+            <i data-lucide="check-circle" class="w-3.5 h-3.5 inline mr-1"></i>แบบทดสอบ (30 ข้อ)
+          </button>
+        </nav>
+
+        <button onclick="scrollNav(200)" 
+                id="btn-scroll-right"
+                class="hidden sm:flex shrink-0 w-8 h-8 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-300 hover:text-white items-center justify-center ml-1 shadow-md transition z-10" 
+                title="เลื่อนไปทางขวา">
+          <i data-lucide="chevron-right" class="w-4 h-4"></i>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- เนื้อหาหลักพร้อม iframe -->
+  <main class="flex-1 w-full flex flex-col bg-slate-900">
+    <iframe id="content-frame" 
+            src="1ความหมายและนิยามของปริภูมิเวกเตอร์.html" 
+            class="w-full flex-1 border-0 transition-opacity duration-200"
+            style="min-height: calc(100vh - 120px);"
+            title="เนื้อหาบทเรียน">
+    </iframe>
+  </main>
+
+  <script>
+    lucide.createIcons();
+
+    let currentFile = '1ความหมายและนิยามของปริภูมิเวกเตอร์.html';
+    const navContainer = document.getElementById('nav-container');
+
+    function scrollNav(amount) {
+      navContainer.scrollBy({ left: amount, behavior: 'smooth' });
+    }
+
+    function loadPage(fileName, btn) {
+      currentFile = fileName;
+      const frame = document.getElementById('content-frame');
+      const label = document.getElementById('current-page-label');
+
+      // เลื่อนปุ่มมาไว้กึ่งกลางสายตา
+      btn.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+
+      frame.style.opacity = '0.3';
+      frame.src = fileName;
+      
+      // ป้องกัน Error หากไม่มี label
+      if (label) {
+        label.textContent = fileName;
+      }
+
+      // เมื่อโหลดเสร็จให้ปรับความโปร่งใสกลับเป็น 100% สว่างคมชัด
+      frame.onload = () => {
+        frame.style.opacity = '1';
+      };
+
+      // รีเซ็ตและไฮไลต์ปุ่มเมนู
+      document.querySelectorAll('.menu-btn').forEach(b => {
+        if (b.classList.contains('border-emerald-500/40') || b.textContent.includes('แบบทดสอบ')) {
+          b.className = 'menu-btn shrink-0 px-4 py-2 rounded-xl whitespace-nowrap font-bold transition bg-emerald-600/30 hover:bg-emerald-600/50 text-emerald-300 border border-emerald-500/40';
+        } else {
+          b.className = 'menu-btn shrink-0 px-3.5 py-2 rounded-xl whitespace-nowrap font-medium transition bg-slate-800 hover:bg-slate-700 text-slate-300';
+        }
+      });
+
+      if (btn.textContent.includes('แบบทดสอบ')) {
+        btn.className = 'menu-btn shrink-0 px-4 py-2 rounded-xl whitespace-nowrap font-bold transition bg-emerald-600 text-white border border-emerald-500 shadow-md shadow-emerald-600/30';
+      } else {
+        btn.className = 'menu-btn shrink-0 px-3.5 py-2 rounded-xl whitespace-nowrap font-medium transition bg-indigo-600 text-white shadow-md shadow-indigo-600/30';
+      }
+    }
+
+    function openExternal() {
+      if (currentFile) {
+        window.open(currentFile, '_blank');
+      }
+    }
+  </script>
+</body>
+</html>

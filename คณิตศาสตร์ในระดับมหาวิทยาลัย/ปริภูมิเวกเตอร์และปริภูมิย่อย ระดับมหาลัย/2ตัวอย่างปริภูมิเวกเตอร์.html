@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>เรื่องที่ 2: ตัวอย่างปริภูมิเวกเตอร์</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <script>
+    window.MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']],
+        displayMath: [['$$', '$$'], ['\\[', '\\]']],
+        processEscapes: true
+      },
+      options: {
+        skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+      }
+    };
+  </script>
+  <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <style>
+    body {
+      font-family: 'Sarabun', sans-serif;
+      background-color: #0f172a;
+      color: #334155;
+    }
+    h1, h2, h3, h4, .font-heading {
+      font-family: 'Prompt', sans-serif;
+    }
+    mjx-container {
+      display: inline-block !important;
+      margin: 0 0.15em !important;
+      line-height: 0 !important;
+      vertical-align: middle !important;
+    }
+    mjx-container[display="true"] {
+      display: block !important;
+      margin: 0.85em 0 !important;
+      overflow-x: auto;
+      overflow-y: hidden;
+      padding: 0.5rem 0;
+    }
+    .math-badge {
+      display: inline-flex;
+      align-items: center;
+      white-space: nowrap;
+      font-feature-settings: "tnum";
+    }
+    .thai-text {
+      word-break: normal;
+      overflow-wrap: break-word;
+      line-height: 1.75;
+    }
+  </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen py-8">
+  <div class="max-w-6xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 bg-slate-900 border border-slate-800 rounded-3xl shadow-2xl space-y-8">
+    
+    <!-- Header -->
+    <header class="border-b border-slate-800 pb-6">
+
+      <h1 class="text-2xl sm:text-3xl lg:text-4xl font-bold text-white mt-3 font-heading">
+        เรื่องที่ 2: ตัวอย่างปริภูมิเวกเตอร์ (Examples of Vector Spaces)
+      </h1>
+      <p class="text-slate-400 mt-2 text-base thai-text">
+        ทำความเข้าใจความเป็น "เวกเตอร์" ในเชิงนามธรรมผ่านโครงสร้างทางคณิตศาสตร์หลากหลายรูปแบบ
+      </p>
+    </header>
+
+    <!-- วัตถุประสงค์การเรียนรู้ -->
+    <section class="p-6 rounded-2xl bg-indigo-950/40 border border-indigo-800/40">
+      <div class="flex items-start gap-4">
+        <div class="p-3 rounded-xl bg-indigo-500/20 text-indigo-400 shrink-0">
+          <i data-lucide="target" class="w-6 h-6"></i>
+        </div>
+        <div>
+          <h2 class="text-lg font-bold text-indigo-200 font-heading">วัตถุประสงค์การเรียนรู้</h2>
+          <p class="mt-1 text-slate-300 thai-text">
+            นักศึกษาสามารถจำแนกตัวอย่างปริภูมิเวกเตอร์จากโครงสร้างทางคณิตศาสตร์ที่แตกต่างกันได้ และอธิบายการดำเนินการภายใต้สัจพจน์ได้อย่างถูกต้อง
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- คำถามนำเพื่อค้นพบ -->
+    <section class="p-6 rounded-2xl bg-amber-950/30 border border-amber-800/40">
+      <div class="flex items-start gap-4">
+        <div class="p-3 rounded-xl bg-amber-500/20 text-amber-400 shrink-0">
+          <i data-lucide="help-circle" class="w-6 h-6"></i>
+        </div>
+        <div>
+          <h2 class="text-lg font-bold text-amber-200 font-heading">คำถามนำเพื่อค้นพบ (Discovery Inquiry)</h2>
+          <p class="mt-1 text-slate-200 font-medium thai-text">
+            "เมทริกซ์ พหุนาม และฟังก์ชัน สามารถเป็นเวกเตอร์ได้อย่างไร ทั้งที่ไม่ได้อยู่ในรูปเวกเตอร์คอลัมน์แบบลูกศรที่คุ้นเคย?"
+          </p>
+          <p class="mt-2 text-sm text-slate-400 thai-text">
+            <span class="text-amber-300 font-semibold">ข้อสังเกตสำคัญ:</span> ในทางพีชคณิตเชิงเส้น สมาชิกในเซตจะเป็น "เวกเตอร์" ได้ ไม่ได้ขึ้นอยู่กับรูปร่างภายนอก แต่ขึ้นอยู่กับว่า <em>มีพฤติกรรมสอดคล้องกับสัจพจน์การบวกและการคูณด้วยสเกลาร์ครบทั้ง 10 ข้อหรือไม่</em> หากบวกกันแล้วได้ผลลัพธ์ชนิดเดิม และคูณสเกลาร์แล้วยังคงปิดอยู่ในเซตเดิม วัตถุเหล่านั้นจะถือเป็นเวกเตอร์ทั้งหมด
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- เนื้อหาหลัก -->
+    <section class="space-y-6">
+      <div class="flex items-center gap-3">
+        <div class="w-2.5 h-7 bg-indigo-500 rounded-full"></div>
+        <h2 class="text-xl sm:text-2xl font-bold text-white font-heading">เนื้อหาหลัก: 4 โครงสร้างปริภูมิเวกเตอร์พื้นฐาน</h2>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div class="p-6 rounded-2xl bg-slate-800/60 border border-slate-700/60 hover:border-indigo-500/50 transition">
+          <div class="flex items-center justify-between mb-3">
+            <span class="text-xs font-semibold px-2.5 py-1 rounded bg-blue-500/20 text-blue-300 border border-blue-500/30">มาตรฐานยุคลิด</span>
+            <span class="math-badge text-indigo-400 font-mono text-sm">$\mathbb{R}^n$ และ $\mathbb{C}^n$</span>
+          </div>
+          <h3 class="text-lg font-bold text-white mb-2 font-heading">1. ปริภูมิตัวเลข n-สิ่งอันดับ</h3>
+          <p class="text-slate-300 text-sm thai-text">
+            เซตของคู่อันดับ $\mathbb{R}^n = \{(x_1, \dots, x_n) \mid x_i \in \mathbb{R}\}$ การบวกทำทีละตำแหน่ง และการคูณด้วยสเกลาร์กระจายเข้าทุกตำแหน่ง เป็นรากฐานของพีชคณิตเชิงเส้น
+          </p>
+        </div>
+
+        <div class="p-6 rounded-2xl bg-slate-800/60 border border-slate-700/60 hover:border-indigo-500/50 transition">
+          <div class="flex items-center justify-between mb-3">
+            <span class="text-xs font-semibold px-2.5 py-1 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">มิติ $m \times n$</span>
+            <span class="math-badge text-emerald-400 font-mono text-sm">$M_{m \times n}(\mathbb{R})$</span>
+          </div>
+          <h3 class="text-lg font-bold text-white mb-2 font-heading">2. ปริภูมิของเมทริกซ์</h3>
+          <p class="text-slate-300 text-sm thai-text">
+            เซตของเมทริกซ์ขนาดเท่ากันทั้งหมด การบวกและการคูณสเกลาร์ทำทีละสมาชิก มีเมทริกซ์ศูนย์ $O$ เป็นเวกเตอร์ศูนย์ และสอดคล้องกับสัจพจน์ครบถ้วน
+          </p>
+        </div>
+
+        <div class="p-6 rounded-2xl bg-slate-800/60 border border-slate-700/60 hover:border-indigo-500/50 transition">
+          <div class="flex items-center justify-between mb-3">
+            <span class="text-xs font-semibold px-2.5 py-1 rounded bg-purple-500/20 text-purple-300 border border-purple-500/30">พหุนาม</span>
+            <span class="math-badge text-purple-400 font-mono text-sm">$P_n$ และ $P$</span>
+          </div>
+          <h3 class="text-lg font-bold text-white mb-2 font-heading">3. ปริภูมิของพหุนาม</h3>
+          <p class="text-slate-300 text-sm thai-text">
+            $P_n$ คือเซตของพหุนามดีกรีไม่เกิน $n$ รวมพหุนามศูนย์ เช่น $p(x) = a_n x^n + \dots + a_0$ 
+            <span class="text-amber-300 block mt-1 font-medium">*ข้อควรระวัง: พหุนามดีกรีเท่ากับ $n$ พอดี ไม่เป็นปริภูมิเวกเตอร์เพราะไม่มีสมบัติปิดการบวก (สัมประสิทธิ์อาจหักล้างกันจนดีกรีลดลงได้)</span>
+          </p>
+        </div>
+
+        <div class="p-6 rounded-2xl bg-slate-800/60 border border-slate-700/60 hover:border-indigo-500/50 transition">
+          <div class="flex items-center justify-between mb-3">
+            <span class="text-xs font-semibold px-2.5 py-1 rounded bg-rose-500/20 text-rose-300 border border-rose-500/30">อนันต์มิติ</span>
+            <span class="math-badge text-rose-400 font-mono text-sm">$C[a, b]$</span>
+          </div>
+          <h3 class="text-lg font-bold text-white mb-2 font-heading">4. ปริภูมิของฟังก์ชัน</h3>
+          <p class="text-slate-300 text-sm thai-text">
+            เซตของฟังก์ชันต่อเนื่อง นิยาม $(f+g)(x) = f(x) + g(x)$ และ $(cf)(x) = c \cdot f(x)$ โดยมีฟังก์ชันคงตัว $z(x) = 0$ ทำหน้าที่เป็นเวกเตอร์ศูนย์
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ตารางเปรียบเทียบ -->
+    <section class="space-y-4">
+      <div class="flex items-center gap-3">
+        <div class="w-2.5 h-7 bg-indigo-500 rounded-full"></div>
+        <h2 class="text-xl sm:text-2xl font-bold text-white font-heading">ความแตกต่าง: เซตธรรมดา VS ปริภูมิเวกเตอร์</h2>
+      </div>
+
+      <div class="overflow-x-auto rounded-2xl border border-slate-800">
+        <table class="w-full text-left text-sm text-slate-300">
+          <thead class="bg-slate-800/90 text-indigo-300 font-heading">
+            <tr>
+              <th class="p-4">คุณลักษณะ</th>
+              <th class="p-4">เซตทั่วไป (General Set)</th>
+              <th class="p-4">ปริภูมิเวกเตอร์ (Vector Space)</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-slate-800 bg-slate-900/60">
+            <tr>
+              <td class="p-4 font-semibold text-white">โครงสร้าง</td>
+              <td class="p-4 thai-text">มีเพียงกลุ่มของสมาชิก โดยไม่ต้องมีกฎเกณฑ์การกระทำ</td>
+              <td class="p-4 text-emerald-400 font-medium thai-text">ต้องมีเซต $V$ ควบคู่กับการดำเนินการ $+$ และ $\cdot$ เหนือสนาม $F$</td>
+            </tr>
+            <tr>
+              <td class="p-4 font-semibold text-white">สมบัติปิด</td>
+              <td class="p-4 thai-text">ไม่จำเป็นต้องมีสมบัติปิด</td>
+              <td class="p-4 text-emerald-400 font-medium thai-text">ต้องมีสมบัติปิดทั้งการบวกและการคูณสเกลาร์อย่างสมบูรณ์</td>
+            </tr>
+            <tr>
+              <td class="p-4 font-semibold text-white">สมาชิกพิเศษ</td>
+              <td class="p-4 thai-text">อาจไม่มีสมาชิกศูนย์หรืออินเวิร์ส</td>
+              <td class="p-4 text-emerald-400 font-medium thai-text">จำเป็นต้องมีเวกเตอร์ศูนย์ $\mathbf{0}$ และเวกเตอร์ผกผัน $-\mathbf{u}$ เสมอ</td>
+            </tr>
+            <tr>
+              <td class="p-4 font-semibold text-white">สัจพจน์</td>
+              <td class="p-4 thai-text">ไม่มีข้อกำหนด</td>
+              <td class="p-4 text-emerald-400 font-medium thai-text">ต้องสอดคล้องกับสัจพจน์ครบทั้ง 10 ประการ</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- Interactive Simulator -->
+    <section class="p-6 rounded-2xl bg-slate-800/40 border border-slate-700/80 space-y-6">
+      <div class="flex items-center gap-3">
+        <div class="p-2.5 rounded-xl bg-cyan-500/20 text-cyan-400">
+          <i data-lucide="play" class="w-5 h-5"></i>
+        </div>
+        <div>
+          <h2 class="text-xl font-bold text-white font-heading">แบบจำลองโต้ตอบ: สำรวจสมบัติปิด (Closure Explorer)</h2>
+          <p class="text-sm text-slate-400">เลือกชนิดของเซตและปรับค่าสเกลาร์ เพื่อตรวจดูว่าผลลัพธ์ยังคงอยู่ในเซตเดิมหรือไม่</p>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div class="space-y-4">
+          <div>
+            <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">เลือกเซตที่ต้องการทดสอบ</label>
+            <select id="set-select" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-2.5 text-white focus:outline-none focus:border-indigo-500 text-sm">
+              <option value="p2">1. ปริภูมิพหุนาม $P_2$ (ดีกรี $\le 2$)</option>
+              <option value="deg2_exact">2. เซตพหุนามดีกรี $= 2$ พอดี (ไม่ใช่ปริภูมิ)</option>
+              <option value="m22_sym">3. เซตเมทริกซ์สมมาตร $2 \times 2$</option>
+              <option value="m22_inv">4. เซตเมทริกซ์หาอินเวิร์สได้ $GL_2$ (ไม่ใช่ปริภูมิ)</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">
+              สเกลาร์ $c = $ <span id="scalar-val" class="text-indigo-400 font-bold">2</span>
+            </label>
+            <input type="range" id="scalar-slider" min="-3" max="3" value="2" step="1" class="w-full accent-indigo-500 cursor-pointer">
+          </div>
+
+          <button id="calc-btn" class="w-full py-2.5 px-4 bg-indigo-600 hover:bg-indigo-500 text-white font-medium rounded-xl transition flex items-center justify-center gap-2">
+            <i data-lucide="refresh-cw" class="w-4 h-4"></i>
+            คำนวณและตรวจสอบผล
+          </button>
+        </div>
+
+        <div class="lg:col-span-2 bg-slate-950 p-5 rounded-xl border border-slate-800 space-y-4">
+          <div class="flex items-center justify-between pb-3 border-b border-slate-800 text-xs">
+            <span class="text-slate-400">ผลการทดลอง</span>
+            <span id="closure-status-badge" class="px-2.5 py-0.5 rounded-full font-semibold">ตรวจสอบสมบัติปิด</span>
+          </div>
+
+          <div id="sim-math-display" class="space-y-3 font-mono text-sm text-slate-200"></div>
+          <div id="sim-explanation" class="p-3.5 rounded-lg text-sm thai-text"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- แบบฝึกหัดสำหรับนักศึกษา -->
+    <section class="space-y-4">
+      <div class="flex items-center gap-3">
+        <div class="w-2.5 h-7 bg-emerald-500 rounded-full"></div>
+        <h2 class="text-xl sm:text-2xl font-bold text-white font-heading">แบบฝึกหัดสำหรับนักศึกษา</h2>
+      </div>
+
+      <div class="p-6 rounded-2xl bg-slate-800/60 border border-slate-700/60 space-y-4">
+        <div class="text-white font-medium thai-text">
+          <span class="text-emerald-400 font-bold">โจทย์:</span> จงยกตัวอย่างปริภูมิเวกเตอร์อย่างน้อย 3 ชนิด พร้อมอธิบายการดำเนินการบวก เวกเตอร์ศูนย์ และการคูณด้วยสเกลาร์ของแต่ละชนิด
+        </div>
+
+        <div class="pt-2">
+          <button id="toggle-solution-btn" class="px-4 py-2 bg-slate-700 hover:bg-slate-600 text-slate-200 text-sm font-medium rounded-xl transition flex items-center gap-2">
+            <i data-lucide="chevron-down" id="solution-icon" class="w-4 h-4 transition-transform"></i>
+            แสดงแนวทางการตอบ / เฉลย
+          </button>
+        </div>
+
+        <div id="solution-content" class="hidden pt-4 border-t border-slate-700/60 space-y-4 text-sm text-slate-300 thai-text">
+          <div class="p-4 rounded-xl bg-slate-900/80 border border-slate-800 space-y-2">
+            <h4 class="font-bold text-indigo-300 font-heading">ตัวอย่างที่ 1: ปริภูมิพหุนาม $P_2$</h4>
+            <p>• <strong>สมาชิก:</strong> พหุนามในรูป $p(x) = a_2 x^2 + a_1 x + a_0$ โดยที่ $a_2, a_1, a_0 \in \mathbb{R}$</p>
+            <p>• <strong>การบวก:</strong> รวมสัมประสิทธิ์ดีกรีเดียวกัน $(p+q)(x) = (a_2+b_2)x^2 + (a_1+b_1)x + (a_0+b_0)$</p>
+            <p>• <strong>การคูณสเกลาร์:</strong> $(cp)(x) = (ca_2)x^2 + (ca_1)x + (ca_0)$</p>
+            <p>• <strong>เวกเตอร์ศูนย์:</strong> พหุนามศูนย์ $0(x) = 0$</p>
+          </div>
+
+          <div class="p-4 rounded-xl bg-slate-900/80 border border-slate-800 space-y-2">
+            <h4 class="font-bold text-emerald-300 font-heading">ตัวอย่างที่ 2: ปริภูมิเมทริกซ์สมมาตร $S_2$</h4>
+            <p>• <strong>สมาชิก:</strong> เมทริกซ์ขนาด $2 \times 2$ ซึ่งสอดคล้องกับ $A^T = A$</p>
+            <p>• <strong>การบวก:</strong> บวกตามตำแหน่ง ซึ่งผลลัพธ์ยังคงสมมาตร $(A+B)^T = A^T + B^T = A + B$</p>
+            <p>• <strong>การคูณสเกลาร์:</strong> $(cA)^T = c(A^T) = cA$ ยังคงสมมาตร</p>
+            <p>• <strong>เวกเตอร์ศูนย์:</strong> เมทริกซ์ศูนย์ขนาด $2 \times 2$</p>
+          </div>
+
+          <div class="p-4 rounded-xl bg-slate-900/80 border border-slate-800 space-y-2">
+            <h4 class="font-bold text-purple-300 font-heading">ตัวอย่างที่ 3: ปริภูมิฟังก์ชันต่อเนื่อง $C[0, 1]$</h4>
+            <p>• <strong>สมาชิก:</strong> ฟังก์ชันค่าจริง $f: [0, 1] \to \mathbb{R}$ ที่มีความต่อเนื่องทุกจุด</p>
+            <p>• <strong>การบวก:</strong> $(f+g)(x) = f(x) + g(x)$ ซึ่งเป็นฟังก์ชันต่อเนื่องเสมอ</p>
+            <p>• <strong>การคูณสเกลาร์:</strong> $(cf)(x) = c \cdot f(x)$</p>
+            <p>• <strong>เวกเตอร์ศูนย์:</strong> ฟังก์ชันศูนย์ $z(x) = 0$</p>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+  </div>
+
+  <script>
+    lucide.createIcons();
+
+    const setSelect = document.getElementById('set-select');
+    const scalarSlider = document.getElementById('scalar-slider');
+    const scalarVal = document.getElementById('scalar-val');
+    const calcBtn = document.getElementById('calc-btn');
+    const simMathDisplay = document.getElementById('sim-math-display');
+    const simExplanation = document.getElementById('sim-explanation');
+    const statusBadge = document.getElementById('closure-status-badge');
+    const toggleSolBtn = document.getElementById('toggle-solution-btn');
+    const solContent = document.getElementById('solution-content');
+    const solIcon = document.getElementById('solution-icon');
+
+    toggleSolBtn.addEventListener('click', () => {
+      const isHidden = solContent.classList.toggle('hidden');
+      solIcon.style.transform = isHidden ? 'rotate(0deg)' : 'rotate(180deg)';
+    });
+
+    scalarSlider.addEventListener('input', (e) => {
+      scalarVal.textContent = e.target.value;
+      updateSimulation();
+    });
+
+    setSelect.addEventListener('change', updateSimulation);
+    calcBtn.addEventListener('click', updateSimulation);
+
+    function updateSimulation() {
+      const choice = setSelect.value;
+      const c = parseInt(scalarSlider.value, 10);
+
+      let mathHtml = '';
+      let expHtml = '';
+      let isClosure = true;
+
+      if (choice === 'p2') {
+        mathHtml = `
+          <div><strong class="text-indigo-400">เวกเตอร์ $\\mathbf{u}$:</strong> $p(x) = 2x^2 - 3x + 1$</div>
+          <div><strong class="text-indigo-400">เวกเตอร์ $\\mathbf{v}$:</strong> $q(x) = -x^2 + 4x - 5$</div>
+          <div class="pt-2 border-t border-slate-800"><strong>ผลบวก $\\mathbf{u} + \\mathbf{v}$:</strong> $(p+q)(x) = x^2 + x - 4$ <span class="text-emerald-400 text-xs">✓ ดีกรี $\\le 2$ อยู่ในเซต</span></div>
+          <div><strong>การคูณสเกลาร์ $c\\mathbf{u}$ ($c=${c}$):</strong> $(cp)(x) = ${2*c}x^2 + ${-3*c}x + ${1*c}$ <span class="text-emerald-400 text-xs">✓ ดีกรี $\\le 2$ อยู่ในเซต</span></div>
+        `;
+        expHtml = `<div class="bg-emerald-950/40 border border-emerald-800/40 text-emerald-300">
+          <strong>สรุปผล:</strong> $P_2$ มีสมบัติปิดทั้งการบวกและการคูณสเกลาร์ และมีพหุนามศูนย์ $0$ อยู่ในเซต จัดเป็น <strong>ปริภูมิเวกเตอร์</strong>
+        </div>`;
+        isClosure = true;
+      } else if (choice === 'deg2_exact') {
+        mathHtml = `
+          <div><strong class="text-amber-400">เวกเตอร์ $\\mathbf{u}$:</strong> $p(x) = x^2 + 3x - 1$ (ดีกรี 2)</div>
+          <div><strong class="text-amber-400">เวกเตอร์ $\\mathbf{v}$:</strong> $q(x) = -x^2 + 2x + 4$ (ดีกรี 2)</div>
+          <div class="pt-2 border-t border-slate-800"><strong>ผลบวก $\\mathbf{u} + \\mathbf{v}$:</strong> $(p+q)(x) = 5x + 3$ <span class="text-rose-400 font-bold text-xs">✗ ดีกรีกลายเป็น 1 (หลุดออกจากเซต!)</span></div>
+        `;
+        expHtml = `<div class="bg-rose-950/40 border border-rose-800/40 text-rose-300">
+          <strong>สรุปผล:</strong> เซตของพหุนามที่กำหนดว่า <em>ต้องมีดีกรีเท่ากับ 2 พอดี</em> <strong>ไม่เป็นปริภูมิเวกเตอร์</strong> เนื่องจากไม่มีสมบัติปิดการบวก (สัมประสิทธิ์หน้า $x^2$ หักล้างกันได้) และไม่มีพหุนามศูนย์
+        </div>`;
+        isClosure = false;
+      } else if (choice === 'm22_sym') {
+        mathHtml = `
+          <div><strong class="text-indigo-400">เมทริกซ์ $A$:</strong> $\\begin{bmatrix} 2 & -1 \\\\ -1 & 4 \\end{bmatrix}$ (สมมาตร)</div>
+          <div><strong class="text-indigo-400">เมทริกซ์ $B$:</strong> $\\begin{bmatrix} 1 & 3 \\\\ 3 & -2 \\end{bmatrix}$ (สมมาตร)</div>
+          <div class="pt-2 border-t border-slate-800"><strong>ผลบวก $A + B$:</strong> $\\begin{bmatrix} 3 & 2 \\\\ 2 & 2 \\end{bmatrix}$ <span class="text-emerald-400 text-xs">✓ ยังคงสมมาตร</span></div>
+          <div><strong>การคูณสเกลาร์ $cA$ ($c=${c}$):</strong> $\\begin{bmatrix} ${2*c} & ${-1*c} \\\\ ${-1*c} & ${4*c} \\end{bmatrix}$ <span class="text-emerald-400 text-xs">✓ ยังคงสมมาตร</span></div>
+        `;
+        expHtml = `<div class="bg-emerald-950/40 border border-emerald-800/40 text-emerald-300">
+          <strong>สรุปผล:</strong> เมทริกซ์สมมาตรมีสมบัติปิดทั้งการบวกและการคูณสเกลาร์ จึงเป็น <strong>ปริภูมิเวกเตอร์ย่อย (Subspace)</strong>
+        </div>`;
+        isClosure = true;
+      } else if (choice === 'm22_inv') {
+        mathHtml = `
+          <div><strong class="text-amber-400">เมทริกซ์ $A$:</strong> $I_2 = \\begin{bmatrix} 1 & 0 \\\\ 0 & 1 \\end{bmatrix}$ (หาอินเวิร์สได้)</div>
+          <div><strong class="text-amber-400">เมทริกซ์ $B$:</strong> $-I_2 = \\begin{bmatrix} -1 & 0 \\\\ 0 & -1 \\end{bmatrix}$ (หาอินเวิร์สได้)</div>
+          <div class="pt-2 border-t border-slate-800"><strong>ผลบวก $A + B$:</strong> $\\begin{bmatrix} 0 & 0 \\\\ 0 & 0 \\end{bmatrix}$ <span class="text-rose-400 font-bold text-xs">✗ เมทริกซ์ศูนย์ หาอินเวิร์สไม่ได้!</span></div>
+        `;
+        expHtml = `<div class="bg-rose-950/40 border border-rose-800/40 text-rose-300">
+          <strong>สรุปผล:</strong> เซตของเมทริกซ์ที่หาอินเวิร์สได้ $GL_n$ <strong>ไม่เป็นปริภูมิเวกเตอร์</strong> เพราะไม่มีสมบัติปิดการบวก และไม่มีเวกเตอร์ศูนย์บรรจุอยู่
+        </div>`;
+        isClosure = false;
+      }
+
+      simMathDisplay.innerHTML = mathHtml;
+      simExplanation.innerHTML = expHtml;
+
+      if (isClosure) {
+        statusBadge.className = 'px-2.5 py-0.5 rounded-full font-semibold text-xs bg-emerald-500/20 text-emerald-400 border border-emerald-500/30';
+        statusBadge.textContent = 'ผ่านเกณฑ์สมบัติปิด (Closed)';
+      } else {
+        statusBadge.className = 'px-2.5 py-0.5 rounded-full font-semibold text-xs bg-rose-500/20 text-rose-400 border border-rose-500/30';
+        statusBadge.textContent = 'ไม่ผ่านสมบัติปิด (Not Closed)';
+      }
+
+      if (window.MathJax && MathJax.typesetPromise) {
+        MathJax.typesetPromise([simMathDisplay, simExplanation]);
+      }
+    }
+
+    updateSimulation();
+  </script>
+</body>
+</html>

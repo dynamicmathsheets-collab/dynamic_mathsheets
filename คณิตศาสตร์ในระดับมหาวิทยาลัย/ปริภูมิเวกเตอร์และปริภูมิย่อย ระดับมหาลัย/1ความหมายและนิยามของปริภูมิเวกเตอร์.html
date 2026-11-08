@@ -1,0 +1,820 @@
+<!DOCTYPE html>
+<html lang="th" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>เรื่องที่ 1: ความหมายและนิยามของปริภูมิเวกเตอร์</title>
+
+  <!-- Google Fonts: Sarabun & Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Sarabun:wght@300;400;500;600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Sarabun', 'Inter', 'sans-serif'],
+            mono: ['Fira Code', 'monospace']
+          },
+          colors: {
+            brand: {
+              50: '#eef2ff',
+              100: '#e0e7ff',
+              200: '#c7d2fe',
+              500: '#6366f1',
+              600: '#4f46e5',
+              700: '#4338ca',
+              800: '#3730a3',
+              900: '#312e81',
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- MathJax Configuration & Loader -->
+  <script>
+    window.MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']],
+        displayMath: [['$$', '$$'], ['\\[', '\\]']],
+        processEscapes: true
+      },
+      svg: { fontCache: 'global' },
+      options: {
+        enableMenu: false
+      },
+      startup: {
+        ready: () => {
+          MathJax.startup.defaultReady();
+        }
+      }
+    };
+  </script>
+  <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <style>
+    /* Custom subtle scrollbar */
+    ::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #f1f5f9;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 9999px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #94a3b8;
+    }
+
+    /* Typography & Thai Wrapping Fixes */
+    body {
+      word-break: normal;
+      overflow-wrap: break-word;
+      line-height: 1.7;
+    }
+
+    /* MathJax Fixes to Prevent Awkward Line Breaks */
+    mjx-container {
+      display: inline-block !important;
+      margin: 0 0.15em !important;
+      vertical-align: middle !important;
+      line-height: 0 !important;
+    }
+    mjx-container[display="true"] {
+      display: block !important;
+      margin: 0.85em 0 !important;
+      text-align: center !important;
+      overflow-x: auto;
+      overflow-y: hidden;
+    }
+    .math-badge {
+      display: inline-flex;
+      align-items: center;
+      white-space: nowrap;
+    }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-800 font-sans antialiased selection:bg-indigo-500 selection:text-white">
+
+  <!-- Main Container: STRICTLY max-w-6xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 -->
+  <div class="max-w-6xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 space-y-10">
+
+    <!-- 1. Header / Hero Section -->
+    <header class="relative overflow-hidden rounded-3xl bg-gradient-to-br from-slate-900 via-indigo-950 to-slate-900 text-white p-6 sm:p-10 shadow-xl border border-indigo-900/50">
+      <div class="absolute -right-16 -top-16 w-80 h-80 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none"></div>
+      <div class="absolute -left-16 -bottom-16 w-80 h-80 bg-blue-500/10 rounded-full blur-3xl pointer-events-none"></div>
+
+      <div class="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
+        <div class="space-y-3 max-w-3xl">
+          <h1 class="text-2xl sm:text-4xl font-bold tracking-tight text-white leading-tight">
+            เรื่องที่ 1: ความหมายและนิยามของปริภูมิเวกเตอร์
+          </h1>
+          <p class="text-sm sm:text-base text-slate-300 font-normal">
+            Vector Space Definition, Field of Scalars &amp; The 10 Fundamental Axioms
+          </p>
+        </div>
+
+        <div class="flex items-center gap-3">
+          <span class="inline-flex items-center justify-center p-3 rounded-2xl bg-white/10 backdrop-blur-md border border-white/10 text-indigo-200">
+            <i data-lucide="layers" class="w-8 h-8"></i>
+          </span>
+        </div>
+      </div>
+
+      <!-- วัตถุประสงค์การเรียนรู้ (Learning Objectives) - Fixed Text Wrapping -->
+      <div class="mt-8 pt-6 border-t border-slate-700/60 flex flex-col sm:flex-row sm:items-start gap-4">
+        <div class="shrink-0 flex items-center gap-2 text-indigo-300 font-semibold text-sm uppercase tracking-wider py-1">
+          <i data-lucide="target" class="w-4 h-4 text-emerald-400"></i>
+          <span>วัตถุประสงค์การเรียนรู้</span>
+        </div>
+        <div class="flex-1 bg-slate-800/80 rounded-2xl p-4 sm:p-5 border border-slate-700/80 text-sm sm:text-base text-slate-200 leading-relaxed">
+          นักศึกษาสามารถอธิบายความหมายของปริภูมิเวกเตอร์เหนือสนาม <span class="math-badge font-semibold text-white px-1.5 py-0.5 rounded bg-slate-700/70 border border-slate-600/50">$\mathbb{R}$</span> หรือ <span class="math-badge font-semibold text-white px-1.5 py-0.5 rounded bg-slate-700/70 border border-slate-600/50">$\mathbb{C}$</span> ระบุองค์ประกอบโครงสร้างทางพีชคณิต และวิเคราะห์สัจพจน์ทั้ง 10 ประการเพื่อพิสูจน์ว่าเป็นปริภูมิเวกเตอร์หรือไม่ได้อย่างถูกต้อง
+        </div>
+      </div>
+    </header>
+
+
+    <!-- Quick Navigation Bar -->
+    <nav class="flex items-center gap-2 overflow-x-auto pb-2 text-sm text-slate-600">
+      <a href="#core-concepts" class="px-4 py-2 rounded-xl bg-white shadow-sm hover:bg-slate-100 hover:text-indigo-600 border border-slate-200/80 font-medium whitespace-nowrap transition-colors flex items-center gap-1.5">
+        <i data-lucide="book-open" class="w-4 h-4 text-indigo-500"></i> 1. เนื้อหาหลัก
+      </a>
+      <a href="#ten-axioms" class="px-4 py-2 rounded-xl bg-white shadow-sm hover:bg-slate-100 hover:text-indigo-600 border border-slate-200/80 font-medium whitespace-nowrap transition-colors flex items-center gap-1.5">
+        <i data-lucide="list-checks" class="w-4 h-4 text-indigo-500"></i> 2. สัจพจน์ 10 ข้อ
+      </a>
+      <a href="#guiding-question" class="px-4 py-2 rounded-xl bg-white shadow-sm hover:bg-slate-100 hover:text-indigo-600 border border-slate-200/80 font-medium whitespace-nowrap transition-colors flex items-center gap-1.5">
+        <i data-lucide="lightbulb" class="w-4 h-4 text-amber-500"></i> 3. คำถามนำเพื่อค้นพบ
+      </a>
+      <a href="#interactive-simulator" class="px-4 py-2 rounded-xl bg-indigo-50 border border-indigo-200 text-indigo-700 font-semibold whitespace-nowrap transition-colors flex items-center gap-1.5">
+        <i data-lucide="cpu" class="w-4 h-4 text-indigo-600"></i> 4. แบบจำลองโต้ตอบ (Lab)
+      </a>
+      <a href="#exercises" class="px-4 py-2 rounded-xl bg-white shadow-sm hover:bg-slate-100 hover:text-indigo-600 border border-slate-200/80 font-medium whitespace-nowrap transition-colors flex items-center gap-1.5">
+        <i data-lucide="pen-tool" class="w-4 h-4 text-emerald-500"></i> 5. แบบฝึกหัด
+      </a>
+    </nav>
+
+
+    <!-- 2. เนื้อหาหลัก (Core Concepts) - Fixed Card Layouts -->
+    <section id="core-concepts" class="space-y-6">
+      <div class="flex items-center justify-between border-b border-slate-200 pb-3">
+        <div>
+          <h2 class="text-xl sm:text-2xl font-bold text-slate-900 flex items-center gap-2">
+            <span class="w-2 h-6 bg-indigo-600 rounded-full inline-block"></span>
+            องค์ประกอบและโครงสร้างพื้นฐาน
+          </h2>
+          <p class="text-sm text-slate-500 mt-1">4 องค์ประกอบสำคัญที่ประกอบขึ้นเป็นระบบพีชคณิตของปริภูมิเวกเตอร์</p>
+        </div>
+      </div>
+
+      <!-- 4 Pillars Grid: Well Padded, Clean Wrapping -->
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
+        <!-- 1. Vectors -->
+        <div class="bg-white p-5 sm:p-6 rounded-2xl border border-slate-200 shadow-sm hover:shadow-md transition-shadow flex flex-col justify-between">
+          <div>
+            <div class="w-10 h-10 rounded-xl bg-blue-100 text-blue-600 flex items-center justify-center font-bold mb-3">
+              <i data-lucide="arrow-up-right" class="w-5 h-5"></i>
+            </div>
+            <h3 class="font-bold text-slate-900 text-base mb-1">1. เวกเตอร์ (Vectors)</h3>
+            <div class="mb-3">
+              <span class="inline-block text-xs text-indigo-700 bg-indigo-50 border border-indigo-100 px-2 py-0.5 rounded font-mono font-medium">
+                Set $V \ne \emptyset$
+              </span>
+            </div>
+            <p class="text-xs sm:text-sm text-slate-600 leading-relaxed">
+              สมาชิกในเซต $V$ เรียกว่า <strong>"เวกเตอร์"</strong> (แทนด้วยสัญลักษณ์ <span class="math-badge">$\mathbf{u}, \mathbf{v}, \mathbf{w}$</span>) ซึ่งสมาชิกอาจอยู่ในรูปของลูกศร, คู่อันดับ, ฟังก์ชัน หรือเมทริกซ์ก็ได้
+            </p>
+          </div>
+        </div>
+
+        <!-- 2. Field of Scalars -->
+        <div class="bg-white p-5 sm:p-6 rounded-2xl border border-slate-200 shadow-sm hover:shadow-md transition-shadow flex flex-col justify-between">
+          <div>
+            <div class="w-10 h-10 rounded-xl bg-purple-100 text-purple-600 flex items-center justify-center font-bold mb-3">
+              <i data-lucide="hash" class="w-5 h-5"></i>
+            </div>
+            <h3 class="font-bold text-slate-900 text-base mb-1">2. สนามสเกลาร์ (Field)</h3>
+            <div class="mb-3">
+              <span class="inline-block text-xs text-purple-700 bg-purple-50 border border-purple-100 px-2 py-0.5 rounded font-mono font-medium">
+                Field $\mathbb{F} = \mathbb{R}$ หรือ $\mathbb{C}$
+              </span>
+            </div>
+            <p class="text-xs sm:text-sm text-slate-600 leading-relaxed">
+              ระบบจำนวนที่นำมาทำหน้าที่เป็น <strong>"สเกลาร์"</strong> (แทนด้วย <span class="math-badge">$c, d \in \mathbb{F}$</span>) นิยมใช้จำนวนจริง $\mathbb{R}$ หรือจำนวนเชิงซ้อน $\mathbb{C}$
+            </p>
+          </div>
+        </div>
+
+        <!-- 3. Vector Addition -->
+        <div class="bg-white p-5 sm:p-6 rounded-2xl border border-slate-200 shadow-sm hover:shadow-md transition-shadow flex flex-col justify-between">
+          <div>
+            <div class="w-10 h-10 rounded-xl bg-emerald-100 text-emerald-600 flex items-center justify-center font-bold mb-3">
+              <i data-lucide="plus-circle" class="w-5 h-5"></i>
+            </div>
+            <h3 class="font-bold text-slate-900 text-base mb-1">3. การบวกเวกเตอร์</h3>
+            <div class="mb-3">
+              <span class="inline-block text-xs text-emerald-700 bg-emerald-50 border border-emerald-100 px-2 py-0.5 rounded font-mono font-medium">
+                $+ : V \times V \to V$
+              </span>
+            </div>
+            <p class="text-xs sm:text-sm text-slate-600 leading-relaxed">
+              การดำเนินการทวิภาคภายในเซต เมื่อนำเวกเตอร์สองตัวมาบวกกัน <span class="math-badge">$\mathbf{u} + \mathbf{v}$</span> แล้วได้ผลลัพธ์เป็นเวกเตอร์ที่ยังคงอยู่ในเซต $V$ เสมอ
+            </p>
+          </div>
+        </div>
+
+        <!-- 4. Scalar Multiplication -->
+        <div class="bg-white p-5 sm:p-6 rounded-2xl border border-slate-200 shadow-sm hover:shadow-md transition-shadow flex flex-col justify-between">
+          <div>
+            <div class="w-10 h-10 rounded-xl bg-amber-100 text-amber-600 flex items-center justify-center font-bold mb-3">
+              <i data-lucide="x-circle" class="w-5 h-5"></i>
+            </div>
+            <h3 class="font-bold text-slate-900 text-base mb-1">4. การคูณด้วยสเกลาร์</h3>
+            <div class="mb-3">
+              <span class="inline-block text-xs text-amber-700 bg-amber-50 border border-amber-100 px-2 py-0.5 rounded font-mono font-medium">
+                $\cdot : \mathbb{F} \times V \to V$
+              </span>
+            </div>
+            <p class="text-xs sm:text-sm text-slate-600 leading-relaxed">
+              การดำเนินการภายนอกที่จับคู่สเกลาร์ <span class="math-badge">$c \in \mathbb{F}$</span> กับเวกเตอร์ <span class="math-badge">$\mathbf{u} \in V$</span> แล้วได้เวกเตอร์ผลลัพธ์ <span class="math-badge">$c\mathbf{u} \in V$</span> เสมอ
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Formal Definition Box -->
+      <div class="bg-white rounded-2xl p-6 border-l-4 border-indigo-600 border-t border-r border-b border-slate-200 shadow-sm">
+        <div class="flex items-start gap-4">
+          <div class="p-2.5 rounded-xl bg-indigo-50 text-indigo-600 mt-0.5 shrink-0">
+            <i data-lucide="bookmark" class="w-5 h-5"></i>
+          </div>
+          <div class="space-y-2">
+            <h3 class="text-base sm:text-lg font-bold text-slate-900">นิยามรูปนัย (Formal Definition of Vector Space)</h3>
+            <p class="text-slate-600 text-sm sm:text-base leading-relaxed">
+              ให้ $V$ เป็นเซตที่ไม่ใช่เซตว่าง และ $\mathbb{F}$ เป็นสนามของสเกลาร์ ($\mathbb{R}$ หรือ $\mathbb{C}$) พร้อมการดำเนินการ 2 ชนิด คือ 
+              <strong>การบวก ($+$)</strong> และ <strong>การคูณด้วยสเกลาร์ ($\cdot$)</strong> 
+              เราจะกล่าวว่า <span class="font-semibold text-indigo-700">$(V, +, \cdot)$ เป็นปริภูมิเวกเตอร์เหนือสนาม $\mathbb{F}$</span> 
+              ก็ต่อเมื่อ สำหรับทุก ๆ <span class="math-badge">$\mathbf{u}, \mathbf{v}, \mathbf{w} \in V$</span> และทุก ๆ สเกลาร์ <span class="math-badge">$c, d \in \mathbb{F}$</span> สอดคล้องกับ <strong>สัจพจน์ทั้ง 10 ข้อ</strong> อย่างครบถ้วนสมบูรณ์
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+
+    <!-- 2. นิยามปริภูมิเวกเตอร์และสัจพจน์ 10 ข้อ (10 Axioms) -->
+    <section id="ten-axioms" class="space-y-6">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-200 pb-3">
+        <div>
+          <h2 class="text-xl sm:text-2xl font-bold text-slate-900 flex items-center gap-2">
+            <span class="w-2 h-6 bg-indigo-600 rounded-full inline-block"></span>
+            สัจพจน์ 10 ข้อของปริภูมิเวกเตอร์ (The 10 Axioms)
+          </h2>
+          <p class="text-sm text-slate-500 mt-1">แบ่งเป็นสมบัติการบวกเวกเตอร์ 5 ข้อ และสมบัติการคูณด้วยสเกลาร์ 5 ข้อ</p>
+        </div>
+        <span class="inline-flex items-center text-xs px-3 py-1 bg-indigo-50 text-indigo-700 font-semibold rounded-lg border border-indigo-200">
+          ต้องสอดคล้องครบทั้ง 10 ข้อ
+        </span>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <!-- Group A: Addition Axioms -->
+        <div class="bg-white rounded-2xl border border-blue-100 shadow-sm overflow-hidden flex flex-col">
+          <div class="bg-gradient-to-r from-blue-600 to-indigo-600 px-5 py-4 text-white flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <i data-lucide="plus" class="w-5 h-5"></i>
+              <h3 class="font-bold text-base sm:text-lg">กลุ่มที่ 1: การบวกเวกเตอร์ (A1 – A5)</h3>
+            </div>
+            <span class="text-xs bg-white/20 px-2.5 py-0.5 rounded-full font-mono">Abelian Group</span>
+          </div>
+          <div class="p-5 space-y-4 divide-y divide-slate-100 flex-1">
+            <!-- A1 -->
+            <div class="pt-3 first:pt-0">
+              <span class="font-bold text-sm text-blue-800 bg-blue-50 px-2 py-0.5 rounded border border-blue-200">A1. ปิดการบวก (Closure under +)</span>
+              <p class="text-sm text-slate-700 mt-1.5 font-mono">ถ้า $\mathbf{u}, \mathbf{v} \in V$ แล้ว $\mathbf{u} + \mathbf{v} \in V$</p>
+              <p class="text-xs text-slate-500 mt-1">ผลบวกของเวกเตอร์สองตัวในเซต ต้องเป็นสมาชิกในเซตเดิมเสมอ</p>
+            </div>
+            <!-- A2 -->
+            <div class="pt-3">
+              <span class="font-bold text-sm text-blue-800 bg-blue-50 px-2 py-0.5 rounded border border-blue-200">A2. สลับที่การบวก (Commutativity)</span>
+              <p class="text-sm text-slate-700 mt-1.5 font-mono">$\mathbf{u} + \mathbf{v} = \mathbf{v} + \mathbf{u}$</p>
+              <p class="text-xs text-slate-500 mt-1">ลำดับการบวกไม่มีผลต่อผลลัพธ์</p>
+            </div>
+            <!-- A3 -->
+            <div class="pt-3">
+              <span class="font-bold text-sm text-blue-800 bg-blue-50 px-2 py-0.5 rounded border border-blue-200">A3. เปลี่ยนหมู่การบวก (Associativity)</span>
+              <p class="text-sm text-slate-700 mt-1.5 font-mono">$(\mathbf{u} + \mathbf{v}) + \mathbf{w} = \mathbf{u} + (\mathbf{v} + \mathbf{w})$</p>
+              <p class="text-xs text-slate-500 mt-1">การจัดกลุ่มการบวกหน้าหรือหลังให้ผลลัพธ์เท่ากัน</p>
+            </div>
+            <!-- A4 -->
+            <div class="pt-3">
+              <span class="font-bold text-sm text-blue-800 bg-blue-50 px-2 py-0.5 rounded border border-blue-200">A4. มีเอกลักษณ์การบวก (Additive Identity)</span>
+              <p class="text-sm text-slate-700 mt-1.5 font-mono">มี $\mathbf{0} \in V$ ซึ่ง $\mathbf{u} + \mathbf{0} = \mathbf{u}$ สำหรับทุก $\mathbf{u} \in V$</p>
+              <p class="text-xs text-slate-500 mt-1">มีเวกเตอร์ศูนย์ในเซตที่บวกกับเวกเตอร์ใดแล้วได้ตัวเดิม</p>
+            </div>
+            <!-- A5 -->
+            <div class="pt-3">
+              <span class="font-bold text-sm text-blue-800 bg-blue-50 px-2 py-0.5 rounded border border-blue-200">A5. มีตัวผกผันการบวก (Additive Inverse)</span>
+              <p class="text-sm text-slate-700 mt-1.5 font-mono">สำหรับทุก $\mathbf{u} \in V$ จะมี $-\mathbf{u} \in V$ ที่ทำให้ $\mathbf{u} + (-\mathbf{u}) = \mathbf{0}$</p>
+              <p class="text-xs text-slate-500 mt-1">ทุกสมาชิกมีตัวตรงข้ามในเซตที่บวกกันแล้วได้เวกเตอร์ศูนย์</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Group M: Scalar Multiplication Axioms -->
+        <div class="bg-white rounded-2xl border border-indigo-100 shadow-sm overflow-hidden flex flex-col">
+          <div class="bg-gradient-to-r from-indigo-700 to-purple-700 px-5 py-4 text-white flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <i data-lucide="scale" class="w-5 h-5"></i>
+              <h3 class="font-bold text-base sm:text-lg">กลุ่มที่ 2: การคูณด้วยสเกลาร์ (M1 – M5)</h3>
+            </div>
+            <span class="text-xs bg-white/20 px-2.5 py-0.5 rounded-full font-mono">Scalar Action</span>
+          </div>
+          <div class="p-5 space-y-4 divide-y divide-slate-100 flex-1">
+            <!-- M1 -->
+            <div class="pt-3 first:pt-0">
+              <span class="font-bold text-sm text-purple-800 bg-purple-50 px-2 py-0.5 rounded border border-purple-200">M1. ปิดการคูณสเกลาร์ (Closure under $\cdot$)</span>
+              <p class="text-sm text-slate-700 mt-1.5 font-mono">ถ้า $c \in \mathbb{F}$ และ $\mathbf{u} \in V$ แล้ว $c\mathbf{u} \in V$</p>
+              <p class="text-xs text-slate-500 mt-1">การคูณเวกเตอร์ด้วยสเกลาร์ ผลลัพธ์ต้องคงอยู่ในเซตเดิม</p>
+            </div>
+            <!-- M2 -->
+            <div class="pt-3">
+              <span class="font-bold text-sm text-purple-800 bg-purple-50 px-2 py-0.5 rounded border border-purple-200">M2. การแจกแจงบนผลบวกเวกเตอร์</span>
+              <p class="text-sm text-slate-700 mt-1.5 font-mono">$c(\mathbf{u} + \mathbf{v}) = c\mathbf{u} + c\mathbf{v}$</p>
+              <p class="text-xs text-slate-500 mt-1">สเกลาร์แจกแจงเข้าไปในการบวกของเวกเตอร์ได้</p>
+            </div>
+            <!-- M3 -->
+            <div class="pt-3">
+              <span class="font-bold text-sm text-purple-800 bg-purple-50 px-2 py-0.5 rounded border border-purple-200">M3. การแจกแจงบนผลบวกสเกลาร์</span>
+              <p class="text-sm text-slate-700 mt-1.5 font-mono">$(c + d)\mathbf{u} = c\mathbf{u} + d\mathbf{u}$</p>
+              <p class="text-xs text-slate-500 mt-1">เวกเตอร์แจกแจงกับผลบวกของสเกลาร์ได้</p>
+            </div>
+            <!-- M4 -->
+            <div class="pt-3">
+              <span class="font-bold text-sm text-purple-800 bg-purple-50 px-2 py-0.5 rounded border border-purple-200">M4. เปลี่ยนหมู่การคูณสเกลาร์</span>
+              <p class="text-sm text-slate-700 mt-1.5 font-mono">$c(d\mathbf{u}) = (cd)\mathbf{u}$</p>
+              <p class="text-xs text-slate-500 mt-1">คูณสเกลาร์ทีละขั้นหรือคูณสเกลาร์กันก่อนแล้วค่อยคูณเวกเตอร์ให้ผลลัพธ์เท่ากัน</p>
+            </div>
+            <!-- M5 -->
+            <div class="pt-3">
+              <span class="font-bold text-sm text-purple-800 bg-purple-50 px-2 py-0.5 rounded border border-purple-200">M5. เอกลักษณ์การคูณสเกลาร์</span>
+              <p class="text-sm text-slate-700 mt-1.5 font-mono">$1\mathbf{u} = \mathbf{u}$ สำหรับทุก $\mathbf{u} \in V$</p>
+              <p class="text-xs text-slate-500 mt-1">เอกลักษณ์การคูณของสนาม ($1$) คูณเวกเตอร์ใดๆ ได้เวกเตอร์ตัวเดิม</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+
+    <!-- 3. คำถามนำเพื่อค้นพบ (Guiding Discovery Question) -->
+    <section id="guiding-question" class="rounded-3xl bg-amber-50/70 border border-amber-200/80 p-6 sm:p-8 shadow-sm">
+      <div class="flex items-start gap-4">
+        <div class="p-3 bg-amber-500 text-white rounded-2xl shadow-md shrink-0">
+          <i data-lucide="help-circle" class="w-6 h-6"></i>
+        </div>
+        <div class="space-y-4 w-full">
+          <div>
+            <span class="text-xs font-bold uppercase tracking-wider text-amber-700 bg-amber-100 px-2.5 py-1 rounded-md">
+              คำถามนำเพื่อการค้นพบ (Discovery Inquiry)
+            </span>
+            <h2 class="text-lg sm:text-xl font-bold text-slate-900 mt-2">
+              "เหตุใดเซตหนึ่งจึงจะเป็นปริภูมิเวกเตอร์ไม่ได้ เพียงเพราะสมาชิกของเซตนั้นมีลักษณะคล้ายเวกเตอร์?"
+            </h2>
+          </div>
+
+          <p class="text-sm sm:text-base text-slate-700 leading-relaxed">
+            บ่อยครั้งที่เราเห็นสมาชิกอยู่ในรูปคู่อันดับ $(x, y)$ หรือสามอันดับ $(x, y, z)$ เรามักจะทึกทักว่าเป็นเวกเตอร์ทันที แต่ในความเป็นจริง การเป็น Vector Space หรือไม่นั้น ขึ้นอยู่กับปัจจัยใดกันแน่?
+          </p>
+
+          <button id="toggle-discovery-btn" onclick="toggleDiscoveryExplanation()" class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-amber-600 hover:bg-amber-700 text-white text-sm font-semibold transition-all shadow-sm">
+            <i data-lucide="sparkles" class="w-4 h-4"></i>
+            <span id="discovery-btn-text">คลิกเพื่อดูบทวิเคราะห์และข้อสรุปสำคัญ</span>
+          </button>
+
+          <!-- Hidden Discovery Explanation Content -->
+          <div id="discovery-content" class="hidden mt-4 pt-4 border-t border-amber-200 text-sm text-slate-700 space-y-3">
+            <div class="p-4 bg-white/90 rounded-2xl border border-amber-300/80 shadow-inner space-y-2.5">
+              <div class="font-bold text-amber-900 text-base flex items-center gap-2">
+                <i data-lucide="check-circle-2" class="w-5 h-5 text-emerald-600"></i>
+                หัวใจสำคัญ: ปริภูมิเวกเตอร์มิได้ขึ้นอยู่กับ "รูปทรงของสมาชิก" แต่ขึ้นอยู่กับ "โครงสร้างการดำเนินการ"
+              </div>
+              <p class="leading-relaxed">
+                1. <strong>ปริภูมิเวกเตอร์คือโครงสร้างสามอันดับ $(V, +, \cdot)$:</strong> เซต $V$ เซตเดียวกัน เช่น $\mathbb{R}^2$ หากนิยามการคูณสเกลาร์แบบไม่ปกติ เช่น $c(x, y) = (cx, 0)$ จะไม่เป็นปริภูมิเวกเตอร์ทันที เพราะทำให้ $1(x, y) \ne (x, y)$ เมื่อ $y \ne 0$
+              </p>
+              <p class="leading-relaxed">
+                2. <strong>สมาชิกหน้าตาไม่เหมือนเวกเตอร์ก็เป็นปริภูมิเวกเตอร์ได้:</strong> เช่น เซตจำนวนจริงบวก $\mathbb{R}^+$ หรือเซตพหุนาม $P_n$ หรือเซตฟังก์ชันต่อเนื่อง $C[a, b]$ ล้วนเป็นปริภูมิเวกเตอร์ที่สมบูรณ์แบบได้เมื่อมีการดำเนินการที่สอดคล้องกับสัจพจน์ครบ 10 ข้อ
+              </p>
+              <div class="p-2.5 bg-amber-50 rounded-lg text-xs font-medium text-amber-950 border border-amber-200">
+                💡 <strong>สรุป:</strong> อย่าตัดสินจากหน้าตาของสมาชิก แต่ต้องตรวจสอบ <strong>"สมบัติปิด และสัจพจน์ทั้ง 10 ข้อภายใต้การดำเนินการที่กำหนด"</strong> เสมอ
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+
+    <!-- 4. แบบจำลองโต้ตอบ (Interactive Simulator / Axiom Checker) -->
+    <section id="interactive-simulator" class="space-y-6">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-200 pb-3">
+        <div>
+          <h2 class="text-xl sm:text-2xl font-bold text-slate-900 flex items-center gap-2">
+            <span class="w-2 h-6 bg-indigo-600 rounded-full inline-block"></span>
+            แบบจำลองโต้ตอบ: เครื่องมือวิเคราะห์สัจพจน์ (Axiom Inspector)
+          </h2>
+          <p class="text-sm text-slate-500 mt-1">เลือกเซตและการดำเนินการเพื่อตรวจสอบสัจพจน์ทั้ง 10 ข้อแบบเรียลไทม์</p>
+        </div>
+        <span class="inline-flex items-center gap-1.5 text-xs px-3 py-1 bg-emerald-50 text-emerald-700 font-semibold rounded-lg border border-emerald-200">
+          <i data-lucide="play" class="w-3.5 h-3.5"></i> Interactive Lab
+        </span>
+      </div>
+
+      <!-- Simulator Card -->
+      <div class="bg-white rounded-3xl border border-slate-200 shadow-md overflow-hidden">
+        <div class="p-6 bg-slate-900 text-white">
+          <label for="caseSelect" class="block text-xs font-semibold uppercase tracking-wider text-indigo-300 mb-2">
+            เลือกกรณีศึกษา (Select Mathematical System):
+          </label>
+          <div class="relative">
+            <select id="caseSelect" onchange="renderCaseAnalysis()" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-3 text-white text-sm sm:text-base focus:ring-2 focus:ring-indigo-500 focus:outline-none cursor-pointer">
+              <option value="case1">กรณีที่ 1: R^2 กับการบวกและการคูณสเกลาร์มาตรฐาน</option>
+              <option value="case2">กรณีที่ 2: R^3 กับการบวกและการคูณสเกลาร์มาตรฐาน</option>
+              <option value="case3">กรณีที่ 3: R^2 บวกมาตรฐาน แต่คูณสเกลาร์แบบพิเศษ c(x, y) = (cx, 0)</option>
+              <option value="case4">กรณีที่ 4: เซตจำนวนจริงบวก R^+ โดย u + v = uv และ c . u = u^c</option>
+              <option value="case5">กรณีที่ 5: คอดรันต์ที่ 1 ใน R^2 (x >= 0, y >= 0) กับการดำเนินการมาตรฐาน</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Case Overview Description -->
+        <div class="p-6 bg-slate-50 border-b border-slate-200">
+          <div id="case-header-content" class="space-y-3">
+            <!-- Dynamically populated by JS -->
+          </div>
+        </div>
+
+        <!-- 10 Axioms Results Table / Checklist -->
+        <div class="p-6">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4">
+            <h3 class="text-sm font-bold text-slate-700 uppercase tracking-wider">
+              ผลการตรวจสอบสัจพจน์ 10 ข้อ (Axioms Verification)
+            </h3>
+            <span id="overall-badge" class="px-3 py-1 rounded-full text-xs font-bold inline-block self-start sm:self-auto"></span>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4" id="axioms-grid">
+            <!-- Dynamically populated by JS -->
+          </div>
+        </div>
+
+        <!-- Bottom Takeaway / Analysis Note -->
+        <div class="px-6 py-4 bg-slate-100 border-t border-slate-200 text-xs sm:text-sm text-slate-700 flex items-start gap-3">
+          <i data-lucide="info" class="w-5 h-5 text-indigo-600 shrink-0 mt-0.5"></i>
+          <div id="case-takeaway" class="leading-relaxed">
+            <!-- Dynamically populated by JS -->
+          </div>
+        </div>
+      </div>
+    </section>
+
+
+    <!-- 5. แบบฝึกหัดสำหรับนักศึกษา (Exercises & Self-Check) -->
+    <section id="exercises" class="space-y-6">
+      <div class="flex items-center justify-between border-b border-slate-200 pb-3">
+        <div>
+          <h2 class="text-xl sm:text-2xl font-bold text-slate-900 flex items-center gap-2">
+            <span class="w-2 h-6 bg-indigo-600 rounded-full inline-block"></span>
+            แบบฝึกหัดทบทวนและฝึกวิเคราะห์
+          </h2>
+          <p class="text-sm text-slate-500 mt-1">ทดสอบความเข้าใจ วิเคราะห์ตัวอย่างที่เป็นและไม่เป็นปริภูมิเวกเตอร์ พร้อมเฉลยละเอียด</p>
+        </div>
+      </div>
+
+      <div class="space-y-4">
+        <!-- Exercise Card 1 -->
+        <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm hover:shadow-md transition-shadow">
+          <div class="flex items-start justify-between gap-4">
+            <div class="space-y-2">
+              <span class="px-2.5 py-0.5 rounded text-xs font-bold bg-blue-100 text-blue-700">ข้อที่ 1 (การเขียนสัจพจน์และตรวจสอบ)</span>
+              <h3 class="text-base font-bold text-slate-900">
+                พิจารณาเซต $V = \{(x, y) \in \mathbb{R}^2 \mid x + y = 0\}$ ร่วมกับการบวกและการคูณสเกลาร์มาตรฐานบน $\mathbb{R}^2$ เซตนี้เป็นปริภูมิเวกเตอร์เหนือ $\mathbb{R}$ หรือไม่?
+              </h3>
+              <p class="text-xs text-slate-500">
+                คำใบ้: ตรวจสอบว่ามีเวกเตอร์ศูนย์ $(0,0)$ หรือไม่ และสมบัติปิดการบวกกับการคูณด้วยสเกลาร์เป็นจริงหรือไม่
+              </p>
+            </div>
+            <button onclick="toggleAnswer('ex1-ans', this)" class="shrink-0 px-3.5 py-2 rounded-xl text-xs font-semibold bg-indigo-50 text-indigo-600 hover:bg-indigo-100 border border-indigo-200 transition-colors flex items-center gap-1.5">
+              <i data-lucide="eye" class="w-3.5 h-3.5"></i>
+              <span>แสดงเฉลย</span>
+            </button>
+          </div>
+
+          <div id="ex1-ans" class="hidden mt-4 pt-4 border-t border-slate-200 text-sm text-slate-700 space-y-2 bg-slate-50 p-4 rounded-xl">
+            <div class="font-bold text-emerald-700 flex items-center gap-1.5">
+              <i data-lucide="check-circle" class="w-4 h-4"></i> คำตอบ: เป็นปริภูมิเวกเตอร์ (Vector Space)
+            </div>
+            <p class="text-xs leading-relaxed">
+              <strong>วิธีวิเคราะห์:</strong> $V$ คือเซตของจุดบนเส้นตรง $y = -x$ ซึ่งผ่านจุดกำเนิด $(0, 0)$
+            </p>
+            <ul class="text-xs list-disc list-inside space-y-1 text-slate-600">
+              <li><strong>มีเอกลักษณ์การบวก:</strong> $(0, 0) \in V$ เพราะ $0 + 0 = 0$ (A4 ผ่าน)</li>
+              <li><strong>ปิดการบวก:</strong> ให้ $\mathbf{u} = (x_1, -x_1), \mathbf{v} = (x_2, -x_2)$ จะได้ $\mathbf{u}+\mathbf{v} = (x_1+x_2, -(x_1+x_2))$ ผลรวมของสมาชิกเป็น 0 เสมอ (A1 ผ่าน)</li>
+              <li><strong>ปิดการคูณสเกลาร์:</strong> สำหรับ $c \in \mathbb{R}$, $c\mathbf{u} = (cx_1, -cx_1) \in V$ เสมอ (M1 ผ่าน)</li>
+              <li>สัจพจน์ข้อที่เหลือได้รับการถ่ายทอดมาจากสมบัติของ $\mathbb{R}^2$ โดยตรง จึงสอดคล้องครบทั้ง 10 ข้อ</li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- Exercise Card 2 -->
+        <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm hover:shadow-md transition-shadow">
+          <div class="flex items-start justify-between gap-4">
+            <div class="space-y-2">
+              <span class="px-2.5 py-0.5 rounded text-xs font-bold bg-amber-100 text-amber-700">ข้อที่ 2 (การระบุเงื่อนไขที่ไม่ผ่าน)</span>
+              <h3 class="text-base font-bold text-slate-900">
+                พิจารณาเซต $V = \{(x, y) \in \mathbb{R}^2 \mid x + y = 1\}$ ร่วมกับการบวกและการคูณสเกลาร์มาตรฐานบน $\mathbb{R}^2$ เซตนี้เป็นปริภูมิเวกเตอร์หรือไม่? หากไม่เป็น ให้ระบุสัจพจน์ที่ไม่สอดคล้อง
+              </h3>
+              <p class="text-xs text-slate-500">
+                คำใบ้: ลองตรวจสอบการมีอยู่ของเวกเตอร์ศูนย์ $\mathbf{0} = (0, 0)$ และสมบัติปิด
+              </p>
+            </div>
+            <button onclick="toggleAnswer('ex2-ans', this)" class="shrink-0 px-3.5 py-2 rounded-xl text-xs font-semibold bg-indigo-50 text-indigo-600 hover:bg-indigo-100 border border-indigo-200 transition-colors flex items-center gap-1.5">
+              <i data-lucide="eye" class="w-3.5 h-3.5"></i>
+              <span>แสดงเฉลย</span>
+            </button>
+          </div>
+
+          <div id="ex2-ans" class="hidden mt-4 pt-4 border-t border-slate-200 text-sm text-slate-700 space-y-2 bg-slate-50 p-4 rounded-xl">
+            <div class="font-bold text-rose-700 flex items-center gap-1.5">
+              <i data-lucide="x-circle" class="w-4 h-4"></i> คำตอบ: ไม่เป็นปริภูมิเวกเตอร์ (Not a Vector Space)
+            </div>
+            <p class="text-xs leading-relaxed font-semibold text-slate-800">
+              เงื่อนไขที่ไม่สอดคล้องอย่างชัดเจน:
+            </p>
+            <ul class="text-xs list-disc list-inside space-y-1.5 text-slate-600">
+              <li><strong>ไม่มีเอกลักษณ์การบวก (ตกสัจพจน์ A4):</strong> เวกเตอร์ศูนย์คือ $(0,0)$ แต่ $0 + 0 = 0 \ne 1$ ดังนั้น $(0,0) \notin V$</li>
+              <li><strong>ไม่ปิดการบวก (ตกสัจพจน์ A1):</strong> เช่น $(1, 0) \in V$ และ $(0, 1) \in V$ ผลรวมคือ $(1, 0) + (0, 1) = (1, 1)$ ซึ่ง $1 + 1 = 2 \ne 1$ ดังนั้น $(1, 1) \notin V$</li>
+              <li><strong>ไม่ปิดการคูณสเกลาร์ (ตกสัจพจน์ M1):</strong> เช่น ให้ $c = 3$ คูณ $(1, 0) \in V$ ได้ $(3, 0)$ ซึ่ง $3 + 0 = 3 \ne 1$</li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- Exercise Card 3 -->
+        <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm hover:shadow-md transition-shadow">
+          <div class="flex items-start justify-between gap-4">
+            <div class="space-y-2">
+              <span class="px-2.5 py-0.5 rounded text-xs font-bold bg-purple-100 text-purple-700">ข้อที่ 3 (สัจพจน์การคูณด้วยสเกลาร์)</span>
+              <h3 class="text-base font-bold text-slate-900">
+                กำหนดเซต $V = \mathbb{R}^2$ มีการบวกมาตรฐาน $(u_1, u_2) + (v_1, v_2) = (u_1+v_1, u_2+v_2)$ แต่นิยามการคูณสเกลาร์เป็น $c(u_1, u_2) = (c^2 u_1, c^2 u_2)$ จงวิเคราะห์ว่าเป็นปริภูมิเวกเตอร์หรือไม่
+              </h3>
+              <p class="text-xs text-slate-500">
+                คำใบ้: ลองทดสอบสัจพจน์การแจกแจงสเกลาร์ $(c + d)\mathbf{u} = c\mathbf{u} + d\mathbf{u}$
+              </p>
+            </div>
+            <button onclick="toggleAnswer('ex3-ans', this)" class="shrink-0 px-3.5 py-2 rounded-xl text-xs font-semibold bg-indigo-50 text-indigo-600 hover:bg-indigo-100 border border-indigo-200 transition-colors flex items-center gap-1.5">
+              <i data-lucide="eye" class="w-3.5 h-3.5"></i>
+              <span>แสดงเฉลย</span>
+            </button>
+          </div>
+
+          <div id="ex3-ans" class="hidden mt-4 pt-4 border-t border-slate-200 text-sm text-slate-700 space-y-2 bg-slate-50 p-4 rounded-xl">
+            <div class="font-bold text-rose-700 flex items-center gap-1.5">
+              <i data-lucide="x-circle" class="w-4 h-4"></i> คำตอบ: ไม่เป็นปริภูมิเวกเตอร์ (Not a Vector Space)
+            </div>
+            <p class="text-xs leading-relaxed">
+              <strong>สัจพจน์ที่ไม่สอดคล้อง:</strong>
+            </p>
+            <ul class="text-xs list-disc list-inside space-y-1.5 text-slate-600">
+              <li><strong>ตกสัจพจน์ M3 [การแจกแจงบนผลบวกสเกลาร์]:</strong> พิจารณา $(c+d)\mathbf{u}$ เทียบกับ $c\mathbf{u} + d\mathbf{u}$</li>
+              <li>ฝั่งซ้าย: $(c+d)\mathbf{u} = ((c+d)^2 u_1, (c+d)^2 u_2) = ((c^2 + 2cd + d^2)u_1, (c^2 + 2cd + d^2)u_2)$</li>
+              <li>ฝั่งขวา: $c\mathbf{u} + d\mathbf{u} = (c^2 u_1, c^2 u_2) + (d^2 u_1, d^2 u_2) = ((c^2+d^2)u_1, (c^2+d^2)u_2)$</li>
+              <li>มีพจน์ $2cd$ ซึ่งทำให้ทั้งสองฝั่งไม่เท่ากันเสมอไป (เช่น $c=1, d=1, \mathbf{u}=(1,0)$ ฝั่งซ้ายได้ $(4,0)$ แต่ฝั่งขวาได้ $(2,0)$)</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </div>
+
+  <!-- JavaScript Logic for Interactivity -->
+  <script>
+    // Toggle Discovery Explanation
+    function toggleDiscoveryExplanation() {
+      const content = document.getElementById('discovery-content');
+      const btnText = document.getElementById('discovery-btn-text');
+      const isHidden = content.classList.contains('hidden');
+
+      if (isHidden) {
+        content.classList.remove('hidden');
+        btnText.innerText = "ซ่อนบทวิเคราะห์";
+      } else {
+        content.classList.add('hidden');
+        btnText.innerText = "คลิกเพื่อดูบทวิเคราะห์และข้อสรุปสำคัญ";
+      }
+      lucide.createIcons();
+    }
+
+    // Toggle Exercises Answer Accordion
+    function toggleAnswer(id, btn) {
+      const el = document.getElementById(id);
+      const isHidden = el.classList.contains('hidden');
+      if (isHidden) {
+        el.classList.remove('hidden');
+        btn.querySelector('span').innerText = 'ซ่อนเฉลย';
+      } else {
+        el.classList.add('hidden');
+        btn.querySelector('span').innerText = 'แสดงเฉลย';
+      }
+      lucide.createIcons();
+      if (window.MathJax && window.MathJax.typesetPromise) {
+        MathJax.typesetPromise([el]).catch((err) => console.log(err));
+      }
+    }
+
+    // Dataset for Cases in Interactive Simulator
+    const casesData = {
+      case1: {
+        title: "กรณีที่ 1: ปริภูมิแบบยุคลิดมาตรฐาน R^2",
+        setDesc: "$V = \\mathbb{R}^2 = \\{(x, y) \\mid x, y \\in \\mathbb{R}\\}$, สนาม $\\mathbb{F} = \\mathbb{R}$",
+        opsDesc: "การบวกมาตรฐาน: $(x_1, y_1) + (x_2, y_2) = (x_1+x_2, y_1+y_2)$ และการคูณสเกลาร์มาตรฐาน: $c(x, y) = (cx, cy)$",
+        isVectorSpace: true,
+        takeaway: "<strong>ข้อสรุป:</strong> ระบบนี้คือแม่แบบปริภูมิยุคลิด 2 มิติ สอดคล้องกับสัจพจน์ครบทั้ง 10 ประการ จึงเป็นปริภูมิเวกเตอร์ (Vector Space)",
+        axioms: [
+          { code: "A1", name: "ปิดการบวก", pass: true, detail: "ผลรวมของจำนวนจริงยังคงเป็นจำนวนจริง: <span class=\"math-badge\">$(x_1+x_2, y_1+y_2) \\in \\mathbb{R}^2$</span>" },
+          { code: "A2", name: "สลับที่การบวก", pass: true, detail: "$x_1+x_2 = x_2+x_1$ จึงได้ <span class=\"math-badge\">$\\mathbf{u}+\\mathbf{v} = \\mathbf{v}+\\mathbf{u}$</span>" },
+          { code: "A3", name: "เปลี่ยนหมู่การบวก", pass: true, detail: "การบวกของจำนวนจริงมีสมบัติการเปลี่ยนหมู่ <span class=\"math-badge\">$(\\mathbf{u}+\\mathbf{v})+\\mathbf{w} = \\mathbf{u}+(\\mathbf{v}+\\mathbf{w})$</span>" },
+          { code: "A4", name: "เอกลักษณ์การบวก", pass: true, detail: "มี <span class=\"math-badge\">$\\mathbf{0} = (0, 0) \\in \\mathbb{R}^2$</span> ซึ่ง <span class=\"math-badge\">$(x, y) + (0, 0) = (x, y)$</span>" },
+          { code: "A5", name: "ตัวผกผันการบวก", pass: true, detail: "สำหรับ $(x, y)$ จะมี <span class=\"math-badge\">$-(x, y) = (-x, -y) \\in \\mathbb{R}^2$</span> ที่บวกกันได้ $(0,0)$" },
+          { code: "M1", name: "ปิดการคูณสเกลาร์", pass: true, detail: "$cx, cy \\in \\mathbb{R}$ ดังนั้น <span class=\"math-badge\">$c\\mathbf{u} = (cx, cy) \\in \\mathbb{R}^2$</span>" },
+          { code: "M2", name: "แจกแจงบนเวกเตอร์", pass: true, detail: "<span class=\"math-badge\">$c(\\mathbf{u}+\\mathbf{v}) = c(x_1+x_2, y_1+y_2) = c\\mathbf{u}+c\\mathbf{v}$</span>" },
+          { code: "M3", name: "แจกแจงบนสเกลาร์", pass: true, detail: "<span class=\"math-badge\">$(c+d)(x, y) = ((c+d)x, (c+d)y) = c(x, y)+d(x, y)$</span>" },
+          { code: "M4", name: "เปลี่ยนหมู่สเกลาร์", pass: true, detail: "<span class=\"math-badge\">$c(d(x, y)) = (cd)(x, y)$</span>" },
+          { code: "M5", name: "เอกลักษณ์สเกลาร์", pass: true, detail: "<span class=\"math-badge\">$1(x, y) = (1\\cdot x, 1\\cdot y) = (x, y)$</span> เท่ากับเวกเตอร์เดิมเสมอ" }
+        ]
+      },
+      case2: {
+        title: "กรณีที่ 2: ปริภูมิแบบยุคลิดมาตรฐาน R^3",
+        setDesc: "$V = \\mathbb{R}^3 = \\{(x, y, z) \\mid x, y, z \\in \\mathbb{R}\\}$, สนาม $\\mathbb{F} = \\mathbb{R}$",
+        opsDesc: "การบวกมาตรฐานใน 3 มิติ และการคูณสเกลาร์มาตรฐานแบบกระจายทุกพิกัด",
+        isVectorSpace: true,
+        takeaway: "<strong>ข้อสรุป:</strong> ระบบ 3 มิตินี้สอดคล้องกับสัจพจน์ครบทั้ง 10 ประการ เป็นปริภูมิเวกเตอร์มาตรฐานเหนือ $\\mathbb{R}$",
+        axioms: [
+          { code: "A1", name: "ปิดการบวก", pass: true, detail: "<span class=\"math-badge\">$(x_1+x_2, y_1+y_2, z_1+z_2) \\in \\mathbb{R}^3$</span>" },
+          { code: "A2", name: "สลับที่การบวก", pass: true, detail: "การบวกของแต่ละพิกัดสลับที่ได้เสมอ" },
+          { code: "A3", name: "เปลี่ยนหมู่การบวก", pass: true, detail: "การบวกของแต่ละพิกัดเปลี่ยนหมู่ได้เสมอ" },
+          { code: "A4", name: "เอกลักษณ์การบวก", pass: true, detail: "มีเวกเตอร์ศูนย์ <span class=\"math-badge\">$\\mathbf{0} = (0, 0, 0) \\in \\mathbb{R}^3$</span>" },
+          { code: "A5", name: "ตัวผกผันการบวก", pass: true, detail: "ทุกเวกเตอร์ $(x,y,z)$ มี <span class=\"math-badge\">$(-x,-y,-z) \\in \\mathbb{R}^3$</span>" },
+          { code: "M1", name: "ปิดการคูณสเกลาร์", pass: true, detail: "<span class=\"math-badge\">$c(x,y,z) = (cx, cy, cz) \\in \\mathbb{R}^3$</span>" },
+          { code: "M2", name: "แจกแจงบนเวกเตอร์", pass: true, detail: "<span class=\"math-badge\">$c(\\mathbf{u}+\\mathbf{v}) = c\\mathbf{u}+c\\mathbf{v}$</span> ทุกพิกัดแจกแจงได้" },
+          { code: "M3", name: "แจกแจงบนสเกลาร์", pass: true, detail: "<span class=\"math-badge\">$(c+d)\\mathbf{u} = c\\mathbf{u}+d\\mathbf{u}$</span> ทุกพิกัดแจกแจงได้" },
+          { code: "M4", name: "เปลี่ยนหมู่สเกลาร์", pass: true, detail: "<span class=\"math-badge\">$c(d\\mathbf{u}) = (cd)\\mathbf{u}$</span> สอดคล้องตามสมบัติจำนวนจริง" },
+          { code: "M5", name: "เอกลักษณ์สเกลาร์", pass: true, detail: "<span class=\"math-badge\">$1(x,y,z) = (x,y,z)$</span> ได้เวกเตอร์เดิมเสมอ" }
+        ]
+      },
+      case3: {
+        title: "กรณีที่ 3: R^2 กับการคูณสเกลาร์ผิดปกติ c(x, y) = (cx, 0)",
+        setDesc: "$V = \\mathbb{R}^2$, สนาม $\\mathbb{F} = \\mathbb{R}$",
+        opsDesc: "การบวกปกติ: $\\mathbf{u}+\\mathbf{v} = (u_1+v_1, u_2+v_2)$ แต่นิยามการคูณสเกลาร์: $c(x, y) = (cx, 0)$ (ตัดตำแหน่งที่สองทิ้งเป็น 0)",
+        isVectorSpace: false,
+        takeaway: "<strong>ข้อสรุป:</strong> ไม่เป็นปริภูมิเวกเตอร์! แม้จะสอดคล้องกับคุณสมบัติการบวกครบ 5 ข้อ และปิดการคูณสเกลาร์ แต่ตกสัจพจน์ M5 ($1\\mathbf{u} \\ne \\mathbf{u}$ เมื่อ $y \\ne 0$)",
+        axioms: [
+          { code: "A1", name: "ปิดการบวก", pass: true, detail: "การบวกเป็นแบบมาตรฐาน ผลลัพธ์อยู่ใน $\\mathbb{R}^2$" },
+          { code: "A2", name: "สลับที่การบวก", pass: true, detail: "สลับที่ได้ตามปกติของการบวก" },
+          { code: "A3", name: "เปลี่ยนหมู่การบวก", pass: true, detail: "เปลี่ยนหมู่ได้ตามปกติ" },
+          { code: "A4", name: "เอกลักษณ์การบวก", pass: true, detail: "มี $(0, 0)$ เป็นเอกลักษณ์การบวก" },
+          { code: "A5", name: "ตัวผกผันการบวก", pass: true, detail: "ทุกเวกเตอร์ $(x, y)$ มี $(-x, -y)$ เป็นตัวผกผัน" },
+          { code: "M1", name: "ปิดการคูณสเกลาร์", pass: true, detail: "<span class=\"math-badge\">$(cx, 0) \\in \\mathbb{R}^2$</span> เสมอ" },
+          { code: "M2", name: "แจกแจงบนเวกเตอร์", pass: true, detail: "<span class=\"math-badge\">$c(\\mathbf{u}+\\mathbf{v}) = (c(u_1+v_1), 0) = c\\mathbf{u}+c\\mathbf{v}$</span> (ผ่าน)" },
+          { code: "M3", name: "แจกแจงบนสเกลาร์", pass: true, detail: "<span class=\"math-badge\">$(c+d)\\mathbf{u} = ((c+d)u_1, 0) = c\\mathbf{u}+d\\mathbf{u}$</span> (ผ่าน)" },
+          { code: "M4", name: "เปลี่ยนหมู่สเกลาร์", pass: true, detail: "<span class=\"math-badge\">$c(d\\mathbf{u}) = c(du_1, 0) = (cd)\\mathbf{u}$</span> (ผ่าน)" },
+          { code: "M5", name: "เอกลักษณ์สเกลาร์", pass: false, detail: "<strong>ล้มเหลว!</strong> <span class=\"math-badge\">$1(x, y) = (x, 0) \\ne (x, y)$</span> เมื่อ $y \\ne 0$ เช่น $1(2, 5) = (2, 0) \\ne (2, 5)$" }
+        ]
+      },
+      case4: {
+        title: "กรณีที่ 4: ระบบจำนวนจริงบวก R^+ (u + v = uv, c . u = u^c)",
+        setDesc: "$V = \\mathbb{R}^+ = \\{x \\in \\mathbb{R} \\mid x > 0\\}$, สนาม $\\mathbb{F} = \\mathbb{R}$",
+        opsDesc: "นิยามการบวก: $u \\oplus v = uv$ และการคูณสเกลาร์: $c \\odot u = u^c$",
+        isVectorSpace: true,
+        takeaway: "<strong>ข้อสรุป:</strong> เซตนี้เป็น <strong>ปริภูมิเวกเตอร์</strong> ที่ถูกต้องตามสัจพจน์ครบ 10 ข้อ โดยมี 'เวกเตอร์ศูนย์' คือเลข $1$ และ 'ตัวผกผันการบวก' คือ $\\frac{1}{u}$",
+        axioms: [
+          { code: "A1", name: "ปิดการบวก", pass: true, detail: "ถ้า $u, v > 0$ แล้ว <span class=\"math-badge\">$u \\oplus v = uv > 0 \\in \\mathbb{R}^+$</span>" },
+          { code: "A2", name: "สลับที่การบวก", pass: true, detail: "<span class=\"math-badge\">$u \\oplus v = uv = vu = v \\oplus u$</span>" },
+          { code: "A3", name: "เปลี่ยนหมู่การบวก", pass: true, detail: "<span class=\"math-badge\">$(u \\oplus v) \\oplus w = u \\oplus (v \\oplus w)$</span>" },
+          { code: "A4", name: "เอกลักษณ์การบวก", pass: true, detail: "มีเวกเตอร์ศูนย์ <span class=\"math-badge\">$\\mathbf{0}_V = 1$</span> ซึ่ง <span class=\"math-badge\">$u \\oplus 1 = u \\cdot 1 = u$</span>" },
+          { code: "A5", name: "ตัวผกผันการบวก", pass: true, detail: "สำหรับ $u > 0$ ตัวผกผันคือ <span class=\"math-badge\">$u^{-1} = \\frac{1}{u} \\in \\mathbb{R}^+$</span> เพราะ $u \\cdot \\frac{1}{u} = 1$" },
+          { code: "M1", name: "ปิดการคูณสเกลาร์", pass: true, detail: "ถ้า $u > 0$ และ $c \\in \\mathbb{R}$ แล้ว <span class=\"math-badge\">$c \\odot u = u^c > 0 \\in \\mathbb{R}^+$</span>" },
+          { code: "M2", name: "แจกแจงบนเวกเตอร์", pass: true, detail: "<span class=\"math-badge\">$c \\odot (u \\oplus v) = (uv)^c = u^c v^c = (c \\odot u) \\oplus (c \\odot v)$</span>" },
+          { code: "M3", name: "แจกแจงบนสเกลาร์", pass: true, detail: "<span class=\"math-badge\">$(c+d) \\odot u = u^{c+d} = u^c \\cdot u^d = (c \\odot u) \\oplus (d \\odot u)$</span>" },
+          { code: "M4", name: "เปลี่ยนหมู่สเกลาร์", pass: true, detail: "<span class=\"math-badge\">$c \\odot (d \\odot u) = (u^d)^c = u^{cd} = (cd) \\odot u$</span>" },
+          { code: "M5", name: "เอกลักษณ์สเกลาร์", pass: true, detail: "<span class=\"math-badge\">$1 \\odot u = u^1 = u$</span> เท่ากับเวกเตอร์เดิมพอดี" }
+        ]
+      },
+      case5: {
+        title: "กรณีที่ 5: คอดรันต์ที่หนึ่ง V = {(x, y) ใน R^2 | x >= 0, y >= 0}",
+        setDesc: "$V = \\{(x, y) \\in \\mathbb{R}^2 \\mid x \\ge 0, y \\ge 0\\}$, สนาม $\\mathbb{F} = \\mathbb{R}$",
+        opsDesc: "การบวกมาตรฐาน และการคูณสเกลาร์มาตรฐาน",
+        isVectorSpace: false,
+        takeaway: "<strong>ข้อสรุป:</strong> ไม่เป็นปริภูมิเวกเตอร์! ล้มเหลวเนื่องจากไม่มีตัวผกผันการบวก และไม่ปิดการคูณด้วยสเกลาร์ลบ ($c < 0$ ทำให้พิกัดหลุดออกนอกจตุภาคที่ 1)",
+        axioms: [
+          { code: "A1", name: "ปิดการบวก", pass: true, detail: "ถ้า $x_1, y_1, x_2, y_2 \\ge 0$ แล้ว $x_1+x_2 \\ge 0, y_1+y_2 \\ge 0$ จึงอยู่ใน $V$" },
+          { code: "A2", name: "สลับที่การบวก", pass: true, detail: "บวกสลับที่ได้ปกติ" },
+          { code: "A3", name: "เปลี่ยนหมู่การบวก", pass: true, detail: "เปลี่ยนหมู่ได้ปกติ" },
+          { code: "A4", name: "เอกลักษณ์การบวก", pass: true, detail: "มี $(0, 0) \\in V$ เพราะ $0 \\ge 0, 0 \\ge 0$" },
+          { code: "A5", name: "ตัวผกผันการบวก", pass: false, detail: "<strong>ล้มเหลว!</strong> สำหรับ $(1, 1) \\in V$ ตัวผกผันคือ <span class=\"math-badge\">$(-1, -1) \\notin V$</span> เพราะพิกัดติดลบ" },
+          { code: "M1", name: "ปิดการคูณสเกลาร์", pass: false, detail: "<strong>ล้มเหลว!</strong> เมื่อ $c < 0$ เช่น $c = -2 \\implies -2(1, 1) = (-2, -2) \\notin V$" },
+          { code: "M2", name: "แจกแจงบนเวกเตอร์", pass: true, detail: "สูตรทางพีชคณิตสอดคล้อง แต่การคูณไม่ปิด" },
+          { code: "M3", name: "แจกแจงบนสเกลาร์", pass: true, detail: "สูตรทางพีชคณิตสอดคล้อง" },
+          { code: "M4", name: "เปลี่ยนหมู่สเกลาร์", pass: true, detail: "สูตรทางพีชคณิตสอดคล้อง" },
+          { code: "M5", name: "เอกลักษณ์สเกลาร์", pass: true, detail: "$1(x, y) = (x, y)$" }
+        ]
+      }
+    };
+
+    function renderCaseAnalysis() {
+      const select = document.getElementById("caseSelect");
+      const selectedKey = select.value;
+      const data = casesData[selectedKey];
+
+      // Header Details
+      const headerContent = document.getElementById("case-header-content");
+      headerContent.innerHTML = `
+        <div class="flex flex-wrap items-center gap-2">
+          <span class="text-xs font-bold uppercase tracking-wider px-2.5 py-1 rounded ${data.isVectorSpace ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-800'}">
+            ${data.isVectorSpace ? '✓ เป็นปริภูมิเวกเตอร์' : '✗ ไม่เป็นปริภูมิเวกเตอร์'}
+          </span>
+          <h4 class="font-bold text-slate-900 text-base sm:text-lg">${data.title}</h4>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs sm:text-sm">
+          <div class="bg-white p-3 rounded-xl border border-slate-200">
+            <span class="font-semibold text-slate-500 block mb-0.5">เซตและสนาม:</span>
+            <span class="text-slate-800 font-mono">${data.setDesc}</span>
+          </div>
+          <div class="bg-white p-3 rounded-xl border border-slate-200">
+            <span class="font-semibold text-slate-500 block mb-0.5">การดำเนินการ:</span>
+            <span class="text-slate-800 font-mono">${data.opsDesc}</span>
+          </div>
+        </div>
+      `;
+
+      // Overall Badge
+      const overallBadge = document.getElementById("overall-badge");
+      if (data.isVectorSpace) {
+        overallBadge.className = "px-3 py-1 rounded-full text-xs font-bold bg-emerald-100 text-emerald-700 border border-emerald-300";
+        overallBadge.innerHTML = "ผ่านสัจพจน์ครบทั้ง 10 ข้อ (Passed)";
+      } else {
+        overallBadge.className = "px-3 py-1 rounded-full text-xs font-bold bg-rose-100 text-rose-700 border border-rose-300";
+        overallBadge.innerHTML = "ไม่ผ่านสัจพจน์บางข้อ (Failed)";
+      }
+
+      // Render 10 Axioms
+      const grid = document.getElementById("axioms-grid");
+      grid.innerHTML = data.axioms.map(ax => `
+        <div class="p-3.5 rounded-xl border transition-all ${ax.pass ? 'bg-white border-slate-200' : 'bg-rose-50/70 border-rose-200 shadow-sm'}">
+          <div class="flex items-center justify-between mb-1.5">
+            <div class="flex items-center gap-2">
+              <span class="font-mono text-xs font-bold px-2 py-0.5 rounded ${ax.pass ? 'bg-slate-100 text-slate-700' : 'bg-rose-200 text-rose-800'}">
+                ${ax.code}
+              </span>
+              <span class="font-semibold text-xs sm:text-sm text-slate-800">${ax.name}</span>
+            </div>
+            ${ax.pass 
+              ? '<span class="text-emerald-600 flex items-center text-xs font-bold gap-1"><i data-lucide="check" class="w-4 h-4"></i> ผ่าน</span>'
+              : '<span class="text-rose-600 flex items-center text-xs font-bold gap-1"><i data-lucide="x" class="w-4 h-4"></i> ไม่ผ่าน</span>'
+            }
+          </div>
+          <div class="text-xs text-slate-600 leading-relaxed pl-1">
+            ${ax.detail}
+          </div>
+        </div>
+      `).join('');
+
+      // Takeaway
+      document.getElementById("case-takeaway").innerHTML = data.takeaway;
+
+      // Re-initialize Lucide and typeset MathJax
+      lucide.createIcons();
+      if (window.MathJax && window.MathJax.typesetPromise) {
+        MathJax.typesetPromise([headerContent, grid, document.getElementById("case-takeaway")]).catch((err) => console.log(err));
+      }
+    }
+
+    // Initial Execution
+    window.addEventListener("DOMContentLoaded", () => {
+      lucide.createIcons();
+      renderCaseAnalysis();
+    });
+  </script>
+</body>
+</html>
