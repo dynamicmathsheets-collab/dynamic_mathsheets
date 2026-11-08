@@ -3,196 +3,679 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>บทเรียนออนไลน์: เวกเตอร์และพีชคณิตเชิงเส้น</title>
-  
-  <!-- Tailwind CSS -->
-  <script src="https://cdn.tailwindcss.com"></script>
-  
-  <!-- Google Fonts: Prompt & Sarabun -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@400;500;600;700&family=Sarabun:wght@300;400;500;600&display=swap" rel="stylesheet">
-  
-  <!-- Font Awesome -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-
+  <title>Dynamic Math Sheets - เมนูหลัก</title>
+  <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <style>
-    body {
-      font-family: 'Sarabun', sans-serif;
+    :root {
+      --primary: #2563eb;
+      --primary-hover: #1d4ed8;
+      --bg-color: #f8fafc;
+      --card-bg: #ffffff;
+      --text-main: #0f172a;
+      --text-sub: #475569;
+      --border: #e2e8f0;
+      --error: #ef4444;
+      --success: #10b981;
     }
-    h1, h2, h3, h4, .font-heading, button {
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
       font-family: 'Prompt', sans-serif;
     }
-    .custom-scroll::-webkit-scrollbar {
-      height: 6px;
+
+    body {
+      background-color: var(--bg-color);
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
     }
-    .custom-scroll::-webkit-scrollbar-thumb {
-      background-color: #cbd5e1;
-      border-radius: 9999px;
+
+    .app-wrapper {
+      flex: 1;
+      max-width: 1100px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 24px 20px 40px;
     }
-    .nav-btn.active {
-      background-color: #4f46e5;
+
+    /* แถบด้านบน: แท็บ + ข้อมูลโปรไฟล์ + ออกจากระบบ */
+    .top-action-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 14px;
+      margin-bottom: 28px;
+    }
+
+    .tab-bar {
+      display: inline-flex;
+      background: #e2e8f0;
+      padding: 5px;
+      border-radius: 16px;
+      box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.05);
+      gap: 6px;
+    }
+
+    .tab-btn {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 22px;
+      background: transparent;
+      border: none;
+      border-radius: 12px;
+      font-size: 0.95rem;
+      font-weight: 500;
+      color: var(--text-sub);
+      cursor: pointer;
+      transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .tab-btn:hover {
+      color: var(--primary);
+      background: rgba(255, 255, 255, 0.5);
+    }
+
+    .tab-btn.active {
       color: #ffffff;
-      box-shadow: 0 4px 6px -1px rgba(79, 70, 229, 0.2);
+      background: linear-gradient(135deg, #2563eb, #3b82f6);
+      font-weight: 600;
+      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+    }
+
+    .tab-btn svg {
+      width: 18px;
+      height: 18px;
+    }
+
+    .nav-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    /* ป้ายแสดงชื่อ บทบาท และวันหมดอายุ */
+    .user-profile-badge {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: #ffffff;
+      padding: 6px 14px 6px 8px;
+      border-radius: 20px;
+      border: 1px solid var(--border);
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+      flex-wrap: wrap;
+    }
+
+    .user-avatar {
+      width: 28px;
+      height: 28px;
+      background: #eff6ff;
+      color: var(--primary);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .user-avatar svg {
+      width: 17px;
+      height: 17px;
+    }
+
+    .user-name {
+      font-size: 0.9rem;
+      font-weight: 500;
+      color: var(--text-main);
+      max-width: 180px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .user-role-tag {
+      font-size: 0.75rem;
+      padding: 2px 8px;
+      background: #e0f2fe;
+      color: #0369a1;
+      border-radius: 10px;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+
+    .user-expire-tag {
+      font-size: 0.75rem;
+      padding: 2px 8px;
+      background: #fef3c7;
+      color: #92400e;
+      border-radius: 10px;
+      font-weight: 500;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      white-space: nowrap;
+    }
+
+    .user-expire-tag svg {
+      width: 12px;
+      height: 12px;
+    }
+
+    .btn-logout {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: #fee2e2;
+      color: #dc2626;
+      border: 1px solid #fecaca;
+      padding: 8px 16px;
+      border-radius: 12px;
+      font-size: 0.9rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .btn-logout:hover {
+      background: #dc2626;
+      color: #ffffff;
+    }
+
+    .btn-logout svg {
+      width: 16px;
+      height: 16px;
+    }
+
+    /* เนื้อหาแต่ละแท็บ */
+    .tab-content {
+      display: none;
+      flex-direction: column;
+      gap: 24px;
+    }
+
+    .tab-content.active {
+      display: flex;
+      animation: fadeIn 0.3s ease-in-out;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .card-frame {
+      background: var(--card-bg);
+      border-radius: 20px;
+      padding: 32px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
+      border: 1px solid var(--border);
+    }
+
+    .card-frame.gradient-header {
+      background: linear-gradient(135deg, #1e3a8a, #2563eb, #38bdf8);
+      color: #ffffff;
+      border: none;
+      box-shadow: 0 8px 24px rgba(37, 99, 235, 0.2);
+    }
+
+    .card-frame.gradient-header h1 {
+      font-size: 1.8rem;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    .card-frame.gradient-header p {
+      font-size: 1rem;
+      opacity: 0.95;
+    }
+
+    .frame-title {
+      font-size: 1.35rem;
+      font-weight: 600;
+      color: var(--text-main);
+      margin-bottom: 18px;
+    }
+
+    .article-body {
+      color: var(--text-sub);
+      font-size: 1rem;
+      line-height: 1.9;
+      text-align: justify;
+    }
+
+    .article-body p {
+      margin-bottom: 16px;
+    }
+
+    /* Grid รายการการ์ด */
+    .grid-menu {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 20px;
+      margin-top: 10px;
+    }
+
+    .menu-card {
+      position: relative;
+      background: #ffffff;
+      border-radius: 18px;
+      padding: 26px 20px;
+      text-align: center;
+      cursor: pointer;
+      border: 1px solid transparent;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 14px;
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.04);
+      text-decoration: none;
+    }
+
+    .menu-card:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 16px 28px rgba(0, 0, 0, 0.09);
+    }
+
+    .card-badge {
+      position: absolute;
+      top: 12px;
+      left: 12px;
+      padding: 2px 8px;
+      border-radius: 12px;
+      font-size: 0.75rem;
+      font-weight: 700;
+    }
+
+    .card-icon-wrapper {
+      width: 70px;
+      height: 70px;
+      border-radius: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: transform 0.3s ease;
+    }
+
+    .menu-card:hover .card-icon-wrapper {
+      transform: scale(1.1) rotate(2deg);
+    }
+
+    .card-icon-wrapper svg {
+      width: 36px;
+      height: 36px;
+    }
+
+    .menu-card h3 {
+      font-size: 1.02rem;
+      font-weight: 600;
+      color: var(--text-main);
+      line-height: 1.4;
+    }
+
+    /* ธีมสีการ์ด 1 - 5 */
+    .card-theme-1 { background: linear-gradient(180deg, #f0f9ff 0%, #ffffff 100%); border-color: #bae6fd; }
+    .card-theme-1 .card-badge { background: #e0f2fe; color: #0284c7; }
+    .card-theme-1 .card-icon-wrapper { background: #bae6fd; color: #0284c7; }
+
+    .card-theme-2 { background: linear-gradient(180deg, #eef2ff 0%, #ffffff 100%); border-color: #c7d2fe; }
+    .card-theme-2 .card-badge { background: #e0e7ff; color: #4f46e5; }
+    .card-theme-2 .card-icon-wrapper { background: #c7d2fe; color: #4f46e5; }
+
+    .card-theme-3 { background: linear-gradient(180deg, #ecfdf5 0%, #ffffff 100%); border-color: #a7f3d0; }
+    .card-theme-3 .card-badge { background: #d1fae5; color: #059669; }
+    .card-theme-3 .card-icon-wrapper { background: #a7f3d0; color: #059669; }
+
+    .card-theme-4 { background: linear-gradient(180deg, #fffbeb 0%, #ffffff 100%); border-color: #fde68a; }
+    .card-theme-4 .card-badge { background: #fef3c7; color: #d97706; }
+    .card-theme-4 .card-icon-wrapper { background: #fde68a; color: #d97706; }
+
+    .card-theme-5 { background: linear-gradient(180deg, #fdf2f8 0%, #ffffff 100%); border-color: #fbcfe8; }
+    .card-theme-5 .card-badge { background: #fce7f3; color: #db2777; }
+    .card-theme-5 .card-icon-wrapper { background: #fbcfe8; color: #db2777; }
+
+    /* ธีมสีการ์ดระดับมหาวิทยาลัย (Uni) */
+    .card-theme-student { background: linear-gradient(180deg, #f0fdfa 0%, #ffffff 100%); border-color: #99f6e4; }
+    .card-theme-student .card-badge { background: #ccfbf1; color: #0d9488; }
+    .card-theme-student .card-icon-wrapper { background: #99f6e4; color: #0d9488; }
+
+    /* ธีมสีการ์ดงานวิจัย & PISA */
+    .card-theme-research { background: linear-gradient(180deg, #faf5ff 0%, #ffffff 100%); border-color: #e9d5ff; }
+    .card-theme-research .card-badge { background: #f3e8ff; color: #7e22ce; }
+    .card-theme-research .card-icon-wrapper { background: #e9d5ff; color: #7e22ce; }
+
+    .card-theme-pisa { background: linear-gradient(180deg, #fff7ed 0%, #ffffff 100%); border-color: #fed7aa; }
+    .card-theme-pisa .card-badge { background: #ffedd5; color: #c2410c; }
+    .card-theme-pisa .card-icon-wrapper { background: #fed7aa; color: #c2410c; }
+
+    footer {
+      background: #ffffff;
+      border-top: 1px solid var(--border);
+      padding: 22px 20px;
+      margin-top: auto;
+    }
+
+    .footer-inner {
+      max-width: 1100px;
+      margin: 0 auto;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      font-size: 0.95rem;
+      color: var(--text-sub);
+    }
+
+    .footer-inner a {
+      color: var(--primary);
+      text-decoration: none;
+    }
+
+    .footer-inner a:hover {
+      text-decoration: underline;
     }
   </style>
-<script>
-  // ตรวจสอบว่ามีสถานะล็อกอินและอีเมลบันทึกไว้หรือไม่
-  const isLoggedIn = localStorage.getItem("dms_is_logged_in") === "true";
-  const userEmail = localStorage.getItem("dms_user_email");
-
-  // หากไม่มี ให้ดีดกลับไปหน้าเข้าสู่ระบบทันที
-  if (!isLoggedIn || !userEmail) {
-    // ปรับ Path ให้ถอยกลับไปหาไฟล์ login.html ตามระดับโฟลเดอร์ (เช่น "../login.html" หากอยู่ในโฟลเดอร์ย่อย 1 ชั้น)
-    window.location.replace("../../login.html"); 
-  }
-</script>
 </head>
-<body class="bg-slate-100 flex flex-col h-screen overflow-hidden">
+<body>
 
-  <!-- Top Navigation Header -->
-  <header class="bg-white border-b border-slate-200/90 shadow-sm shrink-0 z-30">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6">
-      
-      <!-- Top Brand Row -->
-      <div class="flex items-center justify-between py-3 border-b border-slate-100">
-        <div class="flex items-center gap-3">
-          <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-600 to-blue-500 text-white flex items-center justify-center text-xl shadow-md">
-            <i class="fa-solid fa-shapes"></i>
+  <div class="app-wrapper">
+
+    <!-- แถบด้านบน -->
+    <div class="top-action-bar">
+      <div class="tab-bar">
+        <!-- เปลี่ยนชื่อแท็บเป็น งานที่ให้บริการของเรา -->
+        <button class="tab-btn active" onclick="switchTab('tab-cards', event)">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/>
+          </svg>
+          <span>งานที่ให้บริการของเรา</span>
+        </button>
+        <button class="tab-btn" onclick="switchTab('tab-intro', event)">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+          </svg>
+          <span>แนะนำ Dynamic Mathsheets</span>
+        </button>
+      </div>
+
+      <div class="nav-actions">
+        <!-- ป้ายข้อมูลผู้ใช้: ชื่อ-สกุล | สถานะ | วันหมดอายุ -->
+        <div id="userProfileBadge" class="user-profile-badge">
+          <div class="user-avatar">
+            <svg fill="currentColor" viewBox="0 0 24 24">
+              <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+            </svg>
           </div>
-          <div>
-            <h1 class="text-lg sm:text-xl font-bold text-slate-900 tracking-tight leading-tight">
-              สื่อการเรียนรู้ออนไลน์: เวกเตอร์และพีชคณิตเชิงเส้น
-            </h1>
-          </div>
+          <span id="txtUserName" class="user-name">กำลังโหลด...</span>
+          <span id="txtUserRole" class="user-role-tag">-</span>
+          <span id="txtUserExpire" class="user-expire-tag">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+            </svg>
+            <span id="lblExpireDate">กำลังโหลด...</span>
+          </span>
         </div>
 
-      </div>
-
-      <!-- Navigation Tabs (Horizontal Scrollable) -->
-      <nav class="flex items-center gap-2 py-2.5 overflow-x-auto custom-scroll text-xs sm:text-sm font-medium">
-        <button onclick="loadContent(1, '1 ความหมายและองค์ประกอบของเวกเตอร์.html')" id="btn-1" class="nav-btn active px-3.5 py-1.5 rounded-xl whitespace-nowrap transition-all duration-200 flex items-center gap-1.5 bg-slate-100 text-slate-700 hover:bg-slate-200">
-          <span class="w-5 h-5 rounded-full bg-black/10 flex items-center justify-center text-[10px] font-bold">1</span>
-          <span>ความหมายและองค์ประกอบ</span>
+        <button class="btn-logout" onclick="handleLogout()">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
+          </svg>
+          <span>ออกจากระบบ</span>
         </button>
-
-        <button onclick="loadContent(2, '2 การดำเนินการของเวกเตอร์.html')" id="btn-2" class="nav-btn px-3.5 py-1.5 rounded-xl whitespace-nowrap transition-all duration-200 flex items-center gap-1.5 bg-slate-100 text-slate-700 hover:bg-slate-200">
-          <span class="w-5 h-5 rounded-full bg-black/10 flex items-center justify-center text-[10px] font-bold">2</span>
-          <span>การดำเนินการของเวกเตอร์</span>
-        </button>
-
-        <button onclick="loadContent(3, '3 ผลคูณเชิงสเกลาร์.html')" id="btn-3" class="nav-btn px-3.5 py-1.5 rounded-xl whitespace-nowrap transition-all duration-200 flex items-center gap-1.5 bg-slate-100 text-slate-700 hover:bg-slate-200">
-          <span class="w-5 h-5 rounded-full bg-black/10 flex items-center justify-center text-[10px] font-bold">3</span>
-          <span>ผลคูณเชิงสเกลาร์ (Dot)</span>
-        </button>
-
-        <button onclick="loadContent(4, '4 ผลคูณเชิงเวกเตอร์.html')" id="btn-4" class="nav-btn px-3.5 py-1.5 rounded-xl whitespace-nowrap transition-all duration-200 flex items-center gap-1.5 bg-slate-100 text-slate-700 hover:bg-slate-200">
-          <span class="w-5 h-5 rounded-full bg-black/10 flex items-center justify-center text-[10px] font-bold">4</span>
-          <span>ผลคูณเชิงเวกเตอร์ (Cross)</span>
-        </button>
-
-        <button onclick="loadContent(5, '5 การรวมเชิงเส้นและการพึ่งพิงเชิงเส้น.html')" id="btn-5" class="nav-btn px-3.5 py-1.5 rounded-xl whitespace-nowrap transition-all duration-200 flex items-center gap-1.5 bg-slate-100 text-slate-700 hover:bg-slate-200">
-          <span class="w-5 h-5 rounded-full bg-black/10 flex items-center justify-center text-[10px] font-bold">5</span>
-          <span>การรวมและการพึ่งพิงเชิงเส้น</span>
-        </button>
-
-        <button onclick="loadContent(6, '6 ปริภูมิเวกเตอร์และปริภูมิย่อย.html')" id="btn-6" class="nav-btn px-3.5 py-1.5 rounded-xl whitespace-nowrap transition-all duration-200 flex items-center gap-1.5 bg-slate-100 text-slate-700 hover:bg-slate-200">
-          <span class="w-5 h-5 rounded-full bg-black/10 flex items-center justify-center text-[10px] font-bold">6</span>
-          <span>ปริภูมิและปริภูมิย่อย</span>
-        </button>
-
-        <button onclick="loadContent(7, '7 ฐานและมิติของปริภูมิเวกเตอร์.html')" id="btn-7" class="nav-btn px-3.5 py-1.5 rounded-xl whitespace-nowrap transition-all duration-200 flex items-center gap-1.5 bg-slate-100 text-slate-700 hover:bg-slate-200">
-          <span class="w-5 h-5 rounded-full bg-black/10 flex items-center justify-center text-[10px] font-bold">7</span>
-          <span>ฐานและมิติ</span>
-        </button>
-
-        <button onclick="loadContent(8, '8 การประยุกต์เวกเตอร์และการเปลี่ยนฐาน.html')" id="btn-8" class="nav-btn px-3.5 py-1.5 rounded-xl whitespace-nowrap transition-all duration-200 flex items-center gap-1.5 bg-slate-100 text-slate-700 hover:bg-slate-200">
-          <span class="w-5 h-5 rounded-full bg-black/10 flex items-center justify-center text-[10px] font-bold">8</span>
-          <span>การประยุกต์ & การเปลี่ยนฐาน</span>
-        </button>
-
-        <!-- Test Tab -->
-        <button onclick="loadContent(9, 'แบบทดสอบ.html')" id="btn-9" class="nav-btn px-4 py-1.5 rounded-xl whitespace-nowrap transition-all duration-200 flex items-center gap-1.5 bg-indigo-50 text-indigo-700 hover:bg-indigo-100 border border-indigo-200">
-          <i class="fa-solid fa-graduation-cap text-indigo-600"></i>
-          <span class="font-bold">แบบทดสอบวัดผลสัมฤทธิ์</span>
-        </button>
-      </nav>
-
-    </div>
-  </header>
-
-  <!-- Main Content Viewer: iframe takes remaining height -->
-  <main class="flex-1 w-full relative bg-slate-50">
-    <!-- Loading spinner placeholder -->
-    <div id="loader" class="absolute inset-0 flex items-center justify-center bg-slate-50/80 z-10 transition-opacity duration-300 pointer-events-none opacity-0">
-      <div class="flex flex-col items-center gap-2">
-        <i class="fa-solid fa-circle-notch fa-spin text-3xl text-indigo-600"></i>
-        <span class="text-xs text-slate-500 font-medium font-heading">กำลังโหลดเนื้อหา...</span>
       </div>
     </div>
 
-    <!-- The iframe directly loading matching HTML files -->
-    <iframe 
-      id="contentFrame" 
-      src="1 ความหมายและองค์ประกอบของเวกเตอร์.html" 
-      class="w-full h-full border-none shadow-inner"
-      onload="hideLoader()"
-    ></iframe>
-  </main>
+    <!-- แท็บที่ 1: งานที่ให้บริการของเรา -->
+    <div id="tab-cards" class="tab-content active">
+      <div class="card-frame gradient-header">
+        <h1>งานที่ให้บริการของเรา</h1>
+        <p>เลือกสื่อและกิจกรรมการเรียนรู้ที่ต้องการใช้งานในชั้นเรียน</p>
+      </div>
 
-  <!-- Script for Tab Navigation -->
+      <div class="card-frame">
+        <h2 class="frame-title">เมนูสื่อและกิจกรรม</h2>
+        <div class="grid-menu">
+          
+          <!-- การ์ด 1: ใบงานคณิตศาสตร์ (เฉพาะ ครู และ ผู้พัฒนา) -->
+          <div class="menu-card card-theme-1 card-teacher-only" style="display: none;">
+            <span class="card-badge">1</span>
+            <div class="card-icon-wrapper">
+              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+              </svg>
+            </div>
+            <h3>ใบงานคณิตศาสตร์</h3>
+          </div>
+
+          <!-- การ์ด 2: สื่อการสอนคณิตศาสตร์ (เห็นทุกคน: นักเรียน, ครู, ผู้พัฒนา) -->
+          <div class="menu-card card-theme-2 card-common">
+            <span class="card-badge">2</span>
+            <div class="card-icon-wrapper">
+              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2zM9 7h6M9 11h6m-6 4h2"/>
+              </svg>
+            </div>
+            <h3>สื่อการสอนคณิตศาสตร์</h3>
+          </div>
+
+          <!-- การ์ด 3: สื่อการสอนวิทยาศาสตร์ (เห็นทุกคน: นักเรียน, ครู, ผู้พัฒนา) -->
+          <div class="menu-card card-theme-3 card-common">
+            <span class="card-badge">3</span>
+            <div class="card-icon-wrapper">
+              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"/>
+              </svg>
+            </div>
+            <h3>สื่อการสอนวิทยาศาสตร์</h3>
+          </div>
+
+          <!-- การ์ด 4: แบบทดสอบออนไลน์ (เฉพาะ ครู และ ผู้พัฒนา) -->
+          <div class="menu-card card-theme-4 card-teacher-only" style="display: none;">
+            <span class="card-badge">4</span>
+            <div class="card-icon-wrapper">
+              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/>
+              </svg>
+            </div>
+            <h3>แบบทดสอบออนไลน์</h3>
+          </div>
+
+          <!-- การ์ด 5: เกมส์การแข่งขันทางคณิตศาสตร์ (เห็นทุกคน: นักเรียน, ครู, ผู้พัฒนา) -->
+          <div class="menu-card card-theme-5 card-common">
+            <span class="card-badge">5</span>
+            <div class="card-icon-wrapper">
+              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664zM21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+              </svg>
+            </div>
+            <h3>เกมส์การแข่งขันทางคณิตศาสตร์</h3>
+          </div>
+
+          <!-- การ์ด Uni: คณิตศาสตร์ในระดับมหาวิทยาลัย (เห็นทุกคน: นักเรียน, ครู, ผู้พัฒนา) -->
+          <a href="คณิตศาสตร์ในระดับมหาวิทยาลัย/index.html" class="menu-card card-theme-student card-common">
+            <span class="card-badge">Uni</span>
+            <div class="card-icon-wrapper">
+              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l9-5-9-5-9 5 9 5zm0 0l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14zm-4 6v-7.5"/>
+              </svg>
+            </div>
+            <h3>คณิตศาสตร์ในระดับมหาวิทยาลัย</h3>
+          </a>
+
+          <!-- การ์ดวิจัย 1 (เฉพาะ ผู้พัฒนา) -->
+          <div class="menu-card card-theme-research card-dev-only" style="display: none;">
+            <span class="card-badge">★</span>
+            <div class="card-icon-wrapper">
+              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
+              </svg>
+            </div>
+            <h3>เมนูสำหรับผู้ร่วมวิจัยทางการสอนคณิตศาสตร์และวิทยาศาสตร์</h3>
+          </div>
+
+          <!-- การ์ดวิจัย 2: ระบบการประเมิน PISA (เฉพาะ ผู้พัฒนา) -->
+          <div class="menu-card card-theme-pisa card-dev-only" style="display: none;">
+            <span class="card-badge">PISA</span>
+            <div class="card-icon-wrapper">
+              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+              </svg>
+            </div>
+            <h3>ระบบการประเมินสมรรถนะและความฉลาดรู้ตามแนวทาง PISA</h3>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- แท็บที่ 2: แนะนำ Dynamic Mathsheets -->
+    <div id="tab-intro" class="tab-content">
+      <div class="card-frame gradient-header">
+        <h1>แนะนำ Dynamic Math Sheets</h1>
+        <p>นวัตกรรมระบบนิเวศการเรียนรู้คณิตศาสตร์และวิทยาศาสตร์เพื่อการศึกษา</p>
+      </div>
+
+      <div class="card-frame">
+        <h2 class="frame-title">แนวคิดและทิศทางการพัฒนา Dynamic Mathsheets</h2>
+        <div class="article-body">
+          <p>การจัดการเรียนการสอนคณิตศาสตร์และวิทยาศาสตร์ในห้องเรียนปัจจุบัน ครูมักเผชิญกับภาระงานสร้างสื่อและการวัดผลที่ใช้เวลามาก ขณะเดียวกันนักเรียนมักเจอกับแบบฝึกหัดรูปแบบเดิมที่เน้นการจำคำตอบมากกว่าความเข้าใจ โครงการ Dynamic Mathsheets จึงถูกออกแบบขึ้นมาเพื่อทำหน้าที่เป็นผู้ช่วยครูและพื้นที่การเรียนรู้ของนักเรียน โดยมุ่งเน้นความเรียบง่าย ใช้ได้จริง และตอบสนองการจัดการเรียนการสอนใน 5 มิติหลัก</p>
+          <p>มิติแรกคือการแก้ปัญหาความจำเจของโจทย์ ด้วยระบบสร้างและสุ่มตัวเลขแบบเรียลไทม์ ทำให้สามารถสร้างแบบฝึกหัดที่ไม่ซ้ำเดิมได้เรื่อย ๆ ช่วยให้นักเรียนได้ฝึกคิดวิเคราะห์ตามหลักการจริง ไม่ใช่การท่องจำชุดคำตอบ ข้อมูลเหล่านี้เชื่อมต่อเข้าสู่มิติที่สอง คือการจัดรวมโจทย์และกิจกรรมให้อยู่ในรูปแบบใบงานกระดาษที่พร้อมพิมพ์ ครูผู้สอนสามารถกดสั่งพิมพ์ไปใช้งานในชั้นเรียนได้ทันทีโดยไม่ต้องเสียเวลาจัดหน้าหรือพิมพ์เอกสารซ้ำซ้อน</p>
+          <p>ในมิติของความเข้าใจเชิงลึก โครงการได้เพิ่มแบบจำลองทางการศึกษาและโมเดลทางวิทยาศาสตร์แบบปฏิสัมพันธ์ เพื่อเปลี่ยนเนื้อหาที่ซับซ้อนและเป็นนามธรรมให้เห็นเป็นภาพที่จับต้องได้ นักเรียนสามารถทดลองปรับเปลี่ยนตัวแปรและสังเกตผลลัพธ์ด้วยตนเอง ควบคู่ไปกับมิติที่สี่ คือการสอดแทรกกิจกรรมและเกมคณิตศาสตร์ เพื่อสร้างบรรยากาศการเรียนรู้ที่ผ่อนคลาย ช่วยกระตุ้นความสนใจและทำให้เนื้อหาตัวเลขไม่น่าเบื่อ และในมิติสุดท้ายด้านการวัดผล โครงการได้พัฒนาระบบแบบทดสอบออนไลน์ที่ออกแบบให้ยืดหยุ่นต่อความพร้อมของโรงเรียน โดยนักเรียนสามารถใช้อุปกรณ์เพียงเครื่องเดียวที่มีอยู่ในการทำข้อสอบ พร้อมแดชบอร์ดติดตามความเคลื่อนไหวได้แบบเรียลไทม์</p>
+          <p>โดยสรุป Dynamic Mathsheets คือการพัฒนาเครื่องมือการสอนที่มุ่งเน้นการใช้งานได้จริงในห้องเรียน ช่วยลดภาระการเตรียมงานของครู เพิ่มความเข้าใจและความสนุกในการเรียนรู้ของนักเรียน</p>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ส่วนท้าย Footer -->
+  <footer>
+    <div class="footer-inner">
+      <div><strong>ติดต่อเรา Email :</strong> dynamic.mathsheets@gmail.com</div>
+      <div><strong>เพจ :</strong> <a href="https://www.facebook.com/profile.php?id=61577190162363" target="_blank" rel="noopener noreferrer">Dynamic Mathsheets Facebook Page</a></div>
+    </div>
+  </footer>
+
   <script>
-    let currentSrc = '1 ความหมายและองค์ประกอบของเวกเตอร์.html';
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycby1xfgp5uhHnlB5spDJRrpRGWdaNnYOXc4yBIb3p12uMpAxEnNCk4E2u9AlmRtRg_Pz/exec";
 
-    function loadContent(tabIndex, fileName) {
-      currentSrc = fileName;
-      showLoader();
+    // ฟังก์ชันแปลงและตัดเฉพาะวันที่ (DD/MM/YYYY)
+    function cleanDate(str) {
+      if (!str || str === "-" || str === "ตลอดชีพ") return str;
       
-      const frame = document.getElementById('contentFrame');
-      frame.src = encodeURI(fileName);
+      // ถ้าเป็นรูปแบบ DD/MM/YYYY อยู่แล้ว
+      if (/^\d{1,2}\/\d{1,2}\/\d{4}$/.test(str.trim())) {
+        return str.trim();
+      }
 
-      // Update button styling
-      document.querySelectorAll('.nav-btn').forEach((btn, idx) => {
-        if (idx + 1 === tabIndex) {
-          btn.classList.add('active');
-          if (idx + 1 === 9) {
-            btn.classList.remove('bg-indigo-50', 'text-indigo-700');
-            btn.classList.add('bg-indigo-600', 'text-white');
-          } else {
-            btn.classList.remove('bg-slate-100', 'text-slate-700');
-          }
-        } else {
-          btn.classList.remove('active');
-          if (idx + 1 === 9) {
-            btn.classList.remove('bg-indigo-600', 'text-white');
-            btn.classList.add('bg-indigo-50', 'text-indigo-700');
-          } else {
-            btn.classList.add('bg-slate-100', 'text-slate-700');
-          }
-        }
+      // กรณีแปลงจาก String รูปแบบ Date เต็ม เช่น Fri Oct 29 2027 00:00:00 GMT...
+      const d = new Date(str);
+      if (!isNaN(d.getTime())) {
+        const day = String(d.getDate()).padStart(2, '0');
+        const month = String(d.getMonth() + 1).padStart(2, '0');
+        const year = d.getFullYear();
+        return `${day}/${month}/${year}`;
+      }
+
+      return str;
+    }
+
+    // 1. ตรวจสอบสถานะการเข้าสู่ระบบ
+    const isLoggedIn = localStorage.getItem("dms_is_logged_in") === "true";
+    const userEmail = localStorage.getItem("dms_user_email");
+    const userName = localStorage.getItem("dms_user_name") || "สมาชิก";
+    const userRole = localStorage.getItem("dms_user_role") || "นักเรียน";
+    const rawExpire = localStorage.getItem("dms_expire_date") || "-";
+    const userExpire = cleanDate(rawExpire);
+
+    if (!isLoggedIn || !userEmail) {
+      window.location.replace("login.html");
+    }
+
+    // 2. แสดงชื่อ สถานะบทบาท และวันหมดอายุ (ตัดเวลาออก)
+    document.getElementById("txtUserName").textContent = userName;
+    document.getElementById("txtUserRole").textContent = userRole;
+
+    const lblExpireDate = document.getElementById("lblExpireDate");
+    if (userRole === "ผู้พัฒนา" || userExpire === "ตลอดชีพ") {
+      lblExpireDate.textContent = "ตลอดชีพ";
+    } else {
+      lblExpireDate.textContent = `หมดอายุ: ${userExpire}`;
+    }
+
+    // 3. จัดการเปิด/ซ่อนการ์ดตามสิทธิ์
+    applyRoleAccess(userRole);
+
+    function applyRoleAccess(role) {
+      const teacherOnlyCards = document.querySelectorAll(".card-teacher-only");
+      const devOnlyCards = document.querySelectorAll(".card-dev-only");
+
+      if (role === "ผู้พัฒนา") {
+        teacherOnlyCards.forEach(c => c.style.display = "flex");
+        devOnlyCards.forEach(c => c.style.display = "flex");
+      } else if (role === "ครู") {
+        teacherOnlyCards.forEach(c => c.style.display = "flex");
+        devOnlyCards.forEach(c => c.style.display = "none");
+      } else {
+        teacherOnlyCards.forEach(c => c.style.display = "none");
+        devOnlyCards.forEach(c => c.style.display = "none");
+      }
+    }
+
+    // ฟังก์ชันสลับแท็บ
+    function switchTab(tabId, event) {
+      document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+      document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+
+      event.currentTarget.classList.add('active');
+      document.getElementById(tabId).classList.add('active');
+    }
+
+    // ฟังก์ชันยิง JSONP ไปยัง Apps Script
+    function callAppsScript(params) {
+      return new Promise((resolve, reject) => {
+        const cb = "cb_" + Math.round(100000 * Math.random());
+        const s = document.createElement("script");
+        window[cb] = (data) => { delete window[cb]; s.remove(); resolve(data); };
+        s.onerror = () => { delete window[cb]; s.remove(); reject(new Error("Network error")); };
+        const q = Object.keys(params).map(k => `${encodeURIComponent(k)}=${encodeURIComponent(params[k])}`).join("&");
+        s.src = `${SCRIPT_URL}?${q}&callback=${cb}`;
+        document.body.appendChild(s);
       });
     }
 
-    function reloadFrame() {
-      showLoader();
-      const frame = document.getElementById('contentFrame');
-      frame.src = frame.src;
-    }
+    // 4. Heartbeat ยิงสัญญาณทุก 2.5 นาที เพื่อรักษา Session
+    let heartbeatTimer = setInterval(() => {
+      if (userEmail) {
+        callAppsScript({ action: "heartbeat", email: userEmail }).catch(e => console.warn(e));
+      }
+    }, 150000);
 
-    function openExternal() {
-      window.open(currentSrc, '_blank');
-    }
+    // 5. ออกจากระบบ (Logout)
+    async function handleLogout() {
+      if (!confirm("คุณต้องการออกจากระบบหรือไม่?")) return;
 
-    function showLoader() {
-      const loader = document.getElementById('loader');
-      loader.classList.remove('opacity-0');
-      loader.classList.add('opacity-100');
-    }
+      clearInterval(heartbeatTimer);
 
-    function hideLoader() {
-      const loader = document.getElementById('loader');
-      loader.classList.remove('opacity-100');
-      loader.classList.add('opacity-0');
+      try {
+        if (userEmail) {
+          await callAppsScript({ action: "logout", email: userEmail });
+        }
+      } catch (err) {
+        console.error("Logout error:", err);
+      } finally {
+        localStorage.clear();
+        sessionStorage.clear();
+        window.location.replace("login.html");
+      }
     }
   </script>
 </body>
