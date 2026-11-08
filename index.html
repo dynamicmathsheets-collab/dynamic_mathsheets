@@ -96,9 +96,10 @@
       display: flex;
       align-items: center;
       gap: 10px;
+      flex-wrap: wrap;
     }
 
-    /* ป้ายแสดงชื่อและบทบาทผู้ใช้งาน */
+    /* ป้ายแสดงชื่อ บทบาท และวันหมดอายุ */
     .user-profile-badge {
       display: flex;
       align-items: center;
@@ -108,6 +109,7 @@
       border-radius: 20px;
       border: 1px solid var(--border);
       box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+      flex-wrap: wrap;
     }
 
     .user-avatar {
@@ -119,6 +121,7 @@
       display: flex;
       align-items: center;
       justify-content: center;
+      flex-shrink: 0;
     }
 
     .user-avatar svg {
@@ -130,7 +133,7 @@
       font-size: 0.9rem;
       font-weight: 500;
       color: var(--text-main);
-      max-width: 160px;
+      max-width: 180px;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
@@ -143,6 +146,25 @@
       color: #0369a1;
       border-radius: 10px;
       font-weight: 600;
+      white-space: nowrap;
+    }
+
+    .user-expire-tag {
+      font-size: 0.75rem;
+      padding: 2px 8px;
+      background: #fef3c7;
+      color: #92400e;
+      border-radius: 10px;
+      font-weight: 500;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      white-space: nowrap;
+    }
+
+    .user-expire-tag svg {
+      width: 12px;
+      height: 12px;
     }
 
     .btn-logout {
@@ -369,11 +391,12 @@
     <!-- แถบด้านบน -->
     <div class="top-action-bar">
       <div class="tab-bar">
+        <!-- เปลี่ยนชื่อแท็บเป็น งานที่ให้บริการของเรา -->
         <button class="tab-btn active" onclick="switchTab('tab-cards', event)">
           <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/>
           </svg>
-          <span>ตัวอย่างชิ้นงานทดลองใช้</span>
+          <span>งานที่ให้บริการของเรา</span>
         </button>
         <button class="tab-btn" onclick="switchTab('tab-intro', event)">
           <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -384,6 +407,7 @@
       </div>
 
       <div class="nav-actions">
+        <!-- ป้ายข้อมูลผู้ใช้: ชื่อ-สกุล | สถานะ | วันหมดอายุ -->
         <div id="userProfileBadge" class="user-profile-badge">
           <div class="user-avatar">
             <svg fill="currentColor" viewBox="0 0 24 24">
@@ -392,6 +416,12 @@
           </div>
           <span id="txtUserName" class="user-name">กำลังโหลด...</span>
           <span id="txtUserRole" class="user-role-tag">-</span>
+          <span id="txtUserExpire" class="user-expire-tag">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+            </svg>
+            <span id="lblExpireDate">กำลังโหลด...</span>
+          </span>
         </div>
 
         <button class="btn-logout" onclick="handleLogout()">
@@ -403,11 +433,11 @@
       </div>
     </div>
 
-    <!-- แท็บที่ 1: ชิ้นงานทดลองใช้ -->
+    <!-- แท็บที่ 1: งานที่ให้บริการของเรา -->
     <div id="tab-cards" class="tab-content active">
       <div class="card-frame gradient-header">
-        <h1>ชิ้นงานทดลองใช้</h1>
-        <p>เลือกสื่อและกิจกรรมการเรียนรู้ที่ต้องการทดลองใช้งานในชั้นเรียน</p>
+        <h1>งานที่ให้บริการของเรา</h1>
+        <p>เลือกสื่อและกิจกรรมการเรียนรู้ที่ต้องการใช้งานในชั้นเรียน</p>
       </div>
 
       <div class="card-frame">
@@ -537,19 +567,49 @@
   <script>
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycby1xfgp5uhHnlB5spDJRrpRGWdaNnYOXc4yBIb3p12uMpAxEnNCk4E2u9AlmRtRg_Pz/exec";
 
+    // ฟังก์ชันแปลงและตัดเฉพาะวันที่ (DD/MM/YYYY)
+    function cleanDate(str) {
+      if (!str || str === "-" || str === "ตลอดชีพ") return str;
+      
+      // ถ้าเป็นรูปแบบ DD/MM/YYYY อยู่แล้ว
+      if (/^\d{1,2}\/\d{1,2}\/\d{4}$/.test(str.trim())) {
+        return str.trim();
+      }
+
+      // กรณีแปลงจาก String รูปแบบ Date เต็ม เช่น Fri Oct 29 2027 00:00:00 GMT...
+      const d = new Date(str);
+      if (!isNaN(d.getTime())) {
+        const day = String(d.getDate()).padStart(2, '0');
+        const month = String(d.getMonth() + 1).padStart(2, '0');
+        const year = d.getFullYear();
+        return `${day}/${month}/${year}`;
+      }
+
+      return str;
+    }
+
     // 1. ตรวจสอบสถานะการเข้าสู่ระบบ
     const isLoggedIn = localStorage.getItem("dms_is_logged_in") === "true";
     const userEmail = localStorage.getItem("dms_user_email");
     const userName = localStorage.getItem("dms_user_name") || "สมาชิก";
     const userRole = localStorage.getItem("dms_user_role") || "นักเรียน";
+    const rawExpire = localStorage.getItem("dms_expire_date") || "-";
+    const userExpire = cleanDate(rawExpire);
 
     if (!isLoggedIn || !userEmail) {
       window.location.replace("login.html");
     }
 
-    // 2. แสดงชื่อและสถานะบทบาท
+    // 2. แสดงชื่อ สถานะบทบาท และวันหมดอายุ (ตัดเวลาออก)
     document.getElementById("txtUserName").textContent = userName;
     document.getElementById("txtUserRole").textContent = userRole;
+
+    const lblExpireDate = document.getElementById("lblExpireDate");
+    if (userRole === "ผู้พัฒนา" || userExpire === "ตลอดชีพ") {
+      lblExpireDate.textContent = "ตลอดชีพ";
+    } else {
+      lblExpireDate.textContent = `หมดอายุ: ${userExpire}`;
+    }
 
     // 3. จัดการเปิด/ซ่อนการ์ดตามสิทธิ์
     applyRoleAccess(userRole);
@@ -559,15 +619,12 @@
       const devOnlyCards = document.querySelectorAll(".card-dev-only");
 
       if (role === "ผู้พัฒนา") {
-        // เห็นการ์ดทั้งหมด
         teacherOnlyCards.forEach(c => c.style.display = "flex");
         devOnlyCards.forEach(c => c.style.display = "flex");
       } else if (role === "ครู") {
-        // เห็น 1, 2, 3, 4, 5 และ Uni (ซ่อนการ์ดวิจัย)
         teacherOnlyCards.forEach(c => c.style.display = "flex");
         devOnlyCards.forEach(c => c.style.display = "none");
       } else {
-        // นักเรียน: เห็นเฉพาะ 2, 3, 5 และ Uni (ซ่อน 1, 4 และการ์ดวิจัย)
         teacherOnlyCards.forEach(c => c.style.display = "none");
         devOnlyCards.forEach(c => c.style.display = "none");
       }
