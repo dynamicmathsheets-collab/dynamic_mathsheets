@@ -1,0 +1,1204 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>แบบทดสอบวัดผลสัมฤทธิ์ทางการเรียน: ค่าเฉพาะและเวกเตอร์ลักษณะเฉพาะ</title>
+
+  <!-- Google Fonts: Sarabun & Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Sarabun:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- MathJax 3 Configuration -->
+  <script>
+    window.MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']],
+        displayMath: [['$$', '$$'], ['\\[', '\\]']],
+        processEscapes: true
+      },
+      options: {
+        skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+      },
+      startup: {
+        pageReady: () => {
+          return MathJax.startup.defaultPageReady();
+        }
+      }
+    };
+  </script>
+  <!-- Load MathJax 3 -->
+  <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Sarabun', 'Inter', 'sans-serif'],
+          },
+          colors: {
+            brand: {
+              50: '#eef2ff',
+              100: '#e0e7ff',
+              200: '#c7d2fe',
+              500: '#6366f1',
+              600: '#4f46e5',
+              700: '#4338ca',
+              800: '#3730a3',
+              900: '#312e81',
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    /* Prevent MathJax overflow on small screens */
+    mjx-container {
+      overflow-x: auto;
+      overflow-y: hidden;
+      max-width: 100%;
+      vertical-align: middle;
+    }
+    .custom-scroll::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    .custom-scroll::-webkit-scrollbar-thumb {
+      background-color: #cbd5e1;
+      border-radius: 9999px;
+    }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-800 antialiased selection:bg-brand-100 selection:text-brand-800">
+
+  <!-- Top Navigation & Header Banner -->
+  <header class="bg-gradient-to-r from-brand-900 via-indigo-900 to-slate-900 text-white shadow-md sticky top-0 z-40">
+    <div class="max-w-6xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-5">
+      <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+        <div>
+          <h1 class="text-xl sm:text-2xl lg:text-3xl font-extrabold tracking-tight">
+            แบบทดสอบวัดผลสัมฤทธิ์: ค่าเฉพาะและเวกเตอร์ลักษณะเฉพาะ
+          </h1>
+          <p class="text-xs sm:text-sm text-slate-300 mt-0.5">
+            ครอบคลุม K (ความรู้ 10 ข้อ), P (ทักษะกระบวนการ 10 ข้อ), A (เจตคติ/การคิดเชิงวิพากษ์ 10 ข้อ) &bull; ง่าย 10 / ปานกลาง 10 / ยาก 10
+          </p>
+        </div>
+
+        <!-- Quick Stats & Actions -->
+        <div class="flex items-center gap-3">
+          <div class="bg-white/10 backdrop-blur-md px-3 py-2 rounded-xl border border-white/15 text-center min-w-[90px]">
+            <span class="text-[11px] text-slate-300 block">ทำแล้ว</span>
+            <span id="answeredCounter" class="text-lg font-bold text-emerald-300">0 / 30</span>
+          </div>
+          <div class="bg-white/10 backdrop-blur-md px-3 py-2 rounded-xl border border-white/15 text-center min-w-[90px]">
+            <span class="text-[11px] text-slate-300 block">คะแนนปัจจุบัน</span>
+            <span id="scoreCounter" class="text-lg font-bold text-amber-300">0 / 30</span>
+          </div>
+          <button onclick="openSubmitModal()" class="px-4 py-2.5 bg-emerald-500 hover:bg-emerald-600 active:scale-95 text-white font-bold text-xs sm:text-sm rounded-xl shadow-md transition-all flex items-center gap-1.5 whitespace-nowrap">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+            สรุปผลคะแนน
+          </button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Container strictly set to max-w-6xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 -->
+  <main class="max-w-6xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 space-y-8">
+
+      <!-- Filter Controls Grid -->
+      <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5 text-xs">
+        <div>
+          <label class="block text-slate-500 font-medium mb-1">สถานะคำตอบ:</label>
+          <select id="filterStatus" onchange="applyFilters()" class="w-full bg-slate-50 border border-slate-200 rounded-lg p-2 font-semibold text-slate-700 focus:ring-2 focus:ring-brand-500 focus:outline-none">
+            <option value="all">ทั้งหมด (30 ข้อ)</option>
+            <option value="answered">ข้อที่ตอบแล้ว</option>
+            <option value="unanswered">ข้อที่ยังไม่ตอบ</option>
+            <option value="correct">ข้อที่ตอบถูก</option>
+            <option value="incorrect">ข้อที่ตอบผิด</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-slate-500 font-medium mb-1">ระดับความยาก:</label>
+          <select id="filterDifficulty" onchange="applyFilters()" class="w-full bg-slate-50 border border-slate-200 rounded-lg p-2 font-semibold text-slate-700 focus:ring-2 focus:ring-brand-500 focus:outline-none">
+            <option value="all">ทุกระดับความยาก</option>
+            <option value="ง่าย">ง่าย (10 ข้อ)</option>
+            <option value="ปานกลาง">ปานกลาง (10 ข้อ)</option>
+            <option value="ยาก">ยาก (10 ข้อ)</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-slate-500 font-medium mb-1">ด้านการวัด (K/P/A):</label>
+          <select id="filterDomain" onchange="applyFilters()" class="w-full bg-slate-50 border border-slate-200 rounded-lg p-2 font-semibold text-slate-700 focus:ring-2 focus:ring-brand-500 focus:outline-none">
+            <option value="all">ทุกด้าน (K / P / A)</option>
+            <option value="K">พุทธิพิสัย (K - ความรู้)</option>
+            <option value="P">ทักษะกระบวนการ (P - การคำนวณ)</option>
+            <option value="A">เจตคติและการคิดวิพากษ์ (A)</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-slate-500 font-medium mb-1">ผลลัพธ์การเรียนรู้ (LO):</label>
+          <select id="filterLO" onchange="applyFilters()" class="w-full bg-slate-50 border border-slate-200 rounded-lg p-2 font-semibold text-slate-700 focus:ring-2 focus:ring-brand-500 focus:outline-none">
+            <option value="all">ทุกผลลัพธ์ (LO1 - LO6)</option>
+            <option value="LO1">LO1: ค่าเฉพาะ & สมการลักษณะเฉพาะ</option>
+            <option value="LO2">LO2: เวกเตอร์ลักษณะเฉพาะ & ปริภูมิ</option>
+            <option value="LO3">LO3: พหุคูณ ma และ mg</option>
+            <option value="LO4">LO4: ความเป็นอิสระเชิงเส้น</option>
+            <option value="LO5">LO5: การทำให้เป็นแนวทแยง PDP⁻¹</option>
+            <option value="LO6">LO6: เมทริกซ์กำลังสูง & ระบบพลวัต</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Quick Question Jump Grid -->
+      <div class="pt-2 border-t border-slate-100">
+        <span class="text-[11px] font-bold text-slate-500 uppercase tracking-wider block mb-2">คลิกเพื่อข้ามไปยังข้อสอบ:</span>
+        <div id="questionGridNav" class="flex flex-wrap gap-1.5 sm:gap-2">
+          <!-- Populated by JS -->
+        </div>
+      </div>
+    </section>
+
+    <!-- Question Cards Container -->
+    <div id="questionsContainer" class="space-y-6">
+      <!-- 30 Questions rendered dynamically via JS -->
+    </div>
+
+    <!-- Bottom Submit Bar -->
+    <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-4">
+      <div>
+        <h3 class="font-bold text-slate-900 text-base">ทำแบบทดสอบครบถ้วนหรือยัง?</h3>
+        <p class="text-xs text-slate-500">ตรวจสอบคำตอบของท่านอย่างละเอียดก่อนกดส่งกระดาษคำตอบเพื่อรับผลการประเมินรอบด้าน</p>
+      </div>
+      <div class="flex items-center gap-3">
+        <button onclick="openSubmitModal()" class="px-6 py-3 bg-brand-600 hover:bg-brand-700 active:scale-95 text-white font-bold text-sm rounded-xl shadow-lg shadow-brand-500/20 transition-all flex items-center gap-2">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path></svg>
+          ส่งกระดาษคำตอบและดูการวิเคราะห์ผลสัมฤทธิ์
+        </button>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- Modal Analysis Dashboard -->
+  <div id="scoreModal" class="fixed inset-0 bg-slate-950/70 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl max-w-3xl w-full max-h-[90vh] overflow-y-auto custom-scroll shadow-2xl border border-slate-200 p-6 sm:p-8 space-y-6">
+      
+      <div class="flex items-center justify-between border-b border-slate-100 pb-4">
+        <div>
+          <span class="text-xs font-bold text-brand-600 uppercase tracking-wider">รายงานผลสัมฤทธิ์ทางการเรียน</span>
+          <h2 class="text-xl sm:text-2xl font-extrabold text-slate-900">สรุปผลการประเมินความรู้และทักษะ</h2>
+        </div>
+        <button onclick="closeSubmitModal()" class="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-600 flex items-center justify-center font-bold">
+          ✕
+        </button>
+      </div>
+
+      <!-- Total Score Hero -->
+      <div class="bg-gradient-to-r from-brand-900 to-indigo-900 text-white rounded-2xl p-6 text-center shadow-md">
+        <span class="text-xs font-semibold text-brand-200 uppercase tracking-widest block mb-1">คะแนนรวมที่ได้ (Overall Score)</span>
+        <div class="text-4xl sm:text-5xl font-black text-white my-2">
+          <span id="modalTotalScore">0</span> <span class="text-2xl font-normal text-brand-200">/ 30</span>
+        </div>
+        <div id="modalPercentBadge" class="inline-block px-3 py-1 rounded-full text-xs font-bold bg-white/20 text-white border border-white/20 mt-1">
+          คิดเป็น 0%
+        </div>
+        <p id="modalEvaluationMessage" class="text-xs sm:text-sm text-slate-200 mt-3 font-medium">
+          <!-- Text message populated via JS -->
+        </p>
+      </div>
+
+      <!-- Breakdown Grid: 3 Pillars (Difficulty, Domain K/P/A, LO) -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs sm:text-sm">
+        
+        <!-- Domain Breakdown (K, P, A) -->
+        <div class="bg-slate-50 p-4 rounded-2xl border border-slate-200">
+          <h4 class="font-bold text-slate-800 mb-3 flex items-center gap-1.5">
+            <span class="w-2.5 h-2.5 rounded-full bg-brand-600"></span>
+            แยกตามด้านการวัด (K / P / A)
+          </h4>
+          <div class="space-y-2.5" id="domainBreakdown">
+            <!-- Populated via JS -->
+          </div>
+        </div>
+
+        <!-- Difficulty Breakdown -->
+        <div class="bg-slate-50 p-4 rounded-2xl border border-slate-200">
+          <h4 class="font-bold text-slate-800 mb-3 flex items-center gap-1.5">
+            <span class="w-2.5 h-2.5 rounded-full bg-emerald-600"></span>
+            แยกตามระดับความยาก (Difficulty)
+          </h4>
+          <div class="space-y-2.5" id="difficultyBreakdown">
+            <!-- Populated via JS -->
+          </div>
+        </div>
+
+        <!-- LO Breakdown (Full width) -->
+        <div class="bg-slate-50 p-4 rounded-2xl border border-slate-200 md:col-span-2">
+          <h4 class="font-bold text-slate-800 mb-3 flex items-center gap-1.5">
+            <span class="w-2.5 h-2.5 rounded-full bg-indigo-600"></span>
+            แยกตามผลลัพธ์การเรียนรู้ (Learning Outcomes: LO1 - LO6)
+          </h4>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5" id="loBreakdown">
+            <!-- Populated via JS -->
+          </div>
+        </div>
+
+      </div>
+
+      <div class="flex justify-end gap-3 pt-2 border-t border-slate-100">
+        <button onclick="closeSubmitModal()" class="px-5 py-2.5 bg-brand-600 hover:bg-brand-700 text-white font-semibold text-sm rounded-xl transition-all">
+          ปิดหน้าต่างสรุปผลและตรวจทานเฉลย
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+
+  <!-- Question Bank (All 30 Balanced Questions) & Engine Script -->
+  <script>
+    // 30 Items Data:
+    // Difficulty: Easy 10, Medium 10, Hard 10
+    // Domain: K 10, P 10, A 10
+    // LO: LO1 (5), LO2 (5), LO3 (5), LO4 (5), LO5 (5), LO6 (5)
+    const questions = [
+      // 1. Easy | K | LO1
+      {
+        id: 1,
+        difficulty: "ง่าย",
+        domain: "K",
+        domainName: "พุทธิพิสัย (ความรู้ความจำ)",
+        lo: "LO1",
+        loName: "สมการลักษณะเฉพาะและนิยามค่าเฉพาะ",
+        text: "ตามนิยามทางคณิตศาสตร์ เวกเตอร์ $\\mathbf{v}$ จะเป็นเวกเตอร์ลักษณะเฉพาะ (Eigenvector) ของเมทริกซ์ $A$ ก็ต่อเมื่อสอดคล้องกับสมการ $A\\mathbf{v} = \\lambda\\mathbf{v}$ ภายใต้เงื่อนไขจำเป็นตามข้อใด?",
+        choices: [
+          "เวกเตอร์ $\\mathbf{v}$ ต้องไม่เป็นเวกเตอร์ศูนย์ ($\\mathbf{v} \\ne \\mathbf{0}$) เสมอ",
+          "ค่าเฉพาะ $\\lambda$ ต้องไม่เท่ากับศูนย์ ($\\lambda \\ne 0$)",
+          "เมทริกซ์ $A$ ต้องเป็นเมทริกซ์สมมาตรเท่านั้น",
+          "เวกเตอร์ $\\mathbf{v}$ ต้องมีขนาดเท่ากับหนึ่งเสมอ"
+        ],
+        correct: 0,
+        explanation: "ตามนิยามอย่างเป็นทางการของไอเกนเวกเตอร์ เวกเตอร์ $\\mathbf{v}$ ต้องเป็นเวกเตอร์ที่ไม่เป็นศูนย์ ($\\\\mathbf{v} \\ne \\mathbf{0}$) เนื่องจากถ้า $\\mathbf{v} = \\mathbf{0}$ สมการ $A\\mathbf{0} = \\lambda\\mathbf{0}$ จะเป็นจริงเสมอสำหรับทุกสเกลาร์ $\\lambda$ ทำให้ไม่สามารถจำแนกลักษณะเฉพาะของ $A$ ได้ ส่วน $\\lambda$ สามารถเป็นศูนย์ได้เมื่อ $\\det(A) = 0$"
+      },
+
+      // 2. Easy | K | LO2
+      {
+        id: 2,
+        difficulty: "ง่าย",
+        domain: "K",
+        domainName: "พุทธิพิสัย (ความรู้ความจำ)",
+        lo: "LO2",
+        loName: "ปริภูมิลักษณะเฉพาะและเคอร์เนล",
+        text: "ปริภูมิลักษณะเฉพาะ $E_\\lambda$ ที่สัมพันธ์กับค่าเฉพาะ $\\lambda$ มีนิยามเชิงพีชคณิตเชิงเส้นตรงกับข้อใดต่อไปนี้?",
+        choices: [
+          "$E_\\lambda = \\operatorname{Col}(A - \\lambda I)$",
+          "$E_\\lambda = \\ker(A - \\lambda I) = \\operatorname{Null}(A - \\lambda I)$",
+          "$E_\\lambda = \\operatorname{Row}(A + \\lambda I)$",
+          "$E_\\lambda = \\{ \\mathbf{v} \\in \\mathbb{R}^n \\mid \\mathbf{v} \\ne \\mathbf{0} \\}$"
+        ],
+        correct: 1,
+        explanation: "ปริภูมิลักษณะเฉพาะ $E_\\lambda$ คือเซตผลเฉลยทั้งหมดของสมการเอกพันธุ์ $(A - \\lambda I)\\mathbf{v} = \\mathbf{0}$ รวมกับเวกเตอร์ศูนย์ ซึ่งตรงกับนิยามของเคอร์เนลหรือสเปซว่าง (Null Space) ของเมทริกซ์ $A - \\lambda I$ พอดี"
+      },
+
+      // 3. Easy | K | LO3
+      {
+        id: 3,
+        difficulty: "ง่าย",
+        domain: "K",
+        domainName: "พุทธิพิสัย (ความรู้ความจำ)",
+        lo: "LO3",
+        loName: "พหุคูณเชิงพีชคณิตและเชิงเรขาคณิต",
+        text: "สำหรับค่าเฉพาะ $\\lambda$ ใดๆ ของเมทริกซ์ $A$ ข้อใดระบุความสัมพันธ์ระหว่างพหุคูณเชิงเรขาคณิต ($m_g(\\lambda) = \\dim(E_\\lambda)$) และพหุคูณเชิงพีชคณิต ($m_a(\\lambda)$) ได้ถูกต้องเสมอ?",
+        choices: [
+          "$0 \\le m_g(\\lambda) \\le m_a(\\lambda)$",
+          "$1 \\le m_g(\\lambda) \\le m_a(\\lambda)$",
+          "$m_g(\\lambda) = m_a(\\lambda) + 1$",
+          "$m_g(\\lambda) \\ge m_a(\\lambda) \\ge 1$"
+        ],
+        correct: 1,
+        explanation: "เนื่องจาก $\\lambda$ เป็นค่าเฉพาะ จึงต้องมีไอเกนเวกเตอร์ที่ไม่เป็นศูนย์อย่างน้อยหนึ่งตัวเสมอ ส่งผลให้ $\\dim(E_\\lambda) \\ge 1$ และตามทฤษฎีบทการจำกัดมิติ มิติของสเปซคำตอบจะไม่มีทางเกินเลขชี้กำลังของตัวประกอบ $(\\lambda - c)$ ในพหุนามลักษณะเฉพาะ ดังนั้น $1 \\le m_g(\\lambda) \\le m_a(\\lambda)$ เสมอ"
+      },
+
+      // 4. Easy | P | LO1
+      {
+        id: 4,
+        difficulty: "ง่าย",
+        domain: "P",
+        domainName: "ทักษะและกระบวนการ (การคำนวณ)",
+        lo: "LO1",
+        loName: "สมการลักษณะเฉพาะและนิยามค่าเฉพาะ",
+        text: "จงหาค่าเฉพาะของเมทริกซ์สามเหลี่ยมบน $A = \\begin{bmatrix} 5 & 7 \\\\ 0 & -2 \\end{bmatrix}$",
+        choices: [
+          "$\\lambda_1 = 5, \\lambda_2 = -2$",
+          "$\\lambda_1 = 7, \\lambda_2 = 0$",
+          "$\\lambda_1 = 3, \\lambda_2 = -10$",
+          "$\\lambda_1 = 2, \\lambda_2 = -5$"
+        ],
+        correct: 0,
+        explanation: "สำหรับเมทริกซ์สามเหลี่ยม (ทั้งสามเหลี่ยมบนและล่าง) หรือเมทริกซ์แนวทแยง ค่าเฉพาะคือสมาชิกที่อยู่บนเส้นทแยงมุมหลักโดยตรง เพราะ $\\det(A - \\lambda I) = (5 - \\lambda)(-2 - \\lambda) = 0 \\implies \\lambda = 5, -2$"
+      },
+
+      // 5. Easy | P | LO2
+      {
+        id: 5,
+        difficulty: "ง่าย",
+        domain: "P",
+        domainName: "ทักษะและกระบวนการ (การคำนวณ)",
+        lo: "LO2",
+        loName: "ปริภูมิลักษณะเฉพาะและเคอร์เนล",
+        text: "กำหนด $A = \\begin{bmatrix} 3 & 0 \\\\ 0 & 3 \\end{bmatrix}$ มิติของปริภูมิลักษณะเฉพาะ $\\dim(E_3)$ มีค่าเท่ากับเท่าใด?",
+        choices: [
+          "$0$",
+          "$1$",
+          "$2$",
+          "ไม่สามารถระบุได้"
+        ],
+        correct: 2,
+        explanation: "คำนวณ $A - 3I = \\begin{bmatrix} 3-3 & 0 \\\\ 0 & 3-3 \\end{bmatrix} = \\begin{bmatrix} 0 & 0 \\\\ 0 & 0 \\end{bmatrix}$ แรงก์ของเมทริกซ์ศูนย์คือ $0$ ดังนั้น $\\dim(E_3) = n - \\operatorname{rank}(A - 3I) = 2 - 0 = 2$ เวกเตอร์ทุกตัวใน $\\mathbb{R}^2$ เป็นไอเกนเวกเตอร์ของ $A$"
+      },
+
+      // 6. Easy | P | LO5
+      {
+        id: 6,
+        difficulty: "ง่าย",
+        domain: "P",
+        domainName: "ทักษะและกระบวนการ (การคำนวณ)",
+        lo: "LO5",
+        loName: "การทำให้เป็นแนวทแยง $A = PDP^{-1}$",
+        text: "ถ้าเมทริกซ์ $A$ มีค่าเฉพาะ $\\lambda_1 = 4, \\lambda_2 = -1$ ที่สอดคล้องกับเวกเตอร์ลักษณะเฉพาะ $\\mathbf{v}_1 = \\begin{bmatrix} 1 \\\\ 2 \\end{bmatrix}, \\mathbf{v}_2 = \\begin{bmatrix} 1 \\\\ -1 \\end{bmatrix}$ หากเลือกวาง $P = [\\mathbf{v}_1 \\ \\mathbf{v}_2]$ เมทริกซ์ทแยงมุม $D$ ต้องเป็นข้อใด?",
+        choices: [
+          "$D = \\begin{bmatrix} -1 & 0 \\\\ 0 & 4 \\end{bmatrix}$",
+          "$D = \\begin{bmatrix} 4 & 0 \\\\ 0 & -1 \\end{bmatrix}$",
+          "$D = \\begin{bmatrix} 1 & 1 \\\\ 2 & -1 \\end{bmatrix}$",
+          "$D = \\begin{bmatrix} 0 & 4 \\\\ -1 & 0 \\end{bmatrix}$"
+        ],
+        correct: 1,
+        explanation: "ในการสร้างเมทริกซ์ $D$ สมาชิกบนเส้นทแยงมุมหลักต้องเรียงลำดับให้ตรงกับคอลัมน์ของเวกเตอร์ลักษณะเฉพาะใน $P$ อย่างเคร่งครัด เมื่อคอลัมน์ที่ 1 คือ $\\mathbf{v}_1$ (ของ $\\lambda_1=4$) และคอลัมน์ที่ 2 คือ $\\mathbf{v}_2$ (ของ $\\lambda_2=-1$) จึงได้ $D = \\operatorname{diag}(4, -1)$"
+      },
+
+      // 7. Easy | A | LO1
+      {
+        id: 7,
+        difficulty: "ง่าย",
+        domain: "A",
+        domainName: "เจตคติและการคิดวิพากษ์",
+        lo: "LO1",
+        loName: "สมการลักษณะเฉพาะและนิยามค่าเฉพาะ",
+        text: "นักศึกษาคนหนึ่งกล่าวว่า \"ถ้าเมทริกซ์มีค่าเฉพาะ $\\lambda = 0$ แสดงว่าเมทริกซ์นั้นไม่สามารถหาค่าเฉพาะได้และเกิดข้อผิดพลาด\" ข้อความนี้ถูกต้องหรือไม่ เพราะเหตุใด?",
+        choices: [
+          "ถูกต้อง เพราะค่าเฉพาะต้องเป็นจำนวนจริงบวกหรือลบเท่านั้น",
+          "ไม่ถูกต้อง เพราะ $\\lambda = 0$ เป็นค่าเฉพาะที่ถูกต้องตามนิยาม และแสดงว่า $\\det(A) = 0$ (เมทริกซ์ไม่มีตัวผกผัน)",
+          "ถูกต้อง เพราะการหารด้วยศูนย์ในระบบสมการเอกพันธุ์จะทำให้หาผลเฉลยไม่ได้",
+          "ไม่ถูกต้อง เพราะ $\\lambda = 0$ หมายความว่าเมทริกซ์นั้นต้องเป็นเมทริกซ์ศูนย์เท่านั้น"
+        ],
+        correct: 1,
+        explanation: "ค่าเฉพาะ $\\lambda$ สามารถเป็นศูนย์ได้ตามนิยาม $A\\mathbf{v} = 0\\mathbf{v} = \\mathbf{0}$ สำหรับ $\\mathbf{v} \\ne \\mathbf{0}$ ซึ่งหมายความว่าระบบ $A\\mathbf{v} = \\mathbf{0}$ มีผลเฉลยไม่ชัด เจน หรือ $\\det(A) = 0$ นั่นคือ $A$ เป็น Singular matrix ซึ่งเป็นสมบัติสำคัญอย่างหนึ่งในพีชคณิตเชิงเส้น"
+      },
+
+      // 8. Easy | A | LO4
+      {
+        id: 8,
+        difficulty: "ง่าย",
+        domain: "A",
+        domainName: "เจตคติและการคิดวิพากษ์",
+        lo: "LO4",
+        loName: "ความเป็นอิสระเชิงเส้นของเวกเตอร์ลักษณะเฉพาะ",
+        text: "ข้อใดสะท้อนประโยชน์สำคัญที่สุดของทฤษฎีบท: \"เวกเตอร์ลักษณะเฉพาะที่สัมพันธ์กับค่าเฉพาะที่ต่างกันจะเป็นอิสระเชิงเส้นต่อกัน\"?",
+        choices: [
+          "ช่วยให้เราทราบว่าเมทริกซ์นั้นจะมีดีเทอร์มิแนนต์เป็นบวกเสมอ",
+          "ช่วยลดความซับซ้อน โดยไม่ต้องเสียเวลาตั้งสมการทดสอบความเป็นอิสระเชิงเส้นของเวกเตอร์ข้ามกลุ่มค่าเฉพาะ",
+          "ช่วยพิสูจน์ว่าเวกเตอร์ลักษณะเฉพาะทุกตัวต้องตั้งฉากกันเสมอ",
+          "ช่วยให้สามารถคูณเมทริกซ์สลับที่กันได้เสมอ ($AB = BA$)"
+        ],
+        correct: 1,
+        explanation: "ทฤษฎีบทนี้ช่วยให้เราการันตีได้ทันทีว่าเวกเตอร์ลักษณะเฉพาะที่มาจากคนละค่าเฉพาะจะไม่มีทางเป็นพหุคูณสเกลาร์หรือขึ้นต่อกันเชิงเส้น จึงร่นระยะเวลาในการตรวจสอบความพร้อมต่อการเป็นฐานหลัก (Basis) ได้อย่างมหาศาล"
+      },
+
+      // 9. Easy | A | LO6
+      {
+        id: 9,
+        difficulty: "ง่าย",
+        domain: "A",
+        domainName: "เจตคติและการคิดวิพากษ์",
+        lo: "LO6",
+        loName: "เมทริกซ์กำลังสูงและระบบพลวัต",
+        text: "ในการคำนวณ $D^{100}$ เมื่อ $D = \\begin{bmatrix} 2 & 0 \\\\ 0 & 3 \\end{bmatrix}$ เหตุใดจึงคำนวณได้ทันทีเป็น $\\begin{bmatrix} 2^{100} & 0 \\\\ 0 & 3^{100} \\end{bmatrix}$?",
+        choices: [
+          "เพราะเมทริกซ์แนวทแยงไม่มีการส่งผ่านอิทธิพลข้ามแกนพิกัด (Decoupled coordinates)",
+          "เพราะเป็นกฎทั่วไปของเมทริกซ์ทุกชนิดที่สามารถยกกำลังสมาชิกทีละตัวได้",
+          "เพราะเมทริกซ์ $D$ มีค่าดีเทอร์มิแนนต์เท่ากับ $1$",
+          "เพราะเมทริกซ์ $D$ สลับที่การบวกได้"
+        ],
+        correct: 0,
+        explanation: "โครงสร้างแนวทแยงของ $D$ ทำให้สมาชิกในแต่ละแนวแกนพิกัดทำงานแยกเป็นอิสระต่อกันโดยสมบูรณ์ ไม่มีการพัวพันข้ามตัวแปร ($x'_1 = 2x_1, x'_2 = 3x_2$) การคูณซ้ำ $k$ ครั้งจึงเป็นการคูณสเกลาร์แยกตามแกนพิกัดเดิมโดยตรง"
+      },
+
+      // 10. Easy | K | LO4
+      {
+        id: 10,
+        difficulty: "ง่าย",
+        domain: "K",
+        domainName: "พุทธิพิสัย (ความรู้ความจำ)",
+        lo: "LO4",
+        loName: "ความเป็นอิสระเชิงเส้นของเวกเตอร์ลักษณะเฉพาะ",
+        text: "ถ้าเมทริกซ์ $A$ ขนาด $3 \\times 3$ มีค่าเฉพาะคือ $\\lambda_1 = 1, \\lambda_2 = 4, \\lambda_3 = -2$ (แตกต่างกันทั้งหมด) เราสามารถสรุปเกี่ยวกับเวกเตอร์ลักษณะเฉพาะของ $A$ ได้อย่างไร?",
+        choices: [
+          "มีเวกเตอร์ลักษณะเฉพาะที่เป็นอิสระเชิงเส้นต่อกันอย่างน้อย 4 ตัว",
+          "มีเวกเตอร์ลักษณะเฉพาะที่เป็นอิสระเชิงเส้นต่อกัน 3 ตัว ซึ่งรวมกันเป็นฐานหลักของ $\\mathbb{R}^3$ ได้",
+          "เวกเตอร์ลักษณะเฉพาะทั้งสามตัวต้องตกอยู่บนระนาบ $2$ มิติเดียวกัน",
+          "ไม่สามารถสรุปได้ ต้องคำนวณหาเวกเตอร์ออกมาก่อน"
+        ],
+        correct: 1,
+        explanation: "ตามทฤษฎีบท: ถ้าเมทริกซ์ขนาด $n \\times n$ มีค่าเฉพาะต่างกัน $n$ ค่า จะมีเวกเตอร์ลักษณะเฉพาะที่เป็นอิสระเชิงเส้นครบ $n$ ตัวเสมอ ซึ่งสามารถสร้างเป็นฐานหลัก (Eigenbasis) ของ $\\mathbb{R}^n$ ได้ทันที"
+      },
+
+      // 11. Medium | K | LO1
+      {
+        id: 11,
+        difficulty: "ปานกลาง",
+        domain: "K",
+        domainName: "พุทธิพิสัย (ความเข้าใจ)",
+        lo: "LO1",
+        loName: "สมการลักษณะเฉพาะและนิยามค่าเฉพาะ",
+        text: "ความสัมพันธ์ระหว่างผลบวกและผลคูณของค่าเฉพาะกับลักษณะเฉพาะของเมทริกซ์ $A$ ข้อใดถูกต้อง?",
+        choices: [
+          "$\\sum \\lambda_i = \\det(A)$ และ $\\prod \\lambda_i = \\operatorname{tr}(A)$",
+          "$\\sum \\lambda_i = \\operatorname{tr}(A)$ และ $\\prod \\lambda_i = \\det(A)$",
+          "$\\sum \\lambda_i = \\operatorname{rank}(A)$ และ $\\prod \\lambda_i = \\operatorname{tr}(A)$",
+          "$\\sum \\lambda_i = \\det(A)$ และ $\\prod \\lambda_i = 0$"
+        ],
+        correct: 1,
+        explanation: "สำหรับเมทริกซ์จัตุรัสใดๆ ผลบวกของค่าเฉพาะ (นับตามพหุคูณเชิงพีชคณิต) จะเท่ากับเทรซ $\\operatorname{tr}(A)$ เสมอ และผลคูณของค่าเฉพาะทั้งหมดจะเท่ากับดีเทอร์มิแนนต์ $\\det(A)$ เสมอ"
+      },
+
+      // 12. Medium | K | LO5
+      {
+        id: 12,
+        difficulty: "ปานกลาง",
+        domain: "K",
+        domainName: "พุทธิพิสัย (ความเข้าใจ)",
+        lo: "LO5",
+        loName: "การทำให้เป็นแนวทแยง $A = PDP^{-1}$",
+        text: "เงื่อนไขที่จำเป็นและเพียงพอ (Necessary and Sufficient Condition) ที่เมทริกซ์ $A_{n \\times n}$ จะทำให้เป็นแนวทแยงได้ (Diagonalizable) คือข้อใด?",
+        choices: [
+          "เมทริกซ์ $A$ ต้องมีค่าเฉพาะที่เป็นจำนวนจริงบวกทั้งหมด",
+          "เมทริกซ์ $A$ ต้องมีดีเทอร์มิแนนต์ไม่เท่ากับศูนย์",
+          "$m_g(\\lambda) = m_a(\\lambda)$ สำหรับทุกค่าเฉพาะ $\\lambda$ ของ $A$",
+          "เมทริกซ์ $A$ ต้องไม่มีสมาชิกที่เป็นศูนย์เลย"
+        ],
+        correct: 2,
+        explanation: "เมทริกซ์ขนาด $n \\times n$ จะทำให้เป็นแนวทแยงได้ ก็ต่อเมื่อ มีเวกเตอร์ลักษณะเฉพาะที่เป็นอิสระเชิงเส้นครบ $n$ ตัว ซึ่งเทียบเท่ากับเงื่อนไขว่า พหุคูณเชิงเรขาคณิตต้องเท่ากับพหุคูณเชิงพีชคณิตสำหรับทุกค่าเฉพาะ ($m_g(\\lambda) = m_a(\\lambda)$)"
+      },
+
+      // 13. Medium | P | LO1
+      {
+        id: 13,
+        difficulty: "ปานกลาง",
+        domain: "P",
+        domainName: "ทักษะและกระบวนการ (การคำนวณ)",
+        lo: "LO1",
+        loName: "สมการลักษณะเฉพาะและนิยามค่าเฉพาะ",
+        text: "กำหนดเมทริกซ์ $A = \\begin{bmatrix} 4 & 2 \\\\ 1 & 3 \\end{bmatrix}$ พหุนามลักษณะเฉพาะ $p(\\lambda) = \\det(A - \\lambda I)$ ตรงกับข้อใด?",
+        choices: [
+          "$\\lambda^2 - 7\\lambda + 10$",
+          "$\\lambda^2 + 7\\lambda - 10$",
+          "$\\lambda^2 - 7\\lambda + 14$",
+          "$\\lambda^2 - 5\\lambda + 6$"
+        ],
+        correct: 0,
+        explanation: "ใช้สูตรลัดเมทริกซ์ $2 \\times 2$: $p(\\lambda) = \\lambda^2 - \\operatorname{tr}(A)\\lambda + \\det(A)$ โดยที่ $\\operatorname{tr}(A) = 4 + 3 = 7$ และ $\\det(A) = (4)(3) - (2)(1) = 12 - 2 = 10$ จึงได้ $p(\\lambda) = \\lambda^2 - 7\\lambda + 10$"
+      },
+
+      // 14. Medium | P | LO2
+      {
+        id: 14,
+        difficulty: "ปานกลาง",
+        domain: "P",
+        domainName: "ทักษะและกระบวนการ (การคำนวณ)",
+        lo: "LO2",
+        loName: "ปริภูมิลักษณะเฉพาะและเคอร์เนล",
+        text: "ฐานหลัก (Basis) ของปริภูมิลักษณะเฉพาะ $E_5$ ของเมทริกซ์ $A = \\begin{bmatrix} 4 & 1 \\\\ 2 & 3 \\end{bmatrix}$ ที่สัมพันธ์กับค่าเฉพาะ $\\lambda = 5$ คือเซตในข้อใด?",
+        choices: [
+          "$\\left\\{ \\begin{bmatrix} 1 \\\\ 1 \\end{bmatrix} \\right\\}$",
+          "$\\left\\{ \\begin{bmatrix} 1 \\\\ -2 \\end{bmatrix} \\right\\}$",
+          "$\\left\\{ \\begin{bmatrix} -1 \\\\ 2 \\end{bmatrix} \\right\\}$",
+          "$\\left\\{ \\begin{bmatrix} 0 \\\\ 1 \\end{bmatrix} \\right\\}$"
+        ],
+        correct: 0,
+        explanation: "แทน $\\lambda = 5$: $(A - 5I)\\mathbf{v} = \\begin{bmatrix} 4-5 & 1 \\\\ 2 & 3-5 \\end{bmatrix}\\begin{bmatrix} x_1 \\\\ x_2 \\end{bmatrix} = \\begin{bmatrix} -1 & 1 \\\\ 2 & -2 \\end{bmatrix}\\begin{bmatrix} x_1 \\\\ x_2 \\end{bmatrix} = \\begin{bmatrix} 0 \\\\ 0 \\end{bmatrix}$ จะได้ $-x_1 + x_2 = 0 \\implies x_1 = x_2$ ให้ $x_2 = 1$ จะได้เวกเตอร์ฐานหลักคือ $[1, 1]^T$"
+      },
+
+      // 15. Medium | P | LO3
+      {
+        id: 15,
+        difficulty: "ปานกลาง",
+        domain: "P",
+        domainName: "ทักษะและกระบวนการ (การคำนวณ)",
+        lo: "LO3",
+        loName: "พหุคูณเชิงพีชคณิตและเชิงเรขาคณิต",
+        text: "สำหรับเมทริกซ์การเฉือน (Shear Matrix) $A = \\begin{bmatrix} 2 & 1 \\\\ 0 & 2 \\end{bmatrix}$ ค่าของ $m_a(2)$ และ $m_g(2)$ มีค่าตามลำดับตรงกับข้อใด?",
+        choices: [
+          "$m_a(2) = 2, \\, m_g(2) = 2$",
+          "$m_a(2) = 2, \\, m_g(2) = 1$",
+          "$m_a(2) = 1, \\, m_g(2) = 2$",
+          "$m_a(2) = 1, \\, m_g(2) = 1$"
+        ],
+        correct: 1,
+        explanation: "พหุนามลักษณะเฉพาะคือ $(\\lambda - 2)^2 = 0$ ดังนั้นรากซ้ำ 2 ครั้งทำให้ $m_a(2) = 2$ เมื่อคำนวณ $A - 2I = \\begin{bmatrix} 0 & 1 \\\\ 0 & 0 \\end{bmatrix}$ พบว่า $\\operatorname{rank} = 1$ ทำให้ $m_g(2) = 2 - \\operatorname{rank} = 2 - 1 = 1$ ส่งผลให้ $m_g < m_a$ (เป็น Defective matrix)"
+      },
+
+      // 16. Medium | P | LO5
+      {
+        id: 16,
+        difficulty: "ปานกลาง",
+        domain: "P",
+        domainName: "ทักษะและกระบวนการ (การคำนวณ)",
+        lo: "LO5",
+        loName: "การทำให้เป็นแนวทแยง $A = PDP^{-1}$",
+        text: "ถ้าเมทริกซ์ $P = \\begin{bmatrix} 1 & 1 \\\\ 1 & -2 \\end{bmatrix}$ เมทริกซ์ผกผัน $P^{-1}$ มีค่าตรงกับข้อใด?",
+        choices: [
+          "$\\begin{bmatrix} 2/3 & 1/3 \\\\ 1/3 & -1/3 \\end{bmatrix}$",
+          "$\\begin{bmatrix} -2/3 & -1/3 \\\\ -1/3 & 1/3 \\end{bmatrix}$",
+          "$\\begin{bmatrix} 1/3 & 2/3 \\\\ -1/3 & 1/3 \\end{bmatrix}$",
+          "$\\begin{bmatrix} 2 & 1 \\\\ 1 & -1 \\end{bmatrix}$"
+        ],
+        correct: 0,
+        explanation: "$\\det(P) = (1)(-2) - (1)(1) = -3$ ใช้สูตรตัวผกผัน $2 \\times 2$: $P^{-1} = \\frac{1}{-3} \\begin{bmatrix} -2 & -1 \\\\ -1 & 1 \\end{bmatrix} = \\begin{bmatrix} 2/3 & 1/3 \\\\ 1/3 & -1/3 \\end{bmatrix}$"
+      },
+
+      // 17. Medium | P | LO6
+      {
+        id: 17,
+        difficulty: "ปานกลาง",
+        domain: "P",
+        domainName: "ทักษะและกระบวนการ (การคำนวณ)",
+        lo: "LO6",
+        loName: "เมทริกซ์กำลังสูงและระบบพลวัต",
+        text: "กำหนด $A = PDP^{-1}$ โดยที่ $D = \\begin{bmatrix} 1 & 0 \\\\ 0 & 0.5 \\end{bmatrix}$ เมื่อ $k \\to \\infty$ เมทริกซ์ $D^k$ จะลู่เข้าสู่เมทริกซ์ใด?",
+        choices: [
+          "$\\begin{bmatrix} 0 & 0 \\\\ 0 & 0 \\end{bmatrix}$",
+          "$\\begin{bmatrix} 1 & 0 \\\\ 0 & 0 \\end{bmatrix}$",
+          "$\\begin{bmatrix} 1 & 0 \\\\ 0 & 1 \\end{bmatrix}$",
+          "ไม่สามารถหาลิมิตได้เพราะลู่ออกสู่อนันต์"
+        ],
+        correct: 1,
+        explanation: "$D^k = \\begin{bmatrix} 1^k & 0 \\\\ 0 & (0.5)^k \\end{bmatrix}$ เมื่อ $k \\to \\infty$ จะได้ $1^k = 1$ คงที่ และ $(0.5)^k \\to 0$ ดังนั้น $\\lim_{k \\to \\infty} D^k = \\begin{bmatrix} 1 & 0 \\\\ 0 & 0 \\end{bmatrix}$"
+      },
+
+      // 18. Medium | A | LO2
+      {
+        id: 18,
+        difficulty: "ปานกลาง",
+        domain: "A",
+        domainName: "เจตคติและการคิดวิพากษ์",
+        lo: "LO2",
+        loName: "ปริภูมิลักษณะเฉพาะและเคอร์เนล",
+        text: "ในการศึกษาเชิงเรขาคณิต เหตุใดเราจึงต้องนิยามปริภูมิลักษณะเฉพาะ $E_\\lambda$ ให้รวมเวกเตอร์ศูนย์ $\\mathbf{0}$ เข้าไปด้วย ทั้งที่เวกเตอร์ศูนย์ไม่ใช่เวกเตอร์ลักษณะเฉพาะ?",
+        choices: [
+          "เพื่อให้สอดคล้องกับคุณสมบัติของปริภูมิย่อย (Subspace) ที่จำเป็นต้องมีเวกเตอร์ศูนย์เพื่อมีสมบัติปิดภายใต้การบวกและการคูณสเกลาร์",
+          "เพื่อให้สามารถหาดีเทอร์มิแนนต์ของปริภูมิได้",
+          "เพื่อป้องกันไม่ให้เกิดค่าเฉพาะเป็นจำนวนเชิงซ้อน",
+          "เพื่อทำให้ขนาดของเวกเตอร์ลักษณะเฉพาะมีค่าเป็นศูนย์เสมอ"
+        ],
+        correct: 0,
+        explanation: "ในพีชคณิตนามธรรม เซตใดๆ จะเป็นปริภูมิเวกเตอร์ย่อย (Subspace) ได้ก็ต่อเมื่อต้องมีเวกเตอร์ศูนย์บรรจุอยู่ด้วย เพื่อให้มีเอกลักษณ์การบวกและคงสมบัติปิดเชิงเส้น การนิยาม $E_\\lambda = \\ker(A - \\lambda I)$ ทำให้ $E_\\lambda$ เป็น Subspace ที่สมบูรณ์ในตัวเอง"
+      },
+
+      // 19. Medium | A | LO3
+      {
+        id: 19,
+        difficulty: "ปานกลาง",
+        domain: "A",
+        domainName: "เจตคติและการคิดวิพากษ์",
+        lo: "LO3",
+        loName: "พหุคูณเชิงพีชคณิตและเชิงเรขาคณิต",
+        text: "เหตุใดกรณีที่ $m_g(\\lambda) < m_a(\\lambda)$ จึงเรียกว่าเมทริกซ์เกิดความ \"บกพร่อง\" (Defective)?",
+        choices: [
+          "เพราะเมทริกซ์นั้นไม่สามารถหาค่าดีเทอร์มิแนนต์ได้",
+          "เพราะจำนวนเวกเตอร์ลักษณะเฉพาะที่เป็นอิสระเชิงเส้นมีไม่เพียงพอที่จะสร้างเป็นฐานหลักขึงปริภูมิ $\\mathbb{R}^n$",
+          "เพราะค่าเฉพาะที่คำนวณได้มีความคลาดเคลื่อนเชิงตัวเลข",
+          "เพราะเมทริกซ์เกิดการสูญเสียคุณสมบัติการสมมาตร"
+        ],
+        correct: 1,
+        explanation: "คำว่า \"Defective\" (บกพร่อง) หมายถึง การที่มิติของ Eigenspace ขาดแคลนหรือพร่องไปจากจำนวนรากพีชคณิต ทำให้ไม่สามารถรวบรวมไอเกนเวกเตอร์อิสระให้ครบ $n$ ตัวเพื่อเป็นฐานหลักสำหรับแปลงเป็นเมทริกซ์ทแยงมุมได้"
+      },
+
+      // 20. Medium | A | LO6
+      {
+        id: 20,
+        difficulty: "ปานกลาง",
+        domain: "A",
+        domainName: "เจตคติและการคิดวิพากษ์",
+        lo: "LO6",
+        loName: "เมทริกซ์กำลังสูงและระบบพลวัต",
+        text: "พิจารณาระบบพลวัต $\\mathbf{x}_{k+1} = A\\mathbf{x}_k$ ถ้าค่าเฉพาะเด่นของ $A$ มีค่าเท่ากับ $1.05$ ในเชิงการประยุกต์ใช้จริง (เช่น แบบจำลองประชากรหรือเศรษฐศาสตร์) บ่งชี้พฤติกรรมอย่างไร?",
+        choices: [
+          "ระบบจะเสื่อมสลายและประชากรจะสูญพันธุ์เข้าสู่ศูนย์ในระยะยาว",
+          "ระบบจะคงที่อยู่ที่จุดเดิมตลอดกาล",
+          "ระบบจะเกิดการเติบโตแบบทวีคูณ (Exponential Growth) ด้วยอัตรา $5\\%$ ต่อหน่วยเวลา",
+          "ระบบจะแกว่งกวัดสลับขั้วบวกลบตลอดเวลา"
+        ],
+        correct: 2,
+        explanation: "เนื่องจาก $|\lambda| = 1.05 > 1$ พจน์ $\lambda^k = (1.05)^k$ จะขยายตัวขึ้นเรื่อยๆ ส่งผลให้ในระยะยาวระบบจะเติบโตอย่างทวีคูณตามแนวไอเกนเวกเตอร์เด่นด้วยอัตราเพิ่มขึ้น $5\\%$ ต่อช่วงเวลา"
+      },
+
+      // 21. Hard | K | LO4
+      {
+        id: 21,
+        difficulty: "ยาก",
+        domain: "K",
+        domainName: "พุทธิพิสัย (การวิเคราะห์ขั้นสูง)",
+        lo: "LO4",
+        loName: "ความเป็นอิสระเชิงเส้นของเวกเตอร์ลักษณะเฉพาะ",
+        text: "ในการพิสูจน์โดยอุปนัยเชิงคณิตศาสตร์ว่า เวกเตอร์ลักษณะเฉพาะ $\{\\mathbf{v}_1, \\dots, \\mathbf{v}_k\}$ ที่สัมพันธ์กับค่าเฉพาะต่างกัน $\\lambda_1 \\ne \\dots \\ne \\lambda_k$ เป็นอิสระเชิงเส้น ขั้นตอนสำคัญในการกำจัดพจน์ $\\mathbf{v}_k$ ออกจากสมการ $c_1\\mathbf{v}_1 + \\dots + c_k\\mathbf{v}_k = \\mathbf{0}$ คือการคูณสมการด้วยตัวดำเนินการใด?",
+        choices: [
+          "คูณด้วย $A^{-1}$ ทางซ้าย",
+          "คูณด้วยตัวดำเนินการ $(A - \\lambda_k I)$ ทางซ้าย",
+          "คูณด้วยสเกลาร์ $\\det(A)$",
+          "คูณด้วยทรานสโพส $A^T$"
+        ],
+        correct: 1,
+        explanation: "เนื่องจาก $(A - \\lambda_k I)\\mathbf{v}_k = A\\mathbf{v}_k - \\lambda_k\\mathbf{v}_k = \\lambda_k\\mathbf{v}_k - \\lambda_k\\mathbf{v}_k = \\mathbf{0}$ การคูณ $(A - \\lambda_k I)$ ทางซ้ายตลอดสมการจะกำจัดพจน์ที่ $k$ ทิ้งไปอย่างสมบูรณ์ เหลือเพียงพจน์ของ $\\mathbf{v}_1, \\dots, \\mathbf{v}_{k-1}$ ซึ่งช่วยให้ใช้สมมติฐานขั้นอุปนัยสรุปว่าสัมประสิทธิ์ทั้งหมดต้องเป็นศูนย์ได้"
+      },
+
+      // 22. Hard | K | LO6
+      {
+        id: 22,
+        difficulty: "ยาก",
+        domain: "K",
+        domainName: "พุทธิพิสัย (การวิเคราะห์ขั้นสูง)",
+        lo: "LO6",
+        loName: "เมทริกซ์กำลังสูงและระบบพลวัต",
+        text: "นิยามของ **รัศมีเชิงสเปกตรัม (Spectral Radius)** $\\rho(A)$ และเงื่อนไขที่จำเป็นและเพียงพอเพื่อให้ $\\lim_{k \\to \\infty} A^k = \\mathbf{0}$ คือข้อใด?",
+        choices: [
+          "$\\rho(A) = \\min |\\lambda_i|$ และเงื่อนไขคือ $\\rho(A) < 1$",
+          "$\\rho(A) = \\max |\\lambda_i|$ และเงื่อนไขคือ $\\rho(A) < 1$",
+          "$\\rho(A) = \\det(A)$ และเงื่อนไขคือ $\\rho(A) = 0$",
+          "$\\rho(A) = \\operatorname{tr}(A)$ และเงื่อนไขคือ $\\rho(A) < 0$"
+        ],
+        correct: 1,
+        explanation: "รัศมีเชิงสเปกตรัม $\\rho(A)$ นิยามโดย $\\max_i |\\lambda_i|$ (ค่าสัมบูรณ์ที่มากที่สุดในบรรดาค่าเฉพาะทั้งหมด) และตามทฤษฎีบทการลู่เข้าของเมทริกซ์ $A^k \\to \\mathbf{0}$ เมื่อ $k \\to \\infty$ ก็ต่อเมื่อ $\\rho(A) < 1$ เสมอ ไม่ว่าเมทริกซ์นั้นจะเป็นแนวทแยงได้หรือไม่ก็ตาม"
+      },
+
+      // 23. Hard | P | LO3
+      {
+        id: 23,
+        difficulty: "ยาก",
+        domain: "P",
+        domainName: "ทักษะและกระบวนการ (การคำนวณขั้นสูง)",
+        lo: "LO3",
+        loName: "พหุคูณเชิงพีชคณิตและเชิงเรขาคณิต",
+        text: "กำหนดเมทริกซ์ขนาด $3 \\times 3$: $A = \\begin{bmatrix} 3 & 1 & 0 \\\\ 0 & 3 & 0 \\\\ 0 & 0 & 3 \\end{bmatrix}$ จงหาพหุคูณเชิงเรขาคณิต $m_g(3) = \\dim(E_3)$",
+        choices: [
+          "$1$",
+          "$2$",
+          "$3$",
+          "$0$"
+        ],
+        correct: 1,
+        explanation: "คำนวณ $A - 3I = \\begin{bmatrix} 0 & 1 & 0 \\\\ 0 & 0 & 0 \\\\ 0 & 0 & 0 \\end{bmatrix}$ เมทริกซ์นี้มีแถวที่ไม่เป็นศูนย์เพียง 1 แถว ดังนั้น $\\operatorname{rank}(A - 3I) = 1$ ตามทฤษฎีบท Rank-Nullity: $m_g(3) = \\dim(E_3) = n - \\operatorname{rank}(A - 3I) = 3 - 1 = 2$"
+      },
+
+      // 24. Hard | P | LO4
+      {
+        id: 24,
+        difficulty: "ยาก",
+        domain: "P",
+        domainName: "ทักษะและกระบวนการ (การคำนวณขั้นสูง)",
+        lo: "LO4",
+        loName: "ความเป็นอิสระเชิงเส้นของเวกเตอร์ลักษณะเฉพาะ",
+        text: "ถ้า $\\mathbf{v}_1, \\mathbf{v}_2$ เป็นเวกเตอร์ลักษณะเฉพาะที่เป็นอิสระเชิงเส้นที่สัมพันธ์กับค่าเฉพาะ $\\lambda_1$ เดียวกัน และ $\\mathbf{v}_3$ สัมพันธ์กับ $\\lambda_2$ (โดยที่ $\\lambda_1 \\ne \\lambda_2$) เซต $\\{\\mathbf{v}_1, \\mathbf{v}_2, \\mathbf{v}_3\\}$ จะเป็นอิสระเชิงเส้นต่อกันหรือไม่ เพราะเหตุใด?",
+        choices: [
+          "เป็นอิสระเชิงเส้นต่อกันเสมอ ตามทฤษฎีบทการรวมฐานหลักของปริภูมิลักษณะเฉพาะที่ต่างกัน",
+          "ไม่เป็นอิสระเชิงเส้น เพราะ $\\mathbf{v}_1$ และ $\\mathbf{v}_2$ มาจากค่าเฉพาะเดียวกัน",
+          "ขึ้นอยู่กับว่า $\\det(A)$ เป็นบวกหรือลบ",
+          "ไม่สามารถสรุปได้จนกว่าจะทราบมิติของเมทริกซ์"
+        ],
+        correct: 0,
+        explanation: "ตามทฤษฎีบทการรวมฐานหลัก: ถ้ายูเนียนฐานหลักของแต่ละปริภูมิลักษณะเฉพาะ $E_{\\lambda_1}$ และ $E_{\\lambda_2}$ เข้าด้วยกัน เนื่องจาก $E_{\\lambda_1} \\cap E_{\\lambda_2} = \\{\\mathbf{0}\\}$ ผลรวมที่ได้จะเป็นเซตที่เป็นอิสระเชิงเส้นต่อกันทั้งหมดใน $\\mathbb{R}^n$ เสมอ"
+      },
+
+      // 25. Hard | P | LO6
+      {
+        id: 25,
+        difficulty: "ยาก",
+        domain: "P",
+        domainName: "ทักษะและกระบวนการ (การคำนวณขั้นสูง)",
+        lo: "LO6",
+        loName: "เมทริกซ์กำลังสูงและระบบพลวัต",
+        text: "กำหนด $A = \\begin{bmatrix} 4 & 1 \\\\ 2 & 3 \\end{bmatrix}$ ซึ่งมี $\\lambda_1 = 5, \\mathbf{v}_1 = \\begin{bmatrix} 1 \\\\ 1 \\end{bmatrix}$ และ $\\lambda_2 = 2, \\mathbf{v}_2 = \\begin{bmatrix} 1 \\\\ -2 \\end{bmatrix}$ ถ้าเวกเตอร์เริ่มต้นคือ $\\mathbf{x}_0 = \\begin{bmatrix} 2 \\\\ -1 \\end{bmatrix} = \\mathbf{v}_1 + \\mathbf{v}_2$ เวกเตอร์ $\\mathbf{x}_k = A^k\\mathbf{x}_0$ มีสูตรในรูปปิดตรงกับข้อใด?",
+        choices: [
+          "$\\mathbf{x}_k = 5^k \\begin{bmatrix} 1 \\\\ 1 \\end{bmatrix} + 2^k \\begin{bmatrix} 1 \\\\ -2 \\end{bmatrix}$",
+          "$\\mathbf{x}_k = 10^k \\begin{bmatrix} 2 \\\\ -1 \\end{bmatrix}$",
+          "$\\mathbf{x}_k = 7^k \\begin{bmatrix} 1 \\\\ 1 \\end{bmatrix}$",
+          "$\\mathbf{x}_k = \\begin{bmatrix} 5^k + 2^k \\\\ 5^k - 2^k \\end{bmatrix}$"
+        ],
+        correct: 0,
+        explanation: "เนื่องจาก $\\mathbf{x}_0 = 1\\mathbf{v}_1 + 1\\mathbf{v}_2$ เมื่อคูณด้วย $A^k$ จะกระจายเชิงเส้นได้เป็น $\\mathbf{x}_k = A^k(\\mathbf{v}_1 + \\mathbf{v}_2) = A^k\\mathbf{v}_1 + A^k\\mathbf{v}_2 = \\lambda_1^k\\mathbf{v}_1 + \\lambda_2^k\\mathbf{v}_2 = 5^k\\begin{bmatrix} 1 \\\\ 1 \\end{bmatrix} + 2^k\\begin{bmatrix} 1 \\\\ -2 \\end{bmatrix}$"
+      },
+
+      // 26. Hard | A | LO1
+      {
+        id: 26,
+        difficulty: "ยาก",
+        domain: "A",
+        domainName: "เจตคติและการคิดวิพากษ์",
+        lo: "LO1",
+        loName: "สมการลักษณะเฉพาะและนิยามค่าเฉพาะ",
+        text: "ในการวิเคราะห์ปัญหาการสั่นสะเทือนทางวิศวกรรม (Mechanical Vibrations) หรือโหมดการสั่นของสะพาน ค่าเฉพาะ $\\lambda$ และเวกเตอร์ลักษณะเฉพาะ $\\mathbf{v}$ สื่อถึงความหมายทางกายภาพในข้อใด?",
+        choices: [
+          "$\\lambda$ คือความถี่ธรรมชาติของการสั่น (Natural Frequency) และ $\\mathbf{v}$ คือรูปร่างลักษณะของการสั่น (Mode Shape)",
+          "$\\lambda$ คือน้ำหนักของโครงสร้าง และ $\\mathbf{v}$ คือความยาวของสะพาน",
+          "$\\lambda$ คืออุณหภูมิวิกฤต และ $\\mathbf{v}$ คือทิศทางลม",
+          "$\\lambda$ คือความเค้นดึงสูงสุด และ $\\mathbf{v}$ คือปริมาตรคอนกรีต"
+        ],
+        correct: 0,
+        explanation: "ในระบบสมการเชิงอนุพันธ์ของการสั่นไหว $M\\ddot{\\mathbf{x}} + K\\mathbf{x} = \\mathbf{0}$ ค่าเฉพาะสัมพันธ์โดยตรงกับความถี่ธรรมชาติของการสั่น ($\\\\omega^2 = \\lambda$) ส่วนไอเกนเวกเตอร์ $\\mathbf{v}$ คือโหมดการสั่น (Mode Shape) ที่บอกสัดส่วนการเคลื่อนที่ของโครงสร้างในแต่ละจุด ซึ่งเป็นหัวใจของการป้องกันปรากฏการณ์เรโซแนนซ์ (Resonance)"
+      },
+
+      // 27. Hard | A | LO4
+      {
+        id: 27,
+        difficulty: "ยาก",
+        domain: "A",
+        domainName: "เจตคติและการคิดวิพากษ์",
+        lo: "LO4",
+        loName: "ความเป็นอิสระเชิงเส้นของเวกเตอร์ลักษณะเฉพาะ",
+        text: "หากนักวิจัยพบว่าแบบจำลองการแปลงเชิงเส้นของเขามีเมทริกซ์ที่เป็น Defective Matrix เขาจะไม่สามารถใช้การวิเคราะห์แบบใดได้โดยตรง?",
+        choices: [
+          "การหาค่าดีเทอร์มิแนนต์ของระบบ",
+          "การแยกตัวประกอบเป็นผลคูณของเมทริกซ์แนวทแยง $A = PDP^{-1}$ เพื่อวิเคราะห์ระบบพิกัดอิสระ",
+          "การคูณเมทริกซ์กับเวกเตอร์",
+          "การหาทรานสโพสของเมทริกซ์"
+        ],
+        correct: 1,
+        explanation: "เมทริกซ์ที่ Defective ขาดไอเกนเวกเตอร์อิสระ จึงไม่สามารถสร้างเมทริกซ์การแปลง $P$ ที่หาตัวผกผันได้ ทำให้ไม่สามารถใช้คุณประโยชน์ของ $A = PDP^{-1}$ เพื่อแยกมิติของระบบให้เป็นอิสระต่อกัน (Decoupling) ได้โดยตรง"
+      },
+
+      // 28. Hard | A | LO5
+      {
+        id: 28,
+        difficulty: "ยาก",
+        domain: "A",
+        domainName: "เจตคติและการคิดวิพากษ์",
+        lo: "LO5",
+        loName: "การทำให้เป็นแนวทแยง $A = PDP^{-1}$",
+        text: "พิจารณาข้อความ: \"ถ้าเมทริกซ์ $A$ มีตัวผกผัน ($A^{-1}$ หาค่าได้) แล้ว $A$ จะต้องทำให้เป็นแนวทแยงได้เสมอ\" ข้อความนี้เป็นจริงหรือไม่ เพราะเหตุใด?",
+        choices: [
+          "เป็นจริงเสมอ เพราะ $\\det(A) \\ne 0$ รับประกันการมีฐานหลักครบถ้วน",
+          "ไม่จริง เช่น เมทริกซ์ $A = \\begin{bmatrix} 2 & 1 \\\\ 0 & 2 \\end{bmatrix}$ มี $\\det(A) = 4 \\ne 0$ แต่เป็น Defective จึงทำให้เป็นแนวทแยงไม่ได้",
+          "เป็นจริงเสมอ เพราะเมทริกซ์ที่มีตัวผกผันจะมีค่าเฉพาะต่างกันเสมอ",
+          "ไม่จริง เพราะเฉพาะเมทริกซ์ศูนย์เท่านั้นที่ทำให้เป็นแนวทแยงได้"
+        ],
+        correct: 1,
+        explanation: "การมีตัวผกผัน (Invertibility) พิจารณาเพียงว่า $\\det(A) \\ne 0$ หรือ $\\lambda_i \\ne 0$ หรือไม่ ซึ่งไม่เกี่ยวข้องกับความพร้อมของเวกเตอร์ลักษณะเฉพาะ เมทริกซ์อย่าง Shear Matrix $A = \\begin{bmatrix} 2 & 1 \\\\ 0 & 2 \\end{bmatrix}$ หา $A^{-1}$ ได้แน่นอน แต่ไม่สามารถทำให้เป็นแนวทแยงได้"
+      },
+
+      // 29. Hard | A | LO6
+      {
+        id: 29,
+        difficulty: "ยาก",
+        domain: "A",
+        domainName: "เจตคติและการคิดวิพากษ์",
+        lo: "LO6",
+        loName: "เมทริกซ์กำลังสูงและระบบพลวัต",
+        text: "ในอัลกอริทึม PageRank ของ Google หรือการจำลอง Markov Chain การที่เมทริกซ์ความน่าจะเป็นแบบสโตแคสติกมีค่าเฉพาะเด่น $\\lambda_1 = 1$ และ $|\lambda_j| < 1$ สำหรับค่าอื่น ส่งผลดีต่อการประมวลผลอย่างไร?",
+        choices: [
+          "ทำให้ระบบลู่ออกสู่อนันต์ ช่วยเพิ่มความเร็วในการค้นหา",
+          "รับประกันว่าระบบจะลู่เข้าสู่เวกเตอร์สถานะคงตัว (Steady-State Distribution) เพียงหนึ่งเดียวเสมอ โดยไม่ขึ้นกับสถานะเริ่มต้น",
+          "ทำให้เมทริกซ์กลายเป็นเมทริกซ์ศูนย์",
+          "ทำให้ไม่ต้องใช้หน่วยความจำคอมพิวเตอร์ในการเก็บข้อมูล"
+        ],
+        correct: 1,
+        explanation: "ตามทฤษฎีบทเพอร์รอน-โฟรเบนิอุส การมี $\\lambda_1 = 1$ เป็นค่าเฉพาะเด่นเพียงตัวเดียว และค่าอื่นลู่เข้าสู่ศูนย์เมื่อ $k \\to \\infty$ รับประกันว่าการคูณซ้ำ $A^k\\mathbf{x}_0$ จะลู่เข้าสู่ไอเกนเวกเตอร์คงตัวของ $\\lambda_1 = 1$ เสมอ ไม่ว่าผู้ใช้งานจะเริ่มต้นท่องเว็บจากหน้าใดก็ตาม"
+      },
+
+      // 30. Hard | K | LO5
+      {
+        id: 30,
+        difficulty: "ยาก",
+        domain: "K",
+        domainName: "พุทธิพิสัย (การวิเคราะห์ขั้นสูง)",
+        lo: "LO5",
+        loName: "การทำให้เป็นแนวทแยง $A = PDP^{-1}$",
+        text: "ตาม **ทฤษฎีบทสเปกตรัมสำหรับเมทริกซ์สมมาตร (Spectral Theorem for Symmetric Matrices)** เมทริกซ์สมมาตรจริง ($A = A^T$) มีคุณสมบัติพิเศษที่เหนือกว่าเมทริกซ์ทั่วไปในข้อใด?",
+        choices: [
+          "มีค่าเฉพาะเป็นจำนวนจริงเสมอ และสามารถทำให้เป็นแนวทแยงเชิงตั้งฉากได้เสมอ ($A = PDP^T$ โดย $P^{-1} = P^T$)",
+          "มีค่าเฉพาะเป็นจำนวนเชิงซ้อนล้วนเสมอ",
+          "มีดีเทอร์มิแนนต์เท่ากับ $1$ เสมอ",
+          "ไม่มีทางมีค่าเฉพาะซ้ำกันได้เลย"
+        ],
+        correct: 0,
+        explanation: "ทฤษฎีบทสเปกตรัมการันตีว่า: เมทริกซ์สมมาตรจริงทุกตัวจะมีค่าเฉพาะเป็นจำนวนจริงทั้งหมดเสมอ ไม่มีวันเกิดภาวะ Defective ($m_g = m_a$ เสมอ) และสามารถหาฐานหลักของไอเกนเวกเตอร์ที่ตั้งฉากซึ่งกันและกัน (Orthonormal Basis) ได้ ทำให้ $P$ เป็น Orthogonal Matrix ($P^{-1} = P^T$)"
+      }
+    ];
+
+    // State
+    const userAnswers = {};
+    const solutionVisibility = {};
+
+    window.onload = function() {
+      renderQuestionNav();
+      renderQuestions();
+      updateStats();
+    };
+
+    function renderQuestionNav() {
+      const container = document.getElementById('questionGridNav');
+      let html = '';
+      questions.forEach((q, idx) => {
+        html += `
+          <button id="navBtn_${q.id}" onclick="scrollToQuestion(${q.id})" 
+            class="w-7 h-7 sm:w-8 sm:h-8 rounded-lg text-xs font-bold transition-all border border-slate-200 bg-slate-50 text-slate-700 hover:bg-slate-200 flex items-center justify-center">
+            ${q.id}
+          </button>
+        `;
+      });
+      container.innerHTML = html;
+    }
+
+    function renderQuestions() {
+      const container = document.getElementById('questionsContainer');
+      let html = '';
+
+      const choiceLetters = ['ก', 'ข', 'ค', 'ง'];
+
+      questions.forEach(q => {
+        // Badges styling
+        let diffColor = 'bg-emerald-100 text-emerald-800 border-emerald-300';
+        if (q.difficulty === 'ปานกลาง') diffColor = 'bg-amber-100 text-amber-800 border-amber-300';
+        if (q.difficulty === 'ยาก') diffColor = 'bg-rose-100 text-rose-800 border-rose-300';
+
+        let domainColor = 'bg-brand-50 text-brand-700 border-brand-200';
+        if (q.domain === 'P') domainColor = 'bg-indigo-50 text-indigo-700 border-indigo-200';
+        if (q.domain === 'A') domainColor = 'bg-purple-50 text-purple-700 border-purple-200';
+
+        const isAnswered = userAnswers[q.id] !== undefined;
+        const selectedChoice = userAnswers[q.id];
+        const isSolutionOpen = solutionVisibility[q.id] || false;
+
+        html += `
+          <article id="questionCard_${q.id}" class="bg-white rounded-2xl p-5 sm:p-7 shadow-sm border border-slate-200/90 transition-all space-y-4">
+            
+            <!-- Badges Row -->
+            <div class="flex flex-wrap items-center gap-2 text-[11px] sm:text-xs">
+              <span class="px-2.5 py-1 rounded-lg font-extrabold bg-slate-900 text-white shadow-xs">
+                ข้อที่ ${q.id}
+              </span>
+              <span class="px-2.5 py-1 rounded-lg font-semibold border ${diffColor}">
+                ความยาก: ${q.difficulty}
+              </span>
+              <span class="px-2.5 py-1 rounded-lg font-semibold border ${domainColor}">
+                ด้าน: ${q.domain} (${q.domainName})
+              </span>
+              <span class="px-2.5 py-1 rounded-lg font-medium bg-slate-100 text-slate-700 border border-slate-200">
+                ${q.lo}: ${q.loName}
+              </span>
+            </div>
+
+            <!-- Question Text -->
+            <div class="text-base sm:text-lg font-semibold text-slate-900 leading-relaxed pt-1">
+              ${q.text}
+            </div>
+
+            <!-- Choices List -->
+            <div class="space-y-2.5 pt-1">
+        `;
+
+        q.choices.forEach((choice, cIdx) => {
+          const isSelected = selectedChoice === cIdx;
+          const letter = choiceLetters[cIdx];
+          
+          let choiceStyle = "border-slate-200 bg-white hover:bg-slate-50 text-slate-800";
+          let circleStyle = "border-slate-300 bg-slate-100 text-slate-600";
+
+          if (isSelected) {
+            choiceStyle = "border-brand-500 bg-brand-50/50 text-brand-950 ring-2 ring-brand-200";
+            circleStyle = "border-brand-600 bg-brand-600 text-white font-bold";
+          }
+
+          html += `
+            <div onclick="selectChoice(${q.id}, ${cIdx})" 
+              class="flex items-start gap-3 p-3 sm:p-3.5 rounded-xl border transition-all cursor-pointer select-none ${choiceStyle}">
+              <div class="w-7 h-7 rounded-full border flex items-center justify-center shrink-0 mt-0.5 text-xs font-bold transition-all ${circleStyle}">
+                ${letter}
+              </div>
+              <div class="text-xs sm:text-sm pt-0.5 flex-1 font-medium leading-relaxed">
+                ${choice}
+              </div>
+            </div>
+          `;
+        });
+
+        html += `
+            </div>
+
+            <!-- Bottom Actions: Toggle Solution Button & Feedback -->
+            <div class="pt-2 border-t border-slate-100 flex flex-wrap items-center justify-between gap-3">
+              <button onclick="toggleSolution(${q.id})" 
+                class="px-3.5 py-1.5 rounded-lg text-xs font-semibold border border-slate-300 hover:bg-slate-100 text-slate-700 transition-all flex items-center gap-1.5">
+                <svg class="w-3.5 h-3.5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                <span>${isSolutionOpen ? 'ซ่อนเฉลยวิธีคิด' : 'แสดงเฉลยวิธีคิดละเอียด'}</span>
+              </button>
+
+              <div id="itemStatus_${q.id}" class="text-xs font-semibold">
+                ${isAnswered ? '<span class="text-emerald-600">✓ บันทึกคำตอบแล้ว</span>' : '<span class="text-slate-400">ยังไม่ได้ตอบ</span>'}
+              </div>
+            </div>
+
+            <!-- Detailed Solution Box (Collapsible) -->
+            <div id="solutionBox_${q.id}" class="${isSolutionOpen ? '' : 'hidden'} bg-amber-50/70 border border-amber-200/90 rounded-xl p-4 sm:p-5 text-xs sm:text-sm text-slate-800 space-y-2 transition-all">
+              <div class="flex items-center gap-2 text-amber-900 font-bold text-sm">
+                <span class="w-2 h-2 rounded-full bg-amber-600"></span>
+                <span>คำตอบที่ถูกต้อง: ตัวเลือก (${choiceLetters[q.correct]})</span>
+              </div>
+              <div class="leading-relaxed text-slate-700 bg-white p-3.5 rounded-lg border border-amber-200/70">
+                <strong class="text-brand-700 block mb-1">ขั้นตอนและเหตุผลเชิงทฤษฎี:</strong>
+                ${q.explanation}
+              </div>
+            </div>
+
+          </article>
+        `;
+      });
+
+      container.innerHTML = html;
+
+      // Trigger MathJax re-render
+      if (window.MathJax && MathJax.typesetPromise) {
+        MathJax.typesetPromise([container]).catch(err => console.error(err));
+      }
+    }
+
+    function selectChoice(questionId, choiceIdx) {
+      userAnswers[questionId] = choiceIdx;
+      renderQuestions();
+      updateStats();
+      updateNavStyles();
+    }
+
+    function toggleSolution(questionId) {
+      solutionVisibility[questionId] = !solutionVisibility[questionId];
+      renderQuestions();
+    }
+
+    function revealAllSolutions() {
+      questions.forEach(q => {
+        solutionVisibility[q.id] = true;
+      });
+      renderQuestions();
+    }
+
+    function hideAllSolutions() {
+      questions.forEach(q => {
+        solutionVisibility[q.id] = false;
+      });
+      renderQuestions();
+    }
+
+    function resetExam() {
+      if (confirm("ท่านต้องการล้างคำตอบที่บันทึกไว้ทั้งหมดเพื่อเริ่มทำใหม่หรือไม่?")) {
+        for (let key in userAnswers) delete userAnswers[key];
+        for (let key in solutionVisibility) delete solutionVisibility[key];
+        renderQuestions();
+        updateStats();
+        updateNavStyles();
+      }
+    }
+
+    function scrollToQuestion(id) {
+      const el = document.getElementById(`questionCard_${id}`);
+      if (el) {
+        el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+    }
+
+    function updateStats() {
+      let answeredCount = 0;
+      let correctCount = 0;
+
+      questions.forEach(q => {
+        if (userAnswers[q.id] !== undefined) {
+          answeredCount++;
+          if (userAnswers[q.id] === q.correct) {
+            correctCount++;
+          }
+        }
+      });
+
+      document.getElementById('answeredCounter').innerText = `${answeredCount} / 30`;
+      document.getElementById('scoreCounter').innerText = `${correctCount} / 30`;
+    }
+
+    function updateNavStyles() {
+      questions.forEach(q => {
+        const btn = document.getElementById(`navBtn_${q.id}`);
+        if (!btn) return;
+        if (userAnswers[q.id] !== undefined) {
+          btn.className = "w-7 h-7 sm:w-8 sm:h-8 rounded-lg text-xs font-bold transition-all border border-brand-500 bg-brand-600 text-white shadow-xs flex items-center justify-center";
+        } else {
+          btn.className = "w-7 h-7 sm:w-8 sm:h-8 rounded-lg text-xs font-bold transition-all border border-slate-200 bg-slate-50 text-slate-700 hover:bg-slate-200 flex items-center justify-center";
+        }
+      });
+    }
+
+    function applyFilters() {
+      const status = document.getElementById('filterStatus').value;
+      const diff = document.getElementById('filterDifficulty').value;
+      const domain = document.getElementById('filterDomain').value;
+      const lo = document.getElementById('filterLO').value;
+
+      questions.forEach(q => {
+        const card = document.getElementById(`questionCard_${q.id}`);
+        const navBtn = document.getElementById(`navBtn_${q.id}`);
+        if (!card) return;
+
+        let visible = true;
+
+        // Status check
+        const isAns = userAnswers[q.id] !== undefined;
+        const isCorr = isAns && userAnswers[q.id] === q.correct;
+        if (status === 'answered' && !isAns) visible = false;
+        if (status === 'unanswered' && isAns) visible = false;
+        if (status === 'correct' && !isCorr) visible = false;
+        if (status === 'incorrect' && (!isAns || isCorr)) visible = false;
+
+        // Difficulty check
+        if (diff !== 'all' && q.difficulty !== diff) visible = false;
+
+        // Domain check
+        if (domain !== 'all' && q.domain !== domain) visible = false;
+
+        // LO check
+        if (lo !== 'all' && q.lo !== lo) visible = false;
+
+        if (visible) {
+          card.classList.remove('hidden');
+          if (navBtn) navBtn.classList.remove('opacity-20');
+        } else {
+          card.classList.add('hidden');
+          if (navBtn) navBtn.classList.add('opacity-20');
+        }
+      });
+    }
+
+    // Modal Scoring and Analytics Breakdown
+    function openSubmitModal() {
+      let totalCorrect = 0;
+      let totalAnswered = 0;
+
+      // Group stats
+      const domainStats = { K: { total: 0, correct: 0 }, P: { total: 0, correct: 0 }, A: { total: 0, correct: 0 } };
+      const diffStats = { ง่าย: { total: 0, correct: 0 }, ปานกลาง: { total: 0, correct: 0 }, ยาก: { total: 0, correct: 0 } };
+      const loStats = {
+        LO1: { name: "LO1: ค่าเฉพาะ & สมการลักษณะเฉพาะ", total: 0, correct: 0 },
+        LO2: { name: "LO2: ปริภูมิลักษณะเฉพาะ & เคอร์เนล", total: 0, correct: 0 },
+        LO3: { name: "LO3: พหุคูณ ma และ mg", total: 0, correct: 0 },
+        LO4: { name: "LO4: ความเป็นอิสระเชิงเส้น", total: 0, correct: 0 },
+        LO5: { name: "LO5: การทำให้เป็นแนวทแยง PDP⁻¹", total: 0, correct: 0 },
+        LO6: { name: "LO6: เมทริกซ์กำลังสูง & ระบบพลวัต", total: 0, correct: 0 }
+      };
+
+      questions.forEach(q => {
+        domainStats[q.domain].total++;
+        diffStats[q.difficulty].total++;
+        loStats[q.lo].total++;
+
+        if (userAnswers[q.id] !== undefined) {
+          totalAnswered++;
+          if (userAnswers[q.id] === q.correct) {
+            totalCorrect++;
+            domainStats[q.domain].correct++;
+            diffStats[q.difficulty].correct++;
+            loStats[q.lo].correct++;
+          }
+        }
+      });
+
+      const percent = Math.round((totalCorrect / 30) * 100);
+      document.getElementById('modalTotalScore').innerText = totalCorrect;
+      document.getElementById('modalPercentBadge').innerText = `คิดเป็น ${percent}% (ทำไปแล้ว ${totalAnswered}/30 ข้อ)`;
+
+      let msg = "ท่านมีความรู้ความเข้าใจในระดับดีเยี่ยม พร้อมสำหรับการประยุกต์ใช้ในระดับสูง";
+      if (percent < 50) msg = "ควรทบทวนนิยามพื้นฐานและการคำนวณเวกเตอร์ลักษณะเฉพาะเพิ่มเติมในเรื่องที่ 1 - 3";
+      else if (percent < 75) msg = "ผลการเรียนรู้อยู่ในเกณฑ์ดี แนะนำให้ฝึกฝนกรณีค่าเฉพาะซ้ำและเมทริกซ์บกพร่อง (Defective) เพิ่มเติม";
+      document.getElementById('modalEvaluationMessage').innerText = msg;
+
+      // Render Domain Breakdown
+      let domainHtml = '';
+      const domainNames = { K: "พุทธิพิสัย (K - ความรู้ความจำ)", P: "ทักษะกระบวนการ (P - การคำนวณ)", A: "เจตคติและการคิดวิพากษ์ (A)" };
+      for (let k in domainStats) {
+        const item = domainStats[k];
+        const pct = Math.round((item.correct / item.total) * 100);
+        domainHtml += `
+          <div>
+            <div class="flex justify-between font-semibold text-xs text-slate-700 mb-1">
+              <span>${domainNames[k]}</span>
+              <span>${item.correct} / ${item.total} (${pct}%)</span>
+            </div>
+            <div class="w-full bg-slate-200 h-2 rounded-full overflow-hidden">
+              <div class="bg-brand-600 h-full rounded-full transition-all" style="width: ${pct}%"></div>
+            </div>
+          </div>
+        `;
+      }
+      document.getElementById('domainBreakdown').innerHTML = domainHtml;
+
+      // Render Difficulty Breakdown
+      let diffHtml = '';
+      for (let k in diffStats) {
+        const item = diffStats[k];
+        const pct = Math.round((item.correct / item.total) * 100);
+        let barColor = 'bg-emerald-500';
+        if (k === 'ปานกลาง') barColor = 'bg-amber-500';
+        if (k === 'ยาก') barColor = 'bg-rose-500';
+        diffHtml += `
+          <div>
+            <div class="flex justify-between font-semibold text-xs text-slate-700 mb-1">
+              <span>ระดับ ${k}</span>
+              <span>${item.correct} / ${item.total} (${pct}%)</span>
+            </div>
+            <div class="w-full bg-slate-200 h-2 rounded-full overflow-hidden">
+              <div class="${barColor} h-full rounded-full transition-all" style="width: ${pct}%"></div>
+            </div>
+          </div>
+        `;
+      }
+      document.getElementById('difficultyBreakdown').innerHTML = diffHtml;
+
+      // Render LO Breakdown
+      let loHtml = '';
+      for (let k in loStats) {
+        const item = loStats[k];
+        const pct = Math.round((item.correct / item.total) * 100);
+        loHtml += `
+          <div class="bg-white p-2.5 rounded-xl border border-slate-200">
+            <div class="flex justify-between font-bold text-xs text-slate-800 mb-1">
+              <span>${item.name}</span>
+              <span class="text-brand-700">${item.correct}/${item.total}</span>
+            </div>
+            <div class="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
+              <div class="bg-indigo-600 h-full rounded-full transition-all" style="width: ${pct}%"></div>
+            </div>
+          </div>
+        `;
+      }
+      document.getElementById('loBreakdown').innerHTML = loHtml;
+
+      document.getElementById('scoreModal').classList.remove('hidden');
+    }
+
+    function closeSubmitModal() {
+      document.getElementById('scoreModal').classList.add('hidden');
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,1044 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>เรื่องที่ 4: พหุคูณของค่าเฉพาะและทฤษฎีบทสำคัญ</title>
+
+  <!-- Google Fonts: Sarabun & Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Sarabun:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- KaTeX CDN with Auto-render -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js"></script>
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Sarabun', 'Inter', 'sans-serif'],
+          },
+          colors: {
+            brand: {
+              50: '#eef2ff',
+              100: '#e0e7ff',
+              200: '#c7d2fe',
+              500: '#6366f1',
+              600: '#4f46e5',
+              700: '#4338ca',
+              800: '#3730a3',
+              900: '#312e81',
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    .katex { font-size: 1.05em; }
+    .matrix-bracket {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      padding: 0 8px;
+    }
+    .matrix-bracket::before {
+      content: "";
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 5px;
+      border-left: 2px solid #4f46e5;
+      border-top: 2px solid #4f46e5;
+      border-bottom: 2px solid #4f46e5;
+      border-radius: 4px 0 0 4px;
+    }
+    .matrix-bracket::after {
+      content: "";
+      position: absolute;
+      right: 0;
+      top: 0;
+      bottom: 0;
+      width: 5px;
+      border-right: 2px solid #4f46e5;
+      border-top: 2px solid #4f46e5;
+      border-bottom: 2px solid #4f46e5;
+      border-radius: 0 4px 4px 0;
+    }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-800 antialiased selection:bg-brand-100 selection:text-brand-800">
+
+  <!-- Header Banner -->
+  <header class="bg-gradient-to-r from-brand-900 via-indigo-900 to-slate-900 text-white py-10 shadow-md">
+    <div class="max-w-6xl w-full mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+        <div>
+
+          <h1 class="text-2xl sm:text-3xl lg:text-4xl font-extrabold tracking-tight">
+            เรื่องที่ 4: พหุคูณของค่าเฉพาะและทฤษฎีบทสำคัญ
+          </h1>
+          <p class="text-slate-300 text-sm sm:text-base mt-1">
+            Algebraic Multiplicity, Geometric Multiplicity, and Matrix Diagonalizability Criteria
+          </p>
+        </div>
+        <div class="bg-white/10 backdrop-blur-md rounded-xl p-3 border border-white/15 text-center text-xs sm:text-sm">
+          <div class="text-brand-200 font-medium">อสมการหลักของพหุคูณ</div>
+          <div class="text-lg font-bold tracking-wide mt-0.5 text-white">$1 \le m_g(\lambda) \le m_a(\lambda)$</div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content Container with strict max-w-6xl requirement -->
+  <main class="max-w-6xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 space-y-10">
+
+    <!-- Section 1: วัตถุประสงค์การเรียนรู้ -->
+    <section class="bg-white rounded-2xl p-6 sm:p-7 shadow-sm border border-slate-200/80">
+      <div class="flex items-center gap-3 mb-4">
+        <div class="w-9 h-9 rounded-xl bg-indigo-100 text-brand-600 flex items-center justify-center font-bold text-lg shadow-inner">
+          1
+        </div>
+        <h2 class="text-xl sm:text-2xl font-bold text-slate-900">วัตถุประสงค์การเรียนรู้ (Learning Objectives)</h2>
+      </div>
+      <div class="bg-gradient-to-r from-indigo-50 to-slate-50 border-l-4 border-brand-600 p-4 rounded-r-xl">
+        <ul class="space-y-2 text-slate-700 leading-relaxed font-medium text-sm sm:text-base">
+          <li class="flex items-start gap-2.5">
+            <svg class="w-5 h-5 text-brand-600 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+            <span>นักศึกษาสามารถ<strong>อธิบายความแตกต่าง</strong> ระหว่างพหุคูณเชิงพีชคณิต ($m_a$) และพหุคูณเชิงเรขาคณิต ($m_g$) ของค่าเฉพาะได้อย่างชัดเจน</span>
+          </li>
+          <li class="flex items-start gap-2.5">
+            <svg class="w-5 h-5 text-brand-600 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+            <span>นักศึกษาสามารถ<strong>ใช้ทฤษฎีบทที่เกี่ยวข้อง</strong> ในการวิเคราะห์และตรวจสอบว่าเมทริกซ์สามารถแปลงเป็นเมทริกซ์ทแยงมุม (Diagonalizable) หรือเป็นเมทริกซ์บกพร่อง (Defective) ได้</span>
+          </li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- Section 2: เนื้อหาหลัก -->
+    <section class="bg-white rounded-2xl p-6 sm:p-7 shadow-sm border border-slate-200/80">
+      <div class="flex items-center gap-3 mb-6">
+        <div class="w-9 h-9 rounded-xl bg-indigo-100 text-brand-600 flex items-center justify-center font-bold text-lg shadow-inner">
+          2
+        </div>
+        <h2 class="text-xl sm:text-2xl font-bold text-slate-900">เนื้อหาหลัก (Core Concepts)</h2>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <!-- 2.1 พหุคูณเชิงพีชคณิต -->
+        <div class="bg-slate-50/80 border border-slate-200 rounded-xl p-5 hover:border-brand-300 transition-colors">
+          <div class="flex items-center justify-between mb-3">
+            <span class="text-xs font-bold uppercase tracking-wider text-brand-700 bg-brand-100 px-2.5 py-0.5 rounded-full">หัวข้อ 2.1</span>
+            <span class="text-xs text-slate-500">รากของพหุนาม</span>
+          </div>
+          <h3 class="text-lg font-bold text-slate-800 mb-2">พหุคูณเชิงพีชคณิต (Algebraic Multiplicity: $m_a(\lambda)$)</h3>
+          <p class="text-slate-600 text-sm leading-relaxed mb-3">
+            คือ <strong>จำนวนครั้งที่ค่าเฉพาะ $\lambda$ ปรากฏเป็นรากซ้ำ</strong> ในพหุนามลักษณะเฉพาะ $p(\lambda) = \det(A - \lambda I)$
+          </p>
+          <div class="bg-white p-3 rounded-lg border border-slate-200 text-center font-mono my-2 text-slate-900 shadow-sm text-sm">
+            $p(\lambda) = (\lambda - \lambda_1)^{k_1} (\lambda - \lambda_2)^{k_2} \dots \implies m_a(\lambda_1) = k_1$
+          </div>
+          <p class="text-slate-600 text-xs mt-2">
+            สำหรับเมทริกซ์ขนาด $n \times n$ ผลรวมของพหุคูณเชิงพีชคณิตทั้งหมดจะเท่ากับ $n$ เสมอตามทฤษฎีบทมูลฐานของพีชคณิต ($\sum m_a(\lambda_i) = n$)
+          </p>
+        </div>
+
+        <!-- 2.2 พหุคูณเชิงเรขาคณิต -->
+        <div class="bg-slate-50/80 border border-slate-200 rounded-xl p-5 hover:border-brand-300 transition-colors">
+          <div class="flex items-center justify-between mb-3">
+            <span class="text-xs font-bold uppercase tracking-wider text-indigo-700 bg-indigo-100 px-2.5 py-0.5 rounded-full">หัวข้อ 2.2</span>
+            <span class="text-xs text-slate-500">มิติของสเปซ</span>
+          </div>
+          <h3 class="text-lg font-bold text-slate-800 mb-2">พหุคูณเชิงเรขาคณิต (Geometric Multiplicity: $m_g(\lambda)$)</h3>
+          <p class="text-slate-600 text-sm leading-relaxed mb-3">
+            คือ <strong>มิติของปริภูมิลักษณะเฉพาะ $E_\lambda$</strong> หรือจำนวนเวกเตอร์ลักษณะเฉพาะที่เป็นอิสระเชิงเส้นต่อกันสูงสุดที่สอดคล้องกับค่าเฉพาะ $\lambda$:
+          </p>
+          <div class="bg-white p-3 rounded-lg border border-slate-200 text-center font-mono my-2 text-slate-900 shadow-sm text-sm">
+            $m_g(\lambda) = \dim(E_\lambda) = \dim(\ker(A - \lambda I)) = n - \operatorname{rank}(A - \lambda I)$
+          </div>
+          <p class="text-slate-600 text-xs mt-2">
+            คำนวณได้โดยตรงจากจำนวนตัวแปรเสรี (Free Variables) ในระบบสมการเอกพันธุ์ $(A - \lambda I)\mathbf{v} = \mathbf{0}$
+          </p>
+        </div>
+
+        <!-- 2.3 อสมการความสัมพันธ์ -->
+        <div class="bg-slate-50/80 border border-slate-200 rounded-xl p-5 hover:border-brand-300 transition-colors">
+          <div class="flex items-center justify-between mb-3">
+            <span class="text-xs font-bold uppercase tracking-wider text-emerald-700 bg-emerald-100 px-2.5 py-0.5 rounded-full">หัวข้อ 2.3</span>
+            <span class="text-xs text-slate-500">ทฤษฎีบทการจำกัดมิติ</span>
+          </div>
+          <h3 class="text-lg font-bold text-slate-800 mb-2">ความสัมพันธ์ $1 \le m_g(\lambda) \le m_a(\lambda)$</h3>
+          <p class="text-slate-600 text-sm leading-relaxed mb-2">
+            สำหรับค่าเฉพาะ $\lambda$ ใดๆ ของเมทริกซ์ $A$:
+          </p>
+          <div class="bg-emerald-50 border border-emerald-200 p-2.5 rounded-lg text-center my-2 text-emerald-900 font-bold text-base">
+            $1 \le \dim(E_\lambda) \le m_a(\lambda)$
+          </div>
+          <ul class="text-xs text-slate-600 mt-2 space-y-1">
+            <li>&bull; <strong>ขอบเขตล่าง ($m_g \ge 1$):</strong> เนื่องจาก $\lambda$ เป็นค่าเฉพาะ ระบบ $(A-\lambda I)\mathbf{v}=\mathbf{0}$ ต้องมีผลเฉลย $\mathbf{v} \ne \mathbf{0}$ เสมอ</li>
+            <li>&bull; <strong>ขอบเขตบน ($m_g \le m_a$):</strong> มิติของ Eigenspace จะไม่เกินเลขชี้กำลังของ $(\lambda - c)$ ในพหุนามลักษณะเฉพาะ</li>
+          </ul>
+        </div>
+
+        <!-- 2.4 ทฤษฎีบทอิสระเชิงเส้น & การทำให้เป็นแนวทแยง -->
+        <div class="bg-slate-50/80 border border-slate-200 rounded-xl p-5 hover:border-brand-300 transition-colors">
+          <div class="flex items-center justify-between mb-3">
+            <span class="text-xs font-bold uppercase tracking-wider text-purple-700 bg-purple-100 px-2.5 py-0.5 rounded-full">หัวข้อ 2.4 & 2.5</span>
+            <span class="text-xs text-slate-500">Diagonalizability</span>
+          </div>
+          <h3 class="text-lg font-bold text-slate-800 mb-2">อิสระเชิงเส้นและการทำให้เป็นแนวทแยง</h3>
+          <p class="text-slate-600 text-sm leading-relaxed mb-2">
+            <strong>ทฤษฎีบท:</strong> เวกเตอร์ลักษณะเฉพาะที่สอดคล้องกับค่าเฉพาะที่ต่างกัน ($\lambda_i \ne \lambda_j$) จะเป็น<strong>อิสระเชิงเส้นต่อกัน</strong>
+          </p>
+          <div class="bg-white p-2.5 rounded-lg border border-slate-200 text-xs text-slate-800 space-y-1.5 mt-2">
+            <div>&bull; $A_{n \times n}$ จะ <strong>ทำให้เป็นเมทริกซ์ทแยงมุมได้ (Diagonalizable)</strong> ก็ต่อเมื่อมีเวกเตอร์ลักษณะเฉพาะที่เป็นอิสระเชิงเส้นครบ $n$ ตัว</div>
+            <div class="font-semibold text-brand-700">&bull; เงื่อนไขสมมูล: $m_g(\lambda) = m_a(\lambda)$ สำหรับทุกค่าเฉพาะ $\lambda$</div>
+            <div>&bull; ถ้ามีค่าเฉพาะใดที่ $m_g(\lambda) < m_a(\lambda)$ เรียกว่า <strong>เมทริกซ์บกพร่อง (Defective Matrix)</strong> ซึ่งไม่สามารถแปลงเป็นเมทริกซ์ทแยงมุมได้</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Comparative Table -->
+      <div class="mt-6 overflow-hidden rounded-xl border border-slate-200">
+        <div class="bg-slate-100/80 px-4 py-3 border-b border-slate-200">
+          <h4 class="font-bold text-slate-800 text-sm sm:text-base flex items-center gap-2">
+            <span class="w-2.5 h-2.5 rounded-full bg-brand-600"></span>
+            ตารางเปรียบเทียบ: พหุคูณเชิงพีชคณิต vs พหุคูณเชิงเรขาคณิต และความบกพร่องของเมทริกซ์
+          </h4>
+        </div>
+        <div class="overflow-x-auto">
+          <table class="w-full text-left border-collapse text-xs sm:text-sm">
+            <thead>
+              <tr class="bg-slate-50 text-slate-700 border-b border-slate-200">
+                <th class="p-3.5 font-bold w-1/4">เกณฑ์การพิจารณา</th>
+                <th class="p-3.5 font-bold w-3/8 text-brand-700">พหุคูณเชิงพีชคณิต ($m_a$)</th>
+                <th class="p-3.5 font-bold w-3/8 text-indigo-700">พหุคูณเชิงเรขาคณิต ($m_g$)</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-200 text-slate-600">
+              <tr class="hover:bg-slate-50/50">
+                <td class="p-3.5 font-semibold text-slate-800">แหล่งกำเนิด / การคำนวณ</td>
+                <td class="p-3.5">รากซ้ำในสมการพหุนาม $\det(A - \lambda I) = 0$</td>
+                <td class="p-3.5">$\operatorname{nullity}(A - \lambda I) = n - \operatorname{rank}(A - \lambda I)$</td>
+              </tr>
+              <tr class="hover:bg-slate-50/50">
+                <td class="p-3.5 font-semibold text-slate-800">ความหมายเชิงโครงสร้าง</td>
+                <td class="p-3.5">จำนวนโควตาความจุเวกเตอร์ลักษณะเฉพาะทางทฤษฎี</td>
+                <td class="p-3.5">จำนวนเวกเตอร์ลักษณะเฉพาะอิสระเชิงเส้นที่แท้จริง</td>
+              </tr>
+              <tr class="hover:bg-slate-50/50">
+                <td class="p-3.5 font-semibold text-slate-800">กรณีที่เท่ากัน ($m_g = m_a$)</td>
+                <td class="p-3.5 text-emerald-700 font-semibold" colspan="2">
+                  มีเวกเตอร์ลักษณะเฉพาะเพียงพอ $\implies$ เมทริกซ์สามารถทำให้เป็นแนวทแยงได้ (Diagonalizable: $A = PDP^{-1}$)
+                </td>
+              </tr>
+              <tr class="hover:bg-slate-50/50">
+                <td class="p-3.5 font-semibold text-slate-800">กรณีที่น้อยกว่า ($m_g < m_a$)</td>
+                <td class="p-3.5 text-rose-700 font-semibold" colspan="2">
+                  เกิดความบกพร่อง (Defective Matrix) $\implies$ เวกเตอร์อิสระเชิงเส้นไม่พอ ไม่สามารถทำให้เป็นแนวทแยงมุมได้ (ต้องใช้ Jordan Canonical Form แทน)
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- Section 3: แบบจำลองโต้ตอบ (Interactive Multiplicity & Diagonalizability Lab) -->
+    <section class="bg-white rounded-2xl p-6 sm:p-7 shadow-sm border border-slate-200/80">
+      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6 pb-4 border-b border-slate-100">
+        <div class="flex items-center gap-3">
+          <div class="w-9 h-9 rounded-xl bg-indigo-100 text-brand-600 flex items-center justify-center font-bold text-lg shadow-inner">
+            3
+          </div>
+          <div>
+            <h2 class="text-xl sm:text-2xl font-bold text-slate-900">แบบจำลองโต้ตอบ (Multiplicity & Diagonalizability Lab)</h2>
+            <p class="text-xs sm:text-sm text-slate-500">ทดสอบเลือกเมทริกซ์ที่มีค่าเฉพาะซ้ำ เพื่อเปรียบเทียบ $m_a(\lambda)$ กับ $m_g(\lambda)$ และจำแนกความบกพร่อง</p>
+          </div>
+        </div>
+
+        <!-- Presets Bar -->
+        <div class="flex items-center gap-2">
+          <label class="text-xs font-semibold text-slate-600">เลือกกรณีศึกษา:</label>
+          <select id="presetSelector" onchange="selectPreset(this.value)" class="text-xs sm:text-sm bg-slate-100 border border-slate-300 rounded-lg px-2.5 py-1.5 font-medium focus:ring-2 focus:ring-brand-500 focus:outline-none">
+            <option value="shear">1) Shear Matrix 2x2 (Defective: ma=2, mg=1)</option>
+            <option value="scalar">2) Scalar Identity-like 2x2 (Diagonalizable: ma=2, mg=2)</option>
+            <option value="jordan3">3) 3x3 Jordan Block (Defective: ma=3, mg=1)</option>
+            <option value="mixed3">4) 3x3 Mixed Diagonal/Jordan (Defective: ma=3, mg=2)</option>
+            <option value="custom2">5) Custom 2x2 Matrix (ปรับแต่งเอง)</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Matrix Config Grid -->
+      <div class="bg-slate-50 rounded-2xl p-5 border border-slate-200 mb-6">
+        <div class="flex flex-col lg:flex-row items-center justify-between gap-6">
+          
+          <!-- Matrix Display / Inputs -->
+          <div class="flex flex-col items-center">
+            <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2" id="matrixTitle">เมทริกซ์ $A$</span>
+            <div class="matrix-bracket py-1" id="matrixContainer">
+              <!-- Populated via JS -->
+            </div>
+            <div id="polyBadge" class="text-xs text-indigo-700 bg-indigo-50 px-3 py-1 rounded-full border border-indigo-200 mt-3 font-medium">
+              <!-- Populated via JS -->
+            </div>
+          </div>
+
+          <!-- Dynamic Status & Comparison Banner -->
+          <div class="flex-1 w-full flex flex-col items-center sm:items-start bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+            <div class="w-full flex items-center justify-between border-b border-slate-100 pb-2 mb-3">
+              <span class="text-xs font-bold text-slate-500 uppercase">ผลการประเมินความสามารถในการทำให้เป็นแนวทแยง</span>
+              <span id="statusBadge" class="text-xs font-bold px-2.5 py-1 rounded-full">
+                <!-- Badge -->
+              </span>
+            </div>
+            <div id="multiplicitySummary" class="w-full grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs sm:text-sm">
+              <!-- Multiplicity stats populated via JS -->
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Reduction, Steps & Visuals -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+        
+        <!-- Left: Reduction & Nullity computation -->
+        <div id="computationCard" class="lg:col-span-7 space-y-4">
+          <!-- Populated by JS -->
+        </div>
+
+        <!-- Right: 2D Canvas or 3D schematic representation -->
+        <div class="lg:col-span-5 bg-slate-900 rounded-2xl p-4 text-white shadow-md flex flex-col items-center">
+          <div class="w-full flex items-center justify-between pb-2 mb-2 border-b border-slate-800 text-xs">
+            <span class="font-bold text-slate-300 flex items-center gap-1.5">
+              <span class="w-2.5 h-2.5 rounded-full bg-brand-400 inline-block"></span>
+              การแสดงมิติของ Eigenspace ในทางเรขาคณิต
+            </span>
+            <span id="canvasDimLabel" class="text-slate-400 text-[11px]">มิติเชิงเรขาคณิต: 1D</span>
+          </div>
+
+          <div class="relative w-full aspect-square max-w-[340px] bg-slate-950 rounded-xl overflow-hidden border border-slate-800 flex items-center justify-center">
+            <canvas id="multiplicityCanvas" width="340" height="340" class="block w-full h-full"></canvas>
+          </div>
+
+          <!-- Legend -->
+          <div id="canvasLegend" class="w-full mt-3 text-[11px] text-slate-300 space-y-1.5">
+            <!-- Dynamic legend populated by JS -->
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- Section 4: คำถามนำเพื่อค้นพบ -->
+    <section class="bg-white rounded-2xl p-6 sm:p-7 shadow-sm border border-slate-200/80">
+      <div class="flex items-center gap-3 mb-4">
+        <div class="w-9 h-9 rounded-xl bg-amber-100 text-amber-700 flex items-center justify-center font-bold text-lg shadow-inner">
+          4
+        </div>
+        <h2 class="text-xl sm:text-2xl font-bold text-slate-900">คำถามนำเพื่อค้นพบ (Inquiry & Deep Discovery)</h2>
+      </div>
+
+      <div class="bg-amber-50/70 border border-amber-200/90 rounded-2xl p-5 sm:p-6">
+        <div class="flex items-start gap-3">
+          <div class="p-2 bg-amber-500 text-white rounded-xl shrink-0 mt-0.5">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+          </div>
+          <div>
+            <h3 class="text-base sm:text-lg font-bold text-amber-950">
+              หากค่าเฉพาะหนึ่งค่าปรากฏซ้ำสองครั้งในพหุนามลักษณะเฉพาะ ($m_a = 2$) เหตุใดจึงไม่ได้หมายความว่าจะมีเวกเตอร์ลักษณะเฉพาะอิสระเชิงเส้นสองตัว ($m_g = 2$) เสมอไป?
+            </h3>
+            <p class="text-sm text-amber-900/80 mt-1">
+              ทำไมมิติของสเปซคำตอบ $\operatorname{nullity}(A - \lambda I)$ จึงสามารถ "หดตัวลง" เหลือเพียง 1 มิติได้ ทั้งที่พหุนามมีรากซ้ำถึง 2 ครั้ง?
+            </p>
+
+            <button id="toggleInquiryBtn" onclick="toggleInquiry()" class="mt-4 px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white font-medium text-xs sm:text-sm rounded-xl shadow transition-all inline-flex items-center gap-2">
+              <span id="inquiryBtnText">กดเพื่อแสดงแนวคิดและบทวิเคราะห์เชิงเรขาคณิตและพีชคณิต</span>
+              <svg id="inquiryChevron" class="w-4 h-4 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+            </button>
+          </div>
+        </div>
+
+        <div id="inquiryContent" class="hidden mt-6 pt-5 border-t border-amber-200/80 space-y-4 text-slate-800 text-sm leading-relaxed">
+          <div class="p-4 bg-white rounded-xl border border-amber-200 space-y-3">
+            <h4 class="font-bold text-slate-900 text-sm sm:text-base flex items-center gap-2">
+              <span class="w-2 h-2 rounded-full bg-brand-600"></span>
+              บทวิเคราะห์: ความแตกต่างระหว่าง "กำลังของตัวประกอบ" กับ "แรงก์ของเมทริกซ์สัมประสิทธิ์"
+            </h4>
+            <p>
+              1. <strong>ในเชิงพีชคณิต (Algebraic viewpoint):</strong> การที่พหุนามลักษณะเฉพาะมี $(\lambda - c)^2 = 0$ หมายถึงระบบสมการกำลังบอกว่า ค่าขยายสเกลาร์คือ $c$ ในสองมิติ แต่<strong>ไม่ได้บอก</strong>ว่าทิศทางของแกนทั้งสองนั้นเป็นอิสระต่อกันหรือไม่
+            </p>
+            <p>
+              2. <strong>ในเชิงโครงสร้างเมทริกซ์ (Rank-Nullity theorem):</strong> มิติของ Eigenspace ถูกกำหนดโดยทฤษฎีบทแรงก์-เนลลิตี:
+            </p>
+            <div class="text-center font-mono my-2 text-indigo-900 bg-slate-50 py-2 rounded-lg border border-slate-200">
+              $m_g(\lambda) = \dim(E_\lambda) = n - \operatorname{rank}(A - \lambda I)$
+            </div>
+            <p>
+              พิจารณาเมทริกซ์การเฉือน (Shear matrix) $A = \begin{bmatrix} 2 & 1 \\ 0 & 2 \end{bmatrix}$ เมื่อลบ $2I$ ออกไป:
+            </p>
+            <div class="text-center font-mono my-2 bg-amber-50/60 p-2 rounded-lg border border-amber-200 text-amber-950">
+              $A - 2I = \begin{bmatrix} 0 & 1 \\ 0 & 0 \end{bmatrix} \implies \operatorname{rank}(A - 2I) = 1$
+            </div>
+            <p>
+              เพราะว่าแถวที่หนึ่งมีสมาชิกตัวนำคือ 1 ทำให้ $\operatorname{rank} = 1$ ส่งผลให้ $\operatorname{nullity} = 2 - 1 = 1$ เท่านั้น! มีตัวแปรเสรีเพียงตัวเดียว จึงมีเวกเตอร์ลักษณะเฉพาะอิสระเชิงเส้นได้เพียง <strong>1 ตัว</strong>
+            </p>
+            <div class="bg-indigo-50/70 p-3.5 rounded-lg border border-indigo-200 text-xs sm:text-sm text-indigo-950">
+              <strong>มโนทัศน์เชิงเรขาคณิต:</strong> การแปลงแบบเฉือน (Shear) ยืดระนาบในแนวแกน $x$ ด้วยอัตรา 2 เท่า แต่ในแนวแกนอื่น เวกเตอร์จะถูก "บิดเอียงมุม" ไปด้วย จึงไม่มีเส้นตรงในทิศทางอื่นใดเลยที่รักษาแนวทิศทางเดิมไว้ได้นอกจากแกน $x$ เพียงแกนเดียว ทำให้มิติของ Eigenspace ยุบเหลือเพียง 1 มิติ
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Section 5: แบบฝึกหัดสำหรับนักศึกษา -->
+    <section class="bg-white rounded-2xl p-6 sm:p-7 shadow-sm border border-slate-200/80">
+      <div class="flex items-center gap-3 mb-6">
+        <div class="w-9 h-9 rounded-xl bg-indigo-100 text-brand-600 flex items-center justify-center font-bold text-lg shadow-inner">
+          5
+        </div>
+        <h2 class="text-xl sm:text-2xl font-bold text-slate-900">แบบฝึกหัดสำหรับนักศึกษา (Self-Assessment & Exercise)</h2>
+      </div>
+
+      <div class="bg-slate-50 border border-slate-200 rounded-2xl p-6 space-y-6">
+        <div class="border-b border-slate-200 pb-4">
+          <span class="text-xs font-bold uppercase tracking-wider text-brand-700 bg-brand-100 px-2.5 py-0.5 rounded-full">โจทย์วิเคราะห์</span>
+          <p class="text-base sm:text-lg font-medium text-slate-900 mt-2">
+            กำหนดเมทริกซ์ $A = \begin{bmatrix} 2 & 1 \\ 0 & 2 \end{bmatrix}$ จงหาพหุคูณเชิงพีชคณิต ($m_a$) และพหุคูณเชิงเรขาคณิต ($m_g$) ของค่าเฉพาะ พร้อมอธิบายว่าเมทริกซ์นี้มีเวกเตอร์ลักษณะเฉพาะอิสระเชิงเส้นเพียงพอสำหรับการทำให้เป็นเมทริกซ์ทแยงมุมหรือไม่
+          </p>
+        </div>
+
+        <!-- Student Interactive Check Form -->
+        <div class="space-y-4">
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div>
+              <label class="block text-xs font-semibold text-slate-600 mb-1">ค่าเฉพาะ $\lambda$:</label>
+              <input id="ansLambda" type="number" step="any" placeholder="เช่น 2" class="w-full px-3 py-2 bg-white border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-brand-500 focus:outline-none">
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-600 mb-1">พหุคูณเชิงพีชคณิต ($m_a$):</label>
+              <input id="ansMa" type="number" step="any" placeholder="เช่น 2" class="w-full px-3 py-2 bg-white border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-brand-500 focus:outline-none">
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-600 mb-1">พหุคูณเชิงเรขาคณิต ($m_g$):</label>
+              <input id="ansMg" type="number" step="any" placeholder="เช่น 1" class="w-full px-3 py-2 bg-white border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-brand-500 focus:outline-none">
+            </div>
+          </div>
+
+          <div class="flex flex-wrap items-center gap-3 pt-2">
+            <button onclick="checkExerciseAnswer()" class="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-sm rounded-xl shadow transition-all active:scale-95">
+              ตรวจคำตอบ
+            </button>
+            <button onclick="toggleExerciseSolution()" class="px-4 py-2.5 bg-white border border-slate-300 hover:bg-slate-100 text-slate-700 font-medium text-sm rounded-xl transition-all">
+              <span id="solutionBtnText">แสดงวิธีทำและคำเฉลยละเอียด</span>
+            </button>
+            <div id="exerciseFeedback" class="text-sm font-semibold"></div>
+          </div>
+        </div>
+
+        <!-- Detailed Step-by-Step Solution Walkthrough -->
+        <div id="exerciseSolutionDetail" class="hidden mt-6 pt-5 border-t border-slate-200 space-y-4 text-slate-800 text-sm">
+          <div class="bg-white p-5 rounded-xl border border-slate-200 space-y-4">
+            <!-- Step 1 -->
+            <div>
+              <h4 class="font-bold text-brand-700 mb-1 flex items-center gap-2">
+                <span class="w-2 h-2 rounded-full bg-brand-600"></span>
+                ขั้นตอนที่ 1: หาพหุนามลักษณะเฉพาะและพหุคูณเชิงพีชคณิต ($m_a$)
+              </h4>
+              <p class="text-slate-600 mb-2">คำนวณดีเทอร์มิแนนต์ของเมทริกซ์สามเหลี่ยมบน $A - \lambda I$:</p>
+              <div class="bg-slate-50 p-3 rounded-lg text-center font-mono">
+                $$p(\lambda) = \det(A - \lambda I) = \det \begin{bmatrix} 2 - \lambda & 1 \\ 0 & 2 - \lambda \end{bmatrix} = (2 - \lambda)(2 - \lambda) = (\lambda - 2)^2 = 0$$
+              </div>
+              <p class="text-xs text-slate-600 mt-2">
+                เนื่องจากตัวประกอบ $(\lambda - 2)$ ยกกำลัง 2 ดังนั้น ค่าเฉพาะคือ <strong>$\lambda = 2$</strong> โดยมี <strong>พหุคูณเชิงพีชคณิต $m_a(2) = 2$</strong>
+              </p>
+            </div>
+
+            <!-- Step 2 -->
+            <div>
+              <h4 class="font-bold text-brand-700 mb-1 flex items-center gap-2">
+                <span class="w-2 h-2 rounded-full bg-brand-600"></span>
+                ขั้นตอนที่ 2: ตั้งระบบสมการ $(A - 2I)\mathbf{v} = \mathbf{0}$
+              </h4>
+              <div class="bg-slate-50 p-3 rounded-lg text-center font-mono">
+                $$\begin{bmatrix} 2 - 2 & 1 \\ 0 & 2 - 2 \end{bmatrix} \begin{bmatrix} v_1 \\ v_2 \end{bmatrix} = \begin{bmatrix} 0 & 1 \\ 0 & 0 \end{bmatrix} \begin{bmatrix} v_1 \\ v_2 \end{bmatrix} = \begin{bmatrix} 0 \\ 0 \end{bmatrix}$$
+              </div>
+              <p class="text-xs text-slate-600 mt-2">
+                จากสมการแถวที่ 1 จะได้เงื่อนไข $0v_1 + 1v_2 = 0 \implies v_2 = 0$ ในขณะที่ $v_1$ เป็นตัวแปรเสรี (Free Variable)
+              </p>
+            </div>
+
+            <!-- Step 3 -->
+            <div>
+              <h4 class="font-bold text-brand-700 mb-1 flex items-center gap-2">
+                <span class="w-2 h-2 rounded-full bg-brand-600"></span>
+                ขั้นตอนที่ 3: คำนวณมิติของปริภูมิลักษณะเฉพาะและพหุคูณเชิงเรขาคณิต ($m_g$)
+              </h4>
+              <p class="text-slate-600 mb-2">
+                รูปทั่วไปของเวกเตอร์ลักษณะเฉพาะคือ $\mathbf{v} = \begin{bmatrix} v_1 \\ 0 \end{bmatrix} = v_1 \begin{bmatrix} 1 \\ 0 \end{bmatrix}$ เมื่อ $v_1 \ne 0$
+              </p>
+              <div class="bg-slate-50 p-3 rounded-lg text-center font-mono">
+                $$\mathcal{B}_{E_2} = \left\{ \begin{bmatrix} 1 \\ 0 \end{bmatrix} \right\} \implies m_g(2) = \dim(E_2) = 1$$
+              </div>
+              <p class="text-xs text-slate-600 mt-2">
+                หรือคำนวณผ่านทฤษฎีบท: $m_g(2) = 2 - \operatorname{rank}(A - 2I) = 2 - 1 = 1$
+              </p>
+            </div>
+
+            <!-- Step 4 -->
+            <div class="p-4 bg-rose-50 border border-rose-200 rounded-xl">
+              <h4 class="font-bold text-rose-900 mb-1 flex items-center gap-2">
+                <span class="w-2 h-2 rounded-full bg-rose-600"></span>
+                ขั้นตอนที่ 4: สรุปความเพียงพอต่อการทำให้เป็นเมทริกซ์ทแยงมุม
+              </h4>
+              <p class="text-rose-950 text-xs sm:text-sm">
+                เนื่องจาก $m_g(2) = 1 < 2 = m_a(2)$ เมทริกซ์นี้จึงมีเวกเตอร์ลักษณะเฉพาะที่เป็นอิสระเชิงเส้นเพียง 1 ตัว <strong>ไม่เพียงพอ</strong> ที่จะสร้างฐานหลักของ $\mathbb{R}^2$ ได้ (ต้องการ 2 ตัว)
+              </p>
+              <p class="text-xs font-bold text-rose-800 mt-2">
+                สรุป: เมทริกซ์ $A = \begin{bmatrix} 2 & 1 \\ 0 & 2 \end{bmatrix}$ เป็น "เมทริกซ์บกพร่อง (Defective Matrix)" และไม่สามารถแปลงให้เป็นเมทริกซ์ทแยงมุมได้ (Not Diagonalizable)
+              </p>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+  </main>
+
+
+
+  <!-- Application Engine & Interactive Simulation Script -->
+  <script>
+    // State definitions
+    let currentPreset = 'shear';
+    let currentSize = 2;
+    let customMatrix2x2 = [
+      [2, 1],
+      [0, 2]
+    ];
+
+    const presetConfigs = {
+      shear: {
+        title: "Shear Matrix 2×2 (บกพร่อง)",
+        dim: 2,
+        mat: [[2, 1], [0, 2]],
+        poly: "(\\lambda - 2)^2 = 0",
+        evals: [{ lambda: 2, ma: 2, rank: 1, mg: 1 }],
+        isDiag: false,
+        reason: "m_g(2) = 1 < 2 = m_a(2) มีเวกเตอร์อิสระเพียง 1 ตัว (ขาด 1 ตัว)"
+      },
+      scalar: {
+        title: "Scalar Matrix 2×2 (ทแยงมุมได้)",
+        dim: 2,
+        mat: [[2, 0], [0, 2]],
+        poly: "(\\lambda - 2)^2 = 0",
+        evals: [{ lambda: 2, ma: 2, rank: 0, mg: 2 }],
+        isDiag: true,
+        reason: "m_g(2) = 2 = m_a(2) มีเวกเตอร์อิสระครบ 2 ตัวเต็มระนาบ"
+      },
+      jordan3: {
+        title: "3×3 Jordan Block (บกพร่องระดับ 2)",
+        dim: 3,
+        mat: [
+          [3, 1, 0],
+          [0, 3, 1],
+          [0, 0, 3]
+        ],
+        poly: "(\\lambda - 3)^3 = 0",
+        evals: [{ lambda: 3, ma: 3, rank: 2, mg: 1 }],
+        isDiag: false,
+        reason: "m_g(3) = 1 < 3 = m_a(3) ขาดเวกเตอร์อิสระถึง 2 ตัว"
+      },
+      mixed3: {
+        title: "3×3 Mixed Diagonal/Jordan (บกพร่อง)",
+        dim: 3,
+        mat: [
+          [3, 0, 0],
+          [0, 3, 1],
+          [0, 0, 3]
+        ],
+        poly: "(\\lambda - 3)^3 = 0",
+        evals: [{ lambda: 3, ma: 3, rank: 1, mg: 2 }],
+        isDiag: false,
+        reason: "m_g(3) = 2 < 3 = m_a(3) มีเวกเตอร์อิสระ 2 ตัว (ยังขาดอีก 1 ตัว)"
+      },
+      custom2: {
+        title: "Custom 2×2 Matrix",
+        dim: 2,
+        mat: [[2, 1], [0, 2]],
+        isCustom: true
+      }
+    };
+
+    window.onload = function() {
+      selectPreset('shear');
+      renderAllMath();
+    };
+
+    function renderAllMath() {
+      if (window.renderMathInElement) {
+        renderMathInElement(document.body, {
+          delimiters: [
+            {left: '$$', right: '$$', display: true},
+            {left: '$', right: '$', display: false}
+          ],
+          throwOnError: false
+        });
+      }
+    }
+
+    function fmt(n) {
+      if (Math.abs(n - Math.round(n)) < 1e-4) return Math.round(n).toString();
+      return n.toFixed(2).replace(/\.00$/, '');
+    }
+
+    function selectPreset(key) {
+      currentPreset = key;
+      const conf = presetConfigs[key];
+      currentSize = conf.dim;
+
+      renderMatrixUI(conf);
+      analyzeAndRender(conf);
+      renderAllMath();
+    }
+
+    function renderMatrixUI(conf) {
+      const container = document.getElementById('matrixContainer');
+      const title = document.getElementById('matrixTitle');
+      title.innerText = conf.title;
+
+      let html = '';
+      if (conf.isCustom) {
+        html = `
+          <div class="grid grid-cols-2 gap-2">
+            <input type="number" id="c_0_0" value="${customMatrix2x2[0][0]}" step="any" onchange="updateCustomVal(0,0,this.value)" class="w-14 h-11 text-center font-bold bg-white rounded-lg border border-slate-300 shadow-sm focus:ring-2 focus:ring-brand-500 focus:outline-none">
+            <input type="number" id="c_0_1" value="${customMatrix2x2[0][1]}" step="any" onchange="updateCustomVal(0,1,this.value)" class="w-14 h-11 text-center font-bold bg-white rounded-lg border border-slate-300 shadow-sm focus:ring-2 focus:ring-brand-500 focus:outline-none">
+            <input type="number" id="c_1_0" value="${customMatrix2x2[1][0]}" step="any" onchange="updateCustomVal(1,0,this.value)" class="w-14 h-11 text-center font-bold bg-white rounded-lg border border-slate-300 shadow-sm focus:ring-2 focus:ring-brand-500 focus:outline-none">
+            <input type="number" id="c_1_1" value="${customMatrix2x2[1][1]}" step="any" onchange="updateCustomVal(1,1,this.value)" class="w-14 h-11 text-center font-bold bg-white rounded-lg border border-slate-300 shadow-sm focus:ring-2 focus:ring-brand-500 focus:outline-none">
+          </div>
+        `;
+      } else {
+        const dim = conf.dim;
+        const mat = conf.mat;
+        html = `<div class="grid grid-cols-${dim} gap-2 text-center">`;
+        for (let i = 0; i < dim; i++) {
+          for (let j = 0; j < dim; j++) {
+            html += `
+              <div class="w-12 h-10 sm:w-14 sm:h-11 flex items-center justify-center font-bold bg-white rounded-lg border border-slate-200 text-slate-800 shadow-sm text-sm sm:text-base">
+                ${mat[i][j]}
+              </div>
+            `;
+          }
+        }
+        html += `</div>`;
+      }
+      container.innerHTML = html;
+    }
+
+    function updateCustomVal(r, c, val) {
+      customMatrix2x2[r][c] = parseFloat(val) || 0;
+      const conf = presetConfigs['custom2'];
+      analyzeAndRender(conf);
+      renderAllMath();
+    }
+
+    function analyzeAndRender(conf) {
+      let mat = conf.isCustom ? customMatrix2x2 : conf.mat;
+      let dim = conf.dim;
+
+      let polyLatex = '';
+      let evals = [];
+      let isDiagonalizable = false;
+      let summaryText = '';
+
+      if (dim === 2) {
+        const a = mat[0][0], b = mat[0][1], c = mat[1][0], d = mat[1][1];
+        const tr = a + d;
+        const det = a * d - b * c;
+        const disc = tr * tr - 4 * det;
+
+        if (disc > 1e-4) {
+          // Two distinct real eigenvalues
+          const sqrtD = Math.sqrt(disc);
+          const l1 = (tr + sqrtD) / 2;
+          const l2 = (tr - sqrtD) / 2;
+          polyLatex = `(\\lambda - ${fmt(l1)})(\\lambda - ${fmt(l2)}) = 0`;
+          evals = [
+            { lambda: l1, ma: 1, rank: 1, mg: 1 },
+            { lambda: l2, ma: 1, rank: 1, mg: 1 }
+          ];
+          isDiagonalizable = true;
+          summaryText = "มีค่าเฉพาะที่แตกต่างกันครบ $n=2$ ค่า ทำให้มีเวกเตอร์อิสระครบ 2 ตัวเสมอ";
+        } else if (Math.abs(disc) <= 1e-4) {
+          // Repeated real eigenvalue
+          const l0 = tr / 2;
+          polyLatex = `(\\lambda - ${fmt(l0)})^2 = 0`;
+          // Compute rank of A - l0*I
+          const m11 = a - l0, m12 = b, m21 = c, m22 = d - l0;
+          let rank = 1;
+          if (Math.abs(m11) < 1e-4 && Math.abs(m12) < 1e-4 && Math.abs(m21) < 1e-4 && Math.abs(m22) < 1e-4) {
+            rank = 0;
+          }
+          const mg = 2 - rank;
+          evals = [{ lambda: l0, ma: 2, rank: rank, mg: mg }];
+          isDiagonalizable = (mg === 2);
+          summaryText = isDiagonalizable
+            ? `พหุคูณเชิงเรขาคณิต $m_g(${fmt(l0)}) = 2 = m_a$ ทำให้มีเวกเตอร์อิสระครบ 2 ตัว`
+            : `พหุคูณเชิงเรขาคณิต $m_g(${fmt(l0)}) = 1 < 2 = m_a$ ขาดเวกเตอร์อิสระ 1 ตัว (เมทริกซ์บกพร่อง)`;
+        } else {
+          // Complex eigenvalues
+          polyLatex = `\\lambda^2 - ${fmt(tr)}\\lambda + ${fmt(det)} = 0 \\quad (\\text{ค่าเชิงซ้อน})`;
+          evals = [];
+          isDiagonalizable = false;
+          summaryText = "ไม่มีค่าเฉพาะที่เป็นจำนวนจริงใน $\\mathbb{R}^2$";
+        }
+      } else {
+        // 3x3 preset
+        polyLatex = conf.poly;
+        evals = conf.evals;
+        isDiagonalizable = conf.isDiag;
+        summaryText = conf.reason;
+      }
+
+      // Update Badge & Status
+      document.getElementById('polyBadge').innerHTML = `พหุนามลักษณะเฉพาะ: $${polyLatex}$`;
+      const badge = document.getElementById('statusBadge');
+      if (isDiagonalizable) {
+        badge.className = "text-xs font-bold px-3 py-1 rounded-full bg-emerald-100 text-emerald-800 border border-emerald-300";
+        badge.innerText = "ทำให้เป็นแนวทแยงได้ (Diagonalizable)";
+      } else {
+        badge.className = "text-xs font-bold px-3 py-1 rounded-full bg-rose-100 text-rose-800 border border-rose-300";
+        badge.innerText = "เมทริกซ์บกพร่อง (Defective)";
+      }
+
+      // Multiplicity Summary Cards
+      const summaryDiv = document.getElementById('multiplicitySummary');
+      let summaryHtml = '';
+      evals.forEach(e => {
+        summaryHtml += `
+          <div class="bg-slate-50 p-2.5 rounded-lg border border-slate-200">
+            <div class="font-bold text-slate-800">ค่าเฉพาะ $\\lambda = ${fmt(e.lambda)}$</div>
+            <div class="flex items-center justify-between text-xs mt-1">
+              <span>พหุคูณเชิงพีชคณิต ($m_a$):</span>
+              <span class="font-bold text-brand-700">${e.ma}</span>
+            </div>
+            <div class="flex items-center justify-between text-xs">
+              <span>พหุคูณเชิงเรขาคณิต ($m_g$):</span>
+              <span class="font-bold ${e.mg === e.ma ? 'text-emerald-700' : 'text-rose-700'}">${e.mg}</span>
+            </div>
+          </div>
+        `;
+      });
+      summaryHtml += `
+        <div class="col-span-1 sm:col-span-2 text-xs text-slate-600 pt-1">
+          <strong>สรุปการวิเคราะห์:</strong> ${summaryText}
+        </div>
+      `;
+      summaryDiv.innerHTML = summaryHtml;
+
+      // Computation reduction card
+      renderReductionCard(mat, dim, evals);
+
+      // Draw canvas
+      drawCanvasVisual(mat, dim, evals, isDiagonalizable);
+    }
+
+    function renderReductionCard(mat, dim, evals) {
+      const card = document.getElementById('computationCard');
+      if (evals.length === 0) {
+        card.innerHTML = `<div class="p-4 bg-slate-50 rounded-xl text-center text-slate-500 text-sm">ไม่มีค่าเฉพาะที่เป็นจำนวนจริง</div>`;
+        return;
+      }
+
+      const e = evals[0];
+      const lam = e.lambda;
+
+      let subMatrixLatex = '';
+      let rrefLatex = '';
+
+      if (dim === 2) {
+        const m11 = mat[0][0] - lam;
+        const m12 = mat[0][1];
+        const m21 = mat[1][0];
+        const m22 = mat[1][1] - lam;
+
+        subMatrixLatex = `\\begin{bmatrix} ${fmt(m11)} & ${fmt(m12)} \\\\ ${fmt(m21)} & ${fmt(m22)} \\end{bmatrix}`;
+
+        if (e.rank === 0) {
+          rrefLatex = `\\begin{bmatrix} 0 & 0 \\\\ 0 & 0 \\end{bmatrix}`;
+        } else {
+          rrefLatex = `\\begin{bmatrix} 1 & ${fmt(m12 !== 0 ? m12 / (m11 || 1) : 0)} \\\\ 0 & 0 \\end{bmatrix}`;
+        }
+      } else {
+        // 3x3 preset display
+        if (currentPreset === 'jordan3') {
+          subMatrixLatex = `\\begin{bmatrix} 0 & 1 & 0 \\\\ 0 & 0 & 1 \\\\ 0 & 0 & 0 \\end{bmatrix}`;
+          rrefLatex = `\\begin{bmatrix} 0 & 1 & 0 \\\\ 0 & 0 & 1 \\\\ 0 & 0 & 0 \\end{bmatrix}`;
+        } else {
+          subMatrixLatex = `\\begin{bmatrix} 0 & 0 & 0 \\\\ 0 & 0 & 1 \\\\ 0 & 0 & 0 \\end{bmatrix}`;
+          rrefLatex = `\\begin{bmatrix} 0 & 0 & 1 \\\\ 0 & 0 & 0 \\\\ 0 & 0 & 0 \\end{bmatrix}`;
+        }
+      }
+
+      card.innerHTML = `
+        <div class="p-4 bg-slate-50 border border-slate-200 rounded-xl">
+          <div class="flex items-center justify-between mb-2">
+            <span class="text-xs font-bold text-brand-700 uppercase">ขั้นตอนที่ 1: ตรวจสอบ $A - (${fmt(lam)})I$</span>
+            <span class="text-xs text-slate-500">แทน $\\lambda = ${fmt(lam)}$</span>
+          </div>
+          <div class="text-center font-mono my-2 text-sm bg-white p-3 rounded-lg border border-slate-200 overflow-x-auto">
+            $$A - (${fmt(lam)})I = ${subMatrixLatex}$$
+          </div>
+        </div>
+
+        <div class="p-4 bg-slate-50 border border-slate-200 rounded-xl">
+          <div class="flex items-center justify-between mb-2">
+            <span class="text-xs font-bold text-brand-700 uppercase">ขั้นตอนที่ 2: ดำเนินการตามแถวและนับตัวแปรเสรี</span>
+            <span class="text-xs text-slate-500">Rank-Nullity Theorem</span>
+          </div>
+          <div class="text-center font-mono my-2 text-sm bg-white p-3 rounded-lg border border-slate-200 overflow-x-auto">
+            $$\\operatorname{RREF}(A - ${fmt(lam)}I) = ${rrefLatex}$$
+          </div>
+          <div class="grid grid-cols-2 gap-3 mt-3 text-xs sm:text-sm">
+            <div class="bg-white p-2.5 rounded-lg border border-slate-200 text-center">
+              <span class="text-slate-500 block text-xs">แรงก์ (Rank)</span>
+              <span class="font-bold text-slate-800">$\\operatorname{rank} = ${e.rank}$</span>
+            </div>
+            <div class="bg-white p-2.5 rounded-lg border border-slate-200 text-center">
+              <span class="text-slate-500 block text-xs">เนลลิตี = พหุคูณเชิงเรขาคณิต</span>
+              <span class="font-bold text-emerald-700">$m_g = ${dim} - ${e.rank} = ${e.mg}$</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="p-4 ${e.mg === e.ma ? 'bg-emerald-50/70 border-emerald-200' : 'bg-rose-50/70 border-rose-200'} border rounded-xl">
+          <div class="flex items-center justify-between text-xs sm:text-sm font-bold ${e.mg === e.ma ? 'text-emerald-900' : 'text-rose-900'}">
+            <span>การเปรียบเทียบพหุคูณ:</span>
+            <span>$m_g(${fmt(lam)}) = ${e.mg} \\quad ${e.mg === e.ma ? '=' : '<'} \\quad m_a(${fmt(lam)}) = ${e.ma}$</span>
+          </div>
+          <p class="text-xs ${e.mg === e.ma ? 'text-emerald-800' : 'text-rose-800'} mt-1">
+            ${e.mg === e.ma
+              ? "✓ จำนวนเวกเตอร์อิสระเท่ากับความจุเชิงพีชคณิต เมทริกซ์สามารถแยกตัวประกอบเป็น $PDP^{-1}$ ได้"
+              : "✗ มีเวกเตอร์อิสระไม่พอที่จะขึงสเปซมิติ $n$ เกิดปรากฏการณ์ Defect จึงแปลงเป็นรูปทแยงมุมไม่ได้"}
+          </p>
+        </div>
+      `;
+    }
+
+    // 2D Canvas Visualization
+    function drawCanvasVisual(mat, dim, evals, isDiag) {
+      const canvas = document.getElementById('multiplicityCanvas');
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+      const width = canvas.width;
+      const height = canvas.height;
+
+      const originX = width / 2;
+      const originY = height / 2;
+      const scale = 28;
+
+      ctx.clearRect(0, 0, width, height);
+
+      // Grid
+      ctx.strokeStyle = '#1e293b';
+      ctx.lineWidth = 1;
+      for (let i = -5; i <= 5; i++) {
+        const x = originX + i * scale;
+        const y = originY - i * scale;
+        ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, height); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(width, y); ctx.stroke();
+      }
+
+      // Axes
+      ctx.strokeStyle = '#475569';
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      ctx.moveTo(originX, 0); ctx.lineTo(originX, height);
+      ctx.moveTo(0, originY); ctx.lineTo(width, originY);
+      ctx.stroke();
+
+      const dimLabel = document.getElementById('canvasDimLabel');
+      const legendDiv = document.getElementById('canvasLegend');
+
+      if (dim === 3) {
+        dimLabel.innerText = "โครงสร้างมิติ: 3D (จำลอง Projection)";
+        // Draw 3D schematic axes
+        ctx.strokeStyle = '#64748b';
+        ctx.setLineDash([4, 4]);
+        ctx.beginPath();
+        ctx.moveTo(originX, originY);
+        ctx.lineTo(originX - 70, originY + 70); // z axis
+        ctx.stroke();
+        ctx.setLineDash([]);
+
+        if (currentPreset === 'jordan3') {
+          // Only 1 line eigenspace
+          drawEigenspaceLine(ctx, originX, originY, 1, 0, '#f43f5e', 2.5);
+          drawArrow(ctx, originX, originY, originX + 70, originY, '#f43f5e', 3);
+          legendDiv.innerHTML = `
+            <div class="text-rose-400 font-semibold">&bull; มี Eigenspace เพียง 1 เส้นตรง (1D) ในปริภูมิ 3D</div>
+            <div class="text-slate-400">&bull; $m_g = 1$ แต่ $m_a = 3$ ขาดเวกเตอร์ลักษณะเฉพาะอีก 2 ทิศทาง</div>
+          `;
+        } else {
+          // 2D plane eigenspace
+          ctx.fillStyle = 'rgba(99, 102, 241, 0.2)';
+          ctx.beginPath();
+          ctx.moveTo(originX - 100, originY);
+          ctx.lineTo(originX + 100, originY);
+          ctx.lineTo(originX + 30, originY + 80);
+          ctx.lineTo(originX - 170, originY + 80);
+          ctx.closePath();
+          ctx.fill();
+
+          drawArrow(ctx, originX, originY, originX + 70, originY, '#818cf8', 2.5);
+          drawArrow(ctx, originX, originY, originX - 45, originY + 45, '#818cf8', 2.5);
+          legendDiv.innerHTML = `
+            <div class="text-indigo-300 font-semibold">&bull; Eigenspace ก่อตัวเป็นระนาบ 2D ($m_g = 2$) ในระบบ 3D</div>
+            <div class="text-slate-400">&bull; ขาดเวกเตอร์อีก 1 ทิศทางที่จะขึงปริภูมิ 3D ($m_g < m_a=3$)</div>
+          `;
+        }
+        return;
+      }
+
+      // 2x2 Case
+      if (evals.length === 0) {
+        dimLabel.innerText = "ไม่มี Eigenspace จริงใน R²";
+        legendDiv.innerHTML = `<div class="text-slate-400">ค่าเฉพาะเป็นจำนวนเชิงซ้อน (หมุนเวกเตอร์โดยไม่มีแนวแกนคงที่)</div>`;
+        return;
+      }
+
+      const e = evals[0];
+      if (e.mg === 2) {
+        dimLabel.innerText = "มิติเชิงเรขาคณิต: 2D (เต็มระนาบ)";
+        // Span whole R^2
+        ctx.fillStyle = 'rgba(16, 185, 129, 0.18)';
+        ctx.fillRect(0, 0, width, height);
+
+        drawArrow(ctx, originX, originY, originX + 60, originY, '#34d399', 3);
+        drawArrow(ctx, originX, originY, originX, originY - 60, '#34d399', 3);
+
+        legendDiv.innerHTML = `
+          <div class="text-emerald-400 font-semibold">&bull; ระนาบทั้งหมดคือ Eigenspace: $E_2 = \\mathbb{R}^2$ ($m_g = 2$)</div>
+          <div class="text-slate-300">&bull; ทุกเวกเตอร์ที่ไม่ใช่ศูนย์เป็นไอเกนเวกเตอร์ $\\implies$ Diagonalizable</div>
+        `;
+      } else {
+        dimLabel.innerText = "มิติเชิงเรขาคณิต: 1D (เส้นตรง)";
+        // 1 line along x-axis
+        drawEigenspaceLine(ctx, originX, originY, 1, 0, '#fb7185', 2.5);
+        drawArrow(ctx, originX, originY, originX + 70, originY, '#fb7185', 3);
+
+        // Draw a test sheared non-eigenvector to show tilting
+        drawArrow(ctx, originX, originY, originX, originY - 50, '#94a3b8', 1.5);
+        drawArrow(ctx, originX, originY, originX + 50, originY - 100, '#64748b', 1.5, true);
+
+        legendDiv.innerHTML = `
+          <div class="text-rose-400 font-semibold">&bull; เส้นประสีแดง: Eigenspace มิติเดียว ($m_g = 1$) บนแกน x</div>
+          <div class="text-slate-400">&bull; เวกเตอร์ในแนวอื่น (สีเทา) จะถูกเฉือนบิดมุม ไม่รักษาแนวเดิม $\\implies$ Defective</div>
+        `;
+      }
+    }
+
+    function drawEigenspaceLine(ctx, ox, oy, dx, dy, color, width) {
+      ctx.strokeStyle = color;
+      ctx.lineWidth = width;
+      ctx.setLineDash([5, 5]);
+      ctx.beginPath();
+      ctx.moveTo(ox - dx * 200, oy + dy * 200);
+      ctx.lineTo(ox + dx * 200, oy - dy * 200);
+      ctx.stroke();
+      ctx.setLineDash([]);
+    }
+
+    function drawArrow(ctx, fromX, fromY, toX, toY, color, width, isDashed = false) {
+      const headlen = 8;
+      const dx = toX - fromX;
+      const dy = toY - fromY;
+      const angle = Math.atan2(dy, dx);
+
+      ctx.strokeStyle = color;
+      ctx.fillStyle = color;
+      ctx.lineWidth = width;
+      if (isDashed) ctx.setLineDash([3, 3]);
+
+      ctx.beginPath();
+      ctx.moveTo(fromX, fromY);
+      ctx.lineTo(toX, toY);
+      ctx.stroke();
+      ctx.setLineDash([]);
+
+      ctx.beginPath();
+      ctx.moveTo(toX, toY);
+      ctx.lineTo(toX - headlen * Math.cos(angle - Math.PI / 6), toY - headlen * Math.sin(angle - Math.PI / 6));
+      ctx.lineTo(toX - headlen * Math.cos(angle + Math.PI / 6), toY - headlen * Math.sin(angle + Math.PI / 6));
+      ctx.closePath();
+      ctx.fill();
+    }
+
+    // Inquiry Toggle
+    function toggleInquiry() {
+      const content = document.getElementById('inquiryContent');
+      const text = document.getElementById('inquiryBtnText');
+      const chevron = document.getElementById('inquiryChevron');
+
+      if (content.classList.contains('hidden')) {
+        content.classList.remove('hidden');
+        text.innerText = "ซ่อนแนวคิดและบทวิเคราะห์";
+        chevron.classList.add('rotate-180');
+      } else {
+        content.classList.add('hidden');
+        text.innerText = "กดเพื่อแสดงแนวคิดและบทวิเคราะห์เชิงเรขาคณิตและพีชคณิต";
+        chevron.classList.remove('rotate-180');
+      }
+      renderAllMath();
+    }
+
+    // Exercise interactive logic
+    function checkExerciseAnswer() {
+      const l = parseFloat(document.getElementById('ansLambda').value);
+      const ma = parseFloat(document.getElementById('ansMa').value);
+      const mg = parseFloat(document.getElementById('ansMg').value);
+      const fb = document.getElementById('exerciseFeedback');
+
+      if (isNaN(l) || isNaN(ma) || isNaN(mg)) {
+        fb.className = "text-sm font-semibold text-amber-600";
+        fb.innerText = "กรุณากรอกตัวเลขคำตอบให้ครบทั้ง 3 ช่อง";
+        return;
+      }
+
+      if (Math.abs(l - 2) < 0.05 && Math.abs(ma - 2) < 0.05 && Math.abs(mg - 1) < 0.05) {
+        fb.className = "text-sm font-bold text-emerald-600";
+        fb.innerHTML = "<span>✓ ถูกต้องสมบูรณ์แบบ! $\\lambda = 2, m_a = 2, m_g = 1$ เมทริกซ์นี้เป็น Defective ไม่สามารถทำให้เป็นเมทริกซ์ทแยงมุมได้</span>";
+      } else {
+        fb.className = "text-sm font-bold text-rose-600";
+        fb.innerHTML = "<span>✗ ยังไม่ถูกต้อง ลองตรวจสอบรากของ $(\\lambda - 2)^2 = 0$ และจำนวนตัวแปรเสรีของ $(A-2I)$ อีกครั้ง</span>";
+      }
+      renderAllMath();
+    }
+
+    function toggleExerciseSolution() {
+      const sol = document.getElementById('exerciseSolutionDetail');
+      const btn = document.getElementById('solutionBtnText');
+
+      if (sol.classList.contains('hidden')) {
+        sol.classList.remove('hidden');
+        btn.innerText = "ซ่อนเฉลยวิธีทำละเอียด";
+      } else {
+        sol.classList.add('hidden');
+        btn.innerText = "แสดงวิธีทำและคำเฉลยละเอียด";
+      }
+      renderAllMath();
+    }
+  </script>
+</body>
+</html>

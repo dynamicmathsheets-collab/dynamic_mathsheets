@@ -1,0 +1,812 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>เรื่องที่ 1: ความหมายของค่าเฉพาะและเวกเตอร์ลักษณะเฉพาะ (Eigenvalues & Eigenvectors)</title>
+  
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- KaTeX for crisp mathematical formulas -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js"></script>
+  
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  
+  <!-- Google Fonts: Inter & Sarabun for Thai typographic clarity -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=Sarabun:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Sarabun', 'sans-serif'],
+            heading: ['Chakra Petch', 'sans-serif'],
+          },
+          colors: {
+            brand: {
+              50: '#eef2ff',
+              100: '#e0e7ff',
+              200: '#c7d2fe',
+              500: '#6366f1',
+              600: '#4f46e5',
+              700: '#4338ca',
+              900: '#312e81',
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    body {
+      font-family: 'Sarabun', sans-serif;
+      background-color: #f8fafc;
+      color: #1e293b;
+    }
+    h1, h2, h3, h4 {
+      font-family: 'Chakra Petch', sans-serif;
+    }
+    .katex {
+      font-size: 1.08em;
+    }
+    /* Custom styling for canvas cursor */
+    #vectorCanvas {
+      cursor: crosshair;
+      touch-action: none;
+    }
+    /* Smooth transitions for interactive elements */
+    .collapsible-content {
+      transition: max-height 0.3s ease-out, opacity 0.3s ease-out;
+    }
+  </style>
+</head>
+<body class="min-h-screen text-slate-800 antialiased selection:bg-indigo-100 selection:text-indigo-900">
+
+  <!-- Root Container with STRICT layout requirement -->
+  <div class="max-w-6xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 space-y-8">
+    
+    <!-- HEADER -->
+    <header class="border-b border-slate-200 pb-6">
+
+      <h1 class="text-2xl sm:text-4xl font-bold text-slate-900 tracking-tight">
+        เรื่องที่ 1: ความหมายของค่าเฉพาะและเวกเตอร์ลักษณะเฉพาะ
+      </h1>
+      <p class="text-sm sm:text-base text-slate-600 mt-2 font-normal">
+        ทำความเข้าใจแนวคิดรากฐานของ <span class="font-medium text-indigo-600">Eigenvalues (\(\lambda\))</span> และ <span class="font-medium text-indigo-600">Eigenvectors (\(\mathbf{v}\))</span> ผ่านการแปลงเชิงเส้นและการมองเห็นเชิงเรขาคณิต
+      </p>
+    </header>
+
+    <!-- SECTION 1: วัตถุประสงค์การเรียนรู้ -->
+    <section class="bg-gradient-to-r from-blue-50/80 to-indigo-50/80 rounded-2xl p-5 sm:p-6 border border-blue-100/80 shadow-xs">
+      <div class="flex items-start gap-3.5">
+        <div class="p-2.5 bg-blue-600 text-white rounded-xl shadow-xs mt-0.5">
+          <i data-lucide="target" class="w-5 h-5"></i>
+        </div>
+        <div>
+          <h2 class="text-lg font-bold text-slate-900">1. วัตถุประสงค์การเรียนรู้ (Learning Objectives)</h2>
+          <p class="text-slate-700 text-sm sm:text-base mt-1.5 leading-relaxed">
+            เมื่อศึกษาเนื้อหาและทดลองปฏิสัมพันธ์กับแบบจำลองในบทเรียนนี้แล้ว นักศึกษาจะสามารถ:
+          </p>
+          <ul class="mt-2.5 space-y-2 text-sm sm:text-base text-slate-700">
+            <li class="flex items-center gap-2">
+              <i data-lucide="check-circle-2" class="w-4 h-4 text-emerald-600 flex-shrink-0"></i>
+              <span>อธิบายความหมายเชิงพีชคณิตและเชิงเรขาคณิตของ <strong>ค่าเฉพาะ (Eigenvalue)</strong> และ <strong>เวกเตอร์ลักษณะเฉพาะ (Eigenvector)</strong> ได้อย่างถูกต้อง</span>
+            </li>
+            <li class="flex items-center gap-2">
+              <i data-lucide="check-circle-2" class="w-4 h-4 text-emerald-600 flex-shrink-0"></i>
+              <span>ตรวจสอบและพิสูจน์ได้ว่า เวกเตอร์ที่กำหนดให้เป็นเวกเตอร์ลักษณะเฉพาะของเมทริกซ์ที่กำหนดหรือไม่ พร้อมทั้งหาค่าเฉพาะที่สัมพันธ์กันได้</span>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 2: เนื้อหาหลัก -->
+    <section class="space-y-6">
+      <div class="flex items-center gap-2.5 border-b border-slate-200 pb-3">
+        <i data-lucide="book-open" class="w-6 h-6 text-indigo-600"></i>
+        <h2 class="text-xl sm:text-2xl font-bold text-slate-900">2. เนื้อหาหลัก (Core Concepts)</h2>
+      </div>
+
+      <!-- Definition & Equation -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div class="bg-white p-5 sm:p-6 rounded-2xl border border-slate-200/80 shadow-xs hover:border-slate-300 transition-colors">
+          <div class="flex items-center gap-2 text-indigo-700 font-bold mb-3 text-base">
+            <i data-lucide="bookmark" class="w-5 h-5"></i>
+            <h3>นิยามและสมการหลัก</h3>
+          </div>
+          <p class="text-slate-600 text-sm sm:text-base leading-relaxed">
+            กำหนดให้ \(A\) เป็นเมทริกซ์จัตุรัสขนาด \(n \times n\) เวกเตอร์ที่ไม่ใช่เวกเตอร์ศูนย์ \(\mathbf{v} \neq \mathbf{0}\) ใน \(\mathbb{R}^n\) จะถูกเรียกว่า <strong>เวกเตอร์ลักษณะเฉพาะ (Eigenvector)</strong> ของ \(A\) ก็ต่อเมื่อ มีสเกลาร์ \(\lambda\) ซึ่งทำให้:
+          </p>
+          <div class="my-4 p-4 bg-indigo-50/70 border border-indigo-200/60 rounded-xl text-center">
+            <span class="text-xl sm:text-2xl font-semibold text-indigo-950">\(A\mathbf{v} = \lambda\mathbf{v}\)</span>
+            <span class="block text-xs text-indigo-600 mt-1 font-mono font-medium">(เมื่อ \(\mathbf{v} \neq \mathbf{0}\))</span>
+          </div>
+          <p class="text-slate-600 text-sm leading-relaxed">
+            สเกลาร์ \(\lambda\) นี้จะถูกเรียกว่า <strong>ค่าเฉพาะ (Eigenvalue)</strong> ของเมทริกซ์ \(A\) ที่สอดคล้องกับเวกเตอร์ลักษณะเฉพาะ \(\mathbf{v}\)
+          </p>
+        </div>
+
+        <!-- Geometric Meaning -->
+        <div class="bg-white p-5 sm:p-6 rounded-2xl border border-slate-200/80 shadow-xs hover:border-slate-300 transition-colors">
+          <div class="flex items-center gap-2 text-indigo-700 font-bold mb-3 text-base">
+            <i data-lucide="move-diagonal" class="w-5 h-5"></i>
+            <h3>ความหมายเชิงเรขาคณิต (Geometric Interpretation)</h3>
+          </div>
+          <p class="text-slate-600 text-sm sm:text-base leading-relaxed">
+            โดยทั่วไป การคูณเมทริกซ์ \(A\) กับเวกเตอร์ใดๆ มักทำให้เวกเตอร์นั้น <strong>หมุนเปลี่ยนทิศทาง (Rotation)</strong> และ <strong>เปลี่ยนขนาด (Scaling)</strong>
+          </p>
+          <div class="mt-3 p-3.5 bg-amber-50/80 border border-amber-200 rounded-xl">
+            <p class="text-amber-900 text-sm font-medium leading-relaxed">
+              💡 <strong>แต่สำหรับเวกเตอร์ลักษณะเฉพาะ \(\mathbf{v}\):</strong>
+              การแปลงเชิงเส้น \(T(\mathbf{v}) = A\mathbf{v}\) จะ<strong>ไม่ทำให้แนวของเวกเตอร์หมุนเปลี่ยนไป</strong> เวกเตอร์ผลลัพธ์ \(A\mathbf{v}\) ยังคงวางตัวอยู่บน <strong>"แนวเส้นตรงเดิม (Span / Colinear)"</strong> เพียงแต่ถูกยืด หด หรือกลับทิศทางด้วยตัวคูณสเกลาร์ \(\lambda\) เท่านั้น
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Zero vector contrast and sign behaviors -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <!-- Zero vector comparison -->
+        <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-xs">
+          <div class="flex items-center gap-2 text-rose-600 font-bold mb-2">
+            <i data-lucide="alert-octagon" class="w-5 h-5"></i>
+            <h3>เวกเตอร์ศูนย์ vs เวกเตอร์ลักษณะเฉพาะ</h3>
+          </div>
+          <p class="text-slate-600 text-sm leading-relaxed">
+            สำหรับเวกเตอร์ศูนย์ \(\mathbf{0}\) ใดๆ สมการ \(A\mathbf{0} = \lambda\mathbf{0}\) เป็นจริงเสมอสำหรับทุกสเกลาร์ \(\lambda\) 
+          </p>
+          <p class="text-slate-600 text-sm mt-2 leading-relaxed">
+            หากยอมรับให้ \(\mathbf{v} = \mathbf{0}\) เป็นเวกเตอร์ลักษณะเฉพาะ จำนวนจริงทุกจำนวนจะกลายเป็นค่าเฉพาะทันที ซึ่งจะสูญเสียคุณสมบัติจำเพาะ (Unique characteristic) ของเมทริกซ์ไป ดังนั้นตามนิยาม <strong>\(\mathbf{v}\) ต้องไม่เป็นเวกเตอร์ศูนย์</strong>
+          </p>
+        </div>
+
+        <!-- Positive & Negative Eigenvalue -->
+        <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-xs">
+          <div class="flex items-center gap-2 text-emerald-600 font-bold mb-2">
+            <i data-lucide="arrow-up-right" class="w-5 h-5"></i>
+            <h3>ผลของเครื่องหมาย \(\lambda\)</h3>
+          </div>
+          <ul class="text-sm text-slate-600 space-y-2 leading-relaxed">
+            <li>
+              <span class="font-semibold text-emerald-700">\(\lambda > 0\):</span> เวกเตอร์ \(A\mathbf{v}\) ชี้ไปใน <strong>ทิศทางเดิม</strong> (ยืดออกหาก \(\lambda > 1\) หรือหดสั้นลงหาก \(0 < \lambda < 1\))
+            </li>
+            <li>
+              <span class="font-semibold text-rose-700">\(\lambda < 0\):</span> เวกเตอร์ \(A\mathbf{v}\) มีทิศทาง <strong>ตรงกันข้าม 180°</strong> (สะท้อนผ่านจุดกำเนิด) แต่ยังคงวางขนานอยู่บนแนวเส้นตรงเดิม
+            </li>
+          </ul>
+        </div>
+
+        <!-- Zero Eigenvalue -->
+        <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-xs">
+          <div class="flex items-center gap-2 text-purple-600 font-bold mb-2">
+            <i data-lucide="shrink" class="w-5 h-5"></i>
+            <h3>กรณีค่าเฉพาะเป็นศูนย์ (\(\lambda = 0\))</h3>
+          </div>
+          <p class="text-slate-600 text-sm leading-relaxed">
+            สังเกตว่า <strong>\(\lambda = 0\) สามารถเป็นค่าเฉพาะได้!</strong>
+          </p>
+          <p class="text-slate-600 text-sm mt-2 leading-relaxed">
+            เมื่อ \(\lambda = 0\) จะได้ \(A\mathbf{v} = 0\mathbf{v} = \mathbf{0}\) ซึ่งหมายความว่าเวกเตอร์ \(\mathbf{v}\) ถูกเมทริกซ์ \(A\) บีบอัด (ยุบ) ลงกลายเป็นจุดกำเนิด นั่นแสดงว่า \(\mathbf{v}\) อยู่ใน <strong>Null Space (Kernel)</strong> ของ \(A\) และ \(\det(A) = 0\)
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 3: แบบจำลองโต้ตอบ (Interactive 2D Visualizer) -->
+    <section class="bg-white rounded-2xl border border-slate-200 shadow-sm p-5 sm:p-6 space-y-6">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-slate-100 gap-3">
+        <div class="flex items-center gap-2.5">
+          <div class="p-2 bg-indigo-600 text-white rounded-lg">
+            <i data-lucide="play-circle" class="w-5 h-5"></i>
+          </div>
+          <div>
+            <h2 class="text-xl font-bold text-slate-900">3. แบบจำลองโต้ตอบ (Interactive 2D Visualizer)</h2>
+            <p class="text-xs sm:text-sm text-slate-500">ทดลองปรับค่าเมทริกซ์และหมุนเวกเตอร์เพื่อสังเกตพฤติกรรม \(A\mathbf{v}\) เทียบกับ \(\mathbf{v}\)</p>
+          </div>
+        </div>
+        <!-- Status Badge -->
+        <div id="statusBadge" class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs sm:text-sm font-semibold transition-all duration-200 bg-slate-100 text-slate-600 border border-slate-200">
+          <span class="w-2.5 h-2.5 rounded-full bg-slate-400"></span>
+          <span>กำลังตรวจสอบสถานะ...</span>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+        <!-- Canvas Visualizer (Left/Top) -->
+        <div class="lg:col-span-7 flex flex-col items-center">
+          <div class="w-full relative bg-slate-950 rounded-xl overflow-hidden border border-slate-800 shadow-inner">
+            <canvas id="vectorCanvas" class="w-full h-[360px] sm:h-[440px] block"></canvas>
+            
+            <!-- In-canvas Legend Overlay -->
+            <div class="absolute bottom-3 left-3 bg-slate-900/90 backdrop-blur-md px-3 py-2 rounded-lg border border-slate-700 text-xs text-slate-300 flex flex-wrap gap-4 select-none">
+              <div class="flex items-center gap-1.5">
+                <span class="w-3 h-0.5 bg-sky-400 inline-block"></span>
+                <span class="font-mono text-sky-300 font-semibold">\(\mathbf{v}\) (เวกเตอร์ตั้งต้น)</span>
+              </div>
+              <div class="flex items-center gap-1.5">
+                <span class="w-3 h-0.5 bg-rose-500 inline-block"></span>
+                <span class="font-mono text-rose-400 font-semibold">\(A\mathbf{v}\) (เวกเตอร์ภาพ)</span>
+              </div>
+              <div class="flex items-center gap-1.5">
+                <span class="w-3 h-0.5 bg-emerald-400 inline-block border-b border-dashed border-emerald-400"></span>
+                <span class="font-mono text-emerald-300 font-semibold">แนว Span (เมื่อตรงกัน)</span>
+              </div>
+            </div>
+
+            <div class="absolute top-3 right-3 bg-slate-900/80 backdrop-blur-md px-2.5 py-1 rounded text-[11px] text-slate-400 border border-slate-700/80">
+              คลิกหรือลากบนระนาบเพื่อเปลี่ยน \(\mathbf{v}\)
+            </div>
+          </div>
+          <p class="text-xs text-slate-500 mt-2 text-center">
+            * สังเกต: เมื่อเวกเตอร์ \(A\mathbf{v}\) ขนานหรือทับแนวเดียวกับ \(\mathbf{v}\) จะถือว่า \(\mathbf{v}\) เป็น <strong>Eigenvector</strong> ทันที
+          </p>
+        </div>
+
+        <!-- Controls (Right/Bottom) -->
+        <div class="lg:col-span-5 space-y-5">
+          <!-- Preset buttons -->
+          <div>
+            <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">เลือกตัวอย่างเมทริกซ์ (Presets)</label>
+            <div class="grid grid-cols-2 gap-2 text-xs font-medium">
+              <button onclick="setMatrixPreset(3, 0, 0, 2)" class="px-3 py-2 rounded-lg bg-slate-100 hover:bg-indigo-50 hover:text-indigo-700 hover:border-indigo-300 border border-slate-200 transition text-left">
+                <div class="font-bold text-slate-800">1. ทะแยงมุม (บวก)</div>
+                <div class="text-[11px] text-slate-500 font-mono">[3, 0; 0, 2]</div>
+              </button>
+              <button onclick="setMatrixPreset(-2, 0, 0, 1)" class="px-3 py-2 rounded-lg bg-slate-100 hover:bg-indigo-50 hover:text-indigo-700 hover:border-indigo-300 border border-slate-200 transition text-left">
+                <div class="font-bold text-slate-800">2. มีค่าเฉพาะลบ</div>
+                <div class="text-[11px] text-slate-500 font-mono">[-2, 0; 0, 1]</div>
+              </button>
+              <button onclick="setMatrixPreset(2, 0, 0, 0)" class="px-3 py-2 rounded-lg bg-slate-100 hover:bg-indigo-50 hover:text-indigo-700 hover:border-indigo-300 border border-slate-200 transition text-left">
+                <div class="font-bold text-slate-800">3. มีค่าเฉพาะศูนย์</div>
+                <div class="text-[11px] text-slate-500 font-mono">[2, 0; 0, 0]</div>
+              </button>
+              <button onclick="setMatrixPreset(1, 1, 0, 1)" class="px-3 py-2 rounded-lg bg-slate-100 hover:bg-indigo-50 hover:text-indigo-700 hover:border-indigo-300 border border-slate-200 transition text-left">
+                <div class="font-bold text-slate-800">4. เฉือน (Shear)</div>
+                <div class="text-[11px] text-slate-500 font-mono">[1, 1; 0, 1]</div>
+              </button>
+            </div>
+          </div>
+
+          <!-- Matrix Inputs -->
+          <div class="p-4 bg-slate-50 rounded-xl border border-slate-200">
+            <span class="text-xs font-bold text-slate-700 uppercase tracking-wider block mb-2">กำหนดค่าเมทริกซ์ \(A\)</span>
+            <div class="flex items-center justify-center gap-3">
+              <span class="text-2xl font-serif text-slate-400">[</span>
+              <div class="grid grid-cols-2 gap-2 text-center">
+                <input type="number" id="mat_a" value="3" step="0.5" class="w-16 px-2 py-1.5 text-center font-mono text-sm bg-white border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none font-bold">
+                <input type="number" id="mat_b" value="0" step="0.5" class="w-16 px-2 py-1.5 text-center font-mono text-sm bg-white border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none font-bold">
+                <input type="number" id="mat_c" value="0" step="0.5" class="w-16 px-2 py-1.5 text-center font-mono text-sm bg-white border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none font-bold">
+                <input type="number" id="mat_d" value="2" step="0.5" class="w-16 px-2 py-1.5 text-center font-mono text-sm bg-white border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none font-bold">
+              </div>
+              <span class="text-2xl font-serif text-slate-400">]</span>
+            </div>
+          </div>
+
+          <!-- Vector Controls -->
+          <div class="p-4 bg-slate-50 rounded-xl border border-slate-200 space-y-3">
+            <div class="flex justify-between items-center">
+              <span class="text-xs font-bold text-slate-700 uppercase tracking-wider">ปรับพิกัดเวกเตอร์ \(\mathbf{v} = (x, y)\)</span>
+              <button onclick="snapToAxis()" class="text-xs text-indigo-600 hover:text-indigo-800 font-medium">ปัดเข้าหาแกนหลัก (Snap)</button>
+            </div>
+            
+            <div class="space-y-2">
+              <div class="flex items-center gap-3">
+                <span class="text-xs font-mono font-bold text-sky-600 w-4">x:</span>
+                <input type="range" id="slider_x" min="-4" max="4" step="0.1" value="1" class="w-full accent-sky-500">
+                <span id="label_x" class="text-xs font-mono text-slate-700 w-10 text-right">1.0</span>
+              </div>
+              <div class="flex items-center gap-3">
+                <span class="text-xs font-mono font-bold text-sky-600 w-4">y:</span>
+                <input type="range" id="slider_y" min="-4" max="4" step="0.1" value="0" class="w-full accent-sky-500">
+                <span id="label_y" class="text-xs font-mono text-slate-700 w-10 text-right">0.0</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Realtime Computation Output -->
+          <div class="p-4 rounded-xl border bg-slate-900 text-slate-100 font-mono text-xs space-y-2">
+            <div class="flex justify-between text-slate-400 border-b border-slate-800 pb-1">
+              <span>นิพจน์เวกเตอร์</span>
+              <span>ค่าที่ได้</span>
+            </div>
+            <div class="flex justify-between items-center">
+              <span class="text-sky-400 font-semibold">\(\mathbf{v}\) = </span>
+              <span id="disp_v" class="text-sky-300 font-bold">[ 1.00 , 0.00 ]ᵀ</span>
+            </div>
+            <div class="flex justify-between items-center">
+              <span class="text-rose-400 font-semibold">\(A\mathbf{v}\) = </span>
+              <span id="disp_Av" class="text-rose-300 font-bold">[ 3.00 , 0.00 ]ᵀ</span>
+            </div>
+            <div id="lambdaContainer" class="pt-2 border-t border-slate-800 flex justify-between items-center text-slate-300">
+              <span>สัดส่วน (\(\lambda\)):</span>
+              <span id="disp_lambda" class="text-emerald-400 font-bold text-sm">3.00 (Eigenvalue!)</span>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 4: คำถามนำเพื่อค้นพบ -->
+    <section class="bg-white rounded-2xl border border-slate-200 shadow-xs p-5 sm:p-6 space-y-4">
+      <div class="flex items-center gap-2.5 pb-2 border-b border-slate-100">
+        <i data-lucide="help-circle" class="w-6 h-6 text-amber-600"></i>
+        <h2 class="text-xl font-bold text-slate-900">4. คำถามนำเพื่อค้นพบ (Guided Discovery Questions)</h2>
+      </div>
+
+      <div class="bg-amber-50/70 border border-amber-200 rounded-xl p-4 sm:p-5">
+        <p class="text-slate-800 font-semibold text-base mb-2">
+          ❓ คำถามชวนคิด:
+        </p>
+        <p class="text-slate-700 text-sm sm:text-base leading-relaxed">
+          1. <strong>เหตุใดเวกเตอร์ลักษณะเฉพาะจึงต้องไม่ใช่เวกเตอร์ศูนย์ (\(\mathbf{v} \neq \mathbf{0}\))?</strong><br>
+          2. <strong>หากการแปลงเชิงเส้นทำให้เวกเตอร์ชี้ไปในทิศตรงกันข้ามพอดี (\(180^\circ\)) ยังถือว่าเป็นเวกเตอร์ลักษณะเฉพาะได้หรือไม่?</strong>
+        </p>
+
+        <div class="mt-4">
+          <button onclick="toggleAnswer('discoveryAnswer', this)" class="inline-flex items-center gap-2 px-4 py-2 bg-white hover:bg-amber-100/80 border border-amber-300 text-amber-900 text-xs sm:text-sm font-semibold rounded-lg shadow-2xs transition">
+            <i data-lucide="eye" class="w-4 h-4 text-amber-700"></i>
+            <span>คลิกเพื่อดูแนวคิดและคำอธิบาย</span>
+          </button>
+
+          <div id="discoveryAnswer" class="hidden mt-4 pt-4 border-t border-amber-200 text-sm text-slate-700 space-y-3 leading-relaxed">
+            <div class="p-3 bg-white rounded-lg border border-amber-100">
+              <span class="font-bold text-indigo-700">คำตอบข้อ 1:</span> หากเรายอมให้ \(\mathbf{v} = \mathbf{0}\) สมการ \(A\mathbf{0} = \lambda\mathbf{0}\) จะเป็นจริงเสมอสำหรับ <em>ทุกๆ ค่า \(\lambda \in \mathbb{R}\)</em> (เพราะ \(0 = 0\) เสมอ) ซึ่งจะทำให้ค่าเฉพาะไม่มีความหมายเฉพาะตัว และไม่สามารถใช้จำแนกคุณสมบัติของเมทริกซ์ \(A\) ได้เลย
+            </div>
+            <div class="p-3 bg-white rounded-lg border border-amber-100">
+              <span class="font-bold text-indigo-700">คำตอบข้อ 2:</span> <strong>ยังคงเป็นเวกเตอร์ลักษณะเฉพาะได้!</strong> เพราะเวกเตอร์ที่ชี้ทิศตรงกันข้ามยังคงอยู่บน <em>แนวเส้นตรงเดิม (Colinear)</em> เวกเตอร์เพียงแค่คูณด้วยค่าสเกลาร์ที่เป็นลบ เช่น \(\lambda = -1\) หรือ \(\lambda = -2\) (สังเกตได้จาก Preset ข้อ 2 ด้านบน)
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 5: แบบฝึกหัดสำหรับนักศึกษา -->
+    <section class="bg-white rounded-2xl border border-slate-200 shadow-xs p-5 sm:p-6 space-y-6">
+      <div class="flex items-center gap-2.5 pb-2 border-b border-slate-100">
+        <i data-lucide="edit-3" class="w-6 h-6 text-indigo-600"></i>
+        <h2 class="text-xl font-bold text-slate-900">5. แบบฝึกหัดสำหรับนักศึกษา (Exercises & Self-Check)</h2>
+      </div>
+
+      <div class="border border-slate-200 rounded-xl p-5 bg-slate-50/50 space-y-4">
+        <div class="flex items-start gap-3">
+          <span class="w-7 h-7 rounded-full bg-indigo-600 text-white flex items-center justify-center font-bold text-sm shrink-0">
+            1
+          </span>
+          <div class="space-y-2">
+            <h3 class="font-bold text-slate-900 text-base">โจทย์ตรวจสอบความเป็นเวกเตอร์ลักษณะเฉพาะ</h3>
+            <p class="text-slate-700 text-sm sm:text-base leading-relaxed">
+              กำหนดเมทริกซ์ 
+              \( A = \begin{bmatrix} 3 & 0 \\ 0 & 2 \end{bmatrix} \)
+              จงหาว่าเวกเตอร์ \(\mathbf{v}_1 = \begin{bmatrix} 1 \\ 0 \end{bmatrix}\) และ \(\mathbf{v}_2 = \begin{bmatrix} 0 \\ 1 \end{bmatrix}\) เป็นเวกเตอร์ลักษณะเฉพาะของ \(A\) หรือไม่ พร้อมหาค่าเฉพาะที่สอดคล้องกันและอธิบายความหมายเชิงเรขาคณิต
+            </p>
+          </div>
+        </div>
+
+        <!-- Guided Steps / Interactive Check -->
+        <div class="pt-3 border-t border-slate-200 space-y-3">
+          <button onclick="toggleAnswer('exerciseSolution', this)" class="inline-flex items-center gap-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs sm:text-sm font-semibold rounded-lg shadow-xs transition">
+            <i data-lucide="file-check" class="w-4 h-4"></i>
+            <span>แสดงวิธีทำและคำอธิบายโดยละเอียด</span>
+          </button>
+
+          <div id="exerciseSolution" class="hidden mt-4 space-y-4 text-sm text-slate-700 bg-white p-4 sm:p-5 rounded-xl border border-indigo-100">
+            <div>
+              <h4 class="font-bold text-indigo-900 text-base mb-1">ขั้นตอนที่ 1: ตรวจสอบ \(\mathbf{v}_1 = (1, 0)^T\)</h4>
+              <p class="leading-relaxed">คำนวณผลคูณเมทริกซ์กับเวกเตอร์:</p>
+              <div class="my-2 p-3 bg-slate-50 rounded border border-slate-200 font-mono text-center overflow-x-auto">
+                \( A\mathbf{v}_1 = \begin{bmatrix} 3 & 0 \\ 0 & 2 \end{bmatrix}\begin{bmatrix} 1 \\ 0 \end{bmatrix} = \begin{bmatrix} (3)(1) + (0)(0) \\ (0)(1) + (2)(0) \end{bmatrix} = \begin{bmatrix} 3 \\ 0 \end{bmatrix} = 3\begin{bmatrix} 1 \\ 0 \end{bmatrix} = 3\mathbf{v}_1 \)
+              </div>
+              <p class="text-slate-600">
+                เนื่องจาก \(A\mathbf{v}_1 = 3\mathbf{v}_1\) แสดงว่า <strong class="text-emerald-700">\(\mathbf{v}_1 = (1, 0)^T\) เป็นเวกเตอร์ลักษณะเฉพาะ</strong> ที่มีค่าเฉพาะสอดคล้องคือ <strong class="text-emerald-700">\(\lambda_1 = 3\)</strong>
+              </p>
+            </div>
+
+            <div class="pt-3 border-t border-slate-100">
+              <h4 class="font-bold text-indigo-900 text-base mb-1">ขั้นตอนที่ 2: ตรวจสอบ \(\mathbf{v}_2 = (0, 1)^T\)</h4>
+              <p class="leading-relaxed">คำนวณผลคูณเมทริกซ์กับเวกเตอร์:</p>
+              <div class="my-2 p-3 bg-slate-50 rounded border border-slate-200 font-mono text-center overflow-x-auto">
+                \( A\mathbf{v}_2 = \begin{bmatrix} 3 & 0 \\ 0 & 2 \end{bmatrix}\begin{bmatrix} 0 \\ 1 \end{bmatrix} = \begin{bmatrix} (3)(0) + (0)(1) \\ (0)(0) + (2)(1) \end{bmatrix} = \begin{bmatrix} 0 \\ 2 \end{bmatrix} = 2\begin{bmatrix} 0 \\ 1 \end{bmatrix} = 2\mathbf{v}_2 \)
+              </div>
+              <p class="text-slate-600">
+                เนื่องจาก \(A\mathbf{v}_2 = 2\mathbf{v}_2\) แสดงว่า <strong class="text-emerald-700">\(\mathbf{v}_2 = (0, 1)^T\) เป็นเวกเตอร์ลักษณะเฉพาะ</strong> ที่มีค่าเฉพาะสอดคล้องคือ <strong class="text-emerald-700">\(\lambda_2 = 2\)</strong>
+              </p>
+            </div>
+
+            <div class="p-3.5 bg-blue-50/70 border border-blue-200 rounded-lg text-slate-800">
+              <strong class="text-blue-900">สรุปความหมายเชิงเรขาคณิต:</strong>
+              <p class="mt-1 leading-relaxed text-xs sm:text-sm">
+                การแปลงเชิงเส้นนี้ทำให้เวกเตอร์บนแกน \(X\) ยืดขยายออกเป็น <strong>3 เท่า</strong> ของความยาวเดิม (\(\lambda_1=3\)) และเวกเตอร์บนแกน \(Y\) ยืดขยายออกเป็น <strong>2 เท่า</strong> ของความยาวเดิม (\(\lambda_2=2\)) โดยที่ไม่มีการหมุนเบี่ยงเบนออกจากแนวแกนเดิมเลย
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+
+
+  </div>
+
+  <!-- JAVASCRIPT LOGIC & VISUALIZATION -->
+  <script>
+    // Initialize Lucide icons
+    lucide.createIcons();
+
+    // Setup KaTeX auto-renderer
+    window.addEventListener("DOMContentLoaded", () => {
+      renderMathInElement(document.body, {
+        delimiters: [
+          {left: "$$", right: "$$", display: true},
+          {left: "\\[", right: "\\]", display: true},
+          {left: "\\(", right: "\\)", display: false},
+          {left: "$", right: "$", display: false}
+        ],
+        throwOnError: false
+      });
+      initCanvasApp();
+    });
+
+    // Toggle accordion function
+    function toggleAnswer(elementId, btn) {
+      const el = document.getElementById(elementId);
+      if (el.classList.contains('hidden')) {
+        el.classList.remove('hidden');
+        if (btn.querySelector('span')) {
+          btn.querySelector('span').textContent = 'ซ่อนแนวคิดและคำอธิบาย';
+        }
+      } else {
+        el.classList.add('hidden');
+        if (btn.querySelector('span')) {
+          btn.querySelector('span').textContent = 'คลิกเพื่อดูแนวคิดและคำอธิบาย';
+        }
+      }
+    }
+
+    // Interactive Canvas Application
+    let canvas, ctx;
+    let width, height;
+    let originX, originY;
+    const scale = 40; // Pixels per math unit
+
+    // Matrix state
+    let matA = 3, matB = 0, matC = 0, matD = 2;
+    // Vector v state
+    let vecX = 1.0, vecY = 0.0;
+    let isDragging = false;
+
+    function initCanvasApp() {
+      canvas = document.getElementById('vectorCanvas');
+      ctx = canvas.getContext('2d');
+
+      // Resize canvas with devicePixelRatio for sharpness
+      function resize() {
+        const rect = canvas.getBoundingClientRect();
+        const dpr = window.devicePixelRatio || 1;
+        canvas.width = rect.width * dpr;
+        canvas.height = rect.height * dpr;
+        width = canvas.width;
+        height = canvas.height;
+        originX = width / 2;
+        originY = height / 2;
+        ctx.scale(dpr, dpr);
+        draw();
+      }
+
+      window.addEventListener('resize', resize);
+      resize();
+
+      // Matrix Inputs listener
+      const inputs = ['mat_a', 'mat_b', 'mat_c', 'mat_d'];
+      inputs.forEach(id => {
+        document.getElementById(id).addEventListener('input', () => {
+          matA = parseFloat(document.getElementById('mat_a').value) || 0;
+          matB = parseFloat(document.getElementById('mat_b').value) || 0;
+          matC = parseFloat(document.getElementById('mat_c').value) || 0;
+          matD = parseFloat(document.getElementById('mat_d').value) || 0;
+          updateMathOutputs();
+          draw();
+        });
+      });
+
+      // Slider listeners
+      const sliderX = document.getElementById('slider_x');
+      const sliderY = document.getElementById('slider_y');
+
+      sliderX.addEventListener('input', (e) => {
+        vecX = parseFloat(e.target.value);
+        document.getElementById('label_x').textContent = vecX.toFixed(1);
+        updateMathOutputs();
+        draw();
+      });
+
+      sliderY.addEventListener('input', (e) => {
+        vecY = parseFloat(e.target.value);
+        document.getElementById('label_y').textContent = vecY.toFixed(1);
+        updateMathOutputs();
+        draw();
+      });
+
+      // Canvas Drag & Click interactions
+      function handlePointer(event) {
+        const rect = canvas.getBoundingClientRect();
+        const clientX = event.clientX || (event.touches && event.touches[0].clientX);
+        const clientY = event.clientY || (event.touches && event.touches[0].clientY);
+        
+        const px = clientX - rect.left;
+        const py = clientY - rect.top;
+
+        // Convert pixel coords to mathematical units
+        const mathX = (px - rect.width / 2) / scale;
+        const mathY = -(py - rect.height / 2) / scale;
+
+        // Clamp inside reasonable range
+        vecX = Math.max(-4, Math.min(4, Math.round(mathX * 10) / 10));
+        vecY = Math.max(-4, Math.min(4, Math.round(mathY * 10) / 10));
+
+        sliderX.value = vecX;
+        sliderY.value = vecY;
+        document.getElementById('label_x').textContent = vecX.toFixed(1);
+        document.getElementById('label_y').textContent = vecY.toFixed(1);
+
+        updateMathOutputs();
+        draw();
+      }
+
+      canvas.addEventListener('mousedown', (e) => {
+        isDragging = true;
+        handlePointer(e);
+      });
+
+      window.addEventListener('mousemove', (e) => {
+        if (isDragging) handlePointer(e);
+      });
+
+      window.addEventListener('mouseup', () => {
+        isDragging = false;
+      });
+
+      // Touch screen support
+      canvas.addEventListener('touchstart', (e) => {
+        isDragging = true;
+        handlePointer(e);
+        e.preventDefault();
+      }, { passive: false });
+
+      canvas.addEventListener('touchmove', (e) => {
+        if (isDragging) {
+          handlePointer(e);
+          e.preventDefault();
+        }
+      }, { passive: false });
+
+      window.addEventListener('touchend', () => {
+        isDragging = false;
+      });
+
+      updateMathOutputs();
+      draw();
+    }
+
+    function setMatrixPreset(a, b, c, d) {
+      document.getElementById('mat_a').value = a;
+      document.getElementById('mat_b').value = b;
+      document.getElementById('mat_c').value = c;
+      document.getElementById('mat_d').value = d;
+      matA = a; matB = b; matC = c; matD = d;
+      updateMathOutputs();
+      draw();
+    }
+
+    function snapToAxis() {
+      // Snaps to closest of (1,0) or (0,1)
+      if (Math.abs(vecX) >= Math.abs(vecY)) {
+        vecX = vecX >= 0 ? 1 : -1;
+        vecY = 0;
+      } else {
+        vecX = 0;
+        vecY = vecY >= 0 ? 1 : -1;
+      }
+      document.getElementById('slider_x').value = vecX;
+      document.getElementById('slider_y').value = vecY;
+      document.getElementById('label_x').textContent = vecX.toFixed(1);
+      document.getElementById('label_y').textContent = vecY.toFixed(1);
+      updateMathOutputs();
+      draw();
+    }
+
+    function updateMathOutputs() {
+      // Av calculation
+      const avX = matA * vecX + matB * vecY;
+      const avY = matC * vecX + matD * vecY;
+
+      document.getElementById('disp_v').textContent = `[ ${vecX.toFixed(2)} , ${vecY.toFixed(2)} ]ᵀ`;
+      document.getElementById('disp_Av').textContent = `[ ${avX.toFixed(2)} , ${avY.toFixed(2)} ]ᵀ`;
+
+      // Check Eigenvector Condition: v != 0 and cross-product in 2D == 0
+      const normV = Math.hypot(vecX, vecY);
+      const crossProduct = vecX * avY - vecY * avX;
+      const normAv = Math.hypot(avX, avY);
+
+      const statusBadge = document.getElementById('statusBadge');
+      const dispLambda = document.getElementById('disp_lambda');
+
+      if (normV < 0.05) {
+        statusBadge.className = "inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs sm:text-sm font-semibold bg-rose-100 text-rose-700 border border-rose-300";
+        statusBadge.innerHTML = `<span class="w-2.5 h-2.5 rounded-full bg-rose-500"></span> ไม่ใช่ Eigenvector (v เป็นเวกเตอร์ศูนย์)`;
+        dispLambda.textContent = "ไม่มีความหมาย (v = 0)";
+        dispLambda.className = "text-rose-400 font-bold";
+        return;
+      }
+
+      // Check collinearity with small epsilon
+      const isColinear = Math.abs(crossProduct) < 0.08 * (normV * normAv + 0.1);
+
+      if (isColinear) {
+        // Calculate lambda
+        let lambda;
+        if (Math.abs(vecX) > 0.2) {
+          lambda = avX / vecX;
+        } else {
+          lambda = avY / vecY;
+        }
+
+        statusBadge.className = "inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs sm:text-sm font-bold bg-emerald-100 text-emerald-800 border border-emerald-400 shadow-xs animate-pulse";
+        statusBadge.innerHTML = `<span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span> เป็น Eigenvector! (Av = λv)`;
+
+        dispLambda.textContent = `${lambda.toFixed(2)} (Eigenvalue!)`;
+        dispLambda.className = "text-emerald-400 font-bold text-sm";
+      } else {
+        statusBadge.className = "inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs sm:text-sm font-semibold bg-slate-100 text-slate-700 border border-slate-300";
+        statusBadge.innerHTML = `<span class="w-2.5 h-2.5 rounded-full bg-slate-400"></span> หมุนเปลี่ยนแนว (ไม่ใช่ Eigenvector)`;
+
+        dispLambda.textContent = "เวกเตอร์ไม่ขนานกัน (ไม่มีสเกลาร์ λ)";
+        dispLambda.className = "text-slate-400 font-normal";
+      }
+    }
+
+    function draw() {
+      if (!ctx) return;
+      const rect = canvas.getBoundingClientRect();
+      const w = rect.width;
+      const h = rect.height;
+      const ox = w / 2;
+      const oy = h / 2;
+
+      ctx.clearRect(0, 0, w, h);
+
+      // 1. Draw Grid Lines
+      ctx.lineWidth = 1;
+      ctx.strokeStyle = '#1e293b'; // slate-800
+      ctx.fillStyle = '#64748b'; // slate-500
+      ctx.font = '10px monospace';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'top';
+
+      for (let x = -8; x <= 8; x++) {
+        if (x === 0) continue;
+        const px = ox + x * scale;
+        ctx.beginPath();
+        ctx.moveTo(px, 0);
+        ctx.lineTo(px, h);
+        ctx.stroke();
+        ctx.fillText(x, px, oy + 4);
+      }
+
+      ctx.textBaseline = 'middle';
+      ctx.textAlign = 'right';
+      for (let y = -6; y <= 6; y++) {
+        if (y === 0) continue;
+        const py = oy - y * scale;
+        ctx.beginPath();
+        ctx.moveTo(0, py);
+        ctx.lineTo(w, py);
+        ctx.stroke();
+        ctx.fillText(y, ox - 6, py);
+      }
+
+      // 2. Draw Main Axes
+      ctx.lineWidth = 1.5;
+      ctx.strokeStyle = '#475569'; // slate-600
+      ctx.beginPath();
+      ctx.moveTo(0, oy);
+      ctx.lineTo(w, oy);
+      ctx.moveTo(ox, 0);
+      ctx.lineTo(ox, h);
+      ctx.stroke();
+
+      // Axis label
+      ctx.fillStyle = '#94a3b8';
+      ctx.font = '11px sans-serif';
+      ctx.fillText('+X', w - 12, oy - 12);
+      ctx.fillText('+Y', ox + 16, 12);
+
+      // Check Eigenvector Condition
+      const avX = matA * vecX + matB * vecY;
+      const avY = matC * vecX + matD * vecY;
+      const normV = Math.hypot(vecX, vecY);
+      const crossProduct = vecX * avY - vecY * avX;
+      const normAv = Math.hypot(avX, avY);
+      const isColinear = normV > 0.05 && Math.abs(crossProduct) < 0.08 * (normV * normAv + 0.1);
+
+      // 3. If colinear (eigenvector), draw full span line
+      if (isColinear && normV > 0.05) {
+        ctx.save();
+        ctx.strokeStyle = 'rgba(52, 211, 153, 0.45)'; // emerald light
+        ctx.lineWidth = 2;
+        ctx.setLineDash([6, 6]);
+        ctx.beginPath();
+        const factor = 12;
+        ctx.moveTo(ox - vecX * factor * scale, oy + vecY * factor * scale);
+        ctx.lineTo(ox + vecX * factor * scale, oy - vecY * factor * scale);
+        ctx.stroke();
+        ctx.restore();
+      }
+
+      // 4. Draw Vector v (Blue / Cyan)
+      drawArrow(ox, oy, ox + vecX * scale, oy - vecY * scale, '#38bdf8', 3, 'v');
+
+      // 5. Draw Transformed Vector Av (Rose / Emerald)
+      const avColor = isColinear ? '#34d399' : '#f43f5e';
+      drawArrow(ox, oy, ox + avX * scale, oy - avY * scale, avColor, 3.5, 'Av');
+
+      // Origin indicator dot
+      ctx.fillStyle = '#ffffff';
+      ctx.beginPath();
+      ctx.arc(ox, oy, 3.5, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
+    function drawArrow(fromX, fromY, toX, toY, color, width, label) {
+      const headLength = 12;
+      const dx = toX - fromX;
+      const dy = toY - fromY;
+      const angle = Math.atan2(dy, dx);
+      const length = Math.hypot(dx, dy);
+
+      ctx.save();
+      ctx.strokeStyle = color;
+      ctx.fillStyle = color;
+      ctx.lineWidth = width;
+
+      // Line
+      ctx.beginPath();
+      ctx.moveTo(fromX, fromY);
+      ctx.lineTo(toX, toY);
+      ctx.stroke();
+
+      // Arrow head (only if not at origin)
+      if (length > 4) {
+        ctx.beginPath();
+        ctx.moveTo(toX, toY);
+        ctx.lineTo(
+          toX - headLength * Math.cos(angle - Math.PI / 6),
+          toY - headLength * Math.sin(angle - Math.PI / 6)
+        );
+        ctx.lineTo(
+          toX - headLength * Math.cos(angle + Math.PI / 6),
+          toY - headLength * Math.sin(angle + Math.PI / 6)
+        );
+        ctx.closePath();
+        ctx.fill();
+      }
+
+      // Text label
+      ctx.font = 'bold 12px monospace';
+      ctx.fillStyle = color;
+      const textOffset = 14;
+      ctx.fillText(label, toX + textOffset * Math.cos(angle), toY + textOffset * Math.sin(angle));
+      ctx.restore();
+    }
+  </script>
+</body>
+</html>

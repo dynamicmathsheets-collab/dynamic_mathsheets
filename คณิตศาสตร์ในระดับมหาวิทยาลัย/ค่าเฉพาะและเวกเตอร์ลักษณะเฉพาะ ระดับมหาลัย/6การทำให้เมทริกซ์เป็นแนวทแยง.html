@@ -1,0 +1,893 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>เรื่องที่ 6: การทำให้เมทริกซ์เป็นแนวทแยง (Matrix Diagonalization)</title>
+
+  <!-- Google Fonts: Sarabun & Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Sarabun:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- KaTeX CDN with Auto-render extension -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js"></script>
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Sarabun', 'Inter', 'sans-serif'],
+          },
+          colors: {
+            brand: {
+              50: '#eef2ff',
+              100: '#e0e7ff',
+              200: '#c7d2fe',
+              500: '#6366f1',
+              600: '#4f46e5',
+              700: '#4338ca',
+              800: '#3730a3',
+              900: '#312e81',
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    .katex { font-size: 1.05em; }
+    .matrix-bracket {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      padding: 0 8px;
+    }
+    .matrix-bracket::before {
+      content: "";
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 5px;
+      border-left: 2px solid #4f46e5;
+      border-top: 2px solid #4f46e5;
+      border-bottom: 2px solid #4f46e5;
+      border-radius: 4px 0 0 4px;
+    }
+    .matrix-bracket::after {
+      content: "";
+      position: absolute;
+      right: 0;
+      top: 0;
+      bottom: 0;
+      width: 5px;
+      border-right: 2px solid #4f46e5;
+      border-top: 2px solid #4f46e5;
+      border-bottom: 2px solid #4f46e5;
+      border-radius: 0 4px 4px 0;
+    }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-800 antialiased selection:bg-brand-100 selection:text-brand-800">
+
+  <!-- Header Banner -->
+  <header class="bg-gradient-to-r from-brand-900 via-indigo-900 to-slate-900 text-white py-10 shadow-md">
+    <div class="max-w-6xl w-full mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+        <div>
+
+          <h1 class="text-2xl sm:text-3xl lg:text-4xl font-extrabold tracking-tight">
+            เรื่องที่ 6: การทำให้เมทริกซ์เป็นแนวทแยง (Matrix Diagonalization)
+          </h1>
+          <p class="text-slate-300 text-sm sm:text-base mt-1">
+            Diagonalizability Criteria, Constructing Transition Matrix $P$, Diagonal Matrix $D$, and $A = PDP^{-1}$ Verification
+          </p>
+        </div>
+        <div class="bg-white/10 backdrop-blur-md rounded-xl p-3.5 border border-white/15 text-center text-xs sm:text-sm">
+          <div class="text-brand-200 font-medium">สมการการแปลงความคล้ายคลึง</div>
+          <div class="text-xl font-bold tracking-wide mt-0.5 text-white">$A = PDP^{-1} \iff AP = PD$</div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Container strictly set to max-w-6xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 -->
+  <main class="max-w-6xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 space-y-10">
+
+    <!-- Section 1: วัตถุประสงค์การเรียนรู้ -->
+    <section class="bg-white rounded-2xl p-6 sm:p-7 shadow-sm border border-slate-200/80">
+      <div class="flex items-center gap-3 mb-4">
+        <div class="w-9 h-9 rounded-xl bg-indigo-100 text-brand-600 flex items-center justify-center font-bold text-lg shadow-inner">
+          1
+        </div>
+        <h2 class="text-xl sm:text-2xl font-bold text-slate-900">วัตถุประสงค์การเรียนรู้ (Learning Objectives)</h2>
+      </div>
+      <div class="bg-gradient-to-r from-indigo-50 to-slate-50 border-l-4 border-brand-600 p-4 rounded-r-xl">
+        <ul class="space-y-2 text-slate-700 leading-relaxed font-medium text-sm sm:text-base">
+          <li class="flex items-start gap-2.5">
+            <svg class="w-5 h-5 text-brand-600 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+            <span>นักศึกษาสามารถ<strong>ตรวจสอบและวิเคราะห์</strong>ว่าเมทริกซ์จัตุรัสกำหนดให้สามารถทำให้เป็นเมทริกซ์ทแยงมุม (Diagonalizable) ได้หรือไม่</span>
+          </li>
+          <li class="flex items-start gap-2.5">
+            <svg class="w-5 h-5 text-brand-600 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+            <span>นักศึกษาสามารถ<strong>สร้างเมทริกซ์การแปลง $P$ และเมทริกซ์ทแยงมุม $D$</strong> ที่สอดคล้องกันตามลำดับหลัก พร้อมทั้งตรวจสอบสมการการแยกตัวประกอบ $A = PDP^{-1}$ ได้อย่างแม่นยำ</span>
+          </li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- Section 2: เนื้อหาหลัก -->
+    <section class="bg-white rounded-2xl p-6 sm:p-7 shadow-sm border border-slate-200/80">
+      <div class="flex items-center gap-3 mb-6">
+        <div class="w-9 h-9 rounded-xl bg-indigo-100 text-brand-600 flex items-center justify-center font-bold text-lg shadow-inner">
+          2
+        </div>
+        <h2 class="text-xl sm:text-2xl font-bold text-slate-900">เนื้อหาหลัก (Core Theoretical Foundations)</h2>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <!-- 2.1 นิยามและการแปลงคล้าย -->
+        <div class="bg-slate-50/80 border border-slate-200 rounded-xl p-5 hover:border-brand-300 transition-colors">
+          <div class="flex items-center justify-between mb-3">
+            <span class="text-xs font-bold uppercase tracking-wider text-brand-700 bg-brand-100 px-2.5 py-0.5 rounded-full">หัวข้อ 2.1</span>
+            <span class="text-xs text-slate-500">Similarity Transformation</span>
+          </div>
+          <h3 class="text-lg font-bold text-slate-800 mb-2">นิยามเมทริกซ์ที่ทำให้เป็นแนวทแยงได้ (Diagonalizable)</h3>
+          <p class="text-slate-600 text-sm leading-relaxed mb-3">
+            เมทริกซ์จัตุรัส $A$ ขนาด $n \times n$ จะเรียกว่า <strong>ทำให้เป็นเมทริกซ์ทแยงมุมได้ (Diagonalizable)</strong> ก็ต่อเมื่อ $A$ คล้ายคลึงกับเมทริกซ์ทแยงมุม $D$ กล่าวคือ มีเมทริกซ์ไม่เอกฐาน $P$ (Invertible matrix ซึ่ง $\det(P) \ne 0$) ที่ทำให้:
+          </p>
+          <div class="bg-white p-3 rounded-lg border border-slate-200 text-center font-mono my-2 text-slate-900 shadow-sm text-sm">
+            $A = PDP^{-1} \iff P^{-1}AP = D$
+          </div>
+          <p class="text-xs text-slate-600 mt-2">
+            ซึ่งมีความหมายในเชิงเรขาคณิตว่า การแปลงเชิงเส้น $A$ เมื่อมองผ่านพิกัดฐานหลักใหม่ที่เหมาะสมจะกลายเป็นการ "ยืด/หดเวกเตอร์ตามแนวแกนพิกัดอิสระ" โดยไม่เกิดการบิดเอียง
+          </p>
+        </div>
+
+        <!-- 2.2 ความสัมพันธ์ AP = PD -->
+        <div class="bg-slate-50/80 border border-slate-200 rounded-xl p-5 hover:border-brand-300 transition-colors">
+          <div class="flex items-center justify-between mb-3">
+            <span class="text-xs font-bold uppercase tracking-wider text-indigo-700 bg-indigo-100 px-2.5 py-0.5 rounded-full">หัวข้อ 2.2</span>
+            <span class="text-xs text-slate-500">Column Correspondence</span>
+          </div>
+          <h3 class="text-lg font-bold text-slate-800 mb-2">ความสัมพันธ์ $A\mathbf{v}_i = \lambda_i\mathbf{v}_i$ สู่ $AP = PD$</h3>
+          <p class="text-slate-600 text-sm leading-relaxed mb-2">
+            ถ้าเรากำหนดให้ $P = [\mathbf{v}_1 \ \mathbf{v}_2 \ \dots \ \mathbf{v}_n]$ โดยที่ $\mathbf{v}_i$ คือเวกเตอร์ลักษณะเฉพาะ และ $D = \operatorname{diag}(\lambda_1, \lambda_2, \dots, \lambda_n)$:
+          </p>
+          <div class="bg-white p-2.5 rounded-lg border border-slate-200 text-center font-mono my-2 text-xs sm:text-sm text-indigo-950">
+            $$AP = A[\mathbf{v}_1 \dots \mathbf{v}_n] = [A\mathbf{v}_1 \dots A\mathbf{v}_n] = [\lambda_1\mathbf{v}_1 \dots \lambda_n\mathbf{v}_n] = PD$$
+          </div>
+          <p class="text-xs text-slate-600 mt-2">
+            เนื่องจากหลักของ $P$ เป็นอิสระเชิงเส้น $P$ จึงมีตัวผกผัน $P^{-1}$ นำ $P^{-1}$ คูณทางขวาของทั้งสองข้าง จะได้สมการหลัก <strong>$A = PDP^{-1}$</strong> ทันที
+          </p>
+        </div>
+
+        <!-- 2.3 การสร้าง P และ D -->
+        <div class="bg-slate-50/80 border border-slate-200 rounded-xl p-5 hover:border-brand-300 transition-colors">
+          <div class="flex items-center justify-between mb-3">
+            <span class="text-xs font-bold uppercase tracking-wider text-emerald-700 bg-emerald-100 px-2.5 py-0.5 rounded-full">หัวข้อ 2.3 & 2.4</span>
+            <span class="text-xs text-slate-500">กฎลำดับที่ต้องตรงกัน</span>
+          </div>
+          <h3 class="text-lg font-bold text-slate-800 mb-2">การสร้างเมทริกซ์ $P$ และ $D$</h3>
+          <div class="space-y-2 text-xs sm:text-sm text-slate-600">
+            <p>
+              &bull; <strong>เมทริกซ์ $P$ (Modal Matrix):</strong> นำเวกเตอร์ลักษณะเฉพาะที่เป็นอิสระเชิงเส้นทั้ง $n$ ตัวมาเรียงต่อกันเป็นหลัก (Columns):
+              $$P = \begin{bmatrix} \mid & \mid & & \mid \\ \mathbf{v}_1 & \mathbf{v}_2 & \dots & \mathbf{v}_n \\ \mid & \mid & & \mid \end{bmatrix}$$
+            </p>
+            <p>
+              &bull; <strong>เมทริกซ์ $D$ (Spectral Matrix):</strong> เป็นเมทริกซ์ทแยงมุมที่มีสมาชิกบนแนวทแยงหลักคือค่าเฉพาะ <strong>เรียงลำดับให้ตรงกับคอลัมน์ของ $P$ อย่างเคร่งครัด</strong>:
+              $$D = \begin{bmatrix} \lambda_1 & 0 & \dots & 0 \\ 0 & \lambda_2 & \dots & 0 \\ \vdots & \vdots & \ddots & \vdots \\ 0 & 0 & \dots & \lambda_n \end{bmatrix}$$
+            </p>
+          </div>
+        </div>
+
+        <!-- 2.5 เงื่อนไขจำเป็นและเพียงพอ -->
+        <div class="bg-slate-50/80 border border-slate-200 rounded-xl p-5 hover:border-brand-300 transition-colors">
+          <div class="flex items-center justify-between mb-3">
+            <span class="text-xs font-bold uppercase tracking-wider text-purple-700 bg-purple-100 px-2.5 py-0.5 rounded-full">หัวข้อ 2.5</span>
+            <span class="text-xs text-slate-500">Necessary & Sufficient</span>
+          </div>
+          <h3 class="text-lg font-bold text-slate-800 mb-2">ทฤษฎีบทเงื่อนไขการเป็นแนวทแยง (The Diagonalization Theorem)</h3>
+          <p class="text-slate-600 text-sm leading-relaxed mb-2">
+            เมทริกซ์ $A$ ขนาด $n \times n$ จะทำให้เป็นเมทริกซ์ทแยงมุมได้ <strong>ก็ต่อเมื่อ</strong> มีฐานหลักของ $\mathbb{R}^n$ ที่ประกอบขึ้นจากเวกเตอร์ลักษณะเฉพาะของ $A$ (เรียกว่า <em>Eigenbasis</em>)
+          </p>
+          <div class="bg-purple-50 p-2.5 rounded-lg border border-purple-200 text-purple-950 text-xs sm:text-sm font-semibold text-center my-2">
+            $\sum_{i=1}^k \dim(E_{\lambda_i}) = n \iff m_g(\lambda_i) = m_a(\lambda_i) \quad \text{สำหรับทุก } i$
+          </div>
+          <p class="text-xs text-slate-500 mt-2">
+            หากมีแม้แต่ค่าเฉพาะตัวเดียวที่ $m_g(\lambda) < m_a(\lambda)$ เมทริกซ์จะบกพร่อง (Defective) และไม่สามารถทำให้เป็นแนวทแยงได้
+          </p>
+        </div>
+      </div>
+
+      <!-- Flowchart / Algorithm Infographic -->
+      <div class="mt-6 p-5 bg-indigo-50/60 rounded-xl border border-indigo-100">
+        <h4 class="font-bold text-indigo-950 text-sm mb-3 flex items-center gap-2">
+          <svg class="w-4 h-4 text-brand-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path></svg>
+          ขั้นตอนวิธีในการทำให้เมทริกซ์เป็นแนวทแยง (Diagonalization Algorithm)
+        </h4>
+        <div class="grid grid-cols-1 sm:grid-cols-4 gap-3 text-center text-xs">
+          <div class="bg-white p-3 rounded-lg border border-indigo-200 shadow-xs">
+            <span class="font-bold text-brand-700 block mb-1">ขั้นที่ 1: หาค่าเฉพาะ</span>
+            แก้ $\det(A - \lambda I) = 0$ ได้ $\lambda_1, \dots, \lambda_k$
+          </div>
+          <div class="bg-white p-3 rounded-lg border border-indigo-200 shadow-xs">
+            <span class="font-bold text-brand-700 block mb-1">ขั้นที่ 2: หาฐานลักษณะเฉพาะ</span>
+            แก้ $(A - \lambda_i I)\mathbf{v} = \mathbf{0}$ หา Basis ของแต่ละ $E_{\lambda_i}$
+          </div>
+          <div class="bg-white p-3 rounded-lg border border-indigo-200 shadow-xs">
+            <span class="font-bold text-brand-700 block mb-1">ขั้นที่ 3: ตรวจสอบจำนวน</span>
+            นับจำนวนเวกเตอร์อิสระทั้งหมดรวมกัน $= n$ หรือไม่?
+          </div>
+          <div class="bg-white p-3 rounded-lg border border-indigo-200 shadow-xs">
+            <span class="font-bold text-brand-700 block mb-1">ขั้นที่ 4: ประกอบ $P$ และ $D$</span>
+            ถ้าครบ $n$ ตัว วาง $P = [\mathbf{v}_i]$ และ $D = \operatorname{diag}(\lambda_i)$
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Section 3: แบบจำลองโต้ตอบ (Interactive Diagonalization Engine) -->
+    <section class="bg-white rounded-2xl p-6 sm:p-7 shadow-sm border border-slate-200/80">
+      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6 pb-4 border-b border-slate-100">
+        <div class="flex items-center gap-3">
+          <div class="w-9 h-9 rounded-xl bg-indigo-100 text-brand-600 flex items-center justify-center font-bold text-lg shadow-inner">
+            3
+          </div>
+          <div>
+            <h2 class="text-xl sm:text-2xl font-bold text-slate-900">แบบจำลองโต้ตอบ (Interactive Diagonalization Engine)</h2>
+            <p class="text-xs sm:text-sm text-slate-500">เลือกหรือป้อนเมทริกซ์ $A$ เพื่อให้ระบบค้นหา $\lambda, \mathbf{v}$, ตรวจสอบเงื่อนไข ประกอบ $P, D$ และคูณตรวจสอบ $PDP^{-1}$</p>
+          </div>
+        </div>
+
+        <!-- Preset Selector -->
+        <div class="flex items-center gap-2">
+          <label class="text-xs font-semibold text-slate-600">ชุดตัวอย่าง:</label>
+          <select id="diagPresetSelect" onchange="loadDiagPreset(this.value)" class="text-xs sm:text-sm bg-slate-100 border border-slate-300 rounded-lg px-2.5 py-1.5 font-medium focus:ring-2 focus:ring-brand-500 focus:outline-none">
+            <option value="ex1">1) โจทย์หลัก: [[4, 1], [2, 3]] (Diagonalizable)</option>
+            <option value="shear">2) Shear Matrix: [[2, 1], [0, 2]] (Defective - ทำไม่ได้)</option>
+            <option value="scalar">3) ค่าเฉพาะซ้ำแต่ทำได้: [[3, 0], [0, 3]] (Identity Multiple)</option>
+            <option value="symm">4) เมทริกซ์สมมาตร: [[5, 2], [2, 2]] (Orthogonally Diagonalizable)</option>
+            <option value="custom">5) ปรับแต่งเมทริกซ์ $2 \times 2$ ด้วยตนเอง</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Matrix Input & Live Status -->
+      <div class="bg-slate-50 rounded-2xl p-5 border border-slate-200 mb-6">
+        <div class="flex flex-col lg:flex-row items-center justify-between gap-6">
+          
+          <!-- Input Form for Matrix A -->
+          <div class="flex flex-col items-center">
+            <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">เมทริกซ์ต้นแบบ $A$</span>
+            <div class="matrix-bracket py-1">
+              <div class="grid grid-cols-2 gap-2">
+                <input type="number" id="matA_00" value="4" step="any" onchange="onMatrixChange()" class="w-14 h-11 text-center font-bold bg-white rounded-lg border border-slate-300 shadow-sm focus:ring-2 focus:ring-brand-500 focus:outline-none">
+                <input type="number" id="matA_01" value="1" step="any" onchange="onMatrixChange()" class="w-14 h-11 text-center font-bold bg-white rounded-lg border border-slate-300 shadow-sm focus:ring-2 focus:ring-brand-500 focus:outline-none">
+                <input type="number" id="matA_10" value="2" step="any" onchange="onMatrixChange()" class="w-14 h-11 text-center font-bold bg-white rounded-lg border border-slate-300 shadow-sm focus:ring-2 focus:ring-brand-500 focus:outline-none">
+                <input type="number" id="matA_11" value="3" step="any" onchange="onMatrixChange()" class="w-14 h-11 text-center font-bold bg-white rounded-lg border border-slate-300 shadow-sm focus:ring-2 focus:ring-brand-500 focus:outline-none">
+              </div>
+            </div>
+            <div id="traceDetBadge" class="text-xs text-indigo-700 bg-indigo-50 px-3 py-1 rounded-full border border-indigo-200 mt-3 font-medium">
+              <!-- Trace & Det populated via JS -->
+            </div>
+          </div>
+
+          <!-- Evaluation Card -->
+          <div class="flex-1 w-full bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-between">
+            <div class="flex items-center justify-between border-b border-slate-100 pb-2 mb-3">
+              <span class="text-xs font-bold text-slate-500 uppercase">สถานะผลการวิเคราะห์การทำให้เป็นแนวทแยง</span>
+              <span id="diagonalizableBadge" class="text-xs font-bold px-3 py-1 rounded-full">
+                <!-- Status badge -->
+              </span>
+            </div>
+            <div id="evaluationSummary" class="space-y-2 text-xs sm:text-sm">
+              <!-- Summary breakdown populated via JS -->
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step Breakdown & Verification Matrix Multiplication Display -->
+      <div id="diagonalizationStepsContainer" class="space-y-4">
+        <!-- Rendered by JavaScript -->
+      </div>
+    </section>
+
+    <!-- Section 4: คำถามนำเพื่อค้นพบ -->
+    <section class="bg-white rounded-2xl p-6 sm:p-7 shadow-sm border border-slate-200/80">
+      <div class="flex items-center gap-3 mb-4">
+        <div class="w-9 h-9 rounded-xl bg-amber-100 text-amber-700 flex items-center justify-center font-bold text-lg shadow-inner">
+          4
+        </div>
+        <h2 class="text-xl sm:text-2xl font-bold text-slate-900">คำถามนำเพื่อค้นพบ (Inquiry & Deep Concept)</h2>
+      </div>
+
+      <div class="bg-amber-50/70 border border-amber-200/90 rounded-2xl p-5 sm:p-6">
+        <div class="flex items-start gap-3">
+          <div class="p-2 bg-amber-500 text-white rounded-xl shrink-0 mt-0.5">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+          </div>
+          <div>
+            <h3 class="text-base sm:text-lg font-bold text-amber-950">
+              เหตุใดการมีค่าเฉพาะครบ $n$ ค่าโดยนับตามพหุคูณ จึงยังไม่เพียงพอที่จะรับประกันว่าเมทริกซ์ $n \times n$ ทำให้เป็นแนวทแยงได้?
+            </h3>
+            <p class="text-sm text-amber-900/80 mt-1">
+              ทำไมทฤษฎีบทมูลฐานของพีชคณิตที่การันตีว่าพหุนามดีกรี $n$ จะมีราก $n$ ค่าเสมอ จึงไม่ได้รับประกันว่าเมทริกซ์จะแยกตัวประกอบเป็น $PDP^{-1}$ ได้เสมอไป?
+            </p>
+
+            <button id="toggleInquiryBtn" onclick="toggleInquiryAnswer()" class="mt-4 px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white font-medium text-xs sm:text-sm rounded-xl shadow transition-all inline-flex items-center gap-2">
+              <span id="inquiryBtnText">คลิกเพื่อดูบทวิเคราะห์เชิงมโนทัศน์ (ช่องว่างระหว่างพีชคณิตกับเรขาคณิต)</span>
+              <svg id="inquiryChevron" class="w-4 h-4 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+            </button>
+          </div>
+        </div>
+
+        <div id="inquiryContent" class="hidden mt-6 pt-5 border-t border-amber-200/80 space-y-4 text-slate-800 text-sm leading-relaxed">
+          <div class="p-4 bg-white rounded-xl border border-amber-200 space-y-3">
+            <h4 class="font-bold text-slate-900 text-sm sm:text-base flex items-center gap-2">
+              <span class="w-2 h-2 rounded-full bg-brand-600"></span>
+              ความแตกต่างอย่างสิ้นเชิงระหว่าง "จำนวนรากของสมการ" กับ "จำนวนแกนทิศทางอิสระ"
+            </h4>
+            <p>
+              ตาม <strong>ทฤษฎีบทมูลฐานของพีชคณิต (Fundamental Theorem of Algebra)</strong> พหุนามลักษณะเฉพาะ $p(\lambda) = \det(A - \lambda I)$ ที่มีดีกรี $n$ จะมีรากครบ $n$ ตัวเสมอ (เมื่อนับรวมรากซ้ำและจำนวนเชิงซ้อน) นั่นคือ $\sum m_a(\lambda_i) = n$
+            </p>
+            <p>
+              อย่างไรก็ดี การที่เมทริกซ์จะทำให้เป็นแนวทแยงได้นั้น <strong>ไม่ได้ขึ้นอยู่กับว่ามีค่าเฉพาะกี่ค่า แต่ขึ้นอยู่กับว่ามี "เวกเตอร์ลักษณะเฉพาะที่เป็นอิสระเชิงเส้น" เพียงพอที่จะขึงเป็นฐานหลักของ $\mathbb{R}^n$ หรือไม่</strong>
+            </p>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs sm:text-sm mt-2">
+              <div class="p-3 bg-slate-50 rounded-lg border border-slate-200">
+                <span class="font-bold text-brand-700 block mb-1">1. กรณีเมทริกซ์บกพร่อง (Defective Matrix):</span>
+                เมื่อมีค่าเฉพาะซ้ำ ($\lambda = c$ ซ้ำ $m_a$ ครั้ง) มิติของสเปซคำตอบ $\operatorname{nullity}(A - cI)$ หรือ $m_g$ อาจมีค่าน้อยกว่า $m_a$ ได้ เช่น $A = \begin{bmatrix} 2 & 1 \\ 0 & 2 \end{bmatrix}$ มี $\lambda = 2, 2$ ($m_a = 2$) แต่มิติของ $E_2$ คือ $\dim(E_2) = 1$ ทำให้ขาดเวกเตอร์ลักษณะเฉพาะอิสระไป 1 ทิศทาง จึงสร้างเมทริกซ์ผกผัน $P$ ไม่ได้!
+              </div>
+
+              <div class="p-3 bg-slate-50 rounded-lg border border-slate-200">
+                <span class="font-bold text-indigo-700 block mb-1">2. โครงสร้างบล็อกจอร์แดน (Jordan Block):</span>
+                เมทริกซ์ที่ไม่สามารถทำให้เป็นแนวทแยงได้ จะมีโครงสร้างของการ "เฉือน" (Shear Transformation) ร่วมอยู่ด้วย ซึ่งในพีชคณิตขั้นสูงจะต้องแปลงให้อยู่ในรูป <em>Jordan Canonical Form</em> ที่มีเลข 1 อยู่เหนือเส้นทแยงมุมหลัก แทนการเป็นเมทริกซ์ทแยงมุมล้วน
+              </div>
+            </div>
+
+            <div class="p-3 bg-indigo-50/70 border border-indigo-200 rounded-lg text-indigo-950 text-xs sm:text-sm font-medium mt-2">
+              <strong>สรุปคำตอบ:</strong> การนับค่าเฉพาะครบ $n$ ค่าตามพหุคูณเชิงพีชคณิต เป็นเพียง "โควตาทางทฤษฎี" แต่การเป็นแนวทแยงต้องการให้พหุคูณเชิงเรขาคณิตต้องบรรลุเต็มโควตานั้น ($m_g(\lambda) = m_a(\lambda)$ ทุกค่า) เพื่อให้มี Eigenbasis ครบ $n$ ตัวอย่างแท้จริง
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Section 5: แบบฝึกหัดสำหรับนักศึกษา -->
+    <section class="bg-white rounded-2xl p-6 sm:p-7 shadow-sm border border-slate-200/80">
+      <div class="flex items-center gap-3 mb-6">
+        <div class="w-9 h-9 rounded-xl bg-indigo-100 text-brand-600 flex items-center justify-center font-bold text-lg shadow-inner">
+          5
+        </div>
+        <h2 class="text-xl sm:text-2xl font-bold text-slate-900">แบบฝึกหัดสำหรับนักศึกษา (Practice Exercise & Complete Walkthrough)</h2>
+      </div>
+
+      <div class="bg-slate-50 border border-slate-200 rounded-2xl p-6 space-y-6">
+        <div class="border-b border-slate-200 pb-4">
+          <span class="text-xs font-bold uppercase tracking-wider text-brand-700 bg-brand-100 px-2.5 py-0.5 rounded-full">โจทย์ข้อสอบและแบบฝึกหัด</span>
+          <p class="text-base sm:text-lg font-medium text-slate-900 mt-2">
+            จงตรวจสอบว่าเมทริกซ์ 
+            $$A = \begin{bmatrix} 4 & 1 \\ 2 & 3 \end{bmatrix}$$
+            ทำให้เป็นเมทริกซ์แนวทแยงได้หรือไม่ หากได้ จงหาเมทริกซ์ $P$ และเมทริกซ์แนวทแยง $D$ พร้อมทั้งตรวจสอบความถูกต้องของสมการ $A = PDP^{-1}$
+          </p>
+        </div>
+
+        <!-- Student Interaction & Toggle Button -->
+        <div class="flex flex-wrap items-center gap-3">
+          <button onclick="toggleExerciseSolution()" class="px-5 py-2.5 bg-brand-600 hover:bg-brand-700 text-white font-semibold text-sm rounded-xl shadow transition-all active:scale-95 flex items-center gap-2">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
+            <span id="solutionBtnText">แสดงวิธีทำและคำเฉลยละเอียดแบบเป็นลำดับขั้น</span>
+          </button>
+          <span class="text-xs text-slate-500">คลิกเพื่อแสดงการคำนวณ 5 ขั้นตอนฉบับสมบูรณ์</span>
+        </div>
+
+        <!-- Detailed 5-Step Solution -->
+        <div id="exerciseSolutionDetail" class="hidden mt-6 pt-5 border-t border-slate-200 space-y-4 text-slate-800 text-sm">
+          <div class="bg-white p-5 rounded-xl border border-slate-200 space-y-5">
+            
+            <!-- Step 1 -->
+            <div>
+              <h4 class="font-bold text-brand-700 mb-1 flex items-center gap-2">
+                <span class="w-2 h-2 rounded-full bg-brand-600"></span>
+                ขั้นที่ 1: หาค่าเฉพาะ (Eigenvalues) จากพหุนามลักษณะเฉพาะ
+              </h4>
+              <p class="text-slate-600 text-xs sm:text-sm mb-2">ตั้งสมการ $\det(A - \lambda I) = 0$:</p>
+              <div class="bg-slate-50 p-3 rounded-lg text-center font-mono text-xs sm:text-sm">
+                $$\det \begin{bmatrix} 4 - \lambda & 1 \\ 2 & 3 - \lambda \end{bmatrix} = (4 - \lambda)(3 - \lambda) - (1)(2) = \lambda^2 - 7\lambda + 10 = 0$$
+                $$(\lambda - 5)(\lambda - 2) = 0 \implies \lambda_1 = 5, \quad \lambda_2 = 2$$
+              </div>
+              <p class="text-xs text-emerald-700 font-semibold mt-1">
+                ✓ เมทริกซ์ขนาด $2 \times 2$ มีค่าเฉพาะต่างกัน 2 ค่า ($\lambda_1 \ne \lambda_2$) จึงการันตีได้ทันทีว่า <strong>ทำให้เป็นเมทริกซ์แนวทแยงได้แน่นอน (Diagonalizable)</strong>
+              </p>
+            </div>
+
+            <!-- Step 2 -->
+            <div>
+              <h4 class="font-bold text-brand-700 mb-1 flex items-center gap-2">
+                <span class="w-2 h-2 rounded-full bg-brand-600"></span>
+                ขั้นที่ 2: หาเวกเตอร์ลักษณะเฉพาะที่สัมพันธ์กับแต่ละค่าเฉพาะ
+              </h4>
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs sm:text-sm mt-2">
+                <div class="bg-slate-50 p-3 rounded-lg border border-slate-200">
+                  <span class="font-bold text-slate-800 block mb-1">สำหรับ $\lambda_1 = 5$:</span>
+                  $$(A - 5I)\mathbf{v}_1 = \begin{bmatrix} -1 & 1 \\ 2 & -2 \end{bmatrix} \begin{bmatrix} x_1 \\ x_2 \end{bmatrix} = \begin{bmatrix} 0 \\ 0 \end{bmatrix}$$
+                  $-x_1 + x_2 = 0 \implies x_1 = x_2$ ให้ $x_2 = 1$ จะได้:
+                  $$\mathbf{v}_1 = \begin{bmatrix} 1 \\ 1 \end{bmatrix}$$
+                </div>
+                <div class="bg-slate-50 p-3 rounded-lg border border-slate-200">
+                  <span class="font-bold text-slate-800 block mb-1">สำหรับ $\lambda_2 = 2$:</span>
+                  $$(A - 2I)\mathbf{v}_2 = \begin{bmatrix} 2 & 1 \\ 2 & 1 \end{bmatrix} \begin{bmatrix} x_1 \\ x_2 \end{bmatrix} = \begin{bmatrix} 0 \\ 0 \end{bmatrix}$$
+                  $2x_1 + x_2 = 0 \implies x_2 = -2x_1$ ให้ $x_1 = 1$ จะได้:
+                  $$\mathbf{v}_2 = \begin{bmatrix} 1 \\ -2 \end{bmatrix}$$
+                </div>
+              </div>
+            </div>
+
+            <!-- Step 3 -->
+            <div>
+              <h4 class="font-bold text-brand-700 mb-1 flex items-center gap-2">
+                <span class="w-2 h-2 rounded-full bg-brand-600"></span>
+                ขั้นที่ 3: ประกอบเมทริกซ์ $P$ และเมทริกซ์ทแยงมุม $D$
+              </h4>
+              <p class="text-slate-600 text-xs sm:text-sm mb-2">นำเวกเตอร์ลักษณะเฉพาะมาวางเป็นหลักของ $P$ และวางค่าเฉพาะที่ตรงกันบนแนวทแยงของ $D$:</p>
+              <div class="bg-slate-50 p-3 rounded-lg text-center font-mono text-xs sm:text-sm">
+                $$P = [\mathbf{v}_1 \quad \mathbf{v}_2] = \begin{bmatrix} 1 & 1 \\ 1 & -2 \end{bmatrix}, \qquad D = \begin{bmatrix} \lambda_1 & 0 \\ 0 & \lambda_2 \end{bmatrix} = \begin{bmatrix} 5 & 0 \\ 0 & 2 \end{bmatrix}$$
+              </div>
+            </div>
+
+            <!-- Step 4 -->
+            <div>
+              <h4 class="font-bold text-brand-700 mb-1 flex items-center gap-2">
+                <span class="w-2 h-2 rounded-full bg-brand-600"></span>
+                ขั้นที่ 4: คำนวณเมทริกซ์ผกผัน $P^{-1}$
+              </h4>
+              <p class="text-slate-600 text-xs sm:text-sm mb-1">คำนวณดีเทอร์มิแนนต์ของ $P$:</p>
+              <div class="text-center font-mono my-1 text-xs sm:text-sm">
+                $$\det(P) = (1)(-2) - (1)(1) = -2 - 1 = -3$$
+              </div>
+              <p class="text-slate-600 text-xs sm:text-sm mb-1">ใช้สูตรตัวผกผันของเมทริกซ์ $2 \times 2$:</p>
+              <div class="bg-slate-50 p-3 rounded-lg text-center font-mono text-xs sm:text-sm">
+                $$P^{-1} = \frac{1}{-3} \begin{bmatrix} -2 & -1 \\ -1 & 1 \end{bmatrix} = \begin{bmatrix} \frac{2}{3} & \frac{1}{3} \\ \frac{1}{3} & -\frac{1}{3} \end{bmatrix}$$
+              </div>
+            </div>
+
+            <!-- Step 5 -->
+            <div class="p-4 bg-emerald-50/70 border border-emerald-200 rounded-xl space-y-2">
+              <h4 class="font-bold text-emerald-900 mb-1 flex items-center gap-2">
+                <span class="w-2 h-2 rounded-full bg-emerald-600"></span>
+                ขั้นที่ 5: ตรวจสอบความถูกต้องโดยคำนวณ $P D P^{-1}$
+              </h4>
+              <p class="text-xs sm:text-sm text-emerald-950">
+                1) คำนวณผลคูณ $PD$:
+                $$PD = \begin{bmatrix} 1 & 1 \\ 1 & -2 \end{bmatrix} \begin{bmatrix} 5 & 0 \\ 0 & 2 \end{bmatrix} = \begin{bmatrix} 5 & 2 \\ 5 & -4 \end{bmatrix}$$
+              </p>
+              <p class="text-xs sm:text-sm text-emerald-950">
+                2) นำไปคูณกับ $P^{-1}$:
+                $$PDP^{-1} = \begin{bmatrix} 5 & 2 \\ 5 & -4 \end{bmatrix} \begin{bmatrix} \frac{2}{3} & \frac{1}{3} \\ \frac{1}{3} & -\frac{1}{3} \end{bmatrix} = \begin{bmatrix} 5(\frac{2}{3}) + 2(\frac{1}{3}) & 5(\frac{1}{3}) + 2(-\frac{1}{3}) \\ 5(\frac{2}{3}) + (-4)(\frac{1}{3}) & 5(\frac{1}{3}) + (-4)(-\frac{1}{3}) \end{bmatrix} = \begin{bmatrix} \frac{12}{3} & \frac{3}{3} \\ \frac{6}{3} & \frac{9}{3} \end{bmatrix} = \begin{bmatrix} 4 & 1 \\ 2 & 3 \end{bmatrix} = A$$
+              </p>
+              <div class="pt-2 border-t border-emerald-200 text-xs sm:text-sm font-bold text-emerald-900">
+                ✓ ผลลัพธ์ $PDP^{-1}$ ตรงกับเมทริกซ์ $A$ ต้นแบบทุกประการ จึงยืนยันว่าการทำให้เป็นแนวทแยงถูกต้องสมบูรณ์
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Interactive Diagonalization Engine Script -->
+  <script>
+    // State
+    let matrixA = [
+      [4, 1],
+      [2, 3]
+    ];
+
+    const presets = {
+      ex1: {
+        mat: [[4, 1], [2, 3]],
+        name: "โจทย์หลัก: [[4, 1], [2, 3]]"
+      },
+      shear: {
+        mat: [[2, 1], [0, 2]],
+        name: "Shear Matrix: [[2, 1], [0, 2]]"
+      },
+      scalar: {
+        mat: [[3, 0], [0, 3]],
+        name: "Identity Multiple: [[3, 0], [0, 3]]"
+      },
+      symm: {
+        mat: [[5, 2], [2, 2]],
+        name: "เมทริกซ์สมมาตร: [[5, 2], [2, 2]]"
+      },
+      custom: {
+        mat: [[4, 1], [2, 3]],
+        name: "Custom Matrix"
+      }
+    };
+
+    window.onload = function() {
+      computeAndRenderDiagonalization();
+      renderAllMath();
+    };
+
+    function renderAllMath() {
+      if (window.renderMathInElement) {
+        renderMathInElement(document.body, {
+          delimiters: [
+            {left: '$$', right: '$$', display: true},
+            {left: '$', right: '$', display: false}
+          ],
+          throwOnError: false
+        });
+      }
+    }
+
+    function fmt(n) {
+      if (Math.abs(n - Math.round(n)) < 1e-4) return Math.round(n).toString();
+      return n.toFixed(2).replace(/\.00$/, '');
+    }
+
+    function loadDiagPreset(key) {
+      if (presets[key]) {
+        matrixA = JSON.parse(JSON.stringify(presets[key].mat));
+        document.getElementById('matA_00').value = matrixA[0][0];
+        document.getElementById('matA_01').value = matrixA[0][1];
+        document.getElementById('matA_10').value = matrixA[1][0];
+        document.getElementById('matA_11').value = matrixA[1][1];
+        computeAndRenderDiagonalization();
+        renderAllMath();
+      }
+    }
+
+    function onMatrixChange() {
+      matrixA[0][0] = parseFloat(document.getElementById('matA_00').value) || 0;
+      matrixA[0][1] = parseFloat(document.getElementById('matA_01').value) || 0;
+      matrixA[1][0] = parseFloat(document.getElementById('matA_10').value) || 0;
+      matrixA[1][1] = parseFloat(document.getElementById('matA_11').value) || 0;
+      computeAndRenderDiagonalization();
+      renderAllMath();
+    }
+
+    function computeAndRenderDiagonalization() {
+      const a = matrixA[0][0];
+      const b = matrixA[0][1];
+      const c = matrixA[1][0];
+      const d = matrixA[1][1];
+
+      const trace = a + d;
+      const det = a * d - b * c;
+      const disc = trace * trace - 4 * det;
+
+      document.getElementById('traceDetBadge').innerHTML = `$\\text{tr}(A) = ${fmt(trace)}, \\quad \\det(A) = ${fmt(det)}$`;
+
+      const badge = document.getElementById('diagonalizableBadge');
+      const summaryDiv = document.getElementById('evaluationSummary');
+      const stepsDiv = document.getElementById('diagonalizationStepsContainer');
+
+      // Check if complex eigenvalues
+      if (disc < -1e-4) {
+        badge.className = "text-xs font-bold px-3 py-1 rounded-full bg-rose-100 text-rose-800 border border-rose-300";
+        badge.innerText = "ไม่สามารถทำให้เป็นแนวทแยงในจำนวนจริงได้ (Complex Eigenvalues)";
+
+        summaryDiv.innerHTML = `
+          <div class="text-rose-700 font-semibold">
+            ดิสคริมิแนนต์ $D = \\text{tr}^2 - 4\\det = ${fmt(disc)} < 0$
+          </div>
+          <p class="text-slate-600 text-xs">
+            ค่าเฉพาะเป็นจำนวนเชิงซ้อนสังยุคคู่ ไม่มีเวกเตอร์ลักษณะเฉพาะที่เป็นจำนวนจริงใน $\\mathbb{R}^2$
+          </p>
+        `;
+
+        stepsDiv.innerHTML = `
+          <div class="p-6 bg-slate-50 border border-slate-200 rounded-xl text-center text-slate-600 text-sm">
+            เมทริกซ์นี้ไม่มีค่าเฉพาะที่เป็นจำนวนจริง จึงไม่สามารถแปลงเป็นรูป $A = PDP^{-1}$ ภายใต้สนามจำนวนจริง $\\mathbb{R}$
+          </div>
+        `;
+        return;
+      }
+
+      // Real eigenvalues
+      let l1, l2;
+      if (Math.abs(disc) <= 1e-4) {
+        l1 = trace / 2;
+        l2 = l1;
+      } else {
+        const sqrtD = Math.sqrt(disc);
+        l1 = (trace + sqrtD) / 2;
+        l2 = (trace - sqrtD) / 2;
+      }
+
+      // Eigenvectors for l1 and l2
+      const v1 = findEigenvector2x2(a, b, c, d, l1);
+      let v2;
+      let isDiagonalizable = false;
+      let isRepeated = Math.abs(l1 - l2) < 1e-4;
+
+      if (!isRepeated) {
+        v2 = findEigenvector2x2(a, b, c, d, l2);
+        isDiagonalizable = true;
+      } else {
+        // Repeated eigenvalue: check geometric multiplicity of l1
+        const m11 = a - l1, m12 = b, m21 = c, m22 = d - l1;
+        if (Math.abs(m11) < 1e-4 && Math.abs(m12) < 1e-4 && Math.abs(m21) < 1e-4 && Math.abs(m22) < 1e-4) {
+          // Rank 0 => nullity 2
+          isDiagonalizable = true;
+          v1.x = 1; v1.y = 0;
+          v2 = { x: 0, y: 1 };
+        } else {
+          // Rank 1 => nullity 1 < 2 => Defective
+          isDiagonalizable = false;
+          v2 = null;
+        }
+      }
+
+      // Update Top Status Card
+      if (isDiagonalizable) {
+        badge.className = "text-xs font-bold px-3 py-1 rounded-full bg-emerald-100 text-emerald-800 border border-emerald-300";
+        badge.innerText = "ทำให้เป็นแนวทแยงได้ (Diagonalizable: A = PDP⁻¹)";
+
+        summaryDiv.innerHTML = `
+          <div class="grid grid-cols-2 gap-2">
+            <div class="p-2 bg-slate-50 rounded border border-slate-200">
+              <span class="text-[11px] text-slate-500 block">ค่าเฉพาะ $\\lambda_1, \\lambda_2$:</span>
+              <span class="font-bold text-slate-800">${fmt(l1)}, ${fmt(l2)}</span>
+            </div>
+            <div class="p-2 bg-slate-50 rounded border border-slate-200">
+              <span class="text-[11px] text-slate-500 block">เวกเตอร์ลักษณะเฉพาะอิสระ:</span>
+              <span class="font-bold text-emerald-700">ครบ 2 ตัว (เต็มมิติ $\\mathbb{R}^2$)</span>
+            </div>
+          </div>
+          <p class="text-xs text-slate-600 mt-1">
+            ${!isRepeated ? "✓ มีค่าเฉพาะต่างกัน 2 ค่า รับประกันการเป็นแนวทแยงได้เสมอ" : "✓ ค่าเฉพาะซ้ำแต่ $m_g = 2 = m_a$ จึงมีฐานลักษณะเฉพาะครบ"}
+          </p>
+        `;
+
+        renderDiagonalizationStepsSuccess(a, b, c, d, l1, l2, v1, v2);
+      } else {
+        badge.className = "text-xs font-bold px-3 py-1 rounded-full bg-rose-100 text-rose-800 border border-rose-300";
+        badge.innerText = "เมทริกซ์บกพร่อง (Defective: ไม่สามารถทำให้เป็นแนวทแยงได้)";
+
+        summaryDiv.innerHTML = `
+          <div class="grid grid-cols-2 gap-2">
+            <div class="p-2 bg-slate-50 rounded border border-slate-200">
+              <span class="text-[11px] text-slate-500 block">ค่าเฉพาะซ้ำ $\\lambda$:</span>
+              <span class="font-bold text-slate-800">${fmt(l1)} ($m_a = 2$)</span>
+            </div>
+            <div class="p-2 bg-slate-50 rounded border border-slate-200">
+              <span class="text-[11px] text-slate-500 block">พหุคูณเชิงเรขาคณิต:</span>
+              <span class="font-bold text-rose-700">$m_g = \\dim(E_{${fmt(l1)}}) = 1$</span>
+            </div>
+          </div>
+          <p class="text-xs text-rose-700 font-semibold mt-1">
+            ✗ ขาดเวกเตอร์ลักษณะเฉพาะที่เป็นอิสระเชิงเส้นไป 1 ตัว ไม่สามารถสร้างเมทริกซ์ $P$ ที่หาตัวผกผันได้
+          </p>
+        `;
+
+        renderDiagonalizationStepsDefective(a, b, c, d, l1, v1);
+      }
+    }
+
+    function findEigenvector2x2(a, b, c, d, lam) {
+      const m11 = a - lam;
+      const m12 = b;
+
+      if (Math.abs(m11) < 1e-4 && Math.abs(m12) < 1e-4) {
+        return { x: 1, y: 0 };
+      }
+      if (Math.abs(m12) > 1e-4) {
+        let vx = -m12;
+        let vy = m11;
+        return simplifyVector(vx, vy);
+      } else if (Math.abs(m11) > 1e-4) {
+        return { x: 0, y: 1 };
+      } else {
+        // Use second row
+        let vx = -(d - lam);
+        let vy = c;
+        return simplifyVector(vx, vy);
+      }
+    }
+
+    function simplifyVector(x, y) {
+      if (Math.abs(x) < 1e-4 && Math.abs(y) < 1e-4) return { x: 1, y: 0 };
+      // Try to reduce by gcd if integers
+      let scale = Math.max(Math.abs(x), Math.abs(y));
+      if (scale > 1e-4) {
+        let sx = x / scale;
+        let sy = y / scale;
+        // Check if neat fraction or small int
+        if (Math.abs(Math.round(sx * 12) - sx * 12) < 1e-3 && Math.abs(Math.round(sy * 12) - sy * 12) < 1e-3) {
+          x = Math.round(sx * 12);
+          y = Math.round(sy * 12);
+          let g = gcd(Math.abs(x), Math.abs(y));
+          if (g > 0) {
+            x /= g;
+            y /= g;
+          }
+        }
+      }
+      if (x < 0 || (Math.abs(x) < 1e-4 && y < 0)) {
+        x = -x;
+        y = -y;
+      }
+      return { x, y };
+    }
+
+    function gcd(a, b) {
+      while (b) {
+        let t = b;
+        b = a % b;
+        a = t;
+      }
+      return a;
+    }
+
+    function renderDiagonalizationStepsSuccess(a, b, c, d, l1, l2, v1, v2) {
+      const container = document.getElementById('diagonalizationStepsContainer');
+
+      // Matrix P components
+      const p11 = v1.x, p12 = v2.x;
+      const p21 = v1.y, p22 = v2.y;
+
+      const detP = p11 * p22 - p12 * p21;
+      const invP11 = p22 / detP;
+      const invP12 = -p12 / detP;
+      const invP21 = -p21 / detP;
+      const invP22 = p11 / detP;
+
+      // Product PD
+      const pd11 = p11 * l1, pd12 = p12 * l2;
+      const pd21 = p21 * l1, pd22 = p22 * l2;
+
+      // Product (PD) * P^-1
+      const res11 = pd11 * invP11 + pd12 * invP21;
+      const res12 = pd11 * invP12 + pd12 * invP22;
+      const res21 = pd21 * invP11 + pd22 * invP21;
+      const res22 = pd21 * invP12 + pd22 * invP22;
+
+      container.innerHTML = `
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <!-- Step 1 & 2 -->
+          <div class="p-4 bg-slate-50 border border-slate-200 rounded-xl space-y-2">
+            <span class="text-xs font-bold text-brand-700 uppercase">ขั้นตอนที่ 1 & 2: ค่าเฉพาะและเวกเตอร์ลักษณะเฉพาะ</span>
+            <div class="bg-white p-3 rounded-lg border border-slate-200 text-xs sm:text-sm space-y-2">
+              <div class="flex justify-between items-center border-b border-slate-100 pb-1.5">
+                <span>สำหรับ $\\lambda_1 = ${fmt(l1)}$:</span>
+                <span class="font-bold text-indigo-700">$\\mathbf{v}_1 = \\begin{bmatrix} ${fmt(v1.x)} \\\\ ${fmt(v1.y)} \\end{bmatrix}$</span>
+              </div>
+              <div class="flex justify-between items-center">
+                <span>สำหรับ $\\lambda_2 = ${fmt(l2)}$:</span>
+                <span class="font-bold text-indigo-700">$\\mathbf{v}_2 = \\begin{bmatrix} ${fmt(v2.x)} \\\\ ${fmt(v2.y)} \\end{bmatrix}$</span>
+              </div>
+            </div>
+            <p class="text-xs text-slate-500">เวกเตอร์ทั้งสองเป็นอิสระเชิงเส้นต่อกัน จึงพร้อมใช้เป็นหลักของ $P$</p>
+          </div>
+
+          <!-- Step 3: Matrix P & D -->
+          <div class="p-4 bg-slate-50 border border-slate-200 rounded-xl space-y-2">
+            <span class="text-xs font-bold text-brand-700 uppercase">ขั้นตอนที่ 3: ประกอบเมทริกซ์ $P$ และ $D$</span>
+            <div class="grid grid-cols-2 gap-2 text-center text-xs sm:text-sm">
+              <div class="bg-white p-2.5 rounded-lg border border-slate-200">
+                <span class="text-slate-500 text-[11px] block mb-1">เมทริกซ์ $P = [\\mathbf{v}_1 \\ \\mathbf{v}_2]$</span>
+                <div class="font-bold text-slate-800">$$P = \\begin{bmatrix} ${fmt(p11)} & ${fmt(p12)} \\\\ ${fmt(p21)} & ${fmt(p22)} \\end{bmatrix}$$</div>
+              </div>
+              <div class="bg-white p-2.5 rounded-lg border border-slate-200">
+                <span class="text-slate-500 text-[11px] block mb-1">เมทริกซ์ทแยงมุม $D$</span>
+                <div class="font-bold text-slate-800">$$D = \\begin{bmatrix} ${fmt(l1)} & 0 \\\\ 0 & ${fmt(l2)} \\end{bmatrix}$$</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Step 4 & 5: Inversion & Product Verification -->
+        <div class="p-5 bg-emerald-50/70 border border-emerald-200 rounded-2xl space-y-3">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-bold text-emerald-900 uppercase">ขั้นตอนที่ 4 & 5: คำนวณ $P^{-1}$ และคูณตรวจสอบ $PDP^{-1} = A$</span>
+            <span class="text-xs font-bold text-emerald-800 bg-emerald-100 px-2.5 py-0.5 rounded-full">ยืนยันความถูกต้อง 100%</span>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs sm:text-sm">
+            <div class="bg-white p-3 rounded-xl border border-emerald-200">
+              <span class="font-bold text-slate-800 block mb-1">4.1 คำนวณ $P^{-1}$:</span>
+              $$\\det(P) = (${fmt(p11)})(${fmt(p22)}) - (${fmt(p12)})(${fmt(p21)}) = ${fmt(detP)}$$
+              $$P^{-1} = \\begin{bmatrix} ${fmt(invP11)} & ${fmt(invP12)} \\\\ ${fmt(invP21)} & ${fmt(invP22)} \\end{bmatrix}$$
+            </div>
+
+            <div class="bg-white p-3 rounded-xl border border-emerald-200">
+              <span class="font-bold text-slate-800 block mb-1">4.2 ผลคูณ $PD$:</span>
+              $$PD = \\begin{bmatrix} ${fmt(p11)} & ${fmt(p12)} \\\\ ${fmt(p21)} & ${fmt(p22)} \\end{bmatrix} \\begin{bmatrix} ${fmt(l1)} & 0 \\\\ 0 & ${fmt(l2)} \\end{bmatrix} = \\begin{bmatrix} ${fmt(pd11)} & ${fmt(pd12)} \\\\ ${fmt(pd21)} & ${fmt(pd22)} \\end{bmatrix}$$
+            </div>
+          </div>
+
+          <div class="bg-white p-3.5 rounded-xl border border-emerald-200 text-center text-xs sm:text-sm">
+            <span class="font-bold text-slate-800 block mb-1">5. ตรวจสอบสมการ $PDP^{-1}$ เทียบกับ $A$:</span>
+            $$PDP^{-1} = \\begin{bmatrix} ${fmt(pd11)} & ${fmt(pd12)} \\\\ ${fmt(pd21)} & ${fmt(pd22)} \\end{bmatrix} \\begin{bmatrix} ${fmt(invP11)} & ${fmt(invP12)} \\\\ ${fmt(invP21)} & ${fmt(invP22)} \\end{bmatrix} = \\begin{bmatrix} ${fmt(res11)} & ${fmt(res12)} \\\\ ${fmt(res21)} & ${fmt(res22)} \\end{bmatrix} = A$$
+          </div>
+        </div>
+      `;
+    }
+
+    function renderDiagonalizationStepsDefective(a, b, c, d, l1, v1) {
+      const container = document.getElementById('diagonalizationStepsContainer');
+      const m11 = a - l1, m12 = b;
+      const m21 = c, m22 = d - l1;
+
+      container.innerHTML = `
+        <div class="p-5 bg-rose-50 border border-rose-200 rounded-2xl space-y-3">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-bold text-rose-900 uppercase">วิเคราะห์สาเหตุที่ไม่สามารถทำให้เป็นแนวทแยงได้ (Defect Analysis)</span>
+            <span class="text-xs font-bold text-rose-800 bg-rose-100 px-2.5 py-0.5 rounded-full">Defective Matrix</span>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs sm:text-sm">
+            <div class="bg-white p-3.5 rounded-xl border border-rose-200 space-y-1">
+              <span class="font-bold text-slate-800 block mb-1">1. พหุคูณเชิงพีชคณิต (Algebraic Multiplicity):</span>
+              <p>พหุนามลักษณะเฉพาะคือ $(\\lambda - ${fmt(l1)})^2 = 0$</p>
+              <p class="font-semibold text-brand-700">$$\\implies m_a(${fmt(l1)}) = 2$$</p>
+            </div>
+
+            <div class="bg-white p-3.5 rounded-xl border border-rose-200 space-y-1">
+              <span class="font-bold text-slate-800 block mb-1">2. พหุคูณเชิงเรขาคณิต (Geometric Multiplicity):</span>
+              <p>พิจารณาเมทริกซ์ $(A - ${fmt(l1)}I) = \\begin{bmatrix} ${fmt(m11)} & ${fmt(m12)} \\\\ ${fmt(m21)} & ${fmt(m22)} \\end{bmatrix}$</p>
+              <p>พบว่า $\\operatorname{rank}(A - ${fmt(l1)}I) = 1$</p>
+              <p class="font-semibold text-rose-700">$$\\implies m_g(${fmt(l1)}) = 2 - 1 = 1$$</p>
+            </div>
+          </div>
+
+          <div class="bg-white p-4 rounded-xl border border-rose-200 text-xs sm:text-sm leading-relaxed text-slate-700">
+            <strong class="text-rose-800">ข้อสรุปทางทฤษฎีบท:</strong> เนื่องจาก $m_g(${fmt(l1)}) = 1 < 2 = m_a(${fmt(l1)})$ ทำให้มีเวกเตอร์ลักษณะเฉพาะที่เป็นอิสระเชิงเส้นเพียง $\\mathbf{v}_1 = \\begin{bmatrix} ${fmt(v1.x)} \\\\ ${fmt(v1.y)} \\end{bmatrix}$ ตัวเดียวเท่านั้น จึงไม่สามารถสร้างเมทริกซ์ $P$ ขนาด $2 \\times 2$ ที่มีตัวผกผันได้ เมทริกซ์นี้จึง <strong>ไม่สามารถทำให้เป็นแนวทแยงได้ (Not Diagonalizable)</strong>
+          </div>
+        </div>
+      `;
+    }
+
+    // Inquiry toggle
+    function toggleInquiryAnswer() {
+      const content = document.getElementById('inquiryContent');
+      const text = document.getElementById('inquiryBtnText');
+      const chevron = document.getElementById('inquiryChevron');
+
+      if (content.classList.contains('hidden')) {
+        content.classList.remove('hidden');
+        text.innerText = "ซ่อนบทวิเคราะห์เชิงมโนทัศน์";
+        chevron.classList.add('rotate-180');
+      } else {
+        content.classList.add('hidden');
+        text.innerText = "คลิกเพื่อดูบทวิเคราะห์เชิงมโนทัศน์ (ช่องว่างระหว่างพีชคณิตกับเรขาคณิต)";
+        chevron.classList.remove('rotate-180');
+      }
+      renderAllMath();
+    }
+
+    // Exercise toggle
+    function toggleExerciseSolution() {
+      const sol = document.getElementById('exerciseSolutionDetail');
+      const btnText = document.getElementById('solutionBtnText');
+
+      if (sol.classList.contains('hidden')) {
+        sol.classList.remove('hidden');
+        btnText.innerText = "ซ่อนวิธีทำและคำเฉลยละเอียด";
+      } else {
+        sol.classList.add('hidden');
+        btnText.innerText = "แสดงวิธีทำและคำเฉลยละเอียดแบบเป็นลำดับขั้น";
+      }
+      renderAllMath();
+    }
+  </script>
+</body>
+</html>

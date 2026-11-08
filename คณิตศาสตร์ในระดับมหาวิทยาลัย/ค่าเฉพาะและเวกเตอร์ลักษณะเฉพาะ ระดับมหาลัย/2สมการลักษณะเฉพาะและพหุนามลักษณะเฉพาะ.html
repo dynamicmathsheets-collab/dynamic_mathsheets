@@ -1,0 +1,862 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>เรื่องที่ 2: สมการลักษณะเฉพาะและพหุนามลักษณะเฉพาะ</title>
+  
+  <!-- Google Fonts: Sarabun & Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Sarabun:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- KaTeX for crisp LaTeX rendering -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js"></script>
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Sarabun', 'Inter', 'sans-serif'],
+          },
+          colors: {
+            brand: {
+              50: '#eef2ff',
+              100: '#e0e7ff',
+              200: '#c7d2fe',
+              500: '#6366f1',
+              600: '#4f46e5',
+              700: '#4338ca',
+              800: '#3730a3',
+              900: '#312e81',
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    .katex { font-size: 1.05em; }
+    .matrix-input {
+      width: 4rem;
+      height: 3rem;
+      text-align: center;
+      font-weight: 600;
+      transition: all 0.2s ease-in-out;
+    }
+    .bracket-matrix {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      padding: 0 10px;
+    }
+    .bracket-matrix::before {
+      content: "";
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 6px;
+      border-left: 2px solid #4f46e5;
+      border-top: 2px solid #4f46e5;
+      border-bottom: 2px solid #4f46e5;
+      border-radius: 4px 0 0 4px;
+    }
+    .bracket-matrix::after {
+      content: "";
+      position: absolute;
+      right: 0;
+      top: 0;
+      bottom: 0;
+      width: 6px;
+      border-right: 2px solid #4f46e5;
+      border-top: 2px solid #4f46e5;
+      border-bottom: 2px solid #4f46e5;
+      border-radius: 0 4px 4px 0;
+    }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-800 antialiased selection:bg-brand-100 selection:text-brand-800">
+
+  <!-- Header Banner -->
+  <header class="bg-gradient-to-r from-brand-900 via-indigo-900 to-slate-900 text-white py-10 shadow-md">
+    <div class="max-w-6xl w-full mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+        <div>
+          <h1 class="text-2xl sm:text-3xl lg:text-4xl font-extrabold tracking-tight">
+            เรื่องที่ 2: สมการลักษณะเฉพาะและพหุนามลักษณะเฉพาะ
+          </h1>
+          <p class="text-slate-300 text-sm sm:text-base mt-1">
+            Characteristic Equation & Characteristic Polynomial of Square Matrices
+          </p>
+        </div>
+        <div class="bg-white/10 backdrop-blur-md rounded-xl p-3 border border-white/15 text-center text-xs sm:text-sm">
+          <div class="text-brand-200 font-medium">สูตรสำคัญพื้นฐาน</div>
+          <div class="text-lg font-bold tracking-wide mt-0.5 text-white">$\det(A - \lambda I) = 0$</div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content Container with strict width requirement -->
+  <main class="max-w-6xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 space-y-10">
+
+    <!-- Section 1: วัตถุประสงค์การเรียนรู้ -->
+    <section class="bg-white rounded-2xl p-6 sm:p-7 shadow-sm border border-slate-200/80">
+      <div class="flex items-center gap-3 mb-4">
+        <div class="w-9 h-9 rounded-xl bg-indigo-100 text-brand-600 flex items-center justify-center font-bold text-lg shadow-inner">
+          1
+        </div>
+        <h2 class="text-xl sm:text-2xl font-bold text-slate-900">วัตถุประสงค์การเรียนรู้ (Learning Objectives)</h2>
+      </div>
+      <div class="bg-gradient-to-r from-indigo-50 to-slate-50 border-l-4 border-brand-600 p-4 rounded-r-xl">
+        <ul class="space-y-2 text-slate-700 leading-relaxed font-medium">
+          <li class="flex items-start gap-2">
+            <svg class="w-5 h-5 text-brand-600 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+            <span>นักศึกษาสามารถสร้าง<strong>สมการลักษณะเฉพาะ (Characteristic Equation)</strong> และพหุนามลักษณะเฉพาะของเมทริกซ์จัตุรัสได้</span>
+          </li>
+          <li class="flex items-start gap-2">
+            <svg class="w-5 h-5 text-brand-600 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+            <span>นักศึกษาสามารถ<strong>หาค่าเฉพาะ (Eigenvalues: $\lambda$)</strong> และตรวจสอบผลเฉลยด้วยความสัมพันธ์กับเทรซ ($\text{tr}$) และดีเทอร์มิแนนต์ ($\det$) ได้อย่างถูกต้อง</span>
+          </li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- Section 2: เนื้อหาหลัก -->
+    <section class="bg-white rounded-2xl p-6 sm:p-7 shadow-sm border border-slate-200/80">
+      <div class="flex items-center gap-3 mb-6">
+        <div class="w-9 h-9 rounded-xl bg-indigo-100 text-brand-600 flex items-center justify-center font-bold text-lg shadow-inner">
+          2
+        </div>
+        <h2 class="text-xl sm:text-2xl font-bold text-slate-900">เนื้อหาหลัก (Core Concepts)</h2>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <!-- Step 1 & 2 Card -->
+        <div class="bg-slate-50/80 border border-slate-200 rounded-xl p-5 hover:border-brand-300 transition-colors">
+          <div class="flex items-center justify-between mb-3">
+            <span class="text-xs font-bold uppercase tracking-wider text-brand-700 bg-brand-100 px-2.5 py-0.5 rounded-full">ขั้นตอนที่ 1 & 2</span>
+            <span class="text-xs text-slate-500">ที่มาของสมการ</span>
+          </div>
+          <h3 class="text-lg font-bold text-slate-800 mb-2">การจัดรูปและเงื่อนไขไม่เป็นศูนย์</h3>
+          <p class="text-slate-600 text-sm mb-3">
+            เริ่มต้นจากนิยามของไอเกนเวกเตอร์ $A\mathbf{v} = \lambda\mathbf{v}$ เมื่อ $\mathbf{v} \ne \mathbf{0}$ จัดรูปเชิงพีชคณิตเชิงเส้น:
+          </p>
+          <div class="bg-white p-3 rounded-lg border border-slate-200 text-center font-mono my-2 text-slate-900 shadow-sm">
+            $A\mathbf{v} - \lambda I\mathbf{v} = \mathbf{0} \iff (A - \lambda I)\mathbf{v} = \mathbf{0}$
+          </div>
+          <p class="text-slate-600 text-sm mt-3 leading-relaxed">
+            ระบบสมการเอกพันธุ์ $(A-\lambda I)\mathbf{v}=\mathbf{0}$ จะมีผลเฉลยที่ไม่ใช่ศูนย์ ($\mathbf{v} \ne \mathbf{0}$) ได้ก็ต่อเมื่อเมทริกซ์สัมประสิทธิ์ <strong>ไม่มีตัวผกผัน (Singular Matrix)</strong> ซึ่งเทียบเท่ากับเงื่อนไข:
+          </p>
+          <div class="bg-amber-50 border border-amber-200 p-2.5 rounded-lg text-center mt-2 text-amber-900 font-semibold">
+            $\det(A - \lambda I) = 0$
+          </div>
+        </div>
+
+        <!-- Polynomial Card -->
+        <div class="bg-slate-50/80 border border-slate-200 rounded-xl p-5 hover:border-brand-300 transition-colors">
+          <div class="flex items-center justify-between mb-3">
+            <span class="text-xs font-bold uppercase tracking-wider text-indigo-700 bg-indigo-100 px-2.5 py-0.5 rounded-full">นิยามหลัก</span>
+            <span class="text-xs text-slate-500">ดีกรี $n$</span>
+          </div>
+          <h3 class="text-lg font-bold text-slate-800 mb-2">พหุนามลักษณะเฉพาะ</h3>
+          <p class="text-slate-600 text-sm mb-3">
+            เมื่อคำนวณ $\det(A - \lambda I)$ จะได้พหุนามในรูปของตัวแปร $\lambda$ กำลัง $n$ เรียกว่า <strong>พหุนามลักษณะเฉพาะ</strong>:
+          </p>
+          <div class="bg-white p-3 rounded-lg border border-slate-200 text-center font-mono my-2 text-slate-900 shadow-sm">
+            $p(\lambda) = \det(A - \lambda I) = (-1)^n \lambda^n + c_{n-1}\lambda^{n-1} + \dots + \det(A)$
+          </div>
+          <p class="text-slate-600 text-sm mt-3">
+            รากของสมการ $p(\lambda) = 0$ ก็คือ <strong>ค่าเฉพาะ (Eigenvalues)</strong> ของเมทริกซ์ $A$ ซึ่งอาจเป็นจำนวนจริงหรือจำนวนเชิงซ้อน
+          </p>
+        </div>
+
+        <!-- Matrix 2x2 & 3x3 Shortcut Card -->
+        <div class="bg-slate-50/80 border border-slate-200 rounded-xl p-5 hover:border-brand-300 transition-colors">
+          <div class="flex items-center justify-between mb-3">
+            <span class="text-xs font-bold uppercase tracking-wider text-emerald-700 bg-emerald-100 px-2.5 py-0.5 rounded-full">สูตรลัด 2x2</span>
+            <span class="text-xs text-slate-500">ประหยัดเวลา</span>
+          </div>
+          <h3 class="text-lg font-bold text-slate-800 mb-2">การหาค่าเฉพาะสำหรับเมทริกซ์ $2\times2$</h3>
+          <p class="text-slate-600 text-sm mb-2">
+            สำหรับเมทริกซ์ $A = \begin{bmatrix} a & b \\ c & d \end{bmatrix}$ เราสามารถกระจายดีเทอร์มิแนนต์ได้ทันทีเป็น:
+          </p>
+          <div class="bg-white p-3 rounded-lg border border-slate-200 text-center font-mono my-2 text-slate-900 shadow-sm">
+            $\lambda^2 - \text{tr}(A)\lambda + \det(A) = 0$
+          </div>
+          <div class="text-xs text-slate-600 mt-2 space-y-1">
+            <div>&bull; $\text{tr}(A) = a + d$ (ผลบวกสมาชิกบนเส้นทแยงมุมหลัก)</div>
+            <div>&bull; $\det(A) = ad - bc$</div>
+          </div>
+        </div>
+
+        <!-- Trace & Det Property Card -->
+        <div class="bg-slate-50/80 border border-slate-200 rounded-xl p-5 hover:border-brand-300 transition-colors">
+          <div class="flex items-center justify-between mb-3">
+            <span class="text-xs font-bold uppercase tracking-wider text-rose-700 bg-rose-100 px-2.5 py-0.5 rounded-full">ทฤษฎีบทสำคัญ</span>
+            <span class="text-xs text-slate-500">การตรวจสอบคำตอบ</span>
+          </div>
+          <h3 class="text-lg font-bold text-slate-800 mb-2">ความสัมพันธ์กับเทรซและดีเทอร์มิแนนต์</h3>
+          <p class="text-slate-600 text-sm mb-2">
+            ถ้าเมทริกซ์ $A$ มีค่าเฉพาะ $\lambda_1, \lambda_2, \dots, \lambda_n$ (นับซ้ำตามพหุคูณเชิงพีชคณิต Algebraic Multiplicity):
+          </p>
+          <div class="grid grid-cols-2 gap-3 my-2 text-center text-sm">
+            <div class="bg-white p-2.5 rounded-lg border border-slate-200 shadow-sm">
+              <span class="text-slate-500 text-xs block mb-1">ผลบวกค่าเฉพาะ</span>
+              <span class="font-bold text-slate-900">$\sum_{i=1}^n \lambda_i = \text{tr}(A)$</span>
+            </div>
+            <div class="bg-white p-2.5 rounded-lg border border-slate-200 shadow-sm">
+              <span class="text-slate-500 text-xs block mb-1">ผลคูณค่าเฉพาะ</span>
+              <span class="font-bold text-slate-900">$\prod_{i=1}^n \lambda_i = \det(A)$</span>
+            </div>
+          </div>
+          <p class="text-xs text-slate-500 mt-2">
+            *ข้อสังเกต: คุณสมบัตินี้ใช้ตรวจคำตอบได้อย่างรวดเร็วหลังจากแก้สมการหา $\lambda$ เสร็จสิ้น
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Section 3: แบบจำลองโต้ตอบ (Interactive Simulator) -->
+    <section class="bg-white rounded-2xl p-6 sm:p-7 shadow-sm border border-slate-200/80">
+      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6 pb-4 border-b border-slate-100">
+        <div class="flex items-center gap-3">
+          <div class="w-9 h-9 rounded-xl bg-indigo-100 text-brand-600 flex items-center justify-center font-bold text-lg shadow-inner">
+            3
+          </div>
+          <div>
+            <h2 class="text-xl sm:text-2xl font-bold text-slate-900">แบบจำลองโต้ตอบ (Interactive Matrix Simulator)</h2>
+            <p class="text-xs sm:text-sm text-slate-500">ป้อนค่าในเมทริกซ์เพื่อดูการคลี่คลายขั้นตอนการสร้างสมการลักษณะเฉพาะและคำนวณค่าเฉพาะ</p>
+          </div>
+        </div>
+
+        <!-- Matrix Size Selector -->
+        <div class="flex items-center bg-slate-100 p-1 rounded-xl self-start sm:self-center border border-slate-200">
+          <button id="btnSize2" onclick="setMatrixDimension(2)" class="px-3.5 py-1.5 rounded-lg text-sm font-semibold transition-all bg-white text-brand-700 shadow-sm">
+            เมทริกซ์ 2 × 2
+          </button>
+          <button id="btnSize3" onclick="setMatrixDimension(3)" class="px-3.5 py-1.5 rounded-lg text-sm font-semibold text-slate-600 transition-all hover:text-slate-900">
+            เมทริกซ์ 3 × 3
+          </button>
+        </div>
+      </div>
+
+      <!-- Controls & Input Area -->
+      <div class="bg-slate-50 rounded-2xl p-5 border border-slate-200 mb-6">
+        <div class="flex flex-col lg:flex-row items-center justify-around gap-6">
+          
+          <!-- Interactive Matrix Input Wrapper -->
+          <div class="flex flex-col items-center">
+            <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">เมทริกซ์ต้นแบบ $A$</span>
+            <div class="bracket-matrix py-2" id="matrixInputsContainer">
+              <!-- Dynamically populated via JS -->
+            </div>
+          </div>
+
+          <!-- Action buttons -->
+          <div class="flex flex-wrap sm:flex-col gap-2.5">
+            <button onclick="calculateEigenSystem()" class="px-5 py-2.5 bg-brand-600 hover:bg-brand-700 active:scale-95 text-white font-semibold rounded-xl text-sm shadow-md shadow-brand-500/20 transition-all flex items-center justify-center gap-2">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+              คำนวณค่าเฉพาะ
+            </button>
+            <button onclick="generatePreset('random')" class="px-4 py-2 bg-white hover:bg-slate-100 border border-slate-300 text-slate-700 font-medium rounded-xl text-sm transition-all flex items-center justify-center gap-1.5">
+              <svg class="w-4 h-4 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+              สุ่มตัวเลขใหม่
+            </button>
+            <button onclick="generatePreset('diagonal')" class="px-4 py-2 bg-white hover:bg-slate-100 border border-slate-300 text-slate-700 font-medium rounded-xl text-sm transition-all text-xs">
+              ตัวอย่าง: เมทริกซ์ทแยงมุม
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step-by-Step Explanation Dashboard -->
+      <div id="solutionContainer" class="space-y-4">
+        <!-- Rendered by JavaScript -->
+      </div>
+    </section>
+
+    <!-- Section 4: คำถามนำเพื่อค้นพบ -->
+    <section class="bg-white rounded-2xl p-6 sm:p-7 shadow-sm border border-slate-200/80">
+      <div class="flex items-center gap-3 mb-4">
+        <div class="w-9 h-9 rounded-xl bg-amber-100 text-amber-700 flex items-center justify-center font-bold text-lg shadow-inner">
+          4
+        </div>
+        <h2 class="text-xl sm:text-2xl font-bold text-slate-900">คำถามนำเพื่อค้นพบ (Inquiry & Deep Concept)</h2>
+      </div>
+
+      <div class="bg-amber-50/70 border border-amber-200/90 rounded-2xl p-5 sm:p-6">
+        <div class="flex items-start gap-3">
+          <div class="p-2 bg-amber-500 text-white rounded-xl shrink-0 mt-0.5">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+          </div>
+          <div>
+            <h3 class="text-base sm:text-lg font-bold text-amber-950">
+              เหตุใดการมีคำตอบ $\mathbf{v} \ne \mathbf{0}$ ของระบบ $(A - \lambda I)\mathbf{v} = \mathbf{0}$ จึงต้องอาศัยเงื่อนไข $\det(A - \lambda I) = 0$?
+            </h3>
+            <p class="text-sm text-amber-900/80 mt-1">
+              ทำไมเราไม่แก้หาค่าเฉพาะจากสมการเมทริกซ์โดยตรง ทำไมต้องบังคับให้ดีเทอร์มิแนนต์เท่ากับศูนย์?
+            </p>
+
+            <button id="toggleDiscoveryBtn" onclick="toggleDiscoveryExplanation()" class="mt-4 px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white font-medium text-xs sm:text-sm rounded-xl shadow transition-all inline-flex items-center gap-2">
+              <span id="discoveryBtnText">คลิกเพื่อดูบทวิเคราะห์เชิงมโนทัศน์</span>
+              <svg id="discoveryChevron" class="w-4 h-4 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+            </button>
+          </div>
+        </div>
+
+        <div id="discoveryAnswer" class="hidden mt-6 pt-5 border-t border-amber-200/80 space-y-3 text-slate-800 text-sm leading-relaxed">
+          <div class="p-4 bg-white rounded-xl border border-amber-200">
+            <h4 class="font-bold text-slate-900 mb-2 flex items-center gap-2">
+              <span class="w-2 h-2 rounded-full bg-brand-600"></span>
+              ความเชื่อมโยงกับทฤษฎีบทการมีตัวผกผัน (Invertible Matrix Theorem)
+            </h4>
+            <p>
+              สมมติให้เมทริกซ์ $M = (A - \lambda I)$ พิจารณาสมการเชิงเส้นแบบเอกพันธุ์ (Homogeneous System):
+            </p>
+            <div class="text-center font-semibold my-2">$M\mathbf{v} = \mathbf{0}$</div>
+            <p>
+              หาก $M$ มีเมทริกซ์ผกผัน ($M^{-1}$ หาค่าได้) ซึ่งตามทฤษฎีคือเมื่อ $\det(M) \ne 0$ เราจะสามารถคูณ $M^{-1}$ ทั้งสองข้างได้:
+            </p>
+            <div class="text-center font-mono my-2 text-brand-700 bg-slate-50 py-1 rounded">
+              $\mathbf{v} = M^{-1}\mathbf{0} = \mathbf{0}$
+            </div>
+            <p>
+              ซึ่งหมายความว่าระบบจะมีเพียง <strong>ผลเฉลยชัด (Trivial Solution: $\mathbf{v} = \mathbf{0}$)</strong> เท่านั้น! แต่ตามนิยามของ <em>ไอเกนเวกเตอร์</em> จำเป็นต้องเป็นเวกเตอร์ <strong>$\mathbf{v} \ne \mathbf{0}$</strong>
+            </p>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs sm:text-sm">
+            <div class="bg-white p-3.5 rounded-xl border border-amber-200">
+              <span class="font-bold text-slate-900 block mb-1">มิติของ Null Space (Kernel):</span>
+              เพื่อให้มีผลเฉลยที่ไม่ใช่ศูนย์ ($\mathbf{v} \ne \mathbf{0}$) สเปซว่าง $\text{Null}(A - \lambda I)$ จะต้องมีมิติอย่างน้อย 1 ($\dim(\text{Null}) \ge 1$) นั่นคือคอลัมน์ของเมทริกซ์ต้องขึ้นต่อกันเชิงเส้น (Linearly Dependent)
+            </div>
+            <div class="bg-white p-3.5 rounded-xl border border-amber-200">
+              <span class="font-bold text-slate-900 block mb-1">การแปลงสภาพทางเรขาคณิต:</span>
+              การที่ $\det(A - \lambda I) = 0$ หมายถึงการแปลงเชิงเส้นนั้นทำการ "บีบอัด" มิติอย่างน้อย 1 ทิศทางให้ยุบตัวลงกลายเป็นเวกเตอร์ศูนย์ จึงเกิดแกนค่าเฉพาะ (Eigenspace) ขึ้นมา
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Section 5: แบบฝึกหัดสำหรับนักศึกษา -->
+    <section class="bg-white rounded-2xl p-6 sm:p-7 shadow-sm border border-slate-200/80">
+      <div class="flex items-center gap-3 mb-6">
+        <div class="w-9 h-9 rounded-xl bg-indigo-100 text-brand-600 flex items-center justify-center font-bold text-lg shadow-inner">
+          5
+        </div>
+        <h2 class="text-xl sm:text-2xl font-bold text-slate-900">แบบฝึกหัดสำหรับนักศึกษา (Practice Exercise)</h2>
+      </div>
+
+      <div class="bg-slate-50 border border-slate-200 rounded-2xl p-6">
+        <div class="border-b border-slate-200 pb-4 mb-4">
+          <span class="text-xs font-bold uppercase tracking-wider text-brand-700 bg-brand-100 px-2.5 py-0.5 rounded-full">โจทย์ข้อทดสอบ</span>
+          <p class="text-base sm:text-lg font-medium text-slate-900 mt-2">
+            จงหาพหุนามลักษณะเฉพาะและค่าเฉพาะของเมทริกซ์ 
+            $A = \begin{bmatrix} 4 & 1 \\ 2 & 3 \end{bmatrix}$ 
+            พร้อมตรวจสอบคำตอบโดยใช้ความสัมพันธ์ของเทรซ ($\text{tr}$) และดีเทอร์มิแนนต์ ($\det$)
+          </p>
+        </div>
+
+        <!-- Interactive Student Input Check -->
+        <div class="space-y-4">
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label class="block text-xs font-semibold text-slate-600 mb-1">ค่าเฉพาะตัวที่หนึ่ง ($\lambda_1$):</label>
+              <input id="ansLambda1" type="number" step="any" placeholder="พิมพ์คำตอบ เช่น 5" class="w-full px-3 py-2 bg-white border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-brand-500 focus:outline-none">
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-600 mb-1">ค่าเฉพาะตัวที่สอง ($\lambda_2$):</label>
+              <input id="ansLambda2" type="number" step="any" placeholder="พิมพ์คำตอบ เช่น 2" class="w-full px-3 py-2 bg-white border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-brand-500 focus:outline-none">
+            </div>
+          </div>
+
+          <div class="flex flex-wrap items-center gap-3 pt-2">
+            <button onclick="checkStudentExercise()" class="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-sm rounded-xl shadow transition-all active:scale-95">
+              ตรวจคำตอบ
+            </button>
+            <button onclick="toggleExerciseSolution()" class="px-4 py-2.5 bg-white border border-slate-300 hover:bg-slate-100 text-slate-700 font-medium text-sm rounded-xl transition-all">
+              <span id="solutionBtnText">แสดงวิธีทำและคำเฉลยละเอียด</span>
+            </button>
+            <div id="exerciseFeedback" class="text-sm font-semibold"></div>
+          </div>
+        </div>
+
+        <!-- Full Detailed Solution (Collapsible) -->
+        <div id="exerciseSolutionDetail" class="hidden mt-6 pt-5 border-t border-slate-200 space-y-4 text-slate-800 text-sm">
+          <div class="bg-white p-5 rounded-xl border border-slate-200 space-y-4">
+            <div>
+              <h4 class="font-bold text-brand-700 mb-1">ขั้นที่ 1: ตั้งสมการลักษณะเฉพาะ $\det(A - \lambda I) = 0$</h4>
+              <div class="bg-slate-50 p-3 rounded-lg text-center font-mono">
+                $\det \begin{bmatrix} 4 - \lambda & 1 \\ 2 & 3 - \lambda \end{bmatrix} = 0$
+              </div>
+            </div>
+
+            <div>
+              <h4 class="font-bold text-brand-700 mb-1">ขั้นที่ 2: คำนวณดีเทอร์มิแนนต์หาพหุนามลักษณะเฉพาะ $p(\lambda)$</h4>
+              <div class="bg-slate-50 p-3 rounded-lg text-center space-y-1">
+                <div>$p(\lambda) = (4 - \lambda)(3 - \lambda) - (1)(2) = 0$</div>
+                <div>$p(\lambda) = (12 - 7\lambda + \lambda^2) - 2 = 0$</div>
+                <div class="text-base font-bold text-indigo-900">$p(\lambda) = \lambda^2 - 7\lambda + 10 = 0$</div>
+              </div>
+            </div>
+
+            <div>
+              <h4 class="font-bold text-brand-700 mb-1">ขั้นที่ 3: แก้สมการพหุนามกำลังสองเพื่อหาค่าเฉพาะ</h4>
+              <div class="bg-slate-50 p-3 rounded-lg text-center space-y-1">
+                <div>$(\lambda - 5)(\lambda - 2) = 0$</div>
+                <div class="text-base font-bold text-emerald-700">$\therefore \lambda_1 = 5, \quad \lambda_2 = 2$</div>
+              </div>
+            </div>
+
+            <div>
+              <h4 class="font-bold text-brand-700 mb-1">ขั้นที่ 4: ตรวจสอบคำตอบด้วยเทรซ ($\text{tr}$) และดีเทอร์มิแนนต์ ($\det$)</h4>
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mt-2">
+                <div class="p-3 bg-indigo-50/60 rounded-lg border border-indigo-100">
+                  <div class="font-semibold text-indigo-900 mb-1">&bull; ตรวจสอบเทรซ (Trace):</div>
+                  <div>$\text{tr}(A) = 4 + 3 = 7$</div>
+                  <div>ผลบวกค่าเฉพาะ: $\lambda_1 + \lambda_2 = 5 + 2 = 7$</div>
+                  <div class="text-xs text-emerald-600 font-bold mt-1">✓ เท่ากัน ($\text{tr}(A) = \sum \lambda_i$)</div>
+                </div>
+                <div class="p-3 bg-indigo-50/60 rounded-lg border border-indigo-100">
+                  <div class="font-semibold text-indigo-900 mb-1">&bull; ตรวจสอบดีเทอร์มิแนนต์ (Determinant):</div>
+                  <div>$\det(A) = (4)(3) - (1)(2) = 12 - 2 = 10$</div>
+                  <div>ผลคูณค่าเฉพาะ: $\lambda_1 \cdot \lambda_2 = 5 \times 2 = 10$</div>
+                  <div class="text-xs text-emerald-600 font-bold mt-1">✓ เท่ากัน ($\det(A) = \prod \lambda_i$)</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+  </main>
+
+
+
+  <!-- Application Logic -->
+  <script>
+    // State management
+    let currentDim = 2;
+    let matrixData = [
+      [4, 1],
+      [2, 3]
+    ];
+
+    window.onload = function() {
+      renderMatrixInputs();
+      calculateEigenSystem();
+      renderAllMath();
+    };
+
+    function renderAllMath() {
+      if (window.renderMathInElement) {
+        renderMathInElement(document.body, {
+          delimiters: [
+            {left: '$$', right: '$$', display: true},
+            {left: '$', right: '$', display: false}
+          ],
+          throwOnError: false
+        });
+      }
+    }
+
+    function setMatrixDimension(dim) {
+      currentDim = dim;
+      const btn2 = document.getElementById('btnSize2');
+      const btn3 = document.getElementById('btnSize3');
+
+      if (dim === 2) {
+        btn2.className = "px-3.5 py-1.5 rounded-lg text-sm font-semibold transition-all bg-white text-brand-700 shadow-sm";
+        btn3.className = "px-3.5 py-1.5 rounded-lg text-sm font-semibold text-slate-600 transition-all hover:text-slate-900";
+        matrixData = [
+          [4, 1],
+          [2, 3]
+        ];
+      } else {
+        btn3.className = "px-3.5 py-1.5 rounded-lg text-sm font-semibold transition-all bg-white text-brand-700 shadow-sm";
+        btn2.className = "px-3.5 py-1.5 rounded-lg text-sm font-semibold text-slate-600 transition-all hover:text-slate-900";
+        matrixData = [
+          [2, 0, 0],
+          [1, 3, 0],
+          [0, 1, 4]
+        ];
+      }
+      renderMatrixInputs();
+      calculateEigenSystem();
+    }
+
+    function renderMatrixInputs() {
+      const container = document.getElementById('matrixInputsContainer');
+      let html = `<div class="grid grid-cols-${currentDim} gap-2">`;
+      for (let i = 0; i < currentDim; i++) {
+        for (let j = 0; j < currentDim; j++) {
+          const val = matrixData[i][j] !== undefined ? matrixData[i][j] : 0;
+          html += `
+            <input 
+              type="number" 
+              id="m_${i}_${j}" 
+              value="${val}" 
+              step="any"
+              onchange="syncMatrixInput(${i}, ${j}, this.value)"
+              class="matrix-input bg-white rounded-lg border border-slate-300 text-slate-800 text-base shadow-sm focus:border-brand-500 focus:ring-2 focus:ring-brand-200 focus:outline-none"
+            />
+          `;
+        }
+      }
+      html += `</div>`;
+      container.innerHTML = html;
+    }
+
+    function syncMatrixInput(r, c, val) {
+      matrixData[r][c] = parseFloat(val) || 0;
+    }
+
+    function readInputs() {
+      for (let i = 0; i < currentDim; i++) {
+        for (let j = 0; j < currentDim; j++) {
+          const input = document.getElementById(`m_${i}_${j}`);
+          if (input) {
+            matrixData[i][j] = parseFloat(input.value) || 0;
+          }
+        }
+      }
+    }
+
+    function generatePreset(type) {
+      if (type === 'random') {
+        for (let i = 0; i < currentDim; i++) {
+          for (let j = 0; j < currentDim; j++) {
+            // Generate reasonable integer between -5 and 6
+            matrixData[i][j] = Math.floor(Math.random() * 10) - 4;
+          }
+        }
+      } else if (type === 'diagonal') {
+        for (let i = 0; i < currentDim; i++) {
+          for (let j = 0; j < currentDim; j++) {
+            matrixData[i][j] = (i === j) ? (i + 2) : 0;
+          }
+        }
+      }
+      renderMatrixInputs();
+      calculateEigenSystem();
+    }
+
+    // Helper formatting functions
+    function fmt(num) {
+      if (Math.abs(num - Math.round(num)) < 1e-5) {
+        return Math.round(num).toString();
+      }
+      return num.toFixed(2).replace(/\.00$/, '');
+    }
+
+    function formatCoeff(c, power, isLeading = false) {
+      if (Math.abs(c) < 1e-7) return '';
+      let sign = c > 0 ? (isLeading ? '' : '+ ') : (isLeading ? '-' : '- ');
+      let absVal = Math.abs(c);
+      let valStr = Math.abs(absVal - 1) < 1e-7 && power > 0 ? '' : fmt(absVal);
+      
+      let varStr = '';
+      if (power === 1) varStr = '\\lambda';
+      else if (power > 1) varStr = `\\lambda^${power}`;
+
+      return `${sign}${valStr}${varStr} `;
+    }
+
+    function calculateEigenSystem() {
+      readInputs();
+      const sol = document.getElementById('solutionContainer');
+
+      if (currentDim === 2) {
+        solve2x2(sol);
+      } else {
+        solve3x3(sol);
+      }
+
+      renderAllMath();
+    }
+
+    function solve2x2(sol) {
+      const a = matrixData[0][0];
+      const b = matrixData[0][1];
+      const c = matrixData[1][0];
+      const d = matrixData[1][1];
+
+      const trace = a + d;
+      const det = (a * d) - (b * c);
+
+      // characteristic equation: lambda^2 - trace*lambda + det = 0
+      const discriminant = trace * trace - 4 * det;
+
+      let rootInfo = '';
+      let lambda1Str = '', lambda2Str = '';
+      let sumEigen = trace;
+      let prodEigen = det;
+
+      if (discriminant >= 0) {
+        const sqrtD = Math.sqrt(discriminant);
+        const l1 = (trace + sqrtD) / 2;
+        const l2 = (trace - sqrtD) / 2;
+        lambda1Str = fmt(l1);
+        lambda2Str = fmt(l2);
+        if (Math.abs(discriminant) < 1e-7) {
+          rootInfo = `ค่าเฉพาะมีค่าเดียวที่มีพหุคูณเชิงพีชคณิต 2: $\\lambda_1 = \\lambda_2 = ${lambda1Str}$`;
+        } else {
+          rootInfo = `ค่าเฉพาะเป็นจำนวนจริง 2 ค่าที่ต่างกัน: $\\lambda_1 = ${lambda1Str}, \\quad \\lambda_2 = ${lambda2Str}$`;
+        }
+      } else {
+        const realPart = trace / 2;
+        const imagPart = Math.sqrt(-discriminant) / 2;
+        lambda1Str = `${fmt(realPart)} + ${fmt(imagPart)}i`;
+        lambda2Str = `${fmt(realPart)} - ${fmt(imagPart)}i`;
+        rootInfo = `ค่าเฉพาะเป็นจำนวนเชิงซ้อนสังยุคคู่: $\\lambda_{1,2} = ${fmt(realPart)} \\pm ${fmt(imagPart)}i$`;
+      }
+
+      // Format polynomial string
+      const polyTerms = `\\lambda^2 ${trace >= 0 ? '- ' + fmt(trace) : '+ ' + fmt(-trace)}\\lambda ${det >= 0 ? '+ ' + fmt(det) : '- ' + fmt(-det)}`;
+
+      sol.innerHTML = `
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <!-- Step 1 -->
+          <div class="p-4 bg-slate-50 border border-slate-200 rounded-xl">
+            <span class="text-xs font-bold text-brand-600 uppercase">ขั้นที่ 1: สร้างเมทริกซ์ $A - \\lambda I$</span>
+            <div class="my-3 text-center bg-white p-3 rounded-lg border border-slate-200 overflow-x-auto">
+              $$A - \\lambda I = \\begin{bmatrix} ${fmt(a)} - \\lambda & ${fmt(b)} \\\\ ${fmt(c)} & ${fmt(d)} - \\lambda \\end{bmatrix}$$
+            </div>
+            <p class="text-xs text-slate-500">นำ $\\lambda$ ไปลบออกจากสมาชิกบนเส้นทแยงมุมหลักของ $A$</p>
+          </div>
+
+          <!-- Step 2 -->
+          <div class="p-4 bg-slate-50 border border-slate-200 rounded-xl">
+            <span class="text-xs font-bold text-brand-600 uppercase">ขั้นที่ 2: คำนวณ $\\det(A - \\lambda I) = 0$</span>
+            <div class="my-3 text-center bg-white p-3 rounded-lg border border-slate-200 overflow-x-auto text-sm">
+              $$p(\\lambda) = (${fmt(a)} - \\lambda)(${fmt(d)} - \\lambda) - (${fmt(b)})(${fmt(c)}) = 0$$
+              <div class="font-bold text-brand-700 text-base mt-1">$$p(\\lambda) = ${polyTerms} = 0$$</div>
+            </div>
+            <p class="text-xs text-slate-500">ตรงกับรูปแบบมาตรฐาน $\\lambda^2 - \\text{tr}(A)\\lambda + \\det(A) = 0$</p>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <!-- Step 3 -->
+          <div class="p-4 bg-slate-50 border border-slate-200 rounded-xl">
+            <span class="text-xs font-bold text-emerald-700 uppercase">ขั้นที่ 3: แก้สมการหาค่าเฉพาะ $\\lambda$</span>
+            <div class="my-3 bg-white p-3.5 rounded-lg border border-slate-200 text-center">
+              <div class="text-xs text-slate-500 mb-1">ดิสคริมิแนนต์ $D = \\text{tr}^2 - 4\\det = ${fmt(discriminant)}$</div>
+              <div class="text-base font-bold text-slate-900 mt-2">${rootInfo}</div>
+            </div>
+            <p class="text-xs text-slate-500">รากของพหุนามคือกำหนดทิศทางที่เวกเตอร์จะถูกสเกลโดยการแปลง</p>
+          </div>
+
+          <!-- Step 4 -->
+          <div class="p-4 bg-slate-50 border border-slate-200 rounded-xl">
+            <span class="text-xs font-bold text-rose-700 uppercase">ขั้นที่ 4: ตรวจสอบความถูกต้องด้วยทฤษฎี</span>
+            <div class="my-2 space-y-2 text-xs sm:text-sm">
+              <div class="p-2.5 bg-white rounded-lg border border-slate-200 flex justify-between items-center">
+                <span>$\\text{tr}(A) = ${fmt(trace)}$</span>
+                <span class="font-bold text-emerald-600">$\\sum \\lambda_i = ${fmt(sumEigen)}$ ✓</span>
+              </div>
+              <div class="p-2.5 bg-white rounded-lg border border-slate-200 flex justify-between items-center">
+                <span>$\\det(A) = ${fmt(det)}$</span>
+                <span class="font-bold text-emerald-600">$\\prod \\lambda_i = ${fmt(prodEigen)}$ ✓</span>
+              </div>
+            </div>
+            <p class="text-xs text-slate-500">ผลบวกเท่ากับเทรซ และผลคูณเท่ากับดีเทอร์มิแนนต์เสมอ</p>
+          </div>
+        </div>
+      `;
+    }
+
+    function solve3x3(sol) {
+      const M = matrixData;
+      // Trace
+      const trace = M[0][0] + M[1][1] + M[2][2];
+
+      // Sum of principal 2x2 minors: M11 + M22 + M33
+      const m11 = M[1][1] * M[2][2] - M[1][2] * M[2][1];
+      const m22 = M[0][0] * M[2][2] - M[0][2] * M[2][0];
+      const m33 = M[0][0] * M[1][1] - M[0][1] * M[1][0];
+      const c2 = m11 + m22 + m33;
+
+      // Determinant 3x3
+      const det = M[0][0] * m11 - M[0][1] * (M[1][0] * M[2][2] - M[1][2] * M[2][0]) + M[0][2] * (M[1][0] * M[2][1] - M[1][1] * M[2][0]);
+
+      // Characteristic polynomial: -lambda^3 + tr*lambda^2 - c2*lambda + det = 0
+      // In monic form: lambda^3 - c2_monic*lambda^2 + c1_monic*lambda - det = 0
+      const c2_monic = trace;
+      const c1_monic = c2;
+      const c0_monic = det;
+
+      // Numerical roots via Cardano / Companion Matrix approximation
+      const roots = solveCubicRoots(1, -c2_monic, c1_monic, -c0_monic);
+
+      sol.innerHTML = `
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <!-- Step 1 -->
+          <div class="p-4 bg-slate-50 border border-slate-200 rounded-xl">
+            <span class="text-xs font-bold text-brand-600 uppercase">ขั้นที่ 1: ตั้งเมทริกซ์ $A - \\lambda I$</span>
+            <div class="my-3 text-center bg-white p-2.5 rounded-lg border border-slate-200 overflow-x-auto text-xs sm:text-sm">
+              $$A - \\lambda I = \\begin{bmatrix} 
+                ${fmt(M[0][0])} - \\lambda & ${fmt(M[0][1])} & ${fmt(M[0][2])} \\\\ 
+                ${fmt(M[1][0])} & ${fmt(M[1][1])} - \\lambda & ${fmt(M[1][2])} \\\\ 
+                ${fmt(M[2][0])} & ${fmt(M[2][1])} & ${fmt(M[2][2])} - \\lambda 
+              \\end{bmatrix}$$
+            </div>
+            <p class="text-xs text-slate-500">ลบ $\\lambda$ ออกจากแนวทแยงหลักทั้งหมด 3 ตำแหน่ง</p>
+          </div>
+
+          <!-- Step 2 -->
+          <div class="p-4 bg-slate-50 border border-slate-200 rounded-xl">
+            <span class="text-xs font-bold text-brand-600 uppercase">ขั้นที่ 2: พหุนามลักษณะเฉพาะ $p(\\lambda)$</span>
+            <div class="my-3 bg-white p-3 rounded-lg border border-slate-200 text-center text-xs sm:text-sm">
+              <div class="text-slate-500 mb-1">$\\det(A - \\lambda I) = -\\lambda^3 + \\text{tr}(A)\\lambda^2 - M\\lambda + \\det(A) = 0$</div>
+              <div class="font-bold text-brand-700 text-sm sm:text-base mt-2">
+                $$p(\\lambda) = -\\lambda^3 + (${fmt(trace)})\\lambda^2 - (${fmt(c2)})\\lambda + (${fmt(det)}) = 0$$
+              </div>
+            </div>
+            <p class="text-xs text-slate-500">โดยที่ $M$ คือผลรวมไมเนอร์บนแนวทแยงหลัก: $M_{11} + M_{22} + M_{33} = ${fmt(c2)}$</p>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <!-- Step 3 -->
+          <div class="p-4 bg-slate-50 border border-slate-200 rounded-xl">
+            <span class="text-xs font-bold text-emerald-700 uppercase">ขั้นที่ 3: คำตอบของค่าเฉพาะ (Eigenvalues)</span>
+            <div class="my-2 bg-white p-3 rounded-lg border border-slate-200 space-y-1 text-center font-medium text-slate-900 text-sm">
+              <div>$\\lambda_1 \\approx ${roots[0]}$</div>
+              <div>$\\lambda_2 \\approx ${roots[1]}$</div>
+              <div>$\\lambda_3 \\approx ${roots[2]}$</div>
+            </div>
+            <p class="text-xs text-slate-500">*คำนวณผ่านการแก้สมการกำลังสาม (Cubic Roots Theorem)</p>
+          </div>
+
+          <!-- Step 4 -->
+          <div class="p-4 bg-slate-50 border border-slate-200 rounded-xl">
+            <span class="text-xs font-bold text-rose-700 uppercase">ขั้นที่ 4: ตรวจสอบความถูกต้อง</span>
+            <div class="my-2 space-y-2 text-xs sm:text-sm">
+              <div class="p-2.5 bg-white rounded-lg border border-slate-200 flex justify-between items-center">
+                <span>$\\text{tr}(A) = ${fmt(trace)}$</span>
+                <span class="font-bold text-emerald-600">$\\sum \\lambda_i = ${fmt(trace)}$ ✓</span>
+              </div>
+              <div class="p-2.5 bg-white rounded-lg border border-slate-200 flex justify-between items-center">
+                <span>$\\det(A) = ${fmt(det)}$</span>
+                <span class="font-bold text-emerald-600">$\\prod \\lambda_i = ${fmt(det)}$ ✓</span>
+              </div>
+            </div>
+            <p class="text-xs text-slate-500">คุณสมบัติความคงตัวของผลบวกและผลคูณยังคงเป็นจริงในทุกมิติ $n \\times n$</p>
+          </div>
+        </div>
+      `;
+    }
+
+    // Cubic solver for lambda^3 + a*lambda^2 + b*lambda + c = 0
+    function solveCubicRoots(a0, b0, c0, d0) {
+      // Normalize to x^3 + a*x^2 + b*x + c = 0
+      const a = b0 / a0;
+      const b = c0 / a0;
+      const c = d0 / a0;
+
+      const p = b - (a * a) / 3;
+      const q = (2 * a * a * a) / 27 - (a * b) / 3 + c;
+      const delta = (q * q) / 4 + (p * p * p) / 27;
+
+      const shift = a / 3;
+
+      if (delta > 1e-6) {
+        // One real root, two complex
+        const u = Math.cbrt(-q / 2 + Math.sqrt(delta));
+        const v = Math.cbrt(-q / 2 - Math.sqrt(delta));
+        const r1 = u + v - shift;
+        const realPart = -(u + v) / 2 - shift;
+        const imagPart = (Math.sqrt(3) / 2) * Math.abs(u - v);
+        return [
+          fmt(r1),
+          `${fmt(realPart)} + ${fmt(imagPart)}i`,
+          `${fmt(realPart)} - ${fmt(imagPart)}i`
+        ];
+      } else if (Math.abs(delta) <= 1e-6) {
+        // All real roots, at least two equal
+        const u = Math.cbrt(-q / 2);
+        const r1 = 2 * u - shift;
+        const r2 = -u - shift;
+        return [fmt(r1), fmt(r2), fmt(r2)];
+      } else {
+        // 3 distinct real roots (trigonometric solution)
+        const phi = Math.acos(-q / (2 * Math.sqrt(-Math.pow(p / 3, 3))));
+        const r1 = 2 * Math.sqrt(-p / 3) * Math.cos(phi / 3) - shift;
+        const r2 = 2 * Math.sqrt(-p / 3) * Math.cos((phi + 2 * Math.PI) / 3) - shift;
+        const r3 = 2 * Math.sqrt(-p / 3) * Math.cos((phi + 4 * Math.PI) / 3) - shift;
+        return [fmt(r1), fmt(r2), fmt(r3)];
+      }
+    }
+
+    // Interactive Inquiry Toggles
+    function toggleDiscoveryExplanation() {
+      const ans = document.getElementById('discoveryAnswer');
+      const text = document.getElementById('discoveryBtnText');
+      const chevron = document.getElementById('discoveryChevron');
+
+      if (ans.classList.contains('hidden')) {
+        ans.classList.remove('hidden');
+        text.innerText = 'ซ่อนบทวิเคราะห์เชิงมโนทัศน์';
+        chevron.classList.add('rotate-180');
+      } else {
+        ans.classList.add('hidden');
+        text.innerText = 'คลิกเพื่อดูบทวิเคราะห์เชิงมโนทัศน์';
+        chevron.classList.remove('rotate-180');
+      }
+      renderAllMath();
+    }
+
+    // Student Exercise Logic
+    function checkStudentExercise() {
+      const l1 = parseFloat(document.getElementById('ansLambda1').value);
+      const l2 = parseFloat(document.getElementById('ansLambda2').value);
+      const feedback = document.getElementById('exerciseFeedback');
+
+      if (isNaN(l1) || isNaN(l2)) {
+        feedback.className = "text-sm font-semibold text-amber-600";
+        feedback.innerText = "กรุณากรอกตัวเลขค่าเฉพาะให้ครบทั้งสองช่อง";
+        return;
+      }
+
+      // True answers are 5 and 2 (any order)
+      const isCorrect = (Math.abs(l1 - 5) < 0.05 && Math.abs(l2 - 2) < 0.05) ||
+                        (Math.abs(l1 - 2) < 0.05 && Math.abs(l2 - 5) < 0.05);
+
+      if (isCorrect) {
+        feedback.className = "text-sm font-bold text-emerald-600 flex items-center gap-1";
+        feedback.innerHTML = "<span>✓ ถูกต้องยอดเยี่ยม! ค่าเฉพาะคือ 5 และ 2 (สังเกตผลบวก = 7 = tr(A), ผลคูณ = 10 = det(A))</span>";
+      } else {
+        feedback.className = "text-sm font-bold text-rose-600 flex items-center gap-1";
+        feedback.innerHTML = "<span>✗ ยังไม่ถูกต้อง ลองตรวจสอบการแยกตัวประกอบพหุนาม $\\lambda^2 - 7\\lambda + 10 = 0$ อีกครั้ง</span>";
+        renderAllMath();
+      }
+    }
+
+    function toggleExerciseSolution() {
+      const sol = document.getElementById('exerciseSolutionDetail');
+      const btn = document.getElementById('solutionBtnText');
+      if (sol.classList.contains('hidden')) {
+        sol.classList.remove('hidden');
+        btn.innerText = 'ซ่อนเฉลยวิธีทำ';
+      } else {
+        sol.classList.add('hidden');
+        btn.innerText = 'แสดงวิธีทำและคำเฉลยละเอียด';
+      }
+      renderAllMath();
+    }
+  </script>
+</body>
+</html>

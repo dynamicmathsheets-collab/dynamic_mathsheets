@@ -1,0 +1,907 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>เรื่องที่ 7: การประยุกต์เมทริกซ์แนวทแยงและเมทริกซ์กำลังสูง</title>
+
+  <!-- Google Fonts: Sarabun & Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Sarabun:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- KaTeX for high-performance LaTeX formula rendering -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js"></script>
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Sarabun', 'Inter', 'sans-serif'],
+          },
+          colors: {
+            brand: {
+              50: '#eef2ff',
+              100: '#e0e7ff',
+              200: '#c7d2fe',
+              500: '#6366f1',
+              600: '#4f46e5',
+              700: '#4338ca',
+              800: '#3730a3',
+              900: '#312e81',
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    .katex { font-size: 1.05em; }
+    .matrix-bracket {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      padding: 0 8px;
+    }
+    .matrix-bracket::before {
+      content: "";
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 5px;
+      border-left: 2px solid #4f46e5;
+      border-top: 2px solid #4f46e5;
+      border-bottom: 2px solid #4f46e5;
+      border-radius: 4px 0 0 4px;
+    }
+    .matrix-bracket::after {
+      content: "";
+      position: absolute;
+      right: 0;
+      top: 0;
+      bottom: 0;
+      width: 5px;
+      border-right: 2px solid #4f46e5;
+      border-top: 2px solid #4f46e5;
+      border-bottom: 2px solid #4f46e5;
+      border-radius: 0 4px 4px 0;
+    }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-800 antialiased selection:bg-brand-100 selection:text-brand-800">
+
+  <!-- Header Banner -->
+  <header class="bg-gradient-to-r from-brand-900 via-indigo-900 to-slate-900 text-white py-10 shadow-md">
+    <div class="max-w-6xl w-full mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+        <div>
+
+          <h1 class="text-2xl sm:text-3xl lg:text-4xl font-extrabold tracking-tight">
+            เรื่องที่ 7: การประยุกต์เมทริกซ์แนวทแยงและเมทริกซ์กำลังสูง
+          </h1>
+          <p class="text-slate-300 text-sm sm:text-base mt-1">
+            Applications of Diagonal Matrices, Matrix Powers $A^k = P D^k P^{-1}$, and Discrete Dynamical Systems
+          </p>
+        </div>
+        <div class="bg-white/10 backdrop-blur-md rounded-xl p-3.5 border border-white/15 text-center text-xs sm:text-sm">
+          <div class="text-brand-200 font-medium">สูตรเมทริกซ์กำลังสูง</div>
+          <div class="text-xl font-bold tracking-wide mt-0.5 text-white">$A^k = P D^k P^{-1}$</div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Container strictly set to max-w-6xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 -->
+  <main class="max-w-6xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 space-y-10">
+
+    <!-- Section 1: วัตถุประสงค์การเรียนรู้ -->
+    <section class="bg-white rounded-2xl p-6 sm:p-7 shadow-sm border border-slate-200/80">
+      <div class="flex items-center gap-3 mb-4">
+        <div class="w-9 h-9 rounded-xl bg-indigo-100 text-brand-600 flex items-center justify-center font-bold text-lg shadow-inner">
+          1
+        </div>
+        <h2 class="text-xl sm:text-2xl font-bold text-slate-900">วัตถุประสงค์การเรียนรู้ (Learning Objectives)</h2>
+      </div>
+      <div class="bg-gradient-to-r from-indigo-50 to-slate-50 border-l-4 border-brand-600 p-4 rounded-r-xl">
+        <ul class="space-y-2.5 text-slate-700 leading-relaxed font-medium text-sm sm:text-base">
+          <li class="flex items-start gap-2.5">
+            <svg class="w-5 h-5 text-brand-600 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+            <span>นักศึกษาสามารถ<strong>ใช้การทำให้เป็นเมทริกซ์แนวทแยง (Diagonalization)</strong> เพื่อลดทอนความซับซ้อนในการคำนวณเมทริกซ์กำลังสูง $A^k$ ได้อย่างมีประสิทธิภาพ</span>
+          </li>
+          <li class="flex items-start gap-2.5">
+            <svg class="w-5 h-5 text-brand-600 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+            <span>นักศึกษาสามารถ<strong>อธิบายประโยชน์และวิเคราะห์ขอบเขตข้อจำกัด</strong>ของวิธีดังกล่าวในการประยุกต์ใช้กับระบบพลวัตแบบไม่ต่อเนื่อง (Discrete Dynamical Systems) และมาร์คอฟเชนได้</span>
+          </li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- Section 2: เนื้อหาหลัก -->
+    <section class="bg-white rounded-2xl p-6 sm:p-7 shadow-sm border border-slate-200/80">
+      <div class="flex items-center gap-3 mb-6">
+        <div class="w-9 h-9 rounded-xl bg-indigo-100 text-brand-600 flex items-center justify-center font-bold text-lg shadow-inner">
+          2
+        </div>
+        <h2 class="text-xl sm:text-2xl font-bold text-slate-900">เนื้อหาหลัก (Core Mathematical Foundations)</h2>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <!-- 2.1 การคำนวณ A^k และสมบัติ Telescoping -->
+        <div class="bg-slate-50/80 border border-slate-200 rounded-xl p-5 hover:border-brand-300 transition-colors">
+          <div class="flex items-center justify-between mb-3">
+            <span class="text-xs font-bold uppercase tracking-wider text-brand-700 bg-brand-100 px-2.5 py-0.5 rounded-full">หัวข้อ 2.1 & 2.2</span>
+            <span class="text-xs text-slate-500">Telescoping Cancellation</span>
+          </div>
+          <h3 class="text-lg font-bold text-slate-800 mb-2">จาก $A = PDP^{-1}$ สู่ $A^k = PD^kP^{-1}$</h3>
+          <p class="text-slate-600 text-sm leading-relaxed mb-3">
+            เมื่อเมทริกซ์ $A$ สามารถทำให้เป็นแนวทแยงได้ ($A = PDP^{-1}$) การยกกำลัง $k$ ของเมทริกซ์ $A$ จะเกิดการหักล้างของเมทริกซ์ผกผันภายในแบบลูกโซ่ (Telescoping property):
+          </p>
+          <div class="bg-white p-3 rounded-lg border border-slate-200 font-mono text-center text-xs sm:text-sm text-slate-900 shadow-sm leading-loose">
+            $$A^2 = (PDP^{-1})(PDP^{-1}) = PD(\underbrace{P^{-1}P}_{I})DP^{-1} = PD^2P^{-1}$$
+            $$A^k = \underbrace{(PDP^{-1})(PDP^{-1})\cdots(PDP^{-1})}_{k \text{ ครั้ง}} = PD^kP^{-1}$$
+          </div>
+          <p class="text-xs text-slate-600 mt-2">
+            ทำให้เราไม่ต้องนำเมทริกซ์เต็มรูป $A$ มาคูณกันซ้ำๆ $k-1$ ครั้ง แต่เปลี่ยนเป็นการยกกำลังเมทริกซ์แนวทแยง $D$ เพียงครั้งเดียว
+          </p>
+        </div>
+
+        <!-- 2.3 การยกกำลังเมทริกซ์แนวทแยง -->
+        <div class="bg-slate-50/80 border border-slate-200 rounded-xl p-5 hover:border-brand-300 transition-colors">
+          <div class="flex items-center justify-between mb-3">
+            <span class="text-xs font-bold uppercase tracking-wider text-indigo-700 bg-indigo-100 px-2.5 py-0.5 rounded-full">หัวข้อ 2.3</span>
+            <span class="text-xs text-slate-500">Element-wise Power</span>
+          </div>
+          <h3 class="text-lg font-bold text-slate-800 mb-2">การยกกำลังเมทริกซ์แนวทแยง $D^k$</h3>
+          <p class="text-slate-600 text-sm leading-relaxed mb-2">
+            เนื่องจากเมทริกซ์แนวทแยง $D$ มีสมาชิกนอกแนวทแยงหลักเป็นศูนย์ทั้งหมด การยกกำลังจึงทำได้โดยยกกำลังสมาชิกบนเส้นทแยงมุมหลักโดยตรงทีละตัว:
+          </p>
+          <div class="bg-white p-3 rounded-lg border border-slate-200 text-center font-mono my-2 text-xs sm:text-sm text-indigo-950 shadow-sm">
+            $$D = \begin{bmatrix} \lambda_1 & 0 & \dots & 0 \\ 0 & \lambda_2 & \dots & 0 \\ \vdots & \vdots & \ddots & \vdots \\ 0 & 0 & \dots & \lambda_n \end{bmatrix} \implies D^k = \begin{bmatrix} \lambda_1^k & 0 & \dots & 0 \\ 0 & \lambda_2^k & \dots & 0 \\ \vdots & \vdots & \ddots & \vdots \\ 0 & 0 & \dots & \lambda_n^k \end{bmatrix}$$
+          </div>
+          <p class="text-xs text-slate-600 mt-2">
+            ไม่ว่าจะต้องการคำนวณ $k = 10, 100$ หรือ $1,000$ การยกกำลังตัวเลขสเกลาร์ $\lambda_i^k$ ทำได้ในเวลาที่รวดเร็วมาก ($O(\log k)$ ผ่าน Exponentiation by squaring)
+          </p>
+        </div>
+
+        <!-- 2.4 การประยุกต์กับระบบพลวัต -->
+        <div class="bg-slate-50/80 border border-slate-200 rounded-xl p-5 hover:border-brand-300 transition-colors">
+          <div class="flex items-center justify-between mb-3">
+            <span class="text-xs font-bold uppercase tracking-wider text-emerald-700 bg-emerald-100 px-2.5 py-0.5 rounded-full">หัวข้อ 2.4</span>
+            <span class="text-xs text-slate-500">Real-world Systems</span>
+          </div>
+          <h3 class="text-lg font-bold text-slate-800 mb-2">การประยุกต์กับระบบพลวัตแบบไม่ต่อเนื่อง</h3>
+          <p class="text-slate-600 text-sm leading-relaxed mb-2">
+            พิจารณาระบบการเปลี่ยนสถานะตามเวลาไม่ต่อเนื่อง $\mathbf{x}_{k+1} = A\mathbf{x}_k$ สถานะที่เวลา $k$ ใดๆ จะคำนวณได้จาก:
+          </p>
+          <div class="bg-white p-2.5 rounded-lg border border-slate-200 text-center font-mono my-2 text-xs sm:text-sm text-emerald-900 shadow-sm">
+            $$\mathbf{x}_k = A^k \mathbf{x}_0 = P D^k P^{-1} \mathbf{x}_0 = c_1 \lambda_1^k \mathbf{v}_1 + c_2 \lambda_2^k \mathbf{v}_2 + \dots + c_n \lambda_n^k \mathbf{v}_n$$
+          </div>
+          <ul class="text-xs text-slate-600 mt-2 space-y-1">
+            <li>&bull; <strong>Markov Chains:</strong> จำลองการกระจายตัวของประชากรในระยะยาว ($k \to \infty$) เพื่อหาสถานะคงตัว (Steady-state) เมื่อ $\lambda_1 = 1$</li>
+            <li>&bull; <strong>Fibonacci Numbers:</strong> เมทริกซ์ $A = \begin{bmatrix} 1 & 1 \\ 1 & 0 \end{bmatrix}$ ให้สูตรปิด Binet's Formula สำหรับหา $F_k$ โดยไม่ต้องคำนวณย้อนหลังทีละพจน์</li>
+          </ul>
+        </div>
+
+        <!-- 2.5 ข้อจำกัดเมทริกซ์ Defective -->
+        <div class="bg-slate-50/80 border border-slate-200 rounded-xl p-5 hover:border-brand-300 transition-colors">
+          <div class="flex items-center justify-between mb-3">
+            <span class="text-xs font-bold uppercase tracking-wider text-rose-700 bg-rose-100 px-2.5 py-0.5 rounded-full">หัวข้อ 2.5</span>
+            <span class="text-xs text-slate-500">Defective Limitations</span>
+          </div>
+          <h3 class="text-lg font-bold text-slate-800 mb-2">ข้อจำกัดเมื่อเมทริกซ์ไม่สามารถทำให้เป็นแนวทแยงได้</h3>
+          <p class="text-slate-600 text-sm leading-relaxed mb-2">
+            ถ้าเมทริกซ์ $A$ ขาดเวกเตอร์ลักษณะเฉพาะอิสระเชิงเส้น ($m_g(\lambda) < m_a(\lambda)$ หรือ Defective matrix) จะไม่สามารถหา $P^{-1}$ ได้:
+          </p>
+          <div class="bg-white p-2.5 rounded-lg border border-slate-200 text-center text-xs sm:text-sm text-rose-950 shadow-sm font-semibold my-2">
+            ไม่สามารถเขียนในรูป $A^k = P D^k P^{-1}$ ได้โดยตรง
+          </div>
+          <p class="text-xs text-slate-600 mt-2">
+            <strong>ทางออกในทางคณิตศาสตร์:</strong> ต้องเปลี่ยนไปใช้ <em>Jordan Canonical Form</em> ($A = P J P^{-1}$) โดยที่บล็อกจอร์แดน $J_m(\lambda)^k$ จะมีพจน์การลู่เข้าที่เกี่ยวข้องกับสัมประสิทธิ์ทวินาม $\binom{k}{j}\lambda^{k-j}$ ซึ่งซับซ้อนกว่าเมทริกซ์แนวทแยงล้วน
+          </p>
+        </div>
+      </div>
+
+      <!-- Computational Complexity Comparison Table -->
+      <div class="mt-6 overflow-hidden rounded-xl border border-slate-200">
+        <div class="bg-slate-100/80 px-4 py-3 border-b border-slate-200">
+          <h4 class="font-bold text-slate-800 text-sm sm:text-base flex items-center gap-2">
+            <span class="w-2.5 h-2.5 rounded-full bg-brand-600"></span>
+            ตารางเปรียบเทียบความซับซ้อนในการคำนวณ (Computational Complexity: $A^k$)
+          </h4>
+        </div>
+        <div class="overflow-x-auto">
+          <table class="w-full text-left border-collapse text-xs sm:text-sm">
+            <thead>
+              <tr class="bg-slate-50 text-slate-700 border-b border-slate-200">
+                <th class="p-3.5 font-bold w-1/4">มิติการเปรียบเทียบ</th>
+                <th class="p-3.5 font-bold w-3/8 text-slate-700">วิธีคูณเมทริกซ์ซ้ำโดยตรง (Direct Multiplication)</th>
+                <th class="p-3.5 font-bold w-3/8 text-brand-700">วิธีแยกตัวประกอบแนวทแยง (Diagonalization: $P D^k P^{-1}$)</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-200 text-slate-600">
+              <tr class="hover:bg-slate-50/50">
+                <td class="p-3.5 font-semibold text-slate-800">จำนวนการคูณเมทริกซ์</td>
+                <td class="p-3.5">ต้องคูณเมทริกซ์ $k - 1$ ครั้ง (หรือ $O(\log k)$ ครั้งหากใช้ Binary Exponentiation)</td>
+                <td class="p-3.5 text-emerald-700 font-semibold">คูณเมทริกซ์ขนาดเต็มเพียง 2 ครั้งเท่านั้น ($P \times D^k$ และคูณต่อด้วย $P^{-1}$)</td>
+              </tr>
+              <tr class="hover:bg-slate-50/50">
+                <td class="p-3.5 font-semibold text-slate-800">ความซับซ้อนเชิงเวลา (Time Complexity)</td>
+                <td class="p-3.5 font-mono text-rose-700 font-bold">$O(k \cdot n^3)$ หรือ $O(\log k \cdot n^3)$</td>
+                <td class="p-3.5 font-mono text-emerald-700 font-bold">$O(n^3 + n \log k)$</td>
+              </tr>
+              <tr class="hover:bg-slate-50/50">
+                <td class="p-3.5 font-semibold text-slate-800">การวิเคราะห์ลิมิตระยะยาว ($k \to \infty$)</td>
+                <td class="p-3.5 text-slate-500">ทำไม่ได้ ต้องวนลูปคำนวณทีละรอบเรื่อยๆ ไม่เห็นพฤติกรรมเชิงวิเคราะห์</td>
+                <td class="p-3.5 text-emerald-700 font-medium">วิเคราะห์พฤติกรรมระยะยาวได้ทันทีจากการดูลักษณะของ $|\lambda_i| < 1, = 1$ หรือ $> 1$</td>
+              </tr>
+              <tr class="hover:bg-slate-50/50">
+                <td class="p-3.5 font-semibold text-slate-800">ความคุ้มค่า</td>
+                <td class="p-3.5">เหมาะสำหรับค่า $k$ น้อยๆ ($k = 2, 3$)</td>
+                <td class="p-3.5 text-brand-700 font-semibold">คุ้มค่าอย่างยิ่งเมื่อ $k$ มีค่ามาก ($k \ge 5, 50, 1000$) หรือต้องประเมินหลายค่า $k$</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- Section 3: แบบจำลองโต้ตอบ (Interactive Simulator) -->
+    <section class="bg-white rounded-2xl p-6 sm:p-7 shadow-sm border border-slate-200/80">
+      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6 pb-4 border-b border-slate-100">
+        <div class="flex items-center gap-3">
+          <div class="w-9 h-9 rounded-xl bg-indigo-100 text-brand-600 flex items-center justify-center font-bold text-lg shadow-inner">
+            3
+          </div>
+          <div>
+            <h2 class="text-xl sm:text-2xl font-bold text-slate-900">แบบจำลองโต้ตอบ: เปรียบเทียบการคำนวณ $A^k$</h2>
+            <p class="text-xs sm:text-sm text-slate-500">ป้อนเมทริกซ์ $A$ และปรับเลขชี้กำลัง $k$ เพื่อดูการคำนวณแบบคูณซ้ำเทียบกับสูตร $P D^k P^{-1}$ และตัววัดประสิทธิภาพ</p>
+          </div>
+        </div>
+
+        <!-- Presets Selection Bar -->
+        <div class="flex items-center gap-2">
+          <label class="text-xs font-semibold text-slate-600">พรีเซ็ตเมทริกซ์:</label>
+          <select id="presetSelect" onchange="loadPreset(this.value)" class="text-xs sm:text-sm bg-slate-100 border border-slate-300 rounded-lg px-2.5 py-1.5 font-medium focus:ring-2 focus:ring-brand-500 focus:outline-none">
+            <option value="ex1">1) เมทริกซ์โจทย์หลัก: [[4, 1], [2, 3]]</option>
+            <option value="diag">2) เมทริกซ์แนวทแยง: [[3, 0], [0, 2]]</option>
+            <option value="markov">3) มาร์คอฟเชน (Stochastic): [[0.8, 0.3], [0.2, 0.7]]</option>
+            <option value="fib">4) เมทริกซ์ฟีโบนัชชี: [[1, 1], [1, 0]]</option>
+            <option value="shear">5) Shear Matrix (Defective): [[2, 1], [0, 2]]</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Controls Grid: Matrix Input & Exponent Slider -->
+      <div class="bg-slate-50 rounded-2xl p-5 border border-slate-200 mb-6">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-center">
+          
+          <!-- Matrix A Input -->
+          <div class="lg:col-span-5 flex flex-col items-center">
+            <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">เมทริกซ์ต้นแบบ $A$</span>
+            <div class="matrix-bracket py-1">
+              <div class="grid grid-cols-2 gap-2">
+                <input type="number" id="inp_a00" value="4" step="any" onchange="onMatrixUpdated()" class="w-14 h-11 text-center font-bold bg-white rounded-lg border border-slate-300 shadow-sm focus:ring-2 focus:ring-brand-500 focus:outline-none">
+                <input type="number" id="inp_a01" value="1" step="any" onchange="onMatrixUpdated()" class="w-14 h-11 text-center font-bold bg-white rounded-lg border border-slate-300 shadow-sm focus:ring-2 focus:ring-brand-500 focus:outline-none">
+                <input type="number" id="inp_a10" value="2" step="any" onchange="onMatrixUpdated()" class="w-14 h-11 text-center font-bold bg-white rounded-lg border border-slate-300 shadow-sm focus:ring-2 focus:ring-brand-500 focus:outline-none">
+                <input type="number" id="inp_a11" value="3" step="any" onchange="onMatrixUpdated()" class="w-14 h-11 text-center font-bold bg-white rounded-lg border border-slate-300 shadow-sm focus:ring-2 focus:ring-brand-500 focus:outline-none">
+              </div>
+            </div>
+            <div id="statusBadge" class="mt-2 text-xs font-semibold px-2.5 py-0.5 rounded-full">
+              <!-- Diagonalizable status -->
+            </div>
+          </div>
+
+          <!-- Exponent Control Slider & Input -->
+          <div class="lg:col-span-7 flex flex-col justify-center bg-white p-4 rounded-xl border border-slate-200 shadow-sm space-y-3">
+            <div class="flex items-center justify-between">
+              <label for="expSlider" class="text-xs sm:text-sm font-bold text-slate-700">
+                เลขชี้กำลัง ($k$):
+              </label>
+              <div class="flex items-center gap-2">
+                <input type="number" id="expNumber" min="1" max="100" value="5" onchange="syncExponent(this.value)" class="w-16 px-2 py-1 text-center font-bold bg-slate-50 border border-slate-300 rounded-lg text-sm text-brand-700 focus:outline-none focus:ring-2 focus:ring-brand-500">
+                <span class="text-xs text-slate-500">รอบ</span>
+              </div>
+            </div>
+            <input type="range" id="expSlider" min="1" max="50" value="5" oninput="syncExponent(this.value)" class="w-full accent-brand-600 cursor-pointer">
+            <div class="flex justify-between text-[11px] text-slate-400 font-medium">
+              <span>$k = 1$</span>
+              <span>$k = 10$</span>
+              <span>$k = 25$</span>
+              <span>$k = 50$</span>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Side-by-Side Dual Calculation Comparison -->
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 items-stretch mb-6">
+        
+        <!-- Method 1: Direct Multiplication -->
+        <div class="bg-slate-50 border border-slate-200 rounded-2xl p-5 flex flex-col justify-between">
+          <div>
+            <div class="flex items-center justify-between pb-2 mb-3 border-b border-slate-200">
+              <h3 class="font-bold text-slate-800 text-sm sm:text-base flex items-center gap-2">
+                <span class="w-2.5 h-2.5 rounded-full bg-slate-600"></span>
+                วิธีที่ 1: การคูณเมทริกซ์ซ้ำโดยตรง (Direct Multiplication)
+              </h3>
+              <span class="text-[11px] font-semibold text-slate-500 bg-slate-200/70 px-2 py-0.5 rounded">คูณ $A \times A \dots$</span>
+            </div>
+            <p class="text-xs text-slate-600 mb-3">
+              คำนวณสะสมแบบวนรอบ $A^k = A \times A \times \dots \times A$ (คูณเมทริกซ์ $2 \times 2$ ซ้ำทั้งหมด $k - 1$ ครั้ง):
+            </p>
+            <div id="directMultiplicationDetail" class="bg-white p-3.5 rounded-xl border border-slate-200 text-center font-mono text-xs sm:text-sm my-2">
+              <!-- Direct result populated via JS -->
+            </div>
+          </div>
+
+          <!-- Direct Operations Metric -->
+          <div class="mt-4 pt-3 border-t border-slate-200 grid grid-cols-2 gap-2 text-center text-xs">
+            <div class="bg-white p-2 rounded-lg border border-slate-200">
+              <span class="text-slate-500 text-[11px] block">การคูณเมทริกซ์</span>
+              <span id="directMatrixMults" class="font-bold text-slate-800">4 ครั้ง</span>
+            </div>
+            <div class="bg-white p-2 rounded-lg border border-slate-200">
+              <span class="text-slate-500 text-[11px] block">การคูณสเกลาร์ (Scalar Mults)</span>
+              <span id="directScalarOps" class="font-bold text-rose-700">32 ครั้ง</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Method 2: Spectral Diagonalization -->
+        <div class="bg-indigo-50/50 border border-indigo-200 rounded-2xl p-5 flex flex-col justify-between">
+          <div>
+            <div class="flex items-center justify-between pb-2 mb-3 border-b border-indigo-200">
+              <h3 class="font-bold text-brand-900 text-sm sm:text-base flex items-center gap-2">
+                <span class="w-2.5 h-2.5 rounded-full bg-brand-600"></span>
+                วิธีที่ 2: ใช้สูตรการแยกตัวประกอบแนวทแยง ($P D^k P^{-1}$)
+              </h3>
+              <span class="text-[11px] font-semibold text-brand-700 bg-brand-100 px-2 py-0.5 rounded">Telescoping Method</span>
+            </div>
+            <p class="text-xs text-indigo-950 mb-3">
+              ยกกำลังค่าเฉพาะบนแนวทแยง $D^k = \operatorname{diag}(\lambda_1^k, \lambda_2^k)$ แล้วประกบหัวท้ายด้วย $P$ และ $P^{-1}$:
+            </p>
+            <div id="diagonalMultiplicationDetail" class="bg-white p-3.5 rounded-xl border border-indigo-200 text-center font-mono text-xs sm:text-sm my-2">
+              <!-- Diagonal result populated via JS -->
+            </div>
+          </div>
+
+          <!-- Spectral Operations Metric -->
+          <div class="mt-4 pt-3 border-t border-indigo-200 grid grid-cols-2 gap-2 text-center text-xs">
+            <div class="bg-white p-2 rounded-lg border border-indigo-200">
+              <span class="text-slate-500 text-[11px] block">การคูณเมทริกซ์เต็มรูป</span>
+              <span id="spectralMatrixMults" class="font-bold text-emerald-700">คงที่เพียง 2 ครั้ง</span>
+            </div>
+            <div class="bg-white p-2 rounded-lg border border-indigo-200">
+              <span class="text-slate-500 text-[11px] block">การคำนวณ $\lambda_i^k$</span>
+              <span id="spectralScalarOps" class="font-bold text-brand-700">สเกลาร์ยกกำลัง 2 ตัว</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Verification Match Banner -->
+      <div id="verificationBanner" class="p-4 rounded-xl border flex flex-col sm:flex-row items-center justify-between gap-3 text-xs sm:text-sm">
+        <!-- Verification match details rendered by JS -->
+      </div>
+    </section>
+
+    <!-- Section 4: คำถามนำเพื่อค้นพบ -->
+    <section class="bg-white rounded-2xl p-6 sm:p-7 shadow-sm border border-slate-200/80">
+      <div class="flex items-center gap-3 mb-4">
+        <div class="w-9 h-9 rounded-xl bg-amber-100 text-amber-700 flex items-center justify-center font-bold text-lg shadow-inner">
+          4
+        </div>
+        <h2 class="text-xl sm:text-2xl font-bold text-slate-900">คำถามนำเพื่อค้นพบ (Inquiry & Deep Discovery)</h2>
+      </div>
+
+      <div class="bg-amber-50/70 border border-amber-200/90 rounded-2xl p-5 sm:p-6">
+        <div class="flex items-start gap-3">
+          <div class="p-2 bg-amber-500 text-white rounded-xl shrink-0 mt-0.5">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+          </div>
+          <div>
+            <h3 class="text-base sm:text-lg font-bold text-amber-950">
+              เหตุใดการยกกำลังเมทริกซ์แนวทแยงจึงง่ายกว่าการยกกำลังเมทริกซ์ทั่วไปอย่างมหาศาล?
+            </h3>
+            <p class="text-sm text-amber-900/80 mt-1">
+              อะไรคือกลไกพื้นฐานทางพีชคณิตและเรขาคณิตที่ทำให้เมทริกซ์แนวทแยงไม่มี "การพัวพันข้ามมิติ" (Cross-coupling of coordinates)?
+            </p>
+
+            <button id="toggleInquiryBtn" onclick="toggleInquiryAnswer()" class="mt-4 px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white font-medium text-xs sm:text-sm rounded-xl shadow transition-all inline-flex items-center gap-2">
+              <span id="inquiryBtnText">คลิกเพื่อดูบทวิเคราะห์การแยกมิติเป็นอิสระ (Uncoupling of Variables)</span>
+              <svg id="inquiryChevron" class="w-4 h-4 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+            </button>
+          </div>
+        </div>
+
+        <div id="inquiryContent" class="hidden mt-6 pt-5 border-t border-amber-200/80 space-y-4 text-slate-800 text-sm leading-relaxed">
+          <div class="p-4 bg-white rounded-xl border border-amber-200 space-y-3">
+            <h4 class="font-bold text-slate-900 text-sm sm:text-base flex items-center gap-2">
+              <span class="w-2 h-2 rounded-full bg-brand-600"></span>
+              บทวิเคราะห์เชิงมโนทัศน์: การแยกความเกี่ยวพันของระบบพิกัด (Decoupling)
+            </h4>
+            <p>
+              1. <strong>ในเมทริกซ์ทั่วไปที่ไม่ใช่แนวทแยง (Coupled System):</strong> สมาชิกนอกแนวทแยงหลัก ($a_{12}, a_{21}$) ทำหน้าที่ส่งผ่านอิทธิพลข้ามแกนพิกัด เมื่อคำนวณผลคูณ $A\mathbf{x}$ พิกัดใหม่ $x'_1$ จะขึ้นอยู่กับทั้ง $x_1$ และ $x_2$ ทำให้เมื่อคูณซ้ำ $k$ ครั้ง ค่าจะผสมปนเปกันอย่างซับซ้อนตามผลคูณทวินาม
+            </p>
+            <p>
+              2. <strong>ในเมทริกซ์แนวทแยง (Decoupled System):</strong> เมทริกซ์อยู่ในรูป $D = \begin{bmatrix} \lambda_1 & 0 \\ 0 & \lambda_2 \end{bmatrix}$ การกระทำบนเวกเตอร์ใดๆ คือ:
+            </p>
+            <div class="text-center font-mono my-2 text-indigo-900 bg-slate-50 py-2 rounded-lg border border-slate-200 text-xs sm:text-sm">
+              $$D\begin{bmatrix} x_1 \\ x_2 \end{bmatrix} = \begin{bmatrix} \lambda_1 x_1 \\ \lambda_2 x_2 \end{bmatrix} \implies D^k\begin{bmatrix} x_1 \\ x_2 \end{bmatrix} = \begin{bmatrix} \lambda_1^k x_1 \\ \lambda_2^k x_2 \end{bmatrix}$$
+            </div>
+            <p>
+              แกนพิกัดแต่ละแกนดำเนินวิวัฒนาการไป <strong>เป็นอิสระต่อกันโดยสมบูรณ์ (Completely Independent)</strong> แกน $x_1$ ขยายตัวด้วยอัตรา $\lambda_1$ ต่อรอบ และแกน $x_2$ ขยายตัวด้วยอัตรา $\lambda_2$ ต่อรอบ โดยไม่มีการส่งผลกระทบข้ามมิติกันเลย
+            </p>
+            <div class="bg-emerald-50/70 p-3.5 rounded-lg border border-emerald-200 text-xs sm:text-sm text-emerald-950 mt-2">
+              <strong>ข้อสรุปหลัก:</strong> การทำให้เป็นแนวทแยง $A = PDP^{-1}$ คือการ "เปลี่ยนระบบพิกัด" (Change of Basis) จากแกนพิกัดมาตรฐานที่เกี่ยวพันกัน ไปสู่ <em>แกนเวกเตอร์ลักษณะเฉพาะ (Eigenbasis)</em> ซึ่งในระบบพิกัดใหม่นี้ เมทริกซ์จะกลายเป็นอิสระต่อกัน จึงสามารถยกกำลังทีละแกนได้อย่างง่ายดาย
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Section 5: แบบฝึกหัดสำหรับนักศึกษา -->
+    <section class="bg-white rounded-2xl p-6 sm:p-7 shadow-sm border border-slate-200/80">
+      <div class="flex items-center gap-3 mb-6">
+        <div class="w-9 h-9 rounded-xl bg-indigo-100 text-brand-600 flex items-center justify-center font-bold text-lg shadow-inner">
+          5
+        </div>
+        <h2 class="text-xl sm:text-2xl font-bold text-slate-900">แบบฝึกหัดสำหรับนักศึกษา (Practice Exercise & Guided Solution)</h2>
+      </div>
+
+      <div class="bg-slate-50 border border-slate-200 rounded-2xl p-6 space-y-6">
+        <div class="border-b border-slate-200 pb-4">
+          <span class="text-xs font-bold uppercase tracking-wider text-brand-700 bg-brand-100 px-2.5 py-0.5 rounded-full">โจทย์ฝึกปฏิบัติ</span>
+          <p class="text-base sm:text-lg font-medium text-slate-900 mt-2">
+            กำหนดเมทริกซ์ 
+            $$A = \begin{bmatrix} 3 & 0 \\ 0 & 2 \end{bmatrix}$$
+            จงหา $A^5$ ด้วยวิธีตรง และอธิบายว่าการทำให้เป็นเมทริกซ์แนวทแยงช่วยลดขั้นตอนในการคำนวณอย่างไร
+          </p>
+        </div>
+
+        <!-- Student Interactive Form -->
+        <div class="space-y-4">
+          <div class="p-4 bg-white rounded-xl border border-slate-200 space-y-3">
+            <span class="text-xs font-bold text-slate-500 uppercase">ทดสอบป้อนคำตอบเมทริกซ์ $A^5 = \begin{bmatrix} a_{11} & a_{12} \\ a_{21} & a_{22} \end{bmatrix}$</span>
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+              <div>
+                <label class="block text-xs font-semibold text-slate-600 mb-1">ตำแหน่ง $a_{11}$ ($3^5$):</label>
+                <input id="ansA11" type="number" placeholder="เช่น 243" class="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-lg text-sm text-center font-bold focus:ring-2 focus:ring-brand-500 focus:outline-none">
+              </div>
+              <div>
+                <label class="block text-xs font-semibold text-slate-600 mb-1">ตำแหน่ง $a_{12}$:</label>
+                <input id="ansA12" type="number" placeholder="เช่น 0" class="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-lg text-sm text-center font-bold focus:ring-2 focus:ring-brand-500 focus:outline-none">
+              </div>
+              <div>
+                <label class="block text-xs font-semibold text-slate-600 mb-1">ตำแหน่ง $a_{21}$:</label>
+                <input id="ansA21" type="number" placeholder="เช่น 0" class="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-lg text-sm text-center font-bold focus:ring-2 focus:ring-brand-500 focus:outline-none">
+              </div>
+              <div>
+                <label class="block text-xs font-semibold text-slate-600 mb-1">ตำแหน่ง $a_{22}$ ($2^5$):</label>
+                <input id="ansA22" type="number" placeholder="เช่น 32" class="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-lg text-sm text-center font-bold focus:ring-2 focus:ring-brand-500 focus:outline-none">
+              </div>
+            </div>
+          </div>
+
+          <div class="flex flex-wrap items-center gap-3 pt-1">
+            <button onclick="checkExerciseAnswer()" class="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-sm rounded-xl shadow transition-all active:scale-95">
+              ตรวจคำตอบ
+            </button>
+            <button onclick="toggleExerciseSolution()" class="px-4 py-2.5 bg-white border border-slate-300 hover:bg-slate-100 text-slate-700 font-medium text-sm rounded-xl transition-all">
+              <span id="solutionBtnText">แสดงวิธีทำและคำเฉลยละเอียด</span>
+            </button>
+            <div id="exerciseFeedback" class="text-sm font-semibold"></div>
+          </div>
+        </div>
+
+        <!-- Full Detailed Solution (Collapsible) -->
+        <div id="exerciseSolutionDetail" class="hidden mt-6 pt-5 border-t border-slate-200 space-y-4 text-slate-800 text-sm">
+          <div class="bg-white p-5 rounded-xl border border-slate-200 space-y-4">
+            <div>
+              <h4 class="font-bold text-brand-700 mb-1 flex items-center gap-2">
+                <span class="w-2 h-2 rounded-full bg-brand-600"></span>
+                ส่วนที่ 1: การหา $A^5$ ด้วยคุณสมบัติของเมทริกซ์แนวทแยงโดยตรง
+              </h4>
+              <p class="text-slate-600 mb-2">
+                เนื่องจากเมทริกซ์ $A = \begin{bmatrix} 3 & 0 \\ 0 & 2 \end{bmatrix}$ เป็น <strong>เมทริกซ์แนวทแยงอยู่แล้ว (Diagonal Matrix)</strong> ดังนั้น $A = D$ โดยมี $P = I$:
+              </p>
+              <div class="bg-slate-50 p-3.5 rounded-lg text-center font-mono my-2 text-xs sm:text-sm">
+                $$A^5 = \begin{bmatrix} 3 & 0 \\ 0 & 2 \end{bmatrix}^5 = \begin{bmatrix} 3^5 & 0 \\ 0 & 2^5 \end{bmatrix} = \begin{bmatrix} 243 & 0 \\ 0 & 32 \end{bmatrix}$$
+              </div>
+            </div>
+
+            <div>
+              <h4 class="font-bold text-brand-700 mb-1 flex items-center gap-2">
+                <span class="w-2 h-2 rounded-full bg-brand-600"></span>
+                ส่วนที่ 2: การเปรียบเทียบขั้นตอนกับการคูณตรงแบบเดิม
+              </h4>
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs sm:text-sm mt-2">
+                <div class="p-3.5 bg-slate-50 rounded-lg border border-slate-200">
+                  <span class="font-bold text-slate-800 block mb-1">ถ้าคูณเมทริกซ์ซ้ำแบบเดิม:</span>
+                  ต้องคูณเมทริกซ์ $2 \times 2$ ทั้งหมด 4 ครั้ง ($A \times A \to A^2 \to A^3 \to A^4 \to A^5$) ซึ่งการคูณเมทริกซ์แต่ละครั้งต้องใช้การคูณสเกลาร์ 8 ครั้ง รวมเป็นการคูณตัวเลขถึง <strong>32 ครั้ง</strong> และการบวกอีก 16 ครั้ง
+                </div>
+                <div class="p-3.5 bg-emerald-50/70 rounded-lg border border-emerald-200">
+                  <span class="font-bold text-emerald-900 block mb-1">เมื่อใช้การทำให้เป็นแนวทแยง:</span>
+                  ลดทอนเหลือเพียงการยกกำลังตัวเลขสเกลาร์บนแนวทแยง 2 ตัว คือ $3^5 = 243$ และ $2^5 = 32$ ใช้การคูณตัวเลขเพียง <strong>8 ครั้ง</strong> (หรือน้อยกว่านั้นด้วย Binary Exponentiation) โดยไม่มีการบวกเลขข้ามแถวคอลัมน์เลย
+                </div>
+              </div>
+            </div>
+
+            <div class="p-4 bg-indigo-50/70 border border-indigo-200 rounded-xl space-y-1 text-indigo-950 text-xs sm:text-sm">
+              <span class="font-bold block">บทสรุปเชิงลึก:</span>
+              การที่เมทริกซ์อยู่ในรูปแนวทแยงช่วยลดความซับซ้อนจาก $O(k \cdot n^3)$ เหลือเพียง $O(n \cdot \log k)$ ยิ่งเลขชี้กำลัง $k$ และมิติ $n$ มีขนาดใหญ่ ประโยชน์ด้านเวลาและทรัพยากรการประมวลผลของคอมพิวเตอร์จะยิ่งทวีคูณอย่างมหาศาล
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+  </main>
+
+
+
+  <!-- Application Logic & Interactive Engine -->
+  <script>
+    // State
+    let matrixA = [
+      [4, 1],
+      [2, 3]
+    ];
+    let kValue = 5;
+
+    const presets = {
+      ex1: {
+        mat: [[4, 1], [2, 3]],
+        k: 5
+      },
+      diag: {
+        mat: [[3, 0], [0, 2]],
+        k: 5
+      },
+      markov: {
+        mat: [[0.8, 0.3], [0.2, 0.7]],
+        k: 10
+      },
+      fib: {
+        mat: [[1, 1], [1, 0]],
+        k: 8
+      },
+      shear: {
+        mat: [[2, 1], [0, 2]],
+        k: 4
+      }
+    };
+
+    window.onload = function() {
+      computeAllMatrixPowers();
+      renderAllMath();
+    };
+
+    function renderAllMath() {
+      if (window.renderMathInElement) {
+        renderMathInElement(document.body, {
+          delimiters: [
+            {left: '$$', right: '$$', display: true},
+            {left: '$', right: '$', display: false}
+          ],
+          throwOnError: false
+        });
+      }
+    }
+
+    function fmt(n) {
+      if (Math.abs(n - Math.round(n)) < 1e-4) return Math.round(n).toString();
+      if (Math.abs(n) > 1e6 || (Math.abs(n) < 1e-3 && Math.abs(n) > 0)) {
+        return n.toExponential(3);
+      }
+      return n.toFixed(3).replace(/\.?0+$/, '');
+    }
+
+    function loadPreset(key) {
+      if (presets[key]) {
+        matrixA = JSON.parse(JSON.stringify(presets[key].mat));
+        kValue = presets[key].k;
+        document.getElementById('inp_a00').value = matrixA[0][0];
+        document.getElementById('inp_a01').value = matrixA[0][1];
+        document.getElementById('inp_a10').value = matrixA[1][0];
+        document.getElementById('inp_a11').value = matrixA[1][1];
+        document.getElementById('expSlider').value = kValue;
+        document.getElementById('expNumber').value = kValue;
+        computeAllMatrixPowers();
+        renderAllMath();
+      }
+    }
+
+    function onMatrixUpdated() {
+      matrixA[0][0] = parseFloat(document.getElementById('inp_a00').value) || 0;
+      matrixA[0][1] = parseFloat(document.getElementById('inp_a01').value) || 0;
+      matrixA[1][0] = parseFloat(document.getElementById('inp_a10').value) || 0;
+      matrixA[1][1] = parseFloat(document.getElementById('inp_a11').value) || 0;
+      computeAllMatrixPowers();
+      renderAllMath();
+    }
+
+    function syncExponent(val) {
+      let num = parseInt(val) || 1;
+      if (num < 1) num = 1;
+      if (num > 100) num = 100;
+      kValue = num;
+      document.getElementById('expSlider').value = num;
+      document.getElementById('expNumber').value = num;
+      computeAllMatrixPowers();
+      renderAllMath();
+    }
+
+    // Matrix Multiplication Helper 2x2
+    function multiply2x2(m1, m2) {
+      return [
+        [
+          m1[0][0] * m2[0][0] + m1[0][1] * m2[1][0],
+          m1[0][0] * m2[0][1] + m1[0][1] * m2[1][1]
+        ],
+        [
+          m1[1][0] * m2[0][0] + m1[1][1] * m2[1][0],
+          m1[1][0] * m2[0][1] + m1[1][1] * m2[1][1]
+        ]
+      ];
+    }
+
+    // Direct Repeated Matrix Power
+    function matrixPowerDirect(A, k) {
+      let res = [
+        [1, 0],
+        [0, 1]
+      ];
+      for (let i = 0; i < k; i++) {
+        res = multiply2x2(res, A);
+      }
+      return res;
+    }
+
+    function computeAllMatrixPowers() {
+      const a = matrixA[0][0];
+      const b = matrixA[0][1];
+      const c = matrixA[1][0];
+      const d = matrixA[1][1];
+      const k = kValue;
+
+      // 1. Direct Computation
+      const directResult = matrixPowerDirect(matrixA, k);
+      const directMultCount = Math.max(0, k - 1);
+      const directScalarMults = directMultCount * 8; // 8 multiplications per 2x2 matrix product
+
+      document.getElementById('directMatrixMults').innerText = `${directMultCount} ครั้ง`;
+      document.getElementById('directScalarOps').innerText = `${directScalarMults} ครั้ง`;
+
+      const directDetailDiv = document.getElementById('directMultiplicationDetail');
+      directDetailDiv.innerHTML = `
+        <div class="text-xs text-slate-500 mb-1">ผลลัพธ์จากการคูณเมทริกซ์ $A$ ซ้ำ ${k} ครั้ง:</div>
+        $$A^{${k}} = \\begin{bmatrix} ${fmt(directResult[0][0])} & ${fmt(directResult[0][1])} \\\\ ${fmt(directResult[1][0])} & ${fmt(directResult[1][1])} \\end{bmatrix}$$
+      `;
+
+      // 2. Eigenvalues & Diagonalization
+      const trace = a + d;
+      const det = a * d - b * c;
+      const disc = trace * trace - 4 * det;
+
+      const badge = document.getElementById('statusBadge');
+      const diagDetailDiv = document.getElementById('diagonalMultiplicationDetail');
+      const verifyBanner = document.getElementById('verificationBanner');
+
+      if (disc < -1e-4) {
+        // Complex Eigenvalues
+        badge.className = "mt-2 text-xs font-semibold px-2.5 py-0.5 rounded-full bg-amber-100 text-amber-800 border border-amber-200";
+        badge.innerText = "ค่าเฉพาะเป็นจำนวนเชิงซ้อน (Complex)";
+
+        diagDetailDiv.innerHTML = `
+          <div class="text-xs text-amber-800 p-2 bg-amber-50 rounded-lg border border-amber-200">
+            เมทริกซ์นี้มีค่าเฉพาะเป็นจำนวนเชิงซ้อน ต้องใช้พิกัดเชิงขั้วหรือสนามเชิงซ้อน $\\mathbb{C}$ ในการคำนวณ
+          </div>
+        `;
+        verifyBanner.className = "p-4 rounded-xl border border-amber-200 bg-amber-50 text-amber-900 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs sm:text-sm";
+        verifyBanner.innerHTML = `
+          <span>⚡ เมทริกซ์ไม่มีค่าเฉพาะเป็นจำนวนจริง การคำนวณกำลังสูงในระบบจำนวนจริงจึงต้องอาศัยวิธีคูณซ้ำโดยตรง</span>
+        `;
+        return;
+      }
+
+      let l1, l2;
+      if (Math.abs(disc) <= 1e-4) {
+        l1 = trace / 2;
+        l2 = l1;
+      } else {
+        const sqrtD = Math.sqrt(disc);
+        l1 = (trace + sqrtD) / 2;
+        l2 = (trace - sqrtD) / 2;
+      }
+
+      // Check if defective
+      let isDefective = false;
+      let v1 = findEigenvector(a, b, c, d, l1);
+      let v2;
+
+      if (Math.abs(l1 - l2) < 1e-4) {
+        const m11 = a - l1, m12 = b, m21 = c, m22 = d - l1;
+        if (Math.abs(m11) < 1e-4 && Math.abs(m12) < 1e-4 && Math.abs(m21) < 1e-4 && Math.abs(m22) < 1e-4) {
+          // Identity scalar multiple
+          v1 = { x: 1, y: 0 };
+          v2 = { x: 0, y: 1 };
+        } else {
+          isDefective = true;
+        }
+      } else {
+        v2 = findEigenvector(a, b, c, d, l2);
+      }
+
+      if (isDefective) {
+        badge.className = "mt-2 text-xs font-semibold px-2.5 py-0.5 rounded-full bg-rose-100 text-rose-800 border border-rose-200";
+        badge.innerText = "เมทริกซ์บกพร่อง (Defective: m_g < m_a)";
+
+        diagDetailDiv.innerHTML = `
+          <div class="text-xs text-rose-800 p-2 bg-rose-50 rounded-lg border border-rose-200">
+            $m_g(${fmt(l1)}) = 1 < 2$ ขาดเวกเตอร์ลักษณะเฉพาะ ไม่สามารถแยกเป็น $PDP^{-1}$ ได้ ต้องใช้ Jordan Block
+          </div>
+        `;
+        verifyBanner.className = "p-4 rounded-xl border border-rose-200 bg-rose-50 text-rose-900 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs sm:text-sm";
+        verifyBanner.innerHTML = `
+          <span>⚠️ เมทริกซ์นี้บกพร่อง ไม่สามารถใช้สูตร $P D^k P^{-1}$ ได้ ต้องคำนวณด้วยวิธีคูณตรง หรือ Jordan Form $J^k$</span>
+        `;
+        return;
+      }
+
+      // Diagonalizable Success
+      badge.className = "mt-2 text-xs font-semibold px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800 border border-emerald-200";
+      badge.innerText = "ทำให้เป็นแนวทแยงได้ (Diagonalizable)";
+
+      // Build P, D^k, P^-1
+      const p11 = v1.x, p12 = v2.x;
+      const p21 = v1.y, p22 = v2.y;
+      const detP = p11 * p22 - p12 * p21;
+
+      const invP11 = p22 / detP;
+      const invP12 = -p12 / detP;
+      const invP21 = -p21 / detP;
+      const invP22 = p11 / detP;
+
+      const l1_k = Math.pow(l1, k);
+      const l2_k = Math.pow(l2, k);
+
+      // PD^k
+      const pd11 = p11 * l1_k, pd12 = p12 * l2_k;
+      const pd21 = p21 * l1_k, pd22 = p22 * l2_k;
+
+      // (PD^k) * P^-1
+      const specRes11 = pd11 * invP11 + pd12 * invP21;
+      const specRes12 = pd11 * invP12 + pd12 * invP22;
+      const specRes21 = pd21 * invP11 + pd22 * invP21;
+      const specRes22 = pd21 * invP12 + pd22 * invP22;
+
+      diagDetailDiv.innerHTML = `
+        <div class="text-xs text-indigo-900 mb-1">
+          $D^k = \\begin{bmatrix} (${fmt(l1)})^k & 0 \\\\ 0 & (${fmt(l2)})^k \\end{bmatrix} = \\begin{bmatrix} ${fmt(l1_k)} & 0 \\\\ 0 & ${fmt(l2_k)} \\end{bmatrix}$
+        </div>
+        $$P D^{${k}} P^{-1} = \\begin{bmatrix} ${fmt(specRes11)} & ${fmt(specRes12)} \\\\ ${fmt(specRes21)} & ${fmt(specRes22)} \\end{bmatrix}$$
+      `;
+
+      // Verification check
+      const diff11 = Math.abs(directResult[0][0] - specRes11);
+      const diff12 = Math.abs(directResult[0][1] - specRes12);
+      const diff21 = Math.abs(directResult[1][0] - specRes21);
+      const diff22 = Math.abs(directResult[1][1] - specRes22);
+
+      const isMatch = (diff11 < 1e-2 && diff12 < 1e-2 && diff21 < 1e-2 && diff22 < 1e-2);
+
+      verifyBanner.className = isMatch
+        ? "p-4 rounded-xl border border-emerald-300 bg-emerald-50 text-emerald-950 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs sm:text-sm"
+        : "p-4 rounded-xl border border-rose-300 bg-rose-50 text-rose-950 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs sm:text-sm";
+
+      verifyBanner.innerHTML = `
+        <div class="flex items-center gap-2">
+          <svg class="w-5 h-5 ${isMatch ? 'text-emerald-600' : 'text-rose-600'} shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+          <span><strong>ผลการตรวจสอบความสอดคล้อง:</strong> ผลลัพธ์จากทั้งสองวิธี <strong>${isMatch ? 'ตรงกันทุกประการ (100% Match)' : 'มีความคลาดเคลื่อนเชิงตัวเลข'}</strong> ที่เลขชี้กำลัง $k = ${k}$</span>
+        </div>
+        <div class="text-[11px] font-semibold text-brand-700 bg-white px-3 py-1 rounded-lg border border-emerald-200">
+          ประหยัดการคูณเมทริกซ์เต็มรูปไปได้ ${Math.max(0, k - 3)} ครั้ง
+        </div>
+      `;
+    }
+
+    function findEigenvector(a, b, c, d, lam) {
+      const m11 = a - lam;
+      const m12 = b;
+
+      if (Math.abs(m11) < 1e-4 && Math.abs(m12) < 1e-4) {
+        return { x: 1, y: 0 };
+      }
+      if (Math.abs(m12) > 1e-4) {
+        return simplifyVector(-m12, m11);
+      } else if (Math.abs(m11) > 1e-4) {
+        return { x: 0, y: 1 };
+      } else {
+        return simplifyVector(-(d - lam), c);
+      }
+    }
+
+    function simplifyVector(x, y) {
+      if (Math.abs(x) < 1e-4 && Math.abs(y) < 1e-4) return { x: 1, y: 0 };
+      let maxVal = Math.max(Math.abs(x), Math.abs(y));
+      if (maxVal > 1e-4) {
+        x /= maxVal;
+        y /= maxVal;
+      }
+      if (x < 0 || (Math.abs(x) < 1e-4 && y < 0)) {
+        x = -x;
+        y = -y;
+      }
+      return { x, y };
+    }
+
+    // Inquiry toggle
+    function toggleInquiryAnswer() {
+      const content = document.getElementById('inquiryContent');
+      const text = document.getElementById('inquiryBtnText');
+      const chevron = document.getElementById('inquiryChevron');
+
+      if (content.classList.contains('hidden')) {
+        content.classList.remove('hidden');
+        text.innerText = "ซ่อนบทวิเคราะห์การแยกมิติเป็นอิสระ";
+        chevron.classList.add('rotate-180');
+      } else {
+        content.classList.add('hidden');
+        text.innerText = "คลิกเพื่อดูบทวิเคราะห์การแยกมิติเป็นอิสระ (Uncoupling of Variables)";
+        chevron.classList.remove('rotate-180');
+      }
+      renderAllMath();
+    }
+
+    // Exercise Check & Toggle
+    function checkExerciseAnswer() {
+      const a11 = parseFloat(document.getElementById('ansA11').value);
+      const a12 = parseFloat(document.getElementById('ansA12').value);
+      const a21 = parseFloat(document.getElementById('ansA21').value);
+      const a22 = parseFloat(document.getElementById('ansA22').value);
+      const fb = document.getElementById('exerciseFeedback');
+
+      if (isNaN(a11) || isNaN(a12) || isNaN(a21) || isNaN(a22)) {
+        fb.className = "text-sm font-semibold text-amber-600";
+        fb.innerText = "กรุณากรอกตัวเลขให้ครบทั้ง 4 ตำแหน่ง";
+        return;
+      }
+
+      if (Math.abs(a11 - 243) < 0.01 && Math.abs(a12 - 0) < 0.01 && Math.abs(a21 - 0) < 0.01 && Math.abs(a22 - 32) < 0.01) {
+        fb.className = "text-sm font-bold text-emerald-600";
+        fb.innerHTML = "<span>✓ ถูกต้องสมบูรณ์แบบ! $A^5 = \\operatorname{diag}(3^5, 2^5) = \\begin{bmatrix} 243 & 0 \\\\ 0 & 32 \\end{bmatrix}$</span>";
+      } else {
+        fb.className = "text-sm font-bold text-rose-600";
+        fb.innerHTML = "<span>✗ ยังไม่ถูกต้อง ลองตรวจสอบการคำนวณ $3^5 = 243$ และ $2^5 = 32$ โดยที่สมาชิกนอกแนวทแยงเป็น 0</span>";
+      }
+      renderAllMath();
+    }
+
+    function toggleExerciseSolution() {
+      const sol = document.getElementById('exerciseSolutionDetail');
+      const btn = document.getElementById('solutionBtnText');
+
+      if (sol.classList.contains('hidden')) {
+        sol.classList.remove('hidden');
+        btn.innerText = "ซ่อนวิธีทำและคำเฉลยละเอียด";
+      } else {
+        sol.classList.add('hidden');
+        btn.innerText = "แสดงวิธีทำและคำเฉลยละเอียด";
+      }
+      renderAllMath();
+    }
+  </script>
+</body>
+</html>

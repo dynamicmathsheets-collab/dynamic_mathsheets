@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ระบบการเรียนรู้ออนไลน์: ค่าเฉพาะและเวกเตอร์ลักษณะเฉพาะ (Linear Algebra Portal)</title>
+
+  <!-- Google Fonts: Sarabun & Kanit -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700&family=Sarabun:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Sarabun', 'sans-serif'],
+            display: ['Kanit', 'sans-serif'],
+          },
+          colors: {
+            brand: {
+              50: '#eef2ff',
+              100: '#e0e7ff',
+              200: '#c7d2fe',
+              500: '#6366f1',
+              600: '#4f46e5',
+              700: '#4338ca',
+              800: '#3730a3',
+              900: '#312e81',
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    /* Sleek Horizontal Scrollbar */
+    .menu-scroll::-webkit-scrollbar {
+      height: 5px;
+    }
+    .menu-scroll::-webkit-scrollbar-track {
+      background: #0f172a;
+    }
+    .menu-scroll::-webkit-scrollbar-thumb {
+      background: #334155;
+      border-radius: 9999px;
+    }
+    .menu-scroll::-webkit-scrollbar-thumb:hover {
+      background: #6366f1;
+    }
+    /* Smooth horizontal scroll */
+    .menu-scroll {
+      scroll-behavior: smooth;
+      -webkit-overflow-scrolling: touch;
+    }
+    /* Hide scrollbar utility for clean look when supported */
+    .no-scrollbar::-webkit-scrollbar {
+      display: none;
+    }
+    .no-scrollbar {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+  </style>
+<script>
+  // ตรวจสอบว่ามีสถานะล็อกอินและอีเมลบันทึกไว้หรือไม่
+  const isLoggedIn = localStorage.getItem("dms_is_logged_in") === "true";
+  const userEmail = localStorage.getItem("dms_user_email");
+
+  // หากไม่มี ให้ดีดกลับไปหน้าเข้าสู่ระบบทันที
+  if (!isLoggedIn || !userEmail) {
+    // ปรับ Path ให้ถอยกลับไปหาไฟล์ login.html ตามระดับโฟลเดอร์ (เช่น "../login.html" หากอยู่ในโฟลเดอร์ย่อย 1 ชั้น)
+    window.location.replace("../../login.html"); 
+  }
+</script>
+
+</head>
+<body class="bg-slate-950 text-slate-100 flex flex-col h-screen overflow-hidden antialiased">
+
+  <!-- Top Fixed Learning Hub Header -->
+  <header class="bg-slate-900 border-b border-slate-800 shadow-xl z-30 shrink-0">
+    
+    <!-- Top Brand & Meta Toolbar -->
+    <div class="px-4 sm:px-6 py-2.5 flex items-center justify-between border-b border-slate-800/80 bg-slate-900/90 backdrop-blur-md">
+      <div class="flex items-center gap-3">
+        <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-brand-600 to-indigo-500 flex items-center justify-center text-white shadow-md shadow-brand-500/20 font-display font-black text-lg">
+          λ
+        </div>
+        <div>
+
+          <h1 class="text-sm sm:text-base font-bold font-display tracking-tight text-white flex items-center gap-1.5">
+            ค่าเฉพาะและเวกเตอร์ลักษณะเฉพาะ (Eigenvalues & Eigenvectors)
+          </h1>
+        </div>
+      </div>
+
+      <!-- Quick Actions Controls -->
+      <div class="flex items-center gap-2">
+        <!-- Fullscreen toggle -->
+        <button onclick="toggleFullscreen()" title="แสดงเต็มจอ" class="p-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white transition border border-slate-700/50">
+          <svg id="fullscreenIcon" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"></path></svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- Horizontal Scroll Navigation Bar -->
+    <div class="relative bg-slate-950 px-2 sm:px-4 py-2 flex items-center">
+      
+      <!-- Left scroll arrow button -->
+      <button onclick="scrollMenu('left')" class="shrink-0 w-8 h-9 rounded-lg bg-slate-900 hover:bg-slate-800 active:scale-95 text-slate-400 hover:text-white flex items-center justify-center transition border border-slate-800 shadow-md z-10 mr-1.5" title="เลื่อนซ้าย">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
+      </button>
+
+      <!-- Horizontal Menu Items Container -->
+      <nav id="menuContainer" class="menu-scroll overflow-x-auto flex items-center gap-2 py-1 px-1 flex-1">
+        <!-- 1 -->
+        <button onclick="switchTab(0)" id="tab-0" class="tab-item shrink-0 px-3.5 py-2 rounded-xl text-xs sm:text-sm font-medium transition-all flex items-center gap-2 border whitespace-nowrap bg-brand-600 text-white border-brand-400/40 shadow-lg shadow-brand-500/20">
+          <span class="w-5 h-5 rounded-full bg-white/20 flex items-center justify-center font-bold text-[11px]">1</span>
+          <span>ความหมายของค่าเฉพาะและเวกเตอร์ลักษณะเฉพาะ</span>
+        </button>
+
+        <!-- 2 -->
+        <button onclick="switchTab(1)" id="tab-1" class="tab-item shrink-0 px-3.5 py-2 rounded-xl text-xs sm:text-sm font-medium transition-all flex items-center gap-2 border whitespace-nowrap bg-slate-900 text-slate-300 border-slate-800 hover:bg-slate-800 hover:text-white">
+          <span class="w-5 h-5 rounded-full bg-slate-800 flex items-center justify-center font-bold text-[11px] text-slate-400">2</span>
+          <span>สมการลักษณะเฉพาะและพหุนามลักษณะเฉพาะ</span>
+        </button>
+
+        <!-- 3 -->
+        <button onclick="switchTab(2)" id="tab-2" class="tab-item shrink-0 px-3.5 py-2 rounded-xl text-xs sm:text-sm font-medium transition-all flex items-center gap-2 border whitespace-nowrap bg-slate-900 text-slate-300 border-slate-800 hover:bg-slate-800 hover:text-white">
+          <span class="w-5 h-5 rounded-full bg-slate-800 flex items-center justify-center font-bold text-[11px] text-slate-400">3</span>
+          <span>ปริภูมิลักษณะเฉพาะและเวกเตอร์ลักษณะเฉพาะ</span>
+        </button>
+
+        <!-- 4 -->
+        <button onclick="switchTab(3)" id="tab-3" class="tab-item shrink-0 px-3.5 py-2 rounded-xl text-xs sm:text-sm font-medium transition-all flex items-center gap-2 border whitespace-nowrap bg-slate-900 text-slate-300 border-slate-800 hover:bg-slate-800 hover:text-white">
+          <span class="w-5 h-5 rounded-full bg-slate-800 flex items-center justify-center font-bold text-[11px] text-slate-400">4</span>
+          <span>พหุคูณของค่าเฉพาะและทฤษฎีบทสำคัญ</span>
+        </button>
+
+        <!-- 5 -->
+        <button onclick="switchTab(4)" id="tab-4" class="tab-item shrink-0 px-3.5 py-2 rounded-xl text-xs sm:text-sm font-medium transition-all flex items-center gap-2 border whitespace-nowrap bg-slate-900 text-slate-300 border-slate-800 hover:bg-slate-800 hover:text-white">
+          <span class="w-5 h-5 rounded-full bg-slate-800 flex items-center justify-center font-bold text-[11px] text-slate-400">5</span>
+          <span>ความเป็นอิสระเชิงเส้นของเวกเตอร์ลักษณะเฉพาะ</span>
+        </button>
+
+        <!-- 6 -->
+        <button onclick="switchTab(5)" id="tab-5" class="tab-item shrink-0 px-3.5 py-2 rounded-xl text-xs sm:text-sm font-medium transition-all flex items-center gap-2 border whitespace-nowrap bg-slate-900 text-slate-300 border-slate-800 hover:bg-slate-800 hover:text-white">
+          <span class="w-5 h-5 rounded-full bg-slate-800 flex items-center justify-center font-bold text-[11px] text-slate-400">6</span>
+          <span>การทำให้เมทริกซ์เป็นแนวทแยง</span>
+        </button>
+
+        <!-- 7 -->
+        <button onclick="switchTab(6)" id="tab-6" class="tab-item shrink-0 px-3.5 py-2 rounded-xl text-xs sm:text-sm font-medium transition-all flex items-center gap-2 border whitespace-nowrap bg-slate-900 text-slate-300 border-slate-800 hover:bg-slate-800 hover:text-white">
+          <span class="w-5 h-5 rounded-full bg-slate-800 flex items-center justify-center font-bold text-[11px] text-slate-400">7</span>
+          <span>การประยุกต์เมทริกซ์แนวทแยงและเมทริกซ์กำลังสูง</span>
+        </button>
+
+        <!-- 8 -->
+        <button onclick="switchTab(7)" id="tab-7" class="tab-item shrink-0 px-3.5 py-2 rounded-xl text-xs sm:text-sm font-medium transition-all flex items-center gap-2 border whitespace-nowrap bg-slate-900 text-slate-300 border-slate-800 hover:bg-slate-800 hover:text-white">
+          <span class="w-5 h-5 rounded-full bg-slate-800 flex items-center justify-center font-bold text-[11px] text-slate-400">8</span>
+          <span>การประยุกต์และการสังเคราะห์ความรู้เรื่องค่าเฉพาะ</span>
+        </button>
+
+        <!-- 9: แบบทดสอบ Highlighted -->
+        <button onclick="switchTab(8)" id="tab-8" class="tab-item shrink-0 px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all flex items-center gap-2 border whitespace-nowrap bg-gradient-to-r from-emerald-600 to-teal-600 text-white border-emerald-400/50 hover:from-emerald-500 hover:to-teal-500 shadow-md shadow-emerald-500/20">
+          <svg class="w-4 h-4 text-emerald-200" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path></svg>
+          <span>แบบทดสอบวัดผลสัมฤทธิ์ (30 ข้อ)</span>
+          <span class="px-1.5 py-0.2 rounded bg-black/30 text-[10px] text-emerald-100">K-P-A</span>
+        </button>
+      </nav>
+
+      <!-- Right scroll arrow button -->
+      <button onclick="scrollMenu('right')" class="shrink-0 w-8 h-9 rounded-lg bg-slate-900 hover:bg-slate-800 active:scale-95 text-slate-400 hover:text-white flex items-center justify-center transition border border-slate-800 shadow-md z-10 ml-1.5" title="เลื่อนขวา">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+      </button>
+
+    </div>
+  </header>
+
+  <!-- Content Presentation Frame (Full height responsive container) -->
+  <main class="relative flex-1 w-full bg-slate-950 overflow-hidden" id="iframeWrapper">
+    
+    <!-- Loading Spinner Overlay -->
+    <div id="loadingOverlay" class="absolute inset-0 bg-slate-950/80 backdrop-blur-xs flex flex-col items-center justify-center z-20 transition-opacity duration-300">
+      <div class="relative w-12 h-12">
+        <div class="absolute inset-0 rounded-full border-4 border-slate-800"></div>
+        <div class="absolute inset-0 rounded-full border-4 border-brand-500 border-t-transparent animate-spin"></div>
+      </div>
+      <span class="text-xs font-medium text-slate-300 mt-3 tracking-wide">กำลังโหลดเนื้อหาบทเรียน...</span>
+    </div>
+
+    <!-- The Master iframe -->
+    <iframe 
+      id="contentFrame"
+      src="1ความหมายของค่าเฉพาะและเวกเตอร์ลักษณะเฉพาะ.html" 
+      class="w-full h-full border-0 bg-white"
+      title="เนื้อหาบทเรียน"
+      onload="onIframeLoaded()">
+    </iframe>
+
+  </main>
+
+  <!-- Script for Navigation, State, and Iframe Handling -->
+  <script>
+    // File registry matching folder contents exactly
+    const topics = [
+      {
+        id: 1,
+        title: "1. ความหมายของค่าเฉพาะและเวกเตอร์ลักษณะเฉพาะ",
+        filename: "1ความหมายของค่าเฉพาะและเวกเตอร์ลักษณะเฉพาะ.html"
+      },
+      {
+        id: 2,
+        title: "2. สมการลักษณะเฉพาะและพหุนามลักษณะเฉพาะ",
+        filename: "2สมการลักษณะเฉพาะและพหุนามลักษณะเฉพาะ.html"
+      },
+      {
+        id: 3,
+        title: "3. ปริภูมิลักษณะเฉพาะและเวกเตอร์ลักษณะเฉพาะ",
+        filename: "3ปริภูมิลักษณะเฉพาะและเวกเตอร์ลักษณะเฉพาะ.html"
+      },
+      {
+        id: 4,
+        title: "4. พหุคูณของค่าเฉพาะและทฤษฎีบทสำคัญ",
+        filename: "4พหุคูณของค่าเฉพาะและทฤษฎีบทสำคัญ.html"
+      },
+      {
+        id: 5,
+        title: "5. ความเป็นอิสระเชิงเส้นของเวกเตอร์ลักษณะเฉพาะ",
+        filename: "5ความเป็นอิสระเชิงเส้นของเวกเตอร์ลักษณะเฉพาะ.html"
+      },
+      {
+        id: 6,
+        title: "6. การทำให้เมทริกซ์เป็นแนวทแยง",
+        filename: "6การทำให้เมทริกซ์เป็นแนวทแยง.html"
+      },
+      {
+        id: 7,
+        title: "7. การประยุกต์เมทริกซ์แนวทแยงและเมทริกซ์กำลังสูง",
+        filename: "7การประยุกต์เมทริกซ์แนวทแยงและเมทริกซ์กำลังสูง.html"
+      },
+      {
+        id: 8,
+        title: "8. การประยุกต์และการสังเคราะห์ความรู้เรื่องค่าเฉพาะ",
+        filename: "8การประยุกต์และการสังเคราะห์ความรู้เรื่องค่าเฉพาะ.html"
+      },
+      {
+        id: 9,
+        title: "แบบทดสอบวัดผลสัมฤทธิ์ทางการเรียน (30 ข้อ)",
+        filename: "แบบทดสอบ.html"
+      }
+    ];
+
+    let currentTabIndex = 0;
+
+    function switchTab(index) {
+      if (index < 0 || index >= topics.length) return;
+      currentTabIndex = index;
+
+      const target = topics[index];
+      const frame = document.getElementById('contentFrame');
+      const loader = document.getElementById('loadingOverlay');
+      const label = document.getElementById('currentTopicLabel');
+
+      // Show loader
+      loader.classList.remove('opacity-0', 'pointer-events-none');
+
+      // Update frame source
+      frame.src = target.filename;
+
+      // Update label
+      if (label) {
+        label.innerText = target.title;
+      }
+
+      // Update Tab Styles
+      for (let i = 0; i < topics.length; i++) {
+        const tab = document.getElementById(`tab-${i}`);
+        if (!tab) continue;
+
+        if (i === 8) {
+          // Quiz Tab Styling
+          if (i === index) {
+            tab.className = "tab-item shrink-0 px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all flex items-center gap-2 border whitespace-nowrap bg-emerald-500 text-white border-emerald-300 ring-2 ring-emerald-400/50 shadow-lg shadow-emerald-500/30";
+          } else {
+            tab.className = "tab-item shrink-0 px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all flex items-center gap-2 border whitespace-nowrap bg-gradient-to-r from-emerald-600 to-teal-600 text-white border-emerald-400/50 hover:from-emerald-500 hover:to-teal-500 shadow-md shadow-emerald-500/20";
+          }
+        } else {
+          // Lessons 1-8 Styling
+          if (i === index) {
+            tab.className = "tab-item shrink-0 px-3.5 py-2 rounded-xl text-xs sm:text-sm font-medium transition-all flex items-center gap-2 border whitespace-nowrap bg-brand-600 text-white border-brand-400/40 shadow-lg shadow-brand-500/20";
+            const numBadge = tab.querySelector('span');
+            if (numBadge) numBadge.className = "w-5 h-5 rounded-full bg-white/20 flex items-center justify-center font-bold text-[11px] text-white";
+          } else {
+            tab.className = "tab-item shrink-0 px-3.5 py-2 rounded-xl text-xs sm:text-sm font-medium transition-all flex items-center gap-2 border whitespace-nowrap bg-slate-900 text-slate-300 border-slate-800 hover:bg-slate-800 hover:text-white";
+            const numBadge = tab.querySelector('span');
+            if (numBadge) numBadge.className = "w-5 h-5 rounded-full bg-slate-800 flex items-center justify-center font-bold text-[11px] text-slate-400";
+          }
+        }
+      }
+
+      // Smooth scroll selected button into viewport view
+      const activeTab = document.getElementById(`tab-${index}`);
+      if (activeTab) {
+        activeTab.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+      }
+    }
+
+    function onIframeLoaded() {
+      const loader = document.getElementById('loadingOverlay');
+      if (loader) {
+        loader.classList.add('opacity-0', 'pointer-events-none');
+      }
+    }
+
+    // Scroll menu container with arrow buttons
+    function scrollMenu(direction) {
+      const container = document.getElementById('menuContainer');
+      const scrollAmount = 260;
+      if (direction === 'left') {
+        container.scrollBy({ left: -scrollAmount, behavior: 'smooth' });
+      } else {
+        container.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+      }
+    }
+
+    // Toolbar utilities
+    function reloadIframe() {
+      const frame = document.getElementById('contentFrame');
+      const loader = document.getElementById('loadingOverlay');
+      loader.classList.remove('opacity-0', 'pointer-events-none');
+      frame.src = frame.src;
+    }
+
+    function openInNewTab() {
+      const current = topics[currentTabIndex];
+      window.open(current.filename, '_blank');
+    }
+
+    function toggleFullscreen() {
+      const wrapper = document.getElementById('iframeWrapper');
+      if (!document.fullscreenElement) {
+        wrapper.requestFullscreen().catch(err => console.error(err));
+      } else {
+        document.exitFullscreen();
+      }
+    }
+  </script>
+</body>
+</html>

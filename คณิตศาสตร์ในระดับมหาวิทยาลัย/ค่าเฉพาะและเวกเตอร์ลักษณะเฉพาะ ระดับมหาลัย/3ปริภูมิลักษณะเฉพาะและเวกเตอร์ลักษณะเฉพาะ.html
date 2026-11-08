@@ -1,0 +1,973 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>เรื่องที่ 3: ปริภูมิลักษณะเฉพาะและเวกเตอร์ลักษณะเฉพาะ</title>
+
+  <!-- Google Fonts: Sarabun & Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Sarabun:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- KaTeX for crisp LaTeX formula rendering -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js"></script>
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Sarabun', 'Inter', 'sans-serif'],
+          },
+          colors: {
+            brand: {
+              50: '#eef2ff',
+              100: '#e0e7ff',
+              200: '#c7d2fe',
+              500: '#6366f1',
+              600: '#4f46e5',
+              700: '#4338ca',
+              800: '#3730a3',
+              900: '#312e81',
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    .katex { font-size: 1.05em; }
+    .matrix-bracket {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      padding: 0 8px;
+    }
+    .matrix-bracket::before {
+      content: "";
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 5px;
+      border-left: 2px solid #4f46e5;
+      border-top: 2px solid #4f46e5;
+      border-bottom: 2px solid #4f46e5;
+      border-radius: 4px 0 0 4px;
+    }
+    .matrix-bracket::after {
+      content: "";
+      position: absolute;
+      right: 0;
+      top: 0;
+      bottom: 0;
+      width: 5px;
+      border-right: 2px solid #4f46e5;
+      border-top: 2px solid #4f46e5;
+      border-bottom: 2px solid #4f46e5;
+      border-radius: 0 4px 4px 0;
+    }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-800 antialiased selection:bg-brand-100 selection:text-brand-800">
+
+  <!-- Header Banner -->
+  <header class="bg-gradient-to-r from-brand-900 via-indigo-900 to-slate-900 text-white py-10 shadow-md">
+    <div class="max-w-6xl w-full mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+        <div>
+          <h1 class="text-2xl sm:text-3xl lg:text-4xl font-extrabold tracking-tight">
+            เรื่องที่ 3: ปริภูมิลักษณะเฉพาะและเวกเตอร์ลักษณะเฉพาะ
+          </h1>
+          <p class="text-slate-300 text-sm sm:text-base mt-1">
+            Eigenspaces, Eigenvectors, and Basis Determination via $(A - \lambda I)\mathbf{v} = \mathbf{0}$
+          </p>
+        </div>
+        <div class="bg-white/10 backdrop-blur-md rounded-xl p-3 border border-white/15 text-center text-xs sm:text-sm">
+          <div class="text-brand-200 font-medium">นิยามปริภูมิลักษณะเฉพาะ</div>
+          <div class="text-lg font-bold tracking-wide mt-0.5 text-white">$E_\lambda = \ker(A - \lambda I) = \text{Null}(A - \lambda I)$</div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content Container (strictly formatted to required width) -->
+  <main class="max-w-6xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 space-y-10">
+
+    <!-- Section 1: วัตถุประสงค์การเรียนรู้ -->
+    <section class="bg-white rounded-2xl p-6 sm:p-7 shadow-sm border border-slate-200/80">
+      <div class="flex items-center gap-3 mb-4">
+        <div class="w-9 h-9 rounded-xl bg-indigo-100 text-brand-600 flex items-center justify-center font-bold text-lg shadow-inner">
+          1
+        </div>
+        <h2 class="text-xl sm:text-2xl font-bold text-slate-900">วัตถุประสงค์การเรียนรู้ (Learning Objectives)</h2>
+      </div>
+      <div class="bg-gradient-to-r from-indigo-50 to-slate-50 border-l-4 border-brand-600 p-4 rounded-r-xl">
+        <ul class="space-y-2 text-slate-700 leading-relaxed font-medium text-sm sm:text-base">
+          <li class="flex items-start gap-2.5">
+            <svg class="w-5 h-5 text-brand-600 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+            <span>นักศึกษาสามารถ<strong>หาเวกเตอร์ลักษณะเฉพาะ (Eigenvectors)</strong> ที่สัมพันธ์กับค่าเฉพาะแต่ละค่าจากระบบสมการเอกพันธุ์ $(A - \lambda I)\mathbf{v} = \mathbf{0}$ ได้</span>
+          </li>
+          <li class="flex items-start gap-2.5">
+            <svg class="w-5 h-5 text-brand-600 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+            <span>นักศึกษาสามารถ<strong>หาฐานหลัก (Basis) และระบุมิติ (Geometric Multiplicity: $\dim(E_\lambda)$)</strong> ของปริภูมิลักษณะเฉพาะ $E_\lambda$ ได้อย่างถูกต้อง</span>
+          </li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- Section 2: เนื้อหาหลัก -->
+    <section class="bg-white rounded-2xl p-6 sm:p-7 shadow-sm border border-slate-200/80">
+      <div class="flex items-center gap-3 mb-6">
+        <div class="w-9 h-9 rounded-xl bg-indigo-100 text-brand-600 flex items-center justify-center font-bold text-lg shadow-inner">
+          2
+        </div>
+        <h2 class="text-xl sm:text-2xl font-bold text-slate-900">เนื้อหาหลัก (Core Concepts)</h2>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <!-- 2.1 การหาเวกเตอร์ลักษณะเฉพาะ -->
+        <div class="bg-slate-50/80 border border-slate-200 rounded-xl p-5 hover:border-brand-300 transition-colors">
+          <div class="flex items-center justify-between mb-3">
+            <span class="text-xs font-bold uppercase tracking-wider text-brand-700 bg-brand-100 px-2.5 py-0.5 rounded-full">หัวข้อ 2.1</span>
+            <span class="text-xs text-slate-500">ขั้นตอนการแก้สมการ</span>
+          </div>
+          <h3 class="text-lg font-bold text-slate-800 mb-2">การหาเวกเตอร์ลักษณะเฉพาะจาก $(A - \lambda I)\mathbf{v} = \mathbf{0}$</h3>
+          <p class="text-slate-600 text-sm leading-relaxed mb-3">
+            เมื่อทราบค่าเฉพาะ $\lambda$ เรานำค่า $\lambda$ กลับไปแทนที่ในระบบสมการเอกพันธุ์:
+          </p>
+          <div class="bg-white p-3 rounded-lg border border-slate-200 text-center font-mono my-2 text-slate-900 shadow-sm">
+            $(A - \lambda I)\mathbf{v} = \mathbf{0}$
+          </div>
+          <p class="text-slate-600 text-sm leading-relaxed mt-3">
+            ใช้การดำเนินการตามแถวมูลฐาน (Elementary Row Operations) เพื่อแปลงเมทริกซ์แต่งเติม $[A - \lambda I \mid \mathbf{0}]$ ให้อยู่ในรูปขั้นบันไดลดรูป (RREF) เพื่อหาเซตผลเฉลยทั่วไปในรูปของตัวแปรเสรี (Free Variables)
+          </p>
+        </div>
+
+        <!-- 2.2 ปริภูมิลักษณะเฉพาะ -->
+        <div class="bg-slate-50/80 border border-slate-200 rounded-xl p-5 hover:border-brand-300 transition-colors">
+          <div class="flex items-center justify-between mb-3">
+            <span class="text-xs font-bold uppercase tracking-wider text-indigo-700 bg-indigo-100 px-2.5 py-0.5 rounded-full">หัวข้อ 2.2</span>
+            <span class="text-xs text-slate-500">โครงสร้างทางพีชคณิต</span>
+          </div>
+          <h3 class="text-lg font-bold text-slate-800 mb-2">ปริภูมิลักษณะเฉพาะ $E_\lambda = \ker(A - \lambda I)$</h3>
+          <p class="text-slate-600 text-sm leading-relaxed mb-3">
+            เซตของผลเฉลยทั้งหมดของสมการ $(A - \lambda I)\mathbf{v} = \mathbf{0}$ รวมกับเวกเตอร์ศูนย์ ($\mathbf{0}$) มีคุณสมบัติเป็นปริภูมิย่อย (Subspace) ของ $\mathbb{R}^n$ เรียกว่า <strong>ปริภูมิลักษณะเฉพาะ (Eigenspace: $E_\lambda$)</strong>:
+          </p>
+          <div class="bg-white p-3 rounded-lg border border-slate-200 text-center font-mono my-2 text-slate-900 shadow-sm text-sm">
+            $E_\lambda = \{\mathbf{v} \in \mathbb{R}^n \mid A\mathbf{v} = \lambda\mathbf{v}\} = \text{Null}(A - \lambda I)$
+          </div>
+          <p class="text-slate-600 text-sm leading-relaxed mt-2">
+            ปริภูมิย่อยนี้มีความสมบูรณ์ภายใต้การบวกเวกเตอร์และการคูณด้วยสเกลาร์
+          </p>
+        </div>
+
+        <!-- 2.3 ฐานหลักและมิติ -->
+        <div class="bg-slate-50/80 border border-slate-200 rounded-xl p-5 hover:border-brand-300 transition-colors">
+          <div class="flex items-center justify-between mb-3">
+            <span class="text-xs font-bold uppercase tracking-wider text-emerald-700 bg-emerald-100 px-2.5 py-0.5 rounded-full">หัวข้อ 2.3</span>
+            <span class="text-xs text-slate-500">Basis & Dimension</span>
+          </div>
+          <h3 class="text-lg font-bold text-slate-800 mb-2">ฐานหลักและมิติของปริภูมิลักษณะเฉพาะ</h3>
+          <p class="text-slate-600 text-sm leading-relaxed mb-2">
+            &bull; <strong>ฐานหลัก (Basis of $E_\lambda$):</strong> เซตของเวกเตอร์ที่เป็นอิสระเชิงเส้นที่แผ่ทั่ว (span) ปริภูมิลักษณะเฉพาะ $E_\lambda$<br>
+            &bull; <strong>มิติ (Geometric Multiplicity):</strong> จำนวนเวกเตอร์ในฐานหลัก หรือจำนวนตัวแปรเสรีในระบบสมการ:
+          </p>
+          <div class="bg-white p-3 rounded-lg border border-slate-200 text-center font-mono my-2 text-slate-900 shadow-sm text-sm">
+            $\dim(E_\lambda) = \text{nullity}(A - \lambda I) = n - \text{rank}(A - \lambda I)$
+          </div>
+          <p class="text-xs text-slate-500 mt-2">
+            *ข้อสังเกต: มิติเชิงเรขาคณิตจะสอดคล้องกับ $1 \le \dim(E_\lambda) \le \text{พหุคูณเชิงพีชคณิต (Algebraic Multiplicity)}$
+          </p>
+        </div>
+
+        <!-- 2.4 ความสัมพันธ์ระหว่างค่าเฉพาะกับปริภูมิ -->
+        <div class="bg-slate-50/80 border border-slate-200 rounded-xl p-5 hover:border-brand-300 transition-colors">
+          <div class="flex items-center justify-between mb-3">
+            <span class="text-xs font-bold uppercase tracking-wider text-purple-700 bg-purple-100 px-2.5 py-0.5 rounded-full">หัวข้อ 2.4</span>
+            <span class="text-xs text-slate-500">ทฤษฎีบทการแยกอิสระ</span>
+          </div>
+          <h3 class="text-lg font-bold text-slate-800 mb-2">ความสัมพันธ์ระหว่างค่าเฉพาะกับปริภูมิลักษณะเฉพาะ</h3>
+          <p class="text-slate-600 text-sm leading-relaxed mb-2">
+            ถ้า $\lambda_1, \lambda_2, \dots, \lambda_k$ เป็นค่าเฉพาะที่แตกต่างกันทั้งหมดของเมทริกซ์ $A$ ปริภูมิลักษณะเฉพาะที่เกี่ยวข้องจะมีจุดร่วมเพียงจุดเดียวคือเวกเตอร์ศูนย์:
+          </p>
+          <div class="bg-white p-2.5 rounded-lg border border-slate-200 text-center font-mono my-2 text-slate-900 shadow-sm text-sm">
+            $E_{\lambda_i} \cap E_{\lambda_j} = \{\mathbf{0}\} \quad (i \ne j)$
+          </div>
+          <p class="text-xs text-slate-600 mt-2">
+            นอกจากนี้ เวกเตอร์ลักษณะเฉพาะที่สอดคล้องกับค่าเฉพาะที่ต่างกันจะเป็น<strong>อิสระเชิงเส้นต่อกัน (Linearly Independent)</strong> เสมอ
+          </p>
+        </div>
+      </div>
+
+      <!-- 2.5 ตารางเปรียบเทียบ: เวกเตอร์ลักษณะเฉพาะ vs ปริภูมิลักษณะเฉพาะ -->
+      <div class="mt-6 overflow-hidden rounded-xl border border-slate-200">
+        <div class="bg-slate-100/80 px-4 py-3 border-b border-slate-200">
+          <h4 class="font-bold text-slate-800 text-sm sm:text-base flex items-center gap-2">
+            <span class="w-2.5 h-2.5 rounded-full bg-brand-600"></span>
+            ตารางเปรียบเทียบ: ความแตกต่างระหว่างเวกเตอร์ลักษณะเฉพาะกับปริภูมิลักษณะเฉพาะ
+          </h4>
+        </div>
+        <div class="overflow-x-auto">
+          <table class="w-full text-left border-collapse text-xs sm:text-sm">
+            <thead>
+              <tr class="bg-slate-50 text-slate-700 border-b border-slate-200">
+                <th class="p-3.5 font-bold w-1/4">ประเด็นเปรียบเทียบ</th>
+                <th class="p-3.5 font-bold w-3/8 text-brand-700">เวกเตอร์ลักษณะเฉพาะ (Eigenvector: $\mathbf{v}$)</th>
+                <th class="p-3.5 font-bold w-3/8 text-indigo-700">ปริภูมิลักษณะเฉพาะ (Eigenspace: $E_\lambda$)</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-200 text-slate-600">
+              <tr class="hover:bg-slate-50/50">
+                <td class="p-3.5 font-semibold text-slate-800">1. ชนิดของวัตถุคณิตศาสตร์</td>
+                <td class="p-3.5">เป็น "เวกเตอร์ตัวเดี่ยว" (Single Vector) ใน $\mathbb{R}^n$</td>
+                <td class="p-3.5">เป็น "เซต/ปริภูมิย่อย" (Subspace) ของ $\mathbb{R}^n$</td>
+              </tr>
+              <tr class="hover:bg-slate-50/50">
+                <td class="p-3.5 font-semibold text-slate-800">2. การรวมเวกเตอร์ศูนย์ ($\mathbf{0}$)</td>
+                <td class="p-3.5 text-rose-600 font-semibold">ไม่รวมเวกเตอร์ศูนย์เด็ดขาด ($\mathbf{v} \ne \mathbf{0}$)</td>
+                <td class="p-3.5 text-emerald-600 font-semibold">รวมเวกเตอร์ศูนย์เสมอ ($\mathbf{0} \in E_\lambda$) เพื่อเป็น Subspace</td>
+              </tr>
+              <tr class="hover:bg-slate-50/50">
+                <td class="p-3.5 font-semibold text-slate-800">3. ความหมายเชิงเรขาคณิต</td>
+                <td class="p-3.5">ลูกศรที่ทิศทางไม่หมุนเปลี่ยนจากการแปลง $A$ (ถูกยืด/หดด้วยสเกลาร์ $\lambda$)</td>
+                <td class="p-3.5">เส้นตรง (1D) หรือระนาบ (2D) ที่ผ่านจุดกำเนิด ซึ่งคงสภาพแนวเดิมทั้งหมดเมื่อถูกแปลงโดย $A$</td>
+              </tr>
+              <tr class="hover:bg-slate-50/50">
+                <td class="p-3.5 font-semibold text-slate-800">4. โครงสร้างพีชคณิต</td>
+                <td class="p-3.5">สมาชิกตัวหนึ่งในเซต $E_\lambda \setminus \{\mathbf{0}\}$</td>
+                <td class="p-3.5">ผลรวมเชิงเส้นของเวกเตอร์ลักษณะเฉพาะ: $\text{Span}\{\mathbf{v}_1, \dots, \mathbf{v}_k\}$</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- Section 3: แบบจำลองโต้ตอบ (Interactive Eigenspace Explorer) -->
+    <section class="bg-white rounded-2xl p-6 sm:p-7 shadow-sm border border-slate-200/80">
+      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6 pb-4 border-b border-slate-100">
+        <div class="flex items-center gap-3">
+          <div class="w-9 h-9 rounded-xl bg-indigo-100 text-brand-600 flex items-center justify-center font-bold text-lg shadow-inner">
+            3
+          </div>
+          <div>
+            <h2 class="text-xl sm:text-2xl font-bold text-slate-900">แบบจำลองโต้ตอบ (Interactive Eigenspace Explorer)</h2>
+            <p class="text-xs sm:text-sm text-slate-500">เลือกค่าเฉพาะ $\lambda$ เพื่อดูการลดรูปแถวขั้นบันได (RREF) การหาฐานหลัก มิติ และการแสดงภาพ 2D</p>
+          </div>
+        </div>
+
+        <!-- Preset Matrix Selector -->
+        <div class="flex items-center gap-2">
+          <label class="text-xs font-semibold text-slate-600">ชุดตัวอย่าง:</label>
+          <select id="matrixPresetSelect" onchange="loadPresetMatrix(this.value)" class="text-xs sm:text-sm bg-slate-100 border border-slate-300 rounded-lg px-2.5 py-1.5 font-medium focus:ring-2 focus:ring-brand-500 focus:outline-none">
+            <option value="ex1">แบบฝึกหัด: [[4, 1], [2, 3]]</option>
+            <option value="diag">เมทริกซ์ทแยงมุม: [[3, 0], [0, -1]]</option>
+            <option value="shear">เฉือน (Shear): [[2, 1], [0, 2]] (มิติซ้ำ)</option>
+            <option value="symm">สมมาตร: [[2, 1], [1, 2]]</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Controls & Input Area -->
+      <div class="bg-slate-50 rounded-2xl p-5 border border-slate-200 mb-6">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-center">
+          
+          <!-- Matrix Input -->
+          <div class="lg:col-span-4 flex flex-col items-center">
+            <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">ป้อนหรือปรับแต่งเมทริกซ์ $A$</span>
+            <div class="matrix-bracket py-1">
+              <div class="grid grid-cols-2 gap-2">
+                <input type="number" id="mat_a" value="4" step="any" onchange="onMatrixModified()" class="w-14 h-11 text-center font-bold bg-white rounded-lg border border-slate-300 shadow-sm focus:ring-2 focus:ring-brand-400 focus:outline-none">
+                <input type="number" id="mat_b" value="1" step="any" onchange="onMatrixModified()" class="w-14 h-11 text-center font-bold bg-white rounded-lg border border-slate-300 shadow-sm focus:ring-2 focus:ring-brand-400 focus:outline-none">
+                <input type="number" id="mat_c" value="2" step="any" onchange="onMatrixModified()" class="w-14 h-11 text-center font-bold bg-white rounded-lg border border-slate-300 shadow-sm focus:ring-2 focus:ring-brand-400 focus:outline-none">
+                <input type="number" id="mat_d" value="3" step="any" onchange="onMatrixModified()" class="w-14 h-11 text-center font-bold bg-white rounded-lg border border-slate-300 shadow-sm focus:ring-2 focus:ring-brand-400 focus:outline-none">
+              </div>
+            </div>
+            <div id="polyInfoBadge" class="text-xs text-indigo-700 bg-indigo-50 px-3 py-1 rounded-full border border-indigo-200 mt-2 font-medium">
+              <!-- Dynamically populated -->
+            </div>
+          </div>
+
+          <!-- Eigenvalue Selection Chips -->
+          <div class="lg:col-span-8 flex flex-col justify-center">
+            <span class="text-xs font-semibold text-slate-600 uppercase tracking-wider mb-2">เลือกค่าเฉพาะ $\lambda$ เพื่อคำนวณและแสดงปริภูมิลักษณะเฉพาะ $E_\lambda$:</span>
+            <div id="eigenChipsContainer" class="flex flex-wrap items-center gap-3">
+              <!-- Dynamic lambda buttons -->
+            </div>
+            <p class="text-xs text-slate-500 mt-3">
+              *การคลิกเลือกค่าเฉพาะจะอัปเดตการลดรูปแถวมูลฐาน (RREF) และวาดเส้นทางปริภูมิลักษณะเฉพาะบนระนาบ 2D ทันที
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Detail Reduction and Visual Grid -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+        
+        <!-- Left: Reduction Steps & Algebraic Results -->
+        <div id="reductionStepsCard" class="lg:col-span-7 space-y-4">
+          <!-- Populated by JS -->
+        </div>
+
+        <!-- Right: 2D Canvas Visualization -->
+        <div class="lg:col-span-5 bg-slate-900 rounded-2xl p-4 text-white shadow-md flex flex-col items-center">
+          <div class="w-full flex items-center justify-between pb-2 mb-2 border-b border-slate-800 text-xs">
+            <span class="font-bold text-slate-300 flex items-center gap-1.5">
+              <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 inline-block"></span>
+              การแสดงภาพปริภูมิลักษณะเฉพาะใน $\mathbb{R}^2$
+            </span>
+            <span id="canvasZoomInfo" class="text-slate-400 text-[11px]">สเกลระนาบ $[-5, 5]$</span>
+          </div>
+
+          <div class="relative w-full aspect-square max-w-[340px] bg-slate-950 rounded-xl overflow-hidden border border-slate-800 flex items-center justify-center">
+            <canvas id="eigenCanvas" width="340" height="340" class="block w-full h-full"></canvas>
+          </div>
+
+          <!-- Visual Legend -->
+          <div class="grid grid-cols-2 gap-2 w-full mt-3 text-[11px] text-slate-300">
+            <div class="flex items-center gap-2 bg-slate-800/60 p-2 rounded-lg border border-slate-700">
+              <span class="w-3.5 h-1 rounded bg-emerald-400 inline-block"></span>
+              <span>เส้นประ: ปริภูมิ $E_\lambda$ (Eigenspace)</span>
+            </div>
+            <div class="flex items-center gap-2 bg-slate-800/60 p-2 rounded-lg border border-slate-700">
+              <span class="w-3 h-3 rounded-full bg-amber-400 inline-block"></span>
+              <span>เวกเตอร์ฐานหลัก $\mathbf{v}$</span>
+            </div>
+            <div class="flex items-center gap-2 bg-slate-800/60 p-2 rounded-lg border border-slate-700 col-span-2">
+              <span class="w-3 h-3 rounded-full bg-indigo-400 inline-block"></span>
+              <span>การแปลงเวกเตอร์ $A\mathbf{v} = \lambda\mathbf{v}$ (คงอยู่บนแนวเดิมเสมอ)</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- Section 4: คำถามนำเพื่อค้นพบ -->
+    <section class="bg-white rounded-2xl p-6 sm:p-7 shadow-sm border border-slate-200/80">
+      <div class="flex items-center gap-3 mb-4">
+        <div class="w-9 h-9 rounded-xl bg-amber-100 text-amber-700 flex items-center justify-center font-bold text-lg shadow-inner">
+          4
+        </div>
+        <h2 class="text-xl sm:text-2xl font-bold text-slate-900">คำถามนำเพื่อค้นพบ (Inquiry & Deep Concept)</h2>
+      </div>
+
+      <div class="bg-amber-50/70 border border-amber-200/90 rounded-2xl p-5 sm:p-6">
+        <div class="flex items-start gap-3">
+          <div class="p-2 bg-amber-500 text-white rounded-xl shrink-0 mt-0.5">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+          </div>
+          <div>
+            <h3 class="text-base sm:text-lg font-bold text-amber-950">
+              เหตุใดเวกเตอร์ลักษณะเฉพาะหลายตัวที่สัมพันธ์กับค่าเฉพาะเดียวกัน จึงสามารถรวมกันสร้างเป็น "ปริภูมิลักษณะเฉพาะ" เดียวกันได้?
+            </h3>
+            <p class="text-sm text-amber-900/80 mt-1">
+              ทำไมเมื่อเรานำเวกเตอร์ลักษณะเฉพาะที่สอดคล้องกับค่า $\lambda$ เดียวกันมาบวกกัน หรือคูณด้วยค่าคงที่ ผลลัพธ์จึงยังคงเป็นเวกเตอร์ลักษณะเฉพาะของ $\lambda$ นั้นอยู่เสมอ?
+            </p>
+
+            <button id="toggleDiscoveryBtn" onclick="toggleDiscoveryExplanation()" class="mt-4 px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white font-medium text-xs sm:text-sm rounded-xl shadow transition-all inline-flex items-center gap-2">
+              <span id="discoveryBtnText">คลิกเพื่อดูบทพิสูจน์คุณสมบัติความเป็นปริภูมิย่อย (Subspace)</span>
+              <svg id="discoveryChevron" class="w-4 h-4 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+            </button>
+          </div>
+        </div>
+
+        <div id="discoveryAnswer" class="hidden mt-6 pt-5 border-t border-amber-200/80 space-y-4 text-slate-800 text-sm leading-relaxed">
+          <div class="p-4 bg-white rounded-xl border border-amber-200 space-y-3">
+            <h4 class="font-bold text-slate-900 text-sm sm:text-base flex items-center gap-2">
+              <span class="w-2 h-2 rounded-full bg-brand-600"></span>
+              บทพิสูจน์ว่า $E_\lambda$ มีสมบัติปิดภายใต้การกระทำเชิงเส้น (Linearity of Matrix Multiplication)
+            </h4>
+            <p>
+              สมมติให้ $\mathbf{u}, \mathbf{w} \in E_\lambda$ ซึ่งหมายความว่า $A\mathbf{u} = \lambda\mathbf{u}$ และ $A\mathbf{w} = \lambda\mathbf{w}$ และให้ $c$ เป็นสเกลาร์ใดๆ:
+            </p>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs sm:text-sm mt-2">
+              <!-- Closure under addition -->
+              <div class="p-3 bg-slate-50 rounded-lg border border-slate-200">
+                <span class="font-bold text-brand-700 block mb-1">1. สมบัติปิดภายใต้การบวก (Vector Addition):</span>
+                $$A(\mathbf{u} + \mathbf{w}) = A\mathbf{u} + A\mathbf{w} = \lambda\mathbf{u} + \lambda\mathbf{w} = \lambda(\mathbf{u} + \mathbf{w})$$
+                <p class="text-slate-600 mt-1">
+                  ดังนั้น $\mathbf{u} + \mathbf{w} \in E_\lambda$ (ผลบวกยังคงเป็นเวกเตอร์ลักษณะเฉพาะที่สอดคล้องกับค่าเฉพาะ $\lambda$)
+                </p>
+              </div>
+
+              <!-- Closure under scalar multiplication -->
+              <div class="p-3 bg-slate-50 rounded-lg border border-slate-200">
+                <span class="font-bold text-brand-700 block mb-1">2. สมบัติปิดภายใต้การคูณสเกลาร์ (Scalar Multiplication):</span>
+                $$A(c\mathbf{u}) = c(A\mathbf{u}) = c(\lambda\mathbf{u}) = \lambda(c\mathbf{u})$$
+                <p class="text-slate-600 mt-1">
+                  ดังนั้น $c\mathbf{u} \in E_\lambda$ (พหุคูณของเวกเตอร์ลักษณะเฉพาะยังคงเป็นเวกเตอร์ลักษณะเฉพาะเดิม)
+                </p>
+              </div>
+            </div>
+
+            <div class="bg-indigo-50/70 p-3.5 rounded-lg border border-indigo-200 text-xs sm:text-sm text-indigo-950 mt-3">
+              <strong>สรุปเชิงทฤษฎี:</strong> จากคุณสมบัติความเป็นเชิงเส้น (Linearity) ของเมทริกซ์ $A(\alpha\mathbf{u} + \beta\mathbf{w}) = \alpha A\mathbf{u} + \beta A\mathbf{w} = \lambda(\alpha\mathbf{u} + \beta\mathbf{w})$ ทำให้ผลรวมเชิงเส้นทุกแบบของเวกเตอร์ลักษณะเฉพาะในกลุ่มเดียวกัน ไม่หลุดออกไปนอกแนวเดิม จึงก่อตัวเป็น <strong>ปริภูมิย่อย (Subspace)</strong> ที่สมบูรณ์ในตัวเอง
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Section 5: แบบฝึกหัดสำหรับนักศึกษา -->
+    <section class="bg-white rounded-2xl p-6 sm:p-7 shadow-sm border border-slate-200/80">
+      <div class="flex items-center gap-3 mb-6">
+        <div class="w-9 h-9 rounded-xl bg-indigo-100 text-brand-600 flex items-center justify-center font-bold text-lg shadow-inner">
+          5
+        </div>
+        <h2 class="text-xl sm:text-2xl font-bold text-slate-900">แบบฝึกหัดสำหรับนักศึกษา (Practice Exercise)</h2>
+      </div>
+
+      <div class="bg-slate-50 border border-slate-200 rounded-2xl p-6 space-y-6">
+        <div class="border-b border-slate-200 pb-4">
+          <span class="text-xs font-bold uppercase tracking-wider text-brand-700 bg-brand-100 px-2.5 py-0.5 rounded-full">โจทย์ข้อสอบและฝึกปฏิบัติ</span>
+          <p class="text-base sm:text-lg font-medium text-slate-900 mt-2">
+            กำหนดเมทริกซ์ $A = \begin{bmatrix} 4 & 1 \\ 2 & 3 \end{bmatrix}$ (จากเรื่องที่ 2 ทราบแล้วว่ามีค่าเฉพาะ $\lambda_1 = 5$ และ $\lambda_2 = 2$)
+          </p>
+          <p class="text-slate-600 text-sm mt-1">
+            จงหาปริภูมิลักษณะเฉพาะ $E_5$ และ $E_2$ พร้อมทั้งหาเวกเตอร์ลักษณะเฉพาะและฐานหลัก (Basis) ของแต่ละปริภูมิ
+          </p>
+        </div>
+
+        <!-- Guided Steps Tabs / Accordion -->
+        <div class="space-y-4">
+          
+          <!-- Case 1: Lambda = 5 -->
+          <div class="bg-white rounded-xl border border-slate-200 p-4 sm:p-5 shadow-sm">
+            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-3">
+              <h3 class="font-bold text-indigo-900 text-base flex items-center gap-2">
+                <span class="w-2.5 h-2.5 rounded-full bg-brand-600"></span>
+                ตอนที่ 1: การหาปริภูมิลักษณะเฉพาะสำหรับ $\lambda_1 = 5$
+              </h3>
+              <span class="text-xs font-semibold px-2.5 py-1 bg-brand-50 text-brand-700 rounded-full border border-brand-200">แทน $\lambda = 5$</span>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs sm:text-sm">
+              <div class="space-y-2 bg-slate-50 p-3.5 rounded-lg border border-slate-200">
+                <span class="font-bold text-slate-700 block">1.1 ตั้งสมการ $(A - 5I)\mathbf{v} = \mathbf{0}$:</span>
+                <div class="text-center font-mono my-1">
+                  $$\begin{bmatrix} 4-5 & 1 \\ 2 & 3-5 \end{bmatrix} \begin{bmatrix} v_1 \\ v_2 \end{bmatrix} = \begin{bmatrix} -1 & 1 \\ 2 & -2 \end{bmatrix} \begin{bmatrix} v_1 \\ v_2 \end{bmatrix} = \begin{bmatrix} 0 \\ 0 \end{bmatrix}$$
+                </div>
+              </div>
+
+              <div class="space-y-2 bg-slate-50 p-3.5 rounded-lg border border-slate-200">
+                <span class="font-bold text-slate-700 block">1.2 ดำเนินการตามแถวขั้นมูลฐาน (RREF):</span>
+                <div class="text-center font-mono my-1">
+                  $$\begin{bmatrix} -1 & 1 & \bigm| & 0 \\ 2 & -2 & \bigm| & 0 \end{bmatrix} \xrightarrow{R_2 + 2R_1} \begin{bmatrix} 1 & -1 & \bigm| & 0 \\ 0 & 0 & \bigm| & 0 \end{bmatrix}$$
+                </div>
+              </div>
+            </div>
+
+            <!-- Conclusion for Lambda = 5 -->
+            <div class="mt-4 p-3.5 bg-emerald-50/70 border border-emerald-200 rounded-lg text-xs sm:text-sm space-y-1.5 text-emerald-950">
+              <p><strong>ผลเฉลยของสมการ:</strong> $v_1 - v_2 = 0 \implies v_1 = v_2$ กำหนดตัวแปรเสรี $v_2 = t \in \mathbb{R}$</p>
+              <p><strong>รูปทั่วไปของเวกเตอร์:</strong> $\mathbf{v} = \begin{bmatrix} v_1 \\ v_2 \end{bmatrix} = \begin{bmatrix} t \\ t \end{bmatrix} = t \begin{bmatrix} 1 \\ 1 \end{bmatrix} \quad (t \ne 0)$</p>
+              <div class="pt-2 border-t border-emerald-200 font-semibold grid grid-cols-1 sm:grid-cols-2 gap-2">
+                <div>&bull; <strong>ฐานหลักของ $E_5$:</strong> $\mathcal{B}_{E_5} = \left\{ \begin{bmatrix} 1 \\ 1 \end{bmatrix} \right\}$</div>
+                <div>&bull; <strong>ปริภูมิลักษณะเฉพาะ:</strong> $E_5 = \text{Span}\left\{ \begin{bmatrix} 1 \\ 1 \end{bmatrix} \right\}$, $\dim(E_5) = 1$</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Case 2: Lambda = 2 -->
+          <div class="bg-white rounded-xl border border-slate-200 p-4 sm:p-5 shadow-sm">
+            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-3">
+              <h3 class="font-bold text-indigo-900 text-base flex items-center gap-2">
+                <span class="w-2.5 h-2.5 rounded-full bg-brand-600"></span>
+                ตอนที่ 2: การหาปริภูมิลักษณะเฉพาะสำหรับ $\lambda_2 = 2$
+              </h3>
+              <span class="text-xs font-semibold px-2.5 py-1 bg-brand-50 text-brand-700 rounded-full border border-brand-200">แทน $\lambda = 2$</span>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs sm:text-sm">
+              <div class="space-y-2 bg-slate-50 p-3.5 rounded-lg border border-slate-200">
+                <span class="font-bold text-slate-700 block">2.1 ตั้งสมการ $(A - 2I)\mathbf{v} = \mathbf{0}$:</span>
+                <div class="text-center font-mono my-1">
+                  $$\begin{bmatrix} 4-2 & 1 \\ 2 & 3-2 \end{bmatrix} \begin{bmatrix} v_1 \\ v_2 \end{bmatrix} = \begin{bmatrix} 2 & 1 \\ 2 & 1 \end{bmatrix} \begin{bmatrix} v_1 \\ v_2 \end{bmatrix} = \begin{bmatrix} 0 \\ 0 \end{bmatrix}$$
+                </div>
+              </div>
+
+              <div class="space-y-2 bg-slate-50 p-3.5 rounded-lg border border-slate-200">
+                <span class="font-bold text-slate-700 block">2.2 ดำเนินการตามแถวขั้นมูลฐาน (RREF):</span>
+                <div class="text-center font-mono my-1">
+                  $$\begin{bmatrix} 2 & 1 & \bigm| & 0 \\ 2 & 1 & \bigm| & 0 \end{bmatrix} \xrightarrow{R_2 - R_1} \begin{bmatrix} 1 & \frac{1}{2} & \bigm| & 0 \\ 0 & 0 & \bigm| & 0 \end{bmatrix}$$
+                </div>
+              </div>
+            </div>
+
+            <!-- Conclusion for Lambda = 2 -->
+            <div class="mt-4 p-3.5 bg-indigo-50/70 border border-indigo-200 rounded-lg text-xs sm:text-sm space-y-1.5 text-indigo-950">
+              <p><strong>ผลเฉลยของสมการ:</strong> $v_1 + \frac{1}{2}v_2 = 0 \implies v_1 = -\frac{1}{2}v_2$ กำหนดตัวแปรเสรี $v_2 = 2s \in \mathbb{R}$</p>
+              <p><strong>รูปทั่วไปของเวกเตอร์:</strong> $\mathbf{v} = \begin{bmatrix} v_1 \\ v_2 \end{bmatrix} = \begin{bmatrix} -s \\ 2s \end{bmatrix} = s \begin{bmatrix} -1 \\ 2 \end{bmatrix} \quad (s \ne 0)$</p>
+              <div class="pt-2 border-t border-indigo-200 font-semibold grid grid-cols-1 sm:grid-cols-2 gap-2">
+                <div>&bull; <strong>ฐานหลักของ $E_2$:</strong> $\mathcal{B}_{E_2} = \left\{ \begin{bmatrix} -1 \\ 2 \end{bmatrix} \right\}$ (หรือ $\begin{bmatrix} 1 \\ -2 \end{bmatrix}$)</div>
+                <div>&bull; <strong>ปริภูมิลักษณะเฉพาะ:</strong> $E_2 = \text{Span}\left\{ \begin{bmatrix} -1 \\ 2 \end{bmatrix} \right\}$, $\dim(E_2) = 1$</div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+
+  <!-- Interactive Simulator Engine & Visualization -->
+  <script>
+    // State variables
+    let currentMatrix = {
+      a: 4,
+      b: 1,
+      c: 2,
+      d: 3
+    };
+
+    let eigenvalues = [5, 2];
+    let selectedLambda = 5;
+
+    // Presets
+    const presets = {
+      ex1: { a: 4, b: 1, c: 2, d: 3 },
+      diag: { a: 3, b: 0, c: 0, d: -1 },
+      shear: { a: 2, b: 1, c: 0, d: 2 },
+      symm: { a: 2, b: 1, c: 1, d: 2 }
+    };
+
+    window.onload = function() {
+      recomputeEigenvalues();
+      renderAllMath();
+    };
+
+    function renderAllMath() {
+      if (window.renderMathInElement) {
+        renderMathInElement(document.body, {
+          delimiters: [
+            {left: '$$', right: '$$', display: true},
+            {left: '$', right: '$', display: false}
+          ],
+          throwOnError: false
+        });
+      }
+    }
+
+    function loadPresetMatrix(presetKey) {
+      if (presets[presetKey]) {
+        currentMatrix = { ...presets[presetKey] };
+        document.getElementById('mat_a').value = currentMatrix.a;
+        document.getElementById('mat_b').value = currentMatrix.b;
+        document.getElementById('mat_c').value = currentMatrix.c;
+        document.getElementById('mat_d').value = currentMatrix.d;
+        recomputeEigenvalues();
+      }
+    }
+
+    function onMatrixModified() {
+      currentMatrix.a = parseFloat(document.getElementById('mat_a').value) || 0;
+      currentMatrix.b = parseFloat(document.getElementById('mat_b').value) || 0;
+      currentMatrix.c = parseFloat(document.getElementById('mat_c').value) || 0;
+      currentMatrix.d = parseFloat(document.getElementById('mat_d').value) || 0;
+      recomputeEigenvalues();
+    }
+
+    // Solve characteristic polynomial: lambda^2 - tr*lambda + det = 0
+    function recomputeEigenvalues() {
+      const { a, b, c, d } = currentMatrix;
+      const tr = a + d;
+      const det = a * d - b * c;
+      const disc = tr * tr - 4 * det;
+
+      const polyBadge = document.getElementById('polyInfoBadge');
+      const trStr = tr >= 0 ? `- ${fmt(tr)}` : `+ ${fmt(-tr)}`;
+      const detStr = det >= 0 ? `+ ${fmt(det)}` : `- ${fmt(-det)}`;
+      polyBadge.innerHTML = `พหุนาม: $\\lambda^2 ${trStr}\\lambda ${detStr} = 0$`;
+
+      eigenvalues = [];
+
+      if (disc > 1e-7) {
+        const sqrtD = Math.sqrt(disc);
+        eigenvalues.push((tr + sqrtD) / 2);
+        eigenvalues.push((tr - sqrtD) / 2);
+      } else if (Math.abs(disc) <= 1e-7) {
+        eigenvalues.push(tr / 2);
+      } else {
+        // Complex eigenvalues (Visualizer supports real part display)
+        eigenvalues = [];
+      }
+
+      // Check if selectedLambda is valid among eigenvalues
+      if (eigenvalues.length > 0) {
+        const found = eigenvalues.some(val => Math.abs(val - selectedLambda) < 1e-4);
+        if (!found) {
+          selectedLambda = eigenvalues[0];
+        }
+      } else {
+        selectedLambda = null;
+      }
+
+      renderEigenChips();
+      renderReductionAnalysis();
+      drawEigenspaceCanvas();
+      renderAllMath();
+    }
+
+    function renderEigenChips() {
+      const container = document.getElementById('eigenChipsContainer');
+      if (eigenvalues.length === 0) {
+        container.innerHTML = `
+          <div class="text-rose-600 bg-rose-50 border border-rose-200 px-3 py-2 rounded-xl text-xs font-semibold">
+            เมทริกซ์นี้มีค่าเฉพาะเป็นจำนวนเชิงซ้อน (Complex Eigenvalues) ซึ่งไม่มีเวกเตอร์ลักษณะเฉพาะบนระนาบจริง $\\mathbb{R}^2$
+          </div>
+        `;
+        return;
+      }
+
+      let html = '';
+      eigenvalues.forEach((val, idx) => {
+        const isSelected = selectedLambda !== null && Math.abs(val - selectedLambda) < 1e-4;
+        const activeClass = isSelected
+          ? 'bg-brand-600 text-white shadow-md shadow-brand-500/20 ring-2 ring-brand-300'
+          : 'bg-white text-slate-700 hover:bg-slate-100 border border-slate-300';
+
+        html += `
+          <button onclick="selectLambda(${val})" class="px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all flex items-center gap-2 ${activeClass}">
+            <span class="w-2 h-2 rounded-full ${isSelected ? 'bg-white' : 'bg-brand-500'}"></span>
+            $\\lambda_{${idx + 1}} = ${fmt(val)}$
+            ${eigenvalues.length === 1 ? '<span class="text-[10px] opacity-80">(พหุคูณ 2)</span>' : ''}
+          </button>
+        `;
+      });
+
+      container.innerHTML = html;
+    }
+
+    function selectLambda(val) {
+      selectedLambda = val;
+      renderEigenChips();
+      renderReductionAnalysis();
+      drawEigenspaceCanvas();
+      renderAllMath();
+    }
+
+    function fmt(n) {
+      if (Math.abs(n - Math.round(n)) < 1e-4) return Math.round(n).toString();
+      return n.toFixed(2).replace(/\.00$/, '');
+    }
+
+    // Fraction or simple string generator
+    function fmtFraction(num, denom) {
+      if (denom === 0) return '0';
+      const val = num / denom;
+      return fmt(val);
+    }
+
+    function renderReductionAnalysis() {
+      const card = document.getElementById('reductionStepsCard');
+
+      if (selectedLambda === null) {
+        card.innerHTML = `
+          <div class="p-6 bg-slate-50 border border-slate-200 rounded-xl text-center text-slate-500 text-sm">
+            ไม่มีค่าเฉพาะที่เป็นจำนวนจริงให้แสดงผลขั้นตอนการลดรูปแถว
+          </div>
+        `;
+        return;
+      }
+
+      const lam = selectedLambda;
+      const { a, b, c, d } = currentMatrix;
+
+      // Matrix A - lambda * I
+      const m11 = a - lam;
+      const m12 = b;
+      const m21 = c;
+      const m22 = d - lam;
+
+      // Check rank and nullity of (A - lambda I)
+      const isZeroMatrix = Math.abs(m11) < 1e-4 && Math.abs(m12) < 1e-4 && Math.abs(m21) < 1e-4 && Math.abs(m22) < 1e-4;
+
+      let rrefStr = '';
+      let solutionAnalysis = '';
+      let basisLatex = '';
+      let dimVal = 1;
+
+      if (isZeroMatrix) {
+        // Nullity = 2 (e.g. Identity matrix * scalar)
+        dimVal = 2;
+        rrefStr = `\\begin{bmatrix} 0 & 0 & \\bigm| & 0 \\\\ 0 & 0 & \\bigm| & 0 \\end{bmatrix}`;
+        solutionAnalysis = `
+          ทุกสมาชิกเป็นศูนย์ เมทริกซ์มีตัวแปรเสรี 2 ตัว ($v_1, v_2 \\in \\mathbb{R}$)
+          <br>ปริภูมิลักษณะเฉพาะแผ่ทั่วระนาบทั้งหมด: $E_\\lambda = \\mathbb{R}^2$
+        `;
+        basisLatex = `\\left\\{ \\begin{bmatrix} 1 \\\\ 0 \\end{bmatrix}, \\begin{bmatrix} 0 \\\\ 1 \\end{bmatrix} \\right\\}`;
+      } else {
+        // Nullity = 1 (Rank = 1)
+        dimVal = 1;
+
+        // Choose leading pivot row
+        let p1 = m11, p2 = m12;
+        if (Math.abs(p1) < 1e-4 && Math.abs(p2) < 1e-4) {
+          p1 = m21;
+          p2 = m22;
+        }
+
+        let basisV1 = 0, basisV2 = 0;
+
+        if (Math.abs(p1) > 1e-4) {
+          // p1 * v1 + p2 * v2 = 0 => v1 = -(p2/p1) * v2
+          // Let v2 = 1 => v1 = -p2 / p1
+          // If integers can be formed:
+          basisV2 = 1;
+          basisV1 = -p2 / p1;
+          // Scale by nice denominator if reasonable
+          if (Math.abs(p1) > 1e-3) {
+            basisV1 = -p2;
+            basisV2 = p1;
+          }
+          const pivotScale = p1;
+          const ratio = p2 / pivotScale;
+          rrefStr = `\\begin{bmatrix} 1 & ${fmt(ratio)} & \\bigm| & 0 \\\\ 0 & 0 & \\bigm| & 0 \\end{bmatrix}`;
+        } else {
+          // p1 is 0, p2 is non-zero: 0*v1 + p2*v2 = 0 => v2 = 0, v1 is free
+          basisV1 = 1;
+          basisV2 = 0;
+          rrefStr = `\\begin{bmatrix} 0 & 1 & \\bigm| & 0 \\\\ 0 & 0 & \\bigm| & 0 \\end{bmatrix}`;
+        }
+
+        // Simplify basis vector representation
+        const gcdVal = gcd(Math.round(basisV1 * 100), Math.round(basisV2 * 100)) / 100;
+        if (gcdVal > 1e-3) {
+          basisV1 /= gcdVal;
+          basisV2 /= gcdVal;
+        }
+        if (basisV1 < 0 && basisV2 <= 0) {
+          basisV1 = -basisV1;
+          basisV2 = -basisV2;
+        }
+
+        solutionAnalysis = `
+          พบตัวแปรนำ (Pivot variable) 1 ตัว และตัวแปรเสรี (Free variable) 1 ตัว
+          <br>เวกเตอร์ลักษณะเฉพาะรูปทั่วไป: $\\mathbf{v} = t \\begin{bmatrix} ${fmt(basisV1)} \\\\ ${fmt(basisV2)} \\end{bmatrix}$ สำหรับ $t \\ne 0$
+        `;
+        basisLatex = `\\left\\{ \\begin{bmatrix} ${fmt(basisV1)} \\\\ ${fmt(basisV2)} \\end{bmatrix} \\right\\}`;
+      }
+
+      card.innerHTML = `
+        <!-- Step A: Subtraction Matrix -->
+        <div class="p-4 bg-slate-50 border border-slate-200 rounded-xl">
+          <div class="flex items-center justify-between mb-2">
+            <span class="text-xs font-bold text-brand-700 uppercase">ขั้นตอนที่ 1: สร้างเมทริกซ์ $A - (${fmt(lam)})I$</span>
+            <span class="text-xs text-slate-500">แทนค่า $\\lambda = ${fmt(lam)}$</span>
+          </div>
+          <div class="text-center font-mono my-2 text-sm bg-white p-3 rounded-lg border border-slate-200 overflow-x-auto">
+            $$A - (${fmt(lam)})I = \\begin{bmatrix} ${fmt(a)} - (${fmt(lam)}) & ${fmt(b)} \\\\ ${fmt(c)} & ${fmt(d)} - (${fmt(lam)}) \\end{bmatrix} = \\begin{bmatrix} ${fmt(m11)} & ${fmt(m12)} \\\\ ${fmt(m21)} & ${fmt(m22)} \\end{bmatrix}$$
+          </div>
+        </div>
+
+        <!-- Step B: RREF -->
+        <div class="p-4 bg-slate-50 border border-slate-200 rounded-xl">
+          <div class="flex items-center justify-between mb-2">
+            <span class="text-xs font-bold text-brand-700 uppercase">ขั้นตอนที่ 2: ดำเนินการตามแถวขั้นมูลฐาน (RREF)</span>
+            <span class="text-xs text-slate-500">Gauss-Jordan Elimination</span>
+          </div>
+          <div class="text-center font-mono my-2 text-sm bg-white p-3 rounded-lg border border-slate-200 overflow-x-auto">
+            $$\\begin{bmatrix} ${fmt(m11)} & ${fmt(m12)} & \\bigm| & 0 \\\\ ${fmt(m21)} & ${fmt(m22)} & \\bigm| & 0 \\end{bmatrix} \\xrightarrow{\\text{Row Ops}} ${rrefStr}$$
+          </div>
+          <div class="text-xs text-slate-600 mt-2 bg-indigo-50/50 p-2 rounded-lg border border-indigo-100">
+            ${solutionAnalysis}
+          </div>
+        </div>
+
+        <!-- Step C: Basis and Dimension Summary -->
+        <div class="p-4 bg-emerald-50/70 border border-emerald-200 rounded-xl space-y-2">
+          <span class="text-xs font-bold text-emerald-800 uppercase">ขั้นตอนที่ 3: สรุปฐานหลักและมิติของปริภูมิลักษณะเฉพาะ</span>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
+            <div class="bg-white p-3 rounded-lg border border-emerald-200 text-center">
+              <span class="text-xs text-slate-500 block mb-1">ฐานหลัก (Basis of $E_${fmt(lam)}$)</span>
+              <div class="font-bold text-slate-900 text-sm">$$\\mathcal{B}_{E_{${fmt(lam)}}} = ${basisLatex}$$</div>
+            </div>
+            <div class="bg-white p-3 rounded-lg border border-emerald-200 text-center flex flex-col justify-center">
+              <span class="text-xs text-slate-500 block mb-1">มิติ (Geometric Multiplicity)</span>
+              <div class="font-bold text-emerald-700 text-lg">$$\\dim(E_{${fmt(lam)}}) = ${dimVal}$$</div>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function gcd(a, b) {
+      a = Math.abs(a);
+      b = Math.abs(b);
+      while (b) {
+        let t = b;
+        b = a % b;
+        a = t;
+      }
+      return a;
+    }
+
+    // 2D Visualizer on Canvas
+    function drawEigenspaceCanvas() {
+      const canvas = document.getElementById('eigenCanvas');
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+      const width = canvas.width;
+      const height = canvas.height;
+
+      // Coordinate limits
+      const range = 5;
+      const originX = width / 2;
+      const originY = height / 2;
+      const scale = width / (2 * range);
+
+      ctx.clearRect(0, 0, width, height);
+
+      // 1. Draw Coordinate Grid
+      ctx.strokeStyle = '#1e293b';
+      ctx.lineWidth = 1;
+      for (let i = -range; i <= range; i++) {
+        const x = originX + i * scale;
+        const y = originY - i * scale;
+
+        // Vertical line
+        ctx.beginPath();
+        ctx.moveTo(x, 0);
+        ctx.lineTo(x, height);
+        ctx.stroke();
+
+        // Horizontal line
+        ctx.beginPath();
+        ctx.moveTo(0, y);
+        ctx.lineTo(width, y);
+        ctx.stroke();
+      }
+
+      // 2. Draw Main Axes
+      ctx.strokeStyle = '#475569';
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      ctx.moveTo(originX, 0);
+      ctx.lineTo(originX, height);
+      ctx.moveTo(0, originY);
+      ctx.lineTo(width, originY);
+      ctx.stroke();
+
+      // Axis labels
+      ctx.fillStyle = '#64748b';
+      ctx.font = '10px Inter, sans-serif';
+      ctx.fillText('+x', width - 18, originY - 6);
+      ctx.fillText('+y', originX + 6, 14);
+
+      if (selectedLambda === null) return;
+
+      // Compute basis direction
+      const { a, b, c, d } = currentMatrix;
+      const lam = selectedLambda;
+      const m11 = a - lam, m12 = b;
+
+      let vx = 0, vy = 0;
+      if (Math.abs(m11) < 1e-4 && Math.abs(m12) < 1e-4) {
+        // Identity multiple
+        vx = 1; vy = 0;
+      } else if (Math.abs(m11) > 1e-4) {
+        vx = -m12;
+        vy = m11;
+      } else {
+        vx = 1;
+        vy = 0;
+      }
+
+      // Normalize basis vector length for clean drawing
+      const len = Math.sqrt(vx * vx + vy * vy);
+      if (len < 1e-6) return;
+      const uX = vx / len;
+      const uY = vy / len;
+
+      // 3. Draw Eigenspace Line (Span) across full canvas
+      ctx.strokeStyle = '#34d399'; // Emerald-400
+      ctx.lineWidth = 2.5;
+      ctx.setLineDash([6, 6]);
+      ctx.beginPath();
+      ctx.moveTo(originX - uX * range * 2 * scale, originY + uY * range * 2 * scale);
+      ctx.lineTo(originX + uX * range * 2 * scale, originY - uY * range * 2 * scale);
+      ctx.stroke();
+      ctx.setLineDash([]); // Reset dash
+
+      // 4. Draw Basis Eigenvector v (amber arrow)
+      const vScale = 1.8;
+      const targetX = originX + uX * vScale * scale;
+      const targetY = originY - uY * vScale * scale;
+
+      drawArrow(ctx, originX, originY, targetX, targetY, '#fbbf24', 3); // Amber-400
+
+      // Label v
+      ctx.fillStyle = '#fbbf24';
+      ctx.font = 'bold 12px Inter, sans-serif';
+      ctx.fillText('v (Basis)', targetX + 8, targetY - 4);
+
+      // 5. Draw Transformed Vector A*v = lambda*v (indigo arrow)
+      const transScale = vScale * lam;
+      const tTargetX = originX + uX * transScale * scale;
+      const tTargetY = originY - uY * transScale * scale;
+
+      drawArrow(ctx, originX, originY, tTargetX, tTargetY, '#818cf8', 2); // Indigo-400
+
+      // Label A*v
+      ctx.fillStyle = '#c7d2fe';
+      ctx.font = '11px Inter, sans-serif';
+      ctx.fillText(`Av = ${fmt(lam)}v`, tTargetX + 8, tTargetY + 12);
+    }
+
+    function drawArrow(ctx, fromX, fromY, toX, toY, color, width) {
+      const headlen = 9;
+      const dx = toX - fromX;
+      const dy = toY - fromY;
+      const angle = Math.atan2(dy, dx);
+
+      ctx.strokeStyle = color;
+      ctx.fillStyle = color;
+      ctx.lineWidth = width;
+
+      // Line
+      ctx.beginPath();
+      ctx.moveTo(fromX, fromY);
+      ctx.lineTo(toX, toY);
+      ctx.stroke();
+
+      // Arrow head
+      ctx.beginPath();
+      ctx.moveTo(toX, toY);
+      ctx.lineTo(toX - headlen * Math.cos(angle - Math.PI / 6), toY - headlen * Math.sin(angle - Math.PI / 6));
+      ctx.lineTo(toX - headlen * Math.cos(angle + Math.PI / 6), toY - headlen * Math.sin(angle + Math.PI / 6));
+      ctx.closePath();
+      ctx.fill();
+    }
+
+    // Toggle discovery section
+    function toggleDiscoveryExplanation() {
+      const ans = document.getElementById('discoveryAnswer');
+      const text = document.getElementById('discoveryBtnText');
+      const chevron = document.getElementById('discoveryChevron');
+
+      if (ans.classList.contains('hidden')) {
+        ans.classList.remove('hidden');
+        text.innerText = 'ซ่อนบทพิสูจน์คุณสมบัติความเป็นปริภูมิย่อย';
+        chevron.classList.add('rotate-180');
+      } else {
+        ans.classList.add('hidden');
+        text.innerText = 'คลิกเพื่อดูบทพิสูจน์คุณสมบัติความเป็นปริภูมิย่อย (Subspace)';
+        chevron.classList.remove('rotate-180');
+      }
+      renderAllMath();
+    }
+  </script>
+</body>
+</html>

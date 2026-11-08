@@ -1,0 +1,1052 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>เรื่องที่ 8: การประยุกต์และการสังเคราะห์ความรู้เรื่องค่าเฉพาะ</title>
+
+  <!-- Google Fonts: Sarabun & Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Sarabun:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- KaTeX for crisp LaTeX formula rendering -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js"></script>
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Sarabun', 'Inter', 'sans-serif'],
+          },
+          colors: {
+            brand: {
+              50: '#eef2ff',
+              100: '#e0e7ff',
+              200: '#c7d2fe',
+              500: '#6366f1',
+              600: '#4f46e5',
+              700: '#4338ca',
+              800: '#3730a3',
+              900: '#312e81',
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    .katex { font-size: 1.05em; }
+    .matrix-bracket {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      padding: 0 8px;
+    }
+    .matrix-bracket::before {
+      content: "";
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 5px;
+      border-left: 2px solid #4f46e5;
+      border-top: 2px solid #4f46e5;
+      border-bottom: 2px solid #4f46e5;
+      border-radius: 4px 0 0 4px;
+    }
+    .matrix-bracket::after {
+      content: "";
+      position: absolute;
+      right: 0;
+      top: 0;
+      bottom: 0;
+      width: 5px;
+      border-right: 2px solid #4f46e5;
+      border-top: 2px solid #4f46e5;
+      border-bottom: 2px solid #4f46e5;
+      border-radius: 0 4px 4px 0;
+    }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-800 antialiased selection:bg-brand-100 selection:text-brand-800">
+
+  <!-- Header Banner -->
+  <header class="bg-gradient-to-r from-brand-900 via-indigo-900 to-slate-900 text-white py-10 shadow-md">
+    <div class="max-w-6xl w-full mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+        <div>
+          <h1 class="text-2xl sm:text-3xl lg:text-4xl font-extrabold tracking-tight">
+            เรื่องที่ 8: การประยุกต์และการสังเคราะห์ความรู้เรื่องค่าเฉพาะ
+          </h1>
+          <p class="text-slate-300 text-sm sm:text-base mt-1">
+            Eigenvalue Synthesis, Discrete Dynamical Systems, Stability Analysis & Spectral Radius $\rho(A)$
+          </p>
+        </div>
+        <div class="bg-white/10 backdrop-blur-md rounded-xl p-3.5 border border-white/15 text-center text-xs sm:text-sm">
+          <div class="text-brand-200 font-medium">เงื่อนไขเสถียรภาพเชิงเส้น</div>
+          <div class="text-xl font-bold tracking-wide mt-0.5 text-white">$\rho(A) = \max_i |\lambda_i| < 1 \iff \lim_{k \to \infty} A^k = \mathbf{0}$</div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Container strictly set to max-w-6xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 -->
+  <main class="max-w-6xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 space-y-10">
+
+    <!-- Section 1: วัตถุประสงค์การเรียนรู้ -->
+    <section class="bg-white rounded-2xl p-6 sm:p-7 shadow-sm border border-slate-200/80">
+      <div class="flex items-center gap-3 mb-4">
+        <div class="w-9 h-9 rounded-xl bg-indigo-100 text-brand-600 flex items-center justify-center font-bold text-lg shadow-inner">
+          1
+        </div>
+        <h2 class="text-xl sm:text-2xl font-bold text-slate-900">วัตถุประสงค์การเรียนรู้ (Learning Objectives)</h2>
+      </div>
+      <div class="bg-gradient-to-r from-indigo-50 to-slate-50 border-l-4 border-brand-600 p-4 rounded-r-xl">
+        <ul class="space-y-2.5 text-slate-700 leading-relaxed font-medium text-sm sm:text-base">
+          <li class="flex items-start gap-2.5">
+            <svg class="w-5 h-5 text-brand-600 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+            <span>นักศึกษาสามารถ<strong>บูรณาการความรู้</strong>เรื่องค่าเฉพาะ ($\lambda$), เวกเตอร์ลักษณะเฉพาะ ($\mathbf{v}$), ปริภูมิลักษณะเฉพาะ ($E_\lambda$), และการทำให้เป็นแนวทแยง ($A = PDP^{-1}$) เพื่อวิเคราะห์ปัญหาทางคณิตศาสตร์และระบบจริงได้อย่างเป็นระบบ</span>
+          </li>
+          <li class="flex items-start gap-2.5">
+            <svg class="w-5 h-5 text-brand-600 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+            <span>นักศึกษาสามารถ<strong>วิเคราะห์เสถียรภาพและพฤติกรรมระยะยาว</strong>ของระบบพลวัตแบบไม่ต่อเนื่อง ($\mathbf{x}_{k+1} = A\mathbf{x}_k$) โดยอาศัยรัศมีเชิงสเปกตรัม (Spectral Radius: $\rho(A)$) ได้อย่างถูกต้อง</span>
+          </li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- Section 2: เนื้อหาหลัก -->
+    <section class="bg-white rounded-2xl p-6 sm:p-7 shadow-sm border border-slate-200/80">
+      <div class="flex items-center gap-3 mb-6">
+        <div class="w-9 h-9 rounded-xl bg-indigo-100 text-brand-600 flex items-center justify-center font-bold text-lg shadow-inner">
+          2
+        </div>
+        <h2 class="text-xl sm:text-2xl font-bold text-slate-900">เนื้อหาหลัก (Core Mathematical Foundations)</h2>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <!-- 2.1 การตีความค่าเฉพาะทางเรขาคณิต -->
+        <div class="bg-slate-50/80 border border-slate-200 rounded-xl p-5 hover:border-brand-300 transition-colors">
+          <div class="flex items-center justify-between mb-3">
+            <span class="text-xs font-bold uppercase tracking-wider text-brand-700 bg-brand-100 px-2.5 py-0.5 rounded-full">หัวข้อ 2.1</span>
+            <span class="text-xs text-slate-500">Geometric Interpretation</span>
+          </div>
+          <h3 class="text-lg font-bold text-slate-800 mb-2">การตีความค่าเฉพาะ: ขยาย หด หรือกลับทิศ</h3>
+          <p class="text-slate-600 text-sm leading-relaxed mb-3">
+            สำหรับทิศทางพิเศษตามแนวเวกเตอร์ลักษณะเฉพาะ $A\mathbf{v} = \lambda\mathbf{v}$ การแปลงเชิงเส้นจะกระทำเสมือนการคูณด้วยตัวเลขสเกลาร์ $\lambda$:
+          </p>
+          <ul class="text-xs sm:text-sm text-slate-700 space-y-1.5 bg-white p-3 rounded-lg border border-slate-200">
+            <li>&bull; <strong>$|\lambda| > 1$:</strong> เกิดการ <strong>ขยายตัว (Stretching / Expansion)</strong> ออกจากจุดกำเนิด</li>
+            <li>&bull; <strong>$|\lambda| < 1$:</strong> เกิดการ <strong>หดตัว (Contraction / Compression)</strong> เข้าสู่จุดกำเนิด</li>
+            <li>&bull; <strong>$\lambda < 0$:</strong> เวกเตอร์เกิดการ <strong>กลับทิศทาง $180^\circ$ (Reflection)</strong> ข้ามจุดกำเนิด</li>
+            <li>&bull; <strong>$\lambda \in \mathbb{C}$ (จำนวนเชิงซ้อน):</strong> $|\lambda|e^{i\theta}$ ก่อให้เกิด <strong>การหมุนวน (Rotation & Scaling)</strong></li>
+          </ul>
+        </div>
+
+        <!-- 2.2 การเชื่อมโยงกับการแปลงเชิงเส้น -->
+        <div class="bg-slate-50/80 border border-slate-200 rounded-xl p-5 hover:border-brand-300 transition-colors">
+          <div class="flex items-center justify-between mb-3">
+            <span class="text-xs font-bold uppercase tracking-wider text-indigo-700 bg-indigo-100 px-2.5 py-0.5 rounded-full">หัวข้อ 2.2</span>
+            <span class="text-xs text-slate-500">Invariant Directions</span>
+          </div>
+          <h3 class="text-lg font-bold text-slate-800 mb-2">การเชื่อมโยงกับการแปลงเชิงเส้นและแนวแกนคงสภาพ</h3>
+          <p class="text-slate-600 text-sm leading-relaxed mb-2">
+            เวกเตอร์ทั่วไป $\mathbf{x}_0$ สามารถกระจายตามฐานหลักของเวกเตอร์ลักษณะเฉพาะ (Eigenbasis Expansion):
+          </p>
+          <div class="bg-white p-2.5 rounded-lg border border-slate-200 text-center font-mono my-2 text-xs sm:text-sm text-indigo-950 shadow-sm">
+            $$\mathbf{x}_0 = c_1\mathbf{v}_1 + c_2\mathbf{v}_2 + \dots + c_n\mathbf{v}_n$$
+          </div>
+          <p class="text-xs text-slate-600 mt-2">
+            เมื่อทำการแปลงซ้ำ $k$ ครั้ง:
+            $$A^k\mathbf{x}_0 = c_1\lambda_1^k\mathbf{v}_1 + c_2\lambda_2^k\mathbf{v}_2 + \dots + c_n\lambda_n^k\mathbf{v}_n$$
+            แต่ละแนวแกนเวกเตอร์ลักษณะเฉพาะเป็น <em>Invariant Direction</em> ที่ไม่ผสมปนเปกัน พฤติกรรมทั้งหมดของระบบจึงถูกควบคุมโดยลำดับของ $\lambda_i^k$
+          </p>
+        </div>
+
+        <!-- 2.3 การวิเคราะห์เสถียรภาพเบื้องต้น -->
+        <div class="bg-slate-50/80 border border-slate-200 rounded-xl p-5 hover:border-brand-300 transition-colors">
+          <div class="flex items-center justify-between mb-3">
+            <span class="text-xs font-bold uppercase tracking-wider text-emerald-700 bg-emerald-100 px-2.5 py-0.5 rounded-full">หัวข้อ 2.3</span>
+            <span class="text-xs text-slate-500">Spectral Radius & Stability</span>
+          </div>
+          <h3 class="text-lg font-bold text-slate-800 mb-2">เสถียรภาพของระบบเชิงเส้นแบบไม่ต่อเนื่อง</h3>
+          <p class="text-slate-600 text-sm leading-relaxed mb-2">
+            กำหนด <strong>รัศมีเชิงสเปกตรัม (Spectral Radius)</strong> $\rho(A) = \max_i |\lambda_i|$ ระบบ $\mathbf{x}_{k+1} = A\mathbf{x}_k$ จำแนกจุดสมดุลที่จุดกำเนิด $\mathbf{0}$ ได้ดังนี้:
+          </p>
+          <div class="space-y-1.5 text-xs text-slate-700 mt-2">
+            <div class="p-2 bg-emerald-50 rounded border border-emerald-200">
+              <strong>1. แหล่งดึงดูด (Attractor / Sink):</strong> $|\lambda_i| < 1$ ทุกค่า ($\rho(A) < 1$) $\implies$ มีเสถียรภาพเชิงกำกับ (Asymptotically Stable) ลู่เข้าสู่ $\mathbf{0}$ เสมอ
+            </div>
+            <div class="p-2 bg-rose-50 rounded border border-rose-200">
+              <strong>2. แหล่งผลักออก (Repeller / Source):</strong> $|\lambda_i| > 1$ ทุกค่า $\implies$ ไม่เสถียร (Unstable) ลู่ออกสู่อนันต์ในทุกทิศทาง
+            </div>
+            <div class="p-2 bg-amber-50 rounded border border-amber-200">
+              <strong>3. จุดอานม้า (Saddle Point):</strong> มีบาง $|\lambda| > 1$ และบาง $|\lambda| < 1$ $\implies$ ยุบตัวเข้าหาแกนหนึ่ง แต่ระเบิดออกตามอีกแกนหนึ่ง
+            </div>
+          </div>
+        </div>
+
+        <!-- 2.4 & 2.5 การเลือกวิธีคำนวณและการพิสูจน์ข้อสรุป -->
+        <div class="bg-slate-50/80 border border-slate-200 rounded-xl p-5 hover:border-brand-300 transition-colors">
+          <div class="flex items-center justify-between mb-3">
+            <span class="text-xs font-bold uppercase tracking-wider text-purple-700 bg-purple-100 px-2.5 py-0.5 rounded-full">หัวข้อ 2.4 & 2.5</span>
+            <span class="text-xs text-slate-500">Synthesis & Proofs</span>
+          </div>
+          <h3 class="text-lg font-bold text-slate-800 mb-2">การเลือกวิธีคำนวณและการตรวจสอบข้อสรุป</h3>
+          <ul class="text-xs sm:text-sm text-slate-600 space-y-2">
+            <li>
+              &bull; <strong>การเลือกวิธีคำนวณ:</strong>
+              ถ้าเมทริกซ์ทำให้เป็นแนวทแยงได้ ให้ใช้การแยกสเปกตรัม $A = PDP^{-1}$ เพื่อหาผลเฉลยในรูปปิด (Closed-form) แต่ถ้าเมทริกซ์ Defective ให้ใช้ Jordan Form หรือใช้วิธีคำนวณเชิงตัวเลข (Power Iteration / QR algorithm)
+            </li>
+            <li>
+              &bull; <strong>ทฤษฎีบทการตรวจสอบเสถียรภาพ (Lyapunov Criterion):</strong>
+              ระบบ $\mathbf{x}_{k+1} = A\mathbf{x}_k$ จะมีเสถียรภาพเชิงกำกับ ก็ต่อเมื่อ มีเมทริกซ์บวกแน่นอนสมมาตร $P > 0$ ที่สอดคล้องกับสมการเลียปูนอฟ (Discrete Lyapunov Equation):
+              $$A^T P A - P < 0$$
+              ซึ่งสมมูลกับเงื่อนไข $\rho(A) < 1$ ทุกประการ
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Integrated Summary Infographic -->
+      <div class="mt-6 p-4 bg-indigo-50/60 rounded-xl border border-indigo-100">
+        <h4 class="font-bold text-indigo-950 text-sm mb-2 flex items-center gap-2">
+          <svg class="w-4 h-4 text-brand-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+          การสังเคราะห์ความรู้ 4 มิติของค่าเฉพาะ (Eigenvalues 4-Dimensional Synthesis)
+        </h4>
+        <div class="grid grid-cols-1 sm:grid-cols-4 gap-3 text-center text-xs">
+          <div class="bg-white p-3 rounded-lg border border-indigo-200">
+            <span class="font-bold text-brand-700 block mb-1">1. พีชคณิต (Algebra)</span>
+            รากของ $\det(A - \lambda I) = 0$ สัมพันธ์กับ $\text{tr}(A)$ และ $\det(A)$
+          </div>
+          <div class="bg-white p-3 rounded-lg border border-indigo-200">
+            <span class="font-bold text-brand-700 block mb-1">2. เรขาคณิต (Geometry)</span>
+            ทิศทางแกนคงสภาพที่ไม่หมุนเปลี่ยน $E_\lambda = \ker(A - \lambda I)$
+          </div>
+          <div class="bg-white p-3 rounded-lg border border-indigo-200">
+            <span class="font-bold text-brand-700 block mb-1">3. โครงสร้าง (Structure)</span>
+            การแยกตัวประกอบแนวทแยง $A = PDP^{-1}$ เมื่อ $m_g = m_a$ ครบทุกค่า
+          </div>
+          <div class="bg-white p-3 rounded-lg border border-indigo-200">
+            <span class="font-bold text-brand-700 block mb-1">4. พลวัต (Dynamics)</span>
+            กำหนดการลู่เข้า/ลู่ออกของระบบ $\mathbf{x}_k = A^k\mathbf{x}_0$ ผ่าน $\rho(A)$
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Section 3: แบบจำลองโต้ตอบ (Interactive Simulator) -->
+    <section class="bg-white rounded-2xl p-6 sm:p-7 shadow-sm border border-slate-200/80">
+      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6 pb-4 border-b border-slate-100">
+        <div class="flex items-center gap-3">
+          <div class="w-9 h-9 rounded-xl bg-indigo-100 text-brand-600 flex items-center justify-center font-bold text-lg shadow-inner">
+            3
+          </div>
+          <div>
+            <h2 class="text-xl sm:text-2xl font-bold text-slate-900">แบบจำลองโต้ตอบ: สำรวจวิถีการแปลงซ้ำ (Phase Portrait & Dynamics)</h2>
+            <p class="text-xs sm:text-sm text-slate-500">เลือกสถานการณ์จำลองเพื่อสำรวจ $\lambda, \mathbf{v}$, วิเคราะห์การแปลงซ้ำ $\mathbf{x}_k = A^k\mathbf{x}_0$ และสังเกตการลู่เข้า/ลู่ออกบน Canvas 2D</p>
+          </div>
+        </div>
+
+        <!-- Scenario Selector Bar -->
+        <div class="flex items-center gap-2">
+          <label class="text-xs font-semibold text-slate-600">สถานการณ์จำลอง:</label>
+          <select id="scenarioSelect" onchange="loadScenario(this.value)" class="text-xs sm:text-sm bg-slate-100 border border-slate-300 rounded-lg px-2.5 py-1.5 font-medium focus:ring-2 focus:ring-brand-500 focus:outline-none">
+            <option value="sink">1) Sink / Attractor (|λ| < 1 ลู่เข้าหา 0)</option>
+            <option value="source">2) Source / Repeller (|λ| > 1 ลู่ออกสู่อนันต์)</option>
+            <option value="saddle">3) Saddle Point (|λ₁| > 1, |λ₂| < 1 ยุบแกนหนึ่ง ขยายแกนหนึ่ง)</option>
+            <option value="spiral">4) Spiral / Rotation (ค่าเฉพาะเชิงซ้อน |λ| < 1 หมุนวนเข้าหา 0)</option>
+            <option value="markov">5) Markov / Population (λ₁ = 1, λ₂ < 1 สู่ Steady-State)</option>
+            <option value="custom">6) Custom Matrix 2×2 (ปรับค่าเอง)</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Control Panel -->
+      <div class="bg-slate-50 rounded-2xl p-5 border border-slate-200 mb-6">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-center">
+          
+          <!-- Matrix Input Display -->
+          <div class="lg:col-span-4 flex flex-col items-center">
+            <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">เมทริกซ์ระบบ $A$</span>
+            <div class="matrix-bracket py-1">
+              <div class="grid grid-cols-2 gap-2">
+                <input type="number" id="inp_m00" value="0.5" step="0.05" onchange="onMatrixChange()" class="w-14 h-10 text-center font-bold bg-white rounded-lg border border-slate-300 shadow-sm focus:ring-2 focus:ring-brand-500 focus:outline-none text-sm">
+                <input type="number" id="inp_m01" value="0.2" step="0.05" onchange="onMatrixChange()" class="w-14 h-10 text-center font-bold bg-white rounded-lg border border-slate-300 shadow-sm focus:ring-2 focus:ring-brand-500 focus:outline-none text-sm">
+                <input type="number" id="inp_m10" value="0" step="0.05" onchange="onMatrixChange()" class="w-14 h-10 text-center font-bold bg-white rounded-lg border border-slate-300 shadow-sm focus:ring-2 focus:ring-brand-500 focus:outline-none text-sm">
+                <input type="number" id="inp_m11" value="0.8" step="0.05" onchange="onMatrixChange()" class="w-14 h-10 text-center font-bold bg-white rounded-lg border border-slate-300 shadow-sm focus:ring-2 focus:ring-brand-500 focus:outline-none text-sm">
+              </div>
+            </div>
+            <div id="matrixQuickInfo" class="text-[11px] text-slate-500 mt-2 font-medium">
+              <!-- det and trace populated via JS -->
+            </div>
+          </div>
+
+          <!-- Stability & Spectral Analysis Card -->
+          <div class="lg:col-span-8 flex flex-col bg-white p-4 rounded-xl border border-slate-200 shadow-sm space-y-3">
+            <div class="flex items-center justify-between border-b border-slate-100 pb-2">
+              <span class="text-xs font-bold text-slate-600 uppercase">บทวิเคราะห์ค่าเฉพาะและเสถียรภาพระบบ (Stability Diagnosis)</span>
+              <span id="stabilityBadge" class="text-xs font-bold px-2.5 py-0.5 rounded-full">
+                <!-- Badge -->
+              </span>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 text-xs">
+              <div class="p-2 bg-slate-50 rounded border border-slate-200">
+                <span class="text-slate-500 text-[11px] block">ค่าเฉพาะ $\lambda_1, \lambda_2$:</span>
+                <span id="lambdaValsText" class="font-bold text-slate-800">0.5, 0.8</span>
+              </div>
+              <div class="p-2 bg-slate-50 rounded border border-slate-200">
+                <span class="text-slate-500 text-[11px] block">รัศมีสเปกตรัม $\rho(A)$:</span>
+                <span id="rhoText" class="font-bold text-brand-700">0.800</span>
+              </div>
+              <div class="p-2 bg-slate-50 rounded border border-slate-200">
+                <span class="text-slate-500 text-[11px] block">พฤติกรรมระยะยาว ($k \to \infty$):</span>
+                <span id="longTermBehaviorText" class="font-bold text-emerald-700">ลู่เข้าสู่จุดกำเนิด $\mathbf{0}$</span>
+              </div>
+            </div>
+            <!-- Iteration Steps Slider -->
+            <div class="flex items-center gap-3 pt-1">
+              <label for="stepSlider" class="text-xs font-semibold text-slate-600 whitespace-nowrap">จำนวนรอบการแปลง ($k$):</label>
+              <input type="range" id="stepSlider" min="2" max="30" value="15" oninput="updateIterationSteps(this.value)" class="w-full accent-brand-600 cursor-pointer">
+              <span id="stepCountBadge" class="text-xs font-bold text-brand-700 bg-brand-50 px-2 py-0.5 rounded border border-brand-200">15 รอบ</span>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Canvas and Trajectory Analysis Grid -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+        
+        <!-- Left: Phase Portrait Canvas -->
+        <div class="lg:col-span-7 bg-slate-900 rounded-2xl p-4 text-white shadow-md flex flex-col items-center">
+          <div class="w-full flex items-center justify-between pb-2 mb-2 border-b border-slate-800 text-xs">
+            <span class="font-bold text-slate-300 flex items-center gap-1.5">
+              <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 inline-block animate-pulse"></span>
+              วิถีการแปลง $\mathbf{x}_k = A^k\mathbf{x}_0$ บนระนาบเฟส (Phase Space)
+            </span>
+            <span class="text-slate-400 text-[11px]">คลิกบน Canvas เพื่อเปลี่ยนเวกเตอร์ตั้งต้น $\mathbf{x}_0$</span>
+          </div>
+
+          <div class="relative w-full aspect-square max-w-[420px] bg-slate-950 rounded-xl overflow-hidden border border-slate-800 cursor-crosshair">
+            <canvas id="phaseCanvas" width="420" height="420" class="block w-full h-full"></canvas>
+          </div>
+
+          <!-- Canvas Legend -->
+          <div class="w-full mt-3 grid grid-cols-2 sm:grid-cols-3 gap-2 text-[11px] text-slate-300">
+            <div class="flex items-center gap-1.5">
+              <span class="w-3 h-3 rounded-full bg-amber-400 inline-block"></span>
+              <span>เวกเตอร์ตั้งต้น $\mathbf{x}_0$</span>
+            </div>
+            <div class="flex items-center gap-1.5">
+              <span class="w-3.5 h-1 bg-cyan-400 inline-block"></span>
+              <span>วิถีการแปลง $A^k\mathbf{x}_0$</span>
+            </div>
+            <div class="flex items-center gap-1.5">
+              <span class="w-3.5 h-1 border-b-2 border-dashed border-rose-400 inline-block"></span>
+              <span>แนวแกนคงสภาพ $\mathbf{v}_i$</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right: Real-time Trajectory Steps Table & Vector Breakdown -->
+        <div class="lg:col-span-5 space-y-4">
+          <div class="p-4 bg-slate-50 border border-slate-200 rounded-2xl">
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-xs font-bold text-slate-700 uppercase">เวกเตอร์ตั้งต้นปัจจุบัน $\mathbf{x}_0$</span>
+              <span id="x0CoordsText" class="text-xs font-bold text-brand-700 bg-brand-50 px-2 py-0.5 rounded border border-brand-200">[3.00, 2.00]ᵀ</span>
+            </div>
+            <p class="text-xs text-slate-500 mb-3">
+              เวกเตอร์ถูกแปลงไปตามสูตร $\mathbf{x}_{k+1} = A\mathbf{x}_k$ สามารถคลิกจุดใดก็ได้บน Canvas ด้านซ้ายเพื่อทดสอบ
+            </p>
+
+            <div class="overflow-hidden rounded-xl border border-slate-200 bg-white">
+              <div class="max-h-56 overflow-y-auto">
+                <table class="w-full text-left border-collapse text-xs">
+                  <thead class="bg-slate-100 text-slate-700 sticky top-0 border-b border-slate-200">
+                    <tr>
+                      <th class="p-2 font-bold w-16 text-center">รอบ ($k$)</th>
+                      <th class="p-2 font-bold">เวกเตอร์ $\mathbf{x}_k = [x_1, x_2]^T$</th>
+                      <th class="p-2 font-bold text-right">ขนาด $\|\mathbf{x}_k\|$</th>
+                    </tr>
+                  </thead>
+                  <tbody id="trajectoryTableBody" class="divide-y divide-slate-100 font-mono text-slate-600">
+                    <!-- Populated dynamically via JS -->
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+          <!-- Dynamic Analysis Commentary -->
+          <div id="phaseCommentaryCard" class="p-4 bg-indigo-50/70 border border-indigo-200 rounded-2xl text-xs text-indigo-950 space-y-1.5">
+            <!-- Dynamic observation commentary populated via JS -->
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- Section 4: คำถามนำเพื่อค้นพบ -->
+    <section class="bg-white rounded-2xl p-6 sm:p-7 shadow-sm border border-slate-200/80">
+      <div class="flex items-center gap-3 mb-4">
+        <div class="w-9 h-9 rounded-xl bg-amber-100 text-amber-700 flex items-center justify-center font-bold text-lg shadow-inner">
+          4
+        </div>
+        <h2 class="text-xl sm:text-2xl font-bold text-slate-900">คำถามนำเพื่อค้นพบ (Inquiry & Deep Concept)</h2>
+      </div>
+
+      <div class="bg-amber-50/70 border border-amber-200/90 rounded-2xl p-5 sm:p-6">
+        <div class="flex items-start gap-3">
+          <div class="p-2 bg-amber-500 text-white rounded-xl shrink-0 mt-0.5">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+          </div>
+          <div>
+            <h3 class="text-base sm:text-lg font-bold text-amber-950">
+              หากค่าเฉพาะทุกค่าของเมทริกซ์มีค่าสัมบูรณ์น้อยกว่า 1 ($\rho(A) < 1$) จะสรุปได้ภายใต้เงื่อนไขใดว่าการทำซ้ำของการแปลงจะเข้าใกล้เวกเตอร์ศูนย์เสมอ?
+            </h3>
+            <p class="text-sm text-amber-900/80 mt-1">
+              มีกลไกการสลายตัวขององค์ประกอบตามฐานเวกเตอร์ลักษณะเฉพาะ (Spectral Decomposition) อย่างไร และมีกรณีใดหรือไม่ที่พิกัดอาจ "พุ่งสูงขึ้นชั่วคราว" ก่อนจะลู่เข้าศูนย์ในที่สุด?
+            </p>
+
+            <button id="toggleInquiryBtn" onclick="toggleInquiryAnswer()" class="mt-4 px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white font-medium text-xs sm:text-sm rounded-xl shadow transition-all inline-flex items-center gap-2">
+              <span id="inquiryBtnText">คลิกเพื่อดูบทวิเคราะห์การสลายตัวตามสเปกตรัมและปรากฏการณ์ชั่วครู่</span>
+              <svg id="inquiryChevron" class="w-4 h-4 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+            </button>
+          </div>
+        </div>
+
+        <div id="inquiryContent" class="hidden mt-6 pt-5 border-t border-amber-200/80 space-y-4 text-slate-800 text-sm leading-relaxed">
+          <div class="p-4 bg-white rounded-xl border border-amber-200 space-y-3">
+            <h4 class="font-bold text-slate-900 text-sm sm:text-base flex items-center gap-2">
+              <span class="w-2 h-2 rounded-full bg-brand-600"></span>
+              บทพิสูจน์การสลายตัวสู่ศูนย์ผ่าน Spectral Decomposition
+            </h4>
+            <p>
+              สมมติให้เมทริกซ์ $A$ มีค่าเฉพาะ $\lambda_1, \dots, \lambda_n$ ที่สอดคล้องกับ $|\lambda_i| < 1$ ทุกค่า ($\rho(A) < 1$)
+            </p>
+
+            <div class="p-3 bg-slate-50 rounded-lg border border-slate-200 text-xs sm:text-sm">
+              <span class="font-bold text-brand-700 block mb-1">1. กรณีเมทริกซ์ทำให้เป็นแนวทแยงได้ (Diagonalizable):</span>
+              เวกเตอร์ใดๆ $\mathbf{x}_0$ สามารถเขียนเป็นผลรวมเชิงเส้นของเวกเตอร์ลักษณะเฉพาะ:
+              $$\mathbf{x}_0 = c_1\mathbf{v}_1 + c_2\mathbf{v}_2 + \dots + c_n\mathbf{v}_n$$
+              เมื่อคูณด้วย $A^k$:
+              $$A^k\mathbf{x}_0 = c_1\lambda_1^k\mathbf{v}_1 + c_2\lambda_2^k\mathbf{v}_2 + \dots + c_n\lambda_n^k\mathbf{v}_n$$
+              เนื่องจาก $|\lambda_i| < 1$ ดังนั้น $\lim_{k \to \infty} \lambda_i^k = 0$ สำหรับทุกพจน์ จึงได้ทันทีว่า:
+              $$\lim_{k \to \infty} A^k\mathbf{x}_0 = c_1(0)\mathbf{v}_1 + \dots + c_n(0)\mathbf{v}_n = \mathbf{0}$$
+            </div>
+
+            <div class="p-3 bg-indigo-50/60 rounded-lg border border-indigo-200 text-xs sm:text-sm">
+              <span class="font-bold text-indigo-900 block mb-1">2. กรณีทั่วไปรวมถึงเมทริกซ์ที่ไม่เป็นแนวทแยง (Jordan Form):</span>
+              แม้เมทริกซ์จะมีบล็อกจอร์แดน $J_m(\lambda)$ พจน์ทั่วไปจะอยู่ในรูป $\binom{k}{j}\lambda^{k-j}$ ซึ่งเมื่อ $k \to \infty$ การลดลงแบบเอกซ์โพเนนเชียลของ $|\lambda|^k$ จะชนะการเติบโตแบบพหุนาม $k^j$ เสมอ (ตามกฎของโลปิตาล) ส่งผลให้ $A^k \to \mathbf{0}$ เสมอเช่นกัน
+            </div>
+
+            <div class="p-3 bg-amber-50 rounded-lg border border-amber-200 text-amber-950 text-xs sm:text-sm">
+              <strong>ข้อสังเกตสำคัญ (Transient Growth):</strong> ในระบบที่มีเวกเตอร์ลักษณะเฉพาะที่เกือบจะขนานกัน (Non-normal Matrix) ขนาดของเวกเตอร์ $\|\mathbf{x}_k\|$ อาจพุ่งสูงขึ้นชั่วคราวในรอบแรกๆ (Transient Peak) ก่อนที่ผลกระทบของ $|\lambda| < 1$ จะดึงให้ระบบลู่เข้าสู่ศูนย์ในระยะยาว
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Section 5: แบบฝึกหัดสำหรับนักศึกษา -->
+    <section class="bg-white rounded-2xl p-6 sm:p-7 shadow-sm border border-slate-200/80">
+      <div class="flex items-center gap-3 mb-6">
+        <div class="w-9 h-9 rounded-xl bg-indigo-100 text-brand-600 flex items-center justify-center font-bold text-lg shadow-inner">
+          5
+        </div>
+        <h2 class="text-xl sm:text-2xl font-bold text-slate-900">แบบฝึกหัดสำหรับนักศึกษา (Self-Assessment & Rigorous Proof)</h2>
+      </div>
+
+      <div class="bg-slate-50 border border-slate-200 rounded-2xl p-6 space-y-6">
+        <div class="border-b border-slate-200 pb-4">
+          <span class="text-xs font-bold uppercase tracking-wider text-brand-700 bg-brand-100 px-2.5 py-0.5 rounded-full">โจทย์การวิเคราะห์ขั้นสังเคราะห์</span>
+          <p class="text-base sm:text-lg font-medium text-slate-900 mt-2">
+            กำหนดเมทริกซ์จัตุรัส $A$ ที่ทำให้เป็นแนวทแยงได้ ($A = PDP^{-1}$) จงวิเคราะห์พฤติกรรมของ $A^k$ เมื่อ $k$ เพิ่มขึ้น โดยพิจารณาค่าเฉพาะ และอธิบายเงื่อนไขที่จำเป็นและเพียงพอที่ทำให้ $A^k \to \mathbf{0}$ พร้อมทั้งหาเงื่อนไขที่ทำให้ $A^k$ ลู่เข้าสู่เมทริกซ์คงที่ที่ไม่ใช่ศูนย์
+          </p>
+        </div>
+
+        <!-- Interactive Student Self-Check -->
+        <div class="space-y-4">
+          <div class="p-4 bg-white rounded-xl border border-slate-200 space-y-3">
+            <span class="text-xs font-bold text-slate-500 uppercase">ทดสอบความเข้าใจเชิงทฤษฎี (Diagnostic Check)</span>
+            <p class="text-sm font-medium text-slate-800">
+              ข้อความใดต่อไปนี้อธิบายเงื่อนไขที่จำเป็นและเพียงพอสำหรับ $\lim_{k \to \infty} A^k = \mathbf{0}$ ได้ถูกต้องและครอบคลุมที่สุด?
+            </p>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 text-xs sm:text-sm">
+              <label class="flex items-center gap-2 p-3 border rounded-lg hover:bg-slate-50 cursor-pointer">
+                <input type="radio" name="synthQuiz" value="optA" class="text-brand-600 focus:ring-brand-500">
+                <span>(A) $\det(A) < 1$</span>
+              </label>
+              <label class="flex items-center gap-2 p-3 border rounded-lg hover:bg-slate-50 cursor-pointer">
+                <input type="radio" name="synthQuiz" value="optB" class="text-brand-600 focus:ring-brand-500">
+                <span>(B) $|\lambda_i| < 1$ สำหรับทุกค่าเฉพาะ $\lambda_i$ ($\rho(A) < 1$)</span>
+              </label>
+              <label class="flex items-center gap-2 p-3 border rounded-lg hover:bg-slate-50 cursor-pointer">
+                <input type="radio" name="synthQuiz" value="optC" class="text-brand-600 focus:ring-brand-500">
+                <span>(C) $\text{tr}(A) < 0$</span>
+              </label>
+              <label class="flex items-center gap-2 p-3 border rounded-lg hover:bg-slate-50 cursor-pointer">
+                <input type="radio" name="synthQuiz" value="optD" class="text-brand-600 focus:ring-brand-500">
+                <span>(D) เมทริกซ์ $A$ ต้องเป็นเมทริกซ์สมมาตร</span>
+              </label>
+            </div>
+          </div>
+
+          <div class="flex flex-wrap items-center gap-3 pt-1">
+            <button onclick="checkQuizAnswer()" class="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-sm rounded-xl shadow transition-all active:scale-95">
+              ตรวจสอบคำตอบ
+            </button>
+            <button onclick="toggleExerciseSolution()" class="px-4 py-2.5 bg-white border border-slate-300 hover:bg-slate-100 text-slate-700 font-medium text-sm rounded-xl transition-all">
+              <span id="solutionBtnText">แสดงบทพิสูจน์และการวิเคราะห์พฤติกรรมฉบับสมบูรณ์</span>
+            </button>
+            <div id="exerciseFeedback" class="text-sm font-semibold"></div>
+          </div>
+        </div>
+
+        <!-- Full Detailed Proof & Synthesis (Collapsible) -->
+        <div id="exerciseSolutionDetail" class="hidden mt-6 pt-5 border-t border-slate-200 space-y-4 text-slate-800 text-sm">
+          <div class="bg-white p-5 rounded-xl border border-slate-200 space-y-5">
+            
+            <!-- Part 1: Condition for A^k -> 0 -->
+            <div>
+              <h4 class="font-bold text-brand-700 mb-2 flex items-center gap-2">
+                <span class="w-2 h-2 rounded-full bg-brand-600"></span>
+                ส่วนที่ 1: การพิสูจน์เงื่อนไขที่ทำให้ $A^k \to \mathbf{0}$
+              </h4>
+              <p class="text-slate-600 text-xs sm:text-sm leading-relaxed mb-2">
+                เนื่องจากกำหนดให้ $A$ ทำให้เป็นแนวทแยงได้ ดังนั้น $A = PDP^{-1}$ โดยที่ $D = \operatorname{diag}(\lambda_1, \lambda_2, \dots, \lambda_n)$ เมื่อยกกำลัง $k$:
+              </p>
+              <div class="bg-slate-50 p-3 rounded-lg text-center font-mono text-xs sm:text-sm my-2">
+                $$A^k = P D^k P^{-1} = P \begin{bmatrix} \lambda_1^k & 0 & \dots & 0 \\ 0 & \lambda_2^k & \dots & 0 \\ \vdots & \vdots & \ddots & \vdots \\ 0 & 0 & \dots & \lambda_n^k \end{bmatrix} P^{-1}$$
+              </div>
+              <p class="text-slate-600 text-xs sm:text-sm leading-relaxed">
+                พิจารณาลิมิตเมื่อ $k \to \infty$ เนื่องจาก $P$ และ $P^{-1}$ เป็นเมทริกซ์คงที่ที่ไม่ขึ้นกับ $k$:
+              </p>
+              <div class="text-center font-mono my-2 text-xs sm:text-sm font-semibold text-indigo-900">
+                $$\lim_{k \to \infty} A^k = P \left( \lim_{k \to \infty} D^k \right) P^{-1}$$
+              </div>
+              <p class="text-xs sm:text-sm text-slate-700 leading-relaxed">
+                เมทริกซ์ $D^k \to \mathbf{0}$ ก็ต่อเมื่อสมาชิกทุกตัวบนแนวทแยงหลักลู่เข้าสู่ศูนย์ นั่นคือ:
+                $$\lim_{k \to \infty} \lambda_i^k = 0 \iff |\lambda_i| < 1 \quad \text{สำหรับทุก } i = 1, 2, \dots, n$$
+                ดังนั้น เงื่อนไขที่จำเป็นและเพียงพอ (Necessary & Sufficient Condition) คือ <strong>รัศมีเชิงสเปกตรัม $\rho(A) = \max_i |\lambda_i| < 1$</strong>
+              </p>
+            </div>
+
+            <!-- Part 2: Condition for Convergence to Non-zero Steady State -->
+            <div class="p-4 bg-emerald-50/70 border border-emerald-200 rounded-xl space-y-2">
+              <h4 class="font-bold text-emerald-950 mb-1 flex items-center gap-2">
+                <span class="w-2 h-2 rounded-full bg-emerald-600"></span>
+                ส่วนที่ 2: เงื่อนไขที่ทำให้ $A^k$ ลู่เข้าสู่เมทริกซ์คงที่ที่ไม่ใช่ศูนย์ (Steady-State Matrix)
+              </h4>
+              <p class="text-emerald-900 text-xs sm:text-sm leading-relaxed">
+                $A^k$ จะลู่เข้าสู่เมทริกซ์คงที่ $A^\infty \ne \mathbf{0}$ ก็ต่อเมื่อ:
+              </p>
+              <ul class="text-xs sm:text-sm text-emerald-950 space-y-1 list-disc list-inside">
+                <li>มีค่าเฉพาะหนึ่งค่ามีค่าเท่ากับ $1$ พอดี ($\lambda_1 = 1$) และมีพหุคูณเชิงเรขาคณิตเท่ากับพหุคูณเชิงพีชคณิต</li>
+                <li>ค่าเฉพาะที่เหลือทั้งหมดมีค่าสัมบูรณ์น้อยกว่า $1$ ($|\lambda_j| < 1$ สำหรับ $j \ge 2$)</li>
+                <li><strong>ไม่มี</strong> ค่าเฉพาะที่เป็น $-1$ หรือจำนวนเชิงซ้อนบนวงกลมหนึ่งหน่วย ($e^{i\theta}$) เพราะจะทำให้เกิดการแกว่งกวัดไม่ลู่เข้า</li>
+              </ul>
+              <div class="text-center font-mono my-2 text-xs sm:text-sm font-bold text-emerald-900">
+                $$D^\infty = \operatorname{diag}(1, 0, \dots, 0) \implies \lim_{k \to \infty} A^k = \mathbf{v}_1 \mathbf{w}_1^T$$
+              </div>
+              <p class="text-xs text-emerald-800">
+                ซึ่งผลลัพธ์นี้คือหัวใจสำคัญของ <strong>ทฤษฎีบทเพอร์รอน-โฟรเบนิอุส (Perron-Frobenius Theorem)</strong> ที่ใช้ในมาร์คอฟเชนและการจัดอันดับหน้าเว็บ PageRank ของ Google
+              </p>
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+  </main>
+
+
+
+  <!-- Application Engine & Interactive Simulation Script -->
+  <script>
+    // State
+    let matrixA = [
+      [0.5, 0.2],
+      [0.0, 0.8]
+    ];
+    let initialX0 = [3.0, 2.0];
+    let maxSteps = 15;
+
+    const scenarios = {
+      sink: {
+        name: "Sink / Attractor",
+        mat: [[0.5, 0.2], [0, 0.8]],
+        x0: [3.0, 2.0],
+        desc: "ค่าเฉพาะทั้งสองตัวคือ 0.8 และ 0.5 (น้อยกว่า 1 ทั้งคู่) ระบบมีเสถียรภาพสมบูรณ์และยุบตัวเข้าหาจุดกำเนิด"
+      },
+      source: {
+        name: "Source / Repeller",
+        mat: [[1.2, 0.1], [0.1, 1.3]],
+        x0: [0.8, 0.6],
+        desc: "ค่าเฉพาะทั้งคู่มากกว่า 1 (≈ 1.34, 1.16) เวกเตอร์จะถูกผลักออกจากจุดกำเนิดและขยายตัวอย่างรวดเร็วสู่อนันต์"
+      },
+      saddle: {
+        name: "Saddle Point",
+        mat: [[1.2, 0], [0, 0.6]],
+        x0: [0.5, 3.0],
+        desc: "มีแกนหนึ่งขยายตัว (λ = 1.2 > 1) ขณะที่อีกแกนหนึ่งหดตัว (λ = 0.6 < 1) วิถีจะถูกดูดเข้าหาแกน y แต่เบี่ยงหนีตามแนวแกน x"
+      },
+      spiral: {
+        name: "Spiral / Rotation",
+        mat: [[0.6, -0.4], [0.4, 0.6]],
+        x0: [2.5, 2.0],
+        desc: "ค่าเฉพาะเป็นจำนวนเชิงซ้อนสังยุค 0.6 ± 0.4i โดยมี |λ| = √(0.36 + 0.16) ≈ 0.721 < 1 ทำให้เกิดการหมุนวนควงสว่านเข้าสู่จุดศูนย์กลาง"
+      },
+      markov: {
+        name: "Markov / Steady-State",
+        mat: [[0.8, 0.3], [0.2, 0.7]],
+        x0: [1.0, 4.0],
+        desc: "เมทริกซ์สโตแคสติก มี λ₁ = 1 และ λ₂ = 0.5 < 1 ระบบจะลู่เข้าสู่สัดส่วนสถานะคงตัวตามแนวเวกเตอร์ลักษณะเฉพาะ v₁ = [3, 2]ᵀ"
+      },
+      custom: {
+        name: "Custom Matrix",
+        mat: [[0.5, 0.2], [0, 0.8]],
+        x0: [3.0, 2.0],
+        desc: "ปรับแต่งสมาชิกของเมทริกซ์หรือคลิกบนระนาบเพื่อศึกษาพฤติกรรมอิสระ"
+      }
+    };
+
+    window.onload = function() {
+      setupCanvasInteraction();
+      loadScenario('sink');
+      renderAllMath();
+    };
+
+    function renderAllMath() {
+      if (window.renderMathInElement) {
+        renderMathInElement(document.body, {
+          delimiters: [
+            {left: '$$', right: '$$', display: true},
+            {left: '$', right: '$', display: false}
+          ],
+          throwOnError: false
+        });
+      }
+    }
+
+    function fmt(n) {
+      if (Math.abs(n - Math.round(n)) < 1e-4) return Math.round(n).toString();
+      if (Math.abs(n) > 1e4 || (Math.abs(n) < 1e-3 && Math.abs(n) > 0)) {
+        return n.toExponential(2);
+      }
+      return n.toFixed(3).replace(/\.?0+$/, '');
+    }
+
+    function loadScenario(key) {
+      const sc = scenarios[key];
+      if (!sc) return;
+
+      matrixA = JSON.parse(JSON.stringify(sc.mat));
+      initialX0 = [...sc.x0];
+
+      document.getElementById('inp_m00').value = matrixA[0][0];
+      document.getElementById('inp_m01').value = matrixA[0][1];
+      document.getElementById('inp_m10').value = matrixA[1][0];
+      document.getElementById('inp_m11').value = matrixA[1][1];
+
+      analyzeAndRender();
+      renderAllMath();
+    }
+
+    function onMatrixChange() {
+      matrixA[0][0] = parseFloat(document.getElementById('inp_m00').value) || 0;
+      matrixA[0][1] = parseFloat(document.getElementById('inp_m01').value) || 0;
+      matrixA[1][0] = parseFloat(document.getElementById('inp_m10').value) || 0;
+      matrixA[1][1] = parseFloat(document.getElementById('inp_m11').value) || 0;
+
+      analyzeAndRender();
+      renderAllMath();
+    }
+
+    function updateIterationSteps(val) {
+      maxSteps = parseInt(val) || 15;
+      document.getElementById('stepCountBadge').innerText = `${maxSteps} รอบ`;
+      analyzeAndRender();
+      renderAllMath();
+    }
+
+    function setupCanvasInteraction() {
+      const canvas = document.getElementById('phaseCanvas');
+      if (!canvas) return;
+
+      canvas.addEventListener('click', function(e) {
+        const rect = canvas.getBoundingClientRect();
+        const clientX = e.clientX - rect.left;
+        const clientY = e.clientY - rect.top;
+
+        // Transform canvas pixel to coordinates [-5, 5]
+        const width = canvas.width;
+        const height = canvas.height;
+        const originX = width / 2;
+        const originY = height / 2;
+        const scale = 36; // pixels per unit
+
+        const x = (clientX - originX) / scale;
+        const y = (originY - clientY) / scale;
+
+        initialX0 = [Math.round(x * 10) / 10, Math.round(y * 10) / 10];
+        analyzeAndRender();
+        renderAllMath();
+      });
+    }
+
+    function analyzeAndRender() {
+      const a = matrixA[0][0];
+      const b = matrixA[0][1];
+      const c = matrixA[1][0];
+      const d = matrixA[1][1];
+
+      const tr = a + d;
+      const det = a * d - b * c;
+      const disc = tr * tr - 4 * det;
+
+      document.getElementById('matrixQuickInfo').innerHTML = `$\\text{tr}(A) = ${fmt(tr)}, \\quad \\det(A) = ${fmt(det)}$`;
+      document.getElementById('x0CoordsText').innerText = `[${fmt(initialX0[0])}, ${fmt(initialX0[1])}]ᵀ`;
+
+      let l1_str = '', l2_str = '';
+      let rho = 0;
+      let stabilityType = '';
+      let badgeClass = '';
+      let behaviorDesc = '';
+      let commentary = '';
+      let isComplex = false;
+      let eigenvectors = [];
+
+      if (disc < -1e-5) {
+        // Complex Eigenvalues
+        isComplex = true;
+        const realPart = tr / 2;
+        const imagPart = Math.sqrt(-disc) / 2;
+        const mod = Math.sqrt(realPart * realPart + imagPart * imagPart);
+        rho = mod;
+
+        l1_str = `${fmt(realPart)} + ${fmt(imagPart)}i`;
+        l2_str = `${fmt(realPart)} - ${fmt(imagPart)}i`;
+
+        if (Math.abs(rho - 1) < 0.05) {
+          stabilityType = "Center / Neutral Orbit (|λ| ≈ 1)";
+          badgeClass = "bg-amber-100 text-amber-800 border border-amber-300";
+          behaviorDesc = "หมุนวนเป็นวงรีปิด ไม่ลู่เข้าและไม่ลู่ออก";
+          commentary = "ค่าเฉพาะเชิงซ้อนมีขนาดใกล้เคียง 1 ทำให้วิถีโคจรหมุนวนรอบจุดกำเนิดแบบต่อเนื่อง (Neutral Stability)";
+        } else if (rho < 1) {
+          stabilityType = "Spiral Sink / Attractor (|λ| < 1)";
+          badgeClass = "bg-emerald-100 text-emerald-800 border border-emerald-300";
+          behaviorDesc = "หมุนวนเข้าสู่จุดกำเนิด 0";
+          commentary = `ค่าเฉพาะเป็นจำนวนเชิงซ้อนที่มีขนาด $|\\lambda| = ${fmt(rho)} < 1$ ทำให้เกิดการหมุนพร้อมกับหดตัวเข้าสู่จุดศูนย์กลางแบบเกลียวก้นหอย`;
+        } else {
+          stabilityType = "Spiral Source / Repeller (|λ| > 1)";
+          badgeClass = "bg-rose-100 text-rose-800 border border-rose-300";
+          behaviorDesc = "หมุนวนขยายตัวออกสู่อนันต์";
+          commentary = `ค่าเฉพาะเป็นจำนวนเชิงซ้อนที่มีขนาด $|\\lambda| = ${fmt(rho)} > 1$ เกิดการหมุนพร้อมกับการขยายตัวเตลิดออกไปนอกขอบเขตอย่างรวดเร็ว`;
+        }
+
+      } else {
+        // Real Eigenvalues
+        const sqrtD = Math.sqrt(Math.max(0, disc));
+        const val1 = (tr + sqrtD) / 2;
+        const val2 = (tr - sqrtD) / 2;
+
+        l1_str = fmt(val1);
+        l2_str = fmt(val2);
+        rho = Math.max(Math.abs(val1), Math.abs(val2));
+
+        // Compute eigenvectors
+        eigenvectors.push(findRealEigenvector(a, b, c, d, val1));
+        if (Math.abs(val1 - val2) > 1e-4) {
+          eigenvectors.push(findRealEigenvector(a, b, c, d, val2));
+        }
+
+        const abs1 = Math.abs(val1);
+        const abs2 = Math.abs(val2);
+
+        if (abs1 < 0.999 && abs2 < 0.999) {
+          stabilityType = "Nodal Sink / Attractor (เสถียรสมบูรณ์)";
+          badgeClass = "bg-emerald-100 text-emerald-800 border border-emerald-300";
+          behaviorDesc = "ลู่เข้าสู่จุดกำเนิด 0";
+          commentary = `เนื่องจาก $|\\lambda_1| = ${fmt(abs1)} < 1$ และ $|\\lambda_2| = ${fmt(abs2)} < 1$ รัศมีสเปกตรัม $\\rho(A) = ${fmt(rho)} < 1$ ทำให้ทุกองค์ประกอบสลายตัวเข้าสู่เวกเตอร์ศูนย์ในที่สุด`;
+        } else if (abs1 > 1.001 && abs2 > 1.001) {
+          stabilityType = "Nodal Source / Repeller (ไม่เสถียร)";
+          badgeClass = "bg-rose-100 text-rose-800 border border-rose-300";
+          behaviorDesc = "ลู่ออกสู่อนันต์";
+          commentary = `ค่าเฉพาะทั้งสองตัวมีขนาดมากกว่า 1 ทำให้ระบบขยายตัวออกจากจุดศูนย์กลางในทุกทิศทาง`;
+        } else if ((abs1 > 1.001 && abs2 < 0.999) || (abs1 < 0.999 && abs2 > 1.001)) {
+          stabilityType = "Saddle Point (จุดอานม้า)";
+          badgeClass = "bg-amber-100 text-amber-800 border border-amber-300";
+          behaviorDesc = "ยุบตัวตามแกนหนึ่ง ขยายตัวตามอีกแกน";
+          commentary = `มีแกนเสถียร (Stable manifold) ที่มี $|\\lambda| < 1$ และแกนไม่เสถียร (Unstable manifold) ที่มี $|\\lambda| > 1$ วิถีการแปลงจะถูกดึงเข้าหาแกนเสถียรแล้วดีดออกตามแกนไม่เสถียร`;
+        } else {
+          stabilityType = "Steady-State / Neutral Axis (สถานะคงตัว)";
+          badgeClass = "bg-indigo-100 text-indigo-800 border border-indigo-300";
+          behaviorDesc = "ลู่เข้าสู่แนวแกนคงที่";
+          commentary = `มีค่าเฉพาะ $\\lambda = 1$ ขณะที่อีกค่าหนึ่ง $|\\lambda| < 1$ ระบบจะสลายองค์ประกอบส่วนเกินและลู่เข้าสู่สถานะคงตัวตามแนวแกนเวกเตอร์ลักษณะเฉพาะที่สอดคล้องกับ $\\lambda = 1$`;
+        }
+      }
+
+      // Update UI elements
+      document.getElementById('lambdaValsText').innerText = `${l1_str}, ${l2_str}`;
+      document.getElementById('rhoText').innerText = fmt(rho);
+      document.getElementById('longTermBehaviorText').innerText = behaviorDesc;
+
+      const badge = document.getElementById('stabilityBadge');
+      badge.className = `text-xs font-bold px-2.5 py-0.5 rounded-full ${badgeClass}`;
+      badge.innerText = stabilityType;
+
+      document.getElementById('phaseCommentaryCard').innerHTML = `
+        <span class="font-bold block text-indigo-950">ข้อสังเกตเชิงระบบ:</span>
+        <p>${commentary}</p>
+      `;
+
+      // Generate Trajectory
+      const trajectory = generateTrajectory(matrixA, initialX0, maxSteps);
+      renderTrajectoryTable(trajectory);
+      drawPhasePortrait(trajectory, eigenvectors, isComplex);
+    }
+
+    function findRealEigenvector(a, b, c, d, lam) {
+      const m11 = a - lam, m12 = b;
+      let vx = 0, vy = 0;
+      if (Math.abs(m11) < 1e-4 && Math.abs(m12) < 1e-4) {
+        vx = 1; vy = 0;
+      } else if (Math.abs(m12) > 1e-4) {
+        vx = -m12; vy = m11;
+      } else if (Math.abs(m11) > 1e-4) {
+        vx = 0; vy = 1;
+      } else {
+        vx = -(d - lam); vy = c;
+      }
+      const len = Math.sqrt(vx * vx + vy * vy);
+      return len > 1e-5 ? { x: vx / len, y: vy / len } : { x: 1, y: 0 };
+    }
+
+    function generateTrajectory(A, x0, steps) {
+      const traj = [];
+      let current = [x0[0], x0[1]];
+      traj.push({ k: 0, x: current[0], y: current[1], norm: Math.hypot(current[0], current[1]) });
+
+      for (let i = 1; i <= steps; i++) {
+        const nextX = A[0][0] * current[0] + A[0][1] * current[1];
+        const nextY = A[1][0] * current[0] + A[1][1] * current[1];
+        current = [nextX, nextY];
+        traj.push({ k: i, x: current[0], y: current[1], norm: Math.hypot(current[0], current[1]) });
+        if (Math.hypot(current[0], current[1]) > 1e6) break; // prevent infinite explosion in UI
+      }
+      return traj;
+    }
+
+    function renderTrajectoryTable(traj) {
+      const tbody = document.getElementById('trajectoryTableBody');
+      let html = '';
+      traj.slice(0, 10).forEach(pt => {
+        html += `
+          <tr class="hover:bg-slate-50">
+            <td class="p-2 text-center font-bold text-slate-700">${pt.k}</td>
+            <td class="p-2">[${fmt(pt.x)}, ${fmt(pt.y)}]</td>
+            <td class="p-2 text-right font-semibold ${pt.norm < 1e-3 ? 'text-emerald-600' : 'text-slate-800'}">${fmt(pt.norm)}</td>
+          </tr>
+        `;
+      });
+      if (traj.length > 10) {
+        const last = traj[traj.length - 1];
+        html += `
+          <tr class="bg-indigo-50/40 text-indigo-900 font-bold">
+            <td class="p-2 text-center">${last.k}</td>
+            <td class="p-2">[${fmt(last.x)}, ${fmt(last.y)}]</td>
+            <td class="p-2 text-right">${fmt(last.norm)}</td>
+          </tr>
+        `;
+      }
+      tbody.innerHTML = html;
+    }
+
+    function drawPhasePortrait(traj, eigenvectors, isComplex) {
+      const canvas = document.getElementById('phaseCanvas');
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+      const width = canvas.width;
+      const height = canvas.height;
+
+      const originX = width / 2;
+      const originY = height / 2;
+      const scale = 36; // 36px per unit (range roughly [-5.8, 5.8])
+
+      ctx.clearRect(0, 0, width, height);
+
+      // 1. Grid lines
+      ctx.strokeStyle = '#1e293b';
+      ctx.lineWidth = 1;
+      for (let i = -6; i <= 6; i++) {
+        const x = originX + i * scale;
+        const y = originY - i * scale;
+        ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, height); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(width, y); ctx.stroke();
+      }
+
+      // 2. Main Axes
+      ctx.strokeStyle = '#475569';
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      ctx.moveTo(originX, 0); ctx.lineTo(originX, height);
+      ctx.moveTo(0, originY); ctx.lineTo(width, originY);
+      ctx.stroke();
+
+      // Axis labels
+      ctx.fillStyle = '#64748b';
+      ctx.font = '10px Inter';
+      ctx.fillText('+x₁', width - 20, originY - 6);
+      ctx.fillText('+x₂', originX + 6, 14);
+
+      // 3. Draw Eigenvector Invariant Lines (if real)
+      if (!isComplex && eigenvectors.length > 0) {
+        ctx.strokeStyle = '#f43f5e';
+        ctx.lineWidth = 1.2;
+        ctx.setLineDash([4, 4]);
+
+        eigenvectors.forEach(v => {
+          ctx.beginPath();
+          ctx.moveTo(originX - v.x * 300, originY + v.y * 300);
+          ctx.lineTo(originX + v.x * 300, originY - v.y * 300);
+          ctx.stroke();
+        });
+        ctx.setLineDash([]);
+      }
+
+      // 4. Draw Trajectory Path
+      if (traj.length > 1) {
+        ctx.strokeStyle = '#38bdf8'; // Cyan
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        const startPx = originX + traj[0].x * scale;
+        const startPy = originY - traj[0].y * scale;
+        ctx.moveTo(startPx, startPy);
+
+        for (let i = 1; i < traj.length; i++) {
+          const px = originX + traj[i].x * scale;
+          const py = originY - traj[i].y * scale;
+          ctx.lineTo(px, py);
+        }
+        ctx.stroke();
+
+        // Draw points along the path
+        for (let i = 1; i < traj.length; i++) {
+          const px = originX + traj[i].x * scale;
+          const py = originY - traj[i].y * scale;
+          ctx.fillStyle = '#0284c7';
+          ctx.beginPath();
+          ctx.arc(px, py, 2.5, 0, Math.PI * 2);
+          ctx.fill();
+
+          // Draw small arrow indicating direction
+          if (i === 1 || i === Math.floor(traj.length / 2)) {
+            const prevPx = originX + traj[i - 1].x * scale;
+            const prevPy = originY - traj[i - 1].y * scale;
+            drawSmallArrowHead(ctx, prevPx, prevPy, px, py, '#38bdf8');
+          }
+        }
+      }
+
+      // 5. Draw Initial Vector Point x_0
+      if (traj.length > 0) {
+        const x0Px = originX + traj[0].x * scale;
+        const x0Py = originY - traj[0].y * scale;
+
+        ctx.fillStyle = '#fbbf24'; // Amber
+        ctx.beginPath();
+        ctx.arc(x0Px, x0Py, 5.5, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.strokeStyle = '#78350f';
+        ctx.lineWidth = 1.5;
+        ctx.stroke();
+
+        ctx.fillStyle = '#fde68a';
+        ctx.font = 'bold 11px Inter';
+        ctx.fillText('x₀', x0Px + 8, x0Py - 4);
+      }
+    }
+
+    function drawSmallArrowHead(ctx, fromX, fromY, toX, toY, color) {
+      const headlen = 7;
+      const angle = Math.atan2(toY - fromY, toX - fromX);
+      const midX = (fromX + toX) / 2;
+      const midY = (fromY + toY) / 2;
+
+      ctx.fillStyle = color;
+      ctx.beginPath();
+      ctx.moveTo(midX, midY);
+      ctx.lineTo(midX - headlen * Math.cos(angle - Math.PI / 6), midY - headlen * Math.sin(angle - Math.PI / 6));
+      ctx.lineTo(midX - headlen * Math.cos(angle + Math.PI / 6), midY - headlen * Math.sin(angle + Math.PI / 6));
+      ctx.closePath();
+      ctx.fill();
+    }
+
+    // Toggle Inquiry Content
+    function toggleInquiryAnswer() {
+      const content = document.getElementById('inquiryContent');
+      const text = document.getElementById('inquiryBtnText');
+      const chevron = document.getElementById('inquiryChevron');
+
+      if (content.classList.contains('hidden')) {
+        content.classList.remove('hidden');
+        text.innerText = "ซ่อนบทวิเคราะห์การสลายตัวตามสเปกตรัม";
+        chevron.classList.add('rotate-180');
+      } else {
+        content.classList.add('hidden');
+        text.innerText = "คลิกเพื่อดูบทวิเคราะห์การสลายตัวตามสเปกตรัมและปรากฏการณ์ชั่วครู่";
+        chevron.classList.remove('rotate-180');
+      }
+      renderAllMath();
+    }
+
+    // Quiz Check
+    function checkQuizAnswer() {
+      const selected = document.querySelector('input[name="synthQuiz"]:checked');
+      const fb = document.getElementById('exerciseFeedback');
+
+      if (!selected) {
+        fb.className = "text-sm font-semibold text-amber-600";
+        fb.innerText = "กรุณาเลือกตัวเลือกข้อใดข้อหนึ่งก่อนตรวจ";
+        return;
+      }
+
+      if (selected.value === 'optB') {
+        fb.className = "text-sm font-bold text-emerald-600";
+        fb.innerHTML = "<span>✓ ถูกต้องสมบูรณ์แบบ! เงื่อนไขจำเป็นและเพียงพอคือ รัศมีเชิงสเปกตรัม $\\rho(A) = \\max_i |\\lambda_i| < 1$ จึงจะรับประกันว่า $A^k \\to \\mathbf{0}$ เสมอ</span>";
+      } else {
+        fb.className = "text-sm font-bold text-rose-600";
+        fb.innerHTML = "<span>✗ ยังไม่ถูกต้อง เงื่อนไข $\\det(A) < 1$ หรือ $\\text{tr}(A) < 0$ ไม่เพียงพอ (เช่น ค่าเฉพาะ 2 และ 0.1 มี $\\det=0.2 < 1$ แต่ลู่ออกสู่อนันต์)</span>";
+      }
+      renderAllMath();
+    }
+
+    // Toggle Exercise Solution
+    function toggleExerciseSolution() {
+      const sol = document.getElementById('exerciseSolutionDetail');
+      const btn = document.getElementById('solutionBtnText');
+
+      if (sol.classList.contains('hidden')) {
+        sol.classList.remove('hidden');
+        btn.innerText = "ซ่อนบทพิสูจน์และการวิเคราะห์พฤติกรรมฉบับสมบูรณ์";
+      } else {
+        sol.classList.add('hidden');
+        btn.innerText = "แสดงบทพิสูจน์และการวิเคราะห์พฤติกรรมฉบับสมบูรณ์";
+      }
+      renderAllMath();
+    }
+  </script>
+</body>
+</html>
