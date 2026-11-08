@@ -1,0 +1,1271 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>เรื่องที่ 2: การดำเนินการของเวกเตอร์ (Vector Operations)</title>
+
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Google Fonts: Sarabun, Prompt & JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Prompt:wght@400;500;600;700&family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- KaTeX for Math Typesetting -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <!-- Three.js & OrbitControls for 3D Operations -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Sarabun', 'sans-serif'],
+            display: ['Prompt', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace'],
+          },
+          colors: {
+            brand: {
+              50: '#eef2ff',
+              100: '#e0e7ff',
+              500: '#6366f1',
+              600: '#4f46e5',
+              700: '#4338ca',
+              900: '#312e81',
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    body {
+      background-color: #f8fafc;
+      color: #1e293b;
+      font-family: 'Sarabun', sans-serif;
+    }
+    h1, h2, h3, h4, .font-heading {
+      font-family: 'Prompt', sans-serif;
+    }
+    .katex {
+      font-size: 1.05em !important;
+    }
+    input[type=range] {
+      accent-color: #4f46e5;
+    }
+    .canvas-container {
+      touch-action: none;
+    }
+  </style>
+</head>
+<body class="antialiased min-h-screen flex flex-col justify-between selection:bg-indigo-500 selection:text-white">
+
+  <!-- Main Container Strictly Constrained -->
+  <main class="max-w-6xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 space-y-10">
+
+    <!-- 1. Header Section -->
+    <header class="bg-gradient-to-br from-slate-900 via-indigo-950 to-slate-900 rounded-3xl p-6 sm:p-10 text-white shadow-xl relative overflow-hidden border border-indigo-900/50">
+      <div class="absolute -right-16 -bottom-16 w-80 h-80 bg-indigo-500/15 rounded-full blur-3xl pointer-events-none"></div>
+      <div class="relative z-10">
+        <h1 class="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-white mb-4">
+          เรื่องที่ 2: การดำเนินการของเวกเตอร์ (Vector Operations)
+        </h1>
+        <p class="text-slate-300 max-w-3xl text-base sm:text-lg leading-relaxed">
+          เรียนรู้การบวก การลบ และการคูณเวกเตอร์ด้วยสเกลาร์ ทั้งในเชิงเรขาคณิต (หางต่อหัว / สี่เหลี่ยมด้านขนาน) 
+          และเชิงพีชคณิตในรูปองค์ประกอบ 2 มิติและ 3 มิติ พร้อมแบบจำลองเคลื่อนไหวแสดงการสลับที่และการรวมเชิงเส้น
+        </p>
+      </div>
+    </header>
+
+    <!-- 2. วัตถุประสงค์การเรียนรู้ -->
+    <section class="bg-white rounded-2xl p-6 sm:p-7 shadow-sm border border-slate-200/80">
+      <div class="flex items-start gap-4">
+        <div class="p-3 bg-indigo-50 text-indigo-600 rounded-xl mt-0.5 shrink-0">
+          <i data-lucide="target" class="w-6 h-6"></i>
+        </div>
+        <div>
+          <h2 class="text-xl font-bold text-slate-900 mb-2 font-heading">วัตถุประสงค์การเรียนรู้</h2>
+          <p class="text-slate-700 leading-relaxed text-base">
+            นักศึกษาสามารถบวก ลบ และคูณเวกเตอร์ด้วยสเกลาร์ รวมทั้งอธิบายสมบัติของการดำเนินการ (การสลับที่, การเปลี่ยนหมู่, การแจกแจง) 
+            และแสดงผลลัพธ์ในรูปองค์ประกอบทั้งในระบบพิกัด 2 มิติและ 3 มิติได้อย่างถูกต้อง
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3. เนื้อหาหลัก (Theoretical Foundations) -->
+    <section class="space-y-6">
+      <div class="flex items-center justify-between border-b border-slate-200 pb-3">
+        <h2 class="text-2xl font-bold text-slate-900 font-heading flex items-center gap-2">
+          <i data-lucide="book-open" class="w-6 h-6 text-indigo-600"></i> สรุปเนื้อหาและทฤษฎีการดำเนินการของเวกเตอร์
+        </h2>
+        <span class="text-xs text-slate-500 hidden sm:inline">เกณฑ์สำคัญและสูตรการคำนวณ</span>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+        <!-- 3.1 การบวกเวกเตอร์ -->
+        <article class="bg-white p-6 rounded-2xl border border-slate-200/90 shadow-sm flex flex-col justify-between">
+          <div>
+            <div class="flex items-center gap-2 mb-3">
+              <span class="p-2 rounded-lg bg-indigo-50 text-indigo-600"><i data-lucide="plus-circle" class="w-5 h-5"></i></span>
+              <h3 class="text-base font-bold text-slate-900 font-heading">1. การบวกเวกเตอร์ (Addition)</h3>
+            </div>
+            <p class="text-slate-600 text-sm leading-relaxed mb-3">
+              <strong>เชิงเรขาคณิต:</strong> ใช้วิธีหางต่อหัว (Head-to-tail) หรือกฎสี่เหลี่ยมด้านขนาน (Parallelogram law)<br>
+              <strong>เชิงองค์ประกอบ:</strong> นำสมาชิกในตำแหน่งเดียวกันมาบวกกันโดยตรง:
+            </p>
+          </div>
+          <div class="bg-slate-50 p-2.5 rounded-xl border border-slate-200 text-xs font-mono text-center text-slate-800">
+            $\mathbf{u} + \mathbf{v} = \langle u_x + v_x, \, u_y + v_y \rangle$
+          </div>
+        </article>
+
+        <!-- 3.2 การลบเวกเตอร์ -->
+        <article class="bg-white p-6 rounded-2xl border border-slate-200/90 shadow-sm flex flex-col justify-between">
+          <div>
+            <div class="flex items-center gap-2 mb-3">
+              <span class="p-2 rounded-lg bg-blue-50 text-blue-600"><i data-lucide="minus-circle" class="w-5 h-5"></i></span>
+              <h3 class="text-base font-bold text-slate-900 font-heading">2. การลบเวกเตอร์ (Subtraction)</h3>
+            </div>
+            <p class="text-slate-600 text-sm leading-relaxed mb-3">
+              การลบคือการบวกด้วย <strong>เวกเตอร์ตรงข้าม (Opposite Vector)</strong> $\mathbf{u} - \mathbf{v} = \mathbf{u} + (-\mathbf{v})$<br>
+              เชิงเรขาคณิตคือเวกเตอร์ที่ชี้จากหัวของ $\mathbf{v}$ ไปยังหัวของ $\mathbf{u}$ (เมื่อจุดเริ่มต้นอยู่ที่เดียวกัน)
+            </p>
+          </div>
+          <div class="bg-slate-50 p-2.5 rounded-xl border border-slate-200 text-xs font-mono text-center text-slate-800">
+            $\mathbf{u} - \mathbf{v} = \langle u_x - v_x, \, u_y - v_y \rangle$
+          </div>
+        </article>
+
+        <!-- 3.3 การคูณด้วยสเกลาร์ -->
+        <article class="bg-white p-6 rounded-2xl border border-slate-200/90 shadow-sm flex flex-col justify-between">
+          <div>
+            <div class="flex items-center gap-2 mb-3">
+              <span class="p-2 rounded-lg bg-emerald-50 text-emerald-600"><i data-lucide="maximize" class="w-5 h-5"></i></span>
+              <h3 class="text-base font-bold text-slate-900 font-heading">3. การคูณด้วยสเกลาร์ (Scalar)</h3>
+            </div>
+            <p class="text-slate-600 text-sm leading-relaxed mb-3">
+              การคูณด้วยสเกลาร์ $k \in \mathbb{R}$ จะขยาย/ย่อขนาดเป็น $|k|$ เท่า:
+              <br>&bull; ถ้า $k > 0$: ขนาดขยาย/หด ทิศทางเดิม
+              <br>&bull; ถ้า $k < 0$: ทิศทางตรงกันข้าม ($180^\circ$)
+              <br>&bull; ถ้า $k = 0$: ได้เวกเตอร์ศูนย์ $\mathbf{0}$
+            </p>
+          </div>
+          <div class="bg-slate-50 p-2.5 rounded-xl border border-slate-200 text-xs font-mono text-center text-slate-800">
+            $k\mathbf{u} = \langle k u_x, \, k u_y, \, k u_z \rangle$
+          </div>
+        </article>
+
+        <!-- 3.4 เวกเตอร์ในระบบ 2D และ 3D -->
+        <article class="bg-white p-6 rounded-2xl border border-slate-200/90 shadow-sm flex flex-col justify-between">
+          <div>
+            <div class="flex items-center gap-2 mb-3">
+              <span class="p-2 rounded-lg bg-purple-50 text-purple-600"><i data-lucide="box" class="w-5 h-5"></i></span>
+              <h3 class="text-base font-bold text-slate-900 font-heading">4. การดำเนินการใน 2D และ 3D</h3>
+            </div>
+            <p class="text-slate-600 text-sm leading-relaxed mb-3">
+              การคำนวณใช้หลักการแยกตามแต่ละแกนพิกัดอย่างอิสระ ไม่ว่าจะเป็นในระนาบ หรือในปริภูมิ 3 มิติ:
+            </p>
+          </div>
+          <div class="bg-slate-50 p-2.5 rounded-xl border border-slate-200 text-xs font-mono text-center text-slate-800">
+            $\mathbf{u} \pm \mathbf{v} = \langle u_x \pm v_x, \, u_y \pm v_y, \, u_z \pm v_z \rangle$
+          </div>
+        </article>
+
+        <!-- 3.5 สมบัติการสลับที่และการเปลี่ยนหมู่ -->
+        <article class="bg-white p-6 rounded-2xl border border-slate-200/90 shadow-sm flex flex-col justify-between">
+          <div>
+            <div class="flex items-center gap-2 mb-3">
+              <span class="p-2 rounded-lg bg-amber-50 text-amber-600"><i data-lucide="shuffle" class="w-5 h-5"></i></span>
+              <h3 class="text-base font-bold text-slate-900 font-heading">5. สมบัติการสลับที่และเปลี่ยนหมู่</h3>
+            </div>
+            <ul class="text-slate-600 text-sm space-y-1.5 leading-relaxed mb-3">
+              <li><strong>การสลับที่:</strong> $\mathbf{u} + \mathbf{v} = \mathbf{v} + \mathbf{u}$</li>
+              <li><strong>การเปลี่ยนหมู่:</strong> $(\mathbf{u} + \mathbf{v}) + \mathbf{w} = \mathbf{u} + (\mathbf{v} + \mathbf{w})$</li>
+              <li><strong>การเปลี่ยนหมู่สเกลาร์:</strong> $c(d\mathbf{u}) = (cd)\mathbf{u}$</li>
+            </ul>
+          </div>
+          <div class="bg-slate-50 p-2 rounded-xl border border-slate-200 text-xs text-center text-slate-600">
+            (ผลลัพธ์เวกเตอร์ลัพธ์ชี้ไปจุดเดิมเสมอ)
+          </div>
+        </article>
+
+        <!-- 3.6 สมบัติการแจกแจง & เวกเตอร์ศูนย์ -->
+        <article class="bg-white p-6 rounded-2xl border border-slate-200/90 shadow-sm flex flex-col justify-between">
+          <div>
+            <div class="flex items-center gap-2 mb-3">
+              <span class="p-2 rounded-lg bg-rose-50 text-rose-600"><i data-lucide="layers" class="w-5 h-5"></i></span>
+              <h3 class="text-base font-bold text-slate-900 font-heading">6. การแจกแจง & เวกเตอร์ตรงข้าม</h3>
+            </div>
+            <ul class="text-slate-600 text-sm space-y-1.5 leading-relaxed mb-3">
+              <li><strong>การแจกแจงสเกลาร์:</strong> $c(\mathbf{u} + \mathbf{v}) = c\mathbf{u} + c\mathbf{v}$</li>
+              <li><strong>การแจกแจงเวกเตอร์:</strong> $(c + d)\mathbf{u} = c\mathbf{u} + d\mathbf{u}$</li>
+              <li><strong>เอกลักษณ์และตัวผกผัน:</strong> $\mathbf{u} + \mathbf{0} = \mathbf{u}$ และ $\mathbf{u} + (-\mathbf{u}) = \mathbf{0}$</li>
+            </ul>
+          </div>
+          <div class="bg-slate-50 p-2 rounded-xl border border-slate-200 text-xs text-center text-slate-600 font-mono">
+            $\mathbf{0} = \langle 0, 0, 0 \rangle, \quad -\mathbf{u} = (-1)\mathbf{u}$
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <!-- 4. แบบจำลองโต้ตอบ (Interactive Vector Operations Simulator) -->
+    <section class="bg-white rounded-3xl p-5 sm:p-8 shadow-md border border-slate-200/90 space-y-6">
+      
+      <!-- Top Bar of Simulator -->
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 pb-5">
+        <div>
+          <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold bg-indigo-50 text-indigo-700 mb-2">
+            <i data-lucide="play" class="w-3.5 h-3.5 fill-indigo-600"></i> Vector Operations Interactive Lab
+          </div>
+          <h2 class="text-2xl font-bold text-slate-900 font-heading">แบบจำลองโต้ตอบ: การดำเนินการของเวกเตอร์</h2>
+          <p class="text-sm text-slate-600">ทดลองปรับค่าองค์ประกอบ ตัวคูณสเกลาร์ และสังเกตการต่อเวกเตอร์แบบหางต่อหัว สี่เหลี่ยมด้านขนาน และแอนิเมชัน</p>
+        </div>
+
+        <!-- 2D / 3D Switcher -->
+        <div class="inline-flex p-1 bg-slate-100 rounded-xl self-start sm:self-center border border-slate-200 shrink-0">
+          <button id="btnDim2D" onclick="switchDim('2D')" class="px-4 py-2 text-xs sm:text-sm font-semibold rounded-lg bg-white text-indigo-600 shadow-sm transition">
+            2 มิติ (2D Plane)
+          </button>
+          <button id="btnDim3D" onclick="switchDim('3D')" class="px-4 py-2 text-xs sm:text-sm font-medium text-slate-600 hover:text-slate-900 rounded-lg transition">
+            3 มิติ (3D Space)
+          </button>
+        </div>
+      </div>
+
+      <!-- Mode Selector Tabs (Operation Type) -->
+      <div class="flex flex-wrap items-center gap-2">
+        <span class="text-xs font-bold text-slate-500 uppercase tracking-wider mr-1">เลือกการดำเนินการ:</span>
+        <button id="opBtn_add" onclick="setOperation('add')" class="px-3.5 py-1.5 rounded-xl text-xs font-semibold bg-indigo-600 text-white shadow-sm transition">
+          $\mathbf{u} + \mathbf{v}$ (การบวก)
+        </button>
+        <button id="opBtn_sub" onclick="setOperation('sub')" class="px-3.5 py-1.5 rounded-xl text-xs font-medium bg-slate-100 hover:bg-slate-200 text-slate-700 transition">
+          $\mathbf{u} - \mathbf{v}$ (การลบ)
+        </button>
+        <button id="opBtn_lin" onclick="setOperation('lin')" class="px-3.5 py-1.5 rounded-xl text-xs font-medium bg-slate-100 hover:bg-slate-200 text-slate-700 transition">
+          $k_1\mathbf{u} + k_2\mathbf{v}$ (การรวมเชิงเส้น)
+        </button>
+        <button id="opBtn_comm" onclick="setOperation('comm')" class="px-3.5 py-1.5 rounded-xl text-xs font-medium bg-slate-100 hover:bg-slate-200 text-slate-700 transition">
+          $\mathbf{u} + \mathbf{v} = \mathbf{v} + \mathbf{u}$ (สมบัติการสลับที่)
+        </button>
+      </div>
+
+      <!-- Visualizer & Control Layout -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+        
+        <!-- Left: Canvas Area (7 Cols) -->
+        <div class="lg:col-span-7 flex flex-col space-y-4">
+          <div class="relative w-full aspect-square bg-slate-950 rounded-2xl overflow-hidden shadow-inner border border-slate-800 canvas-container">
+            <!-- 2D Canvas -->
+            <canvas id="opsCanvas2D" class="w-full h-full block"></canvas>
+            <!-- 3D Container -->
+            <div id="opsCanvas3D" class="w-full h-full hidden"></div>
+
+            <!-- Visualizer Overlay Info -->
+            <div class="absolute top-3 left-3 flex flex-wrap gap-2 pointer-events-none">
+              <span id="canvasBadge" class="bg-slate-900/85 backdrop-blur text-xs px-2.5 py-1 rounded-md text-slate-300 font-mono border border-slate-700/60 flex items-center gap-1.5">
+                <span class="w-2 h-2 rounded-full bg-emerald-400"></span> $\mathbf{u}$ (เขียว), $\mathbf{v}$ (ฟ้า), ผลลัพธ์ $\mathbf{R}$ (ม่วงแดง)
+              </span>
+            </div>
+
+            <!-- Interactive Animation Control Button -->
+            <div class="absolute bottom-3 left-3 flex items-center gap-2">
+              <button id="btnPlayAnimation" onclick="startVectorAnimation()" class="bg-indigo-600/90 hover:bg-indigo-600 text-white px-3 py-1.5 rounded-xl text-xs backdrop-blur font-medium shadow-md transition flex items-center gap-1.5">
+                <i data-lucide="play" class="w-3.5 h-3.5"></i> เล่นแอนิเมชันต่อเวกเตอร์
+              </button>
+              <button onclick="toggleParallelogramGuide()" id="btnGuide" class="bg-slate-900/80 hover:bg-slate-800 text-slate-300 px-3 py-1.5 rounded-xl text-xs backdrop-blur border border-slate-700 transition flex items-center gap-1.5">
+                <i data-lucide="eye" class="w-3.5 h-3.5"></i> เส้นสี่เหลี่ยมด้านขนาน
+              </button>
+            </div>
+
+            <div class="absolute bottom-3 right-3 flex items-center gap-2">
+              <button onclick="resetDefaults()" title="รีเซ็ตค่าเริ่มต้น" class="bg-slate-900/80 hover:bg-slate-800 text-slate-300 p-2 rounded-lg text-xs backdrop-blur border border-slate-700 transition">
+                <i data-lucide="rotate-ccw" class="w-4 h-4"></i>
+              </button>
+            </div>
+          </div>
+
+          <!-- Vector Controls / Sliders -->
+          <div class="bg-slate-50 p-4 sm:p-5 rounded-2xl border border-slate-200 space-y-4">
+            
+            <!-- Vector u controls -->
+            <div class="p-3.5 bg-white rounded-xl border border-emerald-200 shadow-sm space-y-2">
+              <div class="flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                  <span class="w-3 h-3 rounded-full bg-emerald-500"></span>
+                  <span class="text-sm font-bold text-emerald-800 font-heading">เวกเตอร์ $\mathbf{u}$</span>
+                </div>
+                <span id="label_vec_u" class="font-mono text-xs text-slate-600 bg-slate-100 px-2 py-0.5 rounded">$\mathbf{u} = \langle 3, 2 \rangle$</span>
+              </div>
+              <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-1">
+                <div>
+                  <label class="text-xs text-slate-500 flex justify-between">u_x: <span id="val_ux" class="font-mono font-bold text-slate-700">3</span></label>
+                  <input type="range" id="slider_ux" min="-6" max="6" step="1" value="3" class="w-full h-1.5 bg-slate-200 rounded cursor-pointer" oninput="updateValues()">
+                </div>
+                <div>
+                  <label class="text-xs text-slate-500 flex justify-between">u_y: <span id="val_uy" class="font-mono font-bold text-slate-700">2</span></label>
+                  <input type="range" id="slider_uy" min="-6" max="6" step="1" value="2" class="w-full h-1.5 bg-slate-200 rounded cursor-pointer" oninput="updateValues()">
+                </div>
+                <div id="box_uz" class="hidden">
+                  <label class="text-xs text-slate-500 flex justify-between">u_z: <span id="val_uz" class="font-mono font-bold text-slate-700">1</span></label>
+                  <input type="range" id="slider_uz" min="-6" max="6" step="1" value="1" class="w-full h-1.5 bg-slate-200 rounded cursor-pointer" oninput="updateValues()">
+                </div>
+                <div id="box_k1">
+                  <label class="text-xs text-indigo-700 font-semibold flex justify-between">สเกลาร์ $k_1$: <span id="val_k1" class="font-mono font-bold">1</span></label>
+                  <input type="range" id="slider_k1" min="-3" max="3" step="0.5" value="1" class="w-full h-1.5 bg-indigo-100 rounded cursor-pointer" oninput="updateValues()">
+                </div>
+              </div>
+            </div>
+
+            <!-- Vector v controls -->
+            <div class="p-3.5 bg-white rounded-xl border border-blue-200 shadow-sm space-y-2">
+              <div class="flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                  <span class="w-3 h-3 rounded-full bg-blue-500"></span>
+                  <span class="text-sm font-bold text-blue-800 font-heading">เวกเตอร์ $\mathbf{v}$</span>
+                </div>
+                <span id="label_vec_v" class="font-mono text-xs text-slate-600 bg-slate-100 px-2 py-0.5 rounded">$\mathbf{v} = \langle 1, 4 \rangle$</span>
+              </div>
+              <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-1">
+                <div>
+                  <label class="text-xs text-slate-500 flex justify-between">v_x: <span id="val_vx" class="font-mono font-bold text-slate-700">1</span></label>
+                  <input type="range" id="slider_vx" min="-6" max="6" step="1" value="1" class="w-full h-1.5 bg-slate-200 rounded cursor-pointer" oninput="updateValues()">
+                </div>
+                <div>
+                  <label class="text-xs text-slate-500 flex justify-between">v_y: <span id="val_vy" class="font-mono font-bold text-slate-700">4</span></label>
+                  <input type="range" id="slider_vy" min="-6" max="6" step="1" value="4" class="w-full h-1.5 bg-slate-200 rounded cursor-pointer" oninput="updateValues()">
+                </div>
+                <div id="box_vz" class="hidden">
+                  <label class="text-xs text-slate-500 flex justify-between">v_z: <span id="val_vz" class="font-mono font-bold text-slate-700">2</span></label>
+                  <input type="range" id="slider_vz" min="-6" max="6" step="1" value="2" class="w-full h-1.5 bg-slate-200 rounded cursor-pointer" oninput="updateValues()">
+                </div>
+                <div id="box_k2">
+                  <label class="text-xs text-indigo-700 font-semibold flex justify-between">สเกลาร์ $k_2$: <span id="val_k2" class="font-mono font-bold">1</span></label>
+                  <input type="range" id="slider_k2" min="-3" max="3" step="0.5" value="1" class="w-full h-1.5 bg-indigo-100 rounded cursor-pointer" oninput="updateValues()">
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- Right: Real-time Mathematical Calculation Inspector (5 Cols) -->
+        <div class="lg:col-span-5 flex flex-col space-y-4">
+          
+          <div class="bg-indigo-950 text-white p-5 rounded-2xl shadow-sm border border-indigo-900/60">
+            <h3 class="text-base font-bold font-heading text-indigo-200 mb-1 flex items-center gap-2">
+              <i data-lucide="calculator" class="w-5 h-5 text-indigo-400"></i> แผงวิเคราะห์และขั้นตอนการคำนวณ
+            </h3>
+            <p class="text-xs text-indigo-300/80">แสดงการดำเนินการตามองค์ประกอบและสูตรทางพีชคณิตแบบทันที</p>
+          </div>
+
+          <!-- Step-by-step Result Component Box -->
+          <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm space-y-3">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider">เวกเตอร์ผลลัพธ์ $\mathbf{R}$ (Resultant)</span>
+              <span id="badgeOperationName" class="text-xs font-bold px-2.5 py-0.5 rounded-full bg-indigo-100 text-indigo-800">$\mathbf{u} + \mathbf{v}$</span>
+            </div>
+            <div id="mathResultFormula" class="p-3 bg-slate-50 rounded-lg text-center text-slate-900 text-base font-mono">
+              <!-- Equation Rendered dynamically -->
+            </div>
+            <div id="mathStandardBasis" class="p-2 text-xs font-mono text-center text-slate-600 bg-slate-100/70 rounded">
+              <!-- Standard Basis Form (i, j, k) -->
+            </div>
+          </div>
+
+          <!-- Magnitude of Resultant -->
+          <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm space-y-2">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider">ขนาดของเวกเตอร์ผลลัพธ์ $\|\mathbf{R}\|$</span>
+              <span id="badgeMagResult" class="text-xs font-mono font-bold px-2 py-0.5 rounded bg-emerald-100 text-emerald-800">7.211</span>
+            </div>
+            <div id="mathMagnitudeCalc" class="p-3 bg-slate-50 rounded-lg text-xs sm:text-sm text-center text-slate-800">
+              <!-- Magnitude math -->
+            </div>
+          </div>
+
+          <!-- Commutative / Geometric Insight Box -->
+          <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm space-y-2">
+            <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider">ข้อสังเกตเชิงเรขาคณิต (Geometric Insight)</span>
+            <div id="insightNotice" class="text-xs text-slate-600 bg-indigo-50/50 p-3 rounded-lg leading-relaxed border border-indigo-100/80">
+              <!-- Dynamic observation content -->
+            </div>
+          </div>
+
+          <!-- Comparison Check for Scalar Effect -->
+          <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm space-y-2">
+            <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider">อิทธิพลของสเกลาร์ (Scalar Multiplication Effect)</span>
+            <div id="scalarEffectBox" class="text-xs text-slate-600 p-3 bg-slate-50 rounded-lg space-y-1">
+              <!-- Scalar notes -->
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- 5. คำถามนำเพื่อค้นพบ (Guided Discovery Questions) -->
+    <section class="space-y-4">
+      <div class="flex items-center gap-2 border-b border-slate-200 pb-3">
+        <i data-lucide="lightbulb" class="w-6 h-6 text-amber-500"></i>
+        <h2 class="text-2xl font-bold text-slate-900 font-heading">คำถามนำเพื่อค้นพบ (Guided Discovery)</h2>
+      </div>
+      <p class="text-slate-600 text-sm">ทดลองสังเกตจากแบบจำลองและตั้งสมมติฐาน แล้วคลิกเพื่อเปิดดูแนวคิดและคำอธิบายเชิงคณิตศาสตร์</p>
+
+      <div class="space-y-3 pt-2">
+        <!-- Q1 -->
+        <div class="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm transition">
+          <button onclick="toggleDiscovery(1)" class="w-full text-left p-4 sm:p-5 flex items-center justify-between hover:bg-slate-50/70 transition">
+            <span class="font-semibold text-slate-800 font-heading text-sm sm:text-base flex items-center gap-3">
+              <span class="w-7 h-7 rounded-full bg-indigo-100 text-indigo-700 flex items-center justify-center text-xs font-bold">1</span>
+              การบวกเวกเตอร์มีความแตกต่างจากการบวกจำนวนจริงอย่างไร?
+            </span>
+            <i id="disc-icon-1" data-lucide="chevron-down" class="w-5 h-5 text-slate-400 transform transition-transform"></i>
+          </button>
+          <div id="disc-ans-1" class="hidden px-5 pb-5 text-slate-600 text-sm leading-relaxed border-t border-slate-100 pt-3 bg-indigo-50/30">
+            <p class="font-semibold text-indigo-900 mb-1">คำตอบ: การบวกเวกเตอร์ต้องคำนึงถึงทั้ง "ขนาด" และ "ทิศทาง" ไม่สามารถนำขนาดมาบวกกันเป็นตัวเลขตรงๆ ได้</p>
+            <p>
+              ในการบวกจำนวนจริง $3 + 4 = 7$ เสมอ แต่สำหรับเวกเตอร์ $\|\mathbf{u} + \mathbf{v}\|$ ไม่จำเป็นต้องเท่ากับ $\|\mathbf{u}\| + \|\mathbf{v}\|$ 
+              ขนาดของผลบวกจะขึ้นอยู่กับมุมระหว่างเวกเตอร์ทั้งสอง เช่น หากทำมุม $90^\circ$ กัน เวกเตอร์ขนาด 3 และ 4 จะรวมกันได้ขนาด $\sqrt{3^2 + 4^2} = 5$ เท่านั้น 
+              โดยขนาดรวมจะเป็นไปตามอสมการสามเหลี่ยม $\|\mathbf{u} + \mathbf{v}\| \le \|\mathbf{u}\| + \|\mathbf{v}\|$
+            </p>
+          </div>
+        </div>
+
+        <!-- Q2 -->
+        <div class="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm transition">
+          <button onclick="toggleDiscovery(2)" class="w-full text-left p-4 sm:p-5 flex items-center justify-between hover:bg-slate-50/70 transition">
+            <span class="font-semibold text-slate-800 font-heading text-sm sm:text-base flex items-center gap-3">
+              <span class="w-7 h-7 rounded-full bg-indigo-100 text-indigo-700 flex items-center justify-center text-xs font-bold">2</span>
+              เพราะเหตุใดการบวกเวกเตอร์จึงสามารถสลับลำดับได้ ($\mathbf{u} + \mathbf{v} = \mathbf{v} + \mathbf{u}$)?
+            </span>
+            <i id="disc-icon-2" data-lucide="chevron-down" class="w-5 h-5 text-slate-400 transform transition-transform"></i>
+          </button>
+          <div id="disc-ans-2" class="hidden px-5 pb-5 text-slate-600 text-sm leading-relaxed border-t border-slate-100 pt-3 bg-indigo-50/30">
+            <p class="font-semibold text-indigo-900 mb-1">คำตอบ: เพราะการบวกในแต่ละองค์ประกอบอาศัยสมบัติการสลับที่ของจำนวนจริง และในเชิงเรขาคณิตเป็นเส้นทแยงมุมของสี่เหลี่ยมด้านขนานเดียวกัน</p>
+            <p>
+              1. <strong>เชิงพีชคณิต:</strong> $\mathbf{u} + \mathbf{v} = \langle u_x + v_x, \, u_y + v_y \rangle = \langle v_x + u_x, \, v_y + u_y \rangle = \mathbf{v} + \mathbf{u}$ เพราะการบวกจำนวนจริงมีสมบัติการสลับที่<br>
+              2. <strong>เชิงเรขาคณิต:</strong> การเดินตาม $\mathbf{u}$ แล้วต่อด้วย $\mathbf{v}$ เทียบกับการเดินตาม $\mathbf{v}$ ก่อนแล้วตามด้วย $\mathbf{u}$ จะไปบรรจบที่จุดมุมตรงข้ามของรูปสี่เหลี่ยมด้านขนานเดียวกันเสมอ
+            </p>
+          </div>
+        </div>
+
+        <!-- Q3 -->
+        <div class="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm transition">
+          <button onclick="toggleDiscovery(3)" class="w-full text-left p-4 sm:p-5 flex items-center justify-between hover:bg-slate-50/70 transition">
+            <span class="font-semibold text-slate-800 font-heading text-sm sm:text-base flex items-center gap-3">
+              <span class="w-7 h-7 rounded-full bg-indigo-100 text-indigo-700 flex items-center justify-center text-xs font-bold">3</span>
+              เมื่อคูณเวกเตอร์ด้วยสเกลาร์ลบ ($k < 0$) ทิศทางของเวกเตอร์เปลี่ยนแปลงอย่างไร?
+            </span>
+            <i id="disc-icon-3" data-lucide="chevron-down" class="w-5 h-5 text-slate-400 transform transition-transform"></i>
+          </button>
+          <div id="disc-ans-3" class="hidden px-5 pb-5 text-slate-600 text-sm leading-relaxed border-t border-slate-100 pt-3 bg-indigo-50/30">
+            <p class="font-semibold text-indigo-900 mb-1">คำตอบ: ทิศทางจะกลับทิศ $180^\circ$ (ตรงกันข้ามกับเวกเตอร์เดิม)</p>
+            <p>
+              เครื่องหมายลบส่งผลให้ทุกองค์ประกอบเปลี่ยนเป็นค่าตรงข้าม ($kx, ky, kz$) ส่งผลให้เวกเตอร์มีทิศทางชี้กลับหลัง $180^\circ$ ขนานกับแนวเส้นเดิม ในขณะที่ขนาดของเวกเตอร์จะถูกคูณด้วยค่าสัมบูรณ์ $|k|$ เท่าของขนาดเดิมเสมอ
+            </p>
+          </div>
+        </div>
+
+        <!-- Q4 -->
+        <div class="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm transition">
+          <button onclick="toggleDiscovery(4)" class="w-full text-left p-4 sm:p-5 flex items-center justify-between hover:bg-slate-50/70 transition">
+            <span class="font-semibold text-slate-800 font-heading text-sm sm:text-base flex items-center gap-3">
+              <span class="w-7 h-7 rounded-full bg-indigo-100 text-indigo-700 flex items-center justify-center text-xs font-bold">4</span>
+              ผลลัพธ์ของการบวกเวกเตอร์สองเวกเตอร์จะเป็นเวกเตอร์ศูนย์ ($\mathbf{0}$) ได้ในกรณีใด?
+            </span>
+            <i id="disc-icon-4" data-lucide="chevron-down" class="w-5 h-5 text-slate-400 transform transition-transform"></i>
+          </button>
+          <div id="disc-ans-4" class="hidden px-5 pb-5 text-slate-600 text-sm leading-relaxed border-t border-slate-100 pt-3 bg-indigo-50/30">
+            <p class="font-semibold text-indigo-900 mb-1">คำตอบ: เมื่อเวกเตอร์ทั้งสองเป็น "เวกเตอร์ตรงข้ามกัน" ($\mathbf{v} = -\mathbf{u}$)</p>
+            <p>
+              นั่นคือเวกเตอร์ทั้งสองต้องมี <strong>ขนาดเท่ากันพอดี</strong> ($\|\mathbf{u}\| = \|\mathbf{v}\|$) แต่มี <strong>ทิศทางตรงกันข้ามกันอย่างสิ้นเชิง</strong> เมื่อนำหางมาต่อหัว จุดปลายสุดท้ายจะวนกลับมาทับจุดเริ่มต้นเดิมพอดี ทำให้การกระจัดสุทธิเป็นศูนย์ ($\mathbf{u} + (-\mathbf{u}) = \mathbf{0}$)
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 6. แบบฝึกหัดสำหรับนักศึกษา (Exercises with Verification & Solutions) -->
+    <section class="space-y-4">
+      <div class="flex items-center justify-between border-b border-slate-200 pb-3">
+        <div class="flex items-center gap-2">
+          <i data-lucide="check-square" class="w-6 h-6 text-emerald-600"></i>
+          <h2 class="text-2xl font-bold text-slate-900 font-heading">แบบฝึกหัดสำหรับนักศึกษา</h2>
+        </div>
+        <span class="text-xs text-slate-500 font-medium">ทดสอบการคำนวณ 4 ข้อ</span>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-5 pt-2">
+
+        <!-- Ex 1 -->
+        <div class="bg-white p-5 sm:p-6 rounded-2xl border border-slate-200/90 shadow-sm flex flex-col justify-between">
+          <div class="space-y-3">
+            <div class="flex items-center justify-between">
+              <span class="px-2.5 py-1 text-xs font-bold rounded-lg bg-indigo-50 text-indigo-700">ข้อที่ 1</span>
+              <span class="text-xs text-slate-400">การบวกและลบเวกเตอร์ 2D</span>
+            </div>
+            <p class="text-slate-800 font-medium text-sm leading-relaxed">
+              กำหนด $\mathbf{u} = \langle 2, 3 \rangle$ และ $\mathbf{v} = \langle 4, -1 \rangle$ จงหา $\mathbf{u} + \mathbf{v}$ และ $\mathbf{u} - \mathbf{v}$
+            </p>
+            
+            <div class="space-y-2 pt-1">
+              <div class="flex items-center gap-2">
+                <span class="text-xs font-mono w-16 text-slate-500">$\mathbf{u}+\mathbf{v}:$</span>
+                <input type="text" id="ans_ex1_add" placeholder="เช่น 6, 2" class="w-full text-xs sm:text-sm px-3 py-1.5 rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 font-mono">
+              </div>
+              <div class="flex items-center gap-2">
+                <span class="text-xs font-mono w-16 text-slate-500">$\mathbf{u}-\mathbf{v}:$</span>
+                <input type="text" id="ans_ex1_sub" placeholder="เช่น -2, 4" class="w-full text-xs sm:text-sm px-3 py-1.5 rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 font-mono">
+              </div>
+              <button onclick="checkExercise(1)" class="w-full py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold rounded-xl transition">
+                ตรวจคำตอบ
+              </button>
+            </div>
+            <div id="feedback_1" class="text-xs hidden"></div>
+          </div>
+
+          <div class="mt-4 pt-3 border-t border-slate-100">
+            <button onclick="toggleSolutionBox(1)" class="text-xs text-indigo-600 hover:text-indigo-800 font-medium flex items-center gap-1">
+              <i data-lucide="eye" class="w-3.5 h-3.5"></i> แสดง/ซ่อนวิธีทำอย่างละเอียด
+            </button>
+            <div id="solution_1" class="hidden mt-2 p-3 bg-slate-50 rounded-xl text-xs text-slate-700 leading-relaxed font-mono">
+              <p>$\mathbf{u} + \mathbf{v} = \langle 2 + 4, \, 3 + (-1) \rangle = \mathbf{\langle 6, 2 \rangle}$</p>
+              <p>$\mathbf{u} - \mathbf{v} = \langle 2 - 4, \, 3 - (-1) \rangle = \mathbf{\langle -2, 4 \rangle}$</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Ex 2 -->
+        <div class="bg-white p-5 sm:p-6 rounded-2xl border border-slate-200/90 shadow-sm flex flex-col justify-between">
+          <div class="space-y-3">
+            <div class="flex items-center justify-between">
+              <span class="px-2.5 py-1 text-xs font-bold rounded-lg bg-indigo-50 text-indigo-700">ข้อที่ 2</span>
+              <span class="text-xs text-slate-400">การคูณด้วยสเกลาร์ 3D</span>
+            </div>
+            <p class="text-slate-800 font-medium text-sm leading-relaxed">
+              กำหนด $\mathbf{a} = \langle 1, 2, 3 \rangle$ จงหา $3\mathbf{a}$ และ $-2\mathbf{a}$
+            </p>
+            
+            <div class="space-y-2 pt-1">
+              <div class="flex items-center gap-2">
+                <span class="text-xs font-mono w-16 text-slate-500">$3\mathbf{a}:$</span>
+                <input type="text" id="ans_ex2_pos" placeholder="เช่น 3, 6, 9" class="w-full text-xs sm:text-sm px-3 py-1.5 rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 font-mono">
+              </div>
+              <div class="flex items-center gap-2">
+                <span class="text-xs font-mono w-16 text-slate-500">$-2\mathbf{a}:$</span>
+                <input type="text" id="ans_ex2_neg" placeholder="เช่น -2, -4, -6" class="w-full text-xs sm:text-sm px-3 py-1.5 rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 font-mono">
+              </div>
+              <button onclick="checkExercise(2)" class="w-full py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold rounded-xl transition">
+                ตรวจคำตอบ
+              </button>
+            </div>
+            <div id="feedback_2" class="text-xs hidden"></div>
+          </div>
+
+          <div class="mt-4 pt-3 border-t border-slate-100">
+            <button onclick="toggleSolutionBox(2)" class="text-xs text-indigo-600 hover:text-indigo-800 font-medium flex items-center gap-1">
+              <i data-lucide="eye" class="w-3.5 h-3.5"></i> แสดง/ซ่อนวิธีทำอย่างละเอียด
+            </button>
+            <div id="solution_2" class="hidden mt-2 p-3 bg-slate-50 rounded-xl text-xs text-slate-700 leading-relaxed font-mono">
+              <p>$3\mathbf{a} = \langle 3(1), 3(2), 3(3) \rangle = \mathbf{\langle 3, 6, 9 \rangle}$</p>
+              <p>$-2\mathbf{a} = \langle -2(1), -2(2), -2(3) \rangle = \mathbf{\langle -2, -4, -6 \rangle}$</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Ex 3 -->
+        <div class="bg-white p-5 sm:p-6 rounded-2xl border border-slate-200/90 shadow-sm flex flex-col justify-between">
+          <div class="space-y-3">
+            <div class="flex items-center justify-between">
+              <span class="px-2.5 py-1 text-xs font-bold rounded-lg bg-indigo-50 text-indigo-700">ข้อที่ 3</span>
+              <span class="text-xs text-slate-400">ตรวจสอบสมบัติการสลับที่</span>
+            </div>
+            <p class="text-slate-800 font-medium text-sm leading-relaxed">
+              ให้ $\mathbf{u} = \langle 5, -2 \rangle$ และ $\mathbf{v} = \langle -1, 7 \rangle$ จงหาผลลัพธ์ของ $\mathbf{u}+\mathbf{v}$ และ $\mathbf{v}+\mathbf{u}$ ว่าเท่ากันหรือไม่
+            </p>
+            
+            <div class="flex items-center gap-2 pt-1">
+              <input type="text" id="ans_ex3" placeholder="ระบุผลลัพธ์เวกเตอร์ เช่น 4, 5" class="w-full text-xs sm:text-sm px-3 py-2 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 font-mono">
+              <button onclick="checkExercise(3)" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold rounded-xl transition shrink-0">
+                ตรวจ
+              </button>
+            </div>
+            <div id="feedback_3" class="text-xs hidden"></div>
+          </div>
+
+          <div class="mt-4 pt-3 border-t border-slate-100">
+            <button onclick="toggleSolutionBox(3)" class="text-xs text-indigo-600 hover:text-indigo-800 font-medium flex items-center gap-1">
+              <i data-lucide="eye" class="w-3.5 h-3.5"></i> แสดง/ซ่อนวิธีทำอย่างละเอียด
+            </button>
+            <div id="solution_3" class="hidden mt-2 p-3 bg-slate-50 rounded-xl text-xs text-slate-700 leading-relaxed font-mono">
+              <p>$\mathbf{u} + \mathbf{v} = \langle 5 + (-1), \, -2 + 7 \rangle = \langle 4, 5 \rangle$</p>
+              <p>$\mathbf{v} + \mathbf{u} = \langle -1 + 5, \, 7 + (-2) \rangle = \langle 4, 5 \rangle$</p>
+              <p class="text-emerald-700 font-bold mt-1">สรุป: $\mathbf{u} + \mathbf{v} = \mathbf{v} + \mathbf{u} = \langle 4, 5 \rangle$ จริง</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Ex 4 -->
+        <div class="bg-white p-5 sm:p-6 rounded-2xl border border-slate-200/90 shadow-sm flex flex-col justify-between">
+          <div class="space-y-3">
+            <div class="flex items-center justify-between">
+              <span class="px-2.5 py-1 text-xs font-bold rounded-lg bg-indigo-50 text-indigo-700">ข้อที่ 4</span>
+              <span class="text-xs text-slate-400">สมการเวกเตอร์</span>
+            </div>
+            <p class="text-slate-800 font-medium text-sm leading-relaxed">
+              จงหาเวกเตอร์ $\mathbf{x}$ ที่สอดคล้องกับสมการ $2\mathbf{x} + \langle 3, 4 \rangle = \langle 8, 10 \rangle$
+            </p>
+            
+            <div class="flex items-center gap-2 pt-1">
+              <input type="text" id="ans_ex4" placeholder="เช่น 2.5, 3 หรือ 5/2, 3" class="w-full text-xs sm:text-sm px-3 py-2 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 font-mono">
+              <button onclick="checkExercise(4)" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold rounded-xl transition shrink-0">
+                ตรวจ
+              </button>
+            </div>
+            <div id="feedback_4" class="text-xs hidden"></div>
+          </div>
+
+          <div class="mt-4 pt-3 border-t border-slate-100">
+            <button onclick="toggleSolutionBox(4)" class="text-xs text-indigo-600 hover:text-indigo-800 font-medium flex items-center gap-1">
+              <i data-lucide="eye" class="w-3.5 h-3.5"></i> แสดง/ซ่อนวิธีทำอย่างละเอียด
+            </button>
+            <div id="solution_4" class="hidden mt-2 p-3 bg-slate-50 rounded-xl text-xs text-slate-700 leading-relaxed font-mono">
+              <p>$2\mathbf{x} = \langle 8, 10 \rangle - \langle 3, 4 \rangle$</p>
+              <p>$2\mathbf{x} = \langle 8 - 3, \, 10 - 4 \rangle = \langle 5, 6 \rangle$</p>
+              <p>$\mathbf{x} = \frac{1}{2}\langle 5, 6 \rangle = \mathbf{\langle 2.5, 3 \rangle}$ หรือ $\mathbf{\langle \frac{5}{2}, 3 \rangle}$</p>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Interactive Logic and Visualizer Script -->
+  <script>
+    // State variables
+    let currentDim = '2D';
+    let currentOp = 'add'; // 'add', 'sub', 'lin', 'comm'
+    let showParallelogram = true;
+
+    // Vectors u and v values
+    const vec = {
+      ux: 3, uy: 2, uz: 1, k1: 1,
+      vx: 1, vy: 4, vz: 2, k2: 1
+    };
+
+    // Animation variables
+    let isAnimating = false;
+    let animProgress = 1.0; // 0 to 1
+    let animStartTime = null;
+
+    // 2D Canvas setup
+    const canvas2D = document.getElementById('opsCanvas2D');
+    const ctx2D = canvas2D.getContext('2d');
+    const COORD_RANGE = 20; // -10 to +10
+
+    // 3D Three.js variables
+    let scene3D, camera3D, renderer3D, controls3D;
+    let arrowU_3D, arrowV_3D, arrowR_3D, arrowV_shift_3D;
+
+    window.onload = function() {
+      lucide.createIcons();
+      initMath();
+      resizeCanvas2D();
+      init3D();
+      syncUI();
+      renderAll();
+
+      window.addEventListener('resize', () => {
+        resizeCanvas2D();
+        if (renderer3D && camera3D) {
+          const container = document.getElementById('opsCanvas3D');
+          camera3D.aspect = container.clientWidth / container.clientHeight;
+          camera3D.updateProjectionMatrix();
+          renderer3D.setSize(container.clientWidth, container.clientHeight);
+        }
+        renderAll();
+      });
+    };
+
+    function initMath() {
+      if (window.renderMathInElement) {
+        renderMathInElement(document.body, {
+          delimiters: [
+            {left: '$$', right: '$$', display: true},
+            {left: '$', right: '$', display: false}
+          ],
+          throwOnError: false
+        });
+      }
+    }
+
+    function switchDim(dim) {
+      currentDim = dim;
+      const b2 = document.getElementById('btnDim2D');
+      const b3 = document.getElementById('btnDim3D');
+      const c2 = document.getElementById('opsCanvas2D');
+      const c3 = document.getElementById('opsCanvas3D');
+      const uzBox = document.getElementById('box_uz');
+      const vzBox = document.getElementById('box_vz');
+
+      if (dim === '2D') {
+        b2.className = "px-4 py-2 text-xs sm:text-sm font-semibold rounded-lg bg-white text-indigo-600 shadow-sm transition";
+        b3.className = "px-4 py-2 text-xs sm:text-sm font-medium text-slate-600 hover:text-slate-900 rounded-lg transition";
+        c2.classList.remove('hidden');
+        c3.classList.add('hidden');
+        uzBox.classList.add('hidden');
+        vzBox.classList.add('hidden');
+      } else {
+        b3.className = "px-4 py-2 text-xs sm:text-sm font-semibold rounded-lg bg-white text-indigo-600 shadow-sm transition";
+        b2.className = "px-4 py-2 text-xs sm:text-sm font-medium text-slate-600 hover:text-slate-900 rounded-lg transition";
+        c2.classList.add('hidden');
+        c3.classList.remove('hidden');
+        uzBox.classList.remove('hidden');
+        vzBox.classList.remove('hidden');
+
+        const container = document.getElementById('opsCanvas3D');
+        camera3D.aspect = container.clientWidth / container.clientHeight;
+        camera3D.updateProjectionMatrix();
+        renderer3D.setSize(container.clientWidth, container.clientHeight);
+      }
+      syncUI();
+      renderAll();
+    }
+
+    function setOperation(op) {
+      currentOp = op;
+      const ops = ['add', 'sub', 'lin', 'comm'];
+      ops.forEach(o => {
+        const btn = document.getElementById(`opBtn_${o}`);
+        if (o === op) {
+          btn.className = "px-3.5 py-1.5 rounded-xl text-xs font-semibold bg-indigo-600 text-white shadow-sm transition";
+        } else {
+          btn.className = "px-3.5 py-1.5 rounded-xl text-xs font-medium bg-slate-100 hover:bg-slate-200 text-slate-700 transition";
+        }
+      });
+
+      // Show/Hide scalar sliders based on operation
+      const k1Box = document.getElementById('box_k1');
+      const k2Box = document.getElementById('box_k2');
+      if (op === 'lin') {
+        k1Box.classList.remove('opacity-40', 'pointer-events-none');
+        k2Box.classList.remove('opacity-40', 'pointer-events-none');
+      } else if (op === 'sub') {
+        vec.k1 = 1; vec.k2 = -1;
+        document.getElementById('slider_k1').value = 1;
+        document.getElementById('slider_k2').value = -1;
+      } else {
+        vec.k1 = 1; vec.k2 = 1;
+        document.getElementById('slider_k1').value = 1;
+        document.getElementById('slider_k2').value = 1;
+      }
+
+      startVectorAnimation();
+      syncUI();
+      renderAll();
+    }
+
+    function toggleParallelogramGuide() {
+      showParallelogram = !showParallelogram;
+      const btn = document.getElementById('btnGuide');
+      if (showParallelogram) {
+        btn.classList.add('bg-indigo-900/80', 'text-indigo-200');
+        btn.classList.remove('bg-slate-900/80', 'text-slate-300');
+      } else {
+        btn.classList.remove('bg-indigo-900/80', 'text-indigo-200');
+        btn.classList.add('bg-slate-900/80', 'text-slate-300');
+      }
+      renderAll();
+    }
+
+    function resetDefaults() {
+      vec.ux = 3; vec.uy = 2; vec.uz = 1; vec.k1 = 1;
+      vec.vx = 1; vec.vy = 4; vec.vz = 2; vec.k2 = 1;
+      setOperation('add');
+    }
+
+    function resizeCanvas2D() {
+      const container = canvas2D.parentElement;
+      const dpr = window.devicePixelRatio || 1;
+      canvas2D.width = container.clientWidth * dpr;
+      canvas2D.height = container.clientHeight * dpr;
+      ctx2D.scale(dpr, dpr);
+    }
+
+    function updateValues() {
+      vec.ux = parseFloat(document.getElementById('slider_ux').value);
+      vec.uy = parseFloat(document.getElementById('slider_uy').value);
+      vec.uz = parseFloat(document.getElementById('slider_uz').value);
+      vec.k1 = parseFloat(document.getElementById('slider_k1').value);
+
+      vec.vx = parseFloat(document.getElementById('slider_vx').value);
+      vec.vy = parseFloat(document.getElementById('slider_vy').value);
+      vec.vz = parseFloat(document.getElementById('slider_vz').value);
+      vec.k2 = parseFloat(document.getElementById('slider_k2').value);
+
+      syncUI();
+      renderAll();
+    }
+
+    function syncUI() {
+      document.getElementById('val_ux').textContent = vec.ux;
+      document.getElementById('val_uy').textContent = vec.uy;
+      document.getElementById('val_uz').textContent = vec.uz;
+      document.getElementById('val_k1').textContent = vec.k1;
+
+      document.getElementById('val_vx').textContent = vec.vx;
+      document.getElementById('val_vy').textContent = vec.vy;
+      document.getElementById('val_vz').textContent = vec.vz;
+      document.getElementById('val_k2').textContent = vec.k2;
+
+      // labels
+      if (currentDim === '2D') {
+        document.getElementById('label_vec_u').textContent = `u = <${vec.ux}, ${vec.uy}>`;
+        document.getElementById('label_vec_v').textContent = `v = <${vec.vx}, ${vec.vy}>`;
+      } else {
+        document.getElementById('label_vec_u').textContent = `u = <${vec.ux}, ${vec.uy}, ${vec.uz}>`;
+        document.getElementById('label_vec_v').textContent = `v = <${vec.vx}, ${vec.vy}, ${vec.vz}>`;
+      }
+
+      updateCalculationInspector();
+    }
+
+    function updateCalculationInspector() {
+      const is3D = (currentDim === '3D');
+
+      // Scaled components
+      const u1x = vec.k1 * vec.ux, u1y = vec.k1 * vec.uy, u1z = is3D ? (vec.k1 * vec.uz) : 0;
+      let v2x, v2y, v2z;
+
+      if (currentOp === 'sub') {
+        v2x = -vec.vx; v2y = -vec.vy; v2z = is3D ? (-vec.vz) : 0;
+      } else if (currentOp === 'lin') {
+        v2x = vec.k2 * vec.vx; v2y = vec.k2 * vec.vy; v2z = is3D ? (vec.k2 * vec.vz) : 0;
+      } else {
+        v2x = vec.vx; v2y = vec.vy; v2z = is3D ? vec.vz : 0;
+      }
+
+      const rx = u1x + v2x;
+      const ry = u1y + v2y;
+      const rz = u1z + v2z;
+
+      const magR = Math.sqrt(rx*rx + ry*ry + rz*rz);
+      document.getElementById('badgeMagResult').textContent = magR.toFixed(3);
+
+      const formulaBox = document.getElementById('mathResultFormula');
+      const standardBasis = document.getElementById('mathStandardBasis');
+      const magCalc = document.getElementById('mathMagnitudeCalc');
+      const badgeOp = document.getElementById('badgeOperationName');
+      const insight = document.getElementById('insightNotice');
+      const scalarNote = document.getElementById('scalarEffectBox');
+
+      if (currentOp === 'add') {
+        badgeOp.textContent = 'u + v';
+        insight.innerHTML = `<strong>วิธีหางต่อหัว (Head-to-tail):</strong> เลื่อนเวกเตอร์ $\\mathbf{v}$ ให้จุดเริ่มต้นอยู่ที่หัวของ $\\mathbf{u}$ เวกเตอร์ผลลัพธ์ $\\mathbf{R}$ ชี้จากจุดกำเนิด $(0,0)$ ไปยังหัวของ $\\mathbf{v}$`;
+      } else if (currentOp === 'sub') {
+        badgeOp.textContent = 'u - v = u + (-v)';
+        insight.innerHTML = `<strong>การบวกด้วยเวกเตอร์ตรงข้าม:</strong> กลับทิศทางของ $\\mathbf{v}$ ให้กลายเป็น $-\\mathbf{v}$ แล้วนำหางของ $-\\mathbf{v}$ มาต่อกับหัวของ $\\mathbf{u}$`;
+      } else if (currentOp === 'lin') {
+        badgeOp.textContent = `${vec.k1}u + (${vec.k2})v`;
+        insight.innerHTML = `<strong>การรวมเชิงเส้น (Linear Combination):</strong> ขยายเวกเตอร์ $\\mathbf{u}$ ด้วยสเกลาร์ $k_1 = ${vec.k1}$ และเวกเตอร์ $\\mathbf{v}$ ด้วยสเกลาร์ $k_2 = ${vec.k2}$ แล้วนำมารวมกัน`;
+      } else if (currentOp === 'comm') {
+        badgeOp.textContent = 'u + v = v + u';
+        insight.innerHTML = `<strong>การสลับที่ (Commutative):</strong> เส้นทางสีเขียว$\\to$ฟ้า $(\\mathbf{u}+\\mathbf{v})$ และเส้นทางสีฟ้า$\\to$เขียว $(\\mathbf{v}+\\mathbf{u})$ วิ่งบรรจบที่พิกัดปลาย $\\mathbf{R}$ เดียวกันพอดี เกิดเป็นรูปสี่เหลี่ยมด้านขนานสมบูรณ์`;
+      }
+
+      if (is3D) {
+        formulaBox.innerHTML = `$$\\mathbf{R} = \\langle ${rx.toFixed(1)},\\, ${ry.toFixed(1)},\\, ${rz.toFixed(1)} \\rangle$$`;
+        standardBasis.innerHTML = `รูปฐาน: $${rx.toFixed(1)}\\mathbf{i} ${ry>=0?'+':''}${ry.toFixed(1)}\\mathbf{j} ${rz>=0?'+':''}${rz.toFixed(1)}\\mathbf{k}$`;
+        magCalc.innerHTML = `$$\\|\\mathbf{R}\\| = \\sqrt{(${rx.toFixed(1)})^2 + (${ry.toFixed(1)})^2 + (${rz.toFixed(1)})^2} \\approx ${magR.toFixed(3)}$$`;
+      } else {
+        formulaBox.innerHTML = `$$\\mathbf{R} = \\langle ${rx.toFixed(1)},\\, ${ry.toFixed(1)} \\rangle$$`;
+        standardBasis.innerHTML = `รูปฐาน: $${rx.toFixed(1)}\\mathbf{i} ${ry>=0?'+':''}${ry.toFixed(1)}\\mathbf{j}$`;
+        magCalc.innerHTML = `$$\\|\\mathbf{R}\\| = \\sqrt{(${rx.toFixed(1)})^2 + (${ry.toFixed(1)})^2} = \\sqrt{${(rx*rx + ry*ry).toFixed(1)}} \\approx ${magR.toFixed(3)}$$`;
+      }
+
+      scalarNote.innerHTML = `
+        <div>&bull; ขนาดของ $k_1\\mathbf{u}$: <strong>${(Math.abs(vec.k1) * Math.hypot(vec.ux, vec.uy, is3D?vec.uz:0)).toFixed(2)}</strong> หน่วย (ทิศทาง: ${vec.k1 >= 0 ? 'เดิม' : 'กลับทิศ $180^\\circ$'})</div>
+        <div>&bull; ขนาดของ $k_2\\mathbf{v}$: <strong>${(Math.abs(vec.k2) * Math.hypot(vec.vx, vec.vy, is3D?vec.vz:0)).toFixed(2)}</strong> หน่วย (ทิศทาง: ${vec.k2 >= 0 ? 'เดิม' : 'กลับทิศ $180^\\circ$'})</div>
+      `;
+
+      if (window.renderMathInElement) {
+        renderMathInElement(document.querySelector('.lg\\:col-span-5'), {
+          delimiters: [
+            {left: '$$', right: '$$', display: true},
+            {left: '$', right: '$', display: false}
+          ],
+          throwOnError: false
+        });
+      }
+    }
+
+    // Animation Controller
+    function startVectorAnimation() {
+      isAnimating = true;
+      animStartTime = performance.now();
+      requestAnimationFrame(stepAnimation);
+    }
+
+    function stepAnimation(timestamp) {
+      if (!isAnimating) return;
+      const elapsed = timestamp - animStartTime;
+      const duration = 1200; // ms
+      animProgress = Math.min(1.0, elapsed / duration);
+
+      renderAll();
+
+      if (animProgress < 1.0) {
+        requestAnimationFrame(stepAnimation);
+      } else {
+        isAnimating = false;
+      }
+    }
+
+    // 2D Canvas Drawing
+    function draw2D() {
+      const w = canvas2D.clientWidth;
+      const h = canvas2D.clientHeight;
+      ctx2D.clearRect(0, 0, w, h);
+
+      const cx = w / 2;
+      const cy = h / 2;
+      const unit = w / COORD_RANGE;
+
+      // Draw Grid
+      ctx2D.strokeStyle = '#1e293b';
+      ctx2D.lineWidth = 1;
+      for (let i = -9; i <= 9; i++) {
+        const x = cx + i * unit;
+        const y = cy - i * unit;
+        ctx2D.beginPath();
+        ctx2D.moveTo(x, 0); ctx2D.lineTo(x, h);
+        ctx2D.stroke();
+        ctx2D.beginPath();
+        ctx2D.moveTo(0, y); ctx2D.lineTo(w, y);
+        ctx2D.stroke();
+      }
+
+      // Draw Main Axes
+      ctx2D.strokeStyle = '#475569';
+      ctx2D.lineWidth = 2;
+      ctx2D.beginPath();
+      ctx2D.moveTo(0, cy); ctx2D.lineTo(w, cy);
+      ctx2D.moveTo(cx, 0); ctx2D.lineTo(cx, h);
+      ctx2D.stroke();
+
+      // Axis labels
+      ctx2D.fillStyle = '#64748b';
+      ctx2D.font = '10px JetBrains Mono';
+      ctx2D.fillText('+X', w - 20, cy - 6);
+      ctx2D.fillText('+Y', cx + 6, 16);
+
+      // Calculations for 2D vectors
+      const u1x = vec.k1 * vec.ux;
+      const u1y = vec.k1 * vec.uy;
+      let v2x = vec.vx;
+      let v2y = vec.vy;
+
+      if (currentOp === 'sub') {
+        v2x = -vec.vx;
+        v2y = -vec.vy;
+      } else if (currentOp === 'lin') {
+        v2x = vec.k2 * vec.vx;
+        v2y = vec.k2 * vec.vy;
+      }
+
+      const rx = u1x + v2x;
+      const ry = u1y + v2y;
+
+      const pxU = { x: cx + u1x * unit, y: cy - u1y * unit };
+      const pxV_orig = { x: cx + v2x * unit, y: cy - v2y * unit };
+      const pxR = { x: cx + rx * unit, y: cy - ry * unit };
+
+      // Animated shifted head of v: gliding from origin to tip of u
+      const shiftX = u1x * animProgress;
+      const shiftY = u1y * animProgress;
+      const pxV_shiftedStart = { x: cx + shiftX * unit, y: cy - shiftY * unit };
+      const pxV_shiftedEnd = { x: cx + (shiftX + v2x) * unit, y: cy - (shiftY + v2y) * unit };
+
+      // Parallelogram / Commutative Guides
+      if (showParallelogram || currentOp === 'comm') {
+        ctx2D.setLineDash([4, 4]);
+        ctx2D.strokeStyle = 'rgba(148, 163, 184, 0.45)';
+        ctx2D.lineWidth = 1.5;
+
+        // Origin to V then V to R (v + u)
+        ctx2D.beginPath();
+        ctx2D.moveTo(cx, cy);
+        ctx2D.lineTo(pxV_orig.x, pxV_orig.y);
+        ctx2D.lineTo(pxR.x, pxR.y);
+        ctx2D.stroke();
+
+        // U to R
+        ctx2D.beginPath();
+        ctx2D.moveTo(pxU.x, pxU.y);
+        ctx2D.lineTo(pxR.x, pxR.y);
+        ctx2D.stroke();
+        ctx2D.setLineDash([]);
+      }
+
+      // Draw Vector u from origin (Green)
+      drawArrow(ctx2D, cx, cy, pxU.x, pxU.y, '#10b981', 3.5);
+      drawLabel(ctx2D, `k₁u (${u1x}, ${u1y})`, pxU.x + 8, pxU.y - 8, '#34d399');
+
+      // Draw Original Vector v from origin (Light Blue dashed)
+      if (animProgress > 0 && currentOp !== 'comm') {
+        ctx2D.setLineDash([3, 3]);
+        drawArrow(ctx2D, cx, cy, pxV_orig.x, pxV_orig.y, 'rgba(59, 130, 246, 0.45)', 2);
+        ctx2D.setLineDash([]);
+      }
+
+      // If Commutative mode: show v + u clearly in cyan
+      if (currentOp === 'comm') {
+        drawArrow(ctx2D, cx, cy, pxV_orig.x, pxV_orig.y, '#06b6d4', 3);
+        drawLabel(ctx2D, `v`, pxV_orig.x + 8, pxV_orig.y - 8, '#22d3ee');
+        drawArrow(ctx2D, pxV_orig.x, pxV_orig.y, pxR.x, pxR.y, 'rgba(16, 185, 129, 0.7)', 2.5);
+      }
+
+      // Draw Shifted Vector v (Blue) connected to tip of u
+      drawArrow(ctx2D, pxV_shiftedStart.x, pxV_shiftedStart.y, pxV_shiftedEnd.x, pxV_shiftedEnd.y, '#3b82f6', 3.5);
+      if (animProgress > 0.6) {
+        drawLabel(ctx2D, currentOp === 'sub' ? '-v' : 'v', pxV_shiftedEnd.x + 8, pxV_shiftedEnd.y - 8, '#60a5fa');
+      }
+
+      // Draw Resultant Vector R (Magenta / Indigo) from origin to current animated tip
+      const curRx = cx + (u1x + v2x * animProgress) * unit;
+      const curRy = cy - (u1y + v2y * animProgress) * unit;
+      drawArrow(ctx2D, cx, cy, curRx, curRy, '#ec4899', 4.5);
+      drawLabel(ctx2D, `R = (${rx.toFixed(1)}, ${ry.toFixed(1)})`, curRx + 10, curRy + 12, '#f472b6', true);
+
+      // Origin dot
+      ctx2D.fillStyle = '#ffffff';
+      ctx2D.beginPath();
+      ctx2D.arc(cx, cy, 4, 0, Math.PI * 2);
+      ctx2D.fill();
+    }
+
+    function drawArrow(ctx, fx, fy, tx, ty, color, width) {
+      const head = 12;
+      const angle = Math.atan2(ty - fy, tx - fx);
+      ctx.strokeStyle = color;
+      ctx.fillStyle = color;
+      ctx.lineWidth = width;
+
+      ctx.beginPath();
+      ctx.moveTo(fx, fy);
+      ctx.lineTo(tx, ty);
+      ctx.stroke();
+
+      ctx.beginPath();
+      ctx.moveTo(tx, ty);
+      ctx.lineTo(tx - head * Math.cos(angle - Math.PI / 6), ty - head * Math.sin(angle - Math.PI / 6));
+      ctx.lineTo(tx - head * Math.cos(angle + Math.PI / 6), ty - head * Math.sin(angle + Math.PI / 6));
+      ctx.closePath();
+      ctx.fill();
+    }
+
+    function drawLabel(ctx, text, x, y, color, bold = false) {
+      ctx.fillStyle = color;
+      ctx.font = `${bold ? 'bold ' : ''}12px Prompt`;
+      ctx.fillText(text, x, y);
+    }
+
+    // 3D Scene Implementation
+    function init3D() {
+      const container = document.getElementById('opsCanvas3D');
+      scene3D = new THREE.Scene();
+      scene3D.background = new THREE.Color(0x020617);
+
+      camera3D = new THREE.PerspectiveCamera(45, container.clientWidth / container.clientHeight, 0.1, 100);
+      camera3D.position.set(16, 14, 18);
+
+      renderer3D = new THREE.WebGLRenderer({ antialias: true });
+      renderer3D.setSize(container.clientWidth, container.clientHeight);
+      renderer3D.setPixelRatio(window.devicePixelRatio || 1);
+      container.appendChild(renderer3D.domElement);
+
+      controls3D = new THREE.OrbitControls(camera3D, renderer3D.domElement);
+      controls3D.enableDamping = true;
+      controls3D.dampingFactor = 0.05;
+
+      const light = new THREE.AmbientLight(0xffffff, 0.85);
+      scene3D.add(light);
+      const dirLight = new THREE.DirectionalLight(0xffffff, 0.7);
+      dirLight.position.set(10, 20, 15);
+      scene3D.add(dirLight);
+
+      // Grid helper on XZ plane
+      const grid = new THREE.GridHelper(20, 20, 0x475569, 0x1e293b);
+      scene3D.add(grid);
+
+      // Axes helper
+      const axes = new THREE.AxesHelper(10);
+      scene3D.add(axes);
+
+      // Arrows
+      const dir = new THREE.Vector3(1, 0, 0);
+      const origin = new THREE.Vector3(0, 0, 0);
+
+      arrowU_3D = new THREE.ArrowHelper(dir, origin, 1, 0x10b981, 0.7, 0.35);
+      arrowV_3D = new THREE.ArrowHelper(dir, origin, 1, 0x3b82f6, 0.7, 0.35);
+      arrowV_shift_3D = new THREE.ArrowHelper(dir, origin, 1, 0x60a5fa, 0.7, 0.35);
+      arrowR_3D = new THREE.ArrowHelper(dir, origin, 1, 0xec4899, 0.9, 0.45);
+
+      scene3D.add(arrowU_3D);
+      scene3D.add(arrowV_3D);
+      scene3D.add(arrowV_shift_3D);
+      scene3D.add(arrowR_3D);
+
+      animate3D();
+    }
+
+    function animate3D() {
+      requestAnimationFrame(animate3D);
+      if (currentDim === '3D' && controls3D) {
+        controls3D.update();
+        renderer3D.render(scene3D, camera3D);
+      }
+    }
+
+    function update3DObjects() {
+      if (!arrowU_3D) return;
+
+      const u1 = new THREE.Vector3(vec.k1 * vec.ux, vec.k1 * vec.uy, vec.k1 * vec.uz);
+      let v2;
+      if (currentOp === 'sub') {
+        v2 = new THREE.Vector3(-vec.vx, -vec.vy, -vec.vz);
+      } else if (currentOp === 'lin') {
+        v2 = new THREE.Vector3(vec.k2 * vec.vx, vec.k2 * vec.vy, vec.k2 * vec.vz);
+      } else {
+        v2 = new THREE.Vector3(vec.vx, vec.vy, vec.vz);
+      }
+
+      const res = new THREE.Vector3().addVectors(u1, v2);
+
+      // Set Vector U
+      const lenU = u1.length();
+      if (lenU > 0.001) {
+        arrowU_3D.visible = true;
+        arrowU_3D.setDirection(u1.clone().normalize());
+        arrowU_3D.setLength(lenU, Math.min(0.8, lenU * 0.3), Math.min(0.4, lenU * 0.2));
+      } else {
+        arrowU_3D.visible = false;
+      }
+
+      // Set Vector V at origin (dimmed)
+      const lenV = v2.length();
+      if (lenV > 0.001) {
+        arrowV_3D.visible = true;
+        arrowV_3D.setDirection(v2.clone().normalize());
+        arrowV_3D.setLength(lenV, Math.min(0.8, lenV * 0.3), Math.min(0.4, lenV * 0.2));
+
+        // Shifted V at head of U
+        arrowV_shift_3D.visible = true;
+        arrowV_shift_3D.position.copy(u1);
+        arrowV_shift_3D.setDirection(v2.clone().normalize());
+        arrowV_shift_3D.setLength(lenV, Math.min(0.8, lenV * 0.3), Math.min(0.4, lenV * 0.2));
+      } else {
+        arrowV_3D.visible = false;
+        arrowV_shift_3D.visible = false;
+      }
+
+      // Resultant R
+      const lenR = res.length();
+      if (lenR > 0.001) {
+        arrowR_3D.visible = true;
+        arrowR_3D.setDirection(res.clone().normalize());
+        arrowR_3D.setLength(lenR, Math.min(0.9, lenR * 0.3), Math.min(0.45, lenR * 0.2));
+      } else {
+        arrowR_3D.visible = false;
+      }
+    }
+
+    function renderAll() {
+      if (currentDim === '2D') {
+        draw2D();
+      } else {
+        update3DObjects();
+      }
+    }
+
+    // Collapsible Discovery Questions
+    function toggleDiscovery(id) {
+      const ans = document.getElementById(`disc-ans-${id}`);
+      const icon = document.getElementById(`disc-icon-${id}`);
+      if (ans.classList.contains('hidden')) {
+        ans.classList.remove('hidden');
+        icon.style.transform = 'rotate(180deg)';
+      } else {
+        ans.classList.add('hidden');
+        icon.style.transform = 'rotate(0deg)';
+      }
+    }
+
+    // Toggle Exercise Solutions
+    function toggleSolutionBox(id) {
+      const box = document.getElementById(`solution_${id}`);
+      box.classList.toggle('hidden');
+      if (!box.classList.contains('hidden') && window.renderMathInElement) {
+        renderMathInElement(box, {
+          delimiters: [
+            {left: '$$', right: '$$', display: true},
+            {left: '$', right: '$', display: false}
+          ],
+          throwOnError: false
+        });
+      }
+    }
+
+    // Check Answers
+    function checkExercise(num) {
+      const fb = document.getElementById(`feedback_${num}`);
+      fb.classList.remove('hidden');
+      let isCorrect = false;
+
+      if (num === 1) {
+        const add = document.getElementById('ans_ex1_add').value.trim().replace(/\s+/g, '');
+        const sub = document.getElementById('ans_ex1_sub').value.trim().replace(/\s+/g, '');
+        const addOk = add.includes('6,2') || add.includes('<6,2>');
+        const subOk = sub.includes('-2,4') || sub.includes('<-2,4>');
+        isCorrect = addOk && subOk;
+      } else if (num === 2) {
+        const p = document.getElementById('ans_ex2_pos').value.trim().replace(/\s+/g, '');
+        const n = document.getElementById('ans_ex2_neg').value.trim().replace(/\s+/g, '');
+        const posOk = p.includes('3,6,9') || p.includes('<3,6,9>');
+        const negOk = n.includes('-2,-4,-6') || n.includes('<-2,-4,-6>');
+        isCorrect = posOk && negOk;
+      } else if (num === 3) {
+        const val = document.getElementById('ans_ex3').value.trim().replace(/\s+/g, '');
+        isCorrect = val.includes('4,5') || val.includes('<4,5>');
+      } else if (num === 4) {
+        const val = document.getElementById('ans_ex4').value.trim().replace(/\s+/g, '');
+        isCorrect = val.includes('2.5,3') || val.includes('5/2,3') || val.includes('<2.5,3>') || val.includes('<5/2,3>');
+      }
+
+      if (isCorrect) {
+        fb.className = "text-xs mt-2 text-emerald-700 bg-emerald-50 p-2.5 rounded-lg border border-emerald-200 flex items-center gap-1.5 font-medium";
+        fb.innerHTML = `<i data-lucide="check-circle" class="w-4 h-4 text-emerald-600"></i> ถูกต้องแม่นยำ! การคำนวณถูกต้องสมบูรณ์`;
+      } else {
+        fb.className = "text-xs mt-2 text-rose-700 bg-rose-50 p-2.5 rounded-lg border border-rose-200 flex items-center gap-1.5 font-medium";
+        fb.innerHTML = `<i data-lucide="alert-circle" class="w-4 h-4 text-rose-600"></i> ยังไม่ถูกต้อง ลองตรวจสอบเครื่องหมายบวกลบ หรือเปิดดู "วิธีทำอย่างละเอียด"`;
+      }
+      lucide.createIcons();
+    }
+  </script>
+</body>
+</html>
