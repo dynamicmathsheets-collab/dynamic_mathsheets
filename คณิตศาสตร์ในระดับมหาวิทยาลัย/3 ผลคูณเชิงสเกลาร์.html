@@ -1,0 +1,1409 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>เรื่องที่ 3: ผลคูณเชิงสเกลาร์ (Dot Product)</title>
+
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Google Fonts: Prompt & Sarabun -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Prompt:wght@400;500;600;700&family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+  <!-- KaTeX for Math Typesetting -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+
+  <!-- Three.js & OrbitControls for 3D Simulator -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Sarabun', 'sans-serif'],
+            display: ['Prompt', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace'],
+          },
+          colors: {
+            brand: {
+              50: '#eef2ff',
+              100: '#e0e7ff',
+              500: '#6366f1',
+              600: '#4f46e5',
+              700: '#4338ca',
+              900: '#312e81',
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    body {
+      background-color: #f8fafc;
+      color: #1e293b;
+      font-family: 'Sarabun', sans-serif;
+    }
+    h1, h2, h3, h4, .font-heading {
+      font-family: 'Prompt', sans-serif;
+    }
+    .katex {
+      font-size: 1.05em !important;
+    }
+    input[type=range] {
+      accent-color: #4f46e5;
+    }
+    .canvas-container {
+      touch-action: none;
+    }
+  </style>
+</head>
+<body class="antialiased min-h-screen flex flex-col justify-between selection:bg-indigo-500 selection:text-white">
+
+  <!-- Main Container -->
+  <main class="max-w-6xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 space-y-10">
+
+    <!-- 1. Header Section -->
+    <header class="bg-gradient-to-br from-slate-900 via-indigo-950 to-slate-900 rounded-3xl p-6 sm:p-10 text-white shadow-xl relative overflow-hidden border border-indigo-900/50">
+      <div class="absolute -right-16 -bottom-16 w-80 h-80 bg-indigo-500/15 rounded-full blur-3xl pointer-events-none"></div>
+      <div class="relative z-10">
+
+        <h1 class="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-white mb-4">
+          เรื่องที่ 3: ผลคูณเชิงสเกลาร์ (Dot Product)
+        </h1>
+        <p class="text-slate-300 max-w-3xl text-base sm:text-lg leading-relaxed">
+          ศึกษาความหมายของผลคูณเชิงสเกลาร์ทั้งในเชิงเรขาคณิตและเชิงพีชคณิต การหามุมระหว่างเวกเตอร์ 
+          เงื่อนไขการตั้งฉาก (Orthogonality) และการฉายเวกเตอร์ (Vector Projection) พร้อมแบบจำลองโต้ตอบ 2D และ 3D
+        </p>
+      </div>
+    </header>
+
+    <!-- 2. วัตถุประสงค์การเรียนรู้ -->
+    <section class="bg-white rounded-2xl p-6 sm:p-7 shadow-sm border border-slate-200/80">
+      <div class="flex items-start gap-4">
+        <div class="p-3 bg-indigo-50 text-indigo-600 rounded-xl mt-0.5 shrink-0 text-xl">
+          <i class="fa-solid fa-bullseye"></i>
+        </div>
+        <div>
+          <h2 class="text-xl font-bold text-slate-900 mb-2 font-heading">วัตถุประสงค์การเรียนรู้</h2>
+          <p class="text-slate-700 leading-relaxed text-base">
+            นักศึกษาสามารถหาผลคูณเชิงสเกลาร์ของเวกเตอร์ คำนวณมุมระหว่างเวกเตอร์ ตรวจสอบการตั้งฉาก 
+            และอธิบายความสัมพันธ์ทางเรขาคณิตตลอดจนการฉายเวกเตอร์ทั้งในระบบพิกัด 2 มิติและ 3 มิติได้อย่างถูกต้อง
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3. ส่วนเนื้อหาเชิงทฤษฎี (Structured Theory Cards) -->
+    <section class="space-y-6">
+      <div class="flex items-center justify-between border-b border-slate-200 pb-3">
+        <h2 class="text-2xl font-bold text-slate-900 font-heading flex items-center gap-2.5">
+          <i class="fa-solid fa-book-open text-indigo-600"></i> สรุปเนื้อหาและทฤษฎีผลคูณเชิงสเกลาร์
+        </h2>
+        <span class="text-xs text-slate-500 hidden sm:inline">เกณฑ์สำคัญและสูตรที่ใช้บ่อย</span>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+        
+        <!-- 3.1 ความหมายของ Dot Product -->
+        <article class="bg-white p-6 rounded-2xl border border-slate-200/90 shadow-sm flex flex-col justify-between hover:border-indigo-200 transition">
+          <div>
+            <div class="flex items-center gap-2 mb-3">
+              <span class="p-2 rounded-lg bg-indigo-50 text-indigo-600 text-sm"><i class="fa-solid fa-circle-dot"></i></span>
+              <h3 class="text-base font-bold text-slate-900 font-heading">1. ความหมายของผลคูณเชิงสเกลาร์</h3>
+            </div>
+            <p class="text-slate-600 text-sm leading-relaxed mb-3">
+              ผลคูณเชิงสเกลาร์ (หรือ Inner Product) เป็นการคูณเวกเตอร์สองเวกเตอร์แล้วได้ผลลัพธ์เป็น <strong>จำนวนจริง (Scalar)</strong>:
+            </p>
+          </div>
+          <div class="bg-slate-50 p-2.5 rounded-xl border border-slate-200 text-xs font-mono text-center text-indigo-950 font-semibold">
+            $\mathbf{u} \cdot \mathbf{v} = \|\mathbf{u}\| \|\mathbf{v}\| \cos\theta$
+          </div>
+        </article>
+
+        <!-- 3.2 การคำนวณจากองค์ประกอบ -->
+        <article class="bg-white p-6 rounded-2xl border border-slate-200/90 shadow-sm flex flex-col justify-between hover:border-indigo-200 transition">
+          <div>
+            <div class="flex items-center gap-2 mb-3">
+              <span class="p-2 rounded-lg bg-blue-50 text-blue-600 text-sm"><i class="fa-solid fa-table-cells-large"></i></span>
+              <h3 class="text-base font-bold text-slate-900 font-heading">2. การคำนวณจากองค์ประกอบ</h3>
+            </div>
+            <p class="text-slate-600 text-sm leading-relaxed mb-3">
+              นำผลคูณของแต่ละแกนพิกัดมาบวกกันโดยตรง:
+              <br>&bull; ใน 2D: $\mathbf{u} \cdot \mathbf{v} = u_1 v_1 + u_2 v_2$
+              <br>&bull; ใน 3D: $\mathbf{u} \cdot \mathbf{v} = u_1 v_1 + u_2 v_2 + u_3 v_3$
+            </p>
+          </div>
+          <div class="bg-slate-50 p-2.5 rounded-xl border border-slate-200 text-xs font-mono text-center text-slate-800">
+            $\mathbf{u} \cdot \mathbf{v} = \sum_{i=1}^{n} u_i v_i$
+          </div>
+        </article>
+
+        <!-- 3.3 ความสัมพันธ์กับมุม -->
+        <article class="bg-white p-6 rounded-2xl border border-slate-200/90 shadow-sm flex flex-col justify-between hover:border-indigo-200 transition">
+          <div>
+            <div class="flex items-center gap-2 mb-3">
+              <span class="p-2 rounded-lg bg-emerald-50 text-emerald-600 text-sm"><i class="fa-solid fa-ruler-combined"></i></span>
+              <h3 class="text-base font-bold text-slate-900 font-heading">3. ความสัมพันธ์กับมุม $\theta$</h3>
+            </div>
+            <ul class="text-slate-600 text-xs space-y-1.5 leading-relaxed mb-3">
+              <li>&bull; <strong class="text-slate-800">มุมแหลม</strong> ($0^\circ \le \theta < 90^\circ$): $\mathbf{u}\cdot\mathbf{v} > 0$</li>
+              <li>&bull; <strong class="text-slate-800">มุมฉาก</strong> ($\theta = 90^\circ$): $\mathbf{u}\cdot\mathbf{v} = 0$</li>
+              <li>&bull; <strong class="text-slate-800">มุมป้าน</strong> ($90^\circ < \theta \le 180^\circ$): $\mathbf{u}\cdot\mathbf{v} < 0$</li>
+              <li>&bull; <strong class="text-slate-800">ทิศทางตรงกันข้าม</strong> ($\theta = 180^\circ$): $\mathbf{u}\cdot\mathbf{v} = -\|\mathbf{u}\|\|\mathbf{v}\|$</li>
+            </ul>
+          </div>
+          <div class="bg-slate-50 p-2 rounded-xl border border-slate-200 text-xs text-center text-slate-600 font-mono">
+            เครื่องหมายของ Dot Product ขึ้นอยู่กับ $\cos\theta$
+          </div>
+        </article>
+
+        <!-- 3.4 การหามุมระหว่างเวกเตอร์ -->
+        <article class="bg-white p-6 rounded-2xl border border-slate-200/90 shadow-sm flex flex-col justify-between hover:border-indigo-200 transition">
+          <div>
+            <div class="flex items-center gap-2 mb-3">
+              <span class="p-2 rounded-lg bg-purple-50 text-purple-600 text-sm"><i class="fa-solid fa-angle"></i></span>
+              <h3 class="text-base font-bold text-slate-900 font-heading">4. การหามุมระหว่างเวกเตอร์</h3>
+            </div>
+            <p class="text-slate-600 text-sm leading-relaxed mb-3">
+              เมื่อทราบองค์ประกอบของเวกเตอร์ เราสามารถหามุม $\theta$ ระหว่างเวกเตอร์ทั้งสอง ($0^\circ \le \theta \le 180^\circ$) ได้จาก:
+            </p>
+          </div>
+          <div class="bg-slate-50 p-2.5 rounded-xl border border-slate-200 text-xs font-mono text-center text-slate-800">
+            $\cos\theta = \frac{\mathbf{u} \cdot \mathbf{v}}{\|\mathbf{u}\| \|\mathbf{v}\|} \implies \theta = \arccos\left(\frac{\mathbf{u}\cdot\mathbf{v}}{\|\mathbf{u}\|\|\mathbf{v}\|}\right)$
+          </div>
+        </article>
+
+        <!-- 3.5 เวกเตอร์ตั้งฉาก & การฉายเวกเตอร์ -->
+        <article class="bg-white p-6 rounded-2xl border border-slate-200/90 shadow-sm flex flex-col justify-between hover:border-indigo-200 transition">
+          <div>
+            <div class="flex items-center gap-2 mb-3">
+              <span class="p-2 rounded-lg bg-amber-50 text-amber-600 text-sm"><i class="fa-solid fa-draw-polygon"></i></span>
+              <h3 class="text-base font-bold text-slate-900 font-heading">5. เวกเตอร์ตั้งฉาก & การฉาย</h3>
+            </div>
+            <p class="text-slate-600 text-xs leading-relaxed mb-2">
+              <strong>เวกเตอร์ตั้งฉาก:</strong> $\mathbf{u} \perp \mathbf{v} \iff \mathbf{u} \cdot \mathbf{v} = 0$<br>
+              <strong>การฉายสเกลาร์ (เงา):</strong> $\operatorname{comp}_{\mathbf{v}}\mathbf{u} = \frac{\mathbf{u} \cdot \mathbf{v}}{\|\mathbf{v}\|}$<br>
+              <strong>การฉายเวกเตอร์:</strong>
+            </p>
+          </div>
+          <div class="bg-slate-50 p-2.5 rounded-xl border border-slate-200 text-xs font-mono text-center text-indigo-900">
+            $\operatorname{proj}_{\mathbf{v}}\mathbf{u} = \left(\frac{\mathbf{u} \cdot \mathbf{v}}{\|\mathbf{v}\|^2}\right)\mathbf{v}$
+          </div>
+        </article>
+
+        <!-- 3.6 สมบัติและการประยุกต์ใช้ -->
+        <article class="bg-white p-6 rounded-2xl border border-slate-200/90 shadow-sm flex flex-col justify-between hover:border-indigo-200 transition">
+          <div>
+            <div class="flex items-center gap-2 mb-3">
+              <span class="p-2 rounded-lg bg-rose-50 text-rose-600 text-sm"><i class="fa-solid fa-rocket"></i></span>
+              <h3 class="text-base font-bold text-slate-900 font-heading">6. สมบัติ & การประยุกต์ใช้</h3>
+            </div>
+            <ul class="text-slate-600 text-xs space-y-1.5 leading-relaxed mb-3">
+              <li>&bull; <strong>การสลับที่:</strong> $\mathbf{u} \cdot \mathbf{v} = \mathbf{v} \cdot \mathbf{u}$</li>
+              <li>&bull; <strong>คูณตัวเอง:</strong> $\mathbf{u} \cdot \mathbf{u} = \|\mathbf{u}\|^2$</li>
+              <li>&bull; <strong>งานในฟิสิกส์:</strong> $W = \mathbf{F} \cdot \mathbf{d} = \|\mathbf{F}\|\|\mathbf{d}\|\cos\theta$</li>
+              <li>&bull; <strong>AI & Search:</strong> Cosine Similarity วัดความคล้ายคลึงของข้อความ</li>
+            </ul>
+          </div>
+          <div class="bg-slate-50 p-2 rounded-xl border border-slate-200 text-xs text-center text-slate-600">
+            $c(\mathbf{u} \cdot \mathbf{v}) = (c\mathbf{u}) \cdot \mathbf{v} = \mathbf{u} \cdot (c\mathbf{v})$
+          </div>
+        </article>
+
+      </div>
+    </section>
+
+    <!-- 4. แบบจำลองโต้ตอบ (Interactive Simulator 2D / 3D) -->
+    <section class="bg-white rounded-3xl p-5 sm:p-8 shadow-md border border-slate-200/90 space-y-6">
+      
+      <!-- Simulator Title & Switcher -->
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 pb-5">
+        <div>
+          <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold bg-indigo-50 text-indigo-700 mb-2">
+            <i class="fa-solid fa-play text-indigo-600 text-[10px]"></i> Live Dot Product & Projection Lab
+          </div>
+          <h2 class="text-2xl font-bold text-slate-900 font-heading">แบบจำลองโต้ตอบ: ผลคูณเชิงสเกลาร์และการฉายเวกเตอร์</h2>
+          <p class="text-sm text-slate-600">ลากจุดปลายเวกเตอร์ $\mathbf{u}$ และ $\mathbf{v}$ หรือเลื่อนสไลเดอร์เพื่อดูค่า Dot Product, มุม $\theta$ และภาพการฉายเวกเตอร์แบบเรียลไทม์</p>
+        </div>
+
+        <!-- 2D / 3D Dimension Switcher -->
+        <div class="inline-flex p-1 bg-slate-100 rounded-xl self-start sm:self-center border border-slate-200 shrink-0">
+          <button id="btnDim2D" onclick="switchDim('2D')" class="px-4 py-2 text-xs sm:text-sm font-semibold rounded-lg bg-white text-indigo-600 shadow-sm transition">
+            2 มิติ (2D Plane)
+          </button>
+          <button id="btnDim3D" onclick="switchDim('3D')" class="px-4 py-2 text-xs sm:text-sm font-medium text-slate-600 hover:text-slate-900 rounded-lg transition">
+            3 มิติ (3D Space)
+          </button>
+        </div>
+      </div>
+
+      <!-- Quick Preset Buttons -->
+      <div class="flex flex-wrap items-center gap-2">
+        <span class="text-xs font-bold text-slate-500 uppercase tracking-wider mr-1">ปุ่มทางลัดทดลอง:</span>
+        <button onclick="setPreset('perpendicular')" class="px-3 py-1.5 rounded-xl text-xs font-medium bg-slate-100 hover:bg-slate-200 text-slate-800 transition flex items-center gap-1.5">
+          <i class="fa-solid fa-square-full text-[9px] text-indigo-600"></i> ตั้งฉาก ($90^\circ$, Dot=0)
+        </button>
+        <button onclick="setPreset('parallel')" class="px-3 py-1.5 rounded-xl text-xs font-medium bg-slate-100 hover:bg-slate-200 text-slate-800 transition flex items-center gap-1.5">
+          <i class="fa-solid fa-arrow-right text-[10px] text-emerald-600"></i> ทางเดียวกัน ($0^\circ$, Dot>0)
+        </button>
+        <button onclick="setPreset('opposite')" class="px-3 py-1.5 rounded-xl text-xs font-medium bg-slate-100 hover:bg-slate-200 text-slate-800 transition flex items-center gap-1.5">
+          <i class="fa-solid fa-arrows-left-right text-[10px] text-rose-600"></i> ตรงข้าม ($180^\circ$, Dot<0)
+        </button>
+        <button onclick="setPreset('angle60')" class="px-3 py-1.5 rounded-xl text-xs font-medium bg-slate-100 hover:bg-slate-200 text-slate-800 transition flex items-center gap-1.5">
+          <i class="fa-solid fa-chart-pie text-[10px] text-amber-600"></i> มุม $60^\circ$ ($\cos60^\circ=0.5$)
+        </button>
+      </div>
+
+      <!-- Simulator Main Grid -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+        
+        <!-- Left: Canvas Area (7 Cols) -->
+        <div class="lg:col-span-7 flex flex-col space-y-4">
+          <div class="relative w-full aspect-square bg-slate-950 rounded-2xl overflow-hidden shadow-inner border border-slate-800 canvas-container">
+            <!-- 2D Canvas -->
+            <canvas id="dotCanvas2D" class="w-full h-full block cursor-crosshair"></canvas>
+            <!-- 3D Container -->
+            <div id="dotCanvas3D" class="w-full h-full hidden"></div>
+
+            <!-- Visualizer Badges -->
+            <div class="absolute top-3 left-3 flex flex-wrap gap-2 pointer-events-none">
+              <span id="canvasBadge" class="bg-slate-900/85 backdrop-blur text-xs px-2.5 py-1 rounded-md text-slate-300 font-mono border border-slate-700/60 flex items-center gap-2">
+                <span class="w-2.5 h-2.5 rounded-full bg-emerald-400"></span> $\mathbf{u}$ (เขียว), 
+                <span class="w-2.5 h-2.5 rounded-full bg-blue-400"></span> $\mathbf{v}$ (ฟ้า)
+              </span>
+            </div>
+
+            <!-- Projection Toggle & Reset -->
+            <div class="absolute bottom-3 left-3 flex items-center gap-2">
+              <button id="btnToggleProj" onclick="toggleProjection()" class="bg-amber-600/90 hover:bg-amber-600 text-white px-3 py-1.5 rounded-xl text-xs backdrop-blur font-medium shadow-md transition flex items-center gap-1.5">
+                <i class="fa-solid fa-eye text-xs"></i> <span>แสดงการฉาย $\operatorname{proj}_{\mathbf{v}}\mathbf{u}$</span>
+              </button>
+            </div>
+
+            <div class="absolute bottom-3 right-3 flex items-center gap-2">
+              <button onclick="resetSimulator()" title="รีเซ็ตพิกัดเริ่มต้น" class="bg-slate-900/80 hover:bg-slate-800 text-slate-300 p-2 rounded-lg text-xs backdrop-blur border border-slate-700 transition">
+                <i class="fa-solid fa-rotate-left"></i>
+              </button>
+            </div>
+          </div>
+
+          <!-- Sliders for Vector Coordinates -->
+          <div class="bg-slate-50 p-4 sm:p-5 rounded-2xl border border-slate-200 space-y-4">
+            
+            <!-- Vector u controls -->
+            <div class="p-3.5 bg-white rounded-xl border border-emerald-200 shadow-sm space-y-2">
+              <div class="flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                  <span class="w-3 h-3 rounded-full bg-emerald-500"></span>
+                  <span class="text-sm font-bold text-emerald-800 font-heading">เวกเตอร์ $\mathbf{u}$</span>
+                </div>
+                <span id="coordsDisplayU" class="font-mono text-xs text-slate-600 bg-slate-100 px-2 py-0.5 rounded">$\mathbf{u} = \langle 3, 4 \rangle$</span>
+              </div>
+              <div class="grid grid-cols-2 sm:grid-cols-3 gap-3 pt-1">
+                <div>
+                  <label class="text-xs text-slate-500 flex justify-between">u_x: <span id="val_ux" class="font-mono font-bold text-slate-700">3</span></label>
+                  <input type="range" id="slider_ux" min="-8" max="8" step="1" value="3" class="w-full h-1.5 bg-slate-200 rounded cursor-pointer" oninput="updateFromSliders()">
+                </div>
+                <div>
+                  <label class="text-xs text-slate-500 flex justify-between">u_y: <span id="val_uy" class="font-mono font-bold text-slate-700">4</span></label>
+                  <input type="range" id="slider_uy" min="-8" max="8" step="1" value="4" class="w-full h-1.5 bg-slate-200 rounded cursor-pointer" oninput="updateFromSliders()">
+                </div>
+                <div id="group_uz" class="hidden">
+                  <label class="text-xs text-slate-500 flex justify-between">u_z: <span id="val_uz" class="font-mono font-bold text-slate-700">0</span></label>
+                  <input type="range" id="slider_uz" min="-8" max="8" step="1" value="0" class="w-full h-1.5 bg-slate-200 rounded cursor-pointer" oninput="updateFromSliders()">
+                </div>
+              </div>
+            </div>
+
+            <!-- Vector v controls -->
+            <div class="p-3.5 bg-white rounded-xl border border-blue-200 shadow-sm space-y-2">
+              <div class="flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                  <span class="w-3 h-3 rounded-full bg-blue-500"></span>
+                  <span class="text-sm font-bold text-blue-800 font-heading">เวกเตอร์ $\mathbf{v}$</span>
+                </div>
+                <span id="coordsDisplayV" class="font-mono text-xs text-slate-600 bg-slate-100 px-2 py-0.5 rounded">$\mathbf{v} = \langle 5, 0 \rangle$</span>
+              </div>
+              <div class="grid grid-cols-2 sm:grid-cols-3 gap-3 pt-1">
+                <div>
+                  <label class="text-xs text-slate-500 flex justify-between">v_x: <span id="val_vx" class="font-mono font-bold text-slate-700">5</span></label>
+                  <input type="range" id="slider_vx" min="-8" max="8" step="1" value="5" class="w-full h-1.5 bg-slate-200 rounded cursor-pointer" oninput="updateFromSliders()">
+                </div>
+                <div>
+                  <label class="text-xs text-slate-500 flex justify-between">v_y: <span id="val_vy" class="font-mono font-bold text-slate-700">0</span></label>
+                  <input type="range" id="slider_vy" min="-8" max="8" step="1" value="0" class="w-full h-1.5 bg-slate-200 rounded cursor-pointer" oninput="updateFromSliders()">
+                </div>
+                <div id="group_vz" class="hidden">
+                  <label class="text-xs text-slate-500 flex justify-between">v_z: <span id="val_vz" class="font-mono font-bold text-slate-700">0</span></label>
+                  <input type="range" id="slider_vz" min="-8" max="8" step="1" value="0" class="w-full h-1.5 bg-slate-200 rounded cursor-pointer" oninput="updateFromSliders()">
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- Right: Live Mathematical Dashboard (5 Cols) -->
+        <div class="lg:col-span-5 flex flex-col space-y-4">
+          
+          <div class="bg-indigo-950 text-white p-5 rounded-2xl shadow-sm border border-indigo-900/60">
+            <h3 class="text-base font-bold font-heading text-indigo-200 mb-1 flex items-center gap-2">
+              <i class="fa-solid fa-calculator text-indigo-400"></i> แผงวิเคราะห์ผลคูณและมุมแบบสด
+            </h3>
+            <p class="text-xs text-indigo-300/80">คำนวณค่า Dot Product, มุม $\theta$ และเวกเตอร์การฉายแบบทันที</p>
+          </div>
+
+          <!-- 1. Dot Product Value & Breakdown -->
+          <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm space-y-2">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider">1. ค่าผลคูณเชิงสเกลาร์ ($\mathbf{u} \cdot \mathbf{v}$)</span>
+              <span id="badgeDotStatus" class="text-xs font-bold px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800">มุมแหลม (> 0)</span>
+            </div>
+            <div id="mathDotFormula" class="p-3 bg-slate-50 rounded-lg text-center font-mono text-base text-slate-900 font-semibold">
+              <!-- Dot formula rendered -->
+            </div>
+            <div id="mathDotGeometric" class="p-2 text-xs font-mono text-center text-slate-600 bg-slate-100/70 rounded">
+              <!-- Geometric formula -->
+            </div>
+          </div>
+
+          <!-- 2. Angle Calculation -->
+          <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm space-y-2">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider">2. มุมระหว่างเวกเตอร์ ($\theta$)</span>
+              <span id="badgeAngleDeg" class="text-xs font-mono font-bold px-2.5 py-0.5 rounded bg-indigo-100 text-indigo-800">53.1°</span>
+            </div>
+            <div id="mathAngleCalc" class="p-3 bg-slate-50 rounded-lg text-xs sm:text-sm text-center text-slate-800">
+              <!-- Step by step angle -->
+            </div>
+          </div>
+
+          <!-- 3. Magnitudes -->
+          <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm space-y-2">
+            <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider">3. ขนาดของเวกเตอร์ (Magnitudes)</span>
+            <div class="grid grid-cols-2 gap-2 text-xs text-slate-700">
+              <div class="p-2.5 bg-slate-50 rounded-lg border border-slate-200 flex flex-col">
+                <span class="text-emerald-700 font-semibold">$\|\mathbf{u}\|$</span>
+                <span id="val_mag_u" class="font-mono text-sm font-bold text-slate-900 mt-1">5.000</span>
+              </div>
+              <div class="p-2.5 bg-slate-50 rounded-lg border border-slate-200 flex flex-col">
+                <span class="text-blue-700 font-semibold">$\|\mathbf{v}\|$</span>
+                <span id="val_mag_v" class="font-mono text-sm font-bold text-slate-900 mt-1">5.000</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- 4. Projections (comp_v(u) & proj_v(u)) -->
+          <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm space-y-2">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider">4. การฉายเวกเตอร์ (Vector Projections)</span>
+              <span class="text-[11px] font-mono text-amber-600 bg-amber-50 px-2 py-0.5 rounded border border-amber-200">บนแนว $\mathbf{v}$</span>
+            </div>
+            <div id="mathScalarProj" class="p-2.5 bg-slate-50 rounded-lg text-xs text-slate-800 font-mono">
+              <!-- Scalar Projection -->
+            </div>
+            <div id="mathVectorProj" class="p-2.5 bg-amber-50/60 rounded-lg text-xs text-amber-950 font-mono border border-amber-100">
+              <!-- Vector Projection -->
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- 5. คำถามนำเพื่อค้นพบ (Guided Discovery Questions) -->
+    <section class="space-y-4">
+      <div class="flex items-center gap-2 border-b border-slate-200 pb-3">
+        <i class="fa-solid fa-lightbulb text-amber-500 text-xl"></i>
+        <h2 class="text-2xl font-bold text-slate-900 font-heading">คำถามนำเพื่อค้นพบ (Guided Discovery)</h2>
+      </div>
+      <p class="text-slate-600 text-sm">ทดลองตั้งสมมติฐานและสังเกตจากแบบจำลอง แล้วคลิกเพื่อเปิดดูแนวคิดและคำอธิบายเชิงคณิตศาสตร์</p>
+
+      <div class="space-y-3 pt-2">
+        <!-- Q1 -->
+        <div class="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm transition">
+          <button onclick="toggleDiscovery(1)" class="w-full text-left p-4 sm:p-5 flex items-center justify-between hover:bg-slate-50/70 transition">
+            <span class="font-semibold text-slate-800 font-heading text-sm sm:text-base flex items-center gap-3">
+              <span class="w-7 h-7 rounded-full bg-indigo-100 text-indigo-700 flex items-center justify-center text-xs font-bold">1</span>
+              เหตุใดผลคูณเชิงสเกลาร์ของเวกเตอร์สองเวกเตอร์จึงเป็นจำนวนจริง ไม่ใช่เวกเตอร์?
+            </span>
+            <i id="disc-icon-1" class="fa-solid fa-chevron-down text-slate-400 transform transition-transform"></i>
+          </button>
+          <div id="disc-ans-1" class="hidden px-5 pb-5 text-slate-600 text-sm leading-relaxed border-t border-slate-100 pt-3 bg-indigo-50/30">
+            <p class="font-semibold text-indigo-900 mb-1">คำตอบ: เพราะ Dot Product ถูกนิยามขึ้นเพื่อวัด "ระดับความสอดคล้องหรือทับซ้อนกันของทิศทาง" (Degree of Alignment)</p>
+            <p>
+              ในเชิงกายภาพ ผลคูณเชิงสเกลาร์ไม่ได้สร้างทิศทางใหม่เหมือน Cross Product แต่วัดว่าเวกเตอร์หนึ่งมีองค์ประกอบทอดยาวไปในทิศทางของอีกเวกเตอร์หนึ่งมากน้อยเพียงใด 
+              โดยคิดจาก $\operatorname{comp}_{\mathbf{v}}\mathbf{u} = \|\mathbf{u}\|\cos\theta$ คูณกับขนาด $\|\mathbf{v}\|$ จึงได้ผลลัพธ์เป็นสเกลาร์ที่เป็นตัวเลขเดี่ยว (เช่น ในฟิสิกส์ งาน $W = \mathbf{F}\cdot\mathbf{d}$ เป็นปริมาณสเกลาร์ที่มีหน่วยเป็นจูล)
+            </p>
+          </div>
+        </div>
+
+        <!-- Q2 -->
+        <div class="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm transition">
+          <button onclick="toggleDiscovery(2)" class="w-full text-left p-4 sm:p-5 flex items-center justify-between hover:bg-slate-50/70 transition">
+            <span class="font-semibold text-slate-800 font-heading text-sm sm:text-base flex items-center gap-3">
+              <span class="w-7 h-7 rounded-full bg-indigo-100 text-indigo-700 flex items-center justify-center text-xs font-bold">2</span>
+              เมื่อเวกเตอร์สองเวกเตอร์ตั้งฉากกัน ผลคูณเชิงสเกลาร์มีค่าเท่าใด เพราะเหตุใด?
+            </span>
+            <i id="disc-icon-2" class="fa-solid fa-chevron-down text-slate-400 transform transition-transform"></i>
+          </button>
+          <div id="disc-ans-2" class="hidden px-5 pb-5 text-slate-600 text-sm leading-relaxed border-t border-slate-100 pt-3 bg-indigo-50/30">
+            <p class="font-semibold text-indigo-900 mb-1">คำตอบ: มีค่าเท่ากับ 0 เสมอ ($\mathbf{u} \cdot \mathbf{v} = 0$)</p>
+            <p>
+              เพราะเมื่อเวกเตอร์ตั้งฉากกัน มุมระหว่างเวกเตอร์คือ $\theta = 90^\circ$ ซึ่ง $\cos(90^\circ) = 0$ ส่งผลให้ 
+              $\mathbf{u} \cdot \mathbf{v} = \|\mathbf{u}\|\|\mathbf{v}\|\cos(90^\circ) = 0$ 
+              ในเชิงเรขาคณิต หมายความว่า เวกเตอร์หนึ่งไม่มีเงาหรือองค์ประกอบใดๆ ทอดไปตามแนวของอีกเวกเตอร์หนึ่งเลย คุณสมบัตินี้จึงถูกใช้เป็น <strong>เกณฑ์ตรวจสอบการตั้งฉาก (Orthogonality Test)</strong> ที่สำคัญที่สุดในพีชคณิตเชิงเส้น
+            </p>
+          </div>
+        </div>
+
+        <!-- Q3 -->
+        <div class="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm transition">
+          <button onclick="toggleDiscovery(3)" class="w-full text-left p-4 sm:p-5 flex items-center justify-between hover:bg-slate-50/70 transition">
+            <span class="font-semibold text-slate-800 font-heading text-sm sm:text-base flex items-center gap-3">
+              <span class="w-7 h-7 rounded-full bg-indigo-100 text-indigo-700 flex items-center justify-center text-xs font-bold">3</span>
+              ผลคูณเชิงสเกลาร์มีความสัมพันธ์กับมุมระหว่างเวกเตอร์อย่างไร?
+            </span>
+            <i id="disc-icon-3" class="fa-solid fa-chevron-down text-slate-400 transform transition-transform"></i>
+          </button>
+          <div id="disc-ans-3" class="hidden px-5 pb-5 text-slate-600 text-sm leading-relaxed border-t border-slate-100 pt-3 bg-indigo-50/30">
+            <p class="font-semibold text-indigo-900 mb-1">คำตอบ: เครื่องหมายและขนาดของผลคูณขึ้นอยู่กับค่า $\cos\theta$ ของมุมระหว่างเวกเตอร์โดยตรง</p>
+            <p>
+              เนื่องจากขนาด $\|\mathbf{u}\|$ และ $\|\mathbf{v}\|$ ไม่ติดลบเสมอ เครื่องหมายของ $\mathbf{u} \cdot \mathbf{v}$ จึงถูกกำหนดโดย $\cos\theta$:
+              <br>&bull; <strong>มุมแหลม ($\theta < 90^\circ$):</strong> $\cos\theta > 0 \implies \mathbf{u}\cdot\mathbf{v} > 0$ (ชี้ไปทางเดียวกันบางส่วน)
+              <br>&bull; <strong>มุมฉาก ($\theta = 90^\circ$):</strong> $\cos\theta = 0 \implies \mathbf{u}\cdot\mathbf{v} = 0$
+              <br>&bull; <strong>มุมป้าน ($\theta > 90^\circ$):</strong> $\cos\theta < 0 \implies \mathbf{u}\cdot\mathbf{v} < 0$ (ชี้สวนทางกันบางส่วน)
+              <br>&bull; <strong>ขนานทางเดียวกัน:</strong> ได้ค่าสูงสุดคือ $\|\mathbf{u}\|\|\mathbf{v}\|$ และถ้าสวนทางกันแท้จริงจะได้ค่าน้อยสุดคือ $-\|\mathbf{u}\|\|\mathbf{v}\|$
+            </p>
+          </div>
+        </div>
+
+        <!-- Q4 -->
+        <div class="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm transition">
+          <button onclick="toggleDiscovery(4)" class="w-full text-left p-4 sm:p-5 flex items-center justify-between hover:bg-slate-50/70 transition">
+            <span class="font-semibold text-slate-800 font-heading text-sm sm:text-base flex items-center gap-3">
+              <span class="w-7 h-7 rounded-full bg-indigo-100 text-indigo-700 flex items-center justify-center text-xs font-bold">4</span>
+              การฉายเวกเตอร์ช่วยอธิบายความสัมพันธ์ระหว่างเวกเตอร์สองเวกเตอร์ได้อย่างไร?
+            </span>
+            <i id="disc-icon-4" class="fa-solid fa-chevron-down text-slate-400 transform transition-transform"></i>
+          </button>
+          <div id="disc-ans-4" class="hidden px-5 pb-5 text-slate-600 text-sm leading-relaxed border-t border-slate-100 pt-3 bg-indigo-50/30">
+            <p class="font-semibold text-indigo-900 mb-1">คำตอบ: ช่วยแยกเวกเตอร์ออกเป็น 2 ส่วนที่ตั้งฉากกัน คือส่วนที่ขนานกับแนวเป้าหมาย และส่วนที่ตั้งฉากกับแนวเป้าหมาย</p>
+            <p>
+              การฉายเวกเตอร์ $\operatorname{proj}_{\mathbf{v}}\mathbf{u}$ เสมือนการทอดเงาของ $\mathbf{u}$ ลงบนแนวเส้นตรงของ $\mathbf{v}$ 
+              สิ่งนี้ทำให้เราสามารถแตกเวกเตอร์ $\mathbf{u}$ ออกเป็นสององค์ประกอบ คือ $\mathbf{u} = \mathbf{u}_{\parallel} + \mathbf{u}_{\perp}$ โดยที่ $\mathbf{u}_{\parallel} = \operatorname{proj}_{\mathbf{v}}\mathbf{u}$ และ $\mathbf{u}_{\perp} = \mathbf{u} - \operatorname{proj}_{\mathbf{v}}\mathbf{u}$ ซึ่งมีประโยชน์มหาศาลในการคำนวณแรงเสียดทาน แรงดึงดูดบนพื้นเอียง และการแปลงพิกัดใน 3D Computer Graphics
+            </p>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- 6. แบบฝึกหัดสำหรับนักศึกษา (Self-Check Practice) -->
+    <section class="space-y-4">
+      <div class="flex items-center justify-between border-b border-slate-200 pb-3">
+        <div class="flex items-center gap-2">
+          <i class="fa-solid fa-square-check text-emerald-600 text-xl"></i>
+          <h2 class="text-2xl font-bold text-slate-900 font-heading">แบบฝึกหัดสำหรับนักศึกษา</h2>
+        </div>
+        <span class="text-xs text-slate-500 font-medium">ทดสอบความเข้าใจ 4 ข้อ</span>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-5 pt-2">
+
+        <!-- Question 1 -->
+        <div class="bg-white p-5 sm:p-6 rounded-2xl border border-slate-200/90 shadow-sm flex flex-col justify-between">
+          <div class="space-y-3">
+            <div class="flex items-center justify-between">
+              <span class="px-2.5 py-1 text-xs font-bold rounded-lg bg-indigo-50 text-indigo-700">ข้อที่ 1</span>
+              <span class="text-xs text-slate-400">การหาผลคูณสเกลาร์</span>
+            </div>
+            <p class="text-slate-800 font-medium text-sm leading-relaxed">
+              กำหนด $\mathbf{u} = \langle 2, 3 \rangle$ และ $\mathbf{v} = \langle 4, 1 \rangle$ จงหา $\mathbf{u} \cdot \mathbf{v}$
+            </p>
+            
+            <div class="flex items-center gap-2 pt-1">
+              <input type="text" id="input_ex1" placeholder="กรอกตัวเลขผลลัพธ์ เช่น 11" class="w-full text-xs sm:text-sm px-3.5 py-2 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 font-mono">
+              <button onclick="checkAnswer(1)" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold rounded-xl transition shrink-0">
+                ตรวจ
+              </button>
+            </div>
+            <div id="feedback_1" class="text-xs hidden"></div>
+          </div>
+
+          <div class="mt-4 pt-3 border-t border-slate-100">
+            <button onclick="toggleSolution(1)" class="text-xs text-indigo-600 hover:text-indigo-800 font-medium flex items-center gap-1.5">
+              <i class="fa-solid fa-eye text-xs"></i> แสดง/ซ่อนวิธีทำอย่างละเอียด
+            </button>
+            <div id="solution_1" class="hidden mt-2 p-3 bg-slate-50 rounded-xl text-xs text-slate-700 leading-relaxed font-mono">
+              <p>$\mathbf{u} \cdot \mathbf{v} = u_1 v_1 + u_2 v_2$</p>
+              <p>$\mathbf{u} \cdot \mathbf{v} = (2)(4) + (3)(1) = 8 + 3 = 11$</p>
+              <p class="text-emerald-700 font-bold mt-1">คำตอบคือ 11</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Question 2 -->
+        <div class="bg-white p-5 sm:p-6 rounded-2xl border border-slate-200/90 shadow-sm flex flex-col justify-between">
+          <div class="space-y-3">
+            <div class="flex items-center justify-between">
+              <span class="px-2.5 py-1 text-xs font-bold rounded-lg bg-indigo-50 text-indigo-700">ข้อที่ 2</span>
+              <span class="text-xs text-slate-400">การหามุมระหว่างเวกเตอร์</span>
+            </div>
+            <p class="text-slate-800 font-medium text-sm leading-relaxed">
+              จงหามุมระหว่าง $\mathbf{a} = \langle 1, 2 \rangle$ และ $\mathbf{b} = \langle 2, -1 \rangle$ (หน่วยเป็นองศา)
+            </p>
+            
+            <div class="flex items-center gap-2 pt-1">
+              <input type="text" id="input_ex2" placeholder="กรอกมุม เช่น 90" class="w-full text-xs sm:text-sm px-3.5 py-2 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 font-mono">
+              <button onclick="checkAnswer(2)" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold rounded-xl transition shrink-0">
+                ตรวจ
+              </button>
+            </div>
+            <div id="feedback_2" class="text-xs hidden"></div>
+          </div>
+
+          <div class="mt-4 pt-3 border-t border-slate-100">
+            <button onclick="toggleSolution(2)" class="text-xs text-indigo-600 hover:text-indigo-800 font-medium flex items-center gap-1.5">
+              <i class="fa-solid fa-eye text-xs"></i> แสดง/ซ่อนวิธีทำอย่างละเอียด
+            </button>
+            <div id="solution_2" class="hidden mt-2 p-3 bg-slate-50 rounded-xl text-xs text-slate-700 leading-relaxed font-mono">
+              <p>$\mathbf{a} \cdot \mathbf{b} = (1)(2) + (2)(-1) = 2 - 2 = 0$</p>
+              <p>$\cos\theta = \frac{\mathbf{a} \cdot \mathbf{b}}{\|\mathbf{a}\|\|\mathbf{b}\|} = \frac{0}{\sqrt{5}\sqrt{5}} = 0$</p>
+              <p>$\theta = \arccos(0) = 90^\circ$</p>
+              <p class="text-emerald-700 font-bold mt-1">คำตอบคือ 90 องศา (เวกเตอร์ตั้งฉากกัน)</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Question 3 -->
+        <div class="bg-white p-5 sm:p-6 rounded-2xl border border-slate-200/90 shadow-sm flex flex-col justify-between">
+          <div class="space-y-3">
+            <div class="flex items-center justify-between">
+              <span class="px-2.5 py-1 text-xs font-bold rounded-lg bg-indigo-50 text-indigo-700">ข้อที่ 3</span>
+              <span class="text-xs text-slate-400">ตรวจสอบการตั้งฉาก</span>
+            </div>
+            <p class="text-slate-800 font-medium text-sm leading-relaxed">
+              จงตรวจสอบว่า $\mathbf{u} = \langle 3, 4 \rangle$ และ $\mathbf{v} = \langle 4, -3 \rangle$ ตั้งฉากกันหรือไม่
+            </p>
+            
+            <div class="flex items-center gap-2 pt-1">
+              <input type="text" id="input_ex3" placeholder="พิมพ์ 'ตั้งฉาก' หรือ 'ไม่ตั้งฉาก'" class="w-full text-xs sm:text-sm px-3.5 py-2 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 font-mono">
+              <button onclick="checkAnswer(3)" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold rounded-xl transition shrink-0">
+                ตรวจ
+              </button>
+            </div>
+            <div id="feedback_3" class="text-xs hidden"></div>
+          </div>
+
+          <div class="mt-4 pt-3 border-t border-slate-100">
+            <button onclick="toggleSolution(3)" class="text-xs text-indigo-600 hover:text-indigo-800 font-medium flex items-center gap-1.5">
+              <i class="fa-solid fa-eye text-xs"></i> แสดง/ซ่อนวิธีทำอย่างละเอียด
+            </button>
+            <div id="solution_3" class="hidden mt-2 p-3 bg-slate-50 rounded-xl text-xs text-slate-700 leading-relaxed font-mono">
+              <p>คำนวณ Dot Product:</p>
+              <p>$\mathbf{u} \cdot \mathbf{v} = (3)(4) + (4)(-3) = 12 - 12 = 0$</p>
+              <p>เนื่องจาก $\mathbf{u} \cdot \mathbf{v} = 0$ จึงสรุปได้ว่าเวกเตอร์ทั้งสองตั้งฉากกัน</p>
+              <p class="text-emerald-700 font-bold mt-1">คำตอบคือ ตั้งฉากกัน</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Question 4 -->
+        <div class="bg-white p-5 sm:p-6 rounded-2xl border border-slate-200/90 shadow-sm flex flex-col justify-between">
+          <div class="space-y-3">
+            <div class="flex items-center justify-between">
+              <span class="px-2.5 py-1 text-xs font-bold rounded-lg bg-indigo-50 text-indigo-700">ข้อที่ 4</span>
+              <span class="text-xs text-slate-400">การฉายเชิงเวกเตอร์</span>
+            </div>
+            <p class="text-slate-800 font-medium text-sm leading-relaxed">
+              จงหาการฉายเชิงเวกเตอร์ของ $\mathbf{u} = \langle 3, 4 \rangle$ บน $\mathbf{v} = \langle 1, 0 \rangle$
+            </p>
+            
+            <div class="flex items-center gap-2 pt-1">
+              <input type="text" id="input_ex4" placeholder="เช่น 3, 0 หรือ <3, 0>" class="w-full text-xs sm:text-sm px-3.5 py-2 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 font-mono">
+              <button onclick="checkAnswer(4)" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold rounded-xl transition shrink-0">
+                ตรวจ
+              </button>
+            </div>
+            <div id="feedback_4" class="text-xs hidden"></div>
+          </div>
+
+          <div class="mt-4 pt-3 border-t border-slate-100">
+            <button onclick="toggleSolution(4)" class="text-xs text-indigo-600 hover:text-indigo-800 font-medium flex items-center gap-1.5">
+              <i class="fa-solid fa-eye text-xs"></i> แสดง/ซ่อนวิธีทำอย่างละเอียด
+            </button>
+            <div id="solution_4" class="hidden mt-2 p-3 bg-slate-50 rounded-xl text-xs text-slate-700 leading-relaxed font-mono">
+              <p>$\mathbf{u} \cdot \mathbf{v} = (3)(1) + (4)(0) = 3$</p>
+              <p>$\|\mathbf{v}\|^2 = 1^2 + 0^2 = 1$</p>
+              <p>$\operatorname{proj}_{\mathbf{v}}\mathbf{u} = \left(\frac{\mathbf{u} \cdot \mathbf{v}}{\|\mathbf{v}\|^2}\right)\mathbf{v} = \left(\frac{3}{1}\right)\langle 1, 0 \rangle = \mathbf{\langle 3, 0 \rangle}$ หรือ $3\mathbf{i}$</p>
+              <p class="text-emerald-700 font-bold mt-1">คำตอบคือ $\langle 3, 0 \rangle$</p>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Interactive Logic & Vector Visualization Script -->
+  <script>
+    // Global State
+    let currentDim = '2D';
+    let showProjection = true;
+    const state = {
+      ux: 3, uy: 4, uz: 0,
+      vx: 5, vy: 0, vz: 0
+    };
+
+    // 2D Canvas setup & dragging
+    const canvas2D = document.getElementById('dotCanvas2D');
+    const ctx2D = canvas2D.getContext('2d');
+    let draggingPoint = null; // 'U' or 'V'
+    const GRID_SIZE = 18; // -9 to +9 range
+
+    // 3D Three.js variables
+    let scene3D, camera3D, renderer3D, controls3D;
+    let arrowU_3D, arrowV_3D, arrowProj_3D, dropLine3D, sphereU_3D, sphereV_3D;
+
+    window.onload = function() {
+      initMath();
+      resize2DCanvas();
+      init3DScene();
+      syncUI();
+      renderAll();
+
+      window.addEventListener('resize', () => {
+        resize2DCanvas();
+        if (renderer3D && camera3D) {
+          const container = document.getElementById('dotCanvas3D');
+          camera3D.aspect = container.clientWidth / container.clientHeight;
+          camera3D.updateProjectionMatrix();
+          renderer3D.setSize(container.clientWidth, container.clientHeight);
+        }
+        renderAll();
+      });
+
+      init2DEvents();
+    };
+
+    function initMath() {
+      if (window.renderMathInElement) {
+        renderMathInElement(document.body, {
+          delimiters: [
+            {left: '$$', right: '$$', display: true},
+            {left: '$', right: '$', display: false}
+          ],
+          throwOnError: false
+        });
+      }
+    }
+
+    // Toggle 2D / 3D
+    function switchDim(dim) {
+      currentDim = dim;
+      const b2 = document.getElementById('btnDim2D');
+      const b3 = document.getElementById('btnDim3D');
+      const c2 = document.getElementById('dotCanvas2D');
+      const c3 = document.getElementById('dotCanvas3D');
+      const uzGroup = document.getElementById('group_uz');
+      const vzGroup = document.getElementById('group_vz');
+      const badge = document.getElementById('canvasBadge');
+
+      if (dim === '2D') {
+        b2.className = "px-4 py-2 text-xs sm:text-sm font-semibold rounded-lg bg-white text-indigo-600 shadow-sm transition";
+        b3.className = "px-4 py-2 text-xs sm:text-sm font-medium text-slate-600 hover:text-slate-900 rounded-lg transition";
+        c2.classList.remove('hidden');
+        c3.classList.add('hidden');
+        uzGroup.classList.add('hidden');
+        vzGroup.classList.add('hidden');
+        badge.innerHTML = `<span class="w-2.5 h-2.5 rounded-full bg-emerald-400"></span> u (เขียว), <span class="w-2.5 h-2.5 rounded-full bg-blue-400"></span> v (ฟ้า) — คลิกลากปลายเวกเตอร์ได้`;
+      } else {
+        b3.className = "px-4 py-2 text-xs sm:text-sm font-semibold rounded-lg bg-white text-indigo-600 shadow-sm transition";
+        b2.className = "px-4 py-2 text-xs sm:text-sm font-medium text-slate-600 hover:text-slate-900 rounded-lg transition";
+        c2.classList.add('hidden');
+        c3.classList.remove('hidden');
+        uzGroup.classList.remove('hidden');
+        vzGroup.classList.remove('hidden');
+        badge.innerHTML = `<span class="w-2.5 h-2.5 rounded-full bg-emerald-400"></span> u (เขียว), <span class="w-2.5 h-2.5 rounded-full bg-blue-400"></span> v (ฟ้า) — หมุนมุมมอง 3D ได้อิสระ`;
+
+        const container = document.getElementById('dotCanvas3D');
+        camera3D.aspect = container.clientWidth / container.clientHeight;
+        camera3D.updateProjectionMatrix();
+        renderer3D.setSize(container.clientWidth, container.clientHeight);
+      }
+
+      syncUI();
+      renderAll();
+    }
+
+    function toggleProjection() {
+      showProjection = !showProjection;
+      const btn = document.getElementById('btnToggleProj');
+      if (showProjection) {
+        btn.className = "bg-amber-600/90 hover:bg-amber-600 text-white px-3 py-1.5 rounded-xl text-xs backdrop-blur font-medium shadow-md transition flex items-center gap-1.5";
+        btn.innerHTML = `<i class="fa-solid fa-eye text-xs"></i> <span>แสดงการฉาย proj_v(u)</span>`;
+      } else {
+        btn.className = "bg-slate-900/80 hover:bg-slate-800 text-slate-300 px-3 py-1.5 rounded-xl text-xs backdrop-blur border border-slate-700 transition flex items-center gap-1.5";
+        btn.innerHTML = `<i class="fa-solid fa-eye-slash text-xs"></i> <span>ซ่อนการฉาย</span>`;
+      }
+      renderAll();
+    }
+
+    // Shortcut Presets
+    function setPreset(type) {
+      if (type === 'perpendicular') {
+        // v = (0, 5), u = (5, 0) -> 90 deg, Dot = 0
+        state.ux = 0; state.uy = 5; state.uz = 0;
+        state.vx = 5; state.vy = 0; state.vz = 0;
+      } else if (type === 'parallel') {
+        // parallel same dir
+        state.ux = 4; state.uy = 3; state.uz = 0;
+        state.vx = 6; state.vy = 4.5; state.vz = 0;
+      } else if (type === 'opposite') {
+        // opposite 180 deg
+        state.ux = 4; state.uy = 2; state.uz = 0;
+        state.vx = -4; state.vy = -2; state.vz = 0;
+      } else if (type === 'angle60') {
+        // 60 deg: v along X (6, 0), u with length 6 at 60 deg -> (3, 5.196) -> round to (3, 5)
+        state.vx = 6; state.vy = 0; state.vz = 0;
+        state.ux = 3; state.uy = 5; state.uz = 0;
+      }
+      syncUI();
+      renderAll();
+    }
+
+    function resetSimulator() {
+      state.ux = 3; state.uy = 4; state.uz = 0;
+      state.vx = 5; state.vy = 0; state.vz = 0;
+      syncUI();
+      renderAll();
+    }
+
+    // 2D Canvas setup & Dragging
+    function resize2DCanvas() {
+      const container = canvas2D.parentElement;
+      const dpr = window.devicePixelRatio || 1;
+      canvas2D.width = container.clientWidth * dpr;
+      canvas2D.height = container.clientHeight * dpr;
+      ctx2D.scale(dpr, dpr);
+    }
+
+    function init2DEvents() {
+      const getPos = (e) => {
+        const rect = canvas2D.getBoundingClientRect();
+        const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+        const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+        const xPx = clientX - rect.left;
+        const yPx = clientY - rect.top;
+        const w = rect.width;
+        const h = rect.height;
+        const scaleX = w / GRID_SIZE;
+        const scaleY = h / GRID_SIZE;
+        const wx = Math.round((xPx - w/2) / scaleX);
+        const wy = Math.round((h/2 - yPx) / scaleY);
+        return { wx, wy, xPx, yPx };
+      };
+
+      const handleStart = (e) => {
+        if (currentDim !== '2D') return;
+        const pos = getPos(e);
+        const rect = canvas2D.getBoundingClientRect();
+        const scale = rect.width / GRID_SIZE;
+        const uPxX = rect.width/2 + state.ux * scale;
+        const uPxY = rect.height/2 - state.uy * scale;
+        const vPxX = rect.width/2 + state.vx * scale;
+        const vPxY = rect.height/2 - state.vy * scale;
+
+        const distU = Math.hypot(pos.xPx - uPxX, pos.yPx - uPxY);
+        const distV = Math.hypot(pos.xPx - vPxX, pos.yPx - vPxY);
+
+        if (distU < 25) {
+          draggingPoint = 'U';
+        } else if (distV < 25) {
+          draggingPoint = 'V';
+        }
+      };
+
+      const handleMove = (e) => {
+        if (!draggingPoint || currentDim !== '2D') return;
+        e.preventDefault();
+        const pos = getPos(e);
+        const clampedX = Math.max(-8, Math.min(8, pos.wx));
+        const clampedY = Math.max(-8, Math.min(8, pos.wy));
+
+        if (draggingPoint === 'U') {
+          state.ux = clampedX;
+          state.uy = clampedY;
+        } else if (draggingPoint === 'V') {
+          // Avoid exactly (0,0) for v to avoid division by zero in projections
+          state.vx = (clampedX === 0 && clampedY === 0) ? 1 : clampedX;
+          state.vy = clampedY;
+        }
+        syncUI();
+        renderAll();
+      };
+
+      const handleEnd = () => {
+        draggingPoint = null;
+      };
+
+      canvas2D.addEventListener('mousedown', handleStart);
+      window.addEventListener('mousemove', handleMove);
+      window.addEventListener('mouseup', handleEnd);
+
+      canvas2D.addEventListener('touchstart', handleStart, { passive: false });
+      window.addEventListener('touchmove', handleMove, { passive: false });
+      window.addEventListener('touchend', handleEnd);
+    }
+
+    function draw2D() {
+      const w = canvas2D.clientWidth;
+      const h = canvas2D.clientHeight;
+      ctx2D.clearRect(0, 0, w, h);
+
+      const cx = w / 2;
+      const cy = h / 2;
+      const unit = w / GRID_SIZE;
+
+      // Draw Grid
+      ctx2D.strokeStyle = '#1e293b';
+      ctx2D.lineWidth = 1;
+      for (let i = -8; i <= 8; i++) {
+        const x = cx + i * unit;
+        const y = cy - i * unit;
+        ctx2D.beginPath();
+        ctx2D.moveTo(x, 0); ctx2D.lineTo(x, h);
+        ctx2D.stroke();
+        ctx2D.beginPath();
+        ctx2D.moveTo(0, y); ctx2D.lineTo(w, y);
+        ctx2D.stroke();
+      }
+
+      // Draw Axes
+      ctx2D.strokeStyle = '#475569';
+      ctx2D.lineWidth = 2;
+      ctx2D.beginPath();
+      ctx2D.moveTo(0, cy); ctx2D.lineTo(w, cy);
+      ctx2D.moveTo(cx, 0); ctx2D.lineTo(cx, h);
+      ctx2D.stroke();
+
+      // Axis labels
+      ctx2D.fillStyle = '#64748b';
+      ctx2D.font = '10px JetBrains Mono';
+      ctx2D.fillText('+X', w - 22, cy - 6);
+      ctx2D.fillText('+Y', cx + 6, 16);
+
+      // Coordinates to Pixels
+      const uPx = { x: cx + state.ux * unit, y: cy - state.uy * unit };
+      const vPx = { x: cx + state.vx * unit, y: cy - state.vy * unit };
+
+      // Compute Projection Coordinates
+      const vLenSq = state.vx * state.vx + state.vy * state.vy;
+      const dotProd = state.ux * state.vx + state.uy * state.vy;
+
+      let projPx = null;
+      if (vLenSq > 0.0001) {
+        const factor = dotProd / vLenSq;
+        const projX = factor * state.vx;
+        const projY = factor * state.vy;
+        projPx = { x: cx + projX * unit, y: cy - projY * unit };
+      }
+
+      // Draw Extended line of vector v (direction line) if projection is shown
+      if (showProjection && vLenSq > 0.0001) {
+        ctx2D.strokeStyle = 'rgba(59, 130, 246, 0.2)';
+        ctx2D.lineWidth = 1.5;
+        ctx2D.setLineDash([5, 5]);
+        const extFactor = 3.5;
+        ctx2D.beginPath();
+        ctx2D.moveTo(cx - state.vx * unit * extFactor, cy + state.vy * unit * extFactor);
+        ctx2D.lineTo(cx + state.vx * unit * extFactor, cy - state.vy * unit * extFactor);
+        ctx2D.stroke();
+        ctx2D.setLineDash([]);
+      }
+
+      // Draw Angle Arc between u and v
+      drawAngleArc(ctx2D, cx, cy, state.ux, state.uy, state.vx, state.vy, unit);
+
+      // Draw Vector Projection (Shadow) and perpendicular drop line
+      if (showProjection && projPx) {
+        // Perpendicular dashed line from head of u to proj
+        ctx2D.strokeStyle = '#f59e0b';
+        ctx2D.lineWidth = 1.5;
+        ctx2D.setLineDash([4, 4]);
+        ctx2D.beginPath();
+        ctx2D.moveTo(uPx.x, uPx.y);
+        ctx2D.lineTo(projPx.x, projPx.y);
+        ctx2D.stroke();
+        ctx2D.setLineDash([]);
+
+        // Right angle marker at projection point
+        drawRightAngleSymbol(ctx2D, projPx, uPx, { x: cx, y: cy }, 10);
+
+        // Vector Projection Highlight (Thick Amber arrow)
+        drawArrow(ctx2D, cx, cy, projPx.x, projPx.y, '#f59e0b', 4.5);
+        ctx2D.fillStyle = '#fbbf24';
+        ctx2D.font = 'bold 11px Prompt';
+        ctx2D.fillText(`proj_v(u)`, projPx.x + 8, projPx.y + 16);
+      }
+
+      // Draw Vector u (Green)
+      drawArrow(ctx2D, cx, cy, uPx.x, uPx.y, '#10b981', 4);
+      // Draggable point U
+      ctx2D.fillStyle = '#10b981';
+      ctx2D.beginPath();
+      ctx2D.arc(uPx.x, uPx.y, 7, 0, Math.PI * 2);
+      ctx2D.fill();
+      ctx2D.strokeStyle = '#ffffff';
+      ctx2D.lineWidth = 2;
+      ctx2D.stroke();
+      ctx2D.fillStyle = '#6ee7b7';
+      ctx2D.font = 'bold 12px Prompt';
+      ctx2D.fillText(`u(${state.ux}, ${state.uy})`, uPx.x + 10, uPx.y - 8);
+
+      // Draw Vector v (Blue)
+      drawArrow(ctx2D, cx, cy, vPx.x, vPx.y, '#3b82f6', 4);
+      // Draggable point V
+      ctx2D.fillStyle = '#3b82f6';
+      ctx2D.beginPath();
+      ctx2D.arc(vPx.x, vPx.y, 7, 0, Math.PI * 2);
+      ctx2D.fill();
+      ctx2D.strokeStyle = '#ffffff';
+      ctx2D.lineWidth = 2;
+      ctx2D.stroke();
+      ctx2D.fillStyle = '#93c5fd';
+      ctx2D.font = 'bold 12px Prompt';
+      ctx2D.fillText(`v(${state.vx}, ${state.vy})`, vPx.x + 10, vPx.y - 8);
+
+      // Origin Point
+      ctx2D.fillStyle = '#ffffff';
+      ctx2D.beginPath();
+      ctx2D.arc(cx, cy, 4, 0, Math.PI * 2);
+      ctx2D.fill();
+    }
+
+    function drawAngleArc(ctx, cx, cy, ux, uy, vx, vy, unit) {
+      const magU = Math.hypot(ux, uy);
+      const magV = Math.hypot(vx, vy);
+      if (magU < 0.1 || magV < 0.1) return;
+
+      const angleU = Math.atan2(-uy, ux);
+      const angleV = Math.atan2(-vy, vx);
+
+      let diff = angleU - angleV;
+      while (diff < -Math.PI) diff += 2 * Math.PI;
+      while (diff > Math.PI) diff -= 2 * Math.PI;
+
+      const arcRadius = Math.min(38, Math.min(magU, magV) * unit * 0.45 + 15);
+
+      ctx.beginPath();
+      ctx.strokeStyle = '#a855f7';
+      ctx.lineWidth = 2;
+      if (diff > 0) {
+        ctx.arc(cx, cy, arcRadius, angleV, angleU);
+      } else {
+        ctx.arc(cx, cy, arcRadius, angleU, angleV);
+      }
+      ctx.stroke();
+
+      // Middle angle label
+      const midAngle = angleV + diff / 2;
+      const labelDist = arcRadius + 14;
+      const lx = cx + Math.cos(midAngle) * labelDist;
+      const ly = cy + Math.sin(midAngle) * labelDist;
+      ctx.fillStyle = '#c084fc';
+      ctx.font = 'bold 11px Prompt';
+      ctx.fillText(`θ`, lx - 4, ly + 4);
+    }
+
+    function drawRightAngleSymbol(ctx, pProj, pU, pOrigin, size) {
+      const vFromProjToU = { x: pU.x - pProj.x, y: pU.y - pProj.y };
+      const vFromProjToO = { x: pOrigin.x - pProj.x, y: pOrigin.y - pProj.y };
+
+      const lenU = Math.hypot(vFromProjToU.x, vFromProjToU.y);
+      const lenO = Math.hypot(vFromProjToO.x, vFromProjToO.y);
+      if (lenU < 2 || lenO < 2) return;
+
+      const uUnit = { x: (vFromProjToU.x / lenU) * size, y: (vFromProjToU.y / lenU) * size };
+      const oUnit = { x: (vFromProjToO.x / lenO) * size, y: (vFromProjToO.y / lenO) * size };
+
+      ctx.strokeStyle = '#f59e0b';
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      ctx.moveTo(pProj.x + uUnit.x, pProj.y + uUnit.y);
+      ctx.lineTo(pProj.x + uUnit.x + oUnit.x, pProj.y + uUnit.y + oUnit.y);
+      ctx.lineTo(pProj.x + oUnit.x, pProj.y + oUnit.y);
+      ctx.stroke();
+    }
+
+    function drawArrow(ctx, fx, fy, tx, ty, color, width) {
+      const head = 12;
+      const len = Math.hypot(tx - fx, ty - fy);
+      if (len < 1) return;
+
+      const angle = Math.atan2(ty - fy, tx - fx);
+      ctx.strokeStyle = color;
+      ctx.fillStyle = color;
+      ctx.lineWidth = width;
+
+      ctx.beginPath();
+      ctx.moveTo(fx, fy);
+      ctx.lineTo(tx, ty);
+      ctx.stroke();
+
+      ctx.beginPath();
+      ctx.moveTo(tx, ty);
+      ctx.lineTo(tx - head * Math.cos(angle - Math.PI / 6), ty - head * Math.sin(angle - Math.PI / 6));
+      ctx.lineTo(tx - head * Math.cos(angle + Math.PI / 6), ty - head * Math.sin(angle + Math.PI / 6));
+      ctx.closePath();
+      ctx.fill();
+    }
+
+    // 3D Scene Implementation
+    function init3DScene() {
+      const container = document.getElementById('dotCanvas3D');
+      scene3D = new THREE.Scene();
+      scene3D.background = new THREE.Color(0x020617);
+
+      camera3D = new THREE.PerspectiveCamera(45, container.clientWidth / container.clientHeight, 0.1, 100);
+      camera3D.position.set(14, 12, 16);
+
+      renderer3D = new THREE.WebGLRenderer({ antialias: true });
+      renderer3D.setSize(container.clientWidth, container.clientHeight);
+      renderer3D.setPixelRatio(window.devicePixelRatio || 1);
+      container.appendChild(renderer3D.domElement);
+
+      controls3D = new THREE.OrbitControls(camera3D, renderer3D.domElement);
+      controls3D.enableDamping = true;
+      controls3D.dampingFactor = 0.05;
+
+      const ambient = new THREE.AmbientLight(0xffffff, 0.8);
+      scene3D.add(ambient);
+      const dirLight = new THREE.DirectionalLight(0xffffff, 0.8);
+      dirLight.position.set(10, 20, 15);
+      scene3D.add(dirLight);
+
+      // Grid helper
+      const grid = new THREE.GridHelper(16, 16, 0x475569, 0x1e293b);
+      scene3D.add(grid);
+
+      // Axes helper
+      const axes = new THREE.AxesHelper(9);
+      scene3D.add(axes);
+
+      // Vectors Arrows & Spheres
+      const dir = new THREE.Vector3(1, 0, 0);
+      const origin = new THREE.Vector3(0, 0, 0);
+
+      arrowU_3D = new THREE.ArrowHelper(dir, origin, 1, 0x10b981, 0.8, 0.4);
+      arrowV_3D = new THREE.ArrowHelper(dir, origin, 1, 0x3b82f6, 0.8, 0.4);
+      arrowProj_3D = new THREE.ArrowHelper(dir, origin, 1, 0xf59e0b, 0.6, 0.3);
+
+      scene3D.add(arrowU_3D);
+      scene3D.add(arrowV_3D);
+      scene3D.add(arrowProj_3D);
+
+      // End point spheres
+      const sphGeo = new THREE.SphereGeometry(0.3, 24, 24);
+      sphereU_3D = new THREE.Mesh(sphGeo, new THREE.MeshStandardMaterial({ color: 0x10b981 }));
+      sphereV_3D = new THREE.Mesh(sphGeo, new THREE.MeshStandardMaterial({ color: 0x3b82f6 }));
+      scene3D.add(sphereU_3D);
+      scene3D.add(sphereV_3D);
+
+      // Drop line geometry for projection in 3D
+      const lineMat = new THREE.LineDashedMaterial({ color: 0xf59e0b, dashSize: 0.3, gapSize: 0.2 });
+      const lineGeo = new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(), new THREE.Vector3()]);
+      dropLine3D = new THREE.Line(lineGeo, lineMat);
+      dropLine3D.computeLineDistances();
+      scene3D.add(dropLine3D);
+
+      animate3D();
+    }
+
+    function animate3D() {
+      requestAnimationFrame(animate3D);
+      if (currentDim === '3D' && controls3D) {
+        controls3D.update();
+        renderer3D.render(scene3D, camera3D);
+      }
+    }
+
+    function update3DObjects() {
+      if (!arrowU_3D) return;
+
+      const pU = new THREE.Vector3(state.ux, state.uy, state.uz);
+      const pV = new THREE.Vector3(state.vx, state.vy, state.vz);
+
+      sphereU_3D.position.copy(pU);
+      sphereV_3D.position.copy(pV);
+
+      // Update Arrow U
+      const lenU = pU.length();
+      if (lenU > 0.001) {
+        arrowU_3D.visible = true;
+        arrowU_3D.setDirection(pU.clone().normalize());
+        arrowU_3D.setLength(lenU, Math.min(0.8, lenU * 0.3), Math.min(0.4, lenU * 0.2));
+      } else {
+        arrowU_3D.visible = false;
+      }
+
+      // Update Arrow V
+      const lenV = pV.length();
+      if (lenV > 0.001) {
+        arrowV_3D.visible = true;
+        arrowV_3D.setDirection(pV.clone().normalize());
+        arrowV_3D.setLength(lenV, Math.min(0.8, lenV * 0.3), Math.min(0.4, lenV * 0.2));
+      } else {
+        arrowV_3D.visible = false;
+      }
+
+      // Vector Projection 3D
+      const vLenSq = pV.lengthSq();
+      if (vLenSq > 0.001 && showProjection) {
+        const dot = pU.dot(pV);
+        const factor = dot / vLenSq;
+        const pProj = pV.clone().multiplyScalar(factor);
+
+        const lenProj = pProj.length();
+        if (lenProj > 0.001) {
+          arrowProj_3D.visible = true;
+          arrowProj_3D.setDirection(pProj.clone().normalize());
+          arrowProj_3D.setLength(lenProj, Math.min(0.6, lenProj * 0.3), Math.min(0.3, lenProj * 0.15));
+        } else {
+          arrowProj_3D.visible = false;
+        }
+
+        // Drop line from U to Proj
+        dropLine3D.visible = true;
+        dropLine3D.geometry.setFromPoints([pU, pProj]);
+        dropLine3D.computeLineDistances();
+      } else {
+        arrowProj_3D.visible = false;
+        dropLine3D.visible = false;
+      }
+    }
+
+    // Synchronize UI & Mathematical Dashboard
+    function syncUI() {
+      // Sliders
+      document.getElementById('slider_ux').value = state.ux;
+      document.getElementById('slider_uy').value = state.uy;
+      document.getElementById('slider_uz').value = state.uz;
+      document.getElementById('slider_vx').value = state.vx;
+      document.getElementById('slider_vy').value = state.vy;
+      document.getElementById('slider_vz').value = state.vz;
+
+      document.getElementById('val_ux').textContent = state.ux;
+      document.getElementById('val_uy').textContent = state.uy;
+      document.getElementById('val_uz').textContent = state.uz;
+      document.getElementById('val_vx').textContent = state.vx;
+      document.getElementById('val_vy').textContent = state.vy;
+      document.getElementById('val_vz').textContent = state.vz;
+
+      const is3D = (currentDim === '3D');
+      if (is3D) {
+        document.getElementById('coordsDisplayU').textContent = `u = <${state.ux}, ${state.uy}, ${state.uz}>`;
+        document.getElementById('coordsDisplayV').textContent = `v = <${state.vx}, ${state.vy}, ${state.vz}>`;
+      } else {
+        document.getElementById('coordsDisplayU').textContent = `u = <${state.ux}, ${state.uy}>`;
+        document.getElementById('coordsDisplayV').textContent = `v = <${state.vx}, ${state.vy}>`;
+      }
+
+      updateCalculations();
+    }
+
+    function updateFromSliders() {
+      state.ux = parseFloat(document.getElementById('slider_ux').value);
+      state.uy = parseFloat(document.getElementById('slider_uy').value);
+      state.uz = parseFloat(document.getElementById('slider_uz').value);
+
+      state.vx = parseFloat(document.getElementById('slider_vx').value);
+      state.vy = parseFloat(document.getElementById('slider_vy').value);
+      state.vz = parseFloat(document.getElementById('slider_vz').value);
+
+      syncUI();
+      renderAll();
+    }
+
+    function updateCalculations() {
+      const is3D = (currentDim === '3D');
+      const uz = is3D ? state.uz : 0;
+      const vz = is3D ? state.vz : 0;
+
+      // Magnitudes
+      const magU = Math.hypot(state.ux, state.uy, uz);
+      const magV = Math.hypot(state.vx, state.vy, vz);
+
+      document.getElementById('val_mag_u').textContent = magU.toFixed(3);
+      document.getElementById('val_mag_v').textContent = magV.toFixed(3);
+
+      // Dot Product
+      const termX = state.ux * state.vx;
+      const termY = state.uy * state.vy;
+      const termZ = uz * vz;
+      const dotProd = termX + termY + (is3D ? termZ : 0);
+
+      // Formula Box
+      const dotBox = document.getElementById('mathDotFormula');
+      const dotGeoBox = document.getElementById('mathDotGeometric');
+      const badgeStatus = document.getElementById('badgeDotStatus');
+
+      if (is3D) {
+        dotBox.innerHTML = `$$\\mathbf{u} \\cdot \\mathbf{v} = (${state.ux})(${state.vx}) + (${state.uy})(${state.vy}) + (${uz})(${vz}) = ${dotProd.toFixed(1)}$$`;
+      } else {
+        dotBox.innerHTML = `$$\\mathbf{u} \\cdot \\mathbf{v} = (${state.ux})(${state.vx}) + (${state.uy})(${state.vy}) = ${dotProd.toFixed(1)}$$`;
+      }
+
+      // Angle calculation
+      const angleBadge = document.getElementById('badgeAngleDeg');
+      const angleCalcBox = document.getElementById('mathAngleCalc');
+
+      if (magU < 0.0001 || magV < 0.0001) {
+        badgeStatus.className = "text-xs font-bold px-2.5 py-0.5 rounded-full bg-slate-100 text-slate-600";
+        badgeStatus.textContent = "เวกเตอร์ศูนย์";
+        angleBadge.textContent = "ไม่นิยาม";
+        angleCalcBox.innerHTML = `<span class="text-xs text-slate-500">ไม่สามารถคำนวณมุมได้เนื่องจากมีเวกเตอร์ศูนย์</span>`;
+      } else {
+        let cosTheta = dotProd / (magU * magV);
+        cosTheta = Math.max(-1, Math.min(1, cosTheta)); // clamp numerical error
+        const thetaRad = Math.acos(cosTheta);
+        const thetaDeg = thetaRad * (180 / Math.PI);
+
+        angleBadge.textContent = `${thetaDeg.toFixed(1)}° (${thetaRad.toFixed(2)} rad)`;
+        dotGeoBox.innerHTML = `เชิงเรขาคณิต: $\\|\\mathbf{u}\\|\\|\\mathbf{v}\\|\\cos\\theta = (${magU.toFixed(2)})(${magV.toFixed(2)})(${cosTheta.toFixed(3)}) = ${dotProd.toFixed(1)}$`;
+
+        if (Math.abs(dotProd) < 0.001 || Math.abs(thetaDeg - 90) < 0.1) {
+          badgeStatus.className = "text-xs font-bold px-2.5 py-0.5 rounded-full bg-purple-100 text-purple-800";
+          badgeStatus.textContent = "ตั้งฉากกัน (90°)";
+        } else if (dotProd > 0) {
+          badgeStatus.className = "text-xs font-bold px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800";
+          badgeStatus.textContent = "มุมแหลม (< 90°)";
+        } else {
+          badgeStatus.className = "text-xs font-bold px-2.5 py-0.5 rounded-full bg-rose-100 text-rose-800";
+          badgeStatus.textContent = "มุมป้าน (> 90°)";
+        }
+
+        angleCalcBox.innerHTML = `$$\\cos\\theta = \\frac{${dotProd.toFixed(1)}}{(${magU.toFixed(2)})(${magV.toFixed(2)})} = ${cosTheta.toFixed(3)} \\implies \\theta = ${thetaDeg.toFixed(1)}^\\circ$$`;
+      }
+
+      // Projections
+      const scalarProjBox = document.getElementById('mathScalarProj');
+      const vectorProjBox = document.getElementById('mathVectorProj');
+
+      if (magV < 0.0001) {
+        scalarProjBox.innerHTML = `การฉายสเกลาร์: ไม่สามารถคำนวณได้ (||v|| = 0)`;
+        vectorProjBox.innerHTML = `การฉายเวกเตอร์: ไม่สามารถคำนวณได้`;
+      } else {
+        const compV_u = dotProd / magV;
+        const vLenSq = magV * magV;
+        const factor = dotProd / vLenSq;
+
+        const projX = factor * state.vx;
+        const projY = factor * state.vy;
+        const projZ = is3D ? factor * uz : 0;
+
+        scalarProjBox.innerHTML = `การฉายสเกลาร์: $\\operatorname{comp}_{\\mathbf{v}}\\mathbf{u} = \\frac{\\mathbf{u}\\cdot\\mathbf{v}}{\\|\\mathbf{v}\\|} = \\frac{${dotProd.toFixed(1)}}{${magV.toFixed(2)}} = \\mathbf{${compV_u.toFixed(2)}}$`;
+
+        if (is3D) {
+          vectorProjBox.innerHTML = `$$\\operatorname{proj}_{\\mathbf{v}}\\mathbf{u} = \\left(\\frac{${dotProd.toFixed(1)}}{${vLenSq.toFixed(1)}}\\right)\\mathbf{v} = \\langle ${projX.toFixed(2)},\\, ${projY.toFixed(2)},\\, ${projZ.toFixed(2)} \\rangle$$`;
+        } else {
+          vectorProjBox.innerHTML = `$$\\operatorname{proj}_{\\mathbf{v}}\\mathbf{u} = \\left(\\frac{${dotProd.toFixed(1)}}{${vLenSq.toFixed(1)}}\\right)\\mathbf{v} = \\langle ${projX.toFixed(2)},\\, ${projY.toFixed(2)} \\rangle$$`;
+        }
+      }
+
+      // Re-render KaTeX in the live inspector
+      if (window.renderMathInElement) {
+        renderMathInElement(document.querySelector('.lg\\:col-span-5'), {
+          delimiters: [
+            {left: '$$', right: '$$', display: true},
+            {left: '$', right: '$', display: false}
+          ],
+          throwOnError: false
+        });
+      }
+    }
+
+    function renderAll() {
+      if (currentDim === '2D') {
+        draw2D();
+      } else {
+        update3DObjects();
+      }
+    }
+
+    // Accordion Toggle for Guided Discovery
+    function toggleDiscovery(id) {
+      const ans = document.getElementById(`disc-ans-${id}`);
+      const icon = document.getElementById(`disc-icon-${id}`);
+      if (ans.classList.contains('hidden')) {
+        ans.classList.remove('hidden');
+        icon.style.transform = 'rotate(180deg)';
+      } else {
+        ans.classList.add('hidden');
+        icon.style.transform = 'rotate(0deg)';
+      }
+    }
+
+    // Toggle Practice Solution
+    function toggleSolution(id) {
+      const sol = document.getElementById(`solution_${id}`);
+      sol.classList.toggle('hidden');
+      if (!sol.classList.contains('hidden') && window.renderMathInElement) {
+        renderMathInElement(sol, {
+          delimiters: [
+            {left: '$$', right: '$$', display: true},
+            {left: '$', right: '$', display: false}
+          ],
+          throwOnError: false
+        });
+      }
+    }
+
+    // Check Answers for Practice Exercises
+    function checkAnswer(q) {
+      const input = document.getElementById(`input_ex${q}`).value.trim().replace(/\s+/g, '');
+      const feedback = document.getElementById(`feedback_${q}`);
+      feedback.classList.remove('hidden');
+
+      let isCorrect = false;
+
+      if (q === 1) {
+        // u=(2,3), v=(4,1) -> u.v = 2*4 + 3*1 = 11
+        if (input === '11') isCorrect = true;
+      } else if (q === 2) {
+        // a=(1,2), b=(2,-1) -> dot = 0 -> theta = 90
+        if (input === '90' || input === '90°' || input === 'pi/2') isCorrect = true;
+      } else if (q === 3) {
+        // u=(3,4), v=(4,-3) -> 12-12 = 0 -> ตั้งฉาก
+        if (input.includes('ตั้งฉาก') && !input.includes('ไม่')) isCorrect = true;
+        if (input.toLowerCase() === 'yes' || input === 'จริง' || input === 'ถูก') isCorrect = true;
+      } else if (q === 4) {
+        // proj of (3,4) on (1,0) -> <3,0>
+        if (input.includes('3,0') || input.includes('<3,0>') || input.includes('3i')) isCorrect = true;
+      }
+
+      if (isCorrect) {
+        feedback.className = "text-xs mt-2 text-emerald-700 bg-emerald-50 p-2.5 rounded-lg border border-emerald-200 flex items-center gap-1.5 font-medium";
+        feedback.innerHTML = `<i class="fa-solid fa-circle-check text-emerald-600"></i> ถูกต้องยอดเยี่ยม! การคำนวณถูกต้องสมบูรณ์`;
+      } else {
+        feedback.className = "text-xs mt-2 text-rose-700 bg-rose-50 p-2.5 rounded-lg border border-rose-200 flex items-center gap-1.5 font-medium";
+        feedback.innerHTML = `<i class="fa-solid fa-circle-xmark text-rose-600"></i> ยังไม่ถูกต้อง ลองตรวจสอบการคำนวณหรือกดดู "วิธีทำอย่างละเอียด"`;
+      }
+    }
+  </script>
+</body>
+</html>

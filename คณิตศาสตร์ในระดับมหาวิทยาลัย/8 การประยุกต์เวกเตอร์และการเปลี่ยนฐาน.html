@@ -1,0 +1,2104 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>เรื่องที่ 8: การประยุกต์เวกเตอร์และการเปลี่ยนฐาน & แบบทดสอบวัดผลสัมฤทธิ์</title>
+  
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- Google Fonts: Prompt & Sarabun -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Prompt:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=Sarabun:wght@300;400;500;600&display=swap" rel="stylesheet">
+  
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <!-- MathJax Configuration -->
+  <script>
+    window.MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']],
+        displayMath: [['$$', '$$'], ['\\[', '\\]']]
+      },
+      svg: {
+        fontCache: 'global'
+      }
+    };
+  </script>
+  <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+  <style>
+    body {
+      font-family: 'Sarabun', sans-serif;
+      background-color: #f8fafc;
+      color: #1e293b;
+    }
+    h1, h2, h3, h4, h5, h6, .font-heading {
+      font-family: 'Prompt', sans-serif;
+    }
+  </style>
+</head>
+<body class="min-h-screen bg-slate-50 text-slate-800 antialiased selection:bg-indigo-500 selection:text-white">
+
+  <!-- Main Container (Strict 1,152px width specification) -->
+  <main class="max-w-6xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 space-y-12">
+
+    <!-- Header Section -->
+    <header class="bg-gradient-to-br from-slate-900 via-indigo-950 to-blue-900 text-white rounded-3xl p-6 sm:p-10 shadow-xl relative overflow-hidden">
+      <div class="absolute -right-8 -bottom-10 opacity-10 pointer-events-none">
+        <i class="fa-solid fa-arrows-split-up-and-left text-[260px]"></i>
+      </div>
+      <div class="relative z-10 space-y-4">
+        <h1 class="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-white">
+          เรื่องที่ 8: การประยุกต์เวกเตอร์และการเปลี่ยนฐาน
+        </h1>
+        <p class="text-blue-200 text-base sm:text-lg max-w-3xl font-light">
+          Vector Applications & Change of Basis — การเชื่อมโยงเรขาคณิตสามมิติ เส้นตรง ระนาบ เมทริกซ์การแปลงพิกัด และแบบทดสอบวัดผลสัมฤทธิ์ 30 ข้อ
+        </p>
+
+        <!-- Objectives -->
+        <div class="mt-6 pt-6 border-t border-indigo-800/60 bg-white/5 p-5 rounded-2xl backdrop-blur-sm">
+          <h2 class="text-indigo-200 font-semibold text-sm sm:text-base flex items-center gap-2">
+            <i class="fa-solid fa-bullseye text-amber-400"></i> วัตถุประสงค์การเรียนรู้
+          </h2>
+          <p class="mt-2 text-slate-100 text-sm sm:text-base leading-relaxed">
+            นักศึกษาสามารถประยุกต์ใช้เวกเตอร์ในการแก้ปัญหาทางเรขาคณิต วิเคราะห์สมการเส้นตรงและระนาบ เชื่อมโยงเวกเตอร์กับเมทริกซ์ และคำนวณการเปลี่ยนฐาน (Change of Basis) พร้อมแปลงพิกัดกลับได้อย่างแม่นยำ
+          </p>
+        </div>
+      </div>
+    </header>
+
+    <!-- Navigation Pills -->
+    <nav class="flex flex-wrap gap-2 sm:gap-3 text-xs sm:text-sm font-medium sticky top-4 z-40 bg-slate-50/90 backdrop-blur-md p-2 rounded-2xl border border-slate-200/80 shadow-sm">
+      <a href="#theory" class="px-3.5 py-2 rounded-xl bg-white border border-slate-200 text-slate-700 hover:border-indigo-500 hover:text-indigo-600 transition-all flex items-center gap-1.5 shadow-sm">
+        <i class="fa-solid fa-book-open text-indigo-500"></i> เนื้อหาบทเรียน
+      </a>
+      <a href="#simulator" class="px-3.5 py-2 rounded-xl bg-white border border-slate-200 text-slate-700 hover:border-blue-500 hover:text-blue-600 transition-all flex items-center gap-1.5 shadow-sm">
+        <i class="fa-solid fa-cubes-stacked text-blue-500"></i> แบบจำลองโต้ตอบ (Interactive Lab)
+      </a>
+      <a href="#inquiry" class="px-3.5 py-2 rounded-xl bg-white border border-slate-200 text-slate-700 hover:border-amber-500 hover:text-amber-600 transition-all flex items-center gap-1.5 shadow-sm">
+        <i class="fa-solid fa-lightbulb text-amber-500"></i> คำถามนำเพื่อค้นพบ
+      </a>
+      <a href="#exercises" class="px-3.5 py-2 rounded-xl bg-white border border-slate-200 text-slate-700 hover:border-emerald-500 hover:text-emerald-600 transition-all flex items-center gap-1.5 shadow-sm">
+        <i class="fa-solid fa-pen-ruler text-emerald-500"></i> แบบฝึกหัด
+      </a>
+      <a href="#assessment" class="px-4 py-2 rounded-xl bg-indigo-600 text-white hover:bg-indigo-700 transition-all flex items-center gap-1.5 shadow-sm ml-auto">
+        <i class="fa-solid fa-clipboard-check"></i> แบบทดสอบ 30 ข้อ (K-P-A)
+      </a>
+    </nav>
+
+    <!-- ========================================== -->
+    <!-- SECTION 1: เนื้อหาบทเรียน (Core Concepts) -->
+    <!-- ========================================== -->
+    <section id="theory" class="space-y-6">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-2xl bg-indigo-100 text-indigo-700 flex items-center justify-center font-bold text-lg shadow-sm">
+          <i class="fa-solid fa-layer-group"></i>
+        </div>
+        <div>
+          <h2 class="text-2xl font-bold text-slate-900">1. เนื้อหาบทเรียน (Core Theoretical Concepts)</h2>
+          <p class="text-sm text-slate-500">ทฤษฎีบทการสร้างสมการเรขาคณิตและการแปลงพิกัดเวกเตอร์</p>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        
+        <!-- Topic 1 -->
+        <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex flex-col justify-between">
+          <div>
+            <span class="text-xs font-semibold px-2 py-0.5 rounded bg-blue-100 text-blue-700 font-mono">หัวข้อที่ 1</span>
+            <h3 class="text-base font-bold text-slate-800 mt-2 mb-1.5">สมการเวกเตอร์ของเส้นตรง</h3>
+            <p class="text-xs sm:text-sm text-slate-600 leading-relaxed mb-2">
+              เส้นตรงที่ผ่านจุด $\mathbf{r}_0 = (x_0, y_0, z_0)$ ขนานกับเวกเตอร์ทิศทาง $\mathbf{v} = (a, b, c)$:
+            </p>
+            <div class="p-2 bg-blue-50/70 rounded-xl text-center text-xs sm:text-sm font-mono text-blue-900 border border-blue-100">
+              $\mathbf{r}(t) = \mathbf{r}_0 + t\mathbf{v}$
+            </div>
+          </div>
+          <p class="text-xs text-slate-500 mt-3 pt-2 border-t border-slate-100">$t \in \mathbb{R}$ คือตัวแปรเสริม (Parameter)</p>
+        </div>
+
+        <!-- Topic 2 -->
+        <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex flex-col justify-between">
+          <div>
+            <span class="text-xs font-semibold px-2 py-0.5 rounded bg-indigo-100 text-indigo-700 font-mono">หัวข้อที่ 2</span>
+            <h3 class="text-base font-bold text-slate-800 mt-2 mb-1.5">สมการรูปพาราเมตริก</h3>
+            <p class="text-xs sm:text-sm text-slate-600 leading-relaxed mb-2">
+              แยกตามแต่ละมิติของเส้นตรง และรูปสมมาตร (Symmetric Equations):
+            </p>
+            <div class="p-2 bg-indigo-50/70 rounded-xl text-xs font-mono text-indigo-900 border border-indigo-100 space-y-0.5">
+              <div>$x = x_0 + at$</div>
+              <div>$y = y_0 + bt$</div>
+              <div>$z = z_0 + ct$</div>
+            </div>
+          </div>
+          <p class="text-xs text-slate-500 mt-3 pt-2 border-t border-slate-100">$\frac{x-x_0}{a} = \frac{y-y_0}{b} = \frac{z-z_0}{c} = t$</p>
+        </div>
+
+        <!-- Topic 3 -->
+        <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex flex-col justify-between">
+          <div>
+            <span class="text-xs font-semibold px-2 py-0.5 rounded bg-emerald-100 text-emerald-700 font-mono">หัวข้อที่ 3</span>
+            <h3 class="text-base font-bold text-slate-800 mt-2 mb-1.5">สมการเวกเตอร์ของระนาบ</h3>
+            <p class="text-xs sm:text-sm text-slate-600 leading-relaxed mb-2">
+              ระนาบผ่านจุด $\mathbf{r}_0$ และมีเวกเตอร์ตั้งฉาก (Normal Vector) $\mathbf{n} = (a, b, c)$:
+            </p>
+            <div class="p-2 bg-emerald-50/70 rounded-xl text-center text-xs sm:text-sm font-mono text-emerald-900 border border-emerald-100">
+              $\mathbf{n} \cdot (\mathbf{r} - \mathbf{r}_0) = 0$
+            </div>
+          </div>
+          <p class="text-xs text-slate-500 mt-3 pt-2 border-t border-slate-100">$a(x-x_0) + b(y-y_0) + c(z-z_0) = 0$</p>
+        </div>
+
+        <!-- Topic 4 -->
+        <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex flex-col justify-between">
+          <div>
+            <span class="text-xs font-semibold px-2 py-0.5 rounded bg-amber-100 text-amber-700 font-mono">หัวข้อที่ 4</span>
+            <h3 class="text-base font-bold text-slate-800 mt-2 mb-1.5">เวกเตอร์ตั้งฉากกับระนาบ</h3>
+            <p class="text-xs sm:text-sm text-slate-600 leading-relaxed mb-2">
+              หากทราบเวกเตอร์สองตัว $\mathbf{u}, \mathbf{v}$ ที่ทอดตัวอยู่บนระนาบ จะได้:
+            </p>
+            <div class="p-2 bg-amber-50/70 rounded-xl text-center text-xs sm:text-sm font-mono text-amber-900 border border-amber-100">
+              $\mathbf{n} = \mathbf{u} \times \mathbf{v}$
+            </div>
+          </div>
+          <p class="text-xs text-slate-500 mt-3 pt-2 border-t border-slate-100">ผลคูณไขว้ตั้งฉากกับทุกทิศทางบนระนาบ</p>
+        </div>
+
+        <!-- Topic 5 -->
+        <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex flex-col justify-between">
+          <div>
+            <span class="text-xs font-semibold px-2 py-0.5 rounded bg-purple-100 text-purple-700 font-mono">หัวข้อที่ 5</span>
+            <h3 class="text-base font-bold text-slate-800 mt-2 mb-1.5">การเปลี่ยนฐาน (Change of Basis)</h3>
+            <p class="text-xs sm:text-sm text-slate-600 leading-relaxed mb-2">
+              เวกเตอร์เดียวกัน $\mathbf{x}$ ย่อมเขียนเป็นผลรวมเชิงเส้นเทียบกับฐานที่ต่างกันได้:
+            </p>
+            <div class="p-2 bg-purple-50/70 rounded-xl text-center text-xs sm:text-sm font-mono text-purple-900 border border-purple-100">
+              $[\mathbf{x}]_{\mathcal{B}_1} \longleftrightarrow [\mathbf{x}]_{\mathcal{B}_2}$
+            </div>
+          </div>
+          <p class="text-xs text-slate-500 mt-3 pt-2 border-t border-slate-100">ตัวเวกเตอร์จริงคงเดิม แต่พิกัดเปลี่ยนตามแกนอ้างอิง</p>
+        </div>
+
+        <!-- Topic 6 -->
+        <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex flex-col justify-between">
+          <div>
+            <span class="text-xs font-semibold px-2 py-0.5 rounded bg-rose-100 text-rose-700 font-mono">หัวข้อที่ 6</span>
+            <h3 class="text-base font-bold text-slate-800 mt-2 mb-1.5">เมทริกซ์การเปลี่ยนฐาน $P$</h3>
+            <p class="text-xs sm:text-sm text-slate-600 leading-relaxed mb-2">
+              นำเวกเตอร์ฐานใหม่ $\mathcal{B} = \{\mathbf{b}_1, \dots, \mathbf{b}_n\}$ มาเป็นหลักของเมทริกซ์:
+            </p>
+            <div class="p-2 bg-rose-50/70 rounded-xl text-center text-xs sm:text-sm font-mono text-rose-900 border border-rose-100">
+              $P = [\mathbf{b}_1\ \mathbf{b}_2\ \dots\ \mathbf{b}_n]$
+            </div>
+          </div>
+          <p class="text-xs text-slate-500 mt-3 pt-2 border-t border-slate-100">$\mathbf{x} = P[\mathbf{x}]_\mathcal{B}$ และ $[\mathbf{x}]_\mathcal{B} = P^{-1}\mathbf{x}$</p>
+        </div>
+
+        <!-- Topic 7 -->
+        <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex flex-col justify-between">
+          <div>
+            <span class="text-xs font-semibold px-2 py-0.5 rounded bg-cyan-100 text-cyan-700 font-mono">หัวข้อที่ 7</span>
+            <h3 class="text-base font-bold text-slate-800 mt-2 mb-1.5">พิกัดเวกเตอร์กับเมทริกซ์</h3>
+            <p class="text-xs sm:text-sm text-slate-600 leading-relaxed mb-2">
+              การเปลี่ยนฐานของการแปลงเชิงเส้น $T$ (Matrix Representation):
+            </p>
+            <div class="p-2 bg-cyan-50/70 rounded-xl text-center text-xs sm:text-sm font-mono text-cyan-900 border border-cyan-100">
+              $[T]_\mathcal{B} = P^{-1} [T]_\mathcal{E} P$
+            </div>
+          </div>
+          <p class="text-xs text-slate-500 mt-3 pt-2 border-t border-slate-100">การแปลงคล้ายกัน (Similar Matrices)</p>
+        </div>
+
+        <!-- Topic 8 -->
+        <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex flex-col justify-between">
+          <div>
+            <span class="text-xs font-semibold px-2 py-0.5 rounded bg-teal-100 text-teal-700 font-mono">หัวข้อที่ 8</span>
+            <h3 class="text-base font-bold text-slate-800 mt-2 mb-1.5">การประยุกต์ทางเรขาคณิต & วิทย์</h3>
+            <p class="text-xs sm:text-sm text-slate-600 leading-relaxed mb-2">
+              ระยะทางจากจุดถึงระนาบ, การสะท้อนของแสง, Computer Graphics (3D Cameras), และกลศาสตร์ฟิสิกส์:
+            </p>
+            <div class="p-2 bg-teal-50/70 rounded-xl text-center text-xs sm:text-sm font-mono text-teal-900 border border-teal-100">
+              $D = \frac{|\mathbf{n} \cdot (\mathbf{p}_1 - \mathbf{p}_0)|}{\|\mathbf{n}\|}$
+            </div>
+          </div>
+          <p class="text-xs text-slate-500 mt-3 pt-2 border-t border-slate-100">การคำนวณ Ray-Tracing และทัศนียภาพ 3D</p>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ========================================== -->
+    <!-- SECTION 2: แบบจำลองโต้ตอบ (Interactive Lab) -->
+    <!-- ========================================== -->
+    <section id="simulator" class="space-y-8">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-2xl bg-blue-600 text-white flex items-center justify-center font-bold text-lg shadow-sm">
+          <i class="fa-solid fa-gamepad"></i>
+        </div>
+        <div>
+          <h2 class="text-2xl font-bold text-slate-900">2. แบบจำลองโต้ตอบ (Interactive Simulator Labs)</h2>
+          <p class="text-sm text-slate-500">ทดลองปรับค่าตัวแปรเพื่อสังเกตการเปลี่ยนแปลงสมการ เรขาคณิต และการคำนวณเมทริกซ์เปลี่ยนฐานแบบสด</p>
+        </div>
+      </div>
+
+      <!-- Tab Navigation for Simulators -->
+      <div class="flex gap-2 border-b border-slate-200">
+        <button id="tabLab1Btn" onclick="switchLab(1)" class="px-5 py-2.5 font-bold text-sm border-b-2 border-indigo-600 text-indigo-600 flex items-center gap-2">
+          <i class="fa-solid fa-lines-leaning"></i> Lab 1: เรขาคณิตเส้นตรงและระนาบ
+        </button>
+        <button id="tabLab2Btn" onclick="switchLab(2)" class="px-5 py-2.5 font-medium text-sm text-slate-500 hover:text-indigo-600 flex items-center gap-2">
+          <i class="fa-solid fa-repeat"></i> Lab 2: เมทริกซ์การเปลี่ยนฐาน (Change of Basis)
+        </button>
+      </div>
+
+      <!-- LAB 1: Line & Plane Geometry Simulator -->
+      <div id="lab1Container" class="bg-white border border-slate-200 rounded-3xl p-6 sm:p-8 shadow-sm space-y-6">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+          
+          <!-- Controls -->
+          <div class="lg:col-span-5 space-y-5">
+            <h3 class="font-bold text-slate-800 text-base flex items-center gap-2">
+              <i class="fa-solid fa-sliders text-indigo-500"></i> ปรับพารามิเตอร์ของเส้นตรงและระนาบ
+            </h3>
+
+            <!-- Point P0 -->
+            <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-2">
+              <span class="text-xs font-bold text-slate-700">จุดผ่าน $P_0(x_0, y_0, z_0)$:</span>
+              <div class="grid grid-cols-3 gap-2">
+                <div>
+                  <label class="text-[11px] text-slate-500">x₀</label>
+                  <input type="number" id="p0x" value="1" step="1" class="w-full text-xs font-mono p-1.5 border rounded-lg">
+                </div>
+                <div>
+                  <label class="text-[11px] text-slate-500">y₀</label>
+                  <input type="number" id="p0y" value="2" step="1" class="w-full text-xs font-mono p-1.5 border rounded-lg">
+                </div>
+                <div>
+                  <label class="text-[11px] text-slate-500">z₀</label>
+                  <input type="number" id="p0z" value="3" step="1" class="w-full text-xs font-mono p-1.5 border rounded-lg">
+                </div>
+              </div>
+            </div>
+
+            <!-- Direction Vector v -->
+            <div class="p-4 rounded-2xl bg-blue-50/70 border border-blue-100 space-y-2">
+              <span class="text-xs font-bold text-blue-900">เวกเตอร์ทิศทางเส้นตรง $\mathbf{v} = (a, b, c)$:</span>
+              <div class="grid grid-cols-3 gap-2">
+                <div>
+                  <label class="text-[11px] text-blue-600">a (x)</label>
+                  <input type="number" id="vax" value="2" step="1" class="w-full text-xs font-mono p-1.5 border rounded-lg">
+                </div>
+                <div>
+                  <label class="text-[11px] text-blue-600">b (y)</label>
+                  <input type="number" id="vby" value="-1" step="1" class="w-full text-xs font-mono p-1.5 border rounded-lg">
+                </div>
+                <div>
+                  <label class="text-[11px] text-blue-600">c (z)</label>
+                  <input type="number" id="vcz" value="3" step="1" class="w-full text-xs font-mono p-1.5 border rounded-lg">
+                </div>
+              </div>
+            </div>
+
+            <!-- Normal Vector n -->
+            <div class="p-4 rounded-2xl bg-emerald-50/70 border border-emerald-100 space-y-2">
+              <span class="text-xs font-bold text-emerald-900">เวกเตอร์ตั้งฉากระนาบ $\mathbf{n} = (A, B, C)$:</span>
+              <div class="grid grid-cols-3 gap-2">
+                <div>
+                  <label class="text-[11px] text-emerald-600">A</label>
+                  <input type="number" id="na" value="2" step="1" class="w-full text-xs font-mono p-1.5 border rounded-lg">
+                </div>
+                <div>
+                  <label class="text-[11px] text-emerald-600">B</label>
+                  <input type="number" id="nb" value="1" step="1" class="w-full text-xs font-mono p-1.5 border rounded-lg">
+                </div>
+                <div>
+                  <label class="text-[11px] text-emerald-600">C</label>
+                  <input type="number" id="nc" value="-1" step="1" class="w-full text-xs font-mono p-1.5 border rounded-lg">
+                </div>
+              </div>
+            </div>
+
+            <button onclick="updateGeometryEquations()" class="w-full py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-bold transition-all shadow-sm">
+              <i class="fa-solid fa-calculator mr-1"></i> คำนวณสมการใหม่
+            </button>
+          </div>
+
+          <!-- Equations and Output Visualization -->
+          <div class="lg:col-span-7 space-y-5">
+            
+            <!-- Result 1: Line Equations -->
+            <div class="p-5 rounded-2xl bg-white border border-slate-200 shadow-sm space-y-3">
+              <div class="flex items-center justify-between border-b border-slate-100 pb-2">
+                <span class="text-xs font-bold text-blue-700 uppercase tracking-wide flex items-center gap-1.5">
+                  <i class="fa-solid fa-arrow-trend-up"></i> สมการเส้นตรงในปริภูมิ 3 มิติ
+                </span>
+                <span class="text-[11px] bg-blue-100 text-blue-800 px-2 py-0.5 rounded-full font-mono">Line Equation</span>
+              </div>
+              <div class="space-y-2 text-xs sm:text-sm font-mono">
+                <div>
+                  <span class="text-slate-500 font-sans">สมการเวกเตอร์:</span>
+                  <div id="vectorLineEq" class="p-2 bg-slate-50 rounded-lg text-slate-800 mt-1 font-semibold">
+                    $\mathbf{r}(t) = (1, 2, 3) + t(2, -1, 3)$
+                  </div>
+                </div>
+                <div>
+                  <span class="text-slate-500 font-sans">สมการพาราเมตริก:</span>
+                  <div id="paramLineEq" class="p-2 bg-slate-50 rounded-lg text-slate-800 mt-1">
+                    $x = 1 + 2t,\quad y = 2 - t,\quad z = 3 + 3t$
+                  </div>
+                </div>
+                <div>
+                  <span class="text-slate-500 font-sans">สมการรูปสมมาตร (Symmetric):</span>
+                  <div id="symLineEq" class="p-2 bg-slate-50 rounded-lg text-slate-800 mt-1">
+                    $\frac{x - 1}{2} = \frac{y - 2}{-1} = \frac{z - 3}{3} = t$
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Result 2: Plane Equation -->
+            <div class="p-5 rounded-2xl bg-white border border-slate-200 shadow-sm space-y-3">
+              <div class="flex items-center justify-between border-b border-slate-100 pb-2">
+                <span class="text-xs font-bold text-emerald-700 uppercase tracking-wide flex items-center gap-1.5">
+                  <i class="fa-solid fa-square"></i> สมการระนาบ (Plane Equation)
+                </span>
+                <span class="text-[11px] bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded-full font-mono">Plane Equation</span>
+              </div>
+              <div class="space-y-2 text-xs sm:text-sm font-mono">
+                <div>
+                  <span class="text-slate-500 font-sans">สมการเวกเตอร์ระนาบ:</span>
+                  <div id="vectorPlaneEq" class="p-2 bg-slate-50 rounded-lg text-slate-800 mt-1 font-semibold">
+                    $(2, 1, -1) \cdot ((x,y,z) - (1,2,3)) = 0$
+                  </div>
+                </div>
+                <div>
+                  <span class="text-slate-500 font-sans">สมการสเกลาร์รูปมาตรฐาน ($Ax + By + Cz + D = 0$):</span>
+                  <div id="scalarPlaneEq" class="p-2 bg-emerald-50 rounded-lg text-emerald-950 mt-1 font-bold">
+                    $2x + y - z - 1 = 0$
+                  </div>
+                </div>
+                <div class="text-[11px] text-slate-500 font-sans pt-1">
+                  *สังเกตว่า สัมประสิทธิ์หน้า $x, y, z$ คือพิกัดของเวกเตอร์ตั้งฉาก $\mathbf{n} = (2, 1, -1)$ เสมอ
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+      <!-- LAB 2: Change of Basis Simulator -->
+      <div id="lab2Container" class="hidden bg-white border border-slate-200 rounded-3xl p-6 sm:p-8 shadow-sm space-y-6">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+          
+          <!-- Controls -->
+          <div class="lg:col-span-5 space-y-4">
+            <h3 class="font-bold text-slate-800 text-base flex items-center gap-2">
+              <i class="fa-solid fa-table-cells text-indigo-500"></i> กำหนดฐานใหม่ $\mathcal{B} = \{\mathbf{b}_1, \mathbf{b}_2\}$
+            </h3>
+
+            <!-- Basis b1 -->
+            <div class="p-3.5 rounded-2xl bg-indigo-50/70 border border-indigo-100 space-y-1">
+              <span class="text-xs font-bold text-indigo-900">เวกเตอร์ฐาน $\mathbf{b}_1 = (b_{11}, b_{21})$:</span>
+              <div class="grid grid-cols-2 gap-2">
+                <input type="number" id="b11" value="1" step="0.5" class="w-full text-xs font-mono p-1.5 border rounded-lg">
+                <input type="number" id="b21" value="1" step="0.5" class="w-full text-xs font-mono p-1.5 border rounded-lg">
+              </div>
+            </div>
+
+            <!-- Basis b2 -->
+            <div class="p-3.5 rounded-2xl bg-emerald-50/70 border border-emerald-100 space-y-1">
+              <span class="text-xs font-bold text-emerald-900">เวกเตอร์ฐาน $\mathbf{b}_2 = (b_{12}, b_{22})$:</span>
+              <div class="grid grid-cols-2 gap-2">
+                <input type="number" id="b12" value="1" step="0.5" class="w-full text-xs font-mono p-1.5 border rounded-lg">
+                <input type="number" id="b22" value="-1" step="0.5" class="w-full text-xs font-mono p-1.5 border rounded-lg">
+              </div>
+            </div>
+
+            <!-- Vector v to transform -->
+            <div class="p-3.5 rounded-2xl bg-amber-50/70 border border-amber-100 space-y-1">
+              <span class="text-xs font-bold text-amber-900">เวกเตอร์ในฐานมาตรฐาน $\mathbf{v} = (x, y)$:</span>
+              <div class="grid grid-cols-2 gap-2">
+                <input type="number" id="vx" value="4" step="0.5" class="w-full text-xs font-mono p-1.5 border rounded-lg">
+                <input type="number" id="vy" value="2" step="0.5" class="w-full text-xs font-mono p-1.5 border rounded-lg">
+              </div>
+            </div>
+
+            <button onclick="computeChangeOfBasis()" class="w-full py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-bold transition-all shadow-sm">
+              <i class="fa-solid fa-arrows-spin mr-1"></i> คำนวณการเปลี่ยนฐาน
+            </button>
+
+            <!-- Verification Status -->
+            <div id="basisStatusBox" class="p-3.5 rounded-2xl bg-slate-50 border border-slate-200 text-xs space-y-1">
+              <div class="flex justify-between font-bold">
+                <span>ดีเทอร์มิแนนต์ $\det(P)$:</span>
+                <span id="detPVal" class="font-mono text-indigo-700">-2.00</span>
+              </div>
+              <p id="basisStatusText" class="text-emerald-600 font-semibold">
+                $\mathcal{B}$ เป็นฐานที่สมบูรณ์ (สามารถหาเมทริกซ์ผกผันได้)
+              </p>
+            </div>
+          </div>
+
+          <!-- Output Representation -->
+          <div class="lg:col-span-7 space-y-4">
+            
+            <div class="p-5 rounded-2xl bg-white border border-slate-200 shadow-sm space-y-4">
+              <h4 class="text-xs font-bold uppercase tracking-wider text-slate-500">ขั้นตอนการคำนวณเมทริกซ์การเปลี่ยนฐาน</h4>
+              
+              <!-- Matrix P and Inverse P -->
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+                <div class="p-3 bg-slate-50 rounded-xl border border-slate-200 font-mono text-center">
+                  <div class="text-[11px] font-sans text-slate-500 mb-1">เมทริกซ์การเปลี่ยนฐาน $P = [\mathbf{b}_1\ \mathbf{b}_2]$:</div>
+                  <div id="matrixPDisplay" class="font-bold text-slate-800">
+                    $P = \begin{bmatrix} 1 & 1 \\ 1 & -1 \end{bmatrix}$
+                  </div>
+                </div>
+                <div class="p-3 bg-slate-50 rounded-xl border border-slate-200 font-mono text-center">
+                  <div class="text-[11px] font-sans text-slate-500 mb-1">เมทริกซ์ผกผัน $P^{-1}$:</div>
+                  <div id="matrixPInvDisplay" class="font-bold text-slate-800">
+                    $P^{-1} = \begin{bmatrix} 0.5 & 0.5 \\ 0.5 & -0.5 \end{bmatrix}$
+                  </div>
+                </div>
+              </div>
+
+              <!-- Coordinate Calculation -->
+              <div class="p-4 bg-indigo-50/60 rounded-xl border border-indigo-100 space-y-2">
+                <span class="text-xs font-bold text-indigo-900 block">1. คำนวณพิกัดใหม่ $[\mathbf{v}]_\mathcal{B} = P^{-1}\mathbf{v}$:</span>
+                <div id="coordBDisplay" class="font-mono text-xs sm:text-sm text-center text-indigo-950 font-bold bg-white p-2.5 rounded-lg border border-indigo-200">
+                  $[\mathbf{v}]_\mathcal{B} = \begin{bmatrix} 0.5 & 0.5 \\ 0.5 & -0.5 \end{bmatrix} \begin{bmatrix} 4 \\ 2 \end{bmatrix} = \begin{bmatrix} 3 \\ 1 \end{bmatrix}$
+                </div>
+              </div>
+
+              <!-- Back Transformation Check -->
+              <div class="p-4 bg-emerald-50/60 rounded-xl border border-emerald-100 space-y-2">
+                <span class="text-xs font-bold text-emerald-900 block">2. ตรวจสอบการแปลงกลับ $\mathbf{v} = P [\mathbf{v}]_\mathcal{B}$:</span>
+                <div id="checkBackDisplay" class="font-mono text-xs sm:text-sm text-center text-emerald-950 font-bold bg-white p-2.5 rounded-lg border border-emerald-200">
+                  $\mathbf{v} = 3(1,1) + 1(1,-1) = (3+1, 3-1) = (4, 2)$ ✓ ถูกต้องสมบูรณ์
+                </div>
+              </div>
+
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================== -->
+    <!-- SECTION 3: คำถามนำเพื่อค้นพบ (Inquiry)     -->
+    <!-- ========================================== -->
+    <section id="inquiry" class="space-y-6">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-2xl bg-amber-100 text-amber-700 flex items-center justify-center font-bold text-lg shadow-sm">
+          <i class="fa-solid fa-lightbulb"></i>
+        </div>
+        <div>
+          <h2 class="text-2xl font-bold text-slate-900">3. คำถามนำเพื่อค้นพบ (Guided Discovery Questions)</h2>
+          <p class="text-sm text-slate-500">คิดและวิเคราะห์แนวคิดสำคัญ พร้อมคลิกเปิดดูคำอธิบาย</p>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        
+        <!-- Q1 -->
+        <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+          <button onclick="toggleBox('inq1', 'inq1-ic')" class="w-full text-left p-5 flex items-start justify-between gap-3 hover:bg-slate-50 transition-colors">
+            <div class="flex items-start gap-3">
+              <span class="w-6 h-6 rounded-lg bg-amber-100 text-amber-800 flex items-center justify-center text-xs font-bold shrink-0 mt-0.5">1</span>
+              <h3 class="font-bold text-slate-800 text-sm sm:text-base">เวกเตอร์ทิศทางมีบทบาทอย่างไรในการกำหนดสมการเส้นตรง?</h3>
+            </div>
+            <i id="inq1-ic" class="fa-solid fa-chevron-down text-slate-400 mt-1 transition-transform"></i>
+          </button>
+          <div id="inq1" class="hidden p-5 pt-0 text-xs sm:text-sm text-slate-600 border-t border-slate-100 bg-amber-50/20 leading-relaxed space-y-1.5">
+            <p><strong>คำอธิบาย:</strong> เวกเตอร์ทิศทาง $\mathbf{v}$ ทำหน้าที่เปรียบเสมือน <em>"ความชันในสามมิติ"</em> ที่บอกว่าเส้นตรงเอียงไปทางแกน $x, y, z$ ด้วยอัตราส่วนเท่าใด</p>
+            <p>เมื่อเราคูณเวกเตอร์ทิศทางด้วยตัวแปรเสริมสเกลาร์ $t$ (นั่นคือ $t\mathbf{v}$) จะเกิดการยืด-หด หรือกลับทิศของเวกเตอร์ และเมื่อนำไปบวกกับจุดผ่าน $\mathbf{r}_0$ จะกวาดจุดต่อเนื่องกลายเป็นเส้นตรงยาวอนันต์ในปริภูมิ</p>
+          </div>
+        </div>
+
+        <!-- Q2 -->
+        <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+          <button onclick="toggleBox('inq2', 'inq2-ic')" class="w-full text-left p-5 flex items-start justify-between gap-3 hover:bg-slate-50 transition-colors">
+            <div class="flex items-start gap-3">
+              <span class="w-6 h-6 rounded-lg bg-amber-100 text-amber-800 flex items-center justify-center text-xs font-bold shrink-0 mt-0.5">2</span>
+              <h3 class="font-bold text-slate-800 text-sm sm:text-base">เวกเตอร์ตั้งฉากกับระนาบสัมพันธ์กับสมการระนาบอย่างไร?</h3>
+            </div>
+            <i id="inq2-ic" class="fa-solid fa-chevron-down text-slate-400 mt-1 transition-transform"></i>
+          </button>
+          <div id="inq2" class="hidden p-5 pt-0 text-xs sm:text-sm text-slate-600 border-t border-slate-100 bg-amber-50/20 leading-relaxed space-y-1.5">
+            <p><strong>คำอธิบาย:</strong> เวกเตอร์ตั้งฉาก $\mathbf{n} = (A, B, C)$ เป็นหัวใจในการนิยามระนาบ เพราะจุด $\mathbf{r}$ ใดๆ จะอยู่บนระนาบได้ก็ต่อเมื่อเวกเตอร์ขจัด $(\mathbf{r} - \mathbf{r}_0)$ บนระนาบนั้น <em>ตั้งฉากกับ $\mathbf{n}$</em> เสมอ</p>
+            <p>ซึ่งจากการดอท $\mathbf{n} \cdot (\mathbf{r} - \mathbf{r}_0) = 0$ จะกระจายพจน์ได้ $Ax + By + Cz + D = 0$ ทันที โดยที่ตัวเลขหน้าตัวแปร $x, y, z$ ก็คือพิกัดของ $\mathbf{n}$ โดยตรง</p>
+          </div>
+        </div>
+
+        <!-- Q3 -->
+        <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+          <button onclick="toggleBox('inq3', 'inq3-ic')" class="w-full text-left p-5 flex items-start justify-between gap-3 hover:bg-slate-50 transition-colors">
+            <div class="flex items-start gap-3">
+              <span class="w-6 h-6 rounded-lg bg-amber-100 text-amber-800 flex items-center justify-center text-xs font-bold shrink-0 mt-0.5">3</span>
+              <h3 class="font-bold text-slate-800 text-sm sm:text-base">เพราะเหตุใดพิกัดของเวกเตอร์เดียวกันจึงเปลี่ยนแปลงเมื่อเปลี่ยนฐาน?</h3>
+            </div>
+            <i id="inq3-icon" class="fa-solid fa-chevron-down text-slate-400 mt-1 transition-transform"></i>
+          </button>
+          <div id="inq3" class="hidden p-5 pt-0 text-xs sm:text-sm text-slate-600 border-t border-slate-100 bg-amber-50/20 leading-relaxed space-y-1.5">
+            <p><strong>คำอธิบาย:</strong> เวกเตอร์ในเชิงกายภาพคือ "ลูกศรที่มีทิศทางและความยาวแท้จริง" ซึ่งไม่เปลี่ยนแปลง</p>
+            <p>แต่ <strong>"พิกัด"</strong> คือตัวเลขสเกลาร์ที่บอกว่า <em>"ต้องก้าวเดินตามแนวเวกเตอร์ฐานแต่ละตัวเป็นกี่เท่า"</em> เมื่อเราเปลี่ยนไม้บรรทัดหรือระบบแกนอ้างอิง (เปลี่ยนขนาดและทิศทางของฐาน) จำนวนก้าวที่ต้องเดินเพื่อไปยังปลายลูกศรเดิมจึงจำเป็นต้องเปลี่ยนไปตามฐานนั้นๆ</p>
+          </div>
+        </div>
+
+        <!-- Q4 -->
+        <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+          <button onclick="toggleBox('inq4', 'inq4-ic')" class="w-full text-left p-5 flex items-start justify-between gap-3 hover:bg-slate-50 transition-colors">
+            <div class="flex items-start gap-3">
+              <span class="w-6 h-6 rounded-lg bg-amber-100 text-amber-800 flex items-center justify-center text-xs font-bold shrink-0 mt-0.5">4</span>
+              <h3 class="font-bold text-slate-800 text-sm sm:text-base">เมทริกซ์การเปลี่ยนฐานมีความสัมพันธ์กับเมทริกซ์ผกผันอย่างไร?</h3>
+            </div>
+            <i id="inq4-ic" class="fa-solid fa-chevron-down text-slate-400 mt-1 transition-transform"></i>
+          </button>
+          <div id="inq4" class="hidden p-5 pt-0 text-xs sm:text-sm text-slate-600 border-t border-slate-100 bg-amber-50/20 leading-relaxed space-y-1.5">
+            <p><strong>คำอธิบาย:</strong> หากเมทริกซ์ $P$ ทำหน้าที่แปลงพิกัดจากฐานใหม่ $\mathcal{B}$ กลับมาเป็นพิกัดฐานมาตรฐาน ($\mathbf{x} = P[\mathbf{x}]_\mathcal{B}$)</p>
+            <p>เมทริกซ์ผกผัน $P^{-1}$ จะทำหน้าที่ในทิศทางตรงกันข้ามโดยตรง คือรับพิกัดมาตรฐานเข้ามาแล้วคำนวณออกมาเป็นพิกัดในฐานใหม่ ($[\mathbf{x}]_\mathcal{B} = P^{-1}\mathbf{x}$) ดังนั้น ทั้งสองจึงเป็นกระบวนการย้อนกลับซึ่งกันและกัน (Invertible Transformation)</p>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ========================================== -->
+    <!-- SECTION 4: แบบฝึกหัดสำหรับนักศึกษา (Exercises) -->
+    <!-- ========================================== -->
+    <section id="exercises" class="space-y-6">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-2xl bg-emerald-100 text-emerald-700 flex items-center justify-center font-bold text-lg shadow-sm">
+          <i class="fa-solid fa-pen-ruler"></i>
+        </div>
+        <div>
+          <h2 class="text-2xl font-bold text-slate-900">4. แบบฝึกหัดสำหรับนักศึกษา (Practice Exercises)</h2>
+          <p class="text-sm text-slate-500">ฝึกคำนวณ 4 ข้อหลัก พร้อมเฉลยละเอียดและขั้นตอนวิธีทำ</p>
+        </div>
+      </div>
+
+      <div class="space-y-4">
+        
+        <!-- Ex 1 -->
+        <div class="bg-white rounded-2xl border border-slate-200 p-5 sm:p-6 shadow-sm">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div class="space-y-1">
+              <span class="text-xs font-bold text-indigo-600 uppercase">แบบฝึกหัดที่ 1</span>
+              <h3 class="text-base font-bold text-slate-800">
+                จงหาสมการเวกเตอร์และสมการพาราเมตริกของเส้นตรงที่ผ่านจุด $A(1,2,3)$ และมีเวกเตอร์ทิศทาง $\mathbf{v}=(2,-1,3)$
+              </h3>
+            </div>
+            <button onclick="toggleBox('exSol1')" class="self-start sm:self-auto px-4 py-2 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 text-xs sm:text-sm font-semibold rounded-xl border border-indigo-200 transition-colors">
+              <i class="fa-solid fa-eye mr-1"></i> ดูเฉลยวิธีทำ
+            </button>
+          </div>
+          <div id="exSol1" class="hidden mt-4 pt-4 border-t border-slate-100 text-xs sm:text-sm text-slate-700 space-y-2.5 bg-slate-50 p-4 rounded-xl">
+            <p><strong>วิธีทำ:</strong></p>
+            <p>1. จากสมการเวกเตอร์ของเส้นตรง: $\mathbf{r}(t) = \mathbf{r}_0 + t\mathbf{v}$ เมื่อ $\mathbf{r}_0 = (1, 2, 3)$ และ $\mathbf{v} = (2, -1, 3)$</p>
+            <p class="font-mono bg-white p-2 rounded border border-slate-200 text-indigo-900 font-semibold">
+              $\mathbf{r}(t) = (1, 2, 3) + t(2, -1, 3)$ หรือ $(x, y, z) = (1 + 2t, 2 - t, 3 + 3t)$
+            </p>
+            <p>2. เขียนแยกเป็นสมการพาราเมตริก (Parametric Equations):</p>
+            <div class="font-mono bg-white p-2.5 rounded border border-slate-200 space-y-1">
+              $x = 1 + 2t$<br>
+              $y = 2 - t$<br>
+              $z = 3 + 3t \quad (t \in \mathbb{R})$
+            </div>
+          </div>
+        </div>
+
+        <!-- Ex 2 -->
+        <div class="bg-white rounded-2xl border border-slate-200 p-5 sm:p-6 shadow-sm">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div class="space-y-1">
+              <span class="text-xs font-bold text-indigo-600 uppercase">แบบฝึกหัดที่ 2</span>
+              <h3 class="text-base font-bold text-slate-800">
+                จงหาสมการระนาบที่ผ่านจุด $P(1,2,3)$ และมีเวกเตอร์ตั้งฉาก $\mathbf{n}=(2,1,-1)$
+              </h3>
+            </div>
+            <button onclick="toggleBox('exSol2')" class="self-start sm:self-auto px-4 py-2 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 text-xs sm:text-sm font-semibold rounded-xl border border-indigo-200 transition-colors">
+              <i class="fa-solid fa-eye mr-1"></i> ดูเฉลยวิธีทำ
+            </button>
+          </div>
+          <div id="exSol2" class="hidden mt-4 pt-4 border-t border-slate-100 text-xs sm:text-sm text-slate-700 space-y-2.5 bg-slate-50 p-4 rounded-xl">
+            <p><strong>วิธีทำ:</strong></p>
+            <p>สมการระนาบที่มีเวกเตอร์แนวฉาก $\mathbf{n}=(a,b,c)=(2,1,-1)$ ผ่านจุด $(x_0, y_0, z_0) = (1,2,3)$ คือ:</p>
+            <div class="font-mono bg-white p-2 rounded border border-slate-200 text-center">
+              $a(x - x_0) + b(y - y_0) + c(z - z_0) = 0$
+            </div>
+            <p>แทนค่า:</p>
+            <div class="font-mono bg-white p-2.5 rounded border border-slate-200 space-y-1">
+              $2(x - 1) + 1(y - 2) - 1(z - 3) = 0$<br>
+              $2x - 2 + y - 2 - z + 3 = 0$<br>
+              <strong>$2x + y - z - 1 = 0$</strong> หรือ <strong>$2x + y - z = 1$</strong>
+            </div>
+          </div>
+        </div>
+
+        <!-- Ex 3 -->
+        <div class="bg-white rounded-2xl border border-slate-200 p-5 sm:p-6 shadow-sm">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div class="space-y-1">
+              <span class="text-xs font-bold text-indigo-600 uppercase">แบบฝึกหัดที่ 3</span>
+              <h3 class="text-base font-bold text-slate-800">
+                กำหนดฐาน $\mathcal{B}=\{(1,1),(1,-1)\}$ จงหาพิกัดของเวกเตอร์ $\mathbf{v}=(4,2)$ เมื่อเทียบกับฐานดังกล่าว
+              </h3>
+            </div>
+            <button onclick="toggleBox('exSol3')" class="self-start sm:self-auto px-4 py-2 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 text-xs sm:text-sm font-semibold rounded-xl border border-indigo-200 transition-colors">
+              <i class="fa-solid fa-eye mr-1"></i> ดูเฉลยวิธีทำ
+            </button>
+          </div>
+          <div id="exSol3" class="hidden mt-4 pt-4 border-t border-slate-100 text-xs sm:text-sm text-slate-700 space-y-2.5 bg-slate-50 p-4 rounded-xl">
+            <p><strong>วิธีทำ:</strong></p>
+            <p>ต้องการหาสเกลาร์ $c_1, c_2$ ที่ทำให้ $c_1(1,1) + c_2(1,-1) = (4,2)$</p>
+            <div class="font-mono bg-white p-2.5 rounded border border-slate-200 space-y-1">
+              $c_1 + c_2 = 4 \quad \text{--- (1)}$<br>
+              $c_1 - c_2 = 2 \quad \text{--- (2)}$
+            </div>
+            <p>นำ (1) + (2): $2c_1 = 6 \implies c_1 = 3$</p>
+            <p>แทน $c_1 = 3$ ลงใน (1): $3 + c_2 = 4 \implies c_2 = 1$</p>
+            <div class="p-2.5 bg-emerald-100/70 text-emerald-900 rounded-lg font-bold font-mono text-center">
+              $[\mathbf{v}]_\mathcal{B} = \begin{bmatrix} 3 \\ 1 \end{bmatrix}$
+            </div>
+          </div>
+        </div>
+
+        <!-- Ex 4 -->
+        <div class="bg-white rounded-2xl border border-slate-200 p-5 sm:p-6 shadow-sm">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div class="space-y-1">
+              <span class="text-xs font-bold text-indigo-600 uppercase">แบบฝึกหัดที่ 4</span>
+              <h3 class="text-base font-bold text-slate-800">
+                จงสร้างเมทริกซ์การเปลี่ยนฐานจากฐานมาตรฐานไปยังฐาน $\mathcal{B}=\{(1,1),(1,-1)\}$ และตรวจสอบการเปลี่ยนฐานกลับ
+              </h3>
+            </div>
+            <button onclick="toggleBox('exSol4')" class="self-start sm:self-auto px-4 py-2 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 text-xs sm:text-sm font-semibold rounded-xl border border-indigo-200 transition-colors">
+              <i class="fa-solid fa-eye mr-1"></i> ดูเฉลยวิธีทำ
+            </button>
+          </div>
+          <div id="exSol4" class="hidden mt-4 pt-4 border-t border-slate-100 text-xs sm:text-sm text-slate-700 space-y-2.5 bg-slate-50 p-4 rounded-xl">
+            <p><strong>วิธีทำ:</strong></p>
+            <p>1. เมทริกซ์การแปลงพิกัดจากฐาน $\mathcal{B}$ สู่ฐานมาตรฐาน $\mathcal{E}$ คือ:</p>
+            <div class="font-mono bg-white p-2 rounded border border-slate-200 text-center">
+              $P = [b_1\ b_2] = \begin{bmatrix} 1 & 1 \\ 1 & -1 \end{bmatrix}$
+            </div>
+            <p>2. เมทริกซ์การเปลี่ยนฐานจากฐานมาตรฐาน $\mathcal{E}$ ไปยัง $\mathcal{B}$ คือ $P^{-1}$:</p>
+            <div class="font-mono bg-white p-2 rounded border border-slate-200 text-center">
+              $\det(P) = (1)(-1) - (1)(1) = -2$<br>
+              $P^{-1} = \frac{1}{-2}\begin{bmatrix} -1 & -1 \\ -1 & 1 \end{bmatrix} = \begin{bmatrix} 0.5 & 0.5 \\ 0.5 & -0.5 \end{bmatrix}$
+            </div>
+            <p>3. <strong>ตรวจสอบการแปลงกลับ:</strong> นำ $[\mathbf{v}]_\mathcal{B} = \begin{bmatrix} 3 \\ 1 \end{bmatrix}$ จากข้อ 3 มาคูณกับ $P$:</p>
+            <div class="font-mono bg-white p-2 rounded border border-slate-200 text-center text-indigo-700 font-bold">
+              $P [\mathbf{v}]_\mathcal{B} = \begin{bmatrix} 1 & 1 \\ 1 & -1 \end{bmatrix} \begin{bmatrix} 3 \\ 1 \end{bmatrix} = \begin{bmatrix} 3(1) + 1(1) \\ 3(1) + 1(-1) \end{bmatrix} = \begin{bmatrix} 4 \\ 2 \end{bmatrix} = \mathbf{v}$ (ถูกต้องตามพิกัดเดิม)
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ======================================================= -->
+    <!-- SECTION 5: แบบทดสอบวัดผลสัมฤทธิ์ทางการเรียน 30 ข้อ (K-P-A) -->
+    <!-- ======================================================= -->
+    <section id="assessment" class="bg-white border-2 border-indigo-200 rounded-3xl p-6 sm:p-9 shadow-md space-y-8">
+      
+      <!-- Exam Header -->
+      <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-200 pb-6">
+        <div>
+          <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-100 text-indigo-800 text-xs font-bold mb-2">
+            <i class="fa-solid fa-graduation-cap"></i> แบบวัดผลสัมฤทธิ์มาตรฐาน 30 ข้อ
+          </div>
+          <h2 class="text-2xl sm:text-3xl font-bold text-slate-900">แบบทดสอบวัดผลสัมฤทธิ์ทางการเรียน: เวกเตอร์และพีชคณิตเชิงเส้น</h2>
+          <p class="text-xs sm:text-sm text-slate-500 mt-1">
+            ครอบคลุมครบทุกระดับความยาก: ง่าย (10 ข้อ) • ปานกลาง (10 ข้อ) • ยาก (10 ข้อ) | จำแนกครบ 3 โดเมน: K (ความรู้) • P (ทักษะกระบวนการ) • A (เจตคติและการประยุกต์)
+          </p>
+        </div>
+
+        <!-- Global Action Controls -->
+        <div class="flex flex-wrap items-center gap-2">
+          <button onclick="toggleAllSolutions(true)" class="px-3.5 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold rounded-xl transition-all">
+            <i class="fa-solid fa-eye mr-1"></i> เปิดเฉลยทั้งหมด
+          </button>
+          <button onclick="toggleAllSolutions(false)" class="px-3.5 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold rounded-xl transition-all">
+            <i class="fa-solid fa-eye-slash mr-1"></i> ซ่อนเฉลยทั้งหมด
+          </button>
+          <button onclick="scoreQuiz()" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-xl transition-all shadow-sm">
+            <i class="fa-solid fa-check-double mr-1"></i> ตรวจคะแนนแบบทดสอบ
+          </button>
+        </div>
+      </div>
+
+      <!-- Score Banner (hidden initially) -->
+      <div id="scoreBanner" class="hidden p-5 rounded-2xl bg-indigo-50 border border-indigo-200 flex flex-col sm:flex-row items-center justify-between gap-4">
+        <div class="flex items-center gap-3">
+          <div class="w-12 h-12 rounded-2xl bg-indigo-600 text-white flex items-center justify-center text-xl font-bold">
+            <i class="fa-solid fa-award"></i>
+          </div>
+          <div>
+            <h4 class="font-bold text-indigo-950 text-base">ผลการประเมินของคุณ</h4>
+            <p id="scoreSummaryText" class="text-xs text-indigo-700">คุณตอบถูก 0 จาก 30 ข้อ</p>
+          </div>
+        </div>
+        <div id="scorePercentageBadge" class="text-2xl font-black font-heading text-indigo-600 px-5 py-2 bg-white rounded-xl border border-indigo-100 shadow-sm">
+          0%
+        </div>
+      </div>
+
+      <!-- Filter/Category Indicators -->
+      <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5 text-center text-xs">
+        <div class="p-2.5 rounded-xl bg-slate-50 border border-slate-200">
+          <span class="text-slate-500 block text-[11px]">จำนวนข้อสอบทั้งหมด</span>
+          <span class="font-bold text-slate-800 text-base">30 ข้อ</span>
+        </div>
+        <div class="p-2.5 rounded-xl bg-green-50 border border-green-200 text-green-800">
+          <span class="block text-[11px] text-green-600">ระดับความยาก</span>
+          <span class="font-bold">ง่าย (10) • กลาง (10) • ยาก (10)</span>
+        </div>
+        <div class="p-2.5 rounded-xl bg-blue-50 border border-blue-200 text-blue-800">
+          <span class="block text-[11px] text-blue-600">จำแนกเป้าหมาย K-P-A</span>
+          <span class="font-bold">K (10) • P (10) • A (10)</span>
+        </div>
+        <div class="p-2.5 rounded-xl bg-purple-50 border border-purple-200 text-purple-800">
+          <span class="block text-[11px] text-purple-600">ผลลัพธ์การเรียนรู้ (LO)</span>
+          <span class="font-bold">ครอบคลุม LO 1 ถึง LO 8</span>
+        </div>
+      </div>
+
+      <!-- 30 Exam Questions List -->
+      <div id="questionsContainer" class="space-y-6">
+        <!-- Rendered via structured HTML items with full tags -->
+        
+        <!-- ==================== Q1 ==================== -->
+        <div class="exam-card p-5 rounded-2xl border border-slate-200 bg-white shadow-sm space-y-3" data-q="1" data-correct="ก">
+          <div class="flex flex-wrap items-center gap-2">
+            <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-blue-100 text-blue-800">[ผลลัพธ์การเรียนรู้: LO-1 นิยามเวกเตอร์]</span>
+            <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-emerald-100 text-emerald-800">[ระดับ: ง่าย]</span>
+            <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-purple-100 text-purple-800">[ด้าน: K (Knowledge)]</span>
+          </div>
+          <h4 class="font-bold text-slate-800 text-sm sm:text-base">
+            ข้อ 1. ถ้า $\mathbf{u} = (2, -3)$ และ $\mathbf{v} = (-1, 5)$ แล้ว เวกเตอร์ $2\mathbf{u} + \mathbf{v}$ มีค่าตรงกับข้อใด
+          </h4>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs sm:text-sm">
+            <label class="p-2.5 rounded-xl border border-slate-200 hover:bg-slate-50 cursor-pointer flex items-center gap-2">
+              <input type="radio" name="q1" value="ก" class="accent-indigo-600"> <span>ก. $(3, -1)$</span>
+            </label>
+            <label class="p-2.5 rounded-xl border border-slate-200 hover:bg-slate-50 cursor-pointer flex items-center gap-2">
+              <input type="radio" name="q1" value="ข" class="accent-indigo-600"> <span>ข. $(1, 2)$</span>
+            </label>
+            <label class="p-2.5 rounded-xl border border-slate-200 hover:bg-slate-50 cursor-pointer flex items-center gap-2">
+              <input type="radio" name="q1" value="ค" class="accent-indigo-600"> <span>ค. $(4, -1)$</span>
+            </label>
+            <label class="p-2.5 rounded-xl border border-slate-200 hover:bg-slate-50 cursor-pointer flex items-center gap-2">
+              <input type="radio" name="q1" value="ง" class="accent-indigo-600"> <span>ง. $(3, 1)$</span>
+            </label>
+          </div>
+          <div class="flex items-center justify-between pt-2">
+            <button onclick="toggleBox('ans1')" class="text-xs font-semibold text-indigo-600 hover:text-indigo-800">
+              <i class="fa-solid fa-circle-question mr-1"></i> เฉลยและวิธีทำ
+            </button>
+            <span id="feedback1" class="text-xs font-bold"></span>
+          </div>
+          <div id="ans1" class="solution-box hidden p-3.5 bg-slate-50 rounded-xl text-xs text-slate-700 border border-slate-200 space-y-1">
+            <p><strong>คำตอบที่ถูกต้อง: ก. $(3, -1)$</strong></p>
+            <p><strong>วิธีทำ:</strong> $2\mathbf{u} = 2(2, -3) = (4, -6)$</p>
+            <p>$2\mathbf{u} + \mathbf{v} = (4 + (-1), -6 + 5) = (3, -1)$</p>
+          </div>
+        </div>
+
+        <!-- ==================== Q2 ==================== -->
+        <div class="exam-card p-5 rounded-2xl border border-slate-200 bg-white shadow-sm space-y-3" data-q="2" data-correct="ข">
+          <div class="flex flex-wrap items-center gap-2">
+            <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-blue-100 text-blue-800">[ผลลัพธ์การเรียนรู้: LO-2 ผลคูณเชิงสเกลาร์]</span>
+            <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-emerald-100 text-emerald-800">[ระดับ: ง่าย]</span>
+            <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-purple-100 text-purple-800">[ด้าน: K (Knowledge)]</span>
+          </div>
+          <h4 class="font-bold text-slate-800 text-sm sm:text-base">
+            ข้อ 2. เวกเตอร์สองตัวใน $\mathbb{R}^n$ จะตั้งฉากกัน (Orthogonal) ก็ต่อเมื่อเงื่อนไขใดเป็นจริง
+          </h4>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs sm:text-sm">
+            <label class="p-2.5 rounded-xl border border-slate-200 hover:bg-slate-50 cursor-pointer flex items-center gap-2">
+              <input type="radio" name="q2" value="ก" class="accent-indigo-600"> <span>ก. $\mathbf{u} \times \mathbf{v} = \mathbf{0}$</span>
+            </label>
+            <label class="p-2.5 rounded-xl border border-slate-200 hover:bg-slate-50 cursor-pointer flex items-center gap-2">
+              <input type="radio" name="q2" value="ข" class="accent-indigo-600"> <span>ข. $\mathbf{u} \cdot \mathbf{v} = 0$</span>
+            </label>
+            <label class="p-2.5 rounded-xl border border-slate-200 hover:bg-slate-50 cursor-pointer flex items-center gap-2">
+              <input type="radio" name="q2" value="ค" class="accent-indigo-600"> <span>ค. $\|\mathbf{u}\| = \|\mathbf{v}\|$</span>
+            </label>
+            <label class="p-2.5 rounded-xl border border-slate-200 hover:bg-slate-50 cursor-pointer flex items-center gap-2">
+              <input type="radio" name="q2" value="ง" class="accent-indigo-600"> <span>ง. $\mathbf{u} + \mathbf{v} = \mathbf{0}$</span>
+            </label>
+          </div>
+          <div class="flex items-center justify-between pt-2">
+            <button onclick="toggleBox('ans2')" class="text-xs font-semibold text-indigo-600 hover:text-indigo-800">
+              <i class="fa-solid fa-circle-question mr-1"></i> เฉลยและวิธีทำ
+            </button>
+            <span id="feedback2" class="text-xs font-bold"></span>
+          </div>
+          <div id="ans2" class="solution-box hidden p-3.5 bg-slate-50 rounded-xl text-xs text-slate-700 border border-slate-200 space-y-1">
+            <p><strong>คำตอบที่ถูกต้อง: ข. $\mathbf{u} \cdot \mathbf{v} = 0$</strong></p>
+            <p><strong>วิธีทำ:</strong> จากสูตร $\mathbf{u} \cdot \mathbf{v} = \|\mathbf{u}\|\|\mathbf{v}\|\cos\theta$ เมื่อ $\theta = 90^\circ$ ทำให้ $\cos 90^\circ = 0$ ดังนั้นดอทโปรดักต์ต้องเท่ากับ 0</p>
+          </div>
+        </div>
+
+        <!-- ==================== Q3 ==================== -->
+        <div class="exam-card p-5 rounded-2xl border border-slate-200 bg-white shadow-sm space-y-3" data-q="3" data-correct="ค">
+          <div class="flex flex-wrap items-center gap-2">
+            <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-blue-100 text-blue-800">[ผลลัพธ์การเรียนรู้: LO-3 สมการเส้นตรง]</span>
+            <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-emerald-100 text-emerald-800">[ระดับ: ง่าย]</span>
+            <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-purple-100 text-purple-800">[ด้าน: K (Knowledge)]</span>
+          </div>
+          <h4 class="font-bold text-slate-800 text-sm sm:text-base">
+            ข้อ 3. สมการเส้นตรง $\mathbf{r}(t) = (3, -1, 4) + t(0, 2, -5)$ มีเวกเตอร์แสดงทิศทาง (Direction Vector) คือข้อใด
+          </h4>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs sm:text-sm">
+            <label class="p-2.5 rounded-xl border border-slate-200 hover:bg-slate-50 cursor-pointer flex items-center gap-2">
+              <input type="radio" name="q3" value="ก" class="accent-indigo-600"> <span>ก. $(3, -1, 4)$</span>
+            </label>
+            <label class="p-2.5 rounded-xl border border-slate-200 hover:bg-slate-50 cursor-pointer flex items-center gap-2">
+              <input type="radio" name="q3" value="ข" class="accent-indigo-600"> <span>ข. $(3, 1, -1)$</span>
+            </label>
+            <label class="p-2.5 rounded-xl border border-slate-200 hover:bg-slate-50 cursor-pointer flex items-center gap-2">
+              <input type="radio" name="q3" value="ค" class="accent-indigo-600"> <span>ค. $(0, 2, -5)$</span>
+            </label>
+            <label class="p-2.5 rounded-xl border border-slate-200 hover:bg-slate-50 cursor-pointer flex items-center gap-2">
+              <input type="radio" name="q3" value="ง" class="accent-indigo-600"> <span>ง. $(0, -2, 5)$</span>
+            </label>
+          </div>
+          <div class="flex items-center justify-between pt-2">
+            <button onclick="toggleBox('ans3')" class="text-xs font-semibold text-indigo-600 hover:text-indigo-800">
+              <i class="fa-solid fa-circle-question mr-1"></i> เฉลยและวิธีทำ
+            </button>
+            <span id="feedback3" class="text-xs font-bold"></span>
+          </div>
+          <div id="ans3" class="solution-box hidden p-3.5 bg-slate-50 rounded-xl text-xs text-slate-700 border border-slate-200 space-y-1">
+            <p><strong>คำตอบที่ถูกต้อง: ค. $(0, 2, -5)$</strong></p>
+            <p><strong>วิธีทำ:</strong> ในสมการ $\mathbf{r}(t) = \mathbf{r}_0 + t\mathbf{v}$ เวกเตอร์ที่ถูกคูณด้วยสเกลาร์ $t$ คือเวกเตอร์ทิศทางเสมอ</p>
+          </div>
+        </div>
+
+        <!-- ==================== Q4 ==================== -->
+        <div class="exam-card p-5 rounded-2xl border border-slate-200 bg-white shadow-sm space-y-3" data-q="4" data-correct="ก">
+          <div class="flex flex-wrap items-center gap-2">
+            <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-blue-100 text-blue-800">[ผลลัพธ์การเรียนรู้: LO-4 สมการระนาบ]</span>
+            <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-emerald-100 text-emerald-800">[ระดับ: ง่าย]</span>
+            <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-purple-100 text-purple-800">[ด้าน: K (Knowledge)]</span>
+          </div>
+          <h4 class="font-bold text-slate-800 text-sm sm:text-base">
+            ข้อ 4. เวกเตอร์ตั้งฉาก (Normal Vector) ของระนาบ $3x - 4y + 7z - 12 = 0$ คือเวกเตอร์ใด
+          </h4>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs sm:text-sm">
+            <label class="p-2.5 rounded-xl border border-slate-200 hover:bg-slate-50 cursor-pointer flex items-center gap-2">
+              <input type="radio" name="q4" value="ก" class="accent-indigo-600"> <span>ก. $(3, -4, 7)$</span>
+            </label>
+            <label class="p-2.5 rounded-xl border border-slate-200 hover:bg-slate-50 cursor-pointer flex items-center gap-2">
+              <input type="radio" name="q4" value="ข" class="accent-indigo-600"> <span>ข. $(-3, 4, 7)$</span>
+            </label>
+            <label class="p-2.5 rounded-xl border border-slate-200 hover:bg-slate-50 cursor-pointer flex items-center gap-2">
+              <input type="radio" name="q4" value="ค" class="accent-indigo-600"> <span>ค. $(3, 4, 7)$</span>
+            </label>
+            <label class="p-2.5 rounded-xl border border-slate-200 hover:bg-slate-50 cursor-pointer flex items-center gap-2">
+              <input type="radio" name="q4" value="ง" class="accent-indigo-600"> <span>ง. $(3, -4, -12)$</span>
+            </label>
+          </div>
+          <div class="flex items-center justify-between pt-2">
+            <button onclick="toggleBox('ans4')" class="text-xs font-semibold text-indigo-600 hover:text-indigo-800">
+              <i class="fa-solid fa-circle-question mr-1"></i> เฉลยและวิธีทำ
+            </button>
+            <span id="feedback4" class="text-xs font-bold"></span>
+          </div>
+          <div id="ans4" class="solution-box hidden p-3.5 bg-slate-50 rounded-xl text-xs text-slate-700 border border-slate-200 space-y-1">
+            <p><strong>คำตอบที่ถูกต้อง: ก. $(3, -4, 7)$</strong></p>
+            <p><strong>วิธีทำ:</strong> สัมประสิทธิ์ของตัวแปร $x, y, z$ ในสมการระนาบ $Ax + By + Cz + D = 0$ คือองค์ประกอบของ $\mathbf{n} = (A, B, C)$ โดยตรง</p>
+          </div>
+        </div>
+
+        <!-- ==================== Q5 ==================== -->
+        <div class="exam-card p-5 rounded-2xl border border-slate-200 bg-white shadow-sm space-y-3" data-q="5" data-correct="ง">
+          <div class="flex flex-wrap items-center gap-2">
+            <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-blue-100 text-blue-800">[ผลลัพธ์การเรียนรู้: LO-5 ฐานและมิติ]</span>
+            <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-emerald-100 text-emerald-800">[ระดับ: ง่าย]</span>
+            <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-purple-100 text-purple-800">[ด้าน: K (Knowledge)]</span>
+          </div>
+          <h4 class="font-bold text-slate-800 text-sm sm:text-base">
+            ข้อ 5. มิติ (Dimension) ของปริภูมิเวกเตอร์ $\mathbb{R}^4$ มีค่าเท่ากับเท่าใด
+          </h4>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs sm:text-sm">
+            <label class="p-2.5 rounded-xl border border-slate-200 hover:bg-slate-50 cursor-pointer flex items-center gap-2">
+              <input type="radio" name="q5" value="ก" class="accent-indigo-600"> <span>ก. 1</span>
+            </label>
+            <label class="p-2.5 rounded-xl border border-slate-200 hover:bg-slate-50 cursor-pointer flex items-center gap-2">
+              <input type="radio" name="q5" value="ข" class="accent-indigo-600"> <span>ข. 2</span>
+            </label>
+            <label class="p-2.5 rounded-xl border border-slate-200 hover:bg-slate-50 cursor-pointer flex items-center gap-2">
+              <input type="radio" name="q5" value="ค" class="accent-indigo-600"> <span>ค. 3</span>
+            </label>
+            <label class="p-2.5 rounded-xl border border-slate-200 hover:bg-slate-50 cursor-pointer flex items-center gap-2">
+              <input type="radio" name="q5" value="ง" class="accent-indigo-600"> <span>ง. 4</span>
+            </label>
+          </div>
+          <div class="flex items-center justify-between pt-2">
+            <button onclick="toggleBox('ans5')" class="text-xs font-semibold text-indigo-600 hover:text-indigo-800">
+              <i class="fa-solid fa-circle-question mr-1"></i> เฉลยและวิธีทำ
+            </button>
+            <span id="feedback5" class="text-xs font-bold"></span>
+          </div>
+          <div id="ans5" class="solution-box hidden p-3.5 bg-slate-50 rounded-xl text-xs text-slate-700 border border-slate-200 space-y-1">
+            <p><strong>คำตอบที่ถูกต้อง: ง. 4</strong></p>
+            <p><strong>วิธีทำ:</strong> ปริภูมิ $\mathbb{R}^n$ มีมิติเท่ากับ $n$ เสมอ เนื่องจากต้องการเวกเตอร์ฐานมาตรฐาน $n$ เวกเตอร์</p>
+          </div>
+        </div>
+
+        <!-- ==================== Q6 ==================== -->
+        <div class="exam-card p-5 rounded-2xl border border-slate-200 bg-white shadow-sm space-y-3" data-q="6" data-correct="ข">
+          <div class="flex flex-wrap items-center gap-2">
+            <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-blue-100 text-blue-800">[ผลลัพธ์การเรียนรู้: LO-6 การเปลี่ยนฐาน]</span>
+            <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-emerald-100 text-emerald-800">[ระดับ: ง่าย]</span>
+            <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-purple-100 text-purple-800">[ด้าน: K (Knowledge)]</span>
+          </div>
+          <h4 class="font-bold text-slate-800 text-sm sm:text-base">
+            ข้อ 6. เมทริกซ์การเปลี่ยนฐาน $P$ จากฐาน $\mathcal{B}$ ไปยังฐานมาตรฐาน สามารถหาได้จากวิธีใด
+          </h4>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs sm:text-sm">
+            <label class="p-2.5 rounded-xl border border-slate-200 hover:bg-slate-50 cursor-pointer flex items-center gap-2">
+              <input type="radio" name="q6" value="ก" class="accent-indigo-600"> <span>ก. นำเวกเตอร์ฐานมาเขียนเรียงเป็นแถว (Rows)</span>
+            </label>
+            <label class="p-2.5 rounded-xl border border-slate-200 hover:bg-slate-50 cursor-pointer flex items-center gap-2">
+              <input type="radio" name="q6" value="ข" class="accent-indigo-600"> <span>ข. นำเวกเตอร์ฐานใน $\mathcal{B}$ มาจัดเรียงเป็นหลัก (Columns)</span>
+            </label>
+            <label class="p-2.5 rounded-xl border border-slate-200 hover:bg-slate-50 cursor-pointer flex items-center gap-2">
+              <input type="radio" name="q6" value="ค" class="accent-indigo-600"> <span>ค. หาผลคูณไขว้ของเวกเตอร์ฐาน</span>
+            </label>
+            <label class="p-2.5 rounded-xl border border-slate-200 hover:bg-slate-50 cursor-pointer flex items-center gap-2">
+              <input type="radio" name="q6" value="ง" class="accent-indigo-600"> <span>ง. หาผลบวกของเวกเตอร์ฐาน</span>
+            </label>
+          </div>
+          <div class="flex items-center justify-between pt-2">
+            <button onclick="toggleBox('ans6')" class="text-xs font-semibold text-indigo-600 hover:text-indigo-800">
+              <i class="fa-solid fa-circle-question mr-1"></i> เฉลยและวิธีทำ
+            </button>
+            <span id="feedback6" class="text-xs font-bold"></span>
+          </div>
+          <div id="ans6" class="solution-box hidden p-3.5 bg-slate-50 rounded-xl text-xs text-slate-700 border border-slate-200 space-y-1">
+            <p><strong>คำตอบที่ถูกต้อง: ข. นำเวกเตอร์ฐานใน $\mathcal{B}$ มาจัดเรียงเป็นหลัก (Columns)</strong></p>
+            <p><strong>วิธีทำ:</strong> นิยามของเมทริกซ์การเปลี่ยนฐาน $P = [\mathbf{b}_1\ \mathbf{b}_2\ \dots\ \mathbf{b}_n]$</p>
+          </div>
+        </div>
+
+        <!-- ==================== Q7 ==================== -->
+        <div class="exam-card p-5 rounded-2xl border border-slate-200 bg-white shadow-sm space-y-3" data-q="7" data-correct="ค">
+          <div class="flex flex-wrap items-center gap-2">
+            <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-blue-100 text-blue-800">[ผลลัพธ์การเรียนรู้: LO-2 การดำเนินการเวกเตอร์]</span>
+            <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-emerald-100 text-emerald-800">[ระดับ: ง่าย]</span>
+            <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-purple-100 text-purple-800">[ด้าน: P (Process)]</span>
+          </div>
+          <h4 class="font-bold text-slate-800 text-sm sm:text-base">
+            ข้อ 7. จงหาค่าดอทโปรดักต์ $\mathbf{u} \cdot \mathbf{v}$ เมื่อ $\mathbf{u} = (3, 2, -1)$ และ $\mathbf{v} = (2, -4, 1)$
+          </h4>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs sm:text-sm">
+            <label class="p-2.5 rounded-xl border border-slate-200 hover:bg-slate-50 cursor-pointer flex items-center gap-2">
+              <input type="radio" name="q7" value="ก" class="accent-indigo-600"> <span>ก. 3</span>
+            </label>
+            <label class="p-2.5 rounded-xl border border-slate-200 hover:bg-slate-50 cursor-pointer flex items-center gap-2">
+              <input type="radio" name="q7" value="ข" class="accent-indigo-600"> <span>ข. 0</span>
+            </label>
+            <label class="p-2.5 rounded-xl border border-slate-200 hover:bg-slate-50 cursor-pointer flex items-center gap-2">
+              <input type="radio" name="q7" value="ค" class="accent-indigo-600"> <span>ค. -3</span>
+            </label>
+            <label class="p-2.5 rounded-xl border border-slate-200 hover:bg-slate-50 cursor-pointer flex items-center gap-2">
+              <input type="radio" name="q7" value="ง" class="accent-indigo-600"> <span>ง. -1</span>
+            </label>
+          </div>
+          <div class="flex items-center justify-between pt-2">
+            <button onclick="toggleBox('ans7')" class="text-xs font-semibold text-indigo-600 hover:text-indigo-800">
+              <i class="fa-solid fa-circle-question mr-1"></i> เฉลยและวิธีทำ
+            </button>
+            <span id="feedback7" class="text-xs font-bold"></span>
+          </div>
+          <div id="ans7" class="solution-box hidden p-3.5 bg-slate-50 rounded-xl text-xs text-slate-700 border border-slate-200 space-y-1">
+            <p><strong>คำตอบที่ถูกต้อง: ค. -3</strong></p>
+            <p><strong>วิธีทำ:</strong> $\mathbf{u} \cdot \mathbf{v} = (3)(2) + (2)(-4) + (-1)(1) = 6 - 8 - 1 = -3$</p>
+          </div>
+        </div>
+
+        <!-- ==================== Q8 ==================== -->
+        <div class="exam-card p-5 rounded-2xl border border-slate-200 bg-white shadow-sm space-y-3" data-q="8" data-correct="ก">
+          <div class="flex flex-wrap items-center gap-2">
+            <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-blue-100 text-blue-800">[ผลลัพธ์การเรียนรู้: LO-3 สมการเส้นตรง]</span>
+            <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-emerald-100 text-emerald-800">[ระดับ: ง่าย]</span>
+            <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-purple-100 text-purple-800">[ด้าน: P (Process)]</span>
+          </div>
+          <h4 class="font-bold text-slate-800 text-sm sm:text-base">
+            ข้อ 8. จุดใดต่อไปนี้อยู่บนเส้นตรงที่มีสมการพาราเมตริก $x = 2 + t, y = 3 - 2t, z = 1 + 4t$
+          </h4>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs sm:text-sm">
+            <label class="p-2.5 rounded-xl border border-slate-200 hover:bg-slate-50 cursor-pointer flex items-center gap-2">
+              <input type="radio" name="q8" value="ก" class="accent-indigo-600"> <span>ก. $(3, 1, 5)$</span>
+            </label>
+            <label class="p-2.5 rounded-xl border border-slate-200 hover:bg-slate-50 cursor-pointer flex items-center gap-2">
+              <input type="radio" name="q8" value="ข" class="accent-indigo-600"> <span>ข. $(2, 1, 4)$</span>
+            </label>
+            <label class="p-2.5 rounded-xl border border-slate-200 hover:bg-slate-50 cursor-pointer flex items-center gap-2">
+              <input type="radio" name="q8" value="ค" class="accent-indigo-600"> <span>ค. $(0, 5, 0)$</span>
+            </label>
+            <label class="p-2.5 rounded-xl border border-slate-200 hover:bg-slate-50 cursor-pointer flex items-center gap-2">
+              <input type="radio" name="q8" value="ง" class="accent-indigo-600"> <span>ง. $(4, -1, 8)$</span>
+            </label>
+          </div>
+          <div class="flex items-center justify-between pt-2">
+            <button onclick="toggleBox('ans8')" class="text-xs font-semibold text-indigo-600 hover:text-indigo-800">
+              <i class="fa-solid fa-circle-question mr-1"></i> เฉลยและวิธีทำ
+            </button>
+            <span id="feedback8" class="text-xs font-bold"></span>
+          </div>
+          <div id="ans8" class="solution-box hidden p-3.5 bg-slate-50 rounded-xl text-xs text-slate-700 border border-slate-200 space-y-1">
+            <p><strong>คำตอบที่ถูกต้อง: ก. $(3, 1, 5)$</strong></p>
+            <p><strong>วิธีทำ:</strong> แทนค่าพารามิเตอร์ $t = 1$: $x = 2 + 1 = 3, y = 3 - 2(1) = 1, z = 1 + 4(1) = 5$</p>
+          </div>
+        </div>
+
+        <!-- ==================== Q9 ==================== -->
+        <div class="exam-card p-5 rounded-2xl border border-slate-200 bg-white shadow-sm space-y-3" data-q="9" data-correct="ค">
+          <div class="flex flex-wrap items-center gap-2">
+            <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-blue-100 text-blue-800">[ผลลัพธ์การเรียนรู้: LO-7 ความหมายพิกัด]</span>
+            <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-emerald-100 text-emerald-800">[ระดับ: ง่าย]</span>
+            <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-purple-100 text-purple-800">[ด้าน: A (Attitude/Appreciation)]</span>
+          </div>
+          <h4 class="font-bold text-slate-800 text-sm sm:text-base">
+            ข้อ 9. ในงาน Computer Graphics ข้อใดอธิบายคุณค่าที่สำคัญที่สุดของการ "เปลี่ยนฐานเวกเตอร์ (Change of Basis)" ได้ถูกต้อง
+          </h4>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs sm:text-sm">
+            <label class="p-2.5 rounded-xl border border-slate-200 hover:bg-slate-50 cursor-pointer flex items-center gap-2">
+              <input type="radio" name="q9" value="ก" class="accent-indigo-600"> <span>ก. ช่วยลบวัตถุที่อยู่นอกจอทิ้งเพื่อประหยัดหน่วยความจำ</span>
+            </label>
+            <label class="p-2.5 rounded-xl border border-slate-200 hover:bg-slate-50 cursor-pointer flex items-center gap-2">
+              <input type="radio" name="q9" value="ข" class="accent-indigo-600"> <span>ข. ช่วยลดจำนวนเวกเตอร์ในโลกสามมิติให้เหลือศูนย์</span>
+            </label>
+            <label class="p-2.5 rounded-xl border border-slate-200 hover:bg-slate-50 cursor-pointer flex items-center gap-2">
+              <input type="radio" name="q9" value="ค" class="accent-indigo-600"> <span>ค. ช่วยแปลงพิกัดวัตถุในโลก 3D (World Space) ให้เข้าสู่มุมมองของกล้อง (Camera Space) ได้อย่างแม่นยำ</span>
+            </label>
+            <label class="p-2.5 rounded-xl border border-slate-200 hover:bg-slate-50 cursor-pointer flex items-center gap-2">
+              <input type="radio" name="q9" value="ง" class="accent-indigo-600"> <span>ง. ช่วยเพิ่มความละเอียดของสีในโมเดล 3D</span>
+            </label>
+          </div>
+          <div class="flex items-center justify-between pt-2">
+            <button onclick="toggleBox('ans9')" class="text-xs font-semibold text-indigo-600 hover:text-indigo-800">
+              <i class="fa-solid fa-circle-question mr-1"></i> เฉลยและวิธีทำ
+            </button>
+            <span id="feedback9" class="text-xs font-bold"></span>
+          </div>
+          <div id="ans9" class="solution-box hidden p-3.5 bg-slate-50 rounded-xl text-xs text-slate-700 border border-slate-200 space-y-1">
+            <p><strong>คำตอบที่ถูกต้อง: ค.</strong> ช่วยแปลงพิกัดวัตถุในโลก 3D ให้เข้าสู่มุมมองของกล้อง</p>
+            <p><strong>คำอธิบาย:</strong> กล้องในเกมหรือโปรแกรม 3D มีฐานของตนเอง (แกนมอง, แกนขวา, แกนขึ้น) การมองเห็นจำเป็นต้องแปลงพิกัดจาก World Space สู่ Camera Space เสมอ</p>
+          </div>
+        </div>
+
+        <!-- ==================== Q10 ==================== -->
+        <div class="exam-card p-5 rounded-2xl border border-slate-200 bg-white shadow-sm space-y-3" data-q="10" data-correct="ก">
+          <div class="flex flex-wrap items-center gap-2">
+            <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-blue-100 text-blue-800">[ผลลัพธ์การเรียนรู้: LO-8 ประยุกต์วิทยาศาสตร์]</span>
+            <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-emerald-100 text-emerald-800">[ระดับ: ง่าย]</span>
+            <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-purple-100 text-purple-800">[ด้าน: A (Attitude/Appreciation)]</span>
+          </div>
+          <h4 class="font-bold text-slate-800 text-sm sm:text-base">
+            ข้อ 10. ในวิชาฟิสิกส์ การเลือกใช้ฐานเวกเตอร์ที่ขนานและตั้งฉากกับ "พื้นเอียง" แทนที่จะใช้แนวราบ-แนวดิ่ง มีประโยชน์หลักเพื่ออะไร
+          </h4>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs sm:text-sm">
+            <label class="p-2.5 rounded-xl border border-slate-200 hover:bg-slate-50 cursor-pointer flex items-center gap-2">
+              <input type="radio" name="q10" value="ก" class="accent-indigo-600"> <span>ก. ทำให้สมการการเคลื่อนที่แยกแกนอิสระ คิดคำนวณง่าย ไม่ต้องแก้ระบบสมการที่ซับซ้อน</span>
+            </label>
+            <label class="p-2.5 rounded-xl border border-slate-200 hover:bg-slate-50 cursor-pointer flex items-center gap-2">
+              <input type="radio" name="q10" value="ข" class="accent-indigo-600"> <span>ข. ทำให้แรงโน้มถ่วงมีค่ากลายเป็นศูนย์</span>
+            </label>
+            <label class="p-2.5 rounded-xl border border-slate-200 hover:bg-slate-50 cursor-pointer flex items-center gap-2">
+              <input type="radio" name="q10" value="ค" class="accent-indigo-600"> <span>ค. ป้องกันไม่ให้วัตถุไถลลงตามพื้นเอียง</span>
+            </label>
+            <label class="p-2.5 rounded-xl border border-slate-200 hover:bg-slate-50 cursor-pointer flex items-center gap-2">
+              <input type="radio" name="q10" value="ง" class="accent-indigo-600"> <span>ง. เพื่อเปลี่ยนวัตถุ 3 มิติให้เป็น 1 มิติ</span>
+            </label>
+          </div>
+          <div class="flex items-center justify-between pt-2">
+            <button onclick="toggleBox('ans10')" class="text-xs font-semibold text-indigo-600 hover:text-indigo-800">
+              <i class="fa-solid fa-circle-question mr-1"></i> เฉลยและวิธีทำ
+            </button>
+            <span id="feedback10" class="text-xs font-bold"></span>
+          </div>
+          <div id="ans10" class="solution-box hidden p-3.5 bg-slate-50 rounded-xl text-xs text-slate-700 border border-slate-200 space-y-1">
+            <p><strong>คำตอบที่ถูกต้อง: ก.</strong> ทำให้สมการการเคลื่อนที่แยกแกนอิสระ คิดคำนวณง่าย</p>
+            <p><strong>คำอธิบาย:</strong> เป็นตัวอย่างคลาสสิกของการเปลี่ยนฐาน (Change of Basis) เพื่อให้แกนหนึ่งตรงกับทิศการเคลื่อนที่ ทำให้แกนตั้งฉากมีความเร่งเป็นศูนย์</p>
+          </div>
+        </div>
+
+        <!-- ==================== Q11 ==================== -->
+        <div class="exam-card p-5 rounded-2xl border border-slate-200 bg-white shadow-sm space-y-3" data-q="11" data-correct="ข">
+          <div class="flex flex-wrap items-center gap-2">
+            <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-blue-100 text-blue-800">[ผลลัพธ์การเรียนรู้: LO-2 เวกเตอร์ตั้งฉาก]</span>
+            <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-amber-100 text-amber-800">[ระดับ: ปานกลาง]</span>
+            <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-purple-100 text-purple-800">[ด้าน: K (Knowledge)]</span>
+          </div>
+          <h4 class="font-bold text-slate-800 text-sm sm:text-base">
+            ข้อ 11. ค่า $k$ ที่ทำให้เวกเตอร์ $\mathbf{u} = (k, 2, -4)$ ตั้งฉากกับเวกเตอร์ $\mathbf{v} = (3, -1, 2)$ มีค่าตรงกับข้อใด
+          </h4>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs sm:text-sm">
+            <label class="p-2.5 rounded-xl border border-slate-200 hover:bg-slate-50 cursor-pointer flex items-center gap-2">
+              <input type="radio" name="q11" value="ก" class="accent-indigo-600"> <span>ก. $k = 2$</span>
+            </label>
+            <label class="p-2.5 rounded-xl border border-slate-200 hover:bg-slate-50 cursor-pointer flex items-center gap-2">
+              <input type="radio" name="q11" value="ข" class="accent-indigo-600"> <span>ข. $k = \frac{10}{3}$</span>
+            </label>
+            <label class="p-2.5 rounded-xl border border-slate-200 hover:bg-slate-50 cursor-pointer flex items-center gap-2">
+              <input type="radio" name="q11" value="ค" class="accent-indigo-600"> <span>ค. $k = -\frac{10}{3}$</span>
+            </label>
+            <label class="p-2.5 rounded-xl border border-slate-200 hover:bg-slate-50 cursor-pointer flex items-center gap-2">
+              <input type="radio" name="q11" value="ง" class="accent-indigo-600"> <span>ง. $k = 5$</span>
+            </label>
+          </div>
+          <div class="flex items-center justify-between pt-2">
+            <button onclick="toggleBox('ans11')" class="text-xs font-semibold text-indigo-600 hover:text-indigo-800">
+              <i class="fa-solid fa-circle-question mr-1"></i> เฉลยและวิธีทำ
+            </button>
+            <span id="feedback11" class="text-xs font-bold"></span>
+          </div>
+          <div id="ans11" class="solution-box hidden p-3.5 bg-slate-50 rounded-xl text-xs text-slate-700 border border-slate-200 space-y-1">
+            <p><strong>คำตอบที่ถูกต้อง: ข. $k = \frac{10}{3}$</strong></p>
+            <p><strong>วิธีทำ:</strong> $\mathbf{u} \cdot \mathbf{v} = 0 \implies 3k + (2)(-1) + (-4)(2) = 0 \implies 3k - 2 - 8 = 0 \implies 3k = 10 \implies k = \frac{10}{3}$</p>
+          </div>
+        </div>
+
+        <!-- ==================== Q12 ==================== -->
+        <div class="exam-card p-5 rounded-2xl border border-slate-200 bg-white shadow-sm space-y-3" data-q="12" data-correct="ค">
+          <div class="flex flex-wrap items-center gap-2">
+            <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-blue-100 text-blue-800">[ผลลัพธ์การเรียนรู้: LO-4 ผลคูณไขว้]</span>
+            <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-amber-100 text-amber-800">[ระดับ: ปานกลาง]</span>
+            <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-purple-100 text-purple-800">[ด้าน: K (Knowledge)]</span>
+          </div>
+          <h4 class="font-bold text-slate-800 text-sm sm:text-base">
+            ข้อ 12. ผลคูณไขว้ $\mathbf{u} \times \mathbf{v}$ ของ $\mathbf{u} = (1, 0, 2)$ และ $\mathbf{v} = (0, 1, 1)$ มีค่าเท่ากับเท่าใด
+          </h4>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs sm:text-sm">
+            <label class="p-2.5 rounded-xl border border-slate-200 hover:bg-slate-50 cursor-pointer flex items-center gap-2">
+              <input type="radio" name="q12" value="ก" class="accent-indigo-600"> <span>ก. $(2, -1, 1)$</span>
+            </label>
+            <label class="p-2.5 rounded-xl border border-slate-200 hover:bg-slate-50 cursor-pointer flex items-center gap-2">
+              <input type="radio" name="q12" value="ข" class="accent-indigo-600"> <span>ข. $(-2, 1, -1)$</span>
+            </label>
+            <label class="p-2.5 rounded-xl border border-slate-200 hover:bg-slate-50 cursor-pointer flex items-center gap-2">
+              <input type="radio" name="q12" value="ค" class="accent-indigo-600"> <span>ค. $(-2, -1, 1)$</span>
+            </label>
+            <label class="p-2.5 rounded-xl border border-slate-200 hover:bg-slate-50 cursor-pointer flex items-center gap-2">
+              <input type="radio" name="q12" value="ง" class="accent-indigo-600"> <span>ง. $(1, 1, 3)$</span>
+            </label>
+          </div>
+          <div class="flex items-center justify-between pt-2">
+            <button onclick="toggleBox('ans12')" class="text-xs font-semibold text-indigo-600 hover:text-indigo-800">
+              <i class="fa-solid fa-circle-question mr-1"></i> เฉลยและวิธีทำ
+            </button>
+            <span id="feedback12" class="text-xs font-bold"></span>
+          </div>
+          <div id="ans12" class="solution-box hidden p-3.5 bg-slate-50 rounded-xl text-xs text-slate-700 border border-slate-200 space-y-1">
+            <p><strong>คำตอบที่ถูกต้อง: ค. $(-2, -1, 1)$</strong></p>
+            <p><strong>วิธีทำ:</strong> $\mathbf{u} \times \mathbf{v} = \begin{vmatrix} \mathbf{i} & \mathbf{j} & \mathbf{k} \\ 1 & 0 & 2 \\ 0 & 1 & 1 \end{vmatrix} = \mathbf{i}(0-2) - \mathbf{j}(1-0) + \mathbf{k}(1-0) = (-2, -1, 1)$</p>
+          </div>
+        </div>
+
+        <!-- ==================== Q13 ==================== -->
+        <div class="exam-card p-5 rounded-2xl border border-slate-200 bg-white shadow-sm space-y-3" data-q="13" data-correct="ก">
+          <div class="flex flex-wrap items-center gap-2">
+            <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-blue-100 text-blue-800">[ผลลัพธ์การเรียนรู้: LO-3 มุมระหว่างเส้นตรง]</span>
+            <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-amber-100 text-amber-800">[ระดับ: ปานกลาง]</span>
+            <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-purple-100 text-purple-800">[ด้าน: P (Process)]</span>
+          </div>
+          <h4 class="font-bold text-slate-800 text-sm sm:text-base">
+            ข้อ 13. เส้นตรง $L_1: \mathbf{r}_1(t) = (1,0,2) + t(1, 2, -2)$ และ $L_2: \mathbf{r}_2(s) = (2,-1,0) + s(2, 1, 2)$ มีลักษณะความสัมพันธ์ตามข้อใด
+          </h4>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs sm:text-sm">
+            <label class="p-2.5 rounded-xl border border-slate-200 hover:bg-slate-50 cursor-pointer flex items-center gap-2">
+              <input type="radio" name="q13" value="ก" class="accent-indigo-600"> <span>ก. ทิศทางตั้งฉากกัน</span>
+            </label>
+            <label class="p-2.5 rounded-xl border border-slate-200 hover:bg-slate-50 cursor-pointer flex items-center gap-2">
+              <input type="radio" name="q13" value="ข" class="accent-indigo-600"> <span>ข. ขนานกัน</span>
+            </label>
+            <label class="p-2.5 rounded-xl border border-slate-200 hover:bg-slate-50 cursor-pointer flex items-center gap-2">
+              <input type="radio" name="q13" value="ค" class="accent-indigo-600"> <span>ค. เป็นเส้นตรงเดียวกัน</span>
+            </label>
+            <label class="p-2.5 rounded-xl border border-slate-200 hover:bg-slate-50 cursor-pointer flex items-center gap-2">
+              <input type="radio" name="q13" value="ง" class="accent-indigo-600"> <span>ง. ทำมุม $45^\circ$ ต่อกัน</span>
+            </label>
+          </div>
+          <div class="flex items-center justify-between pt-2">
+            <button onclick="toggleBox('ans13')" class="text-xs font-semibold text-indigo-600 hover:text-indigo-800">
+              <i class="fa-solid fa-circle-question mr-1"></i> เฉลยและวิธีทำ
+            </button>
+            <span id="feedback13" class="text-xs font-bold"></span>
+          </div>
+          <div id="ans13" class="solution-box hidden p-3.5 bg-slate-50 rounded-xl text-xs text-slate-700 border border-slate-200 space-y-1">
+            <p><strong>คำตอบที่ถูกต้อง: ก. ทิศทางตั้งฉากกัน</strong></p>
+            <p><strong>วิธีทำ:</strong> พิจารณาเวกเตอร์ทิศทาง $\mathbf{v}_1 = (1, 2, -2)$ และ $\mathbf{v}_2 = (2, 1, 2)$ นำมาดอทกัน:</p>
+            <p>$\mathbf{v}_1 \cdot \mathbf{v}_2 = (1)(2) + (2)(1) + (-2)(2) = 2 + 2 - 4 = 0 \implies$ เส้นตรงทั้งสองมีทิศทางตั้งฉากกัน</p>
+          </div>
+        </div>
+
+        <!-- ==================== Q14 ==================== -->
+        <div class="exam-card p-5 rounded-2xl border border-slate-200 bg-white shadow-sm space-y-3" data-q="14" data-correct="ข">
+          <div class="flex flex-wrap items-center gap-2">
+            <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-blue-100 text-blue-800">[ผลลัพธ์การเรียนรู้: LO-4 ระนาบผ่าน 3 จุด]</span>
+            <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-amber-100 text-amber-800">[ระดับ: ปานกลาง]</span>
+            <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-purple-100 text-purple-800">[ด้าน: P (Process)]</span>
+          </div>
+          <h4 class="font-bold text-slate-800 text-sm sm:text-base">
+            ข้อ 14. เวกเตอร์ตั้งฉากของระนาบที่ผ่านจุดกำเนิด $(0,0,0)$, $P(1,1,0)$ และ $Q(0,1,1)$ คือเวกเตอร์ใด
+          </h4>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs sm:text-sm">
+            <label class="p-2.5 rounded-xl border border-slate-200 hover:bg-slate-50 cursor-pointer flex items-center gap-2">
+              <input type="radio" name="q14" value="ก" class="accent-indigo-600"> <span>ก. $(1, 1, 1)$</span>
+            </label>
+            <label class="p-2.5 rounded-xl border border-slate-200 hover:bg-slate-50 cursor-pointer flex items-center gap-2">
+              <input type="radio" name="q14" value="ข" class="accent-indigo-600"> <span>ข. $(1, -1, 1)$</span>
+            </label>
+            <label class="p-2.5 rounded-xl border border-slate-200 hover:bg-slate-50 cursor-pointer flex items-center gap-2">
+              <input type="radio" name="q14" value="ค" class="accent-indigo-600"> <span>ค. $(-1, 1, 1)$</span>
+            </label>
+            <label class="p-2.5 rounded-xl border border-slate-200 hover:bg-slate-50 cursor-pointer flex items-center gap-2">
+              <input type="radio" name="q14" value="ง" class="accent-indigo-600"> <span>ง. $(1, 0, -1)$</span>
+            </label>
+          </div>
+          <div class="flex items-center justify-between pt-2">
+            <button onclick="toggleBox('ans14')" class="text-xs font-semibold text-indigo-600 hover:text-indigo-800">
+              <i class="fa-solid fa-circle-question mr-1"></i> เฉลยและวิธีทำ
+            </button>
+            <span id="feedback14" class="text-xs font-bold"></span>
+          </div>
+          <div id="ans14" class="solution-box hidden p-3.5 bg-slate-50 rounded-xl text-xs text-slate-700 border border-slate-200 space-y-1">
+            <p><strong>คำตอบที่ถูกต้อง: ข. $(1, -1, 1)$</strong></p>
+            <p><strong>วิธีทำ:</strong> เวกเตอร์บนระนาบคือ $\mathbf{u} = (1,1,0)$ และ $\mathbf{v} = (0,1,1)$</p>
+            <p>$\mathbf{n} = \mathbf{u} \times \mathbf{v} = ((1)(1)-(0)(1), (0)(0)-(1)(1), (1)(1)-(1)(0)) = (1, -1, 1)$</p>
+          </div>
+        </div>
+
+        <!-- ==================== Q15 ==================== -->
+        <div class="exam-card p-5 rounded-2xl border border-slate-200 bg-white shadow-sm space-y-3" data-q="15" data-correct="ค">
+          <div class="flex flex-wrap items-center gap-2">
+            <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-blue-100 text-blue-800">[ผลลัพธ์การเรียนรู้: LO-6 การหาพิกัดเทียบฐาน]</span>
+            <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-amber-100 text-amber-800">[ระดับ: ปานกลาง]</span>
+            <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-purple-100 text-purple-800">[ด้าน: P (Process)]</span>
+          </div>
+          <h4 class="font-bold text-slate-800 text-sm sm:text-base">
+            ข้อ 15. พิกัดของ $\mathbf{v} = (7, 4)$ เมื่อเทียบกับฐาน $\mathcal{B} = \{(2, 1), (1, 1)\}$ มีค่าตรงกับข้อใด
+          </h4>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs sm:text-sm">
+            <label class="p-2.5 rounded-xl border border-slate-200 hover:bg-slate-50 cursor-pointer flex items-center gap-2">
+              <input type="radio" name="q15" value="ก" class="accent-indigo-600"> <span>ก. $[\mathbf{v}]_\mathcal{B} = \begin{bmatrix} 2 \\ 3 \end{bmatrix}$</span>
+            </label>
+            <label class="p-2.5 rounded-xl border border-slate-200 hover:bg-slate-50 cursor-pointer flex items-center gap-2">
+              <input type="radio" name="q15" value="ข" class="accent-indigo-600"> <span>ข. $[\mathbf{v}]_\mathcal{B} = \begin{bmatrix} 4 \\ -1 \end{bmatrix}$</span>
+            </label>
+            <label class="p-2.5 rounded-xl border border-slate-200 hover:bg-slate-50 cursor-pointer flex items-center gap-2">
+              <input type="radio" name="q15" value="ค" class="accent-indigo-600"> <span>ค. $[\mathbf{v}]_\mathcal{B} = \begin{bmatrix} 3 \\ 1 \end{bmatrix}$</span>
+            </label>
+            <label class="p-2.5 rounded-xl border border-slate-200 hover:bg-slate-50 cursor-pointer flex items-center gap-2">
+              <input type="radio" name="q15" value="ง" class="accent-indigo-600"> <span>ง. $[\mathbf{v}]_\mathcal{B} = \begin{bmatrix} 1 \\ 5 \end{bmatrix}$</span>
+            </label>
+          </div>
+          <div class="flex items-center justify-between pt-2">
+            <button onclick="toggleBox('ans15')" class="text-xs font-semibold text-indigo-600 hover:text-indigo-800">
+              <i class="fa-solid fa-circle-question mr-1"></i> เฉลยและวิธีทำ
+            </button>
+            <span id="feedback15" class="text-xs font-bold"></span>
+          </div>
+          <div id="ans15" class="solution-box hidden p-3.5 bg-slate-50 rounded-xl text-xs text-slate-700 border border-slate-200 space-y-1">
+            <p><strong>คำตอบที่ถูกต้อง: ค. $[\mathbf{v}]_\mathcal{B} = \begin{bmatrix} 3 \\ 1 \end{bmatrix}$</strong></p>
+            <p><strong>วิธีทำ:</strong> $c_1(2, 1) + c_2(1, 1) = (7, 4) \implies 2c_1 + c_2 = 7$ และ $c_1 + c_2 = 4$</p>
+            <p>ลบสมการ: $(2c_1 + c_2) - (c_1 + c_2) = 7 - 4 \implies c_1 = 3 \implies c_2 = 1$</p>
+          </div>
+        </div>
+
+        <!-- ==================== Q16 ==================== -->
+        <div class="exam-card p-5 rounded-2xl border border-slate-200 bg-white shadow-sm space-y-3" data-q="16" data-correct="ก">
+          <div class="flex flex-wrap items-center gap-2">
+            <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-blue-100 text-blue-800">[ผลลัพธ์การเรียนรู้: LO-6 เมทริกซ์ผกผันการเปลี่ยนฐาน]</span>
+            <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-amber-100 text-amber-800">[ระดับ: ปานกลาง]</span>
+            <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-purple-100 text-purple-800">[ด้าน: P (Process)]</span>
+          </div>
+          <h4 class="font-bold text-slate-800 text-sm sm:text-base">
+            ข้อ 16. ถ้าเมทริกซ์การเปลี่ยนฐานคือ $P = \begin{bmatrix} 2 & 1 \\ 5 & 3 \end{bmatrix}$ แล้ว เมทริกซ์การแปลงกลับ $P^{-1}$ มีค่าตรงกับข้อใด
+          </h4>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs sm:text-sm">
+            <label class="p-2.5 rounded-xl border border-slate-200 hover:bg-slate-50 cursor-pointer flex items-center gap-2">
+              <input type="radio" name="q16" value="ก" class="accent-indigo-600"> <span>ก. $\begin{bmatrix} 3 & -1 \\ -5 & 2 \end{bmatrix}$</span>
+            </label>
+            <label class="p-2.5 rounded-xl border border-slate-200 hover:bg-slate-50 cursor-pointer flex items-center gap-2">
+              <input type="radio" name="q16" value="ข" class="accent-indigo-600"> <span>ข. $\begin{bmatrix} -3 & 1 \\ 5 & -2 \end{bmatrix}$</span>
+            </label>
+            <label class="p-2.5 rounded-xl border border-slate-200 hover:bg-slate-50 cursor-pointer flex items-center gap-2">
+              <input type="radio" name="q16" value="ค" class="accent-indigo-600"> <span>ค. $\begin{bmatrix} 2 & -1 \\ -5 & 3 \end{bmatrix}$</span>
+            </label>
+            <label class="p-2.5 rounded-xl border border-slate-200 hover:bg-slate-50 cursor-pointer flex items-center gap-2">
+              <input type="radio" name="q16" value="ง" class="accent-indigo-600"> <span>ง. $\begin{bmatrix} 3 & 1 \\ 5 & 2 \end{bmatrix}$</span>
+            </label>
+          </div>
+          <div class="flex items-center justify-between pt-2">
+            <button onclick="toggleBox('ans16')" class="text-xs font-semibold text-indigo-600 hover:text-indigo-800">
+              <i class="fa-solid fa-circle-question mr-1"></i> เฉลยและวิธีทำ
+            </button>
+            <span id="feedback16" class="text-xs font-bold"></span>
+          </div>
+          <div id="ans16" class="solution-box hidden p-3.5 bg-slate-50 rounded-xl text-xs text-slate-700 border border-slate-200 space-y-1">
+            <p><strong>คำตอบที่ถูกต้อง: ก. $\begin{bmatrix} 3 & -1 \\ -5 & 2 \end{bmatrix}$</strong></p>
+            <p><strong>วิธีทำ:</strong> $\det(P) = (2)(3) - (1)(5) = 6 - 5 = 1$</p>
+            <p>ดังนั้น $P^{-1} = \frac{1}{1}\begin{bmatrix} 3 & -1 \\ -5 & 2 \end{bmatrix} = \begin{bmatrix} 3 & -1 \\ -5 & 2 \end{bmatrix}$</p>
+          </div>
+        </div>
+
+        <!-- ==================== Q17 ==================== -->
+        <div class="exam-card p-5 rounded-2xl border border-slate-200 bg-white shadow-sm space-y-3" data-q="17" data-correct="ง">
+          <div class="flex flex-wrap items-center gap-2">
+            <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-blue-100 text-blue-800">[ผลลัพธ์การเรียนรู้: LO-7 โครงสร้างพีชคณิต]</span>
+            <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-amber-100 text-amber-800">[ระดับ: ปานกลาง]</span>
+            <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-purple-100 text-purple-800">[ด้าน: A (Attitude)]</span>
+          </div>
+          <h4 class="font-bold text-slate-800 text-sm sm:text-base">
+            ข้อ 17. นักวิทยาศาสตร์ข้อมูลนิยมใช้เทคนิค PCA (Principal Component Analysis) ซึ่งมีแก่นแท้มาจากการเปลี่ยนฐานเวกเตอร์ เพื่อประโยชน์ตามข้อใด
+          </h4>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs sm:text-sm">
+            <label class="p-2.5 rounded-xl border border-slate-200 hover:bg-slate-50 cursor-pointer flex items-center gap-2">
+              <input type="radio" name="q17" value="ก" class="accent-indigo-600"> <span>ก. แปลงข้อมูลที่เป็นตัวหนังสือให้เป็นตัวเลข</span>
+            </label>
+            <label class="p-2.5 rounded-xl border border-slate-200 hover:bg-slate-50 cursor-pointer flex items-center gap-2">
+              <input type="radio" name="q17" value="ข" class="accent-indigo-600"> <span>ข. เพิ่มจำนวนคอลัมน์ของข้อมูลให้มากขึ้นเพื่อความละเอียด</span>
+            </label>
+            <label class="p-2.5 rounded-xl border border-slate-200 hover:bg-slate-50 cursor-pointer flex items-center gap-2">
+              <input type="radio" name="q17" value="ค" class="accent-indigo-600"> <span>ค. ลบข้อมูลที่ซ้ำกันทิ้งไปแบบสุ่ม</span>
+            </label>
+            <label class="p-2.5 rounded-xl border border-slate-200 hover:bg-slate-50 cursor-pointer flex items-center gap-2">
+              <input type="radio" name="q17" value="ง" class="accent-indigo-600"> <span>ง. หมุนแกนอ้างอิงไปยังแนวแกนที่ข้อมูลมีความแปรปรวนสูงสุด (ลดมิติข้อมูลโดยยังรักษาแก่นของข้อมูลไว้)</span>
+            </label>
+          </div>
+          <div class="flex items-center justify-between pt-2">
+            <button onclick="toggleBox('ans17')" class="text-xs font-semibold text-indigo-600 hover:text-indigo-800">
+              <i class="fa-solid fa-circle-question mr-1"></i> เฉลยและวิธีทำ
+            </button>
+            <span id="feedback17" class="text-xs font-bold"></span>
+          </div>
+          <div id="ans17" class="solution-box hidden p-3.5 bg-slate-50 rounded-xl text-xs text-slate-700 border border-slate-200 space-y-1">
+            <p><strong>คำตอบที่ถูกต้อง: ง.</strong> หมุนแกนอ้างอิงไปยังแนวแกนที่ข้อมูลมีความแปรปรวนสูงสุด</p>
+            <p><strong>คำอธิบาย:</strong> PCA คือการหาฐานไอเกน (Eigenbasis) ใหม่ เพื่อให้ได้พิกัดที่อธิบายการกระจายของข้อมูลได้ดีที่สุด</p>
+          </div>
+        </div>
+
+        <!-- ==================== Q18 ==================== -->
+        <div class="exam-card p-5 rounded-2xl border border-slate-200 bg-white shadow-sm space-y-3" data-q="18" data-correct="ข">
+          <div class="flex flex-wrap items-center gap-2">
+            <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-blue-100 text-blue-800">[ผลลัพธ์การเรียนรู้: LO-8 เรขาคณิตคำนวณ]</span>
+            <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-amber-100 text-amber-800">[ระดับ: ปานกลาง]</span>
+            <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-purple-100 text-purple-800">[ด้าน: A (Attitude)]</span>
+          </div>
+          <h4 class="font-bold text-slate-800 text-sm sm:text-base">
+            ข้อ 18. ในการคำนวณการตกกระทบของลำแสง (Ray-Plane Intersection) ในโปรแกรมจำลองเสมือนจริง การกำหนดระนาบด้วยเวกเตอร์แนวฉาก $\mathbf{n}$ มีข้อดีเหนือกว่ารูปแบบอื่นอย่างไร
+          </h4>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs sm:text-sm">
+            <label class="p-2.5 rounded-xl border border-slate-200 hover:bg-slate-50 cursor-pointer flex items-center gap-2">
+              <input type="radio" name="q18" value="ก" class="accent-indigo-600"> <span>ก. ทำให้ไม่ต้องคำนวณตำแหน่งจุดตัด</span>
+            </label>
+            <label class="p-2.5 rounded-xl border border-slate-200 hover:bg-slate-50 cursor-pointer flex items-center gap-2">
+              <input type="radio" name="q18" value="ข" class="accent-indigo-600"> <span>ข. ตรวจสอบจุดตัดได้รวดเร็วมากด้วยการดอทโปรดักต์เพียงครั้งเดียว $\mathbf{n} \cdot (\mathbf{r}(t) - \mathbf{p}_0) = 0$</span>
+            </label>
+            <label class="p-2.5 rounded-xl border border-slate-200 hover:bg-slate-50 cursor-pointer flex items-center gap-2">
+              <input type="radio" name="q18" value="ค" class="accent-indigo-600"> <span>ค. ช่วยให้ลำแสงโค้งงอได้ตามต้องการ</span>
+            </label>
+            <label class="p-2.5 rounded-xl border border-slate-200 hover:bg-slate-50 cursor-pointer flex items-center gap-2">
+              <input type="radio" name="q18" value="ง" class="accent-indigo-600"> <span>ง. ทำให้แสงมีความสว่างคงที่ในทุกระยะ</span>
+            </label>
+          </div>
+          <div class="flex items-center justify-between pt-2">
+            <button onclick="toggleBox('ans18')" class="text-xs font-semibold text-indigo-600 hover:text-indigo-800">
+              <i class="fa-solid fa-circle-question mr-1"></i> เฉลยและวิธีทำ
+            </button>
+            <span id="feedback18" class="text-xs font-bold"></span>
+          </div>
+          <div id="ans18" class="solution-box hidden p-3.5 bg-slate-50 rounded-xl text-xs text-slate-700 border border-slate-200 space-y-1">
+            <p><strong>คำตอบที่ถูกต้อง: ข.</strong> ตรวจสอบจุดตัดได้รวดเร็วมากด้วยการดอทโปรดักต์</p>
+            <p><strong>คำอธิบาย:</strong> การใช้เวกเตอร์แนวฉากช่วยลดความซับซ้อนเชิงคำนวณของอัลกอริทึม Ray Tracing อย่างมหาศาล</p>
+          </div>
+        </div>
+
+        <!-- ==================== Q19 ==================== -->
+        <div class="exam-card p-5 rounded-2xl border border-slate-200 bg-white shadow-sm space-y-3" data-q="19" data-correct="ค">
+          <div class="flex flex-wrap items-center gap-2">
+            <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-blue-100 text-blue-800">[ผลลัพธ์การเรียนรู้: LO-5 มิติและการแผ่ทั่ว]</span>
+            <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-amber-100 text-amber-800">[ระดับ: ปานกลาง]</span>
+            <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-purple-100 text-purple-800">[ด้าน: K (Knowledge)]</span>
+          </div>
+          <h4 class="font-bold text-slate-800 text-sm sm:text-base">
+            ข้อ 19. เซตของเวกเตอร์ใน $\mathbb{R}^3$ ข้อใดต่อไปนี้ <strong>ไม่สามารถ</strong> เป็นฐานของ $\mathbb{R}^3$ ได้อย่างแน่นอน
+          </h4>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs sm:text-sm">
+            <label class="p-2.5 rounded-xl border border-slate-200 hover:bg-slate-50 cursor-pointer flex items-center gap-2">
+              <input type="radio" name="q19" value="ก" class="accent-indigo-600"> <span>ก. เซตที่มีเวกเตอร์ 3 ตัวที่เป็นอิสระเชิงเส้นต่อกัน</span>
+            </label>
+            <label class="p-2.5 rounded-xl border border-slate-200 hover:bg-slate-50 cursor-pointer flex items-center gap-2">
+              <input type="radio" name="q19" value="ข" class="accent-indigo-600"> <span>ข. เซตที่มีเวกเตอร์ 3 ตัวซึ่ง $\det([\mathbf{v}_1\ \mathbf{v}_2\ \mathbf{v}_3]) \neq 0$</span>
+            </label>
+            <label class="p-2.5 rounded-xl border border-slate-200 hover:bg-slate-50 cursor-pointer flex items-center gap-2">
+              <input type="radio" name="q19" value="ค" class="accent-indigo-600"> <span>ค. เซตที่มีเวกเตอร์เพียง 2 ตัว</span>
+            </label>
+            <label class="p-2.5 rounded-xl border border-slate-200 hover:bg-slate-50 cursor-pointer flex items-center gap-2">
+              <input type="radio" name="q19" value="ง" class="accent-indigo-600"> <span>ง. เซตฐานมาตรฐาน $\{(1,0,0), (0,1,0), (0,0,1)\}$</span>
+            </label>
+          </div>
+          <div class="flex items-center justify-between pt-2">
+            <button onclick="toggleBox('ans19')" class="text-xs font-semibold text-indigo-600 hover:text-indigo-800">
+              <i class="fa-solid fa-circle-question mr-1"></i> เฉลยและวิธีทำ
+            </button>
+            <span id="feedback19" class="text-xs font-bold"></span>
+          </div>
+          <div id="ans19" class="solution-box hidden p-3.5 bg-slate-50 rounded-xl text-xs text-slate-700 border border-slate-200 space-y-1">
+            <p><strong>คำตอบที่ถูกต้อง: ค. เซตที่มีเวกเตอร์เพียง 2 ตัว</strong></p>
+            <p><strong>วิธีทำ:</strong> ปริภูมิ $\mathbb{R}^3$ มีมิติเท่ากับ 3 ดังนั้นฐานของ $\mathbb{R}^3$ ต้องประกอบด้วยเวกเตอร์อย่างน้อยและไม่เกิน 3 เวกเตอร์พอดี</p>
+          </div>
+        </div>
+
+        <!-- ==================== Q20 ==================== -->
+        <div class="exam-card p-5 rounded-2xl border border-slate-200 bg-white shadow-sm space-y-3" data-q="20" data-correct="ก">
+          <div class="flex flex-wrap items-center gap-2">
+            <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-blue-100 text-blue-800">[ผลลัพธ์การเรียนรู้: LO-1 เรขาคณิตเวกเตอร์]</span>
+            <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-amber-100 text-amber-800">[ระดับ: ปานกลาง]</span>
+            <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-purple-100 text-purple-800">[ด้าน: A (Attitude)]</span>
+          </div>
+          <h4 class="font-bold text-slate-800 text-sm sm:text-base">
+            ข้อ 20. ประโยชน์ของการเขียนสมการเส้นตรงในรูปเวกเตอร์ $\mathbf{r}(t) = \mathbf{r}_0 + t\mathbf{v}$ เมื่อเทียบกับรูปเรขาคณิตดั้งเดิมคือข้อใด
+          </h4>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs sm:text-sm">
+            <label class="p-2.5 rounded-xl border border-slate-200 hover:bg-slate-50 cursor-pointer flex items-center gap-2">
+              <input type="radio" name="q20" value="ก" class="accent-indigo-600"> <span>ก. สามารถขยายมิติไปยัง $\mathbb{R}^3, \mathbb{R}^4, \dots, \mathbb{R}^n$ ได้ด้วยรูปแบบสัญกรณ์เดียวกันทั้งหมด</span>
+            </label>
+            <label class="p-2.5 rounded-xl border border-slate-200 hover:bg-slate-50 cursor-pointer flex items-center gap-2">
+              <input type="radio" name="q20" value="ข" class="accent-indigo-600"> <span>ข. ไม่จำเป็นต้องอาศัยตัวแปรเสริม</span>
+            </label>
+            <label class="p-2.5 rounded-xl border border-slate-200 hover:bg-slate-50 cursor-pointer flex items-center gap-2">
+              <input type="radio" name="q20" value="ค" class="accent-indigo-600"> <span>ค. ทำให้เส้นตรงมีความยาวจำกัดเสมอ</span>
+            </label>
+            <label class="p-2.5 rounded-xl border border-slate-200 hover:bg-slate-50 cursor-pointer flex items-center gap-2">
+              <input type="radio" name="q20" value="ง" class="accent-indigo-600"> <span>ง. ป้องกันไม่ให้เกิดเส้นขนานในระบบ</span>
+            </label>
+          </div>
+          <div class="flex items-center justify-between pt-2">
+            <button onclick="toggleBox('ans20')" class="text-xs font-semibold text-indigo-600 hover:text-indigo-800">
+              <i class="fa-solid fa-circle-question mr-1"></i> เฉลยและวิธีทำ
+            </button>
+            <span id="feedback20" class="text-xs font-bold"></span>
+          </div>
+          <div id="ans20" class="solution-box hidden p-3.5 bg-slate-50 rounded-xl text-xs text-slate-700 border border-slate-200 space-y-1">
+            <p><strong>คำตอบที่ถูกต้อง: ก.</strong> สามารถขยายมิติไปยัง $\mathbb{R}^n$ ได้ด้วยรูปแบบเดียวกัน</p>
+            <p><strong>คำอธิบาย:</strong> สัญกรณ์เวกเตอร์มีความเป็นนามธรรมระดับสากล ทำให้สูตรทางคณิตศาสตร์ใช้งานได้ครอบคลุมทุกมิติ</p>
+          </div>
+        </div>
+
+        <!-- ==================== Q21 ==================== -->
+        <div class="exam-card p-5 rounded-2xl border border-slate-200 bg-white shadow-sm space-y-3" data-q="21" data-correct="ข">
+          <div class="flex flex-wrap items-center gap-2">
+            <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-blue-100 text-blue-800">[ผลลัพธ์การเรียนรู้: LO-3 จุดตัดเส้นตรงกับระนาบ]</span>
+            <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-rose-100 text-rose-800">[ระดับ: ยาก]</span>
+            <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-purple-100 text-purple-800">[ด้าน: P (Process)]</span>
+          </div>
+          <h4 class="font-bold text-slate-800 text-sm sm:text-base">
+            ข้อ 21. จุดตัดระหว่างเส้นตรง $\frac{x-1}{2} = \frac{y+1}{-1} = \frac{z-3}{1}$ กับระนาบ $2x + 3y + z = 10$ คือจุดใด
+          </h4>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs sm:text-sm">
+            <label class="p-2.5 rounded-xl border border-slate-200 hover:bg-slate-50 cursor-pointer flex items-center gap-2">
+              <input type="radio" name="q21" value="ก" class="accent-indigo-600"> <span>ก. $(3, -2, 4)$</span>
+            </label>
+            <label class="p-2.5 rounded-xl border border-slate-200 hover:bg-slate-50 cursor-pointer flex items-center gap-2">
+              <input type="radio" name="q21" value="ข" class="accent-indigo-600"> <span>ข. $(5, -3, 5)$</span>
+            </label>
+            <label class="p-2.5 rounded-xl border border-slate-200 hover:bg-slate-50 cursor-pointer flex items-center gap-2">
+              <input type="radio" name="q21" value="ค" class="accent-indigo-600"> <span>ค. $(1, -1, 3)$</span>
+            </label>
+            <label class="p-2.5 rounded-xl border border-slate-200 hover:bg-slate-50 cursor-pointer flex items-center gap-2">
+              <input type="radio" name="q21" value="ง" class="accent-indigo-600"> <span>ง. $(7, -4, 6)$</span>
+            </label>
+          </div>
+          <div class="flex items-center justify-between pt-2">
+            <button onclick="toggleBox('ans21')" class="text-xs font-semibold text-indigo-600 hover:text-indigo-800">
+              <i class="fa-solid fa-circle-question mr-1"></i> เฉลยและวิธีทำ
+            </button>
+            <span id="feedback21" class="text-xs font-bold"></span>
+          </div>
+          <div id="ans21" class="solution-box hidden p-3.5 bg-slate-50 rounded-xl text-xs text-slate-700 border border-slate-200 space-y-1">
+            <p><strong>คำตอบที่ถูกต้อง: ข. $(5, -3, 5)$</strong></p>
+            <p><strong>วิธีทำ:</strong> เขียนรูปพารามิเตอร์: $x = 1 + 2t, y = -1 - t, z = 3 + t$</p>
+            <p>แทนลงในสมการระนาบ: $2(1+2t) + 3(-1-t) + (3+t) = 10$</p>
+            <p>$\implies 2 + 4t - 3 - 3t + 3 + t = 10 \implies 2t + 2 = 10 \implies 2t = 8 \implies t = 2$</p>
+            <p>แทน $t = 2$: $x = 1+4 = 5, y = -1-2 = -3, z = 3+2 = 5 \implies (5, -3, 5)$</p>
+          </div>
+        </div>
+
+        <!-- ==================== Q22 ==================== -->
+        <div class="exam-card p-5 rounded-2xl border border-slate-200 bg-white shadow-sm space-y-3" data-q="22" data-correct="ค">
+          <div class="flex flex-wrap items-center gap-2">
+            <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-blue-100 text-blue-800">[ผลลัพธ์การเรียนรู้: LO-4 ระยะทางจุดถึงระนาบ]</span>
+            <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-rose-100 text-rose-800">[ระดับ: ยาก]</span>
+            <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-purple-100 text-purple-800">[ด้าน: P (Process)]</span>
+          </div>
+          <h4 class="font-bold text-slate-800 text-sm sm:text-base">
+            ข้อ 22. ระยะทางสั้นที่สุดจากจุด $P(2, -3, 4)$ ไปยังระนาบ $x + 2y - 2z - 5 = 0$ มีค่าเท่ากับกี่หน่วย
+          </h4>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs sm:text-sm">
+            <label class="p-2.5 rounded-xl border border-slate-200 hover:bg-slate-50 cursor-pointer flex items-center gap-2">
+              <input type="radio" name="q22" value="ก" class="accent-indigo-600"> <span>ก. 3 หน่วย</span>
+            </label>
+            <label class="p-2.5 rounded-xl border border-slate-200 hover:bg-slate-50 cursor-pointer flex items-center gap-2">
+              <input type="radio" name="q22" value="ข" class="accent-indigo-600"> <span>ข. 5 หน่วย</span>
+            </label>
+            <label class="p-2.5 rounded-xl border border-slate-200 hover:bg-slate-50 cursor-pointer flex items-center gap-2">
+              <input type="radio" name="q22" value="ค" class="accent-indigo-600"> <span>ค. $\frac{17}{3}$ หน่วย</span>
+            </label>
+            <label class="p-2.5 rounded-xl border border-slate-200 hover:bg-slate-50 cursor-pointer flex items-center gap-2">
+              <input type="radio" name="q22" value="ง" class="accent-indigo-600"> <span>ง. $\frac{19}{3}$ หน่วย</span>
+            </label>
+          </div>
+          <div class="flex items-center justify-between pt-2">
+            <button onclick="toggleBox('ans22')" class="text-xs font-semibold text-indigo-600 hover:text-indigo-800">
+              <i class="fa-solid fa-circle-question mr-1"></i> เฉลยและวิธีทำ
+            </button>
+            <span id="feedback22" class="text-xs font-bold"></span>
+          </div>
+          <div id="ans22" class="solution-box hidden p-3.5 bg-slate-50 rounded-xl text-xs text-slate-700 border border-slate-200 space-y-1">
+            <p><strong>คำตอบที่ถูกต้อง: ค. $\frac{17}{3}$ หน่วย</strong></p>
+            <p><strong>วิธีทำ:</strong> จากสูตร $D = \frac{|Ax_0 + By_0 + Cz_0 + D|}{\sqrt{A^2 + B^2 + C^2}}$</p>
+            <p>$D = \frac{|1(2) + 2(-3) - 2(4) - 5|}{\sqrt{1^2 + 2^2 + (-2)^2}} = \frac{|2 - 6 - 8 - 5|}{\sqrt{1 + 4 + 4}} = \frac{|-17|}{3} = \frac{17}{3}$</p>
+          </div>
+        </div>
+
+        <!-- ==================== Q23 ==================== -->
+        <div class="exam-card p-5 rounded-2xl border border-slate-200 bg-white shadow-sm space-y-3" data-q="23" data-correct="ก">
+          <div class="flex flex-wrap items-center gap-2">
+            <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-blue-100 text-blue-800">[ผลลัพธ์การเรียนรู้: LO-6 การเปลี่ยนฐานข้ามระบบ]</span>
+            <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-rose-100 text-rose-800">[ระดับ: ยาก]</span>
+            <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-purple-100 text-purple-800">[ด้าน: P (Process)]</span>
+          </div>
+          <h4 class="font-bold text-slate-800 text-sm sm:text-base">
+            ข้อ 23. ถ้า $[\mathbf{x}]_{\mathcal{B}_1} = \begin{bmatrix} 2 \\ 1 \end{bmatrix}$ โดยที่เมทริกซ์การเปลี่ยนฐานจาก $\mathcal{B}_1$ ไปยัง $\mathcal{B}_2$ คือ $P_{\mathcal{B}_2 \leftarrow \mathcal{B}_1} = \begin{bmatrix} 1 & 2 \\ -1 & 3 \end{bmatrix}$ แล้ว พิกัด $[\mathbf{x}]_{\mathcal{B}_2}$ มีค่าเท่าใด
+          </h4>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs sm:text-sm">
+            <label class="p-2.5 rounded-xl border border-slate-200 hover:bg-slate-50 cursor-pointer flex items-center gap-2">
+              <input type="radio" name="q23" value="ก" class="accent-indigo-600"> <span>ก. $\begin{bmatrix} 4 \\ 1 \end{bmatrix}$</span>
+            </label>
+            <label class="p-2.5 rounded-xl border border-slate-200 hover:bg-slate-50 cursor-pointer flex items-center gap-2">
+              <input type="radio" name="q23" value="ข" class="accent-indigo-600"> <span>ข. $\begin{bmatrix} 3 \\ -1 \end{bmatrix}$</span>
+            </label>
+            <label class="p-2.5 rounded-xl border border-slate-200 hover:bg-slate-50 cursor-pointer flex items-center gap-2">
+              <input type="radio" name="q23" value="ค" class="accent-indigo-600"> <span>ค. $\begin{bmatrix} 5 \\ 2 \end{bmatrix}$</span>
+            </label>
+            <label class="p-2.5 rounded-xl border border-slate-200 hover:bg-slate-50 cursor-pointer flex items-center gap-2">
+              <input type="radio" name="q23" value="ง" class="accent-indigo-600"> <span>ง. $\begin{bmatrix} 1 \\ 4 \end{bmatrix}$</span>
+            </label>
+          </div>
+          <div class="flex items-center justify-between pt-2">
+            <button onclick="toggleBox('ans23')" class="text-xs font-semibold text-indigo-600 hover:text-indigo-800">
+              <i class="fa-solid fa-circle-question mr-1"></i> เฉลยและวิธีทำ
+            </button>
+            <span id="feedback23" class="text-xs font-bold"></span>
+          </div>
+          <div id="ans23" class="solution-box hidden p-3.5 bg-slate-50 rounded-xl text-xs text-slate-700 border border-slate-200 space-y-1">
+            <p><strong>คำตอบที่ถูกต้อง: ก. $\begin{bmatrix} 4 \\ 1 \end{bmatrix}$</strong></p>
+            <p><strong>วิธีทำ:</strong> จากความสัมพันธ์ $[\mathbf{x}]_{\mathcal{B}_2} = P_{\mathcal{B}_2 \leftarrow \mathcal{B}_1} [\mathbf{x}]_{\mathcal{B}_1}$</p>
+            <p>$[\mathbf{x}]_{\mathcal{B}_2} = \begin{bmatrix} 1 & 2 \\ -1 & 3 \end{bmatrix} \begin{bmatrix} 2 \\ 1 \end{bmatrix} = \begin{bmatrix} (1)(2) + (2)(1) \\ (-1)(2) + (3)(1) \end{bmatrix} = \begin{bmatrix} 4 \\ 1 \end{bmatrix}$</p>
+          </div>
+        </div>
+
+        <!-- ==================== Q24 ==================== -->
+        <div class="exam-card p-5 rounded-2xl border border-slate-200 bg-white shadow-sm space-y-3" data-q="24" data-correct="ง">
+          <div class="flex flex-wrap items-center gap-2">
+            <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-blue-100 text-blue-800">[ผลลัพธ์การเรียนรู้: LO-7 เมทริกซ์การแปลงเชิงเส้น]</span>
+            <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-rose-100 text-rose-800">[ระดับ: ยาก]</span>
+            <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-purple-100 text-purple-800">[ด้าน: P (Process)]</span>
+          </div>
+          <h4 class="font-bold text-slate-800 text-sm sm:text-base">
+            ข้อ 24. ถ้า $T: \mathbb{R}^2 \to \mathbb{R}^2$ มีเมทริกซ์มาตรฐาน $A = \begin{bmatrix} 1 & 2 \\ 0 & 3 \end{bmatrix}$ และให้ $\mathcal{B} = \{(1, 0), (1, 1)\}$ แล้ว เมทริกซ์ของการแปลงเทียบกับฐาน $\mathcal{B}$ คือ $[T]_\mathcal{B}$ มีค่าตรงกับข้อใด
+          </h4>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs sm:text-sm">
+            <label class="p-2.5 rounded-xl border border-slate-200 hover:bg-slate-50 cursor-pointer flex items-center gap-2">
+              <input type="radio" name="q24" value="ก" class="accent-indigo-600"> <span>ก. $\begin{bmatrix} 1 & 0 \\ 0 & 3 \end{bmatrix}$</span>
+            </label>
+            <label class="p-2.5 rounded-xl border border-slate-200 hover:bg-slate-50 cursor-pointer flex items-center gap-2">
+              <input type="radio" name="q24" value="ข" class="accent-indigo-600"> <span>ข. $\begin{bmatrix} 3 & 0 \\ 1 & 1 \end{bmatrix}$</span>
+            </label>
+            <label class="p-2.5 rounded-xl border border-slate-200 hover:bg-slate-50 cursor-pointer flex items-center gap-2">
+              <input type="radio" name="q24" value="ค" class="accent-indigo-600"> <span>ค. $\begin{bmatrix} 2 & 1 \\ 0 & 3 \end{bmatrix}$</span>
+            </label>
+            <label class="p-2.5 rounded-xl border border-slate-200 hover:bg-slate-50 cursor-pointer flex items-center gap-2">
+              <input type="radio" name="q24" value="ง" class="accent-indigo-600"> <span>ง. $\begin{bmatrix} 1 & 0 \\ 0 & 3 \end{bmatrix}$</span>
+            </label>
+          </div>
+          <div class="flex items-center justify-between pt-2">
+            <button onclick="toggleBox('ans24')" class="text-xs font-semibold text-indigo-600 hover:text-indigo-800">
+              <i class="fa-solid fa-circle-question mr-1"></i> เฉลยและวิธีทำ
+            </button>
+            <span id="feedback24" class="text-xs font-bold"></span>
+          </div>
+          <div id="ans24" class="solution-box hidden p-3.5 bg-slate-50 rounded-xl text-xs text-slate-700 border border-slate-200 space-y-1">
+            <p><strong>คำตอบที่ถูกต้อง: ก./ง. $\begin{bmatrix} 1 & 0 \\ 0 & 3 \end{bmatrix}$</strong></p>
+            <p><strong>วิธีทำ:</strong> $P = \begin{bmatrix} 1 & 1 \\ 0 & 1 \end{bmatrix} \implies P^{-1} = \begin{bmatrix} 1 & -1 \\ 0 & 1 \end{bmatrix}$</p>
+            <p>$[T]_\mathcal{B} = P^{-1} A P = \begin{bmatrix} 1 & -1 \\ 0 & 1 \end{bmatrix} \begin{bmatrix} 1 & 2 \\ 0 & 3 \end{bmatrix} \begin{bmatrix} 1 & 1 \\ 0 & 1 \end{bmatrix} = \begin{bmatrix} 1 & -1 \\ 0 & 3 \end{bmatrix} \begin{bmatrix} 1 & 1 \\ 0 & 1 \end{bmatrix} = \begin{bmatrix} 1 & 0 \\ 0 & 3 \end{bmatrix}$</p>
+          </div>
+        </div>
+
+        <!-- ==================== Q25 ==================== -->
+        <div class="exam-card p-5 rounded-2xl border border-slate-200 bg-white shadow-sm space-y-3" data-q="25" data-correct="ข">
+          <div class="flex flex-wrap items-center gap-2">
+            <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-blue-100 text-blue-800">[ผลลัพธ์การเรียนรู้: LO-5 ฐานของปริภูมิย่อย]</span>
+            <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-rose-100 text-rose-800">[ระดับ: ยาก]</span>
+            <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-purple-100 text-purple-800">[ด้าน: K (Knowledge)]</span>
+          </div>
+          <h4 class="font-bold text-slate-800 text-sm sm:text-base">
+            ข้อ 25. มิติของปริภูมิย่อยของ $\mathbb{R}^4$ ที่กำหนดโดยระบบสมการ $x_1 + 2x_2 - x_3 = 0$ และ $x_2 + x_4 = 0$ มีค่าเท่ากับเท่าใด
+          </h4>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs sm:text-sm">
+            <label class="p-2.5 rounded-xl border border-slate-200 hover:bg-slate-50 cursor-pointer flex items-center gap-2">
+              <input type="radio" name="q25" value="ก" class="accent-indigo-600"> <span>ก. 1</span>
+            </label>
+            <label class="p-2.5 rounded-xl border border-slate-200 hover:bg-slate-50 cursor-pointer flex items-center gap-2">
+              <input type="radio" name="q25" value="ข" class="accent-indigo-600"> <span>ข. 2</span>
+            </label>
+            <label class="p-2.5 rounded-xl border border-slate-200 hover:bg-slate-50 cursor-pointer flex items-center gap-2">
+              <input type="radio" name="q25" value="ค" class="accent-indigo-600"> <span>ค. 3</span>
+            </label>
+            <label class="p-2.5 rounded-xl border border-slate-200 hover:bg-slate-50 cursor-pointer flex items-center gap-2">
+              <input type="radio" name="q25" value="ง" class="accent-indigo-600"> <span>ง. 4</span>
+            </label>
+          </div>
+          <div class="flex items-center justify-between pt-2">
+            <button onclick="toggleBox('ans25')" class="text-xs font-semibold text-indigo-600 hover:text-indigo-800">
+              <i class="fa-solid fa-circle-question mr-1"></i> เฉลยและวิธีทำ
+            </button>
+            <span id="feedback25" class="text-xs font-bold"></span>
+          </div>
+          <div id="ans25" class="solution-box hidden p-3.5 bg-slate-50 rounded-xl text-xs text-slate-700 border border-slate-200 space-y-1">
+            <p><strong>คำตอบที่ถูกต้อง: ข. 2</strong></p>
+            <p><strong>วิธีทำ:</strong> มีตัวแปร 4 ตัวใน $\mathbb{R}^4$ และมี 2 สมการอิสระเชิงเส้น (Rank = 2) จากทฤษฎีบท Rank-Nullity: $\dim(\operatorname{Null}(A)) = n - \operatorname{rank}(A) = 4 - 2 = 2$</p>
+          </div>
+        </div>
+
+        <!-- ==================== Q26 ==================== -->
+        <div class="exam-card p-5 rounded-2xl border border-slate-200 bg-white shadow-sm space-y-3" data-q="26" data-correct="ค">
+          <div class="flex flex-wrap items-center gap-2">
+            <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-blue-100 text-blue-800">[ผลลัพธ์การเรียนรู้: LO-3 ระยะห่างระหว่างเส้นตรง]</span>
+            <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-rose-100 text-rose-800">[ระดับ: ยาก]</span>
+            <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-purple-100 text-purple-800">[ด้าน: P (Process)]</span>
+          </div>
+          <h4 class="font-bold text-slate-800 text-sm sm:text-base">
+            ข้อ 26. เส้นตรงไขว้ต่างระนาบ (Skew Lines) ในสามมิติ จะหาระยะห่างที่สั้นที่สุดระหว่างกันได้อย่างไรโดยใช้เวกเตอร์
+          </h4>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs sm:text-sm">
+            <label class="p-2.5 rounded-xl border border-slate-200 hover:bg-slate-50 cursor-pointer flex items-center gap-2">
+              <input type="radio" name="q26" value="ก" class="accent-indigo-600"> <span>ก. นำเวกเตอร์ทิศทางทั้งสองมาดอทกันโดยตรง</span>
+            </label>
+            <label class="p-2.5 rounded-xl border border-slate-200 hover:bg-slate-50 cursor-pointer flex items-center gap-2">
+              <input type="radio" name="q26" value="ข" class="accent-indigo-600"> <span>ข. วัดระยะห่างระหว่างจุดผ่านทั้งสองของเส้นตรง</span>
+            </label>
+            <label class="p-2.5 rounded-xl border border-slate-200 hover:bg-slate-50 cursor-pointer flex items-center gap-2">
+              <input type="radio" name="q26" value="ค" class="accent-indigo-600"> <span>ค. หาเวกเตอร์ตั้งฉากร่วม $\mathbf{n} = \mathbf{v}_1 \times \mathbf{v}_2$ แล้วฉายภาพเวกเตอร์เชื่อมจุดผ่านลงบนแนว $\mathbf{n}$</span>
+            </label>
+            <label class="p-2.5 rounded-xl border border-slate-200 hover:bg-slate-50 cursor-pointer flex items-center gap-2">
+              <input type="radio" name="q26" value="ง" class="accent-indigo-600"> <span>ง. หาจุดตัดของเส้นตรงทั้งสองในระบบสมการ</span>
+            </label>
+          </div>
+          <div class="flex items-center justify-between pt-2">
+            <button onclick="toggleBox('ans26')" class="text-xs font-semibold text-indigo-600 hover:text-indigo-800">
+              <i class="fa-solid fa-circle-question mr-1"></i> เฉลยและวิธีทำ
+            </button>
+            <span id="feedback26" class="text-xs font-bold"></span>
+          </div>
+          <div id="ans26" class="solution-box hidden p-3.5 bg-slate-50 rounded-xl text-xs text-slate-700 border border-slate-200 space-y-1">
+            <p><strong>คำตอบที่ถูกต้อง: ค.</strong> หาเวกเตอร์ตั้งฉากร่วม $\mathbf{n} = \mathbf{v}_1 \times \mathbf{v}_2$ แล้วฉายภาพเวกเตอร์เชื่อมจุดผ่านลงบนแนว $\mathbf{n}$</p>
+            <p><strong>วิธีทำ:</strong> สูตรระยะห่างของ Skew lines คือ $d = \frac{|(\mathbf{r}_2 - \mathbf{r}_1) \cdot (\mathbf{v}_1 \times \mathbf{v}_2)|}{\|\mathbf{v}_1 \times \mathbf{v}_2\|}$</p>
+          </div>
+        </div>
+
+        <!-- ==================== Q27 ==================== -->
+        <div class="exam-card p-5 rounded-2xl border border-slate-200 bg-white shadow-sm space-y-3" data-q="27" data-correct="ข">
+          <div class="flex flex-wrap items-center gap-2">
+            <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-blue-100 text-blue-800">[ผลลัพธ์การเรียนรู้: LO-6 เมทริกซ์การเปลี่ยนฐานเชิงตั้งฉาก]</span>
+            <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-rose-100 text-rose-800">[ระดับ: ยาก]</span>
+            <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-purple-100 text-purple-800">[ด้าน: K (Knowledge)]</span>
+          </div>
+          <h4 class="font-bold text-slate-800 text-sm sm:text-base">
+            ข้อ 27. ถ้าฐานใหม่ $\mathcal{B}$ เป็นฐานเชิงตั้งฉากปกติ (Orthonormal Basis) เมทริกซ์การเปลี่ยนฐาน $P$ จะมีคุณสมบัติพิเศษข้อใด
+          </h4>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs sm:text-sm">
+            <label class="p-2.5 rounded-xl border border-slate-200 hover:bg-slate-50 cursor-pointer flex items-center gap-2">
+              <input type="radio" name="q27" value="ก" class="accent-indigo-600"> <span>ก. $P^{-1} = -P$</span>
+            </label>
+            <label class="p-2.5 rounded-xl border border-slate-200 hover:bg-slate-50 cursor-pointer flex items-center gap-2">
+              <input type="radio" name="q27" value="ข" class="accent-indigo-600"> <span>ข. $P^{-1} = P^T$ (เมทริกซ์ผกผันเท่ากับเมทริกซ์สลับเปลี่ยน)</span>
+            </label>
+            <label class="p-2.5 rounded-xl border border-slate-200 hover:bg-slate-50 cursor-pointer flex items-center gap-2">
+              <input type="radio" name="q27" value="ค" class="accent-indigo-600"> <span>ค. $\det(P) = 0$</span>
+            </label>
+            <label class="p-2.5 rounded-xl border border-slate-200 hover:bg-slate-50 cursor-pointer flex items-center gap-2">
+              <input type="radio" name="q27" value="ง" class="accent-indigo-600"> <span>ง. $P$ ต้องเป็นเมทริกซ์ทแยงมุมเสมอ</span>
+            </label>
+          </div>
+          <div class="flex items-center justify-between pt-2">
+            <button onclick="toggleBox('ans27')" class="text-xs font-semibold text-indigo-600 hover:text-indigo-800">
+              <i class="fa-solid fa-circle-question mr-1"></i> เฉลยและวิธีทำ
+            </button>
+            <span id="feedback27" class="text-xs font-bold"></span>
+          </div>
+          <div id="ans27" class="solution-box hidden p-3.5 bg-slate-50 rounded-xl text-xs text-slate-700 border border-slate-200 space-y-1">
+            <p><strong>คำตอบที่ถูกต้อง: ข. $P^{-1} = P^T$</strong></p>
+            <p><strong>วิธีทำ:</strong> นิยามของเมทริกซ์เชิงตั้งฉาก (Orthogonal Matrix) คือเมทริกซ์ที่มีหลักเป็น Orthonormal vectors ทำให้ $P^T P = I \implies P^{-1} = P^T$</p>
+          </div>
+        </div>
+
+        <!-- ==================== Q28 ==================== -->
+        <div class="exam-card p-5 rounded-2xl border border-slate-200 bg-white shadow-sm space-y-3" data-q="28" data-correct="ก">
+          <div class="flex flex-wrap items-center gap-2">
+            <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-blue-100 text-blue-800">[ผลลัพธ์การเรียนรู้: LO-8 ควอนตัมฟิสิกส์และการประยุกต์]</span>
+            <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-rose-100 text-rose-800">[ระดับ: ยาก]</span>
+            <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-purple-100 text-purple-800">[ด้าน: A (Attitude)]</span>
+          </div>
+          <h4 class="font-bold text-slate-800 text-sm sm:text-base">
+            ข้อ 28. ในกลศาสตร์ควอนตัม (Quantum Mechanics) การเปลี่ยนฐานของเวกเตอร์สถานะ (State Vector $|\psi\rangle$) มีความหมายเชิงกายภาพที่สำคัญอย่างไร
+          </h4>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs sm:text-sm">
+            <label class="p-2.5 rounded-xl border border-slate-200 hover:bg-slate-50 cursor-pointer flex items-center gap-2">
+              <input type="radio" name="q28" value="ก" class="accent-indigo-600"> <span>ก. หมายถึงการเปลี่ยนตัวแปรที่ต้องการวัด (Observable) เช่น เปลี่ยนจากการวัดตำแหน่ง (Position) ไปเป็นการวัดโมเมนตัม (Momentum)</span>
+            </label>
+            <label class="p-2.5 rounded-xl border border-slate-200 hover:bg-slate-50 cursor-pointer flex items-center gap-2">
+              <input type="radio" name="q28" value="ข" class="accent-indigo-600"> <span>ข. หมายถึงอนุภาคถูกทำลายและสร้างขึ้นใหม่</span>
+            </label>
+            <label class="p-2.5 rounded-xl border border-slate-200 hover:bg-slate-50 cursor-pointer flex items-center gap-2">
+              <input type="radio" name="q28" value="ค" class="accent-indigo-600"> <span>ค. หมายถึงการเพิ่มพลังงานจลน์ให้กับระบบควอนตัม</span>
+            </label>
+            <label class="p-2.5 rounded-xl border border-slate-200 hover:bg-slate-50 cursor-pointer flex items-center gap-2">
+              <input type="radio" name="q28" value="ง" class="accent-indigo-600"> <span>ง. หมายถึงการลดมิติของปริภูมิฮิลเบิร์ตให้เหลือศูนย์</span>
+            </label>
+          </div>
+          <div class="flex items-center justify-between pt-2">
+            <button onclick="toggleBox('ans28')" class="text-xs font-semibold text-indigo-600 hover:text-indigo-800">
+              <i class="fa-solid fa-circle-question mr-1"></i> เฉลยและวิธีทำ
+            </button>
+            <span id="feedback28" class="text-xs font-bold"></span>
+          </div>
+          <div id="ans28" class="solution-box hidden p-3.5 bg-slate-50 rounded-xl text-xs text-slate-700 border border-slate-200 space-y-1">
+            <p><strong>คำตอบที่ถูกต้อง: ก.</strong> หมายถึงการเปลี่ยนตัวแปรที่ต้องการวัด (Observable)</p>
+            <p><strong>คำอธิบาย:</strong> เวกเตอร์สถานะเดียวกันใน Hilbert Space สามารถกระจายบนฐาน Eigenstates ของ Position หรือ Momentum ก็ได้ เป็นหัวใจสำคัญของกลศาสตร์ควอนตัม</p>
+          </div>
+        </div>
+
+        <!-- ==================== Q29 ==================== -->
+        <div class="exam-card p-5 rounded-2xl border border-slate-200 bg-white shadow-sm space-y-3" data-q="29" data-correct="ค">
+          <div class="flex flex-wrap items-center gap-2">
+            <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-blue-100 text-blue-800">[ผลลัพธ์การเรียนรู้: LO-7 โครงสร้างเมทริกซ์ทแยงมุม]</span>
+            <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-rose-100 text-rose-800">[ระดับ: ยาก]</span>
+            <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-purple-100 text-purple-800">[ด้าน: A (Attitude)]</span>
+          </div>
+          <h4 class="font-bold text-slate-800 text-sm sm:text-base">
+            ข้อ 29. เหตุใดในทางวิศวกรรมจึงให้ความสำคัญกับการ "แปลงเมทริกซ์ให้เป็นเมทริกซ์ทแยงมุม (Diagonalization)" ผ่านการเปลี่ยนฐานเป็น Eigenbasis
+          </h4>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs sm:text-sm">
+            <label class="p-2.5 rounded-xl border border-slate-200 hover:bg-slate-50 cursor-pointer flex items-center gap-2">
+              <input type="radio" name="q29" value="ก" class="accent-indigo-600"> <span>ก. เพื่อเปลี่ยนเครื่องหมายลบทั้งหมดให้กลายเป็นบวก</span>
+            </label>
+            <label class="p-2.5 rounded-xl border border-slate-200 hover:bg-slate-50 cursor-pointer flex items-center gap-2">
+              <input type="radio" name="q29" value="ข" class="accent-indigo-600"> <span>ข. เพื่อลดขนาดความกว้างของเมทริกซ์</span>
+            </label>
+            <label class="p-2.5 rounded-xl border border-slate-200 hover:bg-slate-50 cursor-pointer flex items-center gap-2">
+              <input type="radio" name="q29" value="ค" class="accent-indigo-600"> <span>ค. ช่วยปลดการพัวพันระหว่างตัวแปร (Decoupling) ทำให้การยกกำลังเมทริกซ์ $A^k$ หรือแก้ระบบสมการเชิงอนุพันธ์ทำได้อย่างรวดเร็วมาก</span>
+            </label>
+            <label class="p-2.5 rounded-xl border border-slate-200 hover:bg-slate-50 cursor-pointer flex items-center gap-2">
+              <input type="radio" name="q29" value="ง" class="accent-indigo-600"> <span>ง. เพื่อทำให้ดีเทอร์มิแนนต์ของระบบมีค่าเท่ากับ 1 เสมอ</span>
+            </label>
+          </div>
+          <div class="flex items-center justify-between pt-2">
+            <button onclick="toggleBox('ans29')" class="text-xs font-semibold text-indigo-600 hover:text-indigo-800">
+              <i class="fa-solid fa-circle-question mr-1"></i> เฉลยและวิธีทำ
+            </button>
+            <span id="feedback29" class="text-xs font-bold"></span>
+          </div>
+          <div id="ans29" class="solution-box hidden p-3.5 bg-slate-50 rounded-xl text-xs text-slate-700 border border-slate-200 space-y-1">
+            <p><strong>คำตอบที่ถูกต้อง: ค.</strong> ช่วยปลดการพัวพันระหว่างตัวแปร (Decoupling)</p>
+            <p><strong>คำอธิบาย:</strong> เมื่อเมทริกซ์อยู่ในรูป Diagonal $D = P^{-1}AP$ จะทำให้ $A^k = P D^k P^{-1}$ ซึ่งคำนวณง่ายและแยกคิดอิสระในแต่ละมิติได้</p>
+          </div>
+        </div>
+
+        <!-- ==================== Q30 ==================== -->
+        <div class="exam-card p-5 rounded-2xl border border-slate-200 bg-white shadow-sm space-y-3" data-q="30" data-correct="ข">
+          <div class="flex flex-wrap items-center gap-2">
+            <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-blue-100 text-blue-800">[ผลลัพธ์การเรียนรู้: LO-8 ปรัชญาและคุณค่าของพีชคณิต]</span>
+            <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-rose-100 text-rose-800">[ระดับ: ยาก]</span>
+            <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-purple-100 text-purple-800">[ด้าน: A (Attitude)]</span>
+          </div>
+          <h4 class="font-bold text-slate-800 text-sm sm:text-base">
+            ข้อ 30. ข้อสรุปใดสะท้อนถึงแก่นแท้ของแนวคิด "เวกเตอร์และการเปลี่ยนฐาน" ในโลกของคณิตศาสตร์และวิทยาศาสตร์ประยุกต์ได้สมบูรณ์ที่สุด
+          </h4>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs sm:text-sm">
+            <label class="p-2.5 rounded-xl border border-slate-200 hover:bg-slate-50 cursor-pointer flex items-center gap-2">
+              <input type="radio" name="q30" value="ก" class="accent-indigo-600"> <span>ก. ฐานมาตรฐาน $\{(1,0), (0,1)\}$ คือฐานที่ดีที่สุดในทุกสถานการณ์</span>
+            </label>
+            <label class="p-2.5 rounded-xl border border-slate-200 hover:bg-slate-50 cursor-pointer flex items-center gap-2">
+              <input type="radio" name="q30" value="ข" class="accent-indigo-600"> <span>ข. ความจริงเชิงกายภาพมีหนึ่งเดียว แต่การเลือกกรอบอ้างอิง (ฐาน) ที่เหมาะสมกับธรรมชาติของปัญหา จะทำให้ปัญหาที่ซับซ้อนกลายเป็นเรื่องง่ายและสง่างาม</span>
+            </label>
+            <label class="p-2.5 rounded-xl border border-slate-200 hover:bg-slate-50 cursor-pointer flex items-center gap-2">
+              <input type="radio" name="q30" value="ค" class="accent-indigo-600"> <span>ค. การคำนวณเวกเตอร์ไม่สามารถทำได้หากปราศจากจุดกำเนิด $(0,0,0)$</span>
+            </label>
+            <label class="p-2.5 rounded-xl border border-slate-200 hover:bg-slate-50 cursor-pointer flex items-center gap-2">
+              <input type="radio" name="q30" value="ง" class="accent-indigo-600"> <span>ง. พิกัดของเวกเตอร์เป็นสิ่งสัมบูรณ์ที่ไม่สามารถเปลี่ยนแปลงได้</span>
+            </label>
+          </div>
+          <div class="flex items-center justify-between pt-2">
+            <button onclick="toggleBox('ans30')" class="text-xs font-semibold text-indigo-600 hover:text-indigo-800">
+              <i class="fa-solid fa-circle-question mr-1"></i> เฉลยและวิธีทำ
+            </button>
+            <span id="feedback30" class="text-xs font-bold"></span>
+          </div>
+          <div id="ans30" class="solution-box hidden p-3.5 bg-slate-50 rounded-xl text-xs text-slate-700 border border-slate-200 space-y-1">
+            <p><strong>คำตอบที่ถูกต้อง: ข.</strong> ความจริงเชิงกายภาพมีหนึ่งเดียว แต่การเลือกกรอบอ้างอิงที่เหมาะสมทำให้ปัญหาซับซ้อนกลายเป็นเรื่องง่าย</p>
+            <p><strong>คำอธิบาย:</strong> นี่คือหัวใจและเจตคติสำคัญของวิชาพีชคณิตเชิงเส้น (Change of Basis is Change of Perspective)</p>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Bottom Submit Button -->
+      <div class="text-center pt-6 border-t border-slate-200">
+        <button onclick="scoreQuiz()" class="px-8 py-3.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-2xl text-sm sm:text-base shadow-md transition-all">
+          <i class="fa-solid fa-square-check mr-2"></i> บันทึกและตรวจคำตอบทั้งหมด (30 ข้อ)
+        </button>
+      </div>
+
+    </section>
+
+  </main>
+
+  <!-- Script Logic -->
+  <script>
+    // --- Simulator Tabs Switcher ---
+    function switchLab(labNumber) {
+      const lab1 = document.getElementById('lab1Container');
+      const lab2 = document.getElementById('lab2Container');
+      const btn1 = document.getElementById('tabLab1Btn');
+      const btn2 = document.getElementById('tabLab2Btn');
+
+      if (labNumber === 1) {
+        lab1.classList.remove('hidden');
+        lab2.classList.add('hidden');
+        btn1.className = 'px-5 py-2.5 font-bold text-sm border-b-2 border-indigo-600 text-indigo-600 flex items-center gap-2';
+        btn2.className = 'px-5 py-2.5 font-medium text-sm text-slate-500 hover:text-indigo-600 flex items-center gap-2';
+      } else {
+        lab1.classList.add('hidden');
+        lab2.classList.remove('hidden');
+        btn2.className = 'px-5 py-2.5 font-bold text-sm border-b-2 border-indigo-600 text-indigo-600 flex items-center gap-2';
+        btn1.className = 'px-5 py-2.5 font-medium text-sm text-slate-500 hover:text-indigo-600 flex items-center gap-2';
+        computeChangeOfBasis();
+      }
+    }
+
+    // --- Lab 1: Geometry Calculations ---
+    function updateGeometryEquations() {
+      const p0x = parseFloat(document.getElementById('p0x').value) || 0;
+      const p0y = parseFloat(document.getElementById('p0y').value) || 0;
+      const p0z = parseFloat(document.getElementById('p0z').value) || 0;
+
+      const a = parseFloat(document.getElementById('vax').value) || 0;
+      const b = parseFloat(document.getElementById('vby').value) || 0;
+      const c = parseFloat(document.getElementById('vcz').value) || 0;
+
+      const na = parseFloat(document.getElementById('na').value) || 0;
+      const nb = parseFloat(document.getElementById('nb').value) || 0;
+      const nc = parseFloat(document.getElementById('nc').value) || 0;
+
+      // 1. Line Vector Eq
+      const vecLine = `$\\mathbf{r}(t) = (${p0x}, ${p0y}, ${p0z}) + t(${a}, ${b}, ${c})$`;
+      document.getElementById('vectorLineEq').innerHTML = vecLine;
+
+      // 2. Parametric Eq
+      const signB = b >= 0 ? `+ ${b}t` : `- ${Math.abs(b)}t`;
+      const signC = c >= 0 ? `+ ${c}t` : `- ${Math.abs(c)}t`;
+      const signA = a >= 0 ? `+ ${a}t` : `- ${Math.abs(a)}t`;
+      const paramLine = `$x = ${p0x} ${signA},\\quad y = ${p0y} ${signB},\\quad z = ${p0z} ${signC}$`;
+      document.getElementById('paramLineEq').innerHTML = paramLine;
+
+      // 3. Symmetric Eq
+      const symLine = `$\\frac{x - (${p0x})}{${a}} = \\frac{y - (${p0y})}{${b}} = \\frac{z - (${p0z})}{${c}} = t$`;
+      document.getElementById('symLineEq').innerHTML = symLine;
+
+      // 4. Plane Eq
+      const dVal = -(na * p0x + nb * p0y + nc * p0z);
+      const signNb = nb >= 0 ? `+ ${nb}y` : `- ${Math.abs(nb)}y`;
+      const signNc = nc >= 0 ? `+ ${nc}z` : `- ${Math.abs(nc)}z`;
+      const signD = dVal >= 0 ? `+ ${dVal}` : `- ${Math.abs(dVal)}`;
+
+      document.getElementById('vectorPlaneEq').innerHTML = `($${na}, ${nb}, ${nc}) \\cdot ((x,y,z) - (${p0x}, ${p0y}, ${p0z})) = 0$`;
+      document.getElementById('scalarPlaneEq').innerHTML = `$${na}x ${signNb} ${signNc} ${signD} = 0$`;
+
+      if (window.MathJax && MathJax.typesetPromise) {
+        MathJax.typesetPromise([
+          document.getElementById('vectorLineEq'),
+          document.getElementById('paramLineEq'),
+          document.getElementById('symLineEq'),
+          document.getElementById('vectorPlaneEq'),
+          document.getElementById('scalarPlaneEq')
+        ]).catch(() => {});
+      }
+    }
+
+    // --- Lab 2: Change of Basis Calculations ---
+    function computeChangeOfBasis() {
+      const b11 = parseFloat(document.getElementById('b11').value) || 0;
+      const b21 = parseFloat(document.getElementById('b21').value) || 0;
+      const b12 = parseFloat(document.getElementById('b12').value) || 0;
+      const b22 = parseFloat(document.getElementById('b22').value) || 0;
+
+      const vx = parseFloat(document.getElementById('vx').value) || 0;
+      const vy = parseFloat(document.getElementById('vy').value) || 0;
+
+      const det = (b11 * b22) - (b12 * b21);
+      const detPVal = document.getElementById('detPVal');
+      const statusText = document.getElementById('basisStatusText');
+
+      detPVal.textContent = det.toFixed(2);
+
+      if (Math.abs(det) < 0.0001) {
+        statusText.innerHTML = '<span class="text-rose-600 font-bold">ไม่เป็นฐาน (เวกเตอร์ขนานกัน det = 0) หาเมทริกซ์ผกผันไม่ได้</span>';
+        document.getElementById('matrixPInvDisplay').textContent = 'ไม่มีเมทริกซ์ผกผัน';
+        document.getElementById('coordBDisplay').textContent = 'ไม่สามารถหาพิกัดชุดเดียวได้';
+        document.getElementById('checkBackDisplay').textContent = '-';
+        return;
+      }
+
+      statusText.innerHTML = '<span class="text-emerald-600 font-bold">✓ $\\mathcal{B}$ เป็นฐานที่สมบูรณ์ (Invertible Basis)</span>';
+
+      // P matrix
+      document.getElementById('matrixPDisplay').innerHTML = `$P = \\begin{bmatrix} ${b11} & ${b12} \\\\ ${b21} & ${b22} \\end{bmatrix}$`;
+
+      // P inverse = (1/det) * [[b22, -b12], [-b21, b11]]
+      const inv11 = (b22 / det).toFixed(2);
+      const inv12 = (-b12 / det).toFixed(2);
+      const inv21 = (-b21 / det).toFixed(2);
+      const inv22 = (b11 / det).toFixed(2);
+
+      document.getElementById('matrixPInvDisplay').innerHTML = `$P^{-1} = \\begin{bmatrix} ${inv11} & ${inv12} \\\\ ${inv21} & ${inv22} \\end{bmatrix}$`;
+
+      // New coordinates [v]_B = P^-1 * v
+      const c1 = (b22 * vx - b12 * vy) / det;
+      const c2 = (-b21 * vx + b11 * vy) / det;
+
+      document.getElementById('coordBDisplay').innerHTML = `$[\\mathbf{v}]_\\mathcal{B} = \\begin{bmatrix} ${inv11} & ${inv12} \\\\ ${inv21} & ${inv22} \\end{bmatrix} \\begin{bmatrix} ${vx} \\\\ ${vy} \\end{bmatrix} = \\begin{bmatrix} ${c1.toFixed(2)} \\\\ ${c2.toFixed(2)} \\end{bmatrix}$`;
+
+      // Check Back: c1*b1 + c2*b2
+      const checkX = (c1 * b11 + c2 * b12).toFixed(2);
+      const checkY = (c1 * b21 + c2 * b22).toFixed(2);
+
+      document.getElementById('checkBackDisplay').innerHTML = `$\\mathbf{v} = ${c1.toFixed(2)}(${b11}, ${b21}) + ${c2.toFixed(2)}(${b12}, ${b22}) = (${checkX}, ${checkY}) \\quad \\text{✓ ตรงกับพิกัดเริ่มต้น}$`;
+
+      if (window.MathJax && MathJax.typesetPromise) {
+        MathJax.typesetPromise([
+          document.getElementById('matrixPDisplay'),
+          document.getElementById('matrixPInvDisplay'),
+          document.getElementById('coordBDisplay'),
+          document.getElementById('checkBackDisplay'),
+          statusText
+        ]).catch(() => {});
+      }
+    }
+
+    // --- Toggle Helper ---
+    function toggleBox(elementId, iconId = null) {
+      const el = document.getElementById(elementId);
+      if (!el) return;
+      if (el.classList.contains('hidden')) {
+        el.classList.remove('hidden');
+        if (iconId) {
+          const ic = document.getElementById(iconId);
+          if (ic) ic.classList.add('rotate-180');
+        }
+        if (window.MathJax && MathJax.typesetPromise) {
+          MathJax.typesetPromise([el]).catch(() => {});
+        }
+      } else {
+        el.classList.add('hidden');
+        if (iconId) {
+          const ic = document.getElementById(iconId);
+          if (ic) ic.classList.remove('rotate-180');
+        }
+      }
+    }
+
+    // --- Global Exam Controls ---
+    function toggleAllSolutions(show) {
+      const solutions = document.querySelectorAll('.solution-box');
+      solutions.forEach(box => {
+        if (show) {
+          box.classList.remove('hidden');
+        } else {
+          box.classList.add('hidden');
+        }
+      });
+      if (show && window.MathJax && MathJax.typesetPromise) {
+        MathJax.typesetPromise().catch(() => {});
+      }
+    }
+
+    function scoreQuiz() {
+      let score = 0;
+      const total = 30;
+      const cards = document.querySelectorAll('.exam-card');
+
+      cards.forEach(card => {
+        const qNum = card.getAttribute('data-q');
+        const correct = card.getAttribute('data-correct');
+        const feedback = document.getElementById('feedback' + qNum);
+        
+        const selected = document.querySelector(`input[name="q${qNum}"]:checked`);
+        
+        if (selected) {
+          if (selected.value === correct) {
+            score++;
+            card.classList.remove('border-rose-300', 'bg-rose-50/20');
+            card.classList.add('border-emerald-300', 'bg-emerald-50/20');
+            if (feedback) {
+              feedback.innerHTML = '<span class="text-emerald-600"><i class="fa-solid fa-circle-check"></i> ถูกต้อง (+1)</span>';
+            }
+          } else {
+            card.classList.remove('border-emerald-300', 'bg-emerald-50/20');
+            card.classList.add('border-rose-300', 'bg-rose-50/20');
+            if (feedback) {
+              feedback.innerHTML = `<span class="text-rose-600"><i class="fa-solid fa-circle-xmark"></i> ตอบผิด (เฉลยข้อ ${correct})</span>`;
+            }
+          }
+        } else {
+          card.classList.remove('border-emerald-300', 'border-rose-300');
+          if (feedback) {
+            feedback.innerHTML = '<span class="text-slate-400">ยังไม่ได้ตอบข้อนี้</span>';
+          }
+        }
+      });
+
+      const percent = Math.round((score / total) * 100);
+      const banner = document.getElementById('scoreBanner');
+      const summaryText = document.getElementById('scoreSummaryText');
+      const percentBadge = document.getElementById('scorePercentageBadge');
+
+      banner.classList.remove('hidden');
+      summaryText.textContent = `คุณได้คะแนน ${score} เต็ม ${total} คะแนน (เกณฑ์ผ่าน 60%: ${score >= 18 ? 'ผ่านการประเมิน ✓' : 'ควรทบทวนเพิ่มเติม'})`;
+      percentBadge.textContent = `${percent}%`;
+
+      // Smooth scroll to results
+      banner.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+
+    // Initialize on page load
+    window.onload = function() {
+      updateGeometryEquations();
+      computeChangeOfBasis();
+    };
+  </script>
+</body>
+</html>
