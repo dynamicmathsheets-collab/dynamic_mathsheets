@@ -1,0 +1,1491 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>แบบทดสอบวัดผลสัมฤทธิ์ทางการเรียน: ระบบสมการเชิงเส้น</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Sarabun -->
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- KaTeX CDN for Math Typesetting -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js"></script>
+    <style>
+        body { font-family: 'Sarabun', sans-serif; }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 antialiased min-h-screen">
+
+    <!-- Container ความกว้างคงที่ 1,152px -->
+    <main class="max-w-6xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 space-y-8">
+        
+        <!-- Header -->
+        <header class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 sm:p-8">
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-100 pb-6">
+                <div>
+                    <span class="inline-block px-3 py-1 bg-indigo-100 text-indigo-700 rounded-full text-xs font-semibold mb-2">
+                        แบบประเมินผลการเรียนรู้ระดับอุดมศึกษา
+                    </span>
+                    <h1 class="text-2xl sm:text-3xl font-bold text-slate-900 tracking-tight">
+                        แบบทดสอบวัดผลสัมฤทธิ์ทางการเรียน เรื่อง ระบบสมการเชิงเส้น
+                    </h1>
+                    <p class="text-sm text-slate-500 mt-1">
+                        ครอบคลุม 8 หัวข้อหลัก • รวม 30 ข้อ • จำแนกตามระดับความยาก (ง่าย 10, ปานกลาง 10, ยาก 10) และมิติการประเมิน K-P-A
+                    </p>
+                </div>
+                <!-- ปุ่มควบคุมส่วนกลาง -->
+                <div class="flex flex-wrap items-center gap-2">
+                    <button onclick="toggleAllAnswers(true)" class="px-3.5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-xs sm:text-sm font-semibold shadow-sm transition-colors">
+                        เปิดเฉลยทั้งหมด
+                    </button>
+                    <button onclick="toggleAllAnswers(false)" class="px-3.5 py-2 bg-slate-200 hover:bg-slate-300 text-slate-700 rounded-lg text-xs sm:text-sm font-semibold transition-colors">
+                        ปิดเฉลยทั้งหมด
+                    </button>
+                    <button onclick="clearAllSelections()" class="px-3.5 py-2 bg-amber-50 hover:bg-amber-100 text-amber-700 border border-amber-200 rounded-lg text-xs sm:text-sm font-semibold transition-colors">
+                        ล้างตัวเลือกที่เลือก
+                    </button>
+                </div>
+            </div>
+
+            <!-- สรุปโครงสร้างข้อสอบ (Test Blueprint Overview) -->
+            <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 pt-6 text-center text-xs">
+                <div class="p-3 bg-emerald-50 border border-emerald-200 rounded-xl">
+                    <div class="text-slate-500">ระดับง่าย</div>
+                    <div class="text-lg font-bold text-emerald-700">10 ข้อ</div>
+                </div>
+                <div class="p-3 bg-amber-50 border border-amber-200 rounded-xl">
+                    <div class="text-slate-500">ระดับปานกลาง</div>
+                    <div class="text-lg font-bold text-amber-700">10 ข้อ</div>
+                </div>
+                <div class="p-3 bg-rose-50 border border-rose-200 rounded-xl">
+                    <div class="text-slate-500">ระดับยาก</div>
+                    <div class="text-lg font-bold text-rose-700">10 ข้อ</div>
+                </div>
+                <div class="p-3 bg-blue-50 border border-blue-200 rounded-xl">
+                    <div class="text-slate-500">มิติ K (ความรู้)</div>
+                    <div class="text-lg font-bold text-blue-700">10 ข้อ</div>
+                </div>
+                <div class="p-3 bg-purple-50 border border-purple-200 rounded-xl">
+                    <div class="text-slate-500">มิติ P (ทักษะกระบวนการ)</div>
+                    <div class="text-lg font-bold text-purple-700">10 ข้อ</div>
+                </div>
+                <div class="p-3 bg-indigo-50 border border-indigo-200 rounded-xl">
+                    <div class="text-slate-500">มิติ A (เจตคติ/วินัย)</div>
+                    <div class="text-lg font-bold text-indigo-700">10 ข้อ</div>
+                </div>
+            </div>
+
+            <!-- ตารางจำแนกผลลัพธ์การเรียนรู้ (CLO Mapping) -->
+            <div class="mt-6 pt-4 border-t border-slate-100 text-xs text-slate-600">
+                <span class="font-bold text-slate-700">ผลลัพธ์การเรียนรู้ (Learning Outcomes: LO):</span>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-2 mt-2">
+                    <div class="bg-slate-50 p-2 rounded border"><strong>LO1:</strong> ความหมาย &amp; เมทริกซ์มาตรฐาน</div>
+                    <div class="bg-slate-50 p-2 rounded border"><strong>LO2:</strong> เซตคำตอบ 3 กรณี &amp; พิกัด</div>
+                    <div class="bg-slate-50 p-2 rounded border"><strong>LO3:</strong> วิธีแทนค่า &amp; กำจัดตัวแปร</div>
+                    <div class="bg-slate-50 p-2 rounded border"><strong>LO4:</strong> กฎของเครเมอร์ &amp; ดีเทอร์มิแนนต์</div>
+                    <div class="bg-slate-50 p-2 rounded border"><strong>LO5:</strong> เมทริกซ์ผกผัน $A^{-1}$ &amp; การตรวจสอบ</div>
+                    <div class="bg-slate-50 p-2 rounded border"><strong>LO6:</strong> ทฤษฎีบทรูเช-กาเปลลี &amp; อันดับ</div>
+                    <div class="bg-slate-50 p-2 rounded border"><strong>LO7:</strong> ระบบพารามิเตอร์ &amp; จุดวิกฤต</div>
+                    <div class="bg-slate-50 p-2 rounded border"><strong>LO8:</strong> เวกเตอร์ $\mathbf{x}=\mathbf{x}_p+\mathbf{x}_h$</div>
+                </div>
+            </div>
+        </header>
+
+        <!-- รายการข้อสอบ 30 ข้อ -->
+        <section class="space-y-6" id="exam-container">
+
+            <!-- ข้อ 1 -->
+            <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 space-y-4">
+                <div class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-100 pb-3">
+                    <div class="flex flex-wrap items-center gap-2">
+                        <span class="px-2.5 py-1 bg-indigo-50 border border-indigo-200 text-indigo-700 text-xs font-bold rounded-lg">LO1: ความหมายและรูปแบบ</span>
+                        <span class="px-2.5 py-1 bg-emerald-50 border border-emerald-200 text-emerald-700 text-xs font-bold rounded-lg">ระดับ: ง่าย</span>
+                        <span class="px-2.5 py-1 bg-blue-50 border border-blue-200 text-blue-700 text-xs font-bold rounded-lg">การวัด: ด้านความรู้ (K)</span>
+                    </div>
+                    <span class="text-sm font-bold text-slate-400">ข้อที่ 1 / 30</span>
+                </div>
+                <div class="text-base text-slate-800 leading-relaxed font-medium">
+                    พิจารณาสมการต่อไปนี้ ข้อใดจัดเป็น <em>สมการเชิงเส้น (Linear Equation)</em> ในตัวแปร $x$ และ $y$ ตามนิยามทางคณิตศาสตร์?
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm text-slate-700">
+                    <label for="q1_opt0" class="flex items-start gap-3 p-3.5 rounded-xl border border-slate-200 bg-slate-50/70 hover:bg-indigo-50/60 hover:border-indigo-300 cursor-pointer transition-all">
+                        <input type="radio" id="q1_opt0" name="question_1" value="0" class="mt-1 w-4 h-4 text-indigo-600 border-slate-300 focus:ring-indigo-500 accent-indigo-600 cursor-pointer flex-shrink-0">
+                        <span class="text-slate-700 leading-relaxed">ก. $2x + 3xy - 4y = 7$</span>
+                    </label>
+                    <label for="q1_opt1" class="flex items-start gap-3 p-3.5 rounded-xl border border-slate-200 bg-slate-50/70 hover:bg-indigo-50/60 hover:border-indigo-300 cursor-pointer transition-all">
+                        <input type="radio" id="q1_opt1" name="question_1" value="1" class="mt-1 w-4 h-4 text-indigo-600 border-slate-300 focus:ring-indigo-500 accent-indigo-600 cursor-pointer flex-shrink-0">
+                        <span class="text-slate-700 leading-relaxed">ข. $\sqrt{3}x - \frac{2}{5}y = \pi$</span>
+                    </label>
+                    <label for="q1_opt2" class="flex items-start gap-3 p-3.5 rounded-xl border border-slate-200 bg-slate-50/70 hover:bg-indigo-50/60 hover:border-indigo-300 cursor-pointer transition-all">
+                        <input type="radio" id="q1_opt2" name="question_1" value="2" class="mt-1 w-4 h-4 text-indigo-600 border-slate-300 focus:ring-indigo-500 accent-indigo-600 cursor-pointer flex-shrink-0">
+                        <span class="text-slate-700 leading-relaxed">ค. $x^2 + y^2 = 25$</span>
+                    </label>
+                    <label for="q1_opt3" class="flex items-start gap-3 p-3.5 rounded-xl border border-slate-200 bg-slate-50/70 hover:bg-indigo-50/60 hover:border-indigo-300 cursor-pointer transition-all">
+                        <input type="radio" id="q1_opt3" name="question_1" value="3" class="mt-1 w-4 h-4 text-indigo-600 border-slate-300 focus:ring-indigo-500 accent-indigo-600 cursor-pointer flex-shrink-0">
+                        <span class="text-slate-700 leading-relaxed">ง. $3x + \sin(y) = 1$</span>
+                    </label>
+                </div>
+                <details class="answer-detail group mt-4 pt-3 border-t border-slate-100 text-xs sm:text-sm">
+                    <summary class="cursor-pointer text-indigo-600 font-bold hover:text-indigo-800 flex items-center justify-between">
+                        <span>เฉลยและคำอธิบายละเอียด</span>
+                        <span class="text-slate-400 group-open:rotate-180 transition-transform">▼</span>
+                    </summary>
+                    <div class="mt-2 p-4 bg-emerald-50/60 rounded-xl border border-emerald-200 text-slate-700 space-y-1">
+                        <div><strong>คำตอบที่ถูกต้อง: ข. $\sqrt{3}x - \frac{2}{5}y = \pi$</strong></div>
+                        <p class="leading-relaxed">
+                            <strong>คำอธิบาย:</strong> สมการเชิงเส้นในตัวแปร $x_1, \dots, x_n$ ต้องเขียนได้ในรูป $a_1x_1 + \dots + a_nx_n = b$ โดยตัวแปรมีเลขชี้กำลังเป็น 1 เท่านั้น ไม่มีการคูณกันระหว่างตัวแปร ($xy$ ในข้อ ก.) ไม่มียกกำลังสอง ($x^2$ ในข้อ ค.) และไม่มีฟังก์ชันอดิศัยของตัวแปร ($\sin(y)$ ในข้อ ง.) ส่วนสัมประสิทธิ์สามารถเป็นจำนวนจริงใด ๆ ก็ได้ ($\sqrt{3}, -\frac{2}{5}, \pi$ เป็นค่าคงตัวจริง)
+                        </p>
+                    </div>
+                </details>
+            </div>
+
+            <!-- ข้อ 2 -->
+            <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 space-y-4">
+                <div class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-100 pb-3">
+                    <div class="flex flex-wrap items-center gap-2">
+                        <span class="px-2.5 py-1 bg-indigo-50 border border-indigo-200 text-indigo-700 text-xs font-bold rounded-lg">LO1: ความหมายและรูปแบบ</span>
+                        <span class="px-2.5 py-1 bg-emerald-50 border border-emerald-200 text-emerald-700 text-xs font-bold rounded-lg">ระดับ: ง่าย</span>
+                        <span class="px-2.5 py-1 bg-purple-50 border border-purple-200 text-purple-700 text-xs font-bold rounded-lg">การวัด: ทักษะกระบวนการ (P)</span>
+                    </div>
+                    <span class="text-sm font-bold text-slate-400">ข้อที่ 2 / 30</span>
+                </div>
+                <div class="text-base text-slate-800 leading-relaxed font-medium">
+                    กำหนดระบบสมการ $\begin{cases} 2x_1 - 3x_2 + x_3 = 4 \\ x_1 + 5x_3 = -2 \\ -4x_2 + 7x_3 = 0 \end{cases}$ ข้อใดคือการเขียนในรูปสมการเมทริกซ์ $A\mathbf{x} = \mathbf{b}$ ที่ถูกต้องสมบูรณ์?
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm text-slate-700">
+                    <label for="q2_opt0" class="flex items-start gap-3 p-3.5 rounded-xl border border-slate-200 bg-slate-50/70 hover:bg-indigo-50/60 hover:border-indigo-300 cursor-pointer transition-all">
+                        <input type="radio" id="q2_opt0" name="question_2" value="0" class="mt-1 w-4 h-4 text-indigo-600 border-slate-300 focus:ring-indigo-500 accent-indigo-600 cursor-pointer flex-shrink-0">
+                        <span class="text-slate-700 leading-relaxed">ก. $\begin{bmatrix} 2 & -3 & 1 \\ 1 & 0 & 5 \\ 0 & -4 & 7 \end{bmatrix} \begin{bmatrix} x_1 \\ x_2 \\ x_3 \end{bmatrix} = \begin{bmatrix} 4 \\ -2 \\ 0 \end{bmatrix}$</span>
+                    </label>
+                    <label for="q2_opt1" class="flex items-start gap-3 p-3.5 rounded-xl border border-slate-200 bg-slate-50/70 hover:bg-indigo-50/60 hover:border-indigo-300 cursor-pointer transition-all">
+                        <input type="radio" id="q2_opt1" name="question_2" value="1" class="mt-1 w-4 h-4 text-indigo-600 border-slate-300 focus:ring-indigo-500 accent-indigo-600 cursor-pointer flex-shrink-0">
+                        <span class="text-slate-700 leading-relaxed">ข. $\begin{bmatrix} 2 & -3 & 1 \\ 1 & 5 & 0 \\ -4 & 7 & 0 \end{bmatrix} \begin{bmatrix} x_1 \\ x_2 \\ x_3 \end{bmatrix} = \begin{bmatrix} 4 \\ -2 \\ 0 \end{bmatrix}$</span>
+                    </label>
+                    <label for="q2_opt2" class="flex items-start gap-3 p-3.5 rounded-xl border border-slate-200 bg-slate-50/70 hover:bg-indigo-50/60 hover:border-indigo-300 cursor-pointer transition-all">
+                        <input type="radio" id="q2_opt2" name="question_2" value="2" class="mt-1 w-4 h-4 text-indigo-600 border-slate-300 focus:ring-indigo-500 accent-indigo-600 cursor-pointer flex-shrink-0">
+                        <span class="text-slate-700 leading-relaxed">ค. $\begin{bmatrix} 2 & -3 & 1 \\ 1 & 1 & 5 \\ 1 & -4 & 7 \end{bmatrix} \begin{bmatrix} x_1 \\ x_2 \\ x_3 \end{bmatrix} = \begin{bmatrix} 4 \\ -2 \\ 0 \end{bmatrix}$</span>
+                    </label>
+                    <label for="q2_opt3" class="flex items-start gap-3 p-3.5 rounded-xl border border-slate-200 bg-slate-50/70 hover:bg-indigo-50/60 hover:border-indigo-300 cursor-pointer transition-all">
+                        <input type="radio" id="q2_opt3" name="question_2" value="3" class="mt-1 w-4 h-4 text-indigo-600 border-slate-300 focus:ring-indigo-500 accent-indigo-600 cursor-pointer flex-shrink-0">
+                        <span class="text-slate-700 leading-relaxed">ง. $\begin{bmatrix} 2 & -3 & 1 \\ 1 & 0 & 5 \\ -4 & 0 & 7 \end{bmatrix} \begin{bmatrix} x_1 \\ x_2 \\ x_3 \end{bmatrix} = \begin{bmatrix} 4 \\ -2 \\ 0 \end{bmatrix}$</span>
+                    </label>
+                </div>
+                <details class="answer-detail group mt-4 pt-3 border-t border-slate-100 text-xs sm:text-sm">
+                    <summary class="cursor-pointer text-indigo-600 font-bold hover:text-indigo-800 flex items-center justify-between">
+                        <span>เฉลยและคำอธิบายละเอียด</span>
+                        <span class="text-slate-400 group-open:rotate-180 transition-transform">▼</span>
+                    </summary>
+                    <div class="mt-2 p-4 bg-emerald-50/60 rounded-xl border border-emerald-200 text-slate-700 space-y-1">
+                        <div><strong>คำตอบที่ถูกต้อง: ก. $\begin{bmatrix} 2 & -3 & 1 \\ 1 & 0 & 5 \\ 0 & -4 & 7 \end{bmatrix} \begin{bmatrix} x_1 \\ x_2 \\ x_3 \end{bmatrix} = \begin{bmatrix} 4 \\ -2 \\ 0 \end{bmatrix}$</strong></div>
+                        <p class="leading-relaxed">
+                            <strong>คำอธิบาย:</strong> ตัวแปรที่หายไปในแต่ละสมการจะมีสัมประสิทธิ์เป็น 0 โดยในสมการที่สองไม่มี $x_2$ ทำให้ตำแหน่ง $a_{22} = 0$ และในสมการที่สามไม่มี $x_1$ ทำให้ตำแหน่ง $a_{31} = 0$
+                        </p>
+                    </div>
+                </details>
+            </div>
+
+            <!-- ข้อ 3 -->
+            <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 space-y-4">
+                <div class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-100 pb-3">
+                    <div class="flex flex-wrap items-center gap-2">
+                        <span class="px-2.5 py-1 bg-indigo-50 border border-indigo-200 text-indigo-700 text-xs font-bold rounded-lg">LO1: ความหมายและรูปแบบ</span>
+                        <span class="px-2.5 py-1 bg-amber-50 border border-amber-200 text-amber-700 text-xs font-bold rounded-lg">ระดับ: ปานกลาง</span>
+                        <span class="px-2.5 py-1 bg-indigo-50 border border-indigo-200 text-indigo-700 text-xs font-bold rounded-lg">การวัด: เจตคติและวินัย (A)</span>
+                    </div>
+                    <span class="text-sm font-bold text-slate-400">ข้อที่ 3 / 30</span>
+                </div>
+                <div class="text-base text-slate-800 leading-relaxed font-medium">
+                    ในการจำลองข้อมูลปัญหาจริง นักศึกษาพบสมการ $\frac{3}{x} + \frac{2}{y} = 5$ และเพื่อนร่วมกลุ่มอ้างว่า <em>"นี่คือสมการเชิงเส้นในตัวแปร $x, y$ เพราะสัมประสิทธิ์เป็นเลขคงที่และมีเครื่องหมายบวก"</em> หากท่านมีเจตคติทางวิชาการที่ยึดมั่นในความถูกต้องตามหลักการ ท่านควรให้คำแนะนำเพื่อนอย่างไร?
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm text-slate-700">
+                    <label for="q3_opt0" class="flex items-start gap-3 p-3.5 rounded-xl border border-slate-200 bg-slate-50/70 hover:bg-indigo-50/60 hover:border-indigo-300 cursor-pointer transition-all">
+                        <input type="radio" id="q3_opt0" name="question_3" value="0" class="mt-1 w-4 h-4 text-indigo-600 border-slate-300 focus:ring-indigo-500 accent-indigo-600 cursor-pointer flex-shrink-0">
+                        <span class="text-slate-700 leading-relaxed">ก. เห็นด้วย เพราะสามารถหาคำตอบได้เช่นเดียวกับสมการทั่วไป</span>
+                    </label>
+                    <label for="q3_opt1" class="flex items-start gap-3 p-3.5 rounded-xl border border-slate-200 bg-slate-50/70 hover:bg-indigo-50/60 hover:border-indigo-300 cursor-pointer transition-all">
+                        <input type="radio" id="q3_opt1" name="question_3" value="1" class="mt-1 w-4 h-4 text-indigo-600 border-slate-300 focus:ring-indigo-500 accent-indigo-600 cursor-pointer flex-shrink-0">
+                        <span class="text-slate-700 leading-relaxed">ข. ชี้แจงว่าไม่เป็นเชิงเส้นใน $x, y$ เพราะตัวแปรเป็นตัวส่วน ($x^{-1}, y^{-1}$) แต่สามารถแปลงเป็นเชิงเส้นได้โดยกำหนดตัวแปรใหม่ $u = \frac{1}{x}, v = \frac{1}{y}$</span>
+                    </label>
+                    <label for="q3_opt2" class="flex items-start gap-3 p-3.5 rounded-xl border border-slate-200 bg-slate-50/70 hover:bg-indigo-50/60 hover:border-indigo-300 cursor-pointer transition-all">
+                        <input type="radio" id="q3_opt2" name="question_3" value="2" class="mt-1 w-4 h-4 text-indigo-600 border-slate-300 focus:ring-indigo-500 accent-indigo-600 cursor-pointer flex-shrink-0">
+                        <span class="text-slate-700 leading-relaxed">ค. ชี้แจงว่าสมการนี้เป็นสมการกำลังสองเพราะเมื่อคูณไขว้จะได้ $3y + 2x = 5xy$ ซึ่งแก้ไม่ได้เลย</span>
+                    </label>
+                    <label for="q3_opt3" class="flex items-start gap-3 p-3.5 rounded-xl border border-slate-200 bg-slate-50/70 hover:bg-indigo-50/60 hover:border-indigo-300 cursor-pointer transition-all">
+                        <input type="radio" id="q3_opt3" name="question_3" value="3" class="mt-1 w-4 h-4 text-indigo-600 border-slate-300 focus:ring-indigo-500 accent-indigo-600 cursor-pointer flex-shrink-0">
+                        <span class="text-slate-700 leading-relaxed">ง. เพิกเฉยและใช้สมการนี้คำนวณผ่านกฎของเครเมอร์โดยตรงเพื่อความรวดเร็ว</span>
+                    </label>
+                </div>
+                <details class="answer-detail group mt-4 pt-3 border-t border-slate-100 text-xs sm:text-sm">
+                    <summary class="cursor-pointer text-indigo-600 font-bold hover:text-indigo-800 flex items-center justify-between">
+                        <span>เฉลยและคำอธิบายละเอียด</span>
+                        <span class="text-slate-400 group-open:rotate-180 transition-transform">▼</span>
+                    </summary>
+                    <div class="mt-2 p-4 bg-emerald-50/60 rounded-xl border border-emerald-200 text-slate-700 space-y-1">
+                        <div><strong>คำตอบที่ถูกต้อง: ข. ชี้แจงว่าไม่เป็นเชิงเส้นใน $x, y$ เพราะตัวแปรเป็นตัวส่วน ($x^{-1}, y^{-1}$) แต่สามารถแปลงเป็นเชิงเส้นได้โดยกำหนดตัวแปรใหม่ $u = \frac{1}{x}, v = \frac{1}{y}$</strong></div>
+                        <p class="leading-relaxed">
+                            <strong>คำอธิบาย:</strong> สะท้อนความถูกต้องทางวิชาการ (Attitude: Rigor and Openness) โดยการแยกแยะนิยามที่แท้จริง ไม่ยอมรับความคลาดเคลื่อนเชิงแนวคิด และเสนอทางออกทางคณิตศาสตร์ที่ถูกต้องด้วยการเปลี่ยนตัวแปร
+                        </p>
+                    </div>
+                </details>
+            </div>
+
+            <!-- ข้อ 4 -->
+            <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 space-y-4">
+                <div class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-100 pb-3">
+                    <div class="flex flex-wrap items-center gap-2">
+                        <span class="px-2.5 py-1 bg-indigo-50 border border-indigo-200 text-indigo-700 text-xs font-bold rounded-lg">LO1: ความหมายและรูปแบบ</span>
+                        <span class="px-2.5 py-1 bg-rose-50 border border-rose-200 text-rose-700 text-xs font-bold rounded-lg">ระดับ: ยาก</span>
+                        <span class="px-2.5 py-1 bg-blue-50 border border-blue-200 text-blue-700 text-xs font-bold rounded-lg">การวัด: ด้านความรู้ (K)</span>
+                    </div>
+                    <span class="text-sm font-bold text-slate-400">ข้อที่ 4 / 30</span>
+                </div>
+                <div class="text-base text-slate-800 leading-relaxed font-medium">
+                    พิจารณาระบบสมการ $\begin{cases} a_1 x + b_1 y = 0 \\ a_2 x + b_2 y = 0 \end{cases}$ และระบบ $\begin{cases} a_1 x + b_1 y = c_1 \\ a_2 x + b_2 y = c_2 \end{cases}$ เมื่อเมทริกซ์สัมประสิทธิ์ $A = \begin{bmatrix} a_1 & b_1 \\ a_2 & b_2 \end{bmatrix}$ มี $\det(A) = 0$ ข้อความใดถูกต้องตามหลักการของระบบสมการเชิงเส้น?
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm text-slate-700">
+                    <label for="q4_opt0" class="flex items-start gap-3 p-3.5 rounded-xl border border-slate-200 bg-slate-50/70 hover:bg-indigo-50/60 hover:border-indigo-300 cursor-pointer transition-all">
+                        <input type="radio" id="q4_opt0" name="question_4" value="0" class="mt-1 w-4 h-4 text-indigo-600 border-slate-300 focus:ring-indigo-500 accent-indigo-600 cursor-pointer flex-shrink-0">
+                        <span class="text-slate-700 leading-relaxed">ก. ทั้งสองระบบต้องไม่มีคำตอบเหมือนกัน</span>
+                    </label>
+                    <label for="q4_opt1" class="flex items-start gap-3 p-3.5 rounded-xl border border-slate-200 bg-slate-50/70 hover:bg-indigo-50/60 hover:border-indigo-300 cursor-pointer transition-all">
+                        <input type="radio" id="q4_opt1" name="question_4" value="1" class="mt-1 w-4 h-4 text-indigo-600 border-slate-300 focus:ring-indigo-500 accent-indigo-600 cursor-pointer flex-shrink-0">
+                        <span class="text-slate-700 leading-relaxed">ข. ระบบเอกพันธ์มีคำตอบอนันต์เสมอ แต่ระบบไม่เอกพันธ์อาจไม่มีคำตอบหรือมีคำตอบอนันต์ก็ได้</span>
+                    </label>
+                    <label for="q4_opt2" class="flex items-start gap-3 p-3.5 rounded-xl border border-slate-200 bg-slate-50/70 hover:bg-indigo-50/60 hover:border-indigo-300 cursor-pointer transition-all">
+                        <input type="radio" id="q4_opt2" name="question_4" value="2" class="mt-1 w-4 h-4 text-indigo-600 border-slate-300 focus:ring-indigo-500 accent-indigo-600 cursor-pointer flex-shrink-0">
+                        <span class="text-slate-700 leading-relaxed">ค. ทั้งสองระบบมีคำตอบชัดแจ้ง $(0,0)$ เพียงคำตอบเดียว</span>
+                    </label>
+                    <label for="q4_opt3" class="flex items-start gap-3 p-3.5 rounded-xl border border-slate-200 bg-slate-50/70 hover:bg-indigo-50/60 hover:border-indigo-300 cursor-pointer transition-all">
+                        <input type="radio" id="q4_opt3" name="question_4" value="3" class="mt-1 w-4 h-4 text-indigo-600 border-slate-300 focus:ring-indigo-500 accent-indigo-600 cursor-pointer flex-shrink-0">
+                        <span class="text-slate-700 leading-relaxed">ง. ระบบไม่เอกพันธ์จะต้องมีคำตอบเดียวเสมอ</span>
+                    </label>
+                </div>
+                <details class="answer-detail group mt-4 pt-3 border-t border-slate-100 text-xs sm:text-sm">
+                    <summary class="cursor-pointer text-indigo-600 font-bold hover:text-indigo-800 flex items-center justify-between">
+                        <span>เฉลยและคำอธิบายละเอียด</span>
+                        <span class="text-slate-400 group-open:rotate-180 transition-transform">▼</span>
+                    </summary>
+                    <div class="mt-2 p-4 bg-emerald-50/60 rounded-xl border border-emerald-200 text-slate-700 space-y-1">
+                        <div><strong>คำตอบที่ถูกต้อง: ข. ระบบเอกพันธ์มีคำตอบอนันต์เสมอ แต่ระบบไม่เอกพันธ์อาจไม่มีคำตอบหรือมีคำตอบอนันต์ก็ได้</strong></div>
+                        <p class="leading-relaxed">
+                            <strong>คำอธิบาย:</strong> ระบบเอกพันธ์ $A\mathbf{x}=\mathbf{0}$ สอดคล้องเสมอ (มี $\mathbf{0}$ เป็นคำตอบชัดแจ้ง) เมื่อ $\det(A)=0$ อันดับของ $A$ น้อยกว่า $n$ จึงการันตีว่ามีคำตอบอนันต์แน่นอน ส่วนระบบไม่เอกพันธ์ขึ้นอยู่กับเวกเตอร์คงตัวว่าจะสอดคล้องหรือขัดแย้ง
+                        </p>
+                    </div>
+                </details>
+            </div>
+
+            <!-- ข้อ 5 -->
+            <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 space-y-4">
+                <div class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-100 pb-3">
+                    <div class="flex flex-wrap items-center gap-2">
+                        <span class="px-2.5 py-1 bg-indigo-50 border border-indigo-200 text-indigo-700 text-xs font-bold rounded-lg">LO2: ความหมายของเซตคำตอบ</span>
+                        <span class="px-2.5 py-1 bg-emerald-50 border border-emerald-200 text-emerald-700 text-xs font-bold rounded-lg">ระดับ: ง่าย</span>
+                        <span class="px-2.5 py-1 bg-blue-50 border border-blue-200 text-blue-700 text-xs font-bold rounded-lg">การวัด: ด้านความรู้ (K)</span>
+                    </div>
+                    <span class="text-sm font-bold text-slate-400">ข้อที่ 5 / 30</span>
+                </div>
+                <div class="text-base text-slate-800 leading-relaxed font-medium">
+                    ในระนาบพิกัดฉาก 2 มิติ ระบบสมการเชิงเส้น 2 ตัวแปร จะ <strong>ไม่มีคำตอบ (No Solution)</strong> ในกรณีใดเชิงเรขาคณิต?
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm text-slate-700">
+                    <label for="q5_opt0" class="flex items-start gap-3 p-3.5 rounded-xl border border-slate-200 bg-slate-50/70 hover:bg-indigo-50/60 hover:border-indigo-300 cursor-pointer transition-all">
+                        <input type="radio" id="q5_opt0" name="question_5" value="0" class="mt-1 w-4 h-4 text-indigo-600 border-slate-300 focus:ring-indigo-500 accent-indigo-600 cursor-pointer flex-shrink-0">
+                        <span class="text-slate-700 leading-relaxed">ก. กราฟของเส้นตรงทั้งสองตัดกันตั้งฉาก</span>
+                    </label>
+                    <label for="q5_opt1" class="flex items-start gap-3 p-3.5 rounded-xl border border-slate-200 bg-slate-50/70 hover:bg-indigo-50/60 hover:border-indigo-300 cursor-pointer transition-all">
+                        <input type="radio" id="q5_opt1" name="question_5" value="1" class="mt-1 w-4 h-4 text-indigo-600 border-slate-300 focus:ring-indigo-500 accent-indigo-600 cursor-pointer flex-shrink-0">
+                        <span class="text-slate-700 leading-relaxed">ข. กราฟของเส้นตรงทั้งสองทับกันสนิทเป็นเส้นเดียวกัน</span>
+                    </label>
+                    <label for="q5_opt2" class="flex items-start gap-3 p-3.5 rounded-xl border border-slate-200 bg-slate-50/70 hover:bg-indigo-50/60 hover:border-indigo-300 cursor-pointer transition-all">
+                        <input type="radio" id="q5_opt2" name="question_5" value="2" class="mt-1 w-4 h-4 text-indigo-600 border-slate-300 focus:ring-indigo-500 accent-indigo-600 cursor-pointer flex-shrink-0">
+                        <span class="text-slate-700 leading-relaxed">ค. กราฟของเส้นตรงทั้งสองขนานกันและไม่ตัดกันเลย</span>
+                    </label>
+                    <label for="q5_opt3" class="flex items-start gap-3 p-3.5 rounded-xl border border-slate-200 bg-slate-50/70 hover:bg-indigo-50/60 hover:border-indigo-300 cursor-pointer transition-all">
+                        <input type="radio" id="q5_opt3" name="question_5" value="3" class="mt-1 w-4 h-4 text-indigo-600 border-slate-300 focus:ring-indigo-500 accent-indigo-600 cursor-pointer flex-shrink-0">
+                        <span class="text-slate-700 leading-relaxed">ง. กราฟเส้นหนึ่งตัดผ่านจุดกำเนิดแต่อีกเส้นไม่ผ่าน</span>
+                    </label>
+                </div>
+                <details class="answer-detail group mt-4 pt-3 border-t border-slate-100 text-xs sm:text-sm">
+                    <summary class="cursor-pointer text-indigo-600 font-bold hover:text-indigo-800 flex items-center justify-between">
+                        <span>เฉลยและคำอธิบายละเอียด</span>
+                        <span class="text-slate-400 group-open:rotate-180 transition-transform">▼</span>
+                    </summary>
+                    <div class="mt-2 p-4 bg-emerald-50/60 rounded-xl border border-emerald-200 text-slate-700 space-y-1">
+                        <div><strong>คำตอบที่ถูกต้อง: ค. กราฟของเส้นตรงทั้งสองขนานกันและไม่ตัดกันเลย</strong></div>
+                        <p class="leading-relaxed">
+                            <strong>คำอธิบาย:</strong> จุดตัดของกราฟคือจุดร่วมที่พิกัด $(x,y)$ สอดคล้องกับทั้งสองสมการพร้อมกัน หากเส้นตรงขนานกันและระยะตัดแกนต่างกัน จะไม่มีจุดร่วมใด ๆ เลย ทำให้เซตคำตอบเป็นเซตว่าง ($S = \emptyset$)
+                        </p>
+                    </div>
+                </details>
+            </div>
+
+            <!-- ข้อ 6 -->
+            <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 space-y-4">
+                <div class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-100 pb-3">
+                    <div class="flex flex-wrap items-center gap-2">
+                        <span class="px-2.5 py-1 bg-indigo-50 border border-indigo-200 text-indigo-700 text-xs font-bold rounded-lg">LO2: ความหมายของเซตคำตอบ</span>
+                        <span class="px-2.5 py-1 bg-amber-50 border border-amber-200 text-amber-700 text-xs font-bold rounded-lg">ระดับ: ปานกลาง</span>
+                        <span class="px-2.5 py-1 bg-purple-50 border border-purple-200 text-purple-700 text-xs font-bold rounded-lg">การวัด: ทักษะกระบวนการ (P)</span>
+                    </div>
+                    <span class="text-sm font-bold text-slate-400">ข้อที่ 6 / 30</span>
+                </div>
+                <div class="text-base text-slate-800 leading-relaxed font-medium">
+                    กำหนดระบบสมการ $\begin{cases} 2x - 4y = 6 \\ -x + 2y = -3 \end{cases}$ ข้อใดคือการเขียน <em>เซตคำตอบเชิงสัญลักษณ์ (Solution Set in Parametric Form)</em> ที่ถูกต้อง?
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm text-slate-700">
+                    <label for="q6_opt0" class="flex items-start gap-3 p-3.5 rounded-xl border border-slate-200 bg-slate-50/70 hover:bg-indigo-50/60 hover:border-indigo-300 cursor-pointer transition-all">
+                        <input type="radio" id="q6_opt0" name="question_6" value="0" class="mt-1 w-4 h-4 text-indigo-600 border-slate-300 focus:ring-indigo-500 accent-indigo-600 cursor-pointer flex-shrink-0">
+                        <span class="text-slate-700 leading-relaxed">ก. $S = \{(3, 0)\}$</span>
+                    </label>
+                    <label for="q6_opt1" class="flex items-start gap-3 p-3.5 rounded-xl border border-slate-200 bg-slate-50/70 hover:bg-indigo-50/60 hover:border-indigo-300 cursor-pointer transition-all">
+                        <input type="radio" id="q6_opt1" name="question_6" value="1" class="mt-1 w-4 h-4 text-indigo-600 border-slate-300 focus:ring-indigo-500 accent-indigo-600 cursor-pointer flex-shrink-0">
+                        <span class="text-slate-700 leading-relaxed">ข. $S = \emptyset$</span>
+                    </label>
+                    <label for="q6_opt2" class="flex items-start gap-3 p-3.5 rounded-xl border border-slate-200 bg-slate-50/70 hover:bg-indigo-50/60 hover:border-indigo-300 cursor-pointer transition-all">
+                        <input type="radio" id="q6_opt2" name="question_6" value="2" class="mt-1 w-4 h-4 text-indigo-600 border-slate-300 focus:ring-indigo-500 accent-indigo-600 cursor-pointer flex-shrink-0">
+                        <span class="text-slate-700 leading-relaxed">ค. $S = \{(3 + 2t, t) \mid t \in \mathbb{R}\}$</span>
+                    </label>
+                    <label for="q6_opt3" class="flex items-start gap-3 p-3.5 rounded-xl border border-slate-200 bg-slate-50/70 hover:bg-indigo-50/60 hover:border-indigo-300 cursor-pointer transition-all">
+                        <input type="radio" id="q6_opt3" name="question_6" value="3" class="mt-1 w-4 h-4 text-indigo-600 border-slate-300 focus:ring-indigo-500 accent-indigo-600 cursor-pointer flex-shrink-0">
+                        <span class="text-slate-700 leading-relaxed">ง. $S = \{(t, 3 + 2t) \mid t \in \mathbb{R}\}$</span>
+                    </label>
+                </div>
+                <details class="answer-detail group mt-4 pt-3 border-t border-slate-100 text-xs sm:text-sm">
+                    <summary class="cursor-pointer text-indigo-600 font-bold hover:text-indigo-800 flex items-center justify-between">
+                        <span>เฉลยและคำอธิบายละเอียด</span>
+                        <span class="text-slate-400 group-open:rotate-180 transition-transform">▼</span>
+                    </summary>
+                    <div class="mt-2 p-4 bg-emerald-50/60 rounded-xl border border-emerald-200 text-slate-700 space-y-1">
+                        <div><strong>คำตอบที่ถูกต้อง: ค. $S = \{(3 + 2t, t) \mid t \in \mathbb{R}\}$</strong></div>
+                        <p class="leading-relaxed">
+                            <strong>คำอธิบาย:</strong> สังเกตว่าสมการที่หนึ่งหารด้วย 2 จะได้ $x - 2y = 3$ ซึ่งเทียบเท่ากับสมการที่สอง (เมื่อคูณด้วย $-1$) ทำให้มีคำตอบอนันต์ กำหนดให้ $y = t$ จะได้ $x = 3 + 2t$ ดังนั้นเซตคำตอบคือ $\{(3 + 2t, t) \mid t \in \mathbb{R}\}$
+                        </p>
+                    </div>
+                </details>
+            </div>
+
+            <!-- ข้อ 7 -->
+            <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 space-y-4">
+                <div class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-100 pb-3">
+                    <div class="flex flex-wrap items-center gap-2">
+                        <span class="px-2.5 py-1 bg-indigo-50 border border-indigo-200 text-indigo-700 text-xs font-bold rounded-lg">LO2: ความหมายของเซตคำตอบ</span>
+                        <span class="px-2.5 py-1 bg-rose-50 border border-rose-200 text-rose-700 text-xs font-bold rounded-lg">ระดับ: ยาก</span>
+                        <span class="px-2.5 py-1 bg-indigo-50 border border-indigo-200 text-indigo-700 text-xs font-bold rounded-lg">การวัด: เจตคติและวินัย (A)</span>
+                    </div>
+                    <span class="text-sm font-bold text-slate-400">ข้อที่ 7 / 30</span>
+                </div>
+                <div class="text-base text-slate-800 leading-relaxed font-medium">
+                    นักศึกษาคนหนึ่งคำนวณระบบสมการ $3$ ตัวแปร แล้วสรุปผลในรายงานว่า <em>"เนื่องจากคำนวณพบคำตอบคือ $(1, 2, 3)$ และ $(2, 4, 6)$ จึงสรุปว่าระบบนี้มีจำนวนคำตอบเท่ากับ 2 คำตอบพอดี"</em> ในฐานะผู้ประเมินเชิงคณิตศาสตร์ ข้อสรุปนี้บกพร่องตามทฤษฎีบทพื้นฐานอย่างไร?
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm text-slate-700">
+                    <label for="q7_opt0" class="flex items-start gap-3 p-3.5 rounded-xl border border-slate-200 bg-slate-50/70 hover:bg-indigo-50/60 hover:border-indigo-300 cursor-pointer transition-all">
+                        <input type="radio" id="q7_opt0" name="question_7" value="0" class="mt-1 w-4 h-4 text-indigo-600 border-slate-300 focus:ring-indigo-500 accent-indigo-600 cursor-pointer flex-shrink-0">
+                        <span class="text-slate-700 leading-relaxed">ก. สรุปถูกต้องแล้ว เพราะสามารถระบุจุดคำตอบได้ชัดเจนสองจุด</span>
+                    </label>
+                    <label for="q7_opt1" class="flex items-start gap-3 p-3.5 rounded-xl border border-slate-200 bg-slate-50/70 hover:bg-indigo-50/60 hover:border-indigo-300 cursor-pointer transition-all">
+                        <input type="radio" id="q7_opt1" name="question_7" value="1" class="mt-1 w-4 h-4 text-indigo-600 border-slate-300 focus:ring-indigo-500 accent-indigo-600 cursor-pointer flex-shrink-0">
+                        <span class="text-slate-700 leading-relaxed">ข. ขัดแย้งกับทฤษฎีบทที่ว่า ระบบสมการเชิงเส้นบนฟีลด์จริงจะมีคำตอบได้เพียง 3 แบบเท่านั้น (ไม่มีคำตอบ, คำตอบเดียว, หรือคำตอบอนันต์) หากพบ 2 คำตอบ ย่อมต้องมีคำตอบอนันต์จากการรวมเชิงเส้น</span>
+                    </label>
+                    <label for="q7_opt2" class="flex items-start gap-3 p-3.5 rounded-xl border border-slate-200 bg-slate-50/70 hover:bg-indigo-50/60 hover:border-indigo-300 cursor-pointer transition-all">
+                        <input type="radio" id="q7_opt2" name="question_7" value="2" class="mt-1 w-4 h-4 text-indigo-600 border-slate-300 focus:ring-indigo-500 accent-indigo-600 cursor-pointer flex-shrink-0">
+                        <span class="text-slate-700 leading-relaxed">ค. บกพร่องเพราะคำตอบที่สองเป็น 2 เท่าของคำตอบแรก จึงต้องตัดคำตอบแรกทิ้ง</span>
+                    </label>
+                    <label for="q7_opt3" class="flex items-start gap-3 p-3.5 rounded-xl border border-slate-200 bg-slate-50/70 hover:bg-indigo-50/60 hover:border-indigo-300 cursor-pointer transition-all">
+                        <input type="radio" id="q7_opt3" name="question_7" value="3" class="mt-1 w-4 h-4 text-indigo-600 border-slate-300 focus:ring-indigo-500 accent-indigo-600 cursor-pointer flex-shrink-0">
+                        <span class="text-slate-700 leading-relaxed">ง. บกพร่องเพราะระบบ 3 ตัวแปรต้องมีคำตอบอย่างน้อย 3 จุดเสมอ</span>
+                    </label>
+                </div>
+                <details class="answer-detail group mt-4 pt-3 border-t border-slate-100 text-xs sm:text-sm">
+                    <summary class="cursor-pointer text-indigo-600 font-bold hover:text-indigo-800 flex items-center justify-between">
+                        <span>เฉลยและคำอธิบายละเอียด</span>
+                        <span class="text-slate-400 group-open:rotate-180 transition-transform">▼</span>
+                    </summary>
+                    <div class="mt-2 p-4 bg-emerald-50/60 rounded-xl border border-emerald-200 text-slate-700 space-y-1">
+                        <div><strong>คำตอบที่ถูกต้อง: ข. ขัดแย้งกับทฤษฎีบทที่ว่า ระบบสมการเชิงเส้นบนฟีลด์จริงจะมีคำตอบได้เพียง 3 แบบเท่านั้น (ไม่มีคำตอบ, คำตอบเดียว, หรือคำตอบอนันต์) หากพบ 2 คำตอบ ย่อมต้องมีคำตอบอนันต์จากการรวมเชิงเส้น</strong></div>
+                        <p class="leading-relaxed">
+                            <strong>คำอธิบาย:</strong> ทฤษฎีบทการมีคำตอบของระบบเชิงเส้นระบุว่า ถ้ามีคำตอบที่ต่างกัน 2 คำตอบ คือ $\mathbf{u} \neq \mathbf{v}$ แล้ว จุดทุกจุดบนเส้นตรงที่เชื่อมระหว่างสองจุดนี้ $t\mathbf{u} + (1-t)\mathbf{v}$ ย่อมเป็นคำตอบด้วยเสมอ จึงเป็นไปไม่ได้ที่จะมีคำตอบจำนวนจำกัด $k$ คำตอบ ($k > 1$)
+                        </p>
+                    </div>
+                </details>
+            </div>
+
+            <!-- ข้อ 8 -->
+            <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 space-y-4">
+                <div class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-100 pb-3">
+                    <div class="flex flex-wrap items-center gap-2">
+                        <span class="px-2.5 py-1 bg-indigo-50 border border-indigo-200 text-indigo-700 text-xs font-bold rounded-lg">LO3: การแทนค่าและการกำจัด</span>
+                        <span class="px-2.5 py-1 bg-emerald-50 border border-emerald-200 text-emerald-700 text-xs font-bold rounded-lg">ระดับ: ง่าย</span>
+                        <span class="px-2.5 py-1 bg-blue-50 border border-blue-200 text-blue-700 text-xs font-bold rounded-lg">การวัด: ด้านความรู้ (K)</span>
+                    </div>
+                    <span class="text-sm font-bold text-slate-400">ข้อที่ 8 / 30</span>
+                </div>
+                <div class="text-base text-slate-800 leading-relaxed font-medium">
+                    การดำเนินการตามแถวขั้นมูลฐาน (Elementary Row Operations) หรือการดำเนินการกับสมการในข้อใดต่อไปนี้ <strong>ทำให้เซตคำตอบของระบบเปลี่ยนไป (สูญเสียความสมมูล)</strong>?
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm text-slate-700">
+                    <label for="q8_opt0" class="flex items-start gap-3 p-3.5 rounded-xl border border-slate-200 bg-slate-50/70 hover:bg-indigo-50/60 hover:border-indigo-300 cursor-pointer transition-all">
+                        <input type="radio" id="q8_opt0" name="question_8" value="0" class="mt-1 w-4 h-4 text-indigo-600 border-slate-300 focus:ring-indigo-500 accent-indigo-600 cursor-pointer flex-shrink-0">
+                        <span class="text-slate-700 leading-relaxed">ก. การสลับลำดับระหว่างสองสมการใด ๆ ($R_i \leftrightarrow R_j$)</span>
+                    </label>
+                    <label for="q8_opt1" class="flex items-start gap-3 p-3.5 rounded-xl border border-slate-200 bg-slate-50/70 hover:bg-indigo-50/60 hover:border-indigo-300 cursor-pointer transition-all">
+                        <input type="radio" id="q8_opt1" name="question_8" value="1" class="mt-1 w-4 h-4 text-indigo-600 border-slate-300 focus:ring-indigo-500 accent-indigo-600 cursor-pointer flex-shrink-0">
+                        <span class="text-slate-700 leading-relaxed">ข. การคูณสมการใดสมการหนึ่งด้วยสเกลาร์ $k = 0$ ($0 \cdot R_i \to R_i$)</span>
+                    </label>
+                    <label for="q8_opt2" class="flex items-start gap-3 p-3.5 rounded-xl border border-slate-200 bg-slate-50/70 hover:bg-indigo-50/60 hover:border-indigo-300 cursor-pointer transition-all">
+                        <input type="radio" id="q8_opt2" name="question_8" value="2" class="mt-1 w-4 h-4 text-indigo-600 border-slate-300 focus:ring-indigo-500 accent-indigo-600 cursor-pointer flex-shrink-0">
+                        <span class="text-slate-700 leading-relaxed">ค. การคูณสมการด้วยค่าคงที่ที่ไม่เป็นศูนย์ $k \neq 0$ ($kR_i \to R_i$)</span>
+                    </label>
+                    <label for="q8_opt3" class="flex items-start gap-3 p-3.5 rounded-xl border border-slate-200 bg-slate-50/70 hover:bg-indigo-50/60 hover:border-indigo-300 cursor-pointer transition-all">
+                        <input type="radio" id="q8_opt3" name="question_8" value="3" class="mt-1 w-4 h-4 text-indigo-600 border-slate-300 focus:ring-indigo-500 accent-indigo-600 cursor-pointer flex-shrink-0">
+                        <span class="text-slate-700 leading-relaxed">ง. การบวกพหุคูณของสมการหนึ่งเข้ากับอีกสมการหนึ่ง ($R_i + cR_j \to R_i$)</span>
+                    </label>
+                </div>
+                <details class="answer-detail group mt-4 pt-3 border-t border-slate-100 text-xs sm:text-sm">
+                    <summary class="cursor-pointer text-indigo-600 font-bold hover:text-indigo-800 flex items-center justify-between">
+                        <span>เฉลยและคำอธิบายละเอียด</span>
+                        <span class="text-slate-400 group-open:rotate-180 transition-transform">▼</span>
+                    </summary>
+                    <div class="mt-2 p-4 bg-emerald-50/60 rounded-xl border border-emerald-200 text-slate-700 space-y-1">
+                        <div><strong>คำตอบที่ถูกต้อง: ข. การคูณสมการใดสมการหนึ่งด้วยสเกลาร์ $k = 0$ ($0 \cdot R_i \to R_i$)</strong></div>
+                        <p class="leading-relaxed">
+                            <strong>คำอธิบาย:</strong> การคูณสมการด้วยศูนย์จะทำให้ข้อมูลของสมการนั้นกลายเป็น $0 = 0$ ซึ่งไม่สามารถย้อนกลับ (Reversible) ได้ ทำให้เซตคำตอบขยายใหญ่ขึ้นและสูญเสียความสมมูลของระบบสมการเดิม
+                        </p>
+                    </div>
+                </details>
+            </div>
+
+            <!-- ข้อ 9 -->
+            <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 space-y-4">
+                <div class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-100 pb-3">
+                    <div class="flex flex-wrap items-center gap-2">
+                        <span class="px-2.5 py-1 bg-indigo-50 border border-indigo-200 text-indigo-700 text-xs font-bold rounded-lg">LO3: การแทนค่าและการกำจัด</span>
+                        <span class="px-2.5 py-1 bg-emerald-50 border border-emerald-200 text-emerald-700 text-xs font-bold rounded-lg">ระดับ: ง่าย</span>
+                        <span class="px-2.5 py-1 bg-purple-50 border border-purple-200 text-purple-700 text-xs font-bold rounded-lg">การวัด: ทักษะกระบวนการ (P)</span>
+                    </div>
+                    <span class="text-sm font-bold text-slate-400">ข้อที่ 9 / 30</span>
+                </div>
+                <div class="text-base text-slate-800 leading-relaxed font-medium">
+                    แก้ระบบสมการ $\begin{cases} x + y = 7 \\ 2x - y = 8 \end{cases}$ ด้วยวิธีกำจัดตัวแปร จะได้ค่า $(x, y)$ ตรงกับข้อใด?
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm text-slate-700">
+                    <label for="q9_opt0" class="flex items-start gap-3 p-3.5 rounded-xl border border-slate-200 bg-slate-50/70 hover:bg-indigo-50/60 hover:border-indigo-300 cursor-pointer transition-all">
+                        <input type="radio" id="q9_opt0" name="question_9" value="0" class="mt-1 w-4 h-4 text-indigo-600 border-slate-300 focus:ring-indigo-500 accent-indigo-600 cursor-pointer flex-shrink-0">
+                        <span class="text-slate-700 leading-relaxed">ก. $(x, y) = (5, 2)$</span>
+                    </label>
+                    <label for="q9_opt1" class="flex items-start gap-3 p-3.5 rounded-xl border border-slate-200 bg-slate-50/70 hover:bg-indigo-50/60 hover:border-indigo-300 cursor-pointer transition-all">
+                        <input type="radio" id="q9_opt1" name="question_9" value="1" class="mt-1 w-4 h-4 text-indigo-600 border-slate-300 focus:ring-indigo-500 accent-indigo-600 cursor-pointer flex-shrink-0">
+                        <span class="text-slate-700 leading-relaxed">ข. $(x, y) = (4, 3)$</span>
+                    </label>
+                    <label for="q9_opt2" class="flex items-start gap-3 p-3.5 rounded-xl border border-slate-200 bg-slate-50/70 hover:bg-indigo-50/60 hover:border-indigo-300 cursor-pointer transition-all">
+                        <input type="radio" id="q9_opt2" name="question_9" value="2" class="mt-1 w-4 h-4 text-indigo-600 border-slate-300 focus:ring-indigo-500 accent-indigo-600 cursor-pointer flex-shrink-0">
+                        <span class="text-slate-700 leading-relaxed">ค. $(x, y) = (6, 1)$</span>
+                    </label>
+                    <label for="q9_opt3" class="flex items-start gap-3 p-3.5 rounded-xl border border-slate-200 bg-slate-50/70 hover:bg-indigo-50/60 hover:border-indigo-300 cursor-pointer transition-all">
+                        <input type="radio" id="q9_opt3" name="question_9" value="3" class="mt-1 w-4 h-4 text-indigo-600 border-slate-300 focus:ring-indigo-500 accent-indigo-600 cursor-pointer flex-shrink-0">
+                        <span class="text-slate-700 leading-relaxed">ง. $(x, y) = (3, 4)$</span>
+                    </label>
+                </div>
+                <details class="answer-detail group mt-4 pt-3 border-t border-slate-100 text-xs sm:text-sm">
+                    <summary class="cursor-pointer text-indigo-600 font-bold hover:text-indigo-800 flex items-center justify-between">
+                        <span>เฉลยและคำอธิบายละเอียด</span>
+                        <span class="text-slate-400 group-open:rotate-180 transition-transform">▼</span>
+                    </summary>
+                    <div class="mt-2 p-4 bg-emerald-50/60 rounded-xl border border-emerald-200 text-slate-700 space-y-1">
+                        <div><strong>คำตอบที่ถูกต้อง: ก. $(x, y) = (5, 2)$</strong></div>
+                        <p class="leading-relaxed">
+                            <strong>คำอธิบาย:</strong> นำสมการทั้งสองมาบวกกัน: $(x + y) + (2x - y) = 7 + 8 \implies 3x = 15 \implies x = 5$ จากนั้นแทน $x = 5$ ในสมการแรกได้ $5 + y = 7 \implies y = 2$
+                        </p>
+                    </div>
+                </details>
+            </div>
+
+            <!-- ข้อ 10 -->
+            <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 space-y-4">
+                <div class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-100 pb-3">
+                    <div class="flex flex-wrap items-center gap-2">
+                        <span class="px-2.5 py-1 bg-indigo-50 border border-indigo-200 text-indigo-700 text-xs font-bold rounded-lg">LO3: การแทนค่าและการกำจัด</span>
+                        <span class="px-2.5 py-1 bg-amber-50 border border-amber-200 text-amber-700 text-xs font-bold rounded-lg">ระดับ: ปานกลาง</span>
+                        <span class="px-2.5 py-1 bg-indigo-50 border border-indigo-200 text-indigo-700 text-xs font-bold rounded-lg">การวัด: เจตคติและวินัย (A)</span>
+                    </div>
+                    <span class="text-sm font-bold text-slate-400">ข้อที่ 10 / 30</span>
+                </div>
+                <div class="text-base text-slate-800 leading-relaxed font-medium">
+                    เมื่อแก้ระบบสมการที่มีทศนิยมหรือเศษส่วนซับซ้อน ข้อปฏิบัติใดสะท้อนถึง <strong>ความรอบคอบและความซื่อสัตย์ทางวิชาการ (Academic Thoroughness & Rigor)</strong> สูงสุด?
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm text-slate-700">
+                    <label for="q10_opt0" class="flex items-start gap-3 p-3.5 rounded-xl border border-slate-200 bg-slate-50/70 hover:bg-indigo-50/60 hover:border-indigo-300 cursor-pointer transition-all">
+                        <input type="radio" id="q10_opt0" name="question_10" value="0" class="mt-1 w-4 h-4 text-indigo-600 border-slate-300 focus:ring-indigo-500 accent-indigo-600 cursor-pointer flex-shrink-0">
+                        <span class="text-slate-700 leading-relaxed">ก. เมื่อได้ผลลัพธ์ นำไปตรวจสอบโดยแทนค่ากลับลงในสมการแรกเพียงสมการเดียว</span>
+                    </label>
+                    <label for="q10_opt1" class="flex items-start gap-3 p-3.5 rounded-xl border border-slate-200 bg-slate-50/70 hover:bg-indigo-50/60 hover:border-indigo-300 cursor-pointer transition-all">
+                        <input type="radio" id="q10_opt1" name="question_10" value="1" class="mt-1 w-4 h-4 text-indigo-600 border-slate-300 focus:ring-indigo-500 accent-indigo-600 cursor-pointer flex-shrink-0">
+                        <span class="text-slate-700 leading-relaxed">ข. ปัดเศษทศนิยมตั้งแต่ขั้นตอนแรกเพื่อความสะดวกรวดเร็วในการคำนวณ</span>
+                    </label>
+                    <label for="q10_opt2" class="flex items-start gap-3 p-3.5 rounded-xl border border-slate-200 bg-slate-50/70 hover:bg-indigo-50/60 hover:border-indigo-300 cursor-pointer transition-all">
+                        <input type="radio" id="q10_opt2" name="question_10" value="2" class="mt-1 w-4 h-4 text-indigo-600 border-slate-300 focus:ring-indigo-500 accent-indigo-600 cursor-pointer flex-shrink-0">
+                        <span class="text-slate-700 leading-relaxed">ค. คงค่าเศษส่วนแท้ไว้ในระหว่างคำนวณ และนำคำตอบที่ได้ไปแทนค่าตรวจสอบกับ <em>ทุกสมการดั้งเดิม</em> ของระบบ</span>
+                    </label>
+                    <label for="q10_opt3" class="flex items-start gap-3 p-3.5 rounded-xl border border-slate-200 bg-slate-50/70 hover:bg-indigo-50/60 hover:border-indigo-300 cursor-pointer transition-all">
+                        <input type="radio" id="q10_opt3" name="question_10" value="3" class="mt-1 w-4 h-4 text-indigo-600 border-slate-300 focus:ring-indigo-500 accent-indigo-600 cursor-pointer flex-shrink-0">
+                        <span class="text-slate-700 leading-relaxed">ง. สรุปคำตอบทันทีโดยไม่ตรวจสอบ เพราะมั่นใจในสูตรที่ใช้</span>
+                    </label>
+                </div>
+                <details class="answer-detail group mt-4 pt-3 border-t border-slate-100 text-xs sm:text-sm">
+                    <summary class="cursor-pointer text-indigo-600 font-bold hover:text-indigo-800 flex items-center justify-between">
+                        <span>เฉลยและคำอธิบายละเอียด</span>
+                        <span class="text-slate-400 group-open:rotate-180 transition-transform">▼</span>
+                    </summary>
+                    <div class="mt-2 p-4 bg-emerald-50/60 rounded-xl border border-emerald-200 text-slate-700 space-y-1">
+                        <div><strong>คำตอบที่ถูกต้อง: ค. คงค่าเศษส่วนแท้ไว้ในระหว่างคำนวณ และนำคำตอบที่ได้ไปแทนค่าตรวจสอบกับ ทุกสมการดั้งเดิม ของระบบ</strong></div>
+                        <p class="leading-relaxed">
+                            <strong>คำอธิบาย:</strong> การปัดเศษทศนิยมก่อนกำหนดจะทำให้เกิด Round-off Error สะสม และคำตอบที่ถูกต้องตามนิยามต้องสอดคล้องกับทุกสมการในระบบพร้อมกัน การแทนกลับครบทุกสมการจึงเป็นกระบวนการตรวจสอบความถูกต้องทางคณิตศาสตร์ที่เคร่งครัด
+                        </p>
+                    </div>
+                </details>
+            </div>
+
+            <!-- ข้อ 11 -->
+            <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 space-y-4">
+                <div class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-100 pb-3">
+                    <div class="flex flex-wrap items-center gap-2">
+                        <span class="px-2.5 py-1 bg-indigo-50 border border-indigo-200 text-indigo-700 text-xs font-bold rounded-lg">LO3: การแทนค่าและการกำจัด</span>
+                        <span class="px-2.5 py-1 bg-rose-50 border border-rose-200 text-rose-700 text-xs font-bold rounded-lg">ระดับ: ยาก</span>
+                        <span class="px-2.5 py-1 bg-purple-50 border border-purple-200 text-purple-700 text-xs font-bold rounded-lg">การวัด: ทักษะกระบวนการ (P)</span>
+                    </div>
+                    <span class="text-sm font-bold text-slate-400">ข้อที่ 11 / 30</span>
+                </div>
+                <div class="text-base text-slate-800 leading-relaxed font-medium">
+                    จงแก้ระบบสมการ 3 ตัวแปรต่อไปนี้: $\begin{cases} 2x + y - z = 1 \\ x - y + z = 2 \\ 3x + 2y - z = 4 \end{cases}$ ผลลัพธ์ของ $x + y + z$ มีค่าเท่ากับเท่าใด?
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm text-slate-700">
+                    <label for="q11_opt0" class="flex items-start gap-3 p-3.5 rounded-xl border border-slate-200 bg-slate-50/70 hover:bg-indigo-50/60 hover:border-indigo-300 cursor-pointer transition-all">
+                        <input type="radio" id="q11_opt0" name="question_11" value="0" class="mt-1 w-4 h-4 text-indigo-600 border-slate-300 focus:ring-indigo-500 accent-indigo-600 cursor-pointer flex-shrink-0">
+                        <span class="text-slate-700 leading-relaxed">ก. 3</span>
+                    </label>
+                    <label for="q11_opt1" class="flex items-start gap-3 p-3.5 rounded-xl border border-slate-200 bg-slate-50/70 hover:bg-indigo-50/60 hover:border-indigo-300 cursor-pointer transition-all">
+                        <input type="radio" id="q11_opt1" name="question_11" value="1" class="mt-1 w-4 h-4 text-indigo-600 border-slate-300 focus:ring-indigo-500 accent-indigo-600 cursor-pointer flex-shrink-0">
+                        <span class="text-slate-700 leading-relaxed">ข. 4</span>
+                    </label>
+                    <label for="q11_opt2" class="flex items-start gap-3 p-3.5 rounded-xl border border-slate-200 bg-slate-50/70 hover:bg-indigo-50/60 hover:border-indigo-300 cursor-pointer transition-all">
+                        <input type="radio" id="q11_opt2" name="question_11" value="2" class="mt-1 w-4 h-4 text-indigo-600 border-slate-300 focus:ring-indigo-500 accent-indigo-600 cursor-pointer flex-shrink-0">
+                        <span class="text-slate-700 leading-relaxed">ค. 5</span>
+                    </label>
+                    <label for="q11_opt3" class="flex items-start gap-3 p-3.5 rounded-xl border border-slate-200 bg-slate-50/70 hover:bg-indigo-50/60 hover:border-indigo-300 cursor-pointer transition-all">
+                        <input type="radio" id="q11_opt3" name="question_11" value="3" class="mt-1 w-4 h-4 text-indigo-600 border-slate-300 focus:ring-indigo-500 accent-indigo-600 cursor-pointer flex-shrink-0">
+                        <span class="text-slate-700 leading-relaxed">ง. 6</span>
+                    </label>
+                </div>
+                <details class="answer-detail group mt-4 pt-3 border-t border-slate-100 text-xs sm:text-sm">
+                    <summary class="cursor-pointer text-indigo-600 font-bold hover:text-indigo-800 flex items-center justify-between">
+                        <span>เฉลยและคำอธิบายละเอียด</span>
+                        <span class="text-slate-400 group-open:rotate-180 transition-transform">▼</span>
+                    </summary>
+                    <div class="mt-2 p-4 bg-emerald-50/60 rounded-xl border border-emerald-200 text-slate-700 space-y-1">
+                        <div><strong>คำตอบที่ถูกต้อง: ง. 6</strong></div>
+                        <p class="leading-relaxed">
+                            <strong>คำอธิบาย:</strong> บวกสมการ (1) กับ (2): $(2x+y-z) + (x-y+z) = 1 + 2 \implies 3x = 3 \implies x = 1$<br>นำ $x=1$ แทนใน (1) และ (3): $\begin{cases} y - z = -1 \\ 2y - z = 1 \end{cases}$ นำสองสมการนี้ลบกันได้ $y = 2$ และแทนกลับได้ $z = 3$<br>ดังนั้น $(x, y, z) = (1, 2, 3)$ มีผลรวมคือ $x + y + z = 1 + 2 + 3 = 6$
+                        </p>
+                    </div>
+                </details>
+            </div>
+
+            <!-- ข้อ 12 -->
+            <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 space-y-4">
+                <div class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-100 pb-3">
+                    <div class="flex flex-wrap items-center gap-2">
+                        <span class="px-2.5 py-1 bg-indigo-50 border border-indigo-200 text-indigo-700 text-xs font-bold rounded-lg">LO4: กฎของเครเมอร์</span>
+                        <span class="px-2.5 py-1 bg-emerald-50 border border-emerald-200 text-emerald-700 text-xs font-bold rounded-lg">ระดับ: ง่าย</span>
+                        <span class="px-2.5 py-1 bg-blue-50 border border-blue-200 text-blue-700 text-xs font-bold rounded-lg">การวัด: ด้านความรู้ (K)</span>
+                    </div>
+                    <span class="text-sm font-bold text-slate-400">ข้อที่ 12 / 30</span>
+                </div>
+                <div class="text-base text-slate-800 leading-relaxed font-medium">
+                    เงื่อนไขจำเป็นและสำคัญที่สุดในการนำ <strong>กฎของเครเมอร์ (Cramer's Rule)</strong> ในรูป $x_i = \frac{\det(A_i)}{\det(A)}$ มาใช้หาคำตอบของระบบสมการคือข้อใด?
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm text-slate-700">
+                    <label for="q12_opt0" class="flex items-start gap-3 p-3.5 rounded-xl border border-slate-200 bg-slate-50/70 hover:bg-indigo-50/60 hover:border-indigo-300 cursor-pointer transition-all">
+                        <input type="radio" id="q12_opt0" name="question_12" value="0" class="mt-1 w-4 h-4 text-indigo-600 border-slate-300 focus:ring-indigo-500 accent-indigo-600 cursor-pointer flex-shrink-0">
+                        <span class="text-slate-700 leading-relaxed">ก. เวกเตอร์ค่าคงที่ $\mathbf{b}$ ต้องเป็นเวกเตอร์ศูนย์</span>
+                    </label>
+                    <label for="q12_opt1" class="flex items-start gap-3 p-3.5 rounded-xl border border-slate-200 bg-slate-50/70 hover:bg-indigo-50/60 hover:border-indigo-300 cursor-pointer transition-all">
+                        <input type="radio" id="q12_opt1" name="question_12" value="1" class="mt-1 w-4 h-4 text-indigo-600 border-slate-300 focus:ring-indigo-500 accent-indigo-600 cursor-pointer flex-shrink-0">
+                        <span class="text-slate-700 leading-relaxed">ข. เมทริกซ์ $A$ ต้องเป็นเมทริกซ์จัตุรัสและ $\det(A) \neq 0$</span>
+                    </label>
+                    <label for="q12_opt2" class="flex items-start gap-3 p-3.5 rounded-xl border border-slate-200 bg-slate-50/70 hover:bg-indigo-50/60 hover:border-indigo-300 cursor-pointer transition-all">
+                        <input type="radio" id="q12_opt2" name="question_12" value="2" class="mt-1 w-4 h-4 text-indigo-600 border-slate-300 focus:ring-indigo-500 accent-indigo-600 cursor-pointer flex-shrink-0">
+                        <span class="text-slate-700 leading-relaxed">ค. เมทริกซ์ $A$ ต้องมีสมาชิกทุกตัวเป็นจำนวนเต็มบวก</span>
+                    </label>
+                    <label for="q12_opt3" class="flex items-start gap-3 p-3.5 rounded-xl border border-slate-200 bg-slate-50/70 hover:bg-indigo-50/60 hover:border-indigo-300 cursor-pointer transition-all">
+                        <input type="radio" id="q12_opt3" name="question_12" value="3" class="mt-1 w-4 h-4 text-indigo-600 border-slate-300 focus:ring-indigo-500 accent-indigo-600 cursor-pointer flex-shrink-0">
+                        <span class="text-slate-700 leading-relaxed">ง. สมาชิกในแนวทแยงมุมหลักต้องมีค่าเท่ากับ 1</span>
+                    </label>
+                </div>
+                <details class="answer-detail group mt-4 pt-3 border-t border-slate-100 text-xs sm:text-sm">
+                    <summary class="cursor-pointer text-indigo-600 font-bold hover:text-indigo-800 flex items-center justify-between">
+                        <span>เฉลยและคำอธิบายละเอียด</span>
+                        <span class="text-slate-400 group-open:rotate-180 transition-transform">▼</span>
+                    </summary>
+                    <div class="mt-2 p-4 bg-emerald-50/60 rounded-xl border border-emerald-200 text-slate-700 space-y-1">
+                        <div><strong>คำตอบที่ถูกต้อง: ข. เมทริกซ์ $A$ ต้องเป็นเมทริกซ์จัตุรัสและ $\det(A) \neq 0$</strong></div>
+                        <p class="leading-relaxed">
+                            <strong>คำอธิบาย:</strong> กฎของเครเมอร์ใช้ได้เฉพาะระบบสมการที่มีจำนวนสมการเท่ากับจำนวนตัวแปร ($n \times n$) และตัวส่วน $\det(A)$ ต้องไม่เท่ากับศูนย์ เพื่อให้ผลหารมีความหมายในระบบจำนวนจริง
+                        </p>
+                    </div>
+                </details>
+            </div>
+
+            <!-- ข้อ 13 -->
+            <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 space-y-4">
+                <div class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-100 pb-3">
+                    <div class="flex flex-wrap items-center gap-2">
+                        <span class="px-2.5 py-1 bg-indigo-50 border border-indigo-200 text-indigo-700 text-xs font-bold rounded-lg">LO4: กฎของเครเมอร์</span>
+                        <span class="px-2.5 py-1 bg-amber-50 border border-amber-200 text-amber-700 text-xs font-bold rounded-lg">ระดับ: ปานกลาง</span>
+                        <span class="px-2.5 py-1 bg-purple-50 border border-purple-200 text-purple-700 text-xs font-bold rounded-lg">การวัด: ทักษะกระบวนการ (P)</span>
+                    </div>
+                    <span class="text-sm font-bold text-slate-400">ข้อที่ 13 / 30</span>
+                </div>
+                <div class="text-base text-slate-800 leading-relaxed font-medium">
+                    กำหนดระบบสมการ $\begin{cases} 3x + 2y = 7 \\ 2x - y = 0 \end{cases}$ ข้อใดคือค่าของ $\det(A)$ และ $\det(A_1)$ เพื่อใช้หาค่า $x$ ตามกฎของเครเมอร์?
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm text-slate-700">
+                    <label for="q13_opt0" class="flex items-start gap-3 p-3.5 rounded-xl border border-slate-200 bg-slate-50/70 hover:bg-indigo-50/60 hover:border-indigo-300 cursor-pointer transition-all">
+                        <input type="radio" id="q13_opt0" name="question_13" value="0" class="mt-1 w-4 h-4 text-indigo-600 border-slate-300 focus:ring-indigo-500 accent-indigo-600 cursor-pointer flex-shrink-0">
+                        <span class="text-slate-700 leading-relaxed">ก. $\det(A) = -7, \ \det(A_1) = -7$</span>
+                    </label>
+                    <label for="q13_opt1" class="flex items-start gap-3 p-3.5 rounded-xl border border-slate-200 bg-slate-50/70 hover:bg-indigo-50/60 hover:border-indigo-300 cursor-pointer transition-all">
+                        <input type="radio" id="q13_opt1" name="question_13" value="1" class="mt-1 w-4 h-4 text-indigo-600 border-slate-300 focus:ring-indigo-500 accent-indigo-600 cursor-pointer flex-shrink-0">
+                        <span class="text-slate-700 leading-relaxed">ข. $\det(A) = -7, \ \det(A_1) = -14$</span>
+                    </label>
+                    <label for="q13_opt2" class="flex items-start gap-3 p-3.5 rounded-xl border border-slate-200 bg-slate-50/70 hover:bg-indigo-50/60 hover:border-indigo-300 cursor-pointer transition-all">
+                        <input type="radio" id="q13_opt2" name="question_13" value="2" class="mt-1 w-4 h-4 text-indigo-600 border-slate-300 focus:ring-indigo-500 accent-indigo-600 cursor-pointer flex-shrink-0">
+                        <span class="text-slate-700 leading-relaxed">ค. $\det(A) = 7, \ \det(A_1) = 7$</span>
+                    </label>
+                    <label for="q13_opt3" class="flex items-start gap-3 p-3.5 rounded-xl border border-slate-200 bg-slate-50/70 hover:bg-indigo-50/60 hover:border-indigo-300 cursor-pointer transition-all">
+                        <input type="radio" id="q13_opt3" name="question_13" value="3" class="mt-1 w-4 h-4 text-indigo-600 border-slate-300 focus:ring-indigo-500 accent-indigo-600 cursor-pointer flex-shrink-0">
+                        <span class="text-slate-700 leading-relaxed">ง. $\det(A) = -1, \ \det(A_1) = 7$</span>
+                    </label>
+                </div>
+                <details class="answer-detail group mt-4 pt-3 border-t border-slate-100 text-xs sm:text-sm">
+                    <summary class="cursor-pointer text-indigo-600 font-bold hover:text-indigo-800 flex items-center justify-between">
+                        <span>เฉลยและคำอธิบายละเอียด</span>
+                        <span class="text-slate-400 group-open:rotate-180 transition-transform">▼</span>
+                    </summary>
+                    <div class="mt-2 p-4 bg-emerald-50/60 rounded-xl border border-emerald-200 text-slate-700 space-y-1">
+                        <div><strong>คำตอบที่ถูกต้อง: ก. $\det(A) = -7, \ \det(A_1) = -7$</strong></div>
+                        <p class="leading-relaxed">
+                            <strong>คำอธิบาย:</strong> $\det(A) = \begin{vmatrix} 3 & 2 \\ 2 & -1 \end{vmatrix} = (3)(-1) - (2)(2) = -3 - 4 = -7$<br>$\det(A_1) = \begin{vmatrix} 7 & 2 \\ 0 & -1 \end{vmatrix} = (7)(-1) - (0)(2) = -7$ ดังนั้น $x = \frac{-7}{-7} = 1$
+                        </p>
+                    </div>
+                </details>
+            </div>
+
+            <!-- ข้อ 14 -->
+            <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 space-y-4">
+                <div class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-100 pb-3">
+                    <div class="flex flex-wrap items-center gap-2">
+                        <span class="px-2.5 py-1 bg-indigo-50 border border-indigo-200 text-indigo-700 text-xs font-bold rounded-lg">LO4: กฎของเครเมอร์</span>
+                        <span class="px-2.5 py-1 bg-rose-50 border border-rose-200 text-rose-700 text-xs font-bold rounded-lg">ระดับ: ยาก</span>
+                        <span class="px-2.5 py-1 bg-indigo-50 border border-indigo-200 text-indigo-700 text-xs font-bold rounded-lg">การวัด: เจตคติและวินัย (A)</span>
+                    </div>
+                    <span class="text-sm font-bold text-slate-400">ข้อที่ 14 / 30</span>
+                </div>
+                <div class="text-base text-slate-800 leading-relaxed font-medium">
+                    ในการวิเคราะห์ระบบเครือข่ายไฟฟ้าที่มีขนาด $10 \times 10$ วิศวกรคนหนึ่งยืนยันที่จะเขียนโปรแกรมคำนวณด้วยกฎของเครเมอร์เพียงอย่างเดียว ข้อวิพากษ์ในเชิง <strong>ประสิทธิภาพและความตระหนักด้านการคำนวณ (Computational Efficiency Awareness)</strong> ข้อใดตรงกับความจริง?
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm text-slate-700">
+                    <label for="q14_opt0" class="flex items-start gap-3 p-3.5 rounded-xl border border-slate-200 bg-slate-50/70 hover:bg-indigo-50/60 hover:border-indigo-300 cursor-pointer transition-all">
+                        <input type="radio" id="q14_opt0" name="question_14" value="0" class="mt-1 w-4 h-4 text-indigo-600 border-slate-300 focus:ring-indigo-500 accent-indigo-600 cursor-pointer flex-shrink-0">
+                        <span class="text-slate-700 leading-relaxed">ก. เป็นทางเลือกที่ดีที่สุดเพราะกฎของเครเมอร์ให้คำตอบแม่นยำที่สุดเสมอ</span>
+                    </label>
+                    <label for="q14_opt1" class="flex items-start gap-3 p-3.5 rounded-xl border border-slate-200 bg-slate-50/70 hover:bg-indigo-50/60 hover:border-indigo-300 cursor-pointer transition-all">
+                        <input type="radio" id="q14_opt1" name="question_14" value="1" class="mt-1 w-4 h-4 text-indigo-600 border-slate-300 focus:ring-indigo-500 accent-indigo-600 cursor-pointer flex-shrink-0">
+                        <span class="text-slate-700 leading-relaxed">ข. กฎของเครเมอร์มีความซับซ้อนระดับ $O((n+1)!)$ สำหรับสูตรกระจาย หรือ $O(n^4)$ จึงไม่มีประสิทธิภาพอย่างยิ่งในทางคอมพิวเตอร์เมื่อเทียบกับ Gaussian Elimination ที่ใช้เพียง $O(n^3)$</span>
+                    </label>
+                    <label for="q14_opt2" class="flex items-start gap-3 p-3.5 rounded-xl border border-slate-200 bg-slate-50/70 hover:bg-indigo-50/60 hover:border-indigo-300 cursor-pointer transition-all">
+                        <input type="radio" id="q14_opt2" name="question_14" value="2" class="mt-1 w-4 h-4 text-indigo-600 border-slate-300 focus:ring-indigo-500 accent-indigo-600 cursor-pointer flex-shrink-0">
+                        <span class="text-slate-700 leading-relaxed">ค. กฎของเครเมอร์ใช้หน่วยความจำน้อยกว่าทุกวิธี</span>
+                    </label>
+                    <label for="q14_opt3" class="flex items-start gap-3 p-3.5 rounded-xl border border-slate-200 bg-slate-50/70 hover:bg-indigo-50/60 hover:border-indigo-300 cursor-pointer transition-all">
+                        <input type="radio" id="q14_opt3" name="question_14" value="3" class="mt-1 w-4 h-4 text-indigo-600 border-slate-300 focus:ring-indigo-500 accent-indigo-600 cursor-pointer flex-shrink-0">
+                        <span class="text-slate-700 leading-relaxed">ง. กฎของเครเมอร์ไม่สามารถใช้กับระบบ 10 ตัวแปรได้ในทางทฤษฎี</span>
+                    </label>
+                </div>
+                <details class="answer-detail group mt-4 pt-3 border-t border-slate-100 text-xs sm:text-sm">
+                    <summary class="cursor-pointer text-indigo-600 font-bold hover:text-indigo-800 flex items-center justify-between">
+                        <span>เฉลยและคำอธิบายละเอียด</span>
+                        <span class="text-slate-400 group-open:rotate-180 transition-transform">▼</span>
+                    </summary>
+                    <div class="mt-2 p-4 bg-emerald-50/60 rounded-xl border border-emerald-200 text-slate-700 space-y-1">
+                        <div><strong>คำตอบที่ถูกต้อง: ข. กฎของเครเมอร์มีความซับซ้อนระดับ $O((n+1)!)$ สำหรับสูตรกระจาย หรือ $O(n^4)$ จึงไม่มีประสิทธิภาพอย่างยิ่งในทางคอมพิวเตอร์เมื่อเทียบกับ Gaussian Elimination ที่ใช้เพียง $O(n^3)$</strong></div>
+                        <p class="leading-relaxed">
+                            <strong>คำอธิบาย:</strong> การเข้าใจขอบเขตและข้อจำกัดของเครื่องมือทางคณิตศาสตร์ในการประยุกต์ใช้งานจริง (Mathematical & Algorithmic Pragmatism) เป็นคุณลักษณะสำคัญ กฎของเครเมอร์มีประโยชน์เชิงทฤษฎีและการวิเคราะห์สูตร แต่ไม่เหมาะกับการคำนวณตัวเลขขนาดใหญ่
+                        </p>
+                    </div>
+                </details>
+            </div>
+
+            <!-- ข้อ 15 -->
+            <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 space-y-4">
+                <div class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-100 pb-3">
+                    <div class="flex flex-wrap items-center gap-2">
+                        <span class="px-2.5 py-1 bg-indigo-50 border border-indigo-200 text-indigo-700 text-xs font-bold rounded-lg">LO5: การแก้ด้วยเมทริกซ์ผกผัน</span>
+                        <span class="px-2.5 py-1 bg-emerald-50 border border-emerald-200 text-emerald-700 text-xs font-bold rounded-lg">ระดับ: ง่าย</span>
+                        <span class="px-2.5 py-1 bg-blue-50 border border-blue-200 text-blue-700 text-xs font-bold rounded-lg">การวัด: ด้านความรู้ (K)</span>
+                    </div>
+                    <span class="text-sm font-bold text-slate-400">ข้อที่ 15 / 30</span>
+                </div>
+                <div class="text-base text-slate-800 leading-relaxed font-medium">
+                    จากสมการเมทริกซ์ $A\mathbf{x} = \mathbf{b}$ เมื่อ $A$ เป็นเมทริกซ์ผกผันได้ ข้อใดคือขั้นตอนการหาเวกเตอร์คำตอบ $\mathbf{x}$ ที่ถูกต้องตามพีชคณิตเมทริกซ์?
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm text-slate-700">
+                    <label for="q15_opt0" class="flex items-start gap-3 p-3.5 rounded-xl border border-slate-200 bg-slate-50/70 hover:bg-indigo-50/60 hover:border-indigo-300 cursor-pointer transition-all">
+                        <input type="radio" id="q15_opt0" name="question_15" value="0" class="mt-1 w-4 h-4 text-indigo-600 border-slate-300 focus:ring-indigo-500 accent-indigo-600 cursor-pointer flex-shrink-0">
+                        <span class="text-slate-700 leading-relaxed">ก. $\mathbf{x} = \frac{\mathbf{b}}{A}$</span>
+                    </label>
+                    <label for="q15_opt1" class="flex items-start gap-3 p-3.5 rounded-xl border border-slate-200 bg-slate-50/70 hover:bg-indigo-50/60 hover:border-indigo-300 cursor-pointer transition-all">
+                        <input type="radio" id="q15_opt1" name="question_15" value="1" class="mt-1 w-4 h-4 text-indigo-600 border-slate-300 focus:ring-indigo-500 accent-indigo-600 cursor-pointer flex-shrink-0">
+                        <span class="text-slate-700 leading-relaxed">ข. $\mathbf{x} = \mathbf{b}A^{-1}$</span>
+                    </label>
+                    <label for="q15_opt2" class="flex items-start gap-3 p-3.5 rounded-xl border border-slate-200 bg-slate-50/70 hover:bg-indigo-50/60 hover:border-indigo-300 cursor-pointer transition-all">
+                        <input type="radio" id="q15_opt2" name="question_15" value="2" class="mt-1 w-4 h-4 text-indigo-600 border-slate-300 focus:ring-indigo-500 accent-indigo-600 cursor-pointer flex-shrink-0">
+                        <span class="text-slate-700 leading-relaxed">ค. คูณทั้งสองข้างทางซ้ายด้วย $A^{-1}$ จะได้ $\mathbf{x} = A^{-1}\mathbf{b}$</span>
+                    </label>
+                    <label for="q15_opt3" class="flex items-start gap-3 p-3.5 rounded-xl border border-slate-200 bg-slate-50/70 hover:bg-indigo-50/60 hover:border-indigo-300 cursor-pointer transition-all">
+                        <input type="radio" id="q15_opt3" name="question_15" value="3" class="mt-1 w-4 h-4 text-indigo-600 border-slate-300 focus:ring-indigo-500 accent-indigo-600 cursor-pointer flex-shrink-0">
+                        <span class="text-slate-700 leading-relaxed">ง. คูณทั้งสองข้างทางขวาด้วย $A^{-1}$ จะได้ $\mathbf{x} = \mathbf{b}A^{-1}$</span>
+                    </label>
+                </div>
+                <details class="answer-detail group mt-4 pt-3 border-t border-slate-100 text-xs sm:text-sm">
+                    <summary class="cursor-pointer text-indigo-600 font-bold hover:text-indigo-800 flex items-center justify-between">
+                        <span>เฉลยและคำอธิบายละเอียด</span>
+                        <span class="text-slate-400 group-open:rotate-180 transition-transform">▼</span>
+                    </summary>
+                    <div class="mt-2 p-4 bg-emerald-50/60 rounded-xl border border-emerald-200 text-slate-700 space-y-1">
+                        <div><strong>คำตอบที่ถูกต้อง: ค. คูณทั้งสองข้างทางซ้ายด้วย $A^{-1}$ จะได้ $\mathbf{x} = A^{-1}\mathbf{b}$</strong></div>
+                        <p class="leading-relaxed">
+                            <strong>คำอธิบาย:</strong> การคูณเมทริกซ์ไม่มีสมบัติการสลับที่ ($AB \neq BA$) และไม่มีการหารเมทริกซ์ ดังนั้นเพื่อกำจัด $A$ ซึ่งอยู่ทางซ้ายของ $\mathbf{x}$ จึงต้องคูณทางซ้ายด้วย $A^{-1}$ ทั้งสองข้าง: $A^{-1}(A\mathbf{x}) = A^{-1}\mathbf{b} \implies I\mathbf{x} = A^{-1}\mathbf{b} \implies \mathbf{x} = A^{-1}\mathbf{b}$
+                        </p>
+                    </div>
+                </details>
+            </div>
+
+            <!-- ข้อ 16 -->
+            <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 space-y-4">
+                <div class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-100 pb-3">
+                    <div class="flex flex-wrap items-center gap-2">
+                        <span class="px-2.5 py-1 bg-indigo-50 border border-indigo-200 text-indigo-700 text-xs font-bold rounded-lg">LO5: การแก้ด้วยเมทริกซ์ผกผัน</span>
+                        <span class="px-2.5 py-1 bg-amber-50 border border-amber-200 text-amber-700 text-xs font-bold rounded-lg">ระดับ: ปานกลาง</span>
+                        <span class="px-2.5 py-1 bg-purple-50 border border-purple-200 text-purple-700 text-xs font-bold rounded-lg">การวัด: ทักษะกระบวนการ (P)</span>
+                    </div>
+                    <span class="text-sm font-bold text-slate-400">ข้อที่ 16 / 30</span>
+                </div>
+                <div class="text-base text-slate-800 leading-relaxed font-medium">
+                    กำหนดเมทริกซ์สัมประสิทธิ์ $A = \begin{bmatrix} 3 & 1 \\ 5 & 2 \end{bmatrix}$ และ $\mathbf{b} = \begin{bmatrix} 4 \\ 7 \end{bmatrix}$ จงหาเวกเตอร์ผลเฉลย $\mathbf{x} = A^{-1}\mathbf{b}$
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm text-slate-700">
+                    <label for="q16_opt0" class="flex items-start gap-3 p-3.5 rounded-xl border border-slate-200 bg-slate-50/70 hover:bg-indigo-50/60 hover:border-indigo-300 cursor-pointer transition-all">
+                        <input type="radio" id="q16_opt0" name="question_16" value="0" class="mt-1 w-4 h-4 text-indigo-600 border-slate-300 focus:ring-indigo-500 accent-indigo-600 cursor-pointer flex-shrink-0">
+                        <span class="text-slate-700 leading-relaxed">ก. $\mathbf{x} = \begin{bmatrix} 1 \\ 1 \end{bmatrix}$</span>
+                    </label>
+                    <label for="q16_opt1" class="flex items-start gap-3 p-3.5 rounded-xl border border-slate-200 bg-slate-50/70 hover:bg-indigo-50/60 hover:border-indigo-300 cursor-pointer transition-all">
+                        <input type="radio" id="q16_opt1" name="question_16" value="1" class="mt-1 w-4 h-4 text-indigo-600 border-slate-300 focus:ring-indigo-500 accent-indigo-600 cursor-pointer flex-shrink-0">
+                        <span class="text-slate-700 leading-relaxed">ข. $\mathbf{x} = \begin{bmatrix} -1 \\ 2 \end{bmatrix}$</span>
+                    </label>
+                    <label for="q16_opt2" class="flex items-start gap-3 p-3.5 rounded-xl border border-slate-200 bg-slate-50/70 hover:bg-indigo-50/60 hover:border-indigo-300 cursor-pointer transition-all">
+                        <input type="radio" id="q16_opt2" name="question_16" value="2" class="mt-1 w-4 h-4 text-indigo-600 border-slate-300 focus:ring-indigo-500 accent-indigo-600 cursor-pointer flex-shrink-0">
+                        <span class="text-slate-700 leading-relaxed">ค. $\mathbf{x} = \begin{bmatrix} 2 \\ -1 \end{bmatrix}$</span>
+                    </label>
+                    <label for="q16_opt3" class="flex items-start gap-3 p-3.5 rounded-xl border border-slate-200 bg-slate-50/70 hover:bg-indigo-50/60 hover:border-indigo-300 cursor-pointer transition-all">
+                        <input type="radio" id="q16_opt3" name="question_16" value="3" class="mt-1 w-4 h-4 text-indigo-600 border-slate-300 focus:ring-indigo-500 accent-indigo-600 cursor-pointer flex-shrink-0">
+                        <span class="text-slate-700 leading-relaxed">ง. $\mathbf{x} = \begin{bmatrix} 0 \\ 4 \end{bmatrix}$</span>
+                    </label>
+                </div>
+                <details class="answer-detail group mt-4 pt-3 border-t border-slate-100 text-xs sm:text-sm">
+                    <summary class="cursor-pointer text-indigo-600 font-bold hover:text-indigo-800 flex items-center justify-between">
+                        <span>เฉลยและคำอธิบายละเอียด</span>
+                        <span class="text-slate-400 group-open:rotate-180 transition-transform">▼</span>
+                    </summary>
+                    <div class="mt-2 p-4 bg-emerald-50/60 rounded-xl border border-emerald-200 text-slate-700 space-y-1">
+                        <div><strong>คำตอบที่ถูกต้อง: ก. $\mathbf{x} = \begin{bmatrix} 1 \\ 1 \end{bmatrix}$</strong></div>
+                        <p class="leading-relaxed">
+                            <strong>คำอธิบาย:</strong> $\det(A) = (3)(2) - (1)(5) = 1$<br>$A^{-1} = \frac{1}{1} \begin{bmatrix} 2 & -1 \\ -5 & 3 \end{bmatrix} = \begin{bmatrix} 2 & -1 \\ -5 & 3 \end{bmatrix}$<br>คำนวณ $\mathbf{x} = A^{-1}\mathbf{b} = \begin{bmatrix} 2 & -1 \\ -5 & 3 \end{bmatrix} \begin{bmatrix} 4 \\ 7 \end{bmatrix} = \begin{bmatrix} 8 - 7 \\ -20 + 21 \end{bmatrix} = \begin{bmatrix} 1 \\ 1 \end{bmatrix}$
+                        </p>
+                    </div>
+                </details>
+            </div>
+
+            <!-- ข้อ 17 -->
+            <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 space-y-4">
+                <div class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-100 pb-3">
+                    <div class="flex flex-wrap items-center gap-2">
+                        <span class="px-2.5 py-1 bg-indigo-50 border border-indigo-200 text-indigo-700 text-xs font-bold rounded-lg">LO5: การแก้ด้วยเมทริกซ์ผกผัน</span>
+                        <span class="px-2.5 py-1 bg-amber-50 border border-amber-200 text-amber-700 text-xs font-bold rounded-lg">ระดับ: ปานกลาง</span>
+                        <span class="px-2.5 py-1 bg-indigo-50 border border-indigo-200 text-indigo-700 text-xs font-bold rounded-lg">การวัด: เจตคติและวินัย (A)</span>
+                    </div>
+                    <span class="text-sm font-bold text-slate-400">ข้อที่ 17 / 30</span>
+                </div>
+                <div class="text-base text-slate-800 leading-relaxed font-medium">
+                    ในการแก้สมการ $A\mathbf{x} = \mathbf{b}$ ด้วย $A^{-1}$ ขั้นตอนการตรวจสอบความถูกต้องของคำตอบ (Verification Step) ที่แสดงถึง <strong>ความสมเหตุสมผลเชิงกระบวนการทางวิทยาศาสตร์</strong> คือข้อใด?
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm text-slate-700">
+                    <label for="q17_opt0" class="flex items-start gap-3 p-3.5 rounded-xl border border-slate-200 bg-slate-50/70 hover:bg-indigo-50/60 hover:border-indigo-300 cursor-pointer transition-all">
+                        <input type="radio" id="q17_opt0" name="question_17" value="0" class="mt-1 w-4 h-4 text-indigo-600 border-slate-300 focus:ring-indigo-500 accent-indigo-600 cursor-pointer flex-shrink-0">
+                        <span class="text-slate-700 leading-relaxed">ก. นำเวกเตอร์ $\mathbf{x}$ ที่คำนวณได้ ไปคูณกลับกับเมทริกซ์ $A$ เพื่อยืนยันว่าได้เวกเตอร์ $\mathbf{b}$ จริง</span>
+                    </label>
+                    <label for="q17_opt1" class="flex items-start gap-3 p-3.5 rounded-xl border border-slate-200 bg-slate-50/70 hover:bg-indigo-50/60 hover:border-indigo-300 cursor-pointer transition-all">
+                        <input type="radio" id="q17_opt1" name="question_17" value="1" class="mt-1 w-4 h-4 text-indigo-600 border-slate-300 focus:ring-indigo-500 accent-indigo-600 cursor-pointer flex-shrink-0">
+                        <span class="text-slate-700 leading-relaxed">ข. ตรวจสอบว่า $\det(A^{-1}) = \det(A)$ หรือไม่</span>
+                    </label>
+                    <label for="q17_opt2" class="flex items-start gap-3 p-3.5 rounded-xl border border-slate-200 bg-slate-50/70 hover:bg-indigo-50/60 hover:border-indigo-300 cursor-pointer transition-all">
+                        <input type="radio" id="q17_opt2" name="question_17" value="2" class="mt-1 w-4 h-4 text-indigo-600 border-slate-300 focus:ring-indigo-500 accent-indigo-600 cursor-pointer flex-shrink-0">
+                        <span class="text-slate-700 leading-relaxed">ค. ตรวจสอบว่าผลรวมของสมาชิกใน $\mathbf{x}$ มากกว่า 0</span>
+                    </label>
+                    <label for="q17_opt3" class="flex items-start gap-3 p-3.5 rounded-xl border border-slate-200 bg-slate-50/70 hover:bg-indigo-50/60 hover:border-indigo-300 cursor-pointer transition-all">
+                        <input type="radio" id="q17_opt3" name="question_17" value="3" class="mt-1 w-4 h-4 text-indigo-600 border-slate-300 focus:ring-indigo-500 accent-indigo-600 cursor-pointer flex-shrink-0">
+                        <span class="text-slate-700 leading-relaxed">ง. ตรวจสอบว่า $A^{-1}$ เป็นเมทริกซ์สมมาตรหรือไม่</span>
+                    </label>
+                </div>
+                <details class="answer-detail group mt-4 pt-3 border-t border-slate-100 text-xs sm:text-sm">
+                    <summary class="cursor-pointer text-indigo-600 font-bold hover:text-indigo-800 flex items-center justify-between">
+                        <span>เฉลยและคำอธิบายละเอียด</span>
+                        <span class="text-slate-400 group-open:rotate-180 transition-transform">▼</span>
+                    </summary>
+                    <div class="mt-2 p-4 bg-emerald-50/60 rounded-xl border border-emerald-200 text-slate-700 space-y-1">
+                        <div><strong>คำตอบที่ถูกต้อง: ก. นำเวกเตอร์ $\mathbf{x}$ ที่คำนวณได้ ไปคูณกลับกับเมทริกซ์ $A$ เพื่อยืนยันว่าได้เวกเตอร์ $\mathbf{b}$ จริง</strong></div>
+                        <p class="leading-relaxed">
+                            <strong>คำอธิบาย:</strong> การตรวจสอบทางตรงด้วยการคำนวณ $A\mathbf{x}$ และเปรียบเทียบว่าเท่ากับ $\mathbf{b}$ หรือไม่ เป็นมาตรฐานการตรวจทานผลลัพธ์ในพีชคณิตเชิงเส้นเพื่อป้องกันข้อผิดพลาดในการหา $A^{-1}$
+                        </p>
+                    </div>
+                </details>
+            </div>
+
+            <!-- ข้อ 18 -->
+            <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 space-y-4">
+                <div class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-100 pb-3">
+                    <div class="flex flex-wrap items-center gap-2">
+                        <span class="px-2.5 py-1 bg-indigo-50 border border-indigo-200 text-indigo-700 text-xs font-bold rounded-lg">LO5: การแก้ด้วยเมทริกซ์ผกผัน</span>
+                        <span class="px-2.5 py-1 bg-rose-50 border border-rose-200 text-rose-700 text-xs font-bold rounded-lg">ระดับ: ยาก</span>
+                        <span class="px-2.5 py-1 bg-purple-50 border border-purple-200 text-purple-700 text-xs font-bold rounded-lg">การวัด: ทักษะกระบวนการ (P)</span>
+                    </div>
+                    <span class="text-sm font-bold text-slate-400">ข้อที่ 18 / 30</span>
+                </div>
+                <div class="text-base text-slate-800 leading-relaxed font-medium">
+                    ถ้า $A = \begin{bmatrix} 1 & 0 & 1 \\ 0 & 1 & 1 \\ 1 & 1 & 1 \end{bmatrix}$ และระบบสมการคือ $A\mathbf{x} = \begin{bmatrix} 2 \\ 3 \\ 4 \end{bmatrix}$ จงหาเวกเตอร์คำตอบ $\mathbf{x} = \begin{bmatrix} x_1 \\ x_2 \\ x_3 \end{bmatrix}$
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm text-slate-700">
+                    <label for="q18_opt0" class="flex items-start gap-3 p-3.5 rounded-xl border border-slate-200 bg-slate-50/70 hover:bg-indigo-50/60 hover:border-indigo-300 cursor-pointer transition-all">
+                        <input type="radio" id="q18_opt0" name="question_18" value="0" class="mt-1 w-4 h-4 text-indigo-600 border-slate-300 focus:ring-indigo-500 accent-indigo-600 cursor-pointer flex-shrink-0">
+                        <span class="text-slate-700 leading-relaxed">ก. $\mathbf{x} = \begin{bmatrix} 1 \\ 2 \\ 1 \end{bmatrix}$</span>
+                    </label>
+                    <label for="q18_opt1" class="flex items-start gap-3 p-3.5 rounded-xl border border-slate-200 bg-slate-50/70 hover:bg-indigo-50/60 hover:border-indigo-300 cursor-pointer transition-all">
+                        <input type="radio" id="q18_opt1" name="question_18" value="1" class="mt-1 w-4 h-4 text-indigo-600 border-slate-300 focus:ring-indigo-500 accent-indigo-600 cursor-pointer flex-shrink-0">
+                        <span class="text-slate-700 leading-relaxed">ข. $\mathbf{x} = \begin{bmatrix} 2 \\ 1 \\ 1 \end{bmatrix}$</span>
+                    </label>
+                    <label for="q18_opt2" class="flex items-start gap-3 p-3.5 rounded-xl border border-slate-200 bg-slate-50/70 hover:bg-indigo-50/60 hover:border-indigo-300 cursor-pointer transition-all">
+                        <input type="radio" id="q18_opt2" name="question_18" value="2" class="mt-1 w-4 h-4 text-indigo-600 border-slate-300 focus:ring-indigo-500 accent-indigo-600 cursor-pointer flex-shrink-0">
+                        <span class="text-slate-700 leading-relaxed">ค. $\mathbf{x} = \begin{bmatrix} 0 \\ 1 \\ 2 \end{bmatrix}$</span>
+                    </label>
+                    <label for="q18_opt3" class="flex items-start gap-3 p-3.5 rounded-xl border border-slate-200 bg-slate-50/70 hover:bg-indigo-50/60 hover:border-indigo-300 cursor-pointer transition-all">
+                        <input type="radio" id="q18_opt3" name="question_18" value="3" class="mt-1 w-4 h-4 text-indigo-600 border-slate-300 focus:ring-indigo-500 accent-indigo-600 cursor-pointer flex-shrink-0">
+                        <span class="text-slate-700 leading-relaxed">ง. $\mathbf{x} = \begin{bmatrix} 1 \\ 1 \\ 2 \end{bmatrix}$</span>
+                    </label>
+                </div>
+                <details class="answer-detail group mt-4 pt-3 border-t border-slate-100 text-xs sm:text-sm">
+                    <summary class="cursor-pointer text-indigo-600 font-bold hover:text-indigo-800 flex items-center justify-between">
+                        <span>เฉลยและคำอธิบายละเอียด</span>
+                        <span class="text-slate-400 group-open:rotate-180 transition-transform">▼</span>
+                    </summary>
+                    <div class="mt-2 p-4 bg-emerald-50/60 rounded-xl border border-emerald-200 text-slate-700 space-y-1">
+                        <div><strong>คำตอบที่ถูกต้อง: ก. $\mathbf{x} = \begin{bmatrix} 1 \\ 2 \\ 1 \end{bmatrix}$</strong></div>
+                        <p class="leading-relaxed">
+                            <strong>คำอธิบาย:</strong> จากระบบสมการ:<br>(1) $x_1 + x_3 = 2$<br>(2) $x_2 + x_3 = 3$<br>(3) $x_1 + x_2 + x_3 = 4$<br>นำ (1) แทนใน (3) จะได้ $2 + x_2 = 4 \implies x_2 = 2$<br>จาก (2): $2 + x_3 = 3 \implies x_3 = 1$<br>จาก (1): $x_1 + 1 = 2 \implies x_1 = 1$<br>ดังนั้น $\mathbf{x} = [1, 2, 1]^T$
+                        </p>
+                    </div>
+                </details>
+            </div>
+
+            <!-- ข้อ 19 -->
+            <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 space-y-4">
+                <div class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-100 pb-3">
+                    <div class="flex flex-wrap items-center gap-2">
+                        <span class="px-2.5 py-1 bg-indigo-50 border border-indigo-200 text-indigo-700 text-xs font-bold rounded-lg">LO6: การจำแนกด้วยอันดับ</span>
+                        <span class="px-2.5 py-1 bg-emerald-50 border border-emerald-200 text-emerald-700 text-xs font-bold rounded-lg">ระดับ: ง่าย</span>
+                        <span class="px-2.5 py-1 bg-blue-50 border border-blue-200 text-blue-700 text-xs font-bold rounded-lg">การวัด: ด้านความรู้ (K)</span>
+                    </div>
+                    <span class="text-sm font-bold text-slate-400">ข้อที่ 19 / 30</span>
+                </div>
+                <div class="text-base text-slate-800 leading-relaxed font-medium">
+                    ตามทฤษฎีบทของรูเช-กาเปลลี (Rouché–Capelli Theorem) ระบบสมการ $A\mathbf{x} = \mathbf{b}$ ที่มี $n$ ตัวแปร จะ <strong>ไม่มีคำตอบ (Inconsistent)</strong> เมื่อใด?
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm text-slate-700">
+                    <label for="q19_opt0" class="flex items-start gap-3 p-3.5 rounded-xl border border-slate-200 bg-slate-50/70 hover:bg-indigo-50/60 hover:border-indigo-300 cursor-pointer transition-all">
+                        <input type="radio" id="q19_opt0" name="question_19" value="0" class="mt-1 w-4 h-4 text-indigo-600 border-slate-300 focus:ring-indigo-500 accent-indigo-600 cursor-pointer flex-shrink-0">
+                        <span class="text-slate-700 leading-relaxed">ก. $\operatorname{rank}(A) = \operatorname{rank}([A \mid \mathbf{b}]) = n$</span>
+                    </label>
+                    <label for="q19_opt1" class="flex items-start gap-3 p-3.5 rounded-xl border border-slate-200 bg-slate-50/70 hover:bg-indigo-50/60 hover:border-indigo-300 cursor-pointer transition-all">
+                        <input type="radio" id="q19_opt1" name="question_19" value="1" class="mt-1 w-4 h-4 text-indigo-600 border-slate-300 focus:ring-indigo-500 accent-indigo-600 cursor-pointer flex-shrink-0">
+                        <span class="text-slate-700 leading-relaxed">ข. $\operatorname{rank}(A) = \operatorname{rank}([A \mid \mathbf{b}]) < n$</span>
+                    </label>
+                    <label for="q19_opt2" class="flex items-start gap-3 p-3.5 rounded-xl border border-slate-200 bg-slate-50/70 hover:bg-indigo-50/60 hover:border-indigo-300 cursor-pointer transition-all">
+                        <input type="radio" id="q19_opt2" name="question_19" value="2" class="mt-1 w-4 h-4 text-indigo-600 border-slate-300 focus:ring-indigo-500 accent-indigo-600 cursor-pointer flex-shrink-0">
+                        <span class="text-slate-700 leading-relaxed">ค. $\operatorname{rank}(A) < \operatorname{rank}([A \mid \mathbf{b}])$</span>
+                    </label>
+                    <label for="q19_opt3" class="flex items-start gap-3 p-3.5 rounded-xl border border-slate-200 bg-slate-50/70 hover:bg-indigo-50/60 hover:border-indigo-300 cursor-pointer transition-all">
+                        <input type="radio" id="q19_opt3" name="question_19" value="3" class="mt-1 w-4 h-4 text-indigo-600 border-slate-300 focus:ring-indigo-500 accent-indigo-600 cursor-pointer flex-shrink-0">
+                        <span class="text-slate-700 leading-relaxed">ง. $\operatorname{rank}(A) > \operatorname{rank}([A \mid \mathbf{b}])$</span>
+                    </label>
+                </div>
+                <details class="answer-detail group mt-4 pt-3 border-t border-slate-100 text-xs sm:text-sm">
+                    <summary class="cursor-pointer text-indigo-600 font-bold hover:text-indigo-800 flex items-center justify-between">
+                        <span>เฉลยและคำอธิบายละเอียด</span>
+                        <span class="text-slate-400 group-open:rotate-180 transition-transform">▼</span>
+                    </summary>
+                    <div class="mt-2 p-4 bg-emerald-50/60 rounded-xl border border-emerald-200 text-slate-700 space-y-1">
+                        <div><strong>คำตอบที่ถูกต้อง: ค. $\operatorname{rank}(A) < \operatorname{rank}([A \mid \mathbf{b}])$</strong></div>
+                        <p class="leading-relaxed">
+                            <strong>คำอธิบาย:</strong> เมื่ออันดับของเมทริกซ์แต่งเติมมากกว่าอันดับของเมทริกซ์สัมประสิทธิ์ จะเกิดแถวขัดแย้งในรูปขั้นบันได คือ $[0 \ \dots \ 0 \mid c]$ โดยที่ $c \neq 0$ ซึ่งเทียบเท่ากับสมการ $0 = c$ ทำให้ระบบไม่มีคำตอบ (ส่วนข้อ ง. เป็นไปไม่ได้ในทางคณิตศาสตร์ เพราะการเพิ่มคอลัมน์ไม่สามารถทำให้อันดับลดลงได้)
+                        </p>
+                    </div>
+                </details>
+            </div>
+
+            <!-- ข้อ 20 -->
+            <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 space-y-4">
+                <div class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-100 pb-3">
+                    <div class="flex flex-wrap items-center gap-2">
+                        <span class="px-2.5 py-1 bg-indigo-50 border border-indigo-200 text-indigo-700 text-xs font-bold rounded-lg">LO6: การจำแนกด้วยอันดับ</span>
+                        <span class="px-2.5 py-1 bg-amber-50 border border-amber-200 text-amber-700 text-xs font-bold rounded-lg">ระดับ: ปานกลาง</span>
+                        <span class="px-2.5 py-1 bg-purple-50 border border-purple-200 text-purple-700 text-xs font-bold rounded-lg">การวัด: ทักษะกระบวนการ (P)</span>
+                    </div>
+                    <span class="text-sm font-bold text-slate-400">ข้อที่ 20 / 30</span>
+                </div>
+                <div class="text-base text-slate-800 leading-relaxed font-medium">
+                    กำหนดเมทริกซ์แต่งเติมในรูปขั้นบันไดแบบแถว (REF) ของระบบสมการ 4 ตัวแปร ($x_1, x_2, x_3, x_4$) ดังนี้:
+$$[A \mid \mathbf{b}] \sim \begin{bmatrix} 1 & 2 & 0 & 3 & \big| & 5 \\ 0 & 0 & 1 & -1 & \big| & 2 \\ 0 & 0 & 0 & 0 & \big| & 0 \end{bmatrix}$$
+ระบบสมการนี้มีกี่คำตอบ และมีจำนวนตัวแปรอิสระ (Free Variables) กี่ตัว?
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm text-slate-700">
+                    <label for="q20_opt0" class="flex items-start gap-3 p-3.5 rounded-xl border border-slate-200 bg-slate-50/70 hover:bg-indigo-50/60 hover:border-indigo-300 cursor-pointer transition-all">
+                        <input type="radio" id="q20_opt0" name="question_20" value="0" class="mt-1 w-4 h-4 text-indigo-600 border-slate-300 focus:ring-indigo-500 accent-indigo-600 cursor-pointer flex-shrink-0">
+                        <span class="text-slate-700 leading-relaxed">ก. มีคำตอบเดียว และมีตัวแปรอิสระ 0 ตัว</span>
+                    </label>
+                    <label for="q20_opt1" class="flex items-start gap-3 p-3.5 rounded-xl border border-slate-200 bg-slate-50/70 hover:bg-indigo-50/60 hover:border-indigo-300 cursor-pointer transition-all">
+                        <input type="radio" id="q20_opt1" name="question_20" value="1" class="mt-1 w-4 h-4 text-indigo-600 border-slate-300 focus:ring-indigo-500 accent-indigo-600 cursor-pointer flex-shrink-0">
+                        <span class="text-slate-700 leading-relaxed">ข. ไม่มีคำตอบ เพราะแถวที่สามเป็นศูนย์ทั้งหมด</span>
+                    </label>
+                    <label for="q20_opt2" class="flex items-start gap-3 p-3.5 rounded-xl border border-slate-200 bg-slate-50/70 hover:bg-indigo-50/60 hover:border-indigo-300 cursor-pointer transition-all">
+                        <input type="radio" id="q20_opt2" name="question_20" value="2" class="mt-1 w-4 h-4 text-indigo-600 border-slate-300 focus:ring-indigo-500 accent-indigo-600 cursor-pointer flex-shrink-0">
+                        <span class="text-slate-700 leading-relaxed">ค. มีคำตอบอนันต์ และมีตัวแปรอิสระ 2 ตัว</span>
+                    </label>
+                    <label for="q20_opt3" class="flex items-start gap-3 p-3.5 rounded-xl border border-slate-200 bg-slate-50/70 hover:bg-indigo-50/60 hover:border-indigo-300 cursor-pointer transition-all">
+                        <input type="radio" id="q20_opt3" name="question_20" value="3" class="mt-1 w-4 h-4 text-indigo-600 border-slate-300 focus:ring-indigo-500 accent-indigo-600 cursor-pointer flex-shrink-0">
+                        <span class="text-slate-700 leading-relaxed">ง. มีคำตอบอนันต์ และมีตัวแปรอิสระ 1 ตัว</span>
+                    </label>
+                </div>
+                <details class="answer-detail group mt-4 pt-3 border-t border-slate-100 text-xs sm:text-sm">
+                    <summary class="cursor-pointer text-indigo-600 font-bold hover:text-indigo-800 flex items-center justify-between">
+                        <span>เฉลยและคำอธิบายละเอียด</span>
+                        <span class="text-slate-400 group-open:rotate-180 transition-transform">▼</span>
+                    </summary>
+                    <div class="mt-2 p-4 bg-emerald-50/60 rounded-xl border border-emerald-200 text-slate-700 space-y-1">
+                        <div><strong>คำตอบที่ถูกต้อง: ค. มีคำตอบอนันต์ และมีตัวแปรอิสระ 2 ตัว</strong></div>
+                        <p class="leading-relaxed">
+                            <strong>คำอธิบาย:</strong> $\operatorname{rank}(A) = 2$ และ $\operatorname{rank}([A \mid \mathbf{b}]) = 2$ ระบบมีความสอดคล้อง (Consistent) จำนวนตัวแปรทั้งหมด $n = 4$ ดังนั้นจำนวนตัวแปรอิสระ $= n - \operatorname{rank}(A) = 4 - 2 = 2$ ตัว (คือ $x_2$ และ $x_4$) จึงมีคำตอบอนันต์
+                        </p>
+                    </div>
+                </details>
+            </div>
+
+            <!-- ข้อ 21 -->
+            <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 space-y-4">
+                <div class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-100 pb-3">
+                    <div class="flex flex-wrap items-center gap-2">
+                        <span class="px-2.5 py-1 bg-indigo-50 border border-indigo-200 text-indigo-700 text-xs font-bold rounded-lg">LO6: การจำแนกด้วยอันดับ</span>
+                        <span class="px-2.5 py-1 bg-rose-50 border border-rose-200 text-rose-700 text-xs font-bold rounded-lg">ระดับ: ยาก</span>
+                        <span class="px-2.5 py-1 bg-blue-50 border border-blue-200 text-blue-700 text-xs font-bold rounded-lg">การวัด: ด้านความรู้ (K)</span>
+                    </div>
+                    <span class="text-sm font-bold text-slate-400">ข้อที่ 21 / 30</span>
+                </div>
+                <div class="text-base text-slate-800 leading-relaxed font-medium">
+                    กำหนดให้ $A$ เป็นเมทริกซ์ขนาด $m \times n$ โดยที่ $m > n$ (Overdetermined System: จำนวนสมการมากกว่าตัวแปร) ข้อความใด <strong>ถูกต้องเสมอ</strong>?
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm text-slate-700">
+                    <label for="q21_opt0" class="flex items-start gap-3 p-3.5 rounded-xl border border-slate-200 bg-slate-50/70 hover:bg-indigo-50/60 hover:border-indigo-300 cursor-pointer transition-all">
+                        <input type="radio" id="q21_opt0" name="question_21" value="0" class="mt-1 w-4 h-4 text-indigo-600 border-slate-300 focus:ring-indigo-500 accent-indigo-600 cursor-pointer flex-shrink-0">
+                        <span class="text-slate-700 leading-relaxed">ก. ระบบ $A\mathbf{x} = \mathbf{b}$ จะต้องไม่มีคำตอบเสมอ</span>
+                    </label>
+                    <label for="q21_opt1" class="flex items-start gap-3 p-3.5 rounded-xl border border-slate-200 bg-slate-50/70 hover:bg-indigo-50/60 hover:border-indigo-300 cursor-pointer transition-all">
+                        <input type="radio" id="q21_opt1" name="question_21" value="1" class="mt-1 w-4 h-4 text-indigo-600 border-slate-300 focus:ring-indigo-500 accent-indigo-600 cursor-pointer flex-shrink-0">
+                        <span class="text-slate-700 leading-relaxed">ข. $\operatorname{rank}(A)$ มีค่าได้สูงสุดเท่ากับ $n$ และระบบอาจมีคำตอบเดียว ไม่มีคำตอบ หรือคำตอบอนันต์ก็ได้ ขึ้นอยู่กับเวกเตอร์ $\mathbf{b}$</span>
+                    </label>
+                    <label for="q21_opt2" class="flex items-start gap-3 p-3.5 rounded-xl border border-slate-200 bg-slate-50/70 hover:bg-indigo-50/60 hover:border-indigo-300 cursor-pointer transition-all">
+                        <input type="radio" id="q21_opt2" name="question_21" value="2" class="mt-1 w-4 h-4 text-indigo-600 border-slate-300 focus:ring-indigo-500 accent-indigo-600 cursor-pointer flex-shrink-0">
+                        <span class="text-slate-700 leading-relaxed">ค. $\operatorname{rank}(A)$ มีค่าเท่ากับ $m$ เสมอ</span>
+                    </label>
+                    <label for="q21_opt3" class="flex items-start gap-3 p-3.5 rounded-xl border border-slate-200 bg-slate-50/70 hover:bg-indigo-50/60 hover:border-indigo-300 cursor-pointer transition-all">
+                        <input type="radio" id="q21_opt3" name="question_21" value="3" class="mt-1 w-4 h-4 text-indigo-600 border-slate-300 focus:ring-indigo-500 accent-indigo-600 cursor-pointer flex-shrink-0">
+                        <span class="text-slate-700 leading-relaxed">ง. ระบบจะมีคำตอบเดียวเสมอเมื่อ $m > n$</span>
+                    </label>
+                </div>
+                <details class="answer-detail group mt-4 pt-3 border-t border-slate-100 text-xs sm:text-sm">
+                    <summary class="cursor-pointer text-indigo-600 font-bold hover:text-indigo-800 flex items-center justify-between">
+                        <span>เฉลยและคำอธิบายละเอียด</span>
+                        <span class="text-slate-400 group-open:rotate-180 transition-transform">▼</span>
+                    </summary>
+                    <div class="mt-2 p-4 bg-emerald-50/60 rounded-xl border border-emerald-200 text-slate-700 space-y-1">
+                        <div><strong>คำตอบที่ถูกต้อง: ข. $\operatorname{rank}(A)$ มีค่าได้สูงสุดเท่ากับ $n$ และระบบอาจมีคำตอบเดียว ไม่มีคำตอบ หรือคำตอบอนันต์ก็ได้ ขึ้นอยู่กับเวกเตอร์ $\mathbf{b}$</strong></div>
+                        <p class="leading-relaxed">
+                            <strong>คำอธิบาย:</strong> อันดับของเมทริกซ์ $\operatorname{rank}(A) \le \min(m, n) = n$ แม้จำนวนสมการจะมากกว่าตัวแปร แต่หากสมการที่เกินมาเป็นพหุคูณเชิงเส้นของสมการอื่น ระบบก็สามารถมีคำตอบเดียวหรือคำตอบอนันต์ได้เช่นกัน
+                        </p>
+                    </div>
+                </details>
+            </div>
+
+            <!-- ข้อ 22 -->
+            <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 space-y-4">
+                <div class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-100 pb-3">
+                    <div class="flex flex-wrap items-center gap-2">
+                        <span class="px-2.5 py-1 bg-indigo-50 border border-indigo-200 text-indigo-700 text-xs font-bold rounded-lg">LO7: ระบบสมการที่มีพารามิเตอร์</span>
+                        <span class="px-2.5 py-1 bg-emerald-50 border border-emerald-200 text-emerald-700 text-xs font-bold rounded-lg">ระดับ: ง่าย</span>
+                        <span class="px-2.5 py-1 bg-blue-50 border border-blue-200 text-blue-700 text-xs font-bold rounded-lg">การวัด: ด้านความรู้ (K)</span>
+                    </div>
+                    <span class="text-sm font-bold text-slate-400">ข้อที่ 22 / 30</span>
+                </div>
+                <div class="text-base text-slate-800 leading-relaxed font-medium">
+                    พิจารณาระบบสมการ $\begin{cases} x + y = 2 \\ 2x + ky = 4 \end{cases}$ ค่าพารามิเตอร์ $k$ ในข้อใดที่ทำให้ระบบสมการนี้มี <strong>คำตอบอนันต์ (Infinitely Many Solutions)</strong>?
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm text-slate-700">
+                    <label for="q22_opt0" class="flex items-start gap-3 p-3.5 rounded-xl border border-slate-200 bg-slate-50/70 hover:bg-indigo-50/60 hover:border-indigo-300 cursor-pointer transition-all">
+                        <input type="radio" id="q22_opt0" name="question_22" value="0" class="mt-1 w-4 h-4 text-indigo-600 border-slate-300 focus:ring-indigo-500 accent-indigo-600 cursor-pointer flex-shrink-0">
+                        <span class="text-slate-700 leading-relaxed">ก. $k = 0$</span>
+                    </label>
+                    <label for="q22_opt1" class="flex items-start gap-3 p-3.5 rounded-xl border border-slate-200 bg-slate-50/70 hover:bg-indigo-50/60 hover:border-indigo-300 cursor-pointer transition-all">
+                        <input type="radio" id="q22_opt1" name="question_22" value="1" class="mt-1 w-4 h-4 text-indigo-600 border-slate-300 focus:ring-indigo-500 accent-indigo-600 cursor-pointer flex-shrink-0">
+                        <span class="text-slate-700 leading-relaxed">ข. $k = 2$</span>
+                    </label>
+                    <label for="q22_opt2" class="flex items-start gap-3 p-3.5 rounded-xl border border-slate-200 bg-slate-50/70 hover:bg-indigo-50/60 hover:border-indigo-300 cursor-pointer transition-all">
+                        <input type="radio" id="q22_opt2" name="question_22" value="2" class="mt-1 w-4 h-4 text-indigo-600 border-slate-300 focus:ring-indigo-500 accent-indigo-600 cursor-pointer flex-shrink-0">
+                        <span class="text-slate-700 leading-relaxed">ค. $k \neq 2$</span>
+                    </label>
+                    <label for="q22_opt3" class="flex items-start gap-3 p-3.5 rounded-xl border border-slate-200 bg-slate-50/70 hover:bg-indigo-50/60 hover:border-indigo-300 cursor-pointer transition-all">
+                        <input type="radio" id="q22_opt3" name="question_22" value="3" class="mt-1 w-4 h-4 text-indigo-600 border-slate-300 focus:ring-indigo-500 accent-indigo-600 cursor-pointer flex-shrink-0">
+                        <span class="text-slate-700 leading-relaxed">ง. $k = -2$</span>
+                    </label>
+                </div>
+                <details class="answer-detail group mt-4 pt-3 border-t border-slate-100 text-xs sm:text-sm">
+                    <summary class="cursor-pointer text-indigo-600 font-bold hover:text-indigo-800 flex items-center justify-between">
+                        <span>เฉลยและคำอธิบายละเอียด</span>
+                        <span class="text-slate-400 group-open:rotate-180 transition-transform">▼</span>
+                    </summary>
+                    <div class="mt-2 p-4 bg-emerald-50/60 rounded-xl border border-emerald-200 text-slate-700 space-y-1">
+                        <div><strong>คำตอบที่ถูกต้อง: ข. $k = 2$</strong></div>
+                        <p class="leading-relaxed">
+                            <strong>คำอธิบาย:</strong> เมื่อ $k = 2$ สมการที่สองคือ $2x + 2y = 4$ ซึ่งเมื่อนำ 2 ไปหารทั้งสองข้างจะได้ $x + y = 2$ เหมือนกับสมการแรกทุกประการ กราฟทับกันสนิท ทำให้มีคำตอบอนันต์
+                        </p>
+                    </div>
+                </details>
+            </div>
+
+            <!-- ข้อ 23 -->
+            <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 space-y-4">
+                <div class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-100 pb-3">
+                    <div class="flex flex-wrap items-center gap-2">
+                        <span class="px-2.5 py-1 bg-indigo-50 border border-indigo-200 text-indigo-700 text-xs font-bold rounded-lg">LO7: ระบบสมการที่มีพารามิเตอร์</span>
+                        <span class="px-2.5 py-1 bg-amber-50 border border-amber-200 text-amber-700 text-xs font-bold rounded-lg">ระดับ: ปานกลาง</span>
+                        <span class="px-2.5 py-1 bg-purple-50 border border-purple-200 text-purple-700 text-xs font-bold rounded-lg">การวัด: ทักษะกระบวนการ (P)</span>
+                    </div>
+                    <span class="text-sm font-bold text-slate-400">ข้อที่ 23 / 30</span>
+                </div>
+                <div class="text-base text-slate-800 leading-relaxed font-medium">
+                    กำหนดระบบสมการ $\begin{cases} x + 2y = 3 \\ 3x + ay = b \end{cases}$ หากต้องการให้ระบบสมการนี้ <strong>ไม่มีคำตอบ (No Solution)</strong> เงื่อนไขของพารามิเตอร์ $a$ และ $b$ ต้องตรงกับข้อใด?
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm text-slate-700">
+                    <label for="q23_opt0" class="flex items-start gap-3 p-3.5 rounded-xl border border-slate-200 bg-slate-50/70 hover:bg-indigo-50/60 hover:border-indigo-300 cursor-pointer transition-all">
+                        <input type="radio" id="q23_opt0" name="question_23" value="0" class="mt-1 w-4 h-4 text-indigo-600 border-slate-300 focus:ring-indigo-500 accent-indigo-600 cursor-pointer flex-shrink-0">
+                        <span class="text-slate-700 leading-relaxed">ก. $a = 6$ และ $b = 9$</span>
+                    </label>
+                    <label for="q23_opt1" class="flex items-start gap-3 p-3.5 rounded-xl border border-slate-200 bg-slate-50/70 hover:bg-indigo-50/60 hover:border-indigo-300 cursor-pointer transition-all">
+                        <input type="radio" id="q23_opt1" name="question_23" value="1" class="mt-1 w-4 h-4 text-indigo-600 border-slate-300 focus:ring-indigo-500 accent-indigo-600 cursor-pointer flex-shrink-0">
+                        <span class="text-slate-700 leading-relaxed">ข. $a = 6$ และ $b \neq 9$</span>
+                    </label>
+                    <label for="q23_opt2" class="flex items-start gap-3 p-3.5 rounded-xl border border-slate-200 bg-slate-50/70 hover:bg-indigo-50/60 hover:border-indigo-300 cursor-pointer transition-all">
+                        <input type="radio" id="q23_opt2" name="question_23" value="2" class="mt-1 w-4 h-4 text-indigo-600 border-slate-300 focus:ring-indigo-500 accent-indigo-600 cursor-pointer flex-shrink-0">
+                        <span class="text-slate-700 leading-relaxed">ค. $a \neq 6$ และ $b = 9$</span>
+                    </label>
+                    <label for="q23_opt3" class="flex items-start gap-3 p-3.5 rounded-xl border border-slate-200 bg-slate-50/70 hover:bg-indigo-50/60 hover:border-indigo-300 cursor-pointer transition-all">
+                        <input type="radio" id="q23_opt3" name="question_23" value="3" class="mt-1 w-4 h-4 text-indigo-600 border-slate-300 focus:ring-indigo-500 accent-indigo-600 cursor-pointer flex-shrink-0">
+                        <span class="text-slate-700 leading-relaxed">ง. $a \neq 6$ สำหรับทุกค่า $b \in \mathbb{R}$</span>
+                    </label>
+                </div>
+                <details class="answer-detail group mt-4 pt-3 border-t border-slate-100 text-xs sm:text-sm">
+                    <summary class="cursor-pointer text-indigo-600 font-bold hover:text-indigo-800 flex items-center justify-between">
+                        <span>เฉลยและคำอธิบายละเอียด</span>
+                        <span class="text-slate-400 group-open:rotate-180 transition-transform">▼</span>
+                    </summary>
+                    <div class="mt-2 p-4 bg-emerald-50/60 rounded-xl border border-emerald-200 text-slate-700 space-y-1">
+                        <div><strong>คำตอบที่ถูกต้อง: ข. $a = 6$ และ $b \neq 9$</strong></div>
+                        <p class="leading-relaxed">
+                            <strong>คำอธิบาย:</strong> เส้นตรงจะขนานกันและไม่ตัดกันเมื่ออัตราส่วนสัมประสิทธิ์หน้าตัวแปรเท่ากันแต่ไม่เท่ากับอัตราส่วนค่าคงตัว: $\frac{1}{3} = \frac{2}{a} \neq \frac{3}{b} \implies a = 6$ และ $b \neq 9$
+                        </p>
+                    </div>
+                </details>
+            </div>
+
+            <!-- ข้อ 24 -->
+            <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 space-y-4">
+                <div class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-100 pb-3">
+                    <div class="flex flex-wrap items-center gap-2">
+                        <span class="px-2.5 py-1 bg-indigo-50 border border-indigo-200 text-indigo-700 text-xs font-bold rounded-lg">LO7: ระบบสมการที่มีพารามิเตอร์</span>
+                        <span class="px-2.5 py-1 bg-amber-50 border border-amber-200 text-amber-700 text-xs font-bold rounded-lg">ระดับ: ปานกลาง</span>
+                        <span class="px-2.5 py-1 bg-indigo-50 border border-indigo-200 text-indigo-700 text-xs font-bold rounded-lg">การวัด: เจตคติและวินัย (A)</span>
+                    </div>
+                    <span class="text-sm font-bold text-slate-400">ข้อที่ 24 / 30</span>
+                </div>
+                <div class="text-base text-slate-800 leading-relaxed font-medium">
+                    เมื่อนักศึกษาต้องการวิเคราะห์ระบบสมการที่มีพารามิเตอร์ $k$ ในเมทริกซ์ $A$ ข้อปฏิบัติใดแสดงถึง <strong>ความรอบคอบและเป็นระบบ (Systematic Analysis)</strong> ที่ดีที่สุด?
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm text-slate-700">
+                    <label for="q24_opt0" class="flex items-start gap-3 p-3.5 rounded-xl border border-slate-200 bg-slate-50/70 hover:bg-indigo-50/60 hover:border-indigo-300 cursor-pointer transition-all">
+                        <input type="radio" id="q24_opt0" name="question_24" value="0" class="mt-1 w-4 h-4 text-indigo-600 border-slate-300 focus:ring-indigo-500 accent-indigo-600 cursor-pointer flex-shrink-0">
+                        <span class="text-slate-700 leading-relaxed">ก. สุ่มแทนค่า $k = 1, 2, 3$ แล้วสรุปผลลัพธ์ทันที</span>
+                    </label>
+                    <label for="q24_opt1" class="flex items-start gap-3 p-3.5 rounded-xl border border-slate-200 bg-slate-50/70 hover:bg-indigo-50/60 hover:border-indigo-300 cursor-pointer transition-all">
+                        <input type="radio" id="q24_opt1" name="question_24" value="1" class="mt-1 w-4 h-4 text-indigo-600 border-slate-300 focus:ring-indigo-500 accent-indigo-600 cursor-pointer flex-shrink-0">
+                        <span class="text-slate-700 leading-relaxed">ข. หาค่า $\det(A)$ เพื่อระบุค่าวิกฤตที่ทำให้ $\det(A) = 0$ จากนั้นแยกพิจารณาเป็น 2 กรณีหลักคือ $\det(A) \neq 0$ (คำตอบเดียว) และนำค่าวิกฤตไปแทนในเมทริกซ์แต่งเติมเพื่อแยกกรณีไม่มีคำตอบหรือคำตอบอนันต์</span>
+                    </label>
+                    <label for="q24_opt2" class="flex items-start gap-3 p-3.5 rounded-xl border border-slate-200 bg-slate-50/70 hover:bg-indigo-50/60 hover:border-indigo-300 cursor-pointer transition-all">
+                        <input type="radio" id="q24_opt2" name="question_24" value="2" class="mt-1 w-4 h-4 text-indigo-600 border-slate-300 focus:ring-indigo-500 accent-indigo-600 cursor-pointer flex-shrink-0">
+                        <span class="text-slate-700 leading-relaxed">ค. สรุปทันทีว่าเมื่อ $\det(A) = 0$ ระบบจะต้องไม่มีคำตอบเสมอ</span>
+                    </label>
+                    <label for="q24_opt3" class="flex items-start gap-3 p-3.5 rounded-xl border border-slate-200 bg-slate-50/70 hover:bg-indigo-50/60 hover:border-indigo-300 cursor-pointer transition-all">
+                        <input type="radio" id="q24_opt3" name="question_24" value="3" class="mt-1 w-4 h-4 text-indigo-600 border-slate-300 focus:ring-indigo-500 accent-indigo-600 cursor-pointer flex-shrink-0">
+                        <span class="text-slate-700 leading-relaxed">ง. ใช้คอมพิวเตอร์พล็อตกราฟจุดเดียวแล้วไม่ต้องพิสูจน์เชิงพีชคณิต</span>
+                    </label>
+                </div>
+                <details class="answer-detail group mt-4 pt-3 border-t border-slate-100 text-xs sm:text-sm">
+                    <summary class="cursor-pointer text-indigo-600 font-bold hover:text-indigo-800 flex items-center justify-between">
+                        <span>เฉลยและคำอธิบายละเอียด</span>
+                        <span class="text-slate-400 group-open:rotate-180 transition-transform">▼</span>
+                    </summary>
+                    <div class="mt-2 p-4 bg-emerald-50/60 rounded-xl border border-emerald-200 text-slate-700 space-y-1">
+                        <div><strong>คำตอบที่ถูกต้อง: ข. หาค่า $\det(A)$ เพื่อระบุค่าวิกฤตที่ทำให้ $\det(A) = 0$ จากนั้นแยกพิจารณาเป็น 2 กรณีหลักคือ $\det(A) \neq 0$ (คำตอบเดียว) และนำค่าวิกฤตไปแทนในเมทริกซ์แต่งเติมเพื่อแยกกรณีไม่มีคำตอบหรือคำตอบอนันต์</strong></div>
+                        <p class="leading-relaxed">
+                            <strong>คำอธิบาย:</strong> กระบวนการแยกกรณีศึกษา (Case-by-Case Analysis) อย่างครอบคลุมทุกสภาวะของพารามิเตอร์ เป็นหัวใจสำคัญของระเบียบวิธีคิดทางคณิตศาสตร์ชั้นสูง
+                        </p>
+                    </div>
+                </details>
+            </div>
+
+            <!-- ข้อ 25 -->
+            <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 space-y-4">
+                <div class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-100 pb-3">
+                    <div class="flex flex-wrap items-center gap-2">
+                        <span class="px-2.5 py-1 bg-indigo-50 border border-indigo-200 text-indigo-700 text-xs font-bold rounded-lg">LO7: ระบบสมการที่มีพารามิเตอร์</span>
+                        <span class="px-2.5 py-1 bg-rose-50 border border-rose-200 text-rose-700 text-xs font-bold rounded-lg">ระดับ: ยาก</span>
+                        <span class="px-2.5 py-1 bg-purple-50 border border-purple-200 text-purple-700 text-xs font-bold rounded-lg">การวัด: ทักษะกระบวนการ (P)</span>
+                    </div>
+                    <span class="text-sm font-bold text-slate-400">ข้อที่ 25 / 30</span>
+                </div>
+                <div class="text-base text-slate-800 leading-relaxed font-medium">
+                    กำหนดระบบสมการ 3 ตัวแปร: $\begin{cases} x + y + z = 2 \\ 2x + 3y + 2z = 5 \\ 2x + 3y + (a^2 - 1)z = a + 1 \end{cases}$ ค่าของพารามิเตอร์ $a$ ในข้อใดทำให้ระบบนี้มี <strong>คำตอบอนันต์</strong>?
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm text-slate-700">
+                    <label for="q25_opt0" class="flex items-start gap-3 p-3.5 rounded-xl border border-slate-200 bg-slate-50/70 hover:bg-indigo-50/60 hover:border-indigo-300 cursor-pointer transition-all">
+                        <input type="radio" id="q25_opt0" name="question_25" value="0" class="mt-1 w-4 h-4 text-indigo-600 border-slate-300 focus:ring-indigo-500 accent-indigo-600 cursor-pointer flex-shrink-0">
+                        <span class="text-slate-700 leading-relaxed">ก. $a = \sqrt{3}$</span>
+                    </label>
+                    <label for="q25_opt1" class="flex items-start gap-3 p-3.5 rounded-xl border border-slate-200 bg-slate-50/70 hover:bg-indigo-50/60 hover:border-indigo-300 cursor-pointer transition-all">
+                        <input type="radio" id="q25_opt1" name="question_25" value="1" class="mt-1 w-4 h-4 text-indigo-600 border-slate-300 focus:ring-indigo-500 accent-indigo-600 cursor-pointer flex-shrink-0">
+                        <span class="text-slate-700 leading-relaxed">ข. $a = -\sqrt{3}$</span>
+                    </label>
+                    <label for="q25_opt2" class="flex items-start gap-3 p-3.5 rounded-xl border border-slate-200 bg-slate-50/70 hover:bg-indigo-50/60 hover:border-indigo-300 cursor-pointer transition-all">
+                        <input type="radio" id="q25_opt2" name="question_25" value="2" class="mt-1 w-4 h-4 text-indigo-600 border-slate-300 focus:ring-indigo-500 accent-indigo-600 cursor-pointer flex-shrink-0">
+                        <span class="text-slate-700 leading-relaxed">ค. $a = 4$</span>
+                    </label>
+                    <label for="q25_opt3" class="flex items-start gap-3 p-3.5 rounded-xl border border-slate-200 bg-slate-50/70 hover:bg-indigo-50/60 hover:border-indigo-300 cursor-pointer transition-all">
+                        <input type="radio" id="q25_opt3" name="question_25" value="3" class="mt-1 w-4 h-4 text-indigo-600 border-slate-300 focus:ring-indigo-500 accent-indigo-600 cursor-pointer flex-shrink-0">
+                        <span class="text-slate-700 leading-relaxed">ง. ไม่มีค่า $a$ ใดเลยที่ทำให้มีคำตอบอนันต์</span>
+                    </label>
+                </div>
+                <details class="answer-detail group mt-4 pt-3 border-t border-slate-100 text-xs sm:text-sm">
+                    <summary class="cursor-pointer text-indigo-600 font-bold hover:text-indigo-800 flex items-center justify-between">
+                        <span>เฉลยและคำอธิบายละเอียด</span>
+                        <span class="text-slate-400 group-open:rotate-180 transition-transform">▼</span>
+                    </summary>
+                    <div class="mt-2 p-4 bg-emerald-50/60 rounded-xl border border-emerald-200 text-slate-700 space-y-1">
+                        <div><strong>คำตอบที่ถูกต้อง: ง. ไม่มีค่า $a$ ใดเลยที่ทำให้มีคำตอบอนันต์</strong></div>
+                        <p class="leading-relaxed">
+                            <strong>คำอธิบาย:</strong> เมื่อนำสมการ (3) ลบสมการ (2): $(a^2 - 1 - 2)z = a + 1 - 5 \implies (a^2 - 3)z = a - 4$<br>การที่จะมีคำตอบอนันต์ ต้องเกิดสภาวะ $0z = 0$ ซึ่งต้องทำให้ $a^2 - 3 = 0 \implies a = \pm\sqrt{3}$ แต่ทางขวามือ $a - 4 = \pm\sqrt{3} - 4 \neq 0$ ทำให้เกิดรูป $0z = c$ ($c \neq 0$) ซึ่งเป็นกรณี <em>ไม่มีคำตอบ</em> เท่านั้น ดังนั้นจึงไม่มีค่า $a$ ใดเลยที่ทำให้มีคำตอบอนันต์
+                        </p>
+                    </div>
+                </details>
+            </div>
+
+            <!-- ข้อ 26 -->
+            <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 space-y-4">
+                <div class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-100 pb-3">
+                    <div class="flex flex-wrap items-center gap-2">
+                        <span class="px-2.5 py-1 bg-indigo-50 border border-indigo-200 text-indigo-700 text-xs font-bold rounded-lg">LO8: โครงสร้างเซตคำตอบ</span>
+                        <span class="px-2.5 py-1 bg-emerald-50 border border-emerald-200 text-emerald-700 text-xs font-bold rounded-lg">ระดับ: ง่าย</span>
+                        <span class="px-2.5 py-1 bg-blue-50 border border-blue-200 text-blue-700 text-xs font-bold rounded-lg">การวัด: ด้านความรู้ (K)</span>
+                    </div>
+                    <span class="text-sm font-bold text-slate-400">ข้อที่ 26 / 30</span>
+                </div>
+                <div class="text-base text-slate-800 leading-relaxed font-medium">
+                    ทฤษฎีบทโครงสร้างผลเฉลยของระบบไม่เอกพันธ์ $A\mathbf{x} = \mathbf{b}$ ระบุว่าผลเฉลยทั่วไปเขียนได้เป็น $\mathbf{x} = \mathbf{x}_p + \mathbf{x}_h$ โดย $\mathbf{x}_h$ คือผลเฉลยของสมการในข้อใด?
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm text-slate-700">
+                    <label for="q26_opt0" class="flex items-start gap-3 p-3.5 rounded-xl border border-slate-200 bg-slate-50/70 hover:bg-indigo-50/60 hover:border-indigo-300 cursor-pointer transition-all">
+                        <input type="radio" id="q26_opt0" name="question_26" value="0" class="mt-1 w-4 h-4 text-indigo-600 border-slate-300 focus:ring-indigo-500 accent-indigo-600 cursor-pointer flex-shrink-0">
+                        <span class="text-slate-700 leading-relaxed">ก. $A\mathbf{x} = \mathbf{b}$</span>
+                    </label>
+                    <label for="q26_opt1" class="flex items-start gap-3 p-3.5 rounded-xl border border-slate-200 bg-slate-50/70 hover:bg-indigo-50/60 hover:border-indigo-300 cursor-pointer transition-all">
+                        <input type="radio" id="q26_opt1" name="question_26" value="1" class="mt-1 w-4 h-4 text-indigo-600 border-slate-300 focus:ring-indigo-500 accent-indigo-600 cursor-pointer flex-shrink-0">
+                        <span class="text-slate-700 leading-relaxed">ข. $A\mathbf{x} = \mathbf{0}$ (ระบบเอกพันธ์ที่เกี่ยวเนื่องกัน)</span>
+                    </label>
+                    <label for="q26_opt2" class="flex items-start gap-3 p-3.5 rounded-xl border border-slate-200 bg-slate-50/70 hover:bg-indigo-50/60 hover:border-indigo-300 cursor-pointer transition-all">
+                        <input type="radio" id="q26_opt2" name="question_26" value="2" class="mt-1 w-4 h-4 text-indigo-600 border-slate-300 focus:ring-indigo-500 accent-indigo-600 cursor-pointer flex-shrink-0">
+                        <span class="text-slate-700 leading-relaxed">ค. $A^T\mathbf{x} = \mathbf{b}$</span>
+                    </label>
+                    <label for="q26_opt3" class="flex items-start gap-3 p-3.5 rounded-xl border border-slate-200 bg-slate-50/70 hover:bg-indigo-50/60 hover:border-indigo-300 cursor-pointer transition-all">
+                        <input type="radio" id="q26_opt3" name="question_26" value="3" class="mt-1 w-4 h-4 text-indigo-600 border-slate-300 focus:ring-indigo-500 accent-indigo-600 cursor-pointer flex-shrink-0">
+                        <span class="text-slate-700 leading-relaxed">ง. $\mathbf{x} = A^{-1}\mathbf{0}$</span>
+                    </label>
+                </div>
+                <details class="answer-detail group mt-4 pt-3 border-t border-slate-100 text-xs sm:text-sm">
+                    <summary class="cursor-pointer text-indigo-600 font-bold hover:text-indigo-800 flex items-center justify-between">
+                        <span>เฉลยและคำอธิบายละเอียด</span>
+                        <span class="text-slate-400 group-open:rotate-180 transition-transform">▼</span>
+                    </summary>
+                    <div class="mt-2 p-4 bg-emerald-50/60 rounded-xl border border-emerald-200 text-slate-700 space-y-1">
+                        <div><strong>คำตอบที่ถูกต้อง: ข. $A\mathbf{x} = \mathbf{0}$ (ระบบเอกพันธ์ที่เกี่ยวเนื่องกัน)</strong></div>
+                        <p class="leading-relaxed">
+                            <strong>คำอธิบาย:</strong> $\mathbf{x}_p$ คือผลเฉลยเฉพาะหนึ่งตัวที่ทำให้ $A\mathbf{x}_p = \mathbf{b}$ ส่วน $\mathbf{x}_h$ คือผลเฉลยทั่วไปของระบบเอกพันธ์ $A\mathbf{x} = \mathbf{0}$ ซึ่งเมื่อบวกกันจะได้ $A(\mathbf{x}_p + \mathbf{x}_h) = A\mathbf{x}_p + A\mathbf{x}_h = \mathbf{b} + \mathbf{0} = \mathbf{b}$
+                        </p>
+                    </div>
+                </details>
+            </div>
+
+            <!-- ข้อ 27 -->
+            <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 space-y-4">
+                <div class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-100 pb-3">
+                    <div class="flex flex-wrap items-center gap-2">
+                        <span class="px-2.5 py-1 bg-indigo-50 border border-indigo-200 text-indigo-700 text-xs font-bold rounded-lg">LO8: โครงสร้างเซตคำตอบ</span>
+                        <span class="px-2.5 py-1 bg-amber-50 border border-amber-200 text-amber-700 text-xs font-bold rounded-lg">ระดับ: ปานกลาง</span>
+                        <span class="px-2.5 py-1 bg-purple-50 border border-purple-200 text-purple-700 text-xs font-bold rounded-lg">การวัด: ทักษะกระบวนการ (P)</span>
+                    </div>
+                    <span class="text-sm font-bold text-slate-400">ข้อที่ 27 / 30</span>
+                </div>
+                <div class="text-base text-slate-800 leading-relaxed font-medium">
+                    กำหนดสมการ $x_1 - 3x_2 + 2x_3 = 4$ จงหาเวกเตอร์คำตอบในรูป $\mathbf{x} = \mathbf{x}_p + s\mathbf{v}_1 + t\mathbf{v}_2$ เมื่อให้ $x_2 = s$ และ $x_3 = t$ เป็นตัวแปรอิสระ
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm text-slate-700">
+                    <label for="q27_opt0" class="flex items-start gap-3 p-3.5 rounded-xl border border-slate-200 bg-slate-50/70 hover:bg-indigo-50/60 hover:border-indigo-300 cursor-pointer transition-all">
+                        <input type="radio" id="q27_opt0" name="question_27" value="0" class="mt-1 w-4 h-4 text-indigo-600 border-slate-300 focus:ring-indigo-500 accent-indigo-600 cursor-pointer flex-shrink-0">
+                        <span class="text-slate-700 leading-relaxed">ก. $\mathbf{x} = \begin{bmatrix} 4 \\ 0 \\ 0 \end{bmatrix} + s \begin{bmatrix} 3 \\ 1 \\ 0 \end{bmatrix} + t \begin{bmatrix} -2 \\ 0 \\ 1 \end{bmatrix}$</span>
+                    </label>
+                    <label for="q27_opt1" class="flex items-start gap-3 p-3.5 rounded-xl border border-slate-200 bg-slate-50/70 hover:bg-indigo-50/60 hover:border-indigo-300 cursor-pointer transition-all">
+                        <input type="radio" id="q27_opt1" name="question_27" value="1" class="mt-1 w-4 h-4 text-indigo-600 border-slate-300 focus:ring-indigo-500 accent-indigo-600 cursor-pointer flex-shrink-0">
+                        <span class="text-slate-700 leading-relaxed">ข. $\mathbf{x} = \begin{bmatrix} 0 \\ 4 \\ 0 \end{bmatrix} + s \begin{bmatrix} -3 \\ 1 \\ 0 \end{bmatrix} + t \begin{bmatrix} 2 \\ 0 \\ 1 \end{bmatrix}$</span>
+                    </label>
+                    <label for="q27_opt2" class="flex items-start gap-3 p-3.5 rounded-xl border border-slate-200 bg-slate-50/70 hover:bg-indigo-50/60 hover:border-indigo-300 cursor-pointer transition-all">
+                        <input type="radio" id="q27_opt2" name="question_27" value="2" class="mt-1 w-4 h-4 text-indigo-600 border-slate-300 focus:ring-indigo-500 accent-indigo-600 cursor-pointer flex-shrink-0">
+                        <span class="text-slate-700 leading-relaxed">ค. $\mathbf{x} = \begin{bmatrix} 4 \\ 0 \\ 0 \end{bmatrix} + s \begin{bmatrix} -3 \\ 1 \\ 0 \end{bmatrix} + t \begin{bmatrix} 2 \\ 0 \\ 1 \end{bmatrix}$</span>
+                    </label>
+                    <label for="q27_opt3" class="flex items-start gap-3 p-3.5 rounded-xl border border-slate-200 bg-slate-50/70 hover:bg-indigo-50/60 hover:border-indigo-300 cursor-pointer transition-all">
+                        <input type="radio" id="q27_opt3" name="question_27" value="3" class="mt-1 w-4 h-4 text-indigo-600 border-slate-300 focus:ring-indigo-500 accent-indigo-600 cursor-pointer flex-shrink-0">
+                        <span class="text-slate-700 leading-relaxed">ง. $\mathbf{x} = \begin{bmatrix} 4 \\ 1 \\ 1 \end{bmatrix} + s \begin{bmatrix} 3 \\ 0 \\ 1 \end{bmatrix} + t \begin{bmatrix} -2 \\ 1 \\ 0 \end{bmatrix}$</span>
+                    </label>
+                </div>
+                <details class="answer-detail group mt-4 pt-3 border-t border-slate-100 text-xs sm:text-sm">
+                    <summary class="cursor-pointer text-indigo-600 font-bold hover:text-indigo-800 flex items-center justify-between">
+                        <span>เฉลยและคำอธิบายละเอียด</span>
+                        <span class="text-slate-400 group-open:rotate-180 transition-transform">▼</span>
+                    </summary>
+                    <div class="mt-2 p-4 bg-emerald-50/60 rounded-xl border border-emerald-200 text-slate-700 space-y-1">
+                        <div><strong>คำตอบที่ถูกต้อง: ก. $\mathbf{x} = \begin{bmatrix} 4 \\ 0 \\ 0 \end{bmatrix} + s \begin{bmatrix} 3 \\ 1 \\ 0 \end{bmatrix} + t \begin{bmatrix} -2 \\ 0 \\ 1 \end{bmatrix}$</strong></div>
+                        <p class="leading-relaxed">
+                            <strong>คำอธิบาย:</strong> จาก $x_1 = 4 + 3x_2 - 2x_3$ แทน $x_2 = s$ และ $x_3 = t$ จะได้:<br>$\begin{bmatrix} x_1 \\ x_2 \\ x_3 \end{bmatrix} = \begin{bmatrix} 4 + 3s - 2t \\ s \\ t \end{bmatrix} = \begin{bmatrix} 4 \\ 0 \\ 0 \end{bmatrix} + s \begin{bmatrix} 3 \\ 1 \\ 0 \end{bmatrix} + t \begin{bmatrix} -2 \\ 0 \\ 1 \end{bmatrix}$
+                        </p>
+                    </div>
+                </details>
+            </div>
+
+            <!-- ข้อ 28 -->
+            <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 space-y-4">
+                <div class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-100 pb-3">
+                    <div class="flex flex-wrap items-center gap-2">
+                        <span class="px-2.5 py-1 bg-indigo-50 border border-indigo-200 text-indigo-700 text-xs font-bold rounded-lg">LO8: โครงสร้างเซตคำตอบ</span>
+                        <span class="px-2.5 py-1 bg-amber-50 border border-amber-200 text-amber-700 text-xs font-bold rounded-lg">ระดับ: ปานกลาง</span>
+                        <span class="px-2.5 py-1 bg-indigo-50 border border-indigo-200 text-indigo-700 text-xs font-bold rounded-lg">การวัด: เจตคติและวินัย (A)</span>
+                    </div>
+                    <span class="text-sm font-bold text-slate-400">ข้อที่ 28 / 30</span>
+                </div>
+                <div class="text-base text-slate-800 leading-relaxed font-medium">
+                    ในการเรียนรู้เรื่องปริภูมิเวกเตอร์ การมองเซตคำตอบของ $A\mathbf{x} = \mathbf{b}$ เป็น <em>"การเลื่อนขนาน (Translation) ปริภูมิย่อย Null Space ด้วยเวกเตอร์ $\mathbf{x}_p$"</em> สะท้อนถึง <strong>ความงดงามทางคณิตศาสตร์และการเชื่อมโยงมโนทัศน์ (Mathematical Connection)</strong> อย่างไร?
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm text-slate-700">
+                    <label for="q28_opt0" class="flex items-start gap-3 p-3.5 rounded-xl border border-slate-200 bg-slate-50/70 hover:bg-indigo-50/60 hover:border-indigo-300 cursor-pointer transition-all">
+                        <input type="radio" id="q28_opt0" name="question_28" value="0" class="mt-1 w-4 h-4 text-indigo-600 border-slate-300 focus:ring-indigo-500 accent-indigo-600 cursor-pointer flex-shrink-0">
+                        <span class="text-slate-700 leading-relaxed">ก. ช่วยให้สามารถท่องจำสูตรลัดได้โดยไม่ต้องเข้าใจทฤษฎี</span>
+                    </label>
+                    <label for="q28_opt1" class="flex items-start gap-3 p-3.5 rounded-xl border border-slate-200 bg-slate-50/70 hover:bg-indigo-50/60 hover:border-indigo-300 cursor-pointer transition-all">
+                        <input type="radio" id="q28_opt1" name="question_28" value="1" class="mt-1 w-4 h-4 text-indigo-600 border-slate-300 focus:ring-indigo-500 accent-indigo-600 cursor-pointer flex-shrink-0">
+                        <span class="text-slate-700 leading-relaxed">ข. เชื่อมโยงพีชคณิตนามธรรมกับภาพเรขาคณิต ทำให้เห็นว่าเซตคำตอบคือปริภูมิสัมพรรค (Affine Subspace) ที่ขนานกับผลเฉลยเอกพันธ์ ซึ่งเป็นรากฐานของสมการเชิงอนุพันธ์และการปรับปรุงค่าเหมาะสม (Optimization)</span>
+                    </label>
+                    <label for="q28_opt2" class="flex items-start gap-3 p-3.5 rounded-xl border border-slate-200 bg-slate-50/70 hover:bg-indigo-50/60 hover:border-indigo-300 cursor-pointer transition-all">
+                        <input type="radio" id="q28_opt2" name="question_28" value="2" class="mt-1 w-4 h-4 text-indigo-600 border-slate-300 focus:ring-indigo-500 accent-indigo-600 cursor-pointer flex-shrink-0">
+                        <span class="text-slate-700 leading-relaxed">ค. ชี้ให้เห็นว่าระบบไม่เอกพันธ์มีความสำคัญน้อยกว่าระบบเอกพันธ์</span>
+                    </label>
+                    <label for="q28_opt3" class="flex items-start gap-3 p-3.5 rounded-xl border border-slate-200 bg-slate-50/70 hover:bg-indigo-50/60 hover:border-indigo-300 cursor-pointer transition-all">
+                        <input type="radio" id="q28_opt3" name="question_28" value="3" class="mt-1 w-4 h-4 text-indigo-600 border-slate-300 focus:ring-indigo-500 accent-indigo-600 cursor-pointer flex-shrink-0">
+                        <span class="text-slate-700 leading-relaxed">ง. บังคับให้ต้องใช้ระบบพิกัดฉาก 2 มิติเสมอในการแก้ปัญหา</span>
+                    </label>
+                </div>
+                <details class="answer-detail group mt-4 pt-3 border-t border-slate-100 text-xs sm:text-sm">
+                    <summary class="cursor-pointer text-indigo-600 font-bold hover:text-indigo-800 flex items-center justify-between">
+                        <span>เฉลยและคำอธิบายละเอียด</span>
+                        <span class="text-slate-400 group-open:rotate-180 transition-transform">▼</span>
+                    </summary>
+                    <div class="mt-2 p-4 bg-emerald-50/60 rounded-xl border border-emerald-200 text-slate-700 space-y-1">
+                        <div><strong>คำตอบที่ถูกต้อง: ข. เชื่อมโยงพีชคณิตนามธรรมกับภาพเรขาคณิต ทำให้เห็นว่าเซตคำตอบคือปริภูมิสัมพรรค (Affine Subspace) ที่ขนานกับผลเฉลยเอกพันธ์ ซึ่งเป็นรากฐานของสมการเชิงอนุพันธ์และการปรับปรุงค่าเหมาะสม (Optimization)</strong></div>
+                        <p class="leading-relaxed">
+                            <strong>คำอธิบาย:</strong> การมองเห็นความเป็นเอกภาพของคณิตศาสตร์ (Unity of Mathematics) ระหว่างพีชคณิตเชิงเส้น เรขาคณิต และแคลคูลัสชั้นสูง ช่วยปลูกฝังเจตคติเชิงบวกต่อการศึกษาคณิตศาสตร์ขั้นสูง
+                        </p>
+                    </div>
+                </details>
+            </div>
+
+            <!-- ข้อ 29 -->
+            <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 space-y-4">
+                <div class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-100 pb-3">
+                    <div class="flex flex-wrap items-center gap-2">
+                        <span class="px-2.5 py-1 bg-indigo-50 border border-indigo-200 text-indigo-700 text-xs font-bold rounded-lg">LO8: โครงสร้างเซตคำตอบ</span>
+                        <span class="px-2.5 py-1 bg-rose-50 border border-rose-200 text-rose-700 text-xs font-bold rounded-lg">ระดับ: ยาก</span>
+                        <span class="px-2.5 py-1 bg-blue-50 border border-blue-200 text-blue-700 text-xs font-bold rounded-lg">การวัด: ด้านความรู้ (K)</span>
+                    </div>
+                    <span class="text-sm font-bold text-slate-400">ข้อที่ 29 / 30</span>
+                </div>
+                <div class="text-base text-slate-800 leading-relaxed font-medium">
+                    กำหนดให้ $\mathbf{u}$ และ $\mathbf{v}$ เป็นคำตอบสองคำตอบที่แตกต่างกันของระบบสมการไม่เอกพันธ์ $A\mathbf{x} = \mathbf{b}$ โดยที่ $\mathbf{b} \neq \mathbf{0}$ เวกเตอร์ในข้อใดต่อไปนี้เป็น <strong>คำตอบของระบบเอกพันธ์ $A\mathbf{x} = \mathbf{0}$ แน่นอน</strong>?
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm text-slate-700">
+                    <label for="q29_opt0" class="flex items-start gap-3 p-3.5 rounded-xl border border-slate-200 bg-slate-50/70 hover:bg-indigo-50/60 hover:border-indigo-300 cursor-pointer transition-all">
+                        <input type="radio" id="q29_opt0" name="question_29" value="0" class="mt-1 w-4 h-4 text-indigo-600 border-slate-300 focus:ring-indigo-500 accent-indigo-600 cursor-pointer flex-shrink-0">
+                        <span class="text-slate-700 leading-relaxed">ก. $\mathbf{u} + \mathbf{v}$</span>
+                    </label>
+                    <label for="q29_opt1" class="flex items-start gap-3 p-3.5 rounded-xl border border-slate-200 bg-slate-50/70 hover:bg-indigo-50/60 hover:border-indigo-300 cursor-pointer transition-all">
+                        <input type="radio" id="q29_opt1" name="question_29" value="1" class="mt-1 w-4 h-4 text-indigo-600 border-slate-300 focus:ring-indigo-500 accent-indigo-600 cursor-pointer flex-shrink-0">
+                        <span class="text-slate-700 leading-relaxed">ข. $2\mathbf{u} - \mathbf{v}$</span>
+                    </label>
+                    <label for="q29_opt2" class="flex items-start gap-3 p-3.5 rounded-xl border border-slate-200 bg-slate-50/70 hover:bg-indigo-50/60 hover:border-indigo-300 cursor-pointer transition-all">
+                        <input type="radio" id="q29_opt2" name="question_29" value="2" class="mt-1 w-4 h-4 text-indigo-600 border-slate-300 focus:ring-indigo-500 accent-indigo-600 cursor-pointer flex-shrink-0">
+                        <span class="text-slate-700 leading-relaxed">ค. $\mathbf{u} - \mathbf{v}$</span>
+                    </label>
+                    <label for="q29_opt3" class="flex items-start gap-3 p-3.5 rounded-xl border border-slate-200 bg-slate-50/70 hover:bg-indigo-50/60 hover:border-indigo-300 cursor-pointer transition-all">
+                        <input type="radio" id="q29_opt3" name="question_29" value="3" class="mt-1 w-4 h-4 text-indigo-600 border-slate-300 focus:ring-indigo-500 accent-indigo-600 cursor-pointer flex-shrink-0">
+                        <span class="text-slate-700 leading-relaxed">ง. $\frac{1}{2}(\mathbf{u} + \mathbf{v})$</span>
+                    </label>
+                </div>
+                <details class="answer-detail group mt-4 pt-3 border-t border-slate-100 text-xs sm:text-sm">
+                    <summary class="cursor-pointer text-indigo-600 font-bold hover:text-indigo-800 flex items-center justify-between">
+                        <span>เฉลยและคำอธิบายละเอียด</span>
+                        <span class="text-slate-400 group-open:rotate-180 transition-transform">▼</span>
+                    </summary>
+                    <div class="mt-2 p-4 bg-emerald-50/60 rounded-xl border border-emerald-200 text-slate-700 space-y-1">
+                        <div><strong>คำตอบที่ถูกต้อง: ค. $\mathbf{u} - \mathbf{v}$</strong></div>
+                        <p class="leading-relaxed">
+                            <strong>คำอธิบาย:</strong> เนื่องจาก $A(\mathbf{u} - \mathbf{v}) = A\mathbf{u} - A\mathbf{v} = \mathbf{b} - \mathbf{b} = \mathbf{0}$ ดังนั้นผลต่างของสองคำตอบใด ๆ ของระบบสมการเดิมจะตกอยู่ใน Null Space หรือเป็นคำตอบของระบบเอกพันธ์เสมอ
+                        </p>
+                    </div>
+                </details>
+            </div>
+
+            <!-- ข้อ 30 -->
+            <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 space-y-4">
+                <div class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-100 pb-3">
+                    <div class="flex flex-wrap items-center gap-2">
+                        <span class="px-2.5 py-1 bg-indigo-50 border border-indigo-200 text-indigo-700 text-xs font-bold rounded-lg">LO8: โครงสร้างเซตคำตอบ</span>
+                        <span class="px-2.5 py-1 bg-rose-50 border border-rose-200 text-rose-700 text-xs font-bold rounded-lg">ระดับ: ยาก</span>
+                        <span class="px-2.5 py-1 bg-indigo-50 border border-indigo-200 text-indigo-700 text-xs font-bold rounded-lg">การวัด: เจตคติและวินัย (A)</span>
+                    </div>
+                    <span class="text-sm font-bold text-slate-400">ข้อที่ 30 / 30</span>
+                </div>
+                <div class="text-base text-slate-800 leading-relaxed font-medium">
+                    พิจารณาข้อความ: <em>"เซตคำตอบของระบบสมการเชิงเส้น $A\mathbf{x} = \mathbf{b}$ เมื่อ $\mathbf{b} \neq \mathbf{0}$ จัดเป็นปริภูมิย่อย (Subspace) ของ $\mathbb{R}^n$"</em> นักศึกษาที่มี <strong>ความเคร่งครัดและแม่นยำในนิยามทางคณิตศาสตร์ (Mathematical Rigor)</strong> ควรประเมินข้อความนี้อย่างไร?
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm text-slate-700">
+                    <label for="q30_opt0" class="flex items-start gap-3 p-3.5 rounded-xl border border-slate-200 bg-slate-50/70 hover:bg-indigo-50/60 hover:border-indigo-300 cursor-pointer transition-all">
+                        <input type="radio" id="q30_opt0" name="question_30" value="0" class="mt-1 w-4 h-4 text-indigo-600 border-slate-300 focus:ring-indigo-500 accent-indigo-600 cursor-pointer flex-shrink-0">
+                        <span class="text-slate-700 leading-relaxed">ก. ถูกต้อง เพราะประกอบด้วยเวกเตอร์ใน $\mathbb{R}^n$ ทั้งหมด</span>
+                    </label>
+                    <label for="q30_opt1" class="flex items-start gap-3 p-3.5 rounded-xl border border-slate-200 bg-slate-50/70 hover:bg-indigo-50/60 hover:border-indigo-300 cursor-pointer transition-all">
+                        <input type="radio" id="q30_opt1" name="question_30" value="1" class="mt-1 w-4 h-4 text-indigo-600 border-slate-300 focus:ring-indigo-500 accent-indigo-600 cursor-pointer flex-shrink-0">
+                        <span class="text-slate-700 leading-relaxed">ข. ผิดพลาด เพราะเซตดังกล่าวไม่มีเวกเตอร์ศูนย์ ($A\mathbf{0} = \mathbf{0} \neq \mathbf{b}$) และไม่มีสมบัติปิดภายใต้การบวก จึงเป็นได้เพียง ปริภูมิสัมพรรค (Affine Space) เท่านั้น</span>
+                    </label>
+                    <label for="q30_opt2" class="flex items-start gap-3 p-3.5 rounded-xl border border-slate-200 bg-slate-50/70 hover:bg-indigo-50/60 hover:border-indigo-300 cursor-pointer transition-all">
+                        <input type="radio" id="q30_opt2" name="question_30" value="2" class="mt-1 w-4 h-4 text-indigo-600 border-slate-300 focus:ring-indigo-500 accent-indigo-600 cursor-pointer flex-shrink-0">
+                        <span class="text-slate-700 leading-relaxed">ค. ถูกต้องเฉพาะเมื่อ $\det(A) \neq 0$</span>
+                    </label>
+                    <label for="q30_opt3" class="flex items-start gap-3 p-3.5 rounded-xl border border-slate-200 bg-slate-50/70 hover:bg-indigo-50/60 hover:border-indigo-300 cursor-pointer transition-all">
+                        <input type="radio" id="q30_opt3" name="question_30" value="3" class="mt-1 w-4 h-4 text-indigo-600 border-slate-300 focus:ring-indigo-500 accent-indigo-600 cursor-pointer flex-shrink-0">
+                        <span class="text-slate-700 leading-relaxed">ง. ถูกต้องเฉพาะเมื่อจำนวนสมการเท่ากับจำนวนตัวแปร</span>
+                    </label>
+                </div>
+                <details class="answer-detail group mt-4 pt-3 border-t border-slate-100 text-xs sm:text-sm">
+                    <summary class="cursor-pointer text-indigo-600 font-bold hover:text-indigo-800 flex items-center justify-between">
+                        <span>เฉลยและคำอธิบายละเอียด</span>
+                        <span class="text-slate-400 group-open:rotate-180 transition-transform">▼</span>
+                    </summary>
+                    <div class="mt-2 p-4 bg-emerald-50/60 rounded-xl border border-emerald-200 text-slate-700 space-y-1">
+                        <div><strong>คำตอบที่ถูกต้อง: ข. ผิดพลาด เพราะเซตดังกล่าวไม่มีเวกเตอร์ศูนย์ ($A\mathbf{0} = \mathbf{0} \neq \mathbf{b}$) และไม่มีสมบัติปิดภายใต้การบวก จึงเป็นได้เพียง ปริภูมิสัมพรรค (Affine Space) เท่านั้น</strong></div>
+                        <p class="leading-relaxed">
+                            <strong>คำอธิบาย:</strong> การตรวจสอบคุณสมบัติ 3 ข้อของปริภูมิย่อย (มีเวกเตอร์ศูนย์, ปิดการบวก, ปิดการคูณสเกลาร์) อย่างเคร่งครัด ชี้ชัดว่าเซตคำตอบของระบบไม่เอกพันธ์ไม่ผ่านเงื่อนไขใดเลย นี่คือวินัยทางคณิตศาสตร์ที่ไม่ทึกทักเอาเอง
+                        </p>
+                    </div>
+                </details>
+            </div>
+
+        </section>
+
+        <!-- Footer -->
+        <footer class="text-center py-6 border-t border-slate-200 text-xs text-slate-500">
+            แบบทดสอบวัดผลสัมฤทธิ์ทางการเรียนวิชาพีชคณิตเชิงเส้น • ครบ 30 ข้อตามพิมพ์เขียวการวัดผล K-P-A และผลลัพธ์การเรียนรู้
+        </footer>
+
+    </main>
+
+    <!-- Script สำหรับควบคุมการเปิด-ปิดเฉลย และ Render สูตร KaTeX -->
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            renderMathInElement(document.body, {
+                delimiters: [
+                    {left: "$$", right: "$$", display: true},
+                    {left: "\\[", right: "\\]", display: true},
+                    {left: "$", right: "$", display: false},
+                    {left: "\\(", right: "\\)", display: false}
+                ],
+                throwOnError: false
+            });
+        });
+
+        function toggleAllAnswers(open) {
+            const details = document.querySelectorAll('.answer-detail');
+            details.forEach(d => {
+                if (open) {
+                    d.setAttribute('open', '');
+                } else {
+                    d.removeAttribute('open');
+                }
+            });
+        }
+
+        function clearAllSelections() {
+            const radios = document.querySelectorAll('input[type="radio"]');
+            radios.forEach(r => r.checked = false);
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>เรื่องที่ 4: การแก้ระบบสมการด้วยกฎของเครเมอร์</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;600;700&display=swap" rel="stylesheet">
+    
+    <!-- KaTeX CSS & JS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js"></script>
+
+    <style>
+        body { font-family: 'Sarabun', sans-serif; }
+        .highlight-col {
+            background-color: #fef3c7 !important;
+            color: #b45309 !important;
+            font-weight: 700;
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 antialiased">
+
+    <!-- Container ความกว้างคงที่ max-w-6xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 (ความกว้างสูงสุด 1,152px) -->
+    <main class="max-w-6xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 space-y-8">
+        
+        <!-- Header -->
+        <header class="border-b border-slate-200 pb-5">
+            <span class="inline-block px-3 py-1 bg-indigo-100 text-indigo-700 rounded-full text-xs font-semibold mb-2">บทเรียนพีชคณิตเชิงเส้น</span>
+            <h1 class="text-2xl sm:text-3xl font-bold text-slate-900">เรื่องที่ 4: การแก้ระบบสมการด้วยกฎของเครเมอร์ (Cramer's Rule)</h1>
+        </header>
+
+        <!-- 1. วัตถุประสงค์การเรียนรู้ -->
+        <section class="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
+            <h2 class="text-lg font-bold text-slate-900 flex items-center gap-2 mb-3">
+                <span class="w-2.5 h-2.5 rounded-full bg-blue-600"></span> 1. วัตถุประสงค์การเรียนรู้
+            </h2>
+            <p class="text-slate-600 leading-relaxed">
+                นักศึกษาสามารถใช้ดีเทอร์มิแนนต์ในการแก้ระบบสมการเชิงเส้นที่มีจำนวนสมการและจำนวนตัวแปรเท่ากัน ($n \times n$) ภายใต้เงื่อนไขที่เหมาะสม พร้อมทั้งอธิบายเหตุผลและข้อจำกัดของการใช้สูตรดังกล่าวได้
+            </p>
+        </section>
+
+        <!-- 2. เนื้อหาหลัก -->
+        <section class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 space-y-6">
+            <h2 class="text-lg font-bold text-slate-900 flex items-center gap-2">
+                <span class="w-2.5 h-2.5 rounded-full bg-emerald-600"></span> 2. เนื้อหาหลัก
+            </h2>
+            
+            <p class="text-slate-700 leading-relaxed">
+                สำหรับระบบสมการเชิงเส้นที่มี $n$ สมการและ $n$ ตัวแปร ในรูปเมทริกซ์ $A\mathbf{x} = \mathbf{b}$ เมื่อ $A$ เป็นเมทริกซ์จัตุรัสขนาด $n \times n$ และมีเงื่อนไขสำคัญคือ <strong>$\det(A) \neq 0$</strong> ระบบสมการนี้จะมีคำตอบเดียว (Unique Solution) ซึ่งสามารถหาได้จาก <strong>กฎของเครเมอร์ (Cramer's Rule)</strong>:
+            </p>
+
+            <div class="bg-slate-50 border border-slate-200 rounded-xl p-5 text-center">
+                <div class="text-lg font-semibold text-slate-900">
+                    $$x_i = \frac{\det(A_i)}{\det(A)}, \quad i = 1, 2, \dots, n$$
+                </div>
+                <p class="mt-2 text-xs sm:text-sm text-slate-500">
+                    โดย $A_i$ คือเมทริกซ์ที่ได้จากการนำเวกเตอร์ค่าคงตัว $\mathbf{b}$ ไปแทนที่ใน<strong>คอลัมน์ที่ $i$</strong> ของเมทริกซ์สัมประสิทธิ์ $A$
+                </p>
+            </div>
+
+            <!-- กล่องข้อความเน้นเงื่อนไขสำคัญ -->
+            <div class="bg-rose-50 border-l-4 border-rose-500 p-4 rounded-r-xl">
+                <div class="flex">
+                    <div class="flex-shrink-0 text-rose-500 font-bold">⚠️ ข้อกำหนดสำคัญ:</div>
+                    <div class="ml-3 text-sm text-rose-800 leading-relaxed">
+                        สูตรของเครเมอร์ในรูปดังกล่าว<strong>สามารถนำมาใช้ได้เมื่อ $\det(A) \neq 0$ เท่านั้น</strong> เนื่องจากหาก $\det(A) = 0$ จะทำให้ตัวส่วนเป็นศูนย์ ซึ่งไม่นิยามในทางคณิตศาสตร์ และระบบสมการจะไม่สามารถมีคำตอบเดียวได้
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 3. แบบจำลองโต้ตอบ -->
+        <section class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 space-y-6">
+            <h2 class="text-lg font-bold text-slate-900 flex items-center gap-2">
+                <span class="w-2.5 h-2.5 rounded-full bg-violet-600"></span> 3. แบบจำลองโต้ตอบ (Interactive Cramer Calculator)
+            </h2>
+            <p class="text-sm text-slate-600">
+                ทดลองปรับเปลี่ยนค่าสัมประสิทธิ์ในเมทริกซ์ $A$ และค่าคงตัว $\mathbf{b}$ ด้านล่าง จากนั้นคลิกเลือกตัวแปร ($x_1, x_2$ หรือ $x_3$) เพื่อดูการสร้างเมทริกซ์ $A_i$ และการคำนวณทีละขั้น
+            </p>
+
+            <!-- แผงป้อนข้อมูลเมทริกซ์ -->
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+                
+                <!-- อินพุต A และ b -->
+                <div class="lg:col-span-5 bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-4">
+                    <div class="flex justify-between items-center">
+                        <span class="text-xs font-bold uppercase tracking-wider text-slate-600">เมทริกซ์สัมประสิทธิ์ $A$ และ เวกเตอร์ $\mathbf{b}$</span>
+                        <button onclick="resetDefaults()" class="text-xs text-indigo-600 hover:underline">ค่าเริ่มต้น</button>
+                    </div>
+
+                    <div class="grid grid-cols-4 gap-2 text-center text-xs font-semibold">
+                        <span>$x_1$</span><span>$x_2$</span><span>$x_3$</span><span class="text-amber-700">$\mathbf{b}$</span>
+                    </div>
+
+                    <!-- แถวที่ 1 -->
+                    <div class="grid grid-cols-4 gap-2">
+                        <input id="a11" type="number" value="1" step="1" class="p-2 border rounded text-center text-sm bg-white" oninput="calculateCramer()">
+                        <input id="a12" type="number" value="2" step="1" class="p-2 border rounded text-center text-sm bg-white" oninput="calculateCramer()">
+                        <input id="a13" type="number" value="3" step="1" class="p-2 border rounded text-center text-sm bg-white" oninput="calculateCramer()">
+                        <input id="b1" type="number" value="9" step="1" class="p-2 border-2 border-amber-300 rounded text-center text-sm bg-amber-50" oninput="calculateCramer()">
+                    </div>
+                    <!-- แถวที่ 2 -->
+                    <div class="grid grid-cols-4 gap-2">
+                        <input id="a21" type="number" value="2" step="1" class="p-2 border rounded text-center text-sm bg-white" oninput="calculateCramer()">
+                        <input id="a22" type="number" value="-1" step="1" class="p-2 border rounded text-center text-sm bg-white" oninput="calculateCramer()">
+                        <input id="a23" type="number" value="1" step="1" class="p-2 border rounded text-center text-sm bg-white" oninput="calculateCramer()">
+                        <input id="b2" type="number" value="8" step="1" class="p-2 border-2 border-amber-300 rounded text-center text-sm bg-amber-50" oninput="calculateCramer()">
+                    </div>
+                    <!-- แถวที่ 3 -->
+                    <div class="grid grid-cols-4 gap-2">
+                        <input id="a31" type="number" value="3" step="1" class="p-2 border rounded text-center text-sm bg-white" oninput="calculateCramer()">
+                        <input id="a32" type="number" value="0" step="1" class="p-2 border rounded text-center text-sm bg-white" oninput="calculateCramer()">
+                        <input id="a33" type="number" value="-1" step="1" class="p-2 border rounded text-center text-sm bg-white" oninput="calculateCramer()">
+                        <input id="b3" type="number" value="3" step="1" class="p-2 border-2 border-amber-300 rounded text-center text-sm bg-amber-50" oninput="calculateCramer()">
+                    </div>
+
+                    <!-- ตัวเลือกตัวแปร -->
+                    <div class="pt-3 border-t border-slate-200">
+                        <span class="block text-xs font-semibold text-slate-600 mb-2">เลือกตัวแปรที่ต้องการคำนวณ ($x_i$):</span>
+                        <div class="flex gap-2">
+                            <button id="btn-x1" onclick="selectVariable(1)" class="flex-1 py-1.5 rounded-lg border text-sm font-semibold transition-colors bg-indigo-600 text-white border-indigo-600">x₁</button>
+                            <button id="btn-x2" onclick="selectVariable(2)" class="flex-1 py-1.5 rounded-lg border text-sm font-semibold transition-colors bg-white text-slate-700 border-slate-300 hover:bg-slate-100">x₂</button>
+                            <button id="btn-x3" onclick="selectVariable(3)" class="flex-1 py-1.5 rounded-lg border text-sm font-semibold transition-colors bg-white text-slate-700 border-slate-300 hover:bg-slate-100">x₃</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- การแสดงผลขั้นตอนการคำนวณ -->
+                <div class="lg:col-span-7 bg-slate-50 p-5 rounded-xl border border-slate-200 space-y-4">
+                    <div class="flex justify-between items-center">
+                        <span class="text-sm font-bold text-slate-800">ขั้นตอนการสร้างเมทริกซ์และการคำนวณ</span>
+                        <span id="detA-badge" class="text-xs px-2.5 py-1 rounded-full font-bold"></span>
+                    </div>
+
+                    <!-- ค่า det(A) -->
+                    <div id="step-detA" class="bg-white p-3 rounded-lg border border-slate-200 text-sm"></div>
+
+                    <!-- ค่า det(Ai) -->
+                    <div id="step-detAi" class="bg-white p-3 rounded-lg border border-slate-200 text-sm"></div>
+
+                    <!-- สรุปผลการหาร -->
+                    <div id="step-result" class="p-3.5 rounded-lg border text-center font-semibold text-sm"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 4. คำถามนำเพื่อค้นพบ -->
+        <section class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 space-y-4">
+            <h2 class="text-lg font-bold text-slate-900 flex items-center gap-2">
+                <span class="w-2.5 h-2.5 rounded-full bg-amber-500"></span> 4. คำถามนำเพื่อค้นพบ
+            </h2>
+            <div class="space-y-3">
+                <details class="group border border-slate-200 rounded-lg p-3 bg-slate-50">
+                    <summary class="font-medium text-slate-800 cursor-pointer flex justify-between items-center text-sm sm:text-base">
+                        <span>1. เหตุใดตัวส่วนของสูตร ($\det(A)$) จึงต้องไม่เป็นศูนย์?</span>
+                        <span class="text-slate-400 group-open:rotate-180 transition-transform">▼</span>
+                    </summary>
+                    <div class="mt-2 text-sm text-slate-600 pt-2 border-t border-slate-200 leading-relaxed">
+                        ในระบบจำนวนจริง การหารด้วยศูนย์<strong>ไม่นิยาม</strong> และในเชิงพีชคณิตเชิงเส้น การที่ $\det(A) = 0$ หมายความว่าเมทริกซ์ $A$ ไม่มีเมทริกซ์ผกผัน ($A^{-1}$ หาไม่ได้) คอลัมน์ของ $A$ มีความเป็นอิสระเชิงเส้นไม่ครบ ทำให้ระบบไม่สามารถหาคำตอบเดียวที่สอดคล้องตามสูตร $\mathbf{x} = A^{-1}\mathbf{b} = \frac{1}{\det(A)}\operatorname{adj}(A)\mathbf{b}$ ได้
+                    </div>
+                </details>
+
+                <details class="group border border-slate-200 rounded-lg p-3 bg-slate-50">
+                    <summary class="font-medium text-slate-800 cursor-pointer flex justify-between items-center text-sm sm:text-base">
+                        <span>2. หาก $\det(A) = 0$ เราสามารถสรุปได้ทันทีหรือไม่ว่าระบบ "ไม่มีคำตอบ"?</span>
+                        <span class="text-slate-400 group-open:rotate-180 transition-transform">▼</span>
+                    </summary>
+                    <div class="mt-2 text-sm text-slate-600 pt-2 border-t border-slate-200 leading-relaxed">
+                        <strong>ยังสรุปไม่ได้ในทันที:</strong> เมื่อ $\det(A) = 0$ ระบบจะตกอยู่ใน 2 กรณี:
+                        <ul class="list-disc list-inside mt-1 space-y-0.5">
+                            <li><strong>ไม่มีคำตอบ (Inconsistent):</strong> เมื่อมี $\det(A_i) \neq 0$ อย่างน้อยหนึ่งตัว (เกิดรูป $\frac{\text{ไม่เป็น 0}}{0}$)</li>
+                            <li><strong>มีคำตอบอนันต์ (Infinitely Many Solutions):</strong> เมื่อ $\det(A_i) = 0$ ทุกตัวสำหรับทุก $i$ (เกิดรูป $\frac{0}{0}$) และสมการสมมูลกัน</li>
+                        </ul>
+                        ดังนั้น หาก $\det(A) = 0$ จะต้องตรวจสอบด้วยวิธีอื่นต่อ เช่น การกำจัดแบบเกาส์ (Gaussian Elimination)
+                    </div>
+                </details>
+            </div>
+        </section>
+
+        <!-- 5. แบบฝึกหัดสำหรับนักศึกษา -->
+        <section class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 space-y-5">
+            <h2 class="text-lg font-bold text-slate-900 flex items-center gap-2">
+                <span class="w-2.5 h-2.5 rounded-full bg-indigo-600"></span> 5. แบบฝึกหัดสำหรับนักศึกษา
+            </h2>
+            <p class="text-sm text-slate-600">
+                จงแก้ระบบสมการต่อไปนี้ด้วยกฎของเครเมอร์ และอธิบายว่าทำไมวิธีนี้จึงไม่สามารถใช้สูตรดังกล่าวได้เมื่อเมทริกซ์สัมประสิทธิ์มีดีเทอร์มิแนนต์เป็นศูนย์:
+            </p>
+
+            <!-- ตัวโจทย์ 3x3 -->
+            <div class="border border-slate-200 rounded-xl p-5 bg-slate-50 space-y-4">
+                <div class="text-center text-base">
+                    $$\begin{cases}
+                    x + y + z = 6 \\
+                    2y + 5z = -4 \\
+                    2x + 5y - z = 27
+                    \end{cases}$$
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
+                    <div class="bg-white p-4 rounded-lg border border-slate-200 text-xs text-slate-600 space-y-2">
+                        <span class="font-bold text-slate-800 block text-sm">ข้อคำถามที่ 1: ขั้นตอนการคำนวณ</span>
+                        <p>1. หา $\det(A)$ จากเมทริกซ์สัมประสิทธิ์</p>
+                        <p>2. สร้าง $A_1, A_2, A_3$ โดยนำ $\mathbf{b} = [6, -4, 27]^T$ แทนทีละหลักแล้วหา $\det$ แต่ละตัว</p>
+                        <p>3. คำนวณ $x = \frac{\det(A_1)}{\det(A)}, y = \frac{\det(A_2)}{\det(A)}, z = \frac{\det(A_3)}{\det(A)}$</p>
+                    </div>
+
+                    <div class="bg-white p-4 rounded-lg border border-slate-200 text-xs text-slate-600 space-y-2">
+                        <span class="font-bold text-slate-800 block text-sm">ข้อคำถามที่ 2: การวิเคราะห์เงื่อนไข $\det(A) = 0$</span>
+                        <p class="leading-relaxed">
+                            อธิบายเหตุผลทางพีชคณิตว่า เหตุใดเมื่อ $\det(A) = 0$ กฎของเครเมอร์จึงล้มเหลวในการหาค่าคำตอบ และต้องวิเคราะห์ด้วยเครื่องมือใดแทน
+                        </p>
+                    </div>
+                </div>
+
+                <details class="text-xs bg-white p-3 rounded-lg border border-slate-200">
+                    <summary class="cursor-pointer text-indigo-600 font-semibold">คลิกเพื่อดูคำตอบและแนวคิดเฉลยละเอียด</summary>
+                    <div class="mt-3 text-slate-700 space-y-2 pt-2 border-t border-slate-100">
+                        <div><strong>1. ผลลัพธ์ดีเทอร์มิแนนต์:</strong></div>
+                        <div class="pl-3">
+                            • $\det(A) = -21$<br>
+                            • $\det(A_1) = -105 \implies x = \frac{-105}{-21} = 5$<br>
+                            • $\det(A_2) = -63 \implies y = \frac{-63}{-21} = 3$<br>
+                            • $\det(A_3) = 42 \implies z = \frac{42}{-21} = -2$
+                        </div>
+                        <div><strong>คำตอบของระบบคือ:</strong> $(x, y, z) = (5, 3, -2)$</div>
+                        <div class="mt-2 text-slate-500">
+                            <strong>2. คำอธิบาย:</strong> เมื่อ $\det(A) = 0$ ตัวส่วนในสูตร $x_i = \frac{\det(A_i)}{\det(A)}$ กลายเป็นศูนย์ ทำให้ไม่สามารถประเมินค่าทางคณิตศาสตร์ได้โดยตรง กฎของเครเมอร์จึงไม่สามารถระบุได้ว่าระบบสมการ "ไม่มีคำตอบ" หรือ "มีคำตอบอนันต์" และจำเป็นต้องใช้วิธีดำเนินการตามแถวขั้นมูลฐาน (Row Operations / Gauss-Jordan) เพื่อหาคำตอบแทน
+                        </div>
+                    </div>
+                </details>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Script สำหรับ KaTeX และ Interactive Simulation -->
+    <script>
+        let currentTargetVar = 1; // 1: x1, 2: x2, 3: x3
+
+        document.addEventListener("DOMContentLoaded", function() {
+            renderMathInElement(document.body, {
+                delimiters: [
+                    {left: "$$", right: "$$", display: true},
+                    {left: "\\[", right: "\\]", display: true},
+                    {left: "$", right: "$", display: false},
+                    {left: "\\(", right: "\\)", display: false}
+                ],
+                throwOnError: false
+            });
+            calculateCramer();
+        });
+
+        function resetDefaults() {
+            document.getElementById('a11').value = 1;
+            document.getElementById('a12').value = 2;
+            document.getElementById('a13').value = 3;
+            document.getElementById('b1').value = 9;
+
+            document.getElementById('a21').value = 2;
+            document.getElementById('a22').value = -1;
+            document.getElementById('a23').value = 1;
+            document.getElementById('b2').value = 8;
+
+            document.getElementById('a31').value = 3;
+            document.getElementById('a32').value = 0;
+            document.getElementById('a33').value = -1;
+            document.getElementById('b3').value = 3;
+
+            selectVariable(1);
+        }
+
+        function selectVariable(index) {
+            currentTargetVar = index;
+            [1, 2, 3].forEach(i => {
+                const btn = document.getElementById(`btn-x${i}`);
+                if (i === index) {
+                    btn.className = "flex-1 py-1.5 rounded-lg border text-sm font-semibold transition-colors bg-indigo-600 text-white border-indigo-600";
+                } else {
+                    btn.className = "flex-1 py-1.5 rounded-lg border text-sm font-semibold transition-colors bg-white text-slate-700 border-slate-300 hover:bg-slate-100";
+                }
+            });
+            calculateCramer();
+        }
+
+        // คำนวณดีเทอร์มิแนนต์ของเมทริกซ์ 3x3
+        function calcDet3x3(m) {
+            return m[0][0] * (m[1][1] * m[2][2] - m[1][2] * m[2][1])
+                 - m[0][1] * (m[1][0] * m[2][2] - m[1][2] * m[2][0])
+                 + m[0][2] * (m[1][0] * m[2][1] - m[1][1] * m[2][0]);
+        }
+
+        function calculateCramer() {
+            const A = [
+                [parseFloat(document.getElementById('a11').value) || 0, parseFloat(document.getElementById('a12').value) || 0, parseFloat(document.getElementById('a13').value) || 0],
+                [parseFloat(document.getElementById('a21').value) || 0, parseFloat(document.getElementById('a22').value) || 0, parseFloat(document.getElementById('a23').value) || 0],
+                [parseFloat(document.getElementById('a31').value) || 0, parseFloat(document.getElementById('a32').value) || 0, parseFloat(document.getElementById('a33').value) || 0]
+            ];
+
+            const b = [
+                parseFloat(document.getElementById('b1').value) || 0,
+                parseFloat(document.getElementById('b2').value) || 0,
+                parseFloat(document.getElementById('b3').value) || 0
+            ];
+
+            const detA = calcDet3x3(A);
+
+            // สร้างเมทริกซ์ Ai โดยการแทนที่คอลัมน์ที่เลือกด้วยเวกเตอร์ b
+            const colIdx = currentTargetVar - 1;
+            const Ai = [
+                [...A[0]],
+                [...A[1]],
+                [...A[2]]
+            ];
+            Ai[0][colIdx] = b[0];
+            Ai[1][colIdx] = b[1];
+            Ai[2][colIdx] = b[2];
+
+            const detAi = calcDet3x3(Ai);
+
+            // อัปเดต UI ส่วน det(A)
+            const detABadge = document.getElementById('detA-badge');
+            const stepDetA = document.getElementById('step-detA');
+            const stepDetAi = document.getElementById('step-detAi');
+            const stepResult = document.getElementById('step-result');
+
+            if (detA !== 0) {
+                detABadge.className = "text-xs px-2.5 py-1 rounded-full font-bold bg-emerald-100 text-emerald-800";
+                detABadge.innerText = "det(A) ≠ 0 (ใช้กฎได้)";
+            } else {
+                detABadge.className = "text-xs px-2.5 py-1 rounded-full font-bold bg-rose-100 text-rose-800";
+                detABadge.innerText = "det(A) = 0 (ใช้กฎไม่ได้)";
+            }
+
+            stepDetA.innerHTML = `<strong>ขั้นที่ 1:</strong> คำนวณดีเทอร์มิแนนต์ของเมทริกซ์สัมประสิทธิ์ $A$<br>` +
+                                 `$$\\det(A) = \\begin{vmatrix} ${A[0][0]} & ${A[0][1]} & ${A[0][2]} \\\\ ${A[1][0]} & ${A[1][1]} & ${A[1][2]} \\\\ ${A[2][0]} & ${A[2][1]} & ${A[2][2]} \\end{vmatrix} = ${detA}$$`;
+
+            // ไฮไลต์หลักที่ถูกแทนที่
+            stepDetAi.innerHTML = `<strong>ขั้นที่ 2:</strong> สร้าง $A_${currentTargetVar}$ โดยแทนคอลัมน์ที่ ${currentTargetVar} ด้วยเวกเตอร์ $\\mathbf{b}$ แล้วหาดีเทอร์มิแนนต์<br>` +
+                                  `$$\\det(A_${currentTargetVar}) = \\begin{vmatrix} ${Ai[0][0]} & ${Ai[0][1]} & ${Ai[0][2]} \\\\ ${Ai[1][0]} & ${Ai[1][1]} & ${Ai[1][2]} \\\\ ${Ai[2][0]} & ${Ai[2][1]} & ${Ai[2][2]} \\end{vmatrix} = ${detAi}$$`;
+
+            if (detA !== 0) {
+                const ans = detAi / detA;
+                const roundedAns = Math.round(ans * 1000) / 1000;
+                stepResult.className = "p-3.5 rounded-lg border text-center font-semibold text-sm bg-emerald-50 text-emerald-800 border-emerald-200";
+                stepResult.innerHTML = `<strong>ขั้นที่ 3:</strong> คำนวณคำตอบจากสูตร: ` +
+                                       `$$x_${currentTargetVar} = \\frac{\\det(A_${currentTargetVar})}{\\det(A)} = \\frac{${detAi}}{${detA}} = ${roundedAns}$$`;
+            } else {
+                stepResult.className = "p-3.5 rounded-lg border text-center font-semibold text-sm bg-rose-50 text-rose-800 border-rose-200";
+                stepResult.innerHTML = `ไม่สามารถหาคำตอบด้วยกฎของเครเมอร์ได้ เนื่องจาก $\\det(A) = 0$ (ตัวส่วนเป็นศูนย์ ทำให้อยู่ในรูปไม่นิยามทางคณิตศาสตร์)`;
+            }
+
+            // เรนเดอร์สูตร KaTeX ซ้ำเมื่อมีการอัปเดตข้อมูล
+            if (window.renderMathInElement) {
+                renderMathInElement(stepDetA, {delimiters: [{left: "$$", right: "$$", display: true}, {left: "$", right: "$", display: false}]});
+                renderMathInElement(stepDetAi, {delimiters: [{left: "$$", right: "$$", display: true}, {left: "$", right: "$", display: false}]});
+                renderMathInElement(stepResult, {delimiters: [{left: "$$", right: "$$", display: true}, {left: "$", right: "$", display: false}]});
+            }
+        }
+    </script>
+</body>
+</html>

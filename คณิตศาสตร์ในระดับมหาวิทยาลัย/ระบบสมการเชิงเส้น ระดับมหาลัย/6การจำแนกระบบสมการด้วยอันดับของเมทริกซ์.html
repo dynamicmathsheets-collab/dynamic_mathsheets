@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>เรื่องที่ 6: การจำแนกระบบสมการด้วยอันดับของเมทริกซ์</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;600;700&display=swap" rel="stylesheet">
+    
+    <!-- KaTeX CSS & JS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js"></script>
+
+    <style>
+        body { font-family: 'Sarabun', sans-serif; }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 antialiased">
+
+    <!-- Container ความกว้างคงที่ max-w-6xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 (ความกว้างสูงสุด 1,152px) -->
+    <main class="max-w-6xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 space-y-8">
+        
+        <!-- Header -->
+        <header class="border-b border-slate-200 pb-5">
+            <span class="inline-block px-3 py-1 bg-indigo-100 text-indigo-700 rounded-full text-xs font-semibold mb-2">บทเรียนพีชคณิตเชิงเส้น</span>
+            <h1 class="text-2xl sm:text-3xl font-bold text-slate-900">เรื่องที่ 6: การจำแนกระบบสมการด้วยอันดับของเมทริกซ์ (Rank Analysis)</h1>
+        </header>
+
+        <!-- 1. วัตถุประสงค์การเรียนรู้ -->
+        <section class="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
+            <h2 class="text-lg font-bold text-slate-900 flex items-center gap-2 mb-3">
+                <span class="w-2.5 h-2.5 rounded-full bg-blue-600"></span> 1. วัตถุประสงค์การเรียนรู้
+            </h2>
+            <p class="text-slate-600 leading-relaxed">
+                นักศึกษาสามารถใช้อันดับของเมทริกซ์สัมประสิทธิ์ $\operatorname{rank}(A)$ และอันดับของเมทริกซ์เสริม $\operatorname{rank}([A \mid \mathbf{b}])$ ในการวิเคราะห์การมีคำตอบและความสอดคล้องของระบบสมการ พร้อมจำแนกจำนวนคำตอบและจำนวนตัวแปรอิสระได้อย่างถูกต้อง
+            </p>
+        </section>
+
+        <!-- 2. เนื้อหาหลัก -->
+        <section class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 space-y-6">
+            <h2 class="text-lg font-bold text-slate-900 flex items-center gap-2">
+                <span class="w-2.5 h-2.5 rounded-full bg-emerald-600"></span> 2. เนื้อหาหลัก (ทฤษฎีบทรูเช-กาเปลลี : Rouché–Capelli Theorem)
+            </h2>
+            
+            <p class="text-slate-700 leading-relaxed">
+                กำหนดระบบสมการเชิงเส้น $A\mathbf{x} = \mathbf{b}$ โดยที่ $A$ เป็นเมทริกซ์สัมประสิทธิ์ขนาด $m \times n$ ($n$ ตัวแปร) และ $[A \mid \mathbf{b}]$ เป็นเมทริกซ์แต่งเติม (Augmented Matrix) ระบบสมการจะมีคำตอบ (Consistent) ก็ต่อเมื่อ:
+            </p>
+
+            <div class="bg-slate-50 border border-slate-200 rounded-xl p-4 text-center text-lg font-semibold text-indigo-900">
+                $$\operatorname{rank}(A) = \operatorname{rank}([A \mid \mathbf{b}])$$
+            </div>
+
+            <!-- การจำแนก 3 รูปแบบ -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+                <!-- ไม่มีคำตอบ -->
+                <div class="bg-rose-50/50 rounded-xl p-5 border border-rose-200 flex flex-col justify-between">
+                    <div>
+                        <span class="inline-block px-2.5 py-0.5 bg-rose-100 text-rose-800 text-xs font-bold rounded-full mb-2">ไม่มีคำตอบ (Inconsistent)</span>
+                        <h3 class="text-base font-bold text-slate-900 mb-2">$\operatorname{rank}(A) < \operatorname{rank}([A \mid \mathbf{b}])$</h3>
+                        <p class="text-xs text-slate-600 leading-relaxed">
+                            เกิดแถวขัดแย้งในรูปขั้นบันไดที่มีลักษณะ $[0 \ \ 0 \ \dots \ 0 \mid c]$ โดยที่ $c \neq 0$ สื่อถึงสมการ $0 = c$ ซึ่งเป็นไปไม่ได้
+                        </p>
+                    </div>
+                    <div class="mt-4 pt-2 border-t border-rose-200 text-xs text-rose-700 font-semibold text-center">
+                        ไม่มีคำตอบ : $S = \emptyset$
+                    </div>
+                </div>
+
+                <!-- คำตอบเดียว -->
+                <div class="bg-emerald-50/50 rounded-xl p-5 border border-emerald-200 flex flex-col justify-between">
+                    <div>
+                        <span class="inline-block px-2.5 py-0.5 bg-emerald-100 text-emerald-800 text-xs font-bold rounded-full mb-2">มีคำตอบเดียว (Unique)</span>
+                        <h3 class="text-base font-bold text-slate-900 mb-2">$\operatorname{rank}(A) = \operatorname{rank}([A \mid \mathbf{b}]) = n$</h3>
+                        <p class="text-xs text-slate-600 leading-relaxed">
+                            จำนวนตัวแปรหลัก (Leading variables) เท่ากับจำนวนตัวแปรทั้งหมดพอดี จึงไม่มีตัวแปรอิสระ ($n - r = 0$)
+                        </p>
+                    </div>
+                    <div class="mt-4 pt-2 border-t border-emerald-200 text-xs text-emerald-700 font-semibold text-center">
+                        คำตอบเดียว : Unique Solution
+                    </div>
+                </div>
+
+                <!-- คำตอบอนันต์ -->
+                <div class="bg-indigo-50/50 rounded-xl p-5 border border-indigo-200 flex flex-col justify-between">
+                    <div>
+                        <span class="inline-block px-2.5 py-0.5 bg-indigo-100 text-indigo-800 text-xs font-bold rounded-full mb-2">มีคำตอบอนันต์ (Infinite)</span>
+                        <h3 class="text-base font-bold text-slate-900 mb-2">$\operatorname{rank}(A) = \operatorname{rank}([A \mid \mathbf{b}]) = r < n$</h3>
+                        <p class="text-xs text-slate-600 leading-relaxed">
+                            ระบบมีความสอดคล้อง แต่มีจำนวนตัวแปรหลักน้อยกว่าตัวแปรทั้งหมด เกิดตัวแปรอิสระ (Free variables) จำนวน $n - r$ ตัว
+                        </p>
+                    </div>
+                    <div class="mt-4 pt-2 border-t border-indigo-200 text-xs text-indigo-700 font-semibold text-center">
+                        คำตอบอนันต์ : พารามิเตอร์ $n - r$ มิติ
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 text-xs sm:text-sm text-slate-700 leading-relaxed">
+                <strong>ความสัมพันธ์ระดับมหาวิทยาลัย:</strong> อันดับ (Rank) คือมิติของปริภูมิคอลัมน์ (Column Space) หรือจำนวนสมาชิกนำหนึ่งใน Row Echelon Form การที่เวกเตอร์ $\mathbf{b}$ อยู่ในปริภูมิคอลัมน์ของ $A$ พอดีจะทำให้อันดับไม่เพิ่มขึ้น ส่งผลให้ระบบสอดคล้อง และขนาดมิติของเซตผลเฉลยคือ $n - \operatorname{rank}(A)$ เสมอ
+            </div>
+        </section>
+
+        <!-- 3. แบบจำลองโต้ตอบ -->
+        <section class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 space-y-6">
+            <h2 class="text-lg font-bold text-slate-900 flex items-center gap-2">
+                <span class="w-2.5 h-2.5 rounded-full bg-violet-600"></span> 3. แบบจำลองโต้ตอบ (Interactive Rank & Echelon Simulator)
+            </h2>
+            <p class="text-sm text-slate-600">
+                ปรับเปลี่ยนค่าสมาชิกในเมทริกซ์แต่งเติม $[A \mid \mathbf{b}]$ (ระบบ 3 สมการ 3 ตัวแปร) ระบบจะลดรูปเป็นเมทริกซ์ขั้นบันได (REF) คำนวณอันดับ และจำแนกประเภทคำตอบทันที
+            </p>
+
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+                <!-- แผงป้อนข้อมูล -->
+                <div class="lg:col-span-5 bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-4">
+                    <div class="flex justify-between items-center">
+                        <span class="text-xs font-bold uppercase tracking-wider text-slate-600">เมทริกซ์แต่งเติม $[A \mid \mathbf{b}]$ ($n = 3$)</span>
+                        <button onclick="setCase(1)" class="text-xs text-indigo-600 hover:underline">รีเซ็ต</button>
+                    </div>
+
+                    <div class="grid grid-cols-4 gap-2 text-center text-xs font-semibold">
+                        <span>$x_1$</span><span>$x_2$</span><span>$x_3$</span><span class="text-indigo-700">$\mathbf{b}$</span>
+                    </div>
+
+                    <!-- แถวที่ 1 -->
+                    <div class="grid grid-cols-4 gap-2">
+                        <input id="m00" type="number" value="1" step="1" class="p-2 border rounded text-center text-sm bg-white" oninput="analyzeSystem()">
+                        <input id="m01" type="number" value="1" step="1" class="p-2 border rounded text-center text-sm bg-white" oninput="analyzeSystem()">
+                        <input id="m02" type="number" value="1" step="1" class="p-2 border rounded text-center text-sm bg-white" oninput="analyzeSystem()">
+                        <input id="mb0" type="number" value="3" step="1" class="p-2 border-2 border-indigo-200 rounded text-center text-sm bg-indigo-50 font-bold" oninput="analyzeSystem()">
+                    </div>
+                    <!-- แถวที่ 2 -->
+                    <div class="grid grid-cols-4 gap-2">
+                        <input id="m10" type="number" value="0" step="1" class="p-2 border rounded text-center text-sm bg-white" oninput="analyzeSystem()">
+                        <input id="m11" type="number" value="1" step="1" class="p-2 border rounded text-center text-sm bg-white" oninput="analyzeSystem()">
+                        <input id="m12" type="number" value="2" step="1" class="p-2 border rounded text-center text-sm bg-white" oninput="analyzeSystem()">
+                        <input id="mb1" type="number" value="4" step="1" class="p-2 border-2 border-indigo-200 rounded text-center text-sm bg-indigo-50 font-bold" oninput="analyzeSystem()">
+                    </div>
+                    <!-- แถวที่ 3 -->
+                    <div class="grid grid-cols-4 gap-2">
+                        <input id="m20" type="number" value="1" step="1" class="p-2 border rounded text-center text-sm bg-white" oninput="analyzeSystem()">
+                        <input id="m21" type="number" value="2" step="1" class="p-2 border rounded text-center text-sm bg-white" oninput="analyzeSystem()">
+                        <input id="m22" type="number" value="3" step="1" class="p-2 border rounded text-center text-sm bg-white" oninput="analyzeSystem()">
+                        <input id="mb2" type="number" value="7" step="1" class="p-2 border-2 border-indigo-200 rounded text-center text-sm bg-indigo-50 font-bold" oninput="analyzeSystem()">
+                    </div>
+
+                    <!-- ปุ่ม Preset ตัวอย่าง -->
+                    <div class="pt-3 border-t border-slate-200">
+                        <span class="block text-xs font-semibold text-slate-600 mb-2">ทดสอบกรณีตัวอย่างจำลอง:</span>
+                        <div class="flex flex-col gap-2 text-xs">
+                            <button onclick="setCase(1)" class="w-full text-left px-3 py-1.5 bg-white border border-slate-300 rounded hover:bg-slate-100 flex justify-between">
+                                <span>กรณีคำตอบเดียว: $\operatorname{rank}=3, n=3$</span>
+                                <span class="text-emerald-600 font-bold">Unique</span>
+                            </button>
+                            <button onclick="setCase(2)" class="w-full text-left px-3 py-1.5 bg-white border border-slate-300 rounded hover:bg-slate-100 flex justify-between">
+                                <span>กรณีคำตอบอนันต์: $\operatorname{rank}=2, n=3$</span>
+                                <span class="text-indigo-600 font-bold">Infinite</span>
+                            </button>
+                            <button onclick="setCase(3)" class="w-full text-left px-3 py-1.5 bg-white border border-slate-300 rounded hover:bg-slate-100 flex justify-between">
+                                <span>กรณีไม่มีคำตอบ: $\operatorname{rank}(A)=2 \neq \operatorname{rank}([A\mid\mathbf{b}])=3$</span>
+                                <span class="text-rose-600 font-bold">None</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- การแสดงผลอันดับและการวิเคราะห์ -->
+                <div class="lg:col-span-7 bg-slate-50 p-5 rounded-xl border border-slate-200 space-y-4">
+                    <div class="flex justify-between items-center">
+                        <span class="text-sm font-bold text-slate-800">ผลการวิเคราะห์อันดับและเมทริกซ์ขั้นบันได</span>
+                        <span id="rank-badge" class="text-xs px-2.5 py-1 rounded-full font-bold"></span>
+                    </div>
+
+                    <!-- เมทริกซ์รูปขั้นบันได -->
+                    <div class="bg-white p-3 rounded-lg border border-slate-200 space-y-1">
+                        <div class="text-xs font-semibold text-slate-500">เมทริกซ์แต่งเติมในรูปขั้นบันได (Row Echelon Form):</div>
+                        <div id="ref-matrix-display" class="py-1 text-center text-sm"></div>
+                    </div>
+
+                    <!-- ค่าอันดับที่ได้ -->
+                    <div class="grid grid-cols-2 gap-3">
+                        <div class="bg-white p-3 rounded-lg border border-slate-200 text-center">
+                            <div class="text-xs text-slate-500">$\operatorname{rank}(A)$</div>
+                            <div id="rankA-val" class="text-xl font-bold text-slate-800 mt-1">-</div>
+                        </div>
+                        <div class="bg-white p-3 rounded-lg border border-slate-200 text-center">
+                            <div class="text-xs text-slate-500">$\operatorname{rank}([A \mid \mathbf{b}])$</div>
+                            <div id="rankAb-val" class="text-xl font-bold text-slate-800 mt-1">-</div>
+                        </div>
+                    </div>
+
+                    <!-- สรุปผลลัพธ์ -->
+                    <div id="conclusion-box" class="p-3.5 rounded-lg border text-sm leading-relaxed"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 4. คำถามนำเพื่อค้นพบ -->
+        <section class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 space-y-4">
+            <h2 class="text-lg font-bold text-slate-900 flex items-center gap-2">
+                <span class="w-2.5 h-2.5 rounded-full bg-amber-500"></span> 4. คำถามนำเพื่อค้นพบ
+            </h2>
+            <div class="space-y-3">
+                <details class="group border border-slate-200 rounded-lg p-3 bg-slate-50">
+                    <summary class="font-medium text-slate-800 cursor-pointer flex justify-between items-center text-sm sm:text-base">
+                        <span>1. เพราะเหตุใดอันดับของเมทริกซ์แต่งเติม $\operatorname{rank}([A \mid \mathbf{b}])$ จึงอาจมากกว่าอันดับของเมทริกซ์สัมประสิทธิ์ $\operatorname{rank}(A)$?</span>
+                        <span class="text-slate-400 group-open:rotate-180 transition-transform">▼</span>
+                    </summary>
+                    <div class="mt-2 text-sm text-slate-600 pt-2 border-t border-slate-200 leading-relaxed">
+                        เมทริกซ์ $[A \mid \mathbf{b}]$ มีคอลัมน์ของเวกเตอร์ $\mathbf{b}$ เพิ่มเข้ามาอีกหนึ่งคอลัมน์ หากเวกเตอร์ $\mathbf{b}$ <strong>ไม่สามารถเขียนในรูปผลรวมเชิงเส้น (Linear Combination)</strong> ของคอลัมน์ใน $A$ ได้ (กล่าวคือ $\mathbf{b} \notin \operatorname{Col}(A)$) เวกเตอร์ $\mathbf{b}$ จะมีความเป็นอิสระเชิงเส้นเพิ่มขึ้น ทำให้อันดับของเมทริกซ์แต่งเติมสูงกว่าอันดับของ $A$ ขึ้นไป 1 อันดับเสมอ ส่งผลให้เกิดแถวขัดแย้ง $[0 \ \dots \ 0 \mid c]$ และทำให้ระบบไม่มีคำตอบ
+                    </div>
+                </details>
+
+                <details class="group border border-slate-200 rounded-lg p-3 bg-slate-50">
+                    <summary class="font-medium text-slate-800 cursor-pointer flex justify-between items-center text-sm sm:text-base">
+                        <span>2. อันดับของเมทริกซ์สัมพันธ์กับจำนวนตัวแปรอิสระ (Free Variables) อย่างไร?</span>
+                        <span class="text-slate-400 group-open:rotate-180 transition-transform">▼</span>
+                    </summary>
+                    <div class="mt-2 text-sm text-slate-600 pt-2 border-t border-slate-200 leading-relaxed">
+                        อันดับ $r = \operatorname{rank}(A)$ สื่อถึง<strong>จำนวนตัวแปรหลัก (Leading/Pivot variables)</strong> ที่สามารถถูกกำหนดค่าได้จากตัวแปรอื่น ดังนั้น เมื่อระบบมี $n$ ตัวแปร จำนวนตัวแปรอิสระที่เหลือจะมีค่าเท่ากับ:
+                        <div class="text-center my-2 font-mono font-bold text-indigo-700">จำนวนตัวแปรอิสระ = n - rank(A)</div>
+                        หาก $n - r > 0$ เราจะสามารถกำหนดตัวแปรเสริม (Parameters เช่น $s, t \in \mathbb{R}$) ให้กับตัวแปรอิสระ ทำให้เกิดชุดคำตอบอนันต์
+                    </div>
+                </details>
+            </div>
+        </section>
+
+        <!-- 5. แบบฝึกหัดสำหรับนักศึกษา -->
+        <section class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 space-y-5">
+            <h2 class="text-lg font-bold text-slate-900 flex items-center gap-2">
+                <span class="w-2.5 h-2.5 rounded-full bg-indigo-600"></span> 5. แบบฝึกหัดสำหรับนักศึกษา
+            </h2>
+            <p class="text-sm text-slate-600">
+                จงวิเคราะห์ระบบสมการต่อไปนี้<strong>โดยไม่ต้องหาคำตอบทั้งหมด</strong> โดยใช้วิธีหาอันดับของเมทริกซ์สัมประสิทธิ์ $\operatorname{rank}(A)$ และเมทริกซ์แต่งเติม $\operatorname{rank}([A \mid \mathbf{b}])$:
+            </p>
+
+            <div class="border border-slate-200 rounded-xl p-5 bg-slate-50 space-y-4">
+                <div class="text-center text-base">
+                    $$\begin{cases}
+                    x_1 - 2x_2 + x_3 = 1 \\
+                    2x_1 - 4x_2 + 2x_3 = 5 \\
+                    -x_1 + 2x_2 - x_3 = 3
+                    \end{cases}$$
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
+                    <div class="bg-white p-4 rounded-lg border border-slate-200 text-xs text-slate-600 space-y-2">
+                        <span class="font-bold text-slate-800 block text-sm">คำชี้แจงการวิเคราะห์:</span>
+                        <p>1. เขียนเมทริกซ์แต่งเติม $[A \mid \mathbf{b}]$ ขนาด $3 \times 4$</p>
+                        <p>2. ใช้การดำเนินการตามแถวขั้นมูลฐาน (Row Operations) ปรับให้อยู่ในรูปขั้นบันได</p>
+                        <p>3. นับจำนวนแถวที่ไม่ใช่ศูนย์เพื่อหา $\operatorname{rank}(A)$ และ $\operatorname{rank}([A \mid \mathbf{b}])$</p>
+                    </div>
+
+                    <div class="bg-white p-4 rounded-lg border border-slate-200 text-xs text-slate-600 space-y-2">
+                        <span class="font-bold text-slate-800 block text-sm">การสรุปผลเชิงทฤษฎี:</span>
+                        <p class="leading-relaxed">
+                            เปรียบเทียบอันดับทั้งสอง หากเท่ากันให้พิจารณาเทียบกับ $n=3$ เพื่อสรุปว่าไม่มีคำตอบ คำตอบเดียว หรือคำตอบอนันต์
+                        </p>
+                    </div>
+                </div>
+
+                <details class="text-xs bg-white p-3 rounded-lg border border-slate-200">
+                    <summary class="cursor-pointer text-indigo-600 font-semibold">คลิกเพื่อดูแนวคิดและเฉลยละเอียด</summary>
+                    <div class="mt-3 text-slate-700 space-y-2 pt-2 border-t border-slate-100">
+                        <div><strong>1. เมทริกซ์แต่งเติมและรูปขั้นบันได:</strong></div>
+                        <div class="pl-3">
+                            $$[A \mid \mathbf{b}] = \begin{bmatrix} 1 & -2 & 1 & 1 \\ 2 & -4 & 2 & 5 \\ -1 & 2 & -1 & 3 \end{bmatrix} \xrightarrow{R_2 - 2R_1, \ R_3 + R_1} \begin{bmatrix} 1 & -2 & 1 & 1 \\ 0 & 0 & 0 & 3 \\ 0 & 0 & 0 & 4 \end{bmatrix} \xrightarrow{R_3 - \frac{4}{3}R_2} \begin{bmatrix} 1 & -2 & 1 & 1 \\ 0 & 0 & 0 & 3 \\ 0 & 0 & 0 & 0 \end{bmatrix}$$
+                        </div>
+                        <div><strong>2. การนับอันดับ:</strong></div>
+                        <div class="pl-3">
+                            • เมทริกซ์สัมประสิทธิ์ $A$ มีแถวที่ไม่เป็นศูนย์เพียง 1 แถว $\implies \operatorname{rank}(A) = 1$<br>
+                            • เมทริกซ์แต่งเติม $[A \mid \mathbf{b}]$ มีแถวที่ไม่เป็นศูนย์ 2 แถว $\implies \operatorname{rank}([A \mid \mathbf{b}]) = 2$
+                        </div>
+                        <div class="mt-2 text-rose-700 font-bold">
+                            <strong>สรุป:</strong> เนื่องจาก $\operatorname{rank}(A) = 1 \neq \operatorname{rank}([A \mid \mathbf{b}]) = 2$ ตามทฤษฎีบทรูเช-กาเปลลี ระบบสมการนี้ <u>ไม่มีคำตอบ (Inconsistent)</u> โดยสังเกตได้จากแถวที่ 2 ที่ให้สมการ $0x_1 + 0x_2 + 0x_3 = 3$ ซึ่งขัดแย้งในตัวเอง
+                        </div>
+                    </div>
+                </details>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Script สำหรับ KaTeX และ Interactive Matrix Rank Analysis -->
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            renderMathInElement(document.body, {
+                delimiters: [
+                    {left: "$$", right: "$$", display: true},
+                    {left: "\\[", right: "\\]", display: true},
+                    {left: "$", right: "$", display: false},
+                    {left: "\\(", right: "\\)", display: false}
+                ],
+                throwOnError: false
+            });
+            analyzeSystem();
+        });
+
+        // ฟังก์ชันตั้งค่า Preset ตัวอย่าง 3 แบบ
+        function setCase(type) {
+            if (type === 1) {
+                // คำตอบเดียว (rank A = rank Ab = 3, n=3)
+                setInputs([
+                    [1, 1, 1, 3],
+                    [0, 1, 2, 3],
+                    [2, 1, 0, 3]
+                ]);
+            } else if (type === 2) {
+                // คำตอบอนันต์ (rank A = rank Ab = 2, n=3)
+                setInputs([
+                    [1, 1, 1, 3],
+                    [0, 1, 2, 4],
+                    [1, 2, 3, 7]
+                ]);
+            } else if (type === 3) {
+                // ไม่มีคำตอบ (rank A = 2, rank Ab = 3)
+                setInputs([
+                    [1, 1, 1, 3],
+                    [0, 1, 2, 4],
+                    [1, 2, 3, 9]
+                ]);
+            }
+            analyzeSystem();
+        }
+
+        function setInputs(matrix) {
+            for (let i = 0; i < 3; i++) {
+                document.getElementById(`m${i}0`).value = matrix[i][0];
+                document.getElementById(`m${i}1`).value = matrix[i][1];
+                document.getElementById(`m${i}2`).value = matrix[i][2];
+                document.getElementById(`mb${i}`).value = matrix[i][3];
+            }
+        }
+
+        function analyzeSystem() {
+            // อ่านค่าเมทริกซ์ 3x4
+            let mat = [];
+            for (let i = 0; i < 3; i++) {
+                let row = [
+                    parseFloat(document.getElementById(`m${i}0`).value) || 0,
+                    parseFloat(document.getElementById(`m${i}1`).value) || 0,
+                    parseFloat(document.getElementById(`m${i}2`).value) || 0,
+                    parseFloat(document.getElementById(`mb${i}`).value) || 0
+                ];
+                mat.push(row);
+            }
+
+            // คำนวณ Row Echelon Form แบบจำลองตัวเลข
+            let echelon = mat.map(r => [...r]);
+            const rows = 3;
+            const cols = 4;
+            let lead = 0;
+
+            for (let r = 0; r < rows; r++) {
+                if (lead >= cols) break;
+                let i = r;
+                while (Math.abs(echelon[i][lead]) < 1e-7) {
+                    i++;
+                    if (i === rows) {
+                        i = r;
+                        lead++;
+                        if (lead === cols) break;
+                    }
+                }
+                if (lead >= cols) break;
+
+                // สลับแถว
+                let temp = echelon[i];
+                echelon[i] = echelon[r];
+                echelon[r] = temp;
+
+                let lv = echelon[r][lead];
+                if (Math.abs(lv) > 1e-7) {
+                    for (let j = 0; j < cols; j++) echelon[r][j] /= lv;
+                }
+
+                for (let k = 0; k < rows; k++) {
+                    if (k !== r) {
+                        let factor = echelon[k][lead];
+                        for (let j = 0; j < cols; j++) {
+                            echelon[k][j] -= factor * echelon[r][j];
+                        }
+                    }
+                }
+                lead++;
+            }
+
+            // ปรับเศษทศนิยมให้สะอาด
+            for (let r = 0; r < rows; r++) {
+                for (let c = 0; c < cols; c++) {
+                    if (Math.abs(echelon[r][c]) < 1e-6) echelon[r][c] = 0;
+                    else echelon[r][c] = Math.round(echelon[r][c] * 100) / 100;
+                }
+            }
+
+            // นับ Rank
+            let rankA = 0;
+            let rankAb = 0;
+            for (let r = 0; r < rows; r++) {
+                let nonZeroA = echelon[r].slice(0, 3).some(v => Math.abs(v) > 1e-6);
+                let nonZeroAb = echelon[r].some(v => Math.abs(v) > 1e-6);
+                if (nonZeroA) rankA++;
+                if (nonZeroAb) rankAb++;
+            }
+
+            // แสดง Echelon Matrix ในรูป LaTeX
+            const refDisplay = document.getElementById('ref-matrix-display');
+            const formatRow = (r) => `${echelon[r][0]} & ${echelon[r][1]} & ${echelon[r][2]} & \\big| & ${echelon[r][3]}`;
+            refDisplay.innerHTML = `$$\\begin{bmatrix} ${formatRow(0)} \\\\ ${formatRow(1)} \\\\ ${formatRow(2)} \\end{bmatrix}$$`;
+
+            document.getElementById('rankA-val').innerText = rankA;
+            document.getElementById('rankAb-val').innerText = rankAb;
+
+            const rankBadge = document.getElementById('rank-badge');
+            const conclusionBox = document.getElementById('conclusion-box');
+            const n = 3;
+
+            if (rankA < rankAb) {
+                rankBadge.className = "text-xs px-2.5 py-1 rounded-full font-bold bg-rose-100 text-rose-800";
+                rankBadge.innerText = "ไม่มีคำตอบ (Inconsistent)";
+                conclusionBox.className = "p-3.5 rounded-lg border text-sm bg-rose-50 text-rose-900 border-rose-200 leading-relaxed";
+                conclusionBox.innerHTML = `<strong>ผลการจำแนก: ไม่มีคำตอบ (No Solution)</strong><br>` +
+                                          `เนื่องจาก $\\operatorname{rank}(A) = ${rankA} < \\operatorname{rank}([A \\mid \\mathbf{b}]) = ${rankAb}$ เกิดแถวที่มีข้อขัดแย้งทางคณิตศาสตร์ในรูป $[0 \\ 0 \\ 0 \\mid c]$ ระบบจึงขัดแย้งกันเอง`;
+            } else if (rankA === rankAb && rankA === n) {
+                rankBadge.className = "text-xs px-2.5 py-1 rounded-full font-bold bg-emerald-100 text-emerald-800";
+                rankBadge.innerText = "คำตอบเดียว (Unique Solution)";
+                conclusionBox.className = "p-3.5 rounded-lg border text-sm bg-emerald-50 text-emerald-900 border-emerald-200 leading-relaxed";
+                conclusionBox.innerHTML = `<strong>ผลการจำแนก: มีคำตอบเพียงชุดเดียว (Unique Solution)</strong><br>` +
+                                          `เนื่องจาก $\\operatorname{rank}(A) = \\operatorname{rank}([A \\mid \\mathbf{b}]) = ${rankA} = n$ ตัวแปรทุกตัวเป็นตัวแปรหลัก (Leading Variables) จึงไม่มีตัวแปรอิสระ ($n - r = 0$)`;
+            } else {
+                const freeVars = n - rankA;
+                rankBadge.className = "text-xs px-2.5 py-1 rounded-full font-bold bg-indigo-100 text-indigo-800";
+                rankBadge.innerText = "คำตอบอนันต์ (Infinitely Many)";
+                conclusionBox.className = "p-3.5 rounded-lg border text-sm bg-indigo-50 text-indigo-900 border-indigo-200 leading-relaxed";
+                conclusionBox.innerHTML = `<strong>ผลการจำแนก: มีคำตอบอนันต์ (Infinitely Many Solutions)</strong><br>` +
+                                          `เนื่องจาก $\\operatorname{rank}(A) = \\operatorname{rank}([A \\mid \\mathbf{b}]) = ${rankA} < n (${n})$ ระบบมีความสอดคล้องแต่เกิดตัวแปรอิสระจำนวน $n - r = ${n} - ${rankA} = ${freeVars}$ ตัวแปร ทำให้เซตคำตอบเขียนในรูปพารามิเตอร์ได้`;
+            }
+
+            // เรนเดอร์ KaTeX
+            if (window.renderMathInElement) {
+                renderMathInElement(refDisplay, {delimiters: [{left: "$$", right: "$$", display: true}]});
+                renderMathInElement(conclusionBox, {delimiters: [{left: "$", right: "$", display: false}]});
+            }
+        }
+    </script>
+</body>
+</html>

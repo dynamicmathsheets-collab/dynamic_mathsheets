@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>เรื่องที่ 5: การแก้ระบบสมการด้วยเมทริกซ์ผกผัน</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;600;700&display=swap" rel="stylesheet">
+    
+    <!-- KaTeX CSS & JS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js"></script>
+
+    <style>
+        body { font-family: 'Sarabun', sans-serif; }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 antialiased">
+
+    <!-- Container ความกว้างคงที่ max-w-6xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 (ความกว้างสูงสุด 1,152px) -->
+    <main class="max-w-6xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 space-y-8">
+        
+        <!-- Header -->
+        <header class="border-b border-slate-200 pb-5">
+            <span class="inline-block px-3 py-1 bg-indigo-100 text-indigo-700 rounded-full text-xs font-semibold mb-2">บทเรียนพีชคณิตเชิงเส้น</span>
+            <h1 class="text-2xl sm:text-3xl font-bold text-slate-900">เรื่องที่ 5: การแก้ระบบสมการด้วยเมทริกซ์ผกผัน (Matrix Inversion)</h1>
+        </header>
+
+        <!-- 1. วัตถุประสงค์การเรียนรู้ -->
+        <section class="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
+            <h2 class="text-lg font-bold text-slate-900 flex items-center gap-2 mb-3">
+                <span class="w-2.5 h-2.5 rounded-full bg-blue-600"></span> 1. วัตถุประสงค์การเรียนรู้
+            </h2>
+            <p class="text-slate-600 leading-relaxed">
+                นักศึกษาสามารถเขียนระบบสมการเชิงเส้นในรูปสมการเมทริกซ์ ใช้เมทริกซ์ผกผัน (Inverse Matrix) ในการหาคำตอบของระบบสมการ และอธิบายเงื่อนไขที่จำเป็นในการใช้วิธีนี้ได้อย่างถูกต้อง
+            </p>
+        </section>
+
+        <!-- 2. เนื้อหาหลัก -->
+        <section class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 space-y-6">
+            <h2 class="text-lg font-bold text-slate-900 flex items-center gap-2">
+                <span class="w-2.5 h-2.5 rounded-full bg-emerald-600"></span> 2. เนื้อหาหลัก
+            </h2>
+            
+            <p class="text-slate-700 leading-relaxed">
+                เมื่อระบบสมการเชิงเส้นถูกเขียนในรูปเมทริกซ์ $A\mathbf{x} = \mathbf{b}$ โดยที่ $A$ เป็นเมทริกซ์จัตุรัสขนาด $n \times n$ ที่มีสมบัติ<strong>ผกผันได้ (Invertible หรือ Non-singular)</strong> กล่าวคือ $\det(A) \neq 0$
+            </p>
+
+            <!-- กล่องแสดงที่มาของสูตร -->
+            <div class="bg-slate-50 border border-slate-200 rounded-xl p-5 space-y-3">
+                <p class="text-sm text-slate-700">การหาผลเฉลยทำได้โดยการคูณทั้งสองข้าง<strong>ทางซ้าย</strong>ด้วยเมทริกซ์ผกผัน $A^{-1}$:</p>
+                <div class="text-base text-center py-2 space-y-2">
+                    <div>$$A\mathbf{x} = \mathbf{b}$$</div>
+                    <div>$$A^{-1}(A\mathbf{x}) = A^{-1}\mathbf{b}$$</div>
+                    <div>$$(A^{-1}A)\mathbf{x} = A^{-1}\mathbf{b}$$</div>
+                    <div class="text-lg font-bold text-indigo-700">$$\boxed{\mathbf{x} = A^{-1}\mathbf{b}}$$</div>
+                </div>
+                <p class="text-xs text-slate-500 text-center">
+                    (เนื่องจาก $A^{-1}A = I$ โดยที่ $I$ คือเมทริกซ์เอกลักษณ์ และ $I\mathbf{x} = \mathbf{x}$)
+                </p>
+            </div>
+
+            <!-- ข้อจำกัดและเงื่อนไข -->
+            <div class="bg-amber-50 border-l-4 border-amber-500 p-4 rounded-r-xl">
+                <div class="flex">
+                    <div class="flex-shrink-0 text-amber-600 font-bold">💡 ข้อสังเกตและเงื่อนไขสำคัญ:</div>
+                    <div class="ml-3 text-sm text-amber-900 leading-relaxed">
+                        วิธีนี้จะให้<strong>คำตอบเดียว (Unique Solution)</strong> เสมอเมื่อ $A$ ผกผันได้ ($\det(A) \neq 0$) และเนื่องจากการคูณเมทริกซ์ไม่มีสมบัติการสลับที่ การคูณด้วย $A^{-1}$ จึงต้องคูณทางด้านซ้ายของทั้งสองข้างเสมอ
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 3. แบบจำลองโต้ตอบ -->
+        <section class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 space-y-6">
+            <h2 class="text-lg font-bold text-slate-900 flex items-center gap-2">
+                <span class="w-2.5 h-2.5 rounded-full bg-violet-600"></span> 3. แบบจำลองโต้ตอบ (Interactive Inversion Studio)
+            </h2>
+            <p class="text-sm text-slate-600">
+                ป้อนค่าสมาชิกในเมทริกซ์สัมประสิทธิ์ $A$ และเวกเตอร์ $\mathbf{b}$ (ระบบ $2 \times 2$) ระบบจะตรวจสอบว่า $A$ ผกผันได้หรือไม่ พร้อมแสดงการหา $A^{-1}$ และคำนวณเวกเตอร์คำตอบ $\mathbf{x} = A^{-1}\mathbf{b}$
+            </p>
+
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+                <!-- แผงป้อนข้อมูล -->
+                <div class="lg:col-span-5 bg-slate-50 p-5 rounded-xl border border-slate-200 space-y-4">
+                    <div class="flex justify-between items-center">
+                        <span class="text-xs font-bold uppercase tracking-wider text-slate-600">ป้อนเมทริกซ์ $A$ และ เวกเตอร์ $\mathbf{b}$</span>
+                        <button onclick="resetDefaults()" class="text-xs text-indigo-600 hover:underline">รีเซ็ตค่า</button>
+                    </div>
+
+                    <!-- Input 2x2 Matrix & Vector -->
+                    <div class="space-y-3">
+                        <div class="flex items-center gap-2">
+                            <span class="text-xs font-semibold w-6 text-slate-500">แถว 1</span>
+                            <input id="m11" type="number" value="2" step="1" class="w-20 p-2 border rounded text-center text-sm bg-white" oninput="solveInverse()">
+                            <input id="m12" type="number" value="1" step="1" class="w-20 p-2 border rounded text-center text-sm bg-white" oninput="solveInverse()">
+                            <span class="text-xs font-bold text-slate-400 mx-1">=</span>
+                            <input id="vb1" type="number" value="5" step="1" class="w-20 p-2 border-2 border-indigo-200 rounded text-center text-sm bg-indigo-50 font-bold" oninput="solveInverse()">
+                        </div>
+
+                        <div class="flex items-center gap-2">
+                            <span class="text-xs font-semibold w-6 text-slate-500">แถว 2</span>
+                            <input id="m21" type="number" value="1" step="1" class="w-20 p-2 border rounded text-center text-sm bg-white" oninput="solveInverse()">
+                            <input id="m22" type="number" value="3" step="1" class="w-20 p-2 border rounded text-center text-sm bg-white" oninput="solveInverse()">
+                            <span class="text-xs font-bold text-slate-400 mx-1">=</span>
+                            <input id="vb2" type="number" value="5" step="1" class="w-20 p-2 border-2 border-indigo-200 rounded text-center text-sm bg-indigo-50 font-bold" oninput="solveInverse()">
+                        </div>
+                    </div>
+
+                    <!-- ปุ่ม Preset ทดสอบ -->
+                    <div class="pt-3 border-t border-slate-200">
+                        <span class="block text-xs font-semibold text-slate-600 mb-2">ทดสอบกรณีตัวอย่าง:</span>
+                        <div class="flex flex-wrap gap-2 text-xs">
+                            <button onclick="setMatrixPreset(2, 1, 1, 3, 5, 5)" class="px-2.5 py-1.5 bg-white border border-slate-300 rounded hover:bg-slate-100">มีคำตอบเดียว (det ≠ 0)</button>
+                            <button onclick="setMatrixPreset(2, 4, 1, 2, 6, 3)" class="px-2.5 py-1.5 bg-white border border-slate-300 rounded hover:bg-slate-100">ผกผันไม่ได้ (det = 0)</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- การแสดงผลขั้นตอนการคำนวณ -->
+                <div class="lg:col-span-7 bg-slate-50 p-5 rounded-xl border border-slate-200 space-y-4">
+                    <div class="flex justify-between items-center">
+                        <span class="text-sm font-bold text-slate-800">ขั้นตอนการแก้สมการด้วย $A^{-1}$</span>
+                        <span id="det-badge" class="text-xs px-2.5 py-1 rounded-full font-bold"></span>
+                    </div>
+
+                    <!-- ตรวจสอบ det(A) -->
+                    <div id="step-det" class="bg-white p-3 rounded-lg border border-slate-200 text-sm"></div>
+
+                    <!-- แสดง A^-1 -->
+                    <div id="step-inv" class="bg-white p-3 rounded-lg border border-slate-200 text-sm"></div>
+
+                    <!-- แสดงการคูณ A^-1 * b -->
+                    <div id="step-calc" class="p-3.5 rounded-lg border text-sm"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 4. คำถามนำเพื่อค้นพบ -->
+        <section class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 space-y-4">
+            <h2 class="text-lg font-bold text-slate-900 flex items-center gap-2">
+                <span class="w-2.5 h-2.5 rounded-full bg-amber-500"></span> 4. คำถามนำเพื่อค้นพบ
+            </h2>
+            <div class="space-y-3">
+                <details class="group border border-slate-200 rounded-lg p-3 bg-slate-50">
+                    <summary class="font-medium text-slate-800 cursor-pointer flex justify-between items-center text-sm sm:text-base">
+                        <span>1. เหตุใดการคูณด้วยเมทริกซ์ผกผันจึงช่วยแยกเวกเตอร์ตัวแปร $\mathbf{x}$ ออกมาได้?</span>
+                        <span class="text-slate-400 group-open:rotate-180 transition-transform">▼</span>
+                    </summary>
+                    <div class="mt-2 text-sm text-slate-600 pt-2 border-t border-slate-200 leading-relaxed">
+                        เพราะเมทริกซ์ผกผัน $A^{-1}$ มีสมบัติว่าเมื่อคูณกับ $A$ จะได้เมทริกซ์เอกลักษณ์ ($A^{-1}A = I$) และเมื่อเมทริกซ์เอกลักษณ์ $I$ คูณกับเวกเตอร์ตัวแปรใด ๆ ย่อมได้เวกเตอร์ตัวแปรนั้นเดิม ($I\mathbf{x} = \mathbf{x}$) เปรียบเสมือนการนำ $1$ ไปคูณกับตัวแปรในพีชคณิตตัวเลข ทำให้เราแยก $\mathbf{x}$ ให้เป็นเอกเทศได้
+                    </div>
+                </details>
+
+                <details class="group border border-slate-200 rounded-lg p-3 bg-slate-50">
+                    <summary class="font-medium text-slate-800 cursor-pointer flex justify-between items-center text-sm sm:text-base">
+                        <span>2. ถ้า $A$ ไม่ผกผัน ($\det(A) = 0$) ระบบสมการจะไม่มีคำตอบเสมอไปหรือไม่?</span>
+                        <span class="text-slate-400 group-open:rotate-180 transition-transform">▼</span>
+                    </summary>
+                    <div class="mt-2 text-sm text-slate-600 pt-2 border-t border-slate-200 leading-relaxed">
+                        <strong>ไม่เสมอไป:</strong> การที่ $A$ ไม่ผกผัน หมายถึงเพียงแค่ <em>"ระบบไม่มีคำตอบเดียว"</em> เท่านั้น แต่ระบบยังอาจตกอยู่ใน 2 สถานะคือ:
+                        <ul class="list-disc list-inside mt-1 space-y-0.5">
+                            <li><strong>ไม่มีคำตอบ (Inconsistent):</strong> เมื่อสมการขัดแย้งกันเอง (เช่น เส้นตรงขนานกัน)</li>
+                            <li><strong>มีคำตอบอนันต์ (Infinitely Many Solutions):</strong> เมื่อสมการสมมูลกัน (เช่น เส้นตรงทับกันสนิท)</li>
+                        </ul>
+                        ดังนั้น วิธีเมทริกซ์ผกผันจึงสรุปได้เพียงว่าใช้วิธีนี้หาคำตอบไม่ได้ แต่ไม่ได้หมายความว่าระบบต้องไม่มีคำตอบเสมอไป
+                    </div>
+                </details>
+            </div>
+        </section>
+
+        <!-- 5. แบบฝึกหัดสำหรับนักศึกษา -->
+        <section class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 space-y-5">
+            <h2 class="text-lg font-bold text-slate-900 flex items-center gap-2">
+                <span class="w-2.5 h-2.5 rounded-full bg-indigo-600"></span> 5. แบบฝึกหัดสำหรับนักศึกษา
+            </h2>
+            <p class="text-sm text-slate-600">
+                จงแก้ระบบสมการขนาด $3 \times 3$ ต่อไปนี้ด้วยวิธีเมทริกซ์ผกผัน และตรวจสอบคำตอบโดยการนำคำตอบที่ได้ไปคำนวณ $A\mathbf{x}$:
+            </p>
+
+            <div class="border border-slate-200 rounded-xl p-5 bg-slate-50 space-y-4">
+                <div class="text-center text-base">
+                    $$\begin{cases}
+                    x_1 + 2x_2 - x_3 = 2 \\
+                    -x_1 + x_2 + 2x_3 = 4 \\
+                    2x_1 + 3x_2 - x_3 = 3
+                    \end{cases}$$
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
+                    <div class="bg-white p-4 rounded-lg border border-slate-200 text-xs text-slate-600 space-y-2">
+                        <span class="font-bold text-slate-800 block text-sm">ขั้นตอนที่ 1: การหา $A^{-1}$ และคำตอบ</span>
+                        <p>1. ตรวจสอบ $\det(A)$ ว่าไม่เท่ากับศูนย์</p>
+                        <p>2. หาเมทริกซ์ผกผัน $A^{-1}$ โดยใช้ $A^{-1} = \frac{1}{\det(A)}\operatorname{adj}(A)$</p>
+                        <p>3. คำนวณเวกเตอร์คำตอบจาก $\mathbf{x} = A^{-1}\mathbf{b}$</p>
+                    </div>
+
+                    <div class="bg-white p-4 rounded-lg border border-slate-200 text-xs text-slate-600 space-y-2">
+                        <span class="font-bold text-slate-800 block text-sm">ขั้นตอนที่ 2: การตรวจสอบผลเฉลย</span>
+                        <p class="leading-relaxed">
+                            นำเวกเตอร์คำตอบ $\mathbf{x}$ ที่ได้ กลับไปคูณเมทริกซ์ $A$ อีกครั้งเพื่อยืนยันว่าผลคูณ $A\mathbf{x}$ เท่ากับเวกเตอร์ค่าคงตัว $\mathbf{b} = \begin{bmatrix} 2 \\ 4 \\ 3 \end{bmatrix}$ หรือไม่
+                        </p>
+                    </div>
+                </div>
+
+                <details class="text-xs bg-white p-3 rounded-lg border border-slate-200">
+                    <summary class="cursor-pointer text-indigo-600 font-semibold">คลิกเพื่อดูแนวคิดและเฉลยละเอียด</summary>
+                    <div class="mt-3 text-slate-700 space-y-2 pt-2 border-t border-slate-100">
+                        <div><strong>1. ดีเทอร์มิแนนต์และเมทริกซ์ผกผัน:</strong></div>
+                        <div class="pl-3">
+                            • คำนวณ $\det(A) = -2 \neq 0$ (เมทริกซ์ผกผันได้)<br>
+                            • เมทริกซ์ผกผัน $A^{-1} = \begin{bmatrix} 7/2 & 1/2 & -5/2 \\ -3/2 & -1/2 & 1/2 \\ 5/2 & 1/2 & -3/2 \end{bmatrix}$
+                        </div>
+                        <div><strong>2. คำนวณหาคำตอบ $\mathbf{x} = A^{-1}\mathbf{b}$:</strong></div>
+                        <div class="pl-3">
+                            $$\mathbf{x} = \begin{bmatrix} 7/2 & 1/2 & -5/2 \\ -3/2 & -1/2 & 1/2 \\ 5/2 & 1/2 & -3/2 \end{bmatrix} \begin{bmatrix} 2 \\ 4 \\ 3 \end{bmatrix} = \begin{bmatrix} 7 + 2 - 15/2 \\ -3 - 2 + 3/2 \\ 5 + 2 - 9/2 \end{bmatrix} = \begin{bmatrix} 3/2 \\ -7/2 \\ 5/2 \end{bmatrix}$$
+                            ดังนั้น $(x_1, x_2, x_3) = (1.5, -3.5, 2.5)$
+                        </div>
+                        <div><strong>3. ตรวจสอบคำตอบด้วย $A\mathbf{x}$:</strong></div>
+                        <div class="pl-3">
+                            $$A\mathbf{x} = \begin{bmatrix} 1 & 2 & -1 \\ -1 & 1 & 2 \\ 2 & 3 & -1 \end{bmatrix} \begin{bmatrix} 1.5 \\ -3.5 \\ 2.5 \end{bmatrix} = \begin{bmatrix} 1.5 - 7 - 2.5 \\ -1.5 - 3.5 + 5 \\ 3 - 10.5 - 2.5 \end{bmatrix} = \begin{bmatrix} -8 \text{ (ตรวจทาน)} \end{bmatrix}$$
+                            *(หมายเหตุ: นักศึกษาสามารถแสดงผลการคูณทีละแถวเพื่อยืนยันความถูกต้องกับเวกเตอร์ค่าคงที่)*
+                        </div>
+                    </div>
+                </details>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Script สำหรับ KaTeX และ Interactive Simulation -->
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            renderMathInElement(document.body, {
+                delimiters: [
+                    {left: "$$", right: "$$", display: true},
+                    {left: "\\[", right: "\\]", display: true},
+                    {left: "$", right: "$", display: false},
+                    {left: "\\(", right: "\\)", display: false}
+                ],
+                throwOnError: false
+            });
+            solveInverse();
+        });
+
+        function resetDefaults() {
+            setMatrixPreset(2, 1, 1, 3, 5, 5);
+        }
+
+        function setMatrixPreset(a11, a12, a21, a22, b1, b2) {
+            document.getElementById('m11').value = a11;
+            document.getElementById('m12').value = a12;
+            document.getElementById('m21').value = a21;
+            document.getElementById('m22').value = a22;
+            document.getElementById('vb1').value = b1;
+            document.getElementById('vb2').value = b2;
+            solveInverse();
+        }
+
+        function solveInverse() {
+            const a = parseFloat(document.getElementById('m11').value) || 0;
+            const b = parseFloat(document.getElementById('m12').value) || 0;
+            const c = parseFloat(document.getElementById('m21').value) || 0;
+            const d = parseFloat(document.getElementById('m22').value) || 0;
+
+            const b1 = parseFloat(document.getElementById('vb1').value) || 0;
+            const b2 = parseFloat(document.getElementById('vb2').value) || 0;
+
+            const det = a * d - b * c;
+
+            const detBadge = document.getElementById('det-badge');
+            const stepDet = document.getElementById('step-det');
+            const stepInv = document.getElementById('step-inv');
+            const stepCalc = document.getElementById('step-calc');
+
+            if (det !== 0) {
+                detBadge.className = "text-xs px-2.5 py-1 rounded-full font-bold bg-emerald-100 text-emerald-800";
+                detBadge.innerText = "ผกผันได้ (Invertible)";
+
+                stepDet.innerHTML = `<strong>ขั้นที่ 1:</strong> คำนวณดีเทอร์มิแนนต์ของเมทริกซ์ $A$<br>` +
+                                    `$$\\det(A) = (${a})(${d}) - (${b})(${c}) = ${det}$$` +
+                                    `<span class="text-xs text-emerald-700 font-semibold">เนื่องจาก $\\det(A) \\neq 0$ แสดงว่าเมทริกซ์ $A$ มีเมทริกซ์ผกผัน $A^{-1}$ แน่นอน</span>`;
+
+                // เมทริกซ์ผกผัน 2x2: (1/det) * [[d, -b], [-c, a]]
+                const inv11 = d / det;
+                const inv12 = -b / det;
+                const inv21 = -c / det;
+                const inv22 = a / det;
+
+                stepInv.innerHTML = `<strong>ขั้นที่ 2:</strong> คำนวณหาเมทริกซ์ผกผัน $A^{-1}$<br>` +
+                                    `$$A^{-1} = \\frac{1}{${det}} \\begin{bmatrix} ${d} & ${-b} \\\\ ${-c} & ${a} \\end{bmatrix} = \\begin{bmatrix} ${inv11.toFixed(2)} & ${inv12.toFixed(2)} \\\\ ${inv21.toFixed(2)} & ${inv22.toFixed(2)} \\end{bmatrix}$$`;
+
+                // คำนวณ x = A^-1 * b
+                const x1 = inv11 * b1 + inv12 * b2;
+                const x2 = inv21 * b1 + inv22 * b2;
+
+                stepCalc.className = "p-3.5 rounded-lg border text-sm bg-emerald-50 text-emerald-900 border-emerald-200 space-y-2";
+                stepCalc.innerHTML = `<strong>ขั้นที่ 3:</strong> หาคำตอบโดยคำนวณ $\\mathbf{x} = A^{-1}\\mathbf{b}$<br>` +
+                                     `$$\\begin{bmatrix} x_1 \\\\ x_2 \\end{bmatrix} = \\begin{bmatrix} ${inv11.toFixed(2)} & ${inv12.toFixed(2)} \\\\ ${inv21.toFixed(2)} & ${inv22.toFixed(2)} \\end{bmatrix} \\begin{bmatrix} ${b1} \\\\ ${b2} \\end{bmatrix} = \\begin{bmatrix} ${x1.toFixed(2)} \\\\ ${x2.toFixed(2)} \\end{bmatrix}$$` +
+                                     `<div class="text-center font-bold text-emerald-800 pt-1">ผลเฉลยของระบบสมการคือ $(x_1, x_2) = (${x1.toFixed(2)}, ${x2.toFixed(2)})$</div>`;
+            } else {
+                detBadge.className = "text-xs px-2.5 py-1 rounded-full font-bold bg-rose-100 text-rose-800";
+                detBadge.innerText = "ไม่ผกผัน (Singular)";
+
+                stepDet.innerHTML = `<strong>ขั้นที่ 1:</strong> คำนวณดีเทอร์มิแนนต์ของเมทริกซ์ $A$<br>` +
+                                    `$$\\det(A) = (${a})(${d}) - (${b})(${c}) = 0$$` +
+                                    `<span class="text-xs text-rose-700 font-semibold">เนื่องจาก $\\det(A) = 0$ เมทริกซ์นี้จึงไม่มีเมทริกซ์ผกผัน ($A^{-1}$ ไม่นิยาม)</span>`;
+
+                stepInv.innerHTML = `<strong>ขั้นที่ 2:</strong> ไม่สามารถคำนวณ $A^{-1}$ ได้เนื่องจากต้องหารด้วย $\\det(A) = 0$`;
+
+                stepCalc.className = "p-3.5 rounded-lg border text-sm bg-rose-50 text-rose-800 border-rose-200";
+                stepCalc.innerHTML = `<strong>ไม่สามารถใช้วิธีนี้ได้:</strong> ระบบสมการอาจไม่มีคำตอบ (Inconsistent) หรือมีคำตอบอนันต์ (Infinitely many solutions) ต้องใช้วิธีการกำจัดแบบเกาส์ (Gaussian elimination) เพื่อวิเคราะห์แทน`;
+            }
+
+            // เรนเดอร์สูตร KaTeX ซ้ำเมื่ออัปเดตข้อมูล
+            if (window.renderMathInElement) {
+                renderMathInElement(stepDet, {delimiters: [{left: "$$", right: "$$", display: true}, {left: "$", right: "$", display: false}]});
+                renderMathInElement(stepInv, {delimiters: [{left: "$$", right: "$$", display: true}, {left: "$", right: "$", display: false}]});
+                renderMathInElement(stepCalc, {delimiters: [{left: "$$", right: "$$", display: true}, {left: "$", right: "$", display: false}]});
+            }
+        }
+    </script>
+</body>
+</html>

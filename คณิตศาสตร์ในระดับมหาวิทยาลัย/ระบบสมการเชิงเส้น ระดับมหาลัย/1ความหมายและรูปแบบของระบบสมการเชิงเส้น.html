@@ -1,0 +1,621 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>เรื่องที่ 1: ความหมายและรูปแบบของระบบสมการเชิงเส้น</title>
+  
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- Google Fonts: Prompt & Sarabun -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Prompt:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=Sarabun:wght@300;400;500;600&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+  
+  <!-- KaTeX for high-performance math rendering -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js"></script>
+
+  <style>
+    body {
+      font-family: 'Sarabun', sans-serif;
+    }
+    h1, h2, h3, h4, .font-heading {
+      font-family: 'Prompt', sans-serif;
+    }
+    code, .font-mono {
+      font-family: 'Fira Code', monospace;
+    }
+    /* KaTeX display fix */
+    .katex-display {
+      margin: 0.6em 0 !important;
+      overflow-x: auto;
+      overflow-y: hidden;
+      padding: 4px 0;
+    }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-800 antialiased min-h-screen selection:bg-indigo-500 selection:text-white">
+
+  <!-- Main Container: กำหนดความกว้างคงที่เป๊ะตามโจทย์ -->
+  <main class="max-w-6xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 space-y-8">
+
+    <!-- Header Section -->
+    <header class="bg-gradient-to-br from-indigo-900 via-indigo-800 to-slate-900 text-white rounded-3xl p-6 sm:p-10 shadow-xl relative overflow-hidden border border-indigo-700/40">
+      <div class="absolute -right-12 -bottom-12 w-64 h-64 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none"></div>
+      <div class="relative z-10 space-y-3">
+        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-500/20 text-indigo-200 border border-indigo-400/30 text-xs sm:text-sm font-medium tracking-wide">
+          <span>พีชคณิตเชิงเส้น (Linear Algebra)</span>
+          <span>•</span>
+          <span>บทเรียนแบบมีปฏิสัมพันธ์</span>
+        </div>
+        <h1 class="text-2xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-white leading-tight">
+          เรื่องที่ 1: ความหมายและรูปแบบของระบบสมการเชิงเส้น
+        </h1>
+        <p class="text-indigo-200 text-sm sm:text-base max-w-3xl font-light leading-relaxed">
+          ทำความเข้าใจแก่นแท้ของระบบสมการเชิงเส้น โครงสร้างสัมประสิทธิ์ การแปลงรูปสู่สัญกรณ์เมทริกซ์มาตรฐาน และการจำแนกระบบสมการในมิติต่าง ๆ
+        </p>
+      </div>
+    </header>
+
+    <!-- 1. วัตถุประสงค์การเรียนรู้ -->
+    <section class="bg-white rounded-2xl p-6 sm:p-8 shadow-sm border border-slate-200/80 hover:shadow-md transition-shadow">
+      <div class="flex items-center gap-3 mb-5 border-b border-slate-100 pb-3">
+        <div class="w-8 h-8 rounded-lg bg-indigo-100 text-indigo-700 flex items-center justify-center font-bold text-lg">
+          1
+        </div>
+        <h2 class="text-xl sm:text-2xl font-bold text-slate-900">วัตถุประสงค์การเรียนรู้</h2>
+      </div>
+      <p class="text-sm sm:text-base text-slate-600 mb-4 font-medium">
+        เมื่อศึกษาและทำกิจกรรมในหัวข้อนี้แล้ว นักศึกษาสามารถ:
+      </p>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <!-- Objective 1 -->
+        <div class="flex items-start gap-3 p-4 rounded-xl bg-slate-50 border border-slate-200/60 hover:border-indigo-300 transition-colors">
+          <div class="mt-0.5 w-6 h-6 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center shrink-0">
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path></svg>
+          </div>
+          <span class="text-sm sm:text-base text-slate-700 font-medium leading-relaxed">
+            อธิบายความหมายและองค์ประกอบของระบบสมการเชิงเส้นได้
+          </span>
+        </div>
+        <!-- Objective 2 -->
+        <div class="flex items-start gap-3 p-4 rounded-xl bg-slate-50 border border-slate-200/60 hover:border-indigo-300 transition-colors">
+          <div class="mt-0.5 w-6 h-6 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center shrink-0">
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path></svg>
+          </div>
+          <span class="text-sm sm:text-base text-slate-700 font-medium leading-relaxed">
+            เขียนระบบสมการในรูปมาตรฐานและรูปเมทริกซ์ได้
+          </span>
+        </div>
+        <!-- Objective 3 -->
+        <div class="flex items-start gap-3 p-4 rounded-xl bg-slate-50 border border-slate-200/60 hover:border-indigo-300 transition-colors">
+          <div class="mt-0.5 w-6 h-6 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center shrink-0">
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path></svg>
+          </div>
+          <span class="text-sm sm:text-base text-slate-700 font-medium leading-relaxed">
+            จำแนกสมการเชิงเส้นออกจากสมการที่ไม่เป็นเชิงเส้นได้
+          </span>
+        </div>
+      </div>
+    </section>
+
+    <!-- 2. เนื้อหาหลัก -->
+    <section class="bg-white rounded-2xl p-6 sm:p-8 shadow-sm border border-slate-200/80 space-y-6">
+      <div class="flex items-center gap-3 border-b border-slate-100 pb-3">
+        <div class="w-8 h-8 rounded-lg bg-indigo-100 text-indigo-700 flex items-center justify-center font-bold text-lg">
+          2
+        </div>
+        <h2 class="text-xl sm:text-2xl font-bold text-slate-900">เนื้อหาหลัก (Core Content)</h2>
+      </div>
+
+      <!-- นิยามและสมการทั่วไป -->
+      <div class="space-y-3">
+        <h3 class="text-lg font-semibold text-slate-800">2.1 ระบบสมการเชิงเส้น $m$ สมการที่มีตัวแปร $n$ ตัว</h3>
+        <p class="text-slate-600 leading-relaxed text-sm sm:text-base">
+          ระบบสมการเชิงเส้น (System of Linear Equations) คือกลุ่มของสมการเชิงเส้นที่พิจารณาร่วมกัน โดยระบบที่มี $m$ สมการ และ $n$ ตัวแปร ($x_1, x_2, \dots, x_n$) สามารถเขียนในรูปทั่วไปได้เป็น:
+        </p>
+        <div class="bg-indigo-50/50 p-4 sm:p-6 rounded-xl border border-indigo-100 text-center shadow-inner overflow-x-auto">
+          \[
+          \begin{aligned}
+          a_{11}x_1 + a_{12}x_2 + \cdots + a_{1n}x_n &= b_1 \\
+          a_{21}x_1 + a_{22}x_2 + \cdots + a_{2n}x_n &= b_2 \\
+          &\;\;\vdots \\
+          a_{m1}x_1 + a_{m2}x_2 + \cdots + a_{mn}x_n &= b_m
+          \end{aligned}
+          \]
+        </div>
+      </div>
+
+      <!-- รูปเมทริกซ์ -->
+      <div class="space-y-3 pt-2">
+        <h3 class="text-lg font-semibold text-slate-800">2.2 การเขียนในรูปเมทริกซ์มาตรฐาน (Matrix Equation)</h3>
+        <p class="text-slate-600 leading-relaxed text-sm sm:text-base">
+          เราสามารถย่อระบบสมการข้างต้นให้อยู่ในรูปของสมการเมทริกซ์ที่กะทัดรัดและสะดวกต่อการคำนวณ:
+        </p>
+        <div class="bg-slate-900 text-white p-4 sm:p-6 rounded-xl shadow-md text-center">
+          <div class="text-lg sm:text-xl text-amber-300 font-mono">
+            \[ A\mathbf{x} = \mathbf{b} \]
+          </div>
+          <div class="mt-3 text-xs sm:text-sm text-slate-300">
+            \[
+            \begin{bmatrix}
+            a_{11} & a_{12} & \cdots & a_{1n} \\
+            a_{21} & a_{22} & \cdots & a_{2n} \\
+            \vdots & \vdots & \ddots & \vdots \\
+            a_{m1} & a_{m2} & \cdots & a_{mn}
+            \end{bmatrix}
+            \begin{bmatrix}
+            x_1 \\ x_2 \\ \vdots \\ x_n
+            \end{bmatrix}
+            =
+            \begin{bmatrix}
+            b_1 \\ b_2 \\ \vdots \\ b_m
+            \end{bmatrix}
+            \]
+          </div>
+        </div>
+
+        <!-- แจกแจงองค์ประกอบ 3 ชิ้น -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-3">
+          <div class="p-4 rounded-xl bg-slate-50 border border-slate-200">
+            <span class="inline-block px-2.5 py-0.5 rounded bg-indigo-100 text-indigo-800 text-xs font-bold mb-2">เมทริกซ์สัมประสิทธิ์ (A)</span>
+            <p class="text-sm text-slate-700"><strong>$A \in \mathbb{R}^{m \times n}$</strong> คือ เมทริกซ์ขนาด $m \times n$ ที่บรรจุสัมประสิทธิ์ $a_{ij}$ หน้าตัวแปรทั้งหมด</p>
+          </div>
+          <div class="p-4 rounded-xl bg-slate-50 border border-slate-200">
+            <span class="inline-block px-2.5 py-0.5 rounded bg-emerald-100 text-emerald-800 text-xs font-bold mb-2">เวกเตอร์ตัวแปร (x)</span>
+            <p class="text-sm text-slate-700"><strong>$\mathbf{x} \in \mathbb{R}^{n \times 1}$</strong> คือ เวกเตอร์หลักของตัวแปรที่ไม่ทราบค่า ($x_1, x_2, \dots, x_n$)</p>
+          </div>
+          <div class="p-4 rounded-xl bg-slate-50 border border-slate-200">
+            <span class="inline-block px-2.5 py-0.5 rounded bg-amber-100 text-amber-800 text-xs font-bold mb-2">เวกเตอร์ค่าคงตัว (b)</span>
+            <p class="text-sm text-slate-700"><strong>$\mathbf{b} \in \mathbb{R}^{m \times 1}$</strong> คือ เวกเตอร์หลักของค่าคงตัวทางขวามือของเครื่องหมายเท่ากับ</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- ข้อควรระวังและการจำแนก -->
+      <div class="space-y-4 pt-4 border-t border-slate-100">
+        <h3 class="text-lg font-semibold text-slate-800 flex items-center gap-2">
+          <span class="text-rose-500">⚠️</span> ข้อควรระวัง: เชิงเส้น (Linear) vs ไม่เป็นเชิงเส้น (Non-linear)
+        </h3>
+        <p class="text-slate-600 text-sm sm:text-base leading-relaxed">
+          ในสมการเชิงเส้น ตัวแปรแต่ละตัวจะต้องมี<strong>เลขชี้กำลังเป็น 1 เท่านั้น</strong> และ<strong>ต้องไม่มีการคูณกันระหว่างตัวแปร</strong> หรือปรากฏอยู่ภายในฟังก์ชันอดิศัย (Transcendental functions) เช่น ตรีโกณมิติ ลอการิทึม หรือเอกซ์โพเนนเชียล
+        </p>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <!-- เชิงเส้น -->
+          <div class="p-4 rounded-xl bg-emerald-50/70 border border-emerald-200">
+            <div class="flex items-center gap-2 text-emerald-800 font-bold mb-2">
+              <svg class="w-5 h-5 text-emerald-600" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>
+              <span>สมการเชิงเส้น (Linear Equations)</span>
+            </div>
+            <ul class="text-sm text-slate-700 space-y-2 list-disc list-inside">
+              <li>$3x_1 + 2x_2 = 5$ <span class="text-xs text-slate-500">(เลขชี้กำลัง 1, สัมประสิทธิ์เป็นค่าคงตัว)</span></li>
+              <li>$\sqrt{3}x - \pi y + \frac{1}{2}z = 0$ <span class="text-xs text-slate-500">(ค่าคงตัวเป็นอตรรกยะได้)</span></li>
+              <li>$x_1 - 4x_2 + x_3 - 9x_4 = 12$</li>
+            </ul>
+          </div>
+          <!-- ไม่เป็นเชิงเส้น -->
+          <div class="p-4 rounded-xl bg-rose-50/70 border border-rose-200">
+            <div class="flex items-center gap-2 text-rose-800 font-bold mb-2">
+              <svg class="w-5 h-5 text-rose-600" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"></path></svg>
+              <span>สมการไม่เป็นเชิงเส้น (Non-linear)</span>
+            </div>
+            <ul class="text-sm text-slate-700 space-y-2 list-disc list-inside">
+              <li>$xy = 5$ <span class="text-xs text-rose-700 font-medium">(มีพจน์คูณข้ามตัวแปร $x \cdot y$)</span></li>
+              <li>$x^2 + y = 3$ <span class="text-xs text-rose-700 font-medium">(ตัวแปรยกกำลังมากกว่าหนึ่ง)</span></li>
+              <li>$\sin(x) + 2y = 1$ หรือ $e^x + y = 4$ <span class="text-xs text-rose-700 font-medium">(ตัวแปรอยู่ในฟังก์ชัน)</span></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3. แบบจำลองโต้ตอบ -->
+    <section class="bg-white rounded-2xl p-6 sm:p-8 shadow-sm border border-slate-200/80 space-y-6">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-100 pb-3">
+        <div class="flex items-center gap-3">
+          <div class="w-8 h-8 rounded-lg bg-indigo-100 text-indigo-700 flex items-center justify-center font-bold text-lg">
+            3
+          </div>
+          <div>
+            <h2 class="text-xl sm:text-2xl font-bold text-slate-900">แบบจำลองโต้ตอบ (Interactive Simulator)</h2>
+            <p class="text-xs sm:text-sm text-slate-500">ทดลองปรับค่าสัมประสิทธิ์และค่าคงตัวเพื่อดูการแปลงรูปและผลลัพธ์แบบทันที</p>
+          </div>
+        </div>
+        <button id="reset-sim-btn" class="self-start sm:self-auto text-xs px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium transition-colors">
+          🔄 คืนค่าเริ่มต้น
+        </button>
+      </div>
+
+      <!-- Controls Panel -->
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 bg-slate-50 p-4 sm:p-6 rounded-2xl border border-slate-200">
+        <!-- สมการที่ 1 -->
+        <div class="space-y-3 bg-white p-4 rounded-xl border border-slate-200/80 shadow-sm">
+          <div class="flex items-center justify-between">
+            <span class="text-sm font-bold text-indigo-800">สมการที่ (1): $a_1x + b_1y = c_1$</span>
+            <span id="eq1-preview" class="text-xs font-mono text-slate-500 font-medium"></span>
+          </div>
+          <div class="grid grid-cols-3 gap-2">
+            <div>
+              <label class="block text-xs text-slate-500 mb-1">สัมประสิทธิ์ $a_1$</label>
+              <input type="number" id="input-a1" value="2" step="0.5" class="w-full px-2.5 py-1.5 text-center text-sm font-semibold rounded-lg border border-slate-300 focus:ring-2 focus:ring-indigo-400 focus:outline-none">
+            </div>
+            <div>
+              <label class="block text-xs text-slate-500 mb-1">สัมประสิทธิ์ $b_1$</label>
+              <input type="number" id="input-b1" value="1" step="0.5" class="w-full px-2.5 py-1.5 text-center text-sm font-semibold rounded-lg border border-slate-300 focus:ring-2 focus:ring-indigo-400 focus:outline-none">
+            </div>
+            <div>
+              <label class="block text-xs text-slate-500 mb-1">ค่าคงตัว $c_1$</label>
+              <input type="number" id="input-c1" value="5" step="0.5" class="w-full px-2.5 py-1.5 text-center text-sm font-semibold rounded-lg border border-indigo-300 bg-indigo-50/50 focus:ring-2 focus:ring-indigo-400 focus:outline-none">
+            </div>
+          </div>
+        </div>
+
+        <!-- สมการที่ 2 -->
+        <div class="space-y-3 bg-white p-4 rounded-xl border border-slate-200/80 shadow-sm">
+          <div class="flex items-center justify-between">
+            <span class="text-sm font-bold text-emerald-800">สมการที่ (2): $a_2x + b_2y = c_2$</span>
+            <span id="eq2-preview" class="text-xs font-mono text-slate-500 font-medium"></span>
+          </div>
+          <div class="grid grid-cols-3 gap-2">
+            <div>
+              <label class="block text-xs text-slate-500 mb-1">สัมประสิทธิ์ $a_2$</label>
+              <input type="number" id="input-a2" value="1" step="0.5" class="w-full px-2.5 py-1.5 text-center text-sm font-semibold rounded-lg border border-slate-300 focus:ring-2 focus:ring-indigo-400 focus:outline-none">
+            </div>
+            <div>
+              <label class="block text-xs text-slate-500 mb-1">สัมประสิทธิ์ $b_2$</label>
+              <input type="number" id="input-b2" value="-1" step="0.5" class="w-full px-2.5 py-1.5 text-center text-sm font-semibold rounded-lg border border-slate-300 focus:ring-2 focus:ring-indigo-400 focus:outline-none">
+            </div>
+            <div>
+              <label class="block text-xs text-slate-500 mb-1">ค่าคงตัว $c_2$</label>
+              <input type="number" id="input-c2" value="1" step="0.5" class="w-full px-2.5 py-1.5 text-center text-sm font-semibold rounded-lg border border-emerald-300 bg-emerald-50/50 focus:ring-2 focus:ring-indigo-400 focus:outline-none">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Real-time Visual Output: 3 Representations -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <!-- 1) รูปสมการมาตรฐาน -->
+        <div class="p-4 rounded-xl bg-slate-50 border border-slate-200 flex flex-col justify-between">
+          <div class="text-xs font-bold uppercase tracking-wider text-slate-500 mb-2">1) รูปสมการมาตรฐาน</div>
+          <div id="math-equations-view" class="py-2 text-center text-base min-h-[4rem] flex items-center justify-center"></div>
+          <div class="text-[11px] text-slate-400 text-center">ระบบ 2 สมการ 2 ตัวแปร ($x, y$)</div>
+        </div>
+
+        <!-- 2) รูปเมทริกซ์ Ax = b & Augmented Matrix -->
+        <div class="p-4 rounded-xl bg-indigo-50/50 border border-indigo-200 flex flex-col justify-between">
+          <div class="text-xs font-bold uppercase tracking-wider text-indigo-700 mb-2">2) รูปแบบเมทริกซ์ $A\mathbf{x} = \mathbf{b}$</div>
+          <div id="math-matrix-view" class="py-2 text-center text-sm min-h-[4rem] flex items-center justify-center"></div>
+          <div id="math-augmented-view" class="text-xs text-indigo-800/80 text-center border-t border-indigo-100 pt-2 mt-1"></div>
+        </div>
+
+        <!-- 3) การวิเคราะห์คำตอบและ Determinant -->
+        <div class="p-4 rounded-xl bg-slate-900 text-white flex flex-col justify-between">
+          <div class="text-xs font-bold uppercase tracking-wider text-amber-400 mb-2">3) สถานะคำตอบของระบบ</div>
+          <div id="solution-status-view" class="py-2 text-center">
+            <!-- Dynamically populated -->
+          </div>
+          <div id="det-value-view" class="text-xs text-slate-400 text-center border-t border-slate-800 pt-2 font-mono"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 4. คำถามนำเพื่อค้นพบ -->
+    <section class="bg-white rounded-2xl p-6 sm:p-8 shadow-sm border border-slate-200/80 space-y-4">
+      <div class="flex items-center gap-3 border-b border-slate-100 pb-3">
+        <div class="w-8 h-8 rounded-lg bg-indigo-100 text-indigo-700 flex items-center justify-center font-bold text-lg">
+          4
+        </div>
+        <div>
+          <h2 class="text-xl sm:text-2xl font-bold text-slate-900">คำถามนำเพื่อค้นพบ (Inquiry Questions)</h2>
+          <p class="text-xs sm:text-sm text-slate-500">คลิกที่คำถามเพื่อดูแนวคิดและคำอธิบายเชิงลึก</p>
+        </div>
+      </div>
+
+      <div class="space-y-3">
+        <!-- Question 1 -->
+        <div class="border border-slate-200 rounded-xl overflow-hidden transition-all duration-200">
+          <button onclick="toggleAccordion('disc-1')" class="w-full text-left p-4 sm:p-5 bg-slate-50/70 hover:bg-slate-100/80 flex items-center justify-between gap-4 font-semibold text-slate-800">
+            <span class="flex items-center gap-2">
+              <span class="text-indigo-600 font-bold">Q1:</span>
+              เหตุใด $3x + 2y = 5$ จึงเป็นสมการเชิงเส้น แต่ $xy = 5$ ไม่เป็นสมการเชิงเส้นในตัวแปร $x, y$?
+            </span>
+            <span id="disc-1-icon" class="text-slate-400 transition-transform duration-200">▼</span>
+          </button>
+          <div id="disc-1" class="hidden p-5 bg-white border-t border-slate-200 text-slate-600 text-sm sm:text-base space-y-3 leading-relaxed">
+            <p>
+              <strong>คำอธิบาย:</strong> ตามนิยามทางคณิตศาสตร์ สมการเชิงเส้นในตัวแปร $x_1, x_2, \dots, x_n$ คือสมการที่อยู่ในรูป
+              \[ c_1x_1 + c_2x_2 + \cdots + c_nx_n = b \]
+              โดยที่ $c_i$ และ $b$ เป็นค่าคงตัว
+            </p>
+            <ul class="list-disc list-inside space-y-1.5 pl-2">
+              <li>
+                สำหรับ <strong>$3x + 2y = 5$</strong>: ตัวแปร $x$ และ $y$ ต่างมีดีกรี (เลขชี้กำลัง) เป็น $1$ และอยู่คนละพจน์แยกจากการบวก จึงเป็นสมการเชิงเส้น (ในทางเรขาคณิตคือเส้นตรงในระนาบ 2 มิติ)
+              </li>
+              <li>
+                สำหรับ <strong>$xy = 5$</strong>: เป็นพจน์ที่มีการนำตัวแปร $x$ มาคูณกับ $y$ ทำให้พจน์นี้มี<strong>ดีกรีรวมเท่ากับ $1 + 1 = 2$</strong> ซึ่งขัดต่อนิยามของความเชิงเส้น (ในทางเรขาคณิตกราฟนี้คือไฮเพอร์โบลา ไม่ใช่เส้นตรง)
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- Question 2 -->
+        <div class="border border-slate-200 rounded-xl overflow-hidden transition-all duration-200">
+          <button onclick="toggleAccordion('disc-2')" class="w-full text-left p-4 sm:p-5 bg-slate-50/70 hover:bg-slate-100/80 flex items-center justify-between gap-4 font-semibold text-slate-800">
+            <span class="flex items-center gap-2">
+              <span class="text-indigo-600 font-bold">Q2:</span>
+              ระบบที่มี 3 สมการและ 2 ตัวแปร จำเป็นต้องมีคำตอบหรือไม่?
+            </span>
+            <span id="disc-2-icon" class="text-slate-400 transition-transform duration-200">▼</span>
+          </button>
+          <div id="disc-2" class="hidden p-5 bg-white border-t border-slate-200 text-slate-600 text-sm sm:text-base space-y-3 leading-relaxed">
+            <p>
+              <strong>คำตอบ: ไม่จำเป็นต้องมีคำตอบ</strong> (ระบบอาจมีคำตอบเดียว, มีคำตอบนับไม่ถ้วน, หรือไม่มีคำตอบเลยก็ได้)
+            </p>
+            <p>
+              <strong>การมองในเชิงเรขาคณิต:</strong> ในระบบ 2 ตัวแปร แต่ละสมการแสดงถึง<strong>เส้นตรงหนึ่งเส้นบนระนาบ $xy$</strong>:
+            </p>
+            <ul class="list-disc list-inside space-y-1 pl-2">
+              <li><strong>มี 3 สมการ</strong> หมายถึงมีเส้นตรง 3 เส้นบนระนาบเดียวกัน</li>
+              <li>ระบบจะมีคำตอบก็ต่อเมื่อ <em>เส้นตรงทั้งสามเส้นตัดกันที่จุดเดียวกันพอดี</em> (Concurrent lines)</li>
+              <li>ในกรณีทั่วไป เส้นตรง 3 เส้นมักจะตัดกันเป็นรูปสามเหลี่ยม (ไม่มีจุดร่วมของทั้งสามเส้นพร้อมกัน) หรือบางเส้นขนานกัน จึงทำให้ระบบ<strong>ไม่มีคำตอบ (Inconsistent)</strong> เป็นส่วนใหญ่</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 5. แบบฝึกหัดสำหรับนักศึกษา -->
+    <section class="bg-white rounded-2xl p-6 sm:p-8 shadow-sm border border-slate-200/80 space-y-6">
+      <div class="flex items-center gap-3 border-b border-slate-100 pb-3">
+        <div class="w-8 h-8 rounded-lg bg-indigo-100 text-indigo-700 flex items-center justify-center font-bold text-lg">
+          5
+        </div>
+        <h2 class="text-xl sm:text-2xl font-bold text-slate-900">แบบฝึกหัดสำหรับนักศึกษา (Exercises)</h2>
+      </div>
+
+      <!-- Exercise 1 -->
+      <div class="p-5 rounded-xl bg-slate-50 border border-slate-200 space-y-4">
+        <div class="flex items-start justify-between gap-2">
+          <div>
+            <span class="inline-block px-2.5 py-0.5 rounded bg-indigo-100 text-indigo-800 text-xs font-bold mb-1">แบบฝึกหัดที่ 1</span>
+            <h3 class="text-base sm:text-lg font-bold text-slate-900">การเขียนระบบสมการในรูป $A\mathbf{x} = \mathbf{b}$</h3>
+          </div>
+        </div>
+        <p class="text-slate-700 text-sm sm:text-base">
+          จงเขียนระบบสมการ 3 สมการ 4 ตัวแปรต่อไปนี้ให้อยู่ในรูปเมทริกซ์ $A\mathbf{x} = \mathbf{b}$:
+        </p>
+        <div class="bg-white p-4 rounded-lg border border-slate-200 overflow-x-auto text-sm sm:text-base font-mono">
+          \[
+          \begin{aligned}
+          2x_1 - 3x_2 + x_3 - 5x_4 &= 7 \\
+          x_1 + 4x_3 + 2x_4 &= -1 \\
+          -x_2 + 6x_3 - x_4 &= 0
+          \end{aligned}
+          \]
+        </div>
+        
+        <button onclick="toggleAccordion('ex-1-sol')" class="inline-flex items-center gap-1.5 text-xs sm:text-sm font-semibold text-indigo-600 hover:text-indigo-800 transition-colors">
+          <span id="ex-1-sol-btn-text">👁️ กดเพื่อดูแนวคิดและเฉลย</span>
+        </button>
+
+        <div id="ex-1-sol" class="hidden p-4 rounded-lg bg-white border border-indigo-200 space-y-3 text-slate-700 text-sm sm:text-base">
+          <p class="font-semibold text-indigo-900">วิธีทำและเฉลย:</p>
+          <p class="text-sm">สังเกตว่าพจน์ที่หายไปมีสัมประสิทธิ์เป็น 0 (เช่น สมการที่ 2 ไม่มี $x_2$ ดังนั้นสัมประสิทธิ์คือ $0$ และสมการที่ 3 ไม่มี $x_1$ สัมประสิทธิ์คือ $0$)</p>
+          <div class="overflow-x-auto py-2 text-center">
+            \[
+            \underbrace{\begin{bmatrix}
+            2 & -3 & 1 & -5 \\
+            1 & 0 & 4 & 2 \\
+            0 & -1 & 6 & -1
+            \end{bmatrix}}_{A \,(3 \times 4)}
+            \underbrace{\begin{bmatrix}
+            x_1 \\ x_2 \\ x_3 \\ x_4
+            \end{bmatrix}}_{\mathbf{x} \,(4 \times 1)}
+            =
+            \underbrace{\begin{bmatrix}
+            7 \\ -1 \\ 0
+            \end{bmatrix}}_{\mathbf{b} \,(3 \times 1)}
+            \]
+          </div>
+        </div>
+      </div>
+
+      <!-- Exercise 2 -->
+      <div class="p-5 rounded-xl bg-slate-50 border border-slate-200 space-y-4">
+        <div>
+          <span class="inline-block px-2.5 py-0.5 rounded bg-indigo-100 text-indigo-800 text-xs font-bold mb-1">แบบฝึกหัดที่ 2</span>
+          <h3 class="text-base sm:text-lg font-bold text-slate-900">จำแนกระบบสมการที่กำหนดว่าเป็นเชิงเส้นหรือไม่ พร้อมให้เหตุผล</h3>
+        </div>
+        <p class="text-slate-700 text-sm sm:text-base">
+          พิจารณาแต่ละระบบสมการด้านล่าง แล้วตรวจสอบความเข้าใจ:
+        </p>
+
+        <!-- Sub questions -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <!-- Item A -->
+          <div class="bg-white p-4 rounded-lg border border-slate-200 space-y-3">
+            <div class="font-mono text-sm font-semibold text-slate-800">
+              ข้อ 2.1)
+              \[
+              \begin{aligned}
+              x_1 + 5x_2 &= 9 \\
+              \sqrt{2}x_1 - 4x_2 &= 11
+              \end{aligned}
+              \]
+            </div>
+            <button onclick="toggleAccordion('ex-2a-sol')" class="text-xs font-semibold text-indigo-600 hover:text-indigo-800">
+              กดดูเฉลย 2.1
+            </button>
+            <div id="ex-2a-sol" class="hidden text-xs sm:text-sm text-slate-600 pt-2 border-t border-slate-100">
+              <span class="inline-block px-2 py-0.5 rounded bg-emerald-100 text-emerald-800 font-bold mb-1">เป็นระบบเชิงเส้น</span>
+              <p>เพราะตัวแปร $x_1, x_2$ ทุกตัวยกกำลังหนึ่ง และค่า $\sqrt{2}$ เป็นเพียงสัมประสิทธิ์ค่าคงตัวที่เป็นอตรรกยะ ซึ่งเป็นจำนวนจริงที่อนุญาตในระบบสมการเชิงเส้น</p>
+            </div>
+          </div>
+
+          <!-- Item B -->
+          <div class="bg-white p-4 rounded-lg border border-slate-200 space-y-3">
+            <div class="font-mono text-sm font-semibold text-slate-800">
+              ข้อ 2.2)
+              \[
+              \begin{aligned}
+              x_1 + 3x_2 - x_1x_3 &= 0 \\
+              2x_2 + 4x_3 &= 8
+              \end{aligned}
+              \]
+            </div>
+            <button onclick="toggleAccordion('ex-2b-sol')" class="text-xs font-semibold text-indigo-600 hover:text-indigo-800">
+              กดดูเฉลย 2.2
+            </button>
+            <div id="ex-2b-sol" class="hidden text-xs sm:text-sm text-slate-600 pt-2 border-t border-slate-100">
+              <span class="inline-block px-2 py-0.5 rounded bg-rose-100 text-rose-800 font-bold mb-1">ไม่เป็นระบบเชิงเส้น</span>
+              <p>เนื่องจากในสมการแรกมีพจน์ผลคูณของตัวแปรคือ $x_1x_3$ ซึ่งมีระดับขั้นรวม (degree) เท่ากับ 2 ทำให้สมการนี้ไม่เป็นไปตามนิยามของสมการเชิงเส้น</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Footer Summary -->
+    <footer class="text-center text-xs sm:text-sm text-slate-500 py-4 border-t border-slate-200">
+      เอกสารการเรียนรู้แบบตอบสนอง เรื่องที่ 1: ความหมายและรูปแบบของระบบสมการเชิงเส้น • พัฒนาเพื่อการศึกษา
+    </footer>
+
+  </main>
+
+  <!-- Interactive Simulator & KaTeX Helper Scripts -->
+  <script>
+    // Accordion Toggle Utility
+    function toggleAccordion(id) {
+      const el = document.getElementById(id);
+      const icon = document.getElementById(id + '-icon');
+      if (el) {
+        el.classList.toggle('hidden');
+        if (icon) {
+          icon.style.transform = el.classList.contains('hidden') ? 'rotate(0deg)' : 'rotate(180deg)';
+        }
+      }
+    }
+
+    // Interactive Simulator Logic
+    function updateSimulator() {
+      const a1 = parseFloat(document.getElementById('input-a1').value) || 0;
+      const b1 = parseFloat(document.getElementById('input-b1').value) || 0;
+      const c1 = parseFloat(document.getElementById('input-c1').value) || 0;
+
+      const a2 = parseFloat(document.getElementById('input-a2').value) || 0;
+      const b2 = parseFloat(document.getElementById('input-b2').value) || 0;
+      const c2 = parseFloat(document.getElementById('input-c2').value) || 0;
+
+      // Formatting helper
+      const formatEq = (a, b, c) => {
+        let termA = a === 1 ? 'x' : (a === -1 ? '-x' : `${a}x`);
+        let termB = b >= 0 ? `+ ${b === 1 ? 'y' : b + 'y'}` : `- ${Math.abs(b) === 1 ? 'y' : Math.abs(b) + 'y'}`;
+        return `${termA} ${termB} = ${c}`;
+      };
+
+      document.getElementById('eq1-preview').textContent = formatEq(a1, b1, c1);
+      document.getElementById('eq2-preview').textContent = formatEq(a2, b2, c2);
+
+      // Render Math Equations Form
+      const mathEqContainer = document.getElementById('math-equations-view');
+      const eqTex = `\\begin{aligned} ${a1}x ${b1 >= 0 ? '+' : ''}${b1}y &= ${c1} \\\\[3pt] ${a2}x ${b2 >= 0 ? '+' : ''}${b2}y &= ${c2} \\end{aligned}`;
+      katex.render(eqTex, mathEqContainer, { throwOnError: false });
+
+      // Render Matrix Form: A x = b
+      const mathMatrixContainer = document.getElementById('math-matrix-view');
+      const matrixTex = `\\begin{bmatrix} ${a1} & ${b1} \\\\ ${a2} & ${b2} \\end{bmatrix} \\begin{bmatrix} x \\\\ y \\end{bmatrix} = \\begin{bmatrix} ${c1} \\\\ ${c2} \\end{bmatrix}`;
+      katex.render(matrixTex, mathMatrixContainer, { throwOnError: false });
+
+      // Render Augmented Matrix [A | b]
+      const mathAugContainer = document.getElementById('math-augmented-view');
+      const augTex = `[A|\\mathbf{b}] = \\left[\\begin{array}{cc|c} ${a1} & ${b1} & ${c1} \\\\ ${a2} & ${b2} & ${c2} \\end{array}\\right]`;
+      katex.render(augTex, mathAugContainer, { throwOnError: false });
+
+      // Solve System (Cramer's Rule / Determinant)
+      const detA = (a1 * b2) - (a2 * b1);
+      const detX = (c1 * b2) - (c2 * b1);
+      const detY = (a1 * c2) - (a2 * c1);
+
+      const statusContainer = document.getElementById('solution-status-view');
+      const detContainer = document.getElementById('det-value-view');
+
+      detContainer.textContent = `det(A) = (${a1})(${b2}) - (${b1})(${a2}) = ${Number(detA.toFixed(4))}`;
+
+      if (Math.abs(detA) > 1e-7) {
+        const x = detX / detA;
+        const y = detY / detA;
+        const xStr = Number.isInteger(x) ? x : x.toFixed(2);
+        const yStr = Number.isInteger(y) ? y : y.toFixed(2);
+
+        statusContainer.innerHTML = `
+          <div class="inline-block px-2.5 py-1 rounded bg-emerald-500/20 text-emerald-300 font-semibold text-xs mb-1.5 border border-emerald-500/30">
+            ✓ มีคำตอบเดียว (Unique Solution)
+          </div>
+          <div class="font-mono text-base text-amber-300">
+            x = ${xStr}, \\quad y = ${yStr}
+          </div>
+        `;
+        // Re-render KaTeX in statusContainer
+        if (window.renderMathInElement) {
+          renderMathInElement(statusContainer, {
+            delimiters: [{left: "$", right: "$", display: false}]
+          });
+        }
+      } else {
+        // detA == 0
+        if (Math.abs(detX) < 1e-7 && Math.abs(detY) < 1e-7) {
+          statusContainer.innerHTML = `
+            <div class="inline-block px-2.5 py-1 rounded bg-blue-500/20 text-blue-300 font-semibold text-xs mb-1.5 border border-blue-500/30">
+              ∞ มีคำตอบนับไม่ถ้วน (Infinitely Many Solutions)
+            </div>
+            <p class="text-xs text-slate-300">สมการทั้งสองสอดคล้องกันและเป็นเส้นตรงทับกันสนิท (Dependent)</p>
+          `;
+        } else {
+          statusContainer.innerHTML = `
+            <div class="inline-block px-2.5 py-1 rounded bg-rose-500/20 text-rose-300 font-semibold text-xs mb-1.5 border border-rose-500/30">
+              ✕ ไม่มีคำตอบ (No Solution)
+            </div>
+            <p class="text-xs text-slate-300">เส้นตรงทั้งสองขนานกันโดยไม่ทับกัน (Inconsistent)</p>
+          `;
+        }
+      }
+    }
+
+    // Attach listeners
+    ['a1', 'b1', 'c1', 'a2', 'b2', 'c2'].forEach(id => {
+      document.getElementById('input-' + id).addEventListener('input', updateSimulator);
+    });
+
+    document.getElementById('reset-sim-btn').addEventListener('click', () => {
+      document.getElementById('input-a1').value = 2;
+      document.getElementById('input-b1').value = 1;
+      document.getElementById('input-c1').value = 5;
+      document.getElementById('input-a2').value = 1;
+      document.getElementById('input-b2').value = -1;
+      document.getElementById('input-c2').value = 1;
+      updateSimulator();
+    });
+
+    // Initialize KaTeX on page load
+    document.addEventListener("DOMContentLoaded", function() {
+      if (typeof renderMathInElement !== 'undefined') {
+        renderMathInElement(document.body, {
+          delimiters: [
+            {left: "$$", right: "$$", display: true},
+            {left: "\\[", right: "\\]", display: true},
+            {left: "$", right: "$", display: false},
+            {left: "\\(", right: "\\)", display: false}
+          ],
+          throwOnError: false
+        });
+      }
+      updateSimulator();
+    });
+  </script>
+</body>
+</html>
